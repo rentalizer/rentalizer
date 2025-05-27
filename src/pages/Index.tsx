@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Download, Calculator, TrendingUp, Search } from 'lucide-react';
 import { ResultsTable } from '@/components/ResultsTable';
+import { ApiKeyInput } from '@/components/ApiKeyInput';
 import { calculateMarketMetrics } from '@/utils/marketCalculations';
+import { fetchMarketData, ApiConfig } from '@/services/marketDataService';
 
 interface SubmarketData {
   submarket: string;
@@ -15,91 +18,43 @@ interface SubmarketData {
   multiple: number;
 }
 
-// Sample market data - in a real app, this would come from APIs
-const marketDatabase = {
-  'nashville': {
-    strData: [
-      { submarket: 'Downtown', revenue: 6794 },
-      { submarket: 'The Gulch', revenue: 6000 },
-      { submarket: 'East Nashville', revenue: 5200 },
-      { submarket: '12 South', revenue: 4800 },
-      { submarket: 'Midtown', revenue: 4640 },
-      { submarket: 'Music Row', revenue: 4200 },
-      { submarket: 'Germantown', revenue: 3800 }
-    ],
-    rentData: [
-      { submarket: 'Downtown', rent: 2513 },
-      { submarket: 'The Gulch', rent: 2456 },
-      { submarket: 'East Nashville', rent: 2307 },
-      { submarket: '12 South', rent: 2136 },
-      { submarket: 'Midtown', rent: 2272 },
-      { submarket: 'Music Row', rent: 2100 },
-      { submarket: 'Germantown', rent: 2200 }
-    ]
-  },
-  'miami': {
-    strData: [
-      { submarket: 'Brickell', revenue: 7200 },
-      { submarket: 'South Beach', revenue: 8500 },
-      { submarket: 'Downtown Miami', revenue: 6800 },
-      { submarket: 'Wynwood', revenue: 5400 },
-      { submarket: 'Coral Gables', revenue: 6200 }
-    ],
-    rentData: [
-      { submarket: 'Brickell', rent: 3200 },
-      { submarket: 'South Beach', rent: 3800 },
-      { submarket: 'Downtown Miami', rent: 2900 },
-      { submarket: 'Wynwood', rent: 2400 },
-      { submarket: 'Coral Gables', rent: 2800 }
-    ]
-  },
-  'austin': {
-    strData: [
-      { submarket: 'Downtown Austin', revenue: 6500 },
-      { submarket: 'South Austin', revenue: 5800 },
-      { submarket: 'East Austin', revenue: 5200 },
-      { submarket: 'West Austin', revenue: 4800 },
-      { submarket: 'North Austin', revenue: 4200 }
-    ],
-    rentData: [
-      { submarket: 'Downtown Austin', rent: 2800 },
-      { submarket: 'South Austin', rent: 2400 },
-      { submarket: 'East Austin', rent: 2200 },
-      { submarket: 'West Austin', rent: 2000 },
-      { submarket: 'North Austin', rent: 1900 }
-    ]
-  }
-};
-
 const Index = () => {
   const [city, setCity] = useState('');
   const [results, setResults] = useState<SubmarketData[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState('');
+  const [apiConfig, setApiConfig] = useState<ApiConfig>({});
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!city.trim()) return;
 
     setIsAnalyzing(true);
     setError('');
     
-    // Simulate API call delay
-    setTimeout(() => {
-      const cityKey = city.toLowerCase().trim();
-      const cityData = marketDatabase[cityKey as keyof typeof marketDatabase];
+    try {
+      console.log(`Analyzing ${city} with API config:`, { 
+        hasAirdnaKey: !!apiConfig.airdnaApiKey,
+        hasOpenaiKey: !!apiConfig.openaiApiKey 
+      });
       
-      if (cityData) {
-        const calculatedResults = calculateMarketMetrics(cityData.strData, cityData.rentData);
-        setResults(calculatedResults);
-        console.log(`Found data for ${city}:`, calculatedResults);
+      const marketData = await fetchMarketData(city, apiConfig);
+      const calculatedResults = calculateMarketMetrics(marketData.strData, marketData.rentData);
+      
+      setResults(calculatedResults);
+      console.log(`Analysis complete for ${city}:`, calculatedResults);
+      
+    } catch (error) {
+      console.error('Market analysis error:', error);
+      setResults([]);
+      
+      if (error instanceof Error) {
+        setError(error.message);
       } else {
-        setResults([]);
-        setError(`No data available for "${city}". Currently supported cities: Nashville, Miami, Austin`);
-        console.log(`No data found for: ${city}`);
+        setError(`Unable to analyze ${city}. Please check the city name or try again later.`);
       }
-      
+    } finally {
       setIsAnalyzing(false);
-    }, 1500);
+    }
   };
 
   const handleExport = () => {
@@ -124,6 +79,18 @@ const Index = () => {
     window.URL.revokeObjectURL(url);
   };
 
+  const getAnalysisStatusText = () => {
+    if (apiConfig.airdnaApiKey && apiConfig.openaiApiKey) {
+      return 'Fetching live AirDNA and AI rental data...';
+    } else if (apiConfig.openaiApiKey) {
+      return 'Using sample STR data and fetching AI rental data...';
+    } else if (apiConfig.airdnaApiKey) {
+      return 'Fetching live AirDNA data and using sample rental data...';
+    } else {
+      return 'Using sample market data...';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -140,8 +107,12 @@ const Index = () => {
             <Badge variant="outline">2BR/2BA Properties</Badge>
             <Badge variant="outline">Upscale Tier</Badge>
             <Badge variant="outline">Top 25% Performance</Badge>
+            <Badge variant="outline">API Ready</Badge>
           </div>
         </div>
+
+        {/* API Configuration */}
+        <ApiKeyInput onApiKeysChange={setApiConfig} />
 
         {/* City Analysis */}
         <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
@@ -160,7 +131,7 @@ const Index = () => {
                   type="text"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  placeholder="Enter city name (e.g., Nashville, Miami, Austin)"
+                  placeholder="Enter any US city name (e.g., Denver, Seattle, Atlanta)"
                   className="mt-2 text-lg"
                 />
                 {error && (
@@ -169,13 +140,19 @@ const Index = () => {
               </div>
 
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <h4 className="font-medium text-blue-900 mb-2">Analysis Process:</h4>
+                <h4 className="font-medium text-blue-900 mb-2">Current Analysis Mode:</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Fetches AirDNA data for 2BR/2BA upscale properties (past 24 months)</li>
-                  <li>• Applies +25% adjustment for top 25% performance</li>
-                  <li>• Sources median rent data from Rentometer</li>
-                  <li>• Filters for $4,000+ revenue and 2.0+ multiple criteria</li>
-                  <li>• Ranks by revenue-to-rent multiple</li>
+                  {apiConfig.airdnaApiKey ? (
+                    <li>• ✅ Live AirDNA data (2BR/2BA upscale properties, top 25% performance)</li>
+                  ) : (
+                    <li>• 📋 Sample STR data (for supported cities: Nashville, Miami, Austin)</li>
+                  )}
+                  {apiConfig.openaiApiKey ? (
+                    <li>• 🤖 AI-powered rental data research via OpenAI</li>
+                  ) : (
+                    <li>• 📋 Sample rental data (for supported cities only)</li>
+                  )}
+                  <li>• 🧮 Automated revenue-to-rent calculations and filtering (4k+ revenue, 2.0+ multiple)</li>
                 </ul>
               </div>
 
@@ -222,18 +199,18 @@ const Index = () => {
               
               <div className="mt-6 space-y-4">
                 <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                  <h4 className="font-medium text-green-900 mb-2">✅ Submarkets Meeting Criteria</h4>
+                  <h4 className="font-medium text-green-900 mb-2">✅ Analysis Complete</h4>
                   <p className="text-sm text-green-800">
-                    All listed submarkets meet your specified criteria and are strong candidates for STR investment.
+                    Found {results.length} submarkets meeting investment criteria for {city}.
                   </p>
                 </div>
 
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                  <h4 className="font-medium text-blue-900 mb-2">Notes:</h4>
+                  <h4 className="font-medium text-blue-900 mb-2">Data Sources:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• <strong>STR Revenue (Top 25%):</strong> Based on AirDNA data, top 25% performing 2BR/2BA Upscale STRs</li>
-                    <li>• <strong>Median Rent:</strong> Sourced from Rentometer, reflecting current median rents for 2-bedroom, 2-bath apartments</li>
-                    <li>• <strong>Revenue-to-Rent Multiple:</strong> Calculated by dividing STR revenue by median rent</li>
+                    <li>• <strong>STR Revenue:</strong> {apiConfig.airdnaApiKey ? 'Live AirDNA API data' : 'Sample data'} (2BR/2BA Upscale, Top 25%)</li>
+                    <li>• <strong>Rental Data:</strong> {apiConfig.openaiApiKey ? 'AI-powered research via OpenAI' : 'Sample data'}</li>
+                    <li>• <strong>Calculations:</strong> Automated filtering and revenue-to-rent multiples</li>
                   </ul>
                 </div>
               </div>
@@ -249,7 +226,9 @@ const Index = () => {
                 <div className="text-red-500 text-5xl">⚠️</div>
                 <p className="text-lg text-gray-600">{error}</p>
                 <p className="text-sm text-gray-500">
-                  Try entering one of the supported cities or check your spelling.
+                  {!apiConfig.airdnaApiKey && !apiConfig.openaiApiKey 
+                    ? "Add API keys above for any US city, or try: Nashville, Miami, Austin" 
+                    : "Please check the city name and try again"}
                 </p>
               </div>
             </CardContent>
@@ -262,7 +241,7 @@ const Index = () => {
               <div className="text-center space-y-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
                 <p className="text-lg text-gray-600">Analyzing {city} market data...</p>
-                <p className="text-sm text-gray-500">Fetching AirDNA revenue data and Rentometer rent data</p>
+                <p className="text-sm text-gray-500">{getAnalysisStatusText()}</p>
               </div>
             </CardContent>
           </Card>
