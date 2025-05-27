@@ -77,10 +77,8 @@ const Index = () => {
   const [results, setResults] = useState<SubmarketData[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  const availableCities = Object.keys(marketDatabase);
-
   const handleAnalyze = () => {
-    if (!city) return;
+    if (!city.trim()) return;
 
     setIsAnalyzing(true);
     
@@ -151,19 +149,15 @@ const Index = () => {
           <CardContent>
             <div className="space-y-6">
               <div>
-                <Label htmlFor="city" className="text-base font-medium">Select Target City</Label>
-                <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {availableCities.map((cityName) => (
-                    <Button
-                      key={cityName}
-                      variant={city === cityName ? "default" : "outline"}
-                      onClick={() => setCity(cityName)}
-                      className="justify-start"
-                    >
-                      {cityName}
-                    </Button>
-                  ))}
-                </div>
+                <Label htmlFor="city" className="text-base font-medium">Enter Target City</Label>
+                <Input
+                  id="city"
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Enter city name (e.g., Nashville, Miami, Austin)"
+                  className="mt-2 text-lg"
+                />
               </div>
 
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
@@ -180,7 +174,7 @@ const Index = () => {
               <div className="text-center">
                 <Button
                   onClick={handleAnalyze}
-                  disabled={!city || isAnalyzing}
+                  disabled={!city.trim() || isAnalyzing}
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200"
                 >
