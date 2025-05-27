@@ -23,6 +23,22 @@ const Index = () => {
   const [rentData, setRentData] = useState<Array<{submarket: string, rent: number}>>([]);
   const [results, setResults] = useState<SubmarketData[]>([]);
 
+  const handleStrDataChange = (data: Array<{submarket: string, revenue?: number, rent?: number}>) => {
+    const filteredData = data
+      .filter((item): item is {submarket: string, revenue: number} => 
+        item.revenue !== undefined && item.revenue > 0
+      );
+    setStrData(filteredData);
+  };
+
+  const handleRentDataChange = (data: Array<{submarket: string, revenue?: number, rent?: number}>) => {
+    const filteredData = data
+      .filter((item): item is {submarket: string, rent: number} => 
+        item.rent !== undefined && item.rent > 0
+      );
+    setRentData(filteredData);
+  };
+
   const handleCalculate = () => {
     if (strData.length === 0 || rentData.length === 0) {
       return;
@@ -113,7 +129,7 @@ const Index = () => {
             title="STR Revenue Data"
             description="Enter monthly STR revenue by submarket (will be automatically adjusted +25%)"
             placeholder="Revenue"
-            onDataChange={setStrData}
+            onDataChange={handleStrDataChange}
             icon="dollar-sign"
           />
           
@@ -121,7 +137,7 @@ const Index = () => {
             title="Median Rent Data"
             description="Enter median rent for 2BR/2BA apartments by submarket"
             placeholder="Rent"
-            onDataChange={setRentData}
+            onDataChange={handleRentDataChange}
             icon="home"
           />
         </div>
