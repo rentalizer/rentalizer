@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,7 +17,7 @@ interface SubmarketData {
 
 // Sample market data - in a real app, this would come from APIs
 const marketDatabase = {
-  'Nashville': {
+  'nashville': {
     strData: [
       { submarket: 'Downtown', revenue: 6794 },
       { submarket: 'The Gulch', revenue: 6000 },
@@ -38,7 +37,7 @@ const marketDatabase = {
       { submarket: 'Germantown', rent: 2200 }
     ]
   },
-  'Miami': {
+  'miami': {
     strData: [
       { submarket: 'Brickell', revenue: 7200 },
       { submarket: 'South Beach', revenue: 8500 },
@@ -54,7 +53,7 @@ const marketDatabase = {
       { submarket: 'Coral Gables', rent: 2800 }
     ]
   },
-  'Austin': {
+  'austin': {
     strData: [
       { submarket: 'Downtown Austin', revenue: 6500 },
       { submarket: 'South Austin', revenue: 5800 },
@@ -76,21 +75,27 @@ const Index = () => {
   const [city, setCity] = useState('');
   const [results, setResults] = useState<SubmarketData[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [error, setError] = useState('');
 
   const handleAnalyze = () => {
     if (!city.trim()) return;
 
     setIsAnalyzing(true);
+    setError('');
     
     // Simulate API call delay
     setTimeout(() => {
-      const cityData = marketDatabase[city as keyof typeof marketDatabase];
+      const cityKey = city.toLowerCase().trim();
+      const cityData = marketDatabase[cityKey as keyof typeof marketDatabase];
       
       if (cityData) {
         const calculatedResults = calculateMarketMetrics(cityData.strData, cityData.rentData);
         setResults(calculatedResults);
+        console.log(`Found data for ${city}:`, calculatedResults);
       } else {
         setResults([]);
+        setError(`No data available for "${city}". Currently supported cities: Nashville, Miami, Austin`);
+        console.log(`No data found for: ${city}`);
       }
       
       setIsAnalyzing(false);
@@ -158,6 +163,9 @@ const Index = () => {
                   placeholder="Enter city name (e.g., Nashville, Miami, Austin)"
                   className="mt-2 text-lg"
                 />
+                {error && (
+                  <p className="mt-2 text-sm text-red-600">{error}</p>
+                )}
               </div>
 
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
@@ -228,6 +236,21 @@ const Index = () => {
                     <li>• <strong>Revenue-to-Rent Multiple:</strong> Calculated by dividing STR revenue by median rent</li>
                   </ul>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* No Results Message */}
+        {!isAnalyzing && error && (
+          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <CardContent className="py-12">
+              <div className="text-center space-y-4">
+                <div className="text-red-500 text-5xl">⚠️</div>
+                <p className="text-lg text-gray-600">{error}</p>
+                <p className="text-sm text-gray-500">
+                  Try entering one of the supported cities or check your spelling.
+                </p>
               </div>
             </CardContent>
           </Card>
