@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
@@ -59,15 +58,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     let mounted = true;
     
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change event:', event, 'Session exists:', !!session);
-      
+    const processSession = (session: Session | null) => {
       if (!mounted) return;
       
       if (session?.user) {
-        console.log('User found in session, setting up user profile...');
-        
+        console.log('Processing user session...');
         let subscriptionStatus: 'active' | 'inactive' | 'trial' = 'trial';
         if (session.user.email?.includes('premium') || session.user.email?.includes('pro')) {
           subscriptionStatus = 'active';
@@ -79,36 +74,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           subscription_status: subscriptionStatus
         });
       } else {
-        console.log('No user in session, clearing user state');
+        console.log('No user session found');
         setUser(null);
       }
       
-      // Always set loading to false after processing auth state
       console.log('Setting isLoading to false');
       setIsLoading(false);
+    };
+    
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state change:', event);
+      processSession(session);
     });
 
-    // Get initial session immediately
+    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session check:', !!session);
-      if (!mounted) return;
-      
-      if (session?.user) {
-        console.log('Initial session found, setting user');
-        let subscriptionStatus: 'active' | 'inactive' | 'trial' = 'trial';
-        if (session.user.email?.includes('premium') || session.user.email?.includes('pro')) {
-          subscriptionStatus = 'active';
-        }
-        
-        setUser({
-          id: session.user.id,
-          email: session.user.email || '',
-          subscription_status: subscriptionStatus
-        });
-      }
-      
-      console.log('Initial session check complete, setting isLoading to false');
-      setIsLoading(false);
+      console.log('Initial session loaded');
+      processSession(session);
     });
 
     return () => {
@@ -202,9 +185,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isSubscribed
   };
 
-  console.log('AuthProvider render - isLoading:', isLoading, 'user:', !!user);
+  console.log('AuthProvider render - isLoading:', isLoading, 'user exists:', !!user);
 
-  // Only show loading screen for a brief moment during initial load
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center justify-center">
