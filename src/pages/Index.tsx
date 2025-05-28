@@ -48,14 +48,14 @@ const Index = () => {
     setError('');
     
     try {
-      console.log(`Analyzing ${city} with API config:`, { 
+      console.log(`Rentalizing ${city} with API config:`, { 
         hasProfessionalKey: !!apiConfig.airdnaApiKey,
         hasAIKey: !!apiConfig.openaiApiKey 
       });
       
       // Show loading toast
       toast({
-        title: "🔍 Analyzing Market",
+        title: "🔍 Rentalizing Market",
         description: `Fetching ${apiConfig.airdnaApiKey ? 'live professional' : 'sample'} data for ${city}...`,
       });
       
@@ -66,14 +66,14 @@ const Index = () => {
       
       // Show success toast
       toast({
-        title: "✅ Analysis Complete",
+        title: "✅ Rentalization Complete",
         description: `Found ${calculatedResults.length} qualifying submarkets in ${city}`,
       });
       
-      console.log(`Analysis complete for ${city}:`, calculatedResults);
+      console.log(`Rentalization complete for ${city}:`, calculatedResults);
       
     } catch (error) {
-      console.error('Market analysis error:', error);
+      console.error('Market rentalization error:', error);
       setResults([]);
       
       let errorMessage = '';
@@ -81,13 +81,13 @@ const Index = () => {
         errorMessage = error.message;
         setError(error.message);
       } else {
-        errorMessage = `Unable to analyze ${city}. Please check the city name or try again later.`;
+        errorMessage = `Unable to rentalize ${city}. Please check the city name or try again later.`;
         setError(errorMessage);
       }
       
       // Show error toast with helpful guidance
       toast({
-        title: "❌ Analysis Failed",
+        title: "❌ Rentalization Failed",
         description: errorMessage,
         variant: "destructive",
       });
@@ -286,7 +286,7 @@ const Index = () => {
                   className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-3 text-lg font-medium shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 border border-cyan-500/20"
                 >
                   <Calculator className="h-5 w-5 mr-2" />
-                  {isAnalyzing ? 'Analyzing Market Data...' : 'Analyze Market'}
+                  {isAnalyzing ? 'Rentalizing Market Data...' : 'Rentalize Market'}
                 </Button>
               </div>
             </div>
@@ -417,7 +417,7 @@ const Index = () => {
                   <div className="animate-spin rounded-full h-12 w-12 border-2 border-transparent border-t-cyan-400 border-r-purple-400 mx-auto"></div>
                   <div className="absolute inset-0 rounded-full bg-cyan-400/10 blur-lg animate-pulse"></div>
                 </div>
-                <p className="text-lg text-gray-300">Analyzing {city} market data...</p>
+                <p className="text-lg text-gray-300">Rentalizing {city} market data...</p>
                 <p className="text-sm text-gray-500">{getAnalysisStatusText()}</p>
               </div>
             </CardContent>
