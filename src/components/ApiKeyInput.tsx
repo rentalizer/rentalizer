@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Key, Eye, EyeOff, Search } from 'lucide-react';
+import { Key, Eye, EyeOff, Search, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface ApiKeyInputProps {
   onApiKeysChange: (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => void;
@@ -73,22 +74,31 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
+          <Alert className="border-orange-200 bg-orange-50">
+            <AlertTriangle className="h-4 w-4 text-orange-600" />
+            <AlertDescription className="text-orange-800">
+              <strong>AirDNA API requires a subscription</strong> - The free tier doesn't include API access. 
+              If you don't have a subscription, the app will automatically use sample data for analysis.
+            </AlertDescription>
+          </Alert>
+
           <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <h4 className="font-medium text-blue-900 mb-2">Professional STR Market Intelligence:</h4>
+            <h4 className="font-medium text-blue-900 mb-2">How the app works:</h4>
             <div className="space-y-2 text-sm text-blue-800">
               <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">Sample Data</Badge>
+                <span>Works without any API keys - includes Nashville, Miami, Austin, Denver, Seattle</span>
+              </div>
+              <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs">AirDNA API</Badge>
-                <span>Professional STR data used by real estate investors (FREE tier available)</span>
+                <span>Professional STR data (requires paid subscription on RapidAPI)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs">OpenAI</Badge>
-                <span>AI-powered rental data research (~$5-20/month)</span>
+                <span>AI-powered rental data research for any city (~$5-20/month)</span>
               </div>
-              <p className="text-xs text-blue-600 mt-2">
-                Leave blank to use sample data. Keys are stored locally in your browser.
-              </p>
-              <p className="text-xs text-green-600 mt-1">
-                ✅ Now using AirDNA - professional short-term rental market data!
+              <p className="text-xs text-green-600 mt-2">
+                ✅ App automatically falls back to sample data if API keys don't work
               </p>
             </div>
           </div>
@@ -96,7 +106,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="airdna-key" className="text-sm font-medium">
-                AirDNA API Key (Professional STR Data)
+                AirDNA API Key (Optional - Requires Subscription)
               </Label>
               <Input
                 id="airdna-key"
@@ -107,7 +117,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 className="mt-1"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Get from: rapidapi.com/hub (search "AirDNA")
+                Get from: rapidapi.com/hub (search "AirDNA" - paid subscription required)
               </p>
             </div>
 
