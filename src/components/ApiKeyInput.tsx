@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Key, Eye, EyeOff } from 'lucide-react';
+import { Key, Eye, EyeOff, Search } from 'lucide-react';
 
 interface ApiKeyInputProps {
   onApiKeysChange: (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => void;
@@ -15,6 +15,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   const [airdnaKey, setAirdnaKey] = useState('');
   const [openaiKey, setOpenaiKey] = useState('');
   const [showKeys, setShowKeys] = useState(false);
+  const [showStoredKeys, setShowStoredKeys] = useState(false);
 
   const handleSaveKeys = () => {
     // Store in localStorage for session persistence
@@ -25,6 +26,25 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
       airdnaApiKey: airdnaKey || undefined,
       openaiApiKey: openaiKey || undefined
     });
+  };
+
+  const handleViewStoredKeys = () => {
+    const storedAirdna = localStorage.getItem('airdna_api_key') || 'Not set';
+    const storedOpenai = localStorage.getItem('openai_api_key') || 'Not set';
+    
+    console.log('=== STORED API KEYS ===');
+    console.log('AirDNA API Key:', storedAirdna);
+    console.log('OpenAI API Key:', storedOpenai);
+    console.log('=====================');
+    
+    setShowStoredKeys(!showStoredKeys);
+  };
+
+  const getStoredKeys = () => {
+    return {
+      airdna: localStorage.getItem('airdna_api_key') || 'Not set',
+      openai: localStorage.getItem('openai_api_key') || 'Not set'
+    };
   };
 
   // Load keys from localStorage on component mount
@@ -106,17 +126,50 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setShowKeys(!showKeys)}
-              className="flex items-center gap-2"
-            >
-              {showKeys ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              {showKeys ? 'Hide' : 'Show'} Keys
-            </Button>
+          {showStoredKeys && (
+            <div className="bg-gray-50 p-4 rounded-lg border">
+              <h4 className="font-medium text-gray-900 mb-2">Currently Stored Keys:</h4>
+              <div className="space-y-2 text-sm">
+                <div>
+                  <span className="font-medium">AirDNA:</span> 
+                  <span className="ml-2 font-mono text-xs">
+                    {getStoredKeys().airdna === 'Not set' ? 'Not set' : `${getStoredKeys().airdna.substring(0, 8)}...`}
+                  </span>
+                </div>
+                <div>
+                  <span className="font-medium">OpenAI:</span> 
+                  <span className="ml-2 font-mono text-xs">
+                    {getStoredKeys().openai === 'Not set' ? 'Not set' : `${getStoredKeys().openai.substring(0, 8)}...`}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowKeys(!showKeys)}
+                className="flex items-center gap-2"
+              >
+                {showKeys ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showKeys ? 'Hide' : 'Show'} Keys
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleViewStoredKeys}
+                className="flex items-center gap-2"
+              >
+                <Search className="h-4 w-4" />
+                {showStoredKeys ? 'Hide' : 'Find'} Stored Keys
+              </Button>
+            </div>
 
             <Button
               onClick={handleSaveKeys}
