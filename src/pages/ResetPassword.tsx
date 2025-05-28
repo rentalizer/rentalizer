@@ -21,17 +21,24 @@ export const ResetPassword = () => {
 
   useEffect(() => {
     const validateToken = async () => {
-      console.log('Validating reset token...');
+      console.log('🔐 Validating reset token...');
+      console.log('🔗 Current URL:', window.location.href);
       
       // Check if we have the required tokens in the URL
       const accessToken = searchParams.get('access_token');
       const refreshToken = searchParams.get('refresh_token');
       const type = searchParams.get('type');
       
-      console.log('URL params:', { accessToken: !!accessToken, refreshToken: !!refreshToken, type });
+      console.log('📋 URL params:', { 
+        accessToken: accessToken ? 'present' : 'missing', 
+        refreshToken: refreshToken ? 'present' : 'missing', 
+        type 
+      });
       
       if (accessToken && refreshToken && type === 'recovery') {
         try {
+          console.log('🔄 Setting session with tokens...');
+          
           // Set the session with the tokens from the URL
           const { data, error } = await supabase.auth.setSession({
             access_token: accessToken,
@@ -39,14 +46,15 @@ export const ResetPassword = () => {
           });
           
           if (error) {
-            console.error('Session error:', error);
+            console.error('❌ Session error:', error);
             throw error;
           }
           
-          console.log('Session set successfully:', !!data.session);
+          console.log('✅ Session set successfully:', !!data.session);
+          console.log('👤 User in session:', data.session?.user?.email);
           setIsValidToken(true);
         } catch (error) {
-          console.error('Token validation failed:', error);
+          console.error('💥 Token validation failed:', error);
           toast({
             title: "❌ Invalid Reset Link",
             description: "This password reset link is invalid or has expired.",
@@ -54,7 +62,8 @@ export const ResetPassword = () => {
           });
         }
       } else {
-        console.log('Missing required tokens or invalid type');
+        console.log('❌ Missing required tokens or invalid type');
+        console.log('Available URL params:', Object.fromEntries(searchParams.entries()));
         toast({
           title: "❌ Invalid Reset Link",
           description: "This password reset link is invalid or has expired.",
@@ -70,6 +79,8 @@ export const ResetPassword = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    console.log('🔐 Starting password update...');
     
     if (!password || !confirmPassword) {
       toast({
@@ -101,15 +112,18 @@ export const ResetPassword = () => {
     setIsSubmitting(true);
     
     try {
+      console.log('🔄 Updating user password...');
+      
       const { error } = await supabase.auth.updateUser({ 
         password: password 
       });
 
       if (error) {
+        console.error('❌ Password update error:', error);
         throw error;
       }
 
-      console.log('Password updated successfully');
+      console.log('✅ Password updated successfully');
       setPasswordReset(true);
       
       toast({
@@ -118,7 +132,7 @@ export const ResetPassword = () => {
       });
       
     } catch (error: any) {
-      console.error('Password reset error:', error);
+      console.error('💥 Password reset failed:', error);
       toast({
         title: "❌ Reset Failed",
         description: error.message || "Failed to reset password. Please try again.",
@@ -130,6 +144,7 @@ export const ResetPassword = () => {
   };
 
   const handleGoHome = () => {
+    console.log('🏠 Navigating to home and signing out...');
     // Sign out the user and redirect to home
     supabase.auth.signOut().then(() => {
       navigate('/');
@@ -142,6 +157,7 @@ export const ResetPassword = () => {
         <div className="text-center space-y-4">
           <div className="text-cyan-300 text-xl">Validating reset link...</div>
           <div className="text-gray-400 text-sm">Please wait while we verify your request.</div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
         </div>
       </div>
     );
@@ -156,7 +172,7 @@ export const ResetPassword = () => {
             <div>
               <h1 className="text-2xl font-bold text-cyan-300 mb-4">Invalid Reset Link</h1>
               <p className="text-gray-400 mb-6">
-                This password reset link is invalid or has expired. Please request a new one.
+                This password reset link is invalid or has expired. Please request a new one from the sign-in page.
               </p>
             </div>
             <Button 
