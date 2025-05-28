@@ -1,6 +1,9 @@
 
 import React from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TrendingUp, DollarSign, Star } from 'lucide-react';
 
 interface SubmarketData {
   submarket: string;
@@ -11,74 +14,94 @@ interface SubmarketData {
 
 interface ResultsTableProps {
   results: SubmarketData[];
+  city: string;
 }
 
-export const ResultsTable: React.FC<ResultsTableProps> = ({ results }) => {
-  if (results.length === 0) {
+export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city }) => {
+  const getScoreColor = (multiple: number) => {
+    if (multiple >= 3.0) return 'bg-green-500 text-white';
+    if (multiple >= 2.5) return 'bg-blue-500 text-white';
+    return 'bg-yellow-500 text-black';
+  };
+
+  const getScoreLabel = (multiple: number) => {
+    if (multiple >= 3.0) return 'Excellent';
+    if (multiple >= 2.5) return 'Very Good';
+    return 'Good';
+  };
+
+  if (!results || results.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-500">
-        <p className="text-lg">No submarkets meet the qualifying criteria</p>
-        <p className="text-sm mt-2">Submarkets must have $4,000+ revenue and 2.0+ revenue-to-rent multiple</p>
-      </div>
+      <Card className="w-full bg-gray-900/95 border-gray-700">
+        <CardContent className="p-8 text-center">
+          <p className="text-gray-400">No results to display</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-gray-50">
-            <TableHead className="font-semibold text-gray-900">Submarket</TableHead>
-            <TableHead className="font-semibold text-gray-900">STR Revenue (Top 25%)</TableHead>
-            <TableHead className="font-semibold text-gray-900">Median Rent</TableHead>
-            <TableHead className="font-semibold text-gray-900">Revenue-to-Rent Multiple</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {results.map((row, index) => (
-            <TableRow key={index} className="hover:bg-gray-50 transition-colors">
-              <TableCell className="font-medium text-gray-900">{row.submarket}</TableCell>
-              <TableCell className="text-green-600 font-semibold">
-                ${row.strRevenue.toLocaleString()}
-              </TableCell>
-              <TableCell className="text-gray-700">
-                ${row.medianRent.toLocaleString()}
-              </TableCell>
-              <TableCell className="font-semibold text-blue-600">
-                {row.multiple.toFixed(2)}x
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <h4 className="font-medium text-blue-900 mb-2">Summary Statistics:</h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div>
-            <span className="text-blue-700">Qualifying Markets:</span>
-            <div className="font-semibold text-blue-900">{results.length}</div>
-          </div>
-          <div>
-            <span className="text-blue-700">Avg Revenue:</span>
-            <div className="font-semibold text-blue-900">
-              ${Math.round(results.reduce((sum, r) => sum + r.strRevenue, 0) / results.length).toLocaleString()}
-            </div>
-          </div>
-          <div>
-            <span className="text-blue-700">Avg Rent:</span>
-            <div className="font-semibold text-blue-900">
-              ${Math.round(results.reduce((sum, r) => sum + r.medianRent, 0) / results.length).toLocaleString()}
-            </div>
-          </div>
-          <div>
-            <span className="text-blue-700">Avg Multiple:</span>
-            <div className="font-semibold text-blue-900">
-              {(results.reduce((sum, r) => sum + r.multiple, 0) / results.length).toFixed(2)}x
-            </div>
-          </div>
+    <Card className="w-full bg-gray-900/95 border-gray-700 shadow-2xl">
+      <CardHeader className="border-b border-gray-700">
+        <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
+          <TrendingUp className="h-6 w-6 text-cyan-400" />
+          {city} Market Analysis
+        </CardTitle>
+        <p className="text-gray-400">Revenue potential by submarket</p>
+      </CardHeader>
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-gray-700 hover:bg-gray-800/50">
+                <TableHead className="text-gray-300 font-semibold">Submarket</TableHead>
+                <TableHead className="text-gray-300 font-semibold">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-green-400" />
+                    STR Revenue
+                  </div>
+                </TableHead>
+                <TableHead className="text-gray-300 font-semibold">Median Rent</TableHead>
+                <TableHead className="text-gray-300 font-semibold">Revenue-to-Rent Multiple</TableHead>
+                <TableHead className="text-gray-300 font-semibold">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4 text-orange-400" />
+                    Rating
+                  </div>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {results.map((result, index) => (
+                <TableRow 
+                  key={index} 
+                  className="border-gray-700 hover:bg-gray-800/50 transition-colors"
+                >
+                  <TableCell className="font-medium text-white">
+                    {result.submarket}
+                  </TableCell>
+                  <TableCell className="text-green-400 font-semibold">
+                    ${result.strRevenue.toLocaleString()}
+                  </TableCell>
+                  <TableCell className="text-blue-400 font-semibold">
+                    ${result.medianRent.toLocaleString()}
+                  </TableCell>
+                  <TableCell className="text-purple-400 font-semibold">
+                    {result.multiple.toFixed(2)}x
+                  </TableCell>
+                  <TableCell>
+                    <Badge 
+                      className={`${getScoreColor(result.multiple)} font-semibold border-0`}
+                    >
+                      {getScoreLabel(result.multiple)}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
