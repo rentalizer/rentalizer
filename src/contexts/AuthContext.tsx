@@ -57,9 +57,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     console.log('AuthProvider initializing...');
     
+    let mounted = true;
+    
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state change event:', event, 'Session exists:', !!session);
+      
+      if (!mounted) return;
       
       if (session?.user) {
         console.log('User found in session, setting up user profile...');
@@ -80,11 +84,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       
       // Always set loading to false after processing auth state
+      console.log('Setting isLoading to false');
+      setIsLoading(false);
+    });
+
+    // Get initial session immediately
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', !!session);
+      if (!mounted) return;
+      
+      if (session?.user) {
+        console.log('Initial session found, setting user');
+        let subscriptionStatus: 'active' | 'inactive' | 'trial' = 'trial';
+        if (session.user.email?.includes('premium') || session.user.email?.includes('pro')) {
+          subscriptionStatus = 'active';
+        }
+        
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          subscription_status: subscriptionStatus
+        });
+      }
+      
+      console.log('Initial session check complete, setting isLoading to false');
       setIsLoading(false);
     });
 
     return () => {
       console.log('Cleaning up auth subscription');
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -172,6 +201,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signOut,
     isSubscribed
   };
+
+  console.log('AuthProvider render - isLoading:', isLoading, 'user:', !!user);
 
   // Only show loading screen for a brief moment during initial load
   if (isLoading) {
