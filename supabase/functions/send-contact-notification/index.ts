@@ -1,5 +1,8 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { Resend } from "npm:resend@2.0.0";
+
+const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,34 +25,40 @@ serve(async (req) => {
       timestamp: new Date().toISOString()
     })
 
-    // Here you would typically send an email notification
-    // For now, we'll just log it to the function logs
-    // You can add email service integration later (SendGrid, Resend, etc.)
-    
-    console.log('📋 Contact Details:')
-    console.log('Name:', name)
-    console.log('Email:', email)
-    console.log('Message:', message)
-    console.log('Received at:', new Date().toLocaleString())
+    // Send email notification using Resend
+    const emailResponse = await resend.emails.send({
+      from: "Rentalizer <notifications@istayusa.com>",
+      to: ["rich@istayusa.com"],
+      subject: `🔔 New Contact Message from ${name}`,
+      html: `
+        <h1>New Contact Message Received</h1>
+        <p>You have received a new contact message through Rentalizer!</p>
+        
+        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3>Contact Details:</h3>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Received:</strong> ${new Date().toLocaleString()}</p>
+        </div>
+        
+        <div style="background: #ffffff; padding: 20px; border-radius: 8px; border-left: 4px solid #0891b2;">
+          <h3>Message:</h3>
+          <p style="white-space: pre-wrap;">${message}</p>
+        </div>
+        
+        <p style="margin-top: 30px; color: #666;">
+          This notification was sent automatically from your Rentalizer contact form.
+        </p>
+      `,
+    });
 
-    // TODO: Add email notification service here
-    // Example with SendGrid or Resend:
-    // await sendEmail({
-    //   to: 'support@istayusa.com',
-    //   subject: `New Contact Message from ${name}`,
-    //   html: `
-    //     <h3>New Contact Message</h3>
-    //     <p><strong>From:</strong> ${name} (${email})</p>
-    //     <p><strong>Message:</strong></p>
-    //     <p>${message}</p>
-    //     <p><strong>Received:</strong> ${new Date().toLocaleString()}</p>
-    //   `
-    // })
+    console.log('📨 Email notification sent successfully:', emailResponse);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: 'Contact notification processed successfully' 
+        message: 'Contact notification sent successfully',
+        emailId: emailResponse.data?.id
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -62,7 +71,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: 'Failed to process contact notification' 
+        error: 'Failed to process contact notification',
+        details: error.message
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
