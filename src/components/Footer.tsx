@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { BarChart3, Mail, Globe, Twitter, Linkedin, Github } from 'lucide-react';
+import { ContactChat } from './ContactChat';
 
 export const Footer = () => {
   return (
@@ -73,17 +74,15 @@ export const Footer = () => {
             <h4 className="text-lg font-semibold text-cyan-300 mb-4">Support</h4>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
-                  Contact Us
-                </a>
+                <ContactChat />
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
+                <a href="/privacy-policy" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
                   Privacy Policy
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
+                <a href="/terms-of-service" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
                   Terms of Service
                 </a>
               </li>
@@ -94,7 +93,7 @@ export const Footer = () => {
         {/* Bottom Section */}
         <div className="mt-12 pt-8 border-t border-gray-700/50 flex flex-col md:flex-row justify-between items-center">
           <div className="text-gray-400 text-sm mb-4 md:mb-0">
-            © 2024 Rentalizer. All rights reserved. Built with AI-powered market intelligence.
+            © 2024 iStay USA LLC. All rights reserved. Built with AI-powered market intelligence.
           </div>
           <div className="flex items-center gap-6 text-sm">
             <span className="text-gray-400">Powered by</span>
