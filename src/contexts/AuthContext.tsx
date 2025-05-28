@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
@@ -57,7 +58,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Get initial session
     const getSession = async () => {
       console.log('Getting initial session...');
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('Error getting session:', error);
+      }
+      
       if (session?.user) {
         console.log('Found existing session for user:', session.user.email);
         await loadUserProfile(session.user);
@@ -177,8 +183,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (error) {
-        console.error('Sign in error:', error);
-        throw error;
+        console.error('Sign in error:', error.message, error);
+        throw new Error(error.message);
+      }
+
+      if (!data.user) {
+        console.error('No user returned from sign in');
+        throw new Error('Authentication failed - no user returned');
       }
 
       console.log('Sign in successful for:', email);
@@ -200,8 +211,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (error) {
-        console.error('Sign up error:', error);
-        throw error;
+        console.error('Sign up error:', error.message, error);
+        throw new Error(error.message);
+      }
+
+      if (!data.user) {
+        console.error('No user returned from sign up');
+        throw new Error('Sign up failed - no user returned');
       }
 
       console.log('Sign up successful for:', email);

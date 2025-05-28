@@ -30,14 +30,27 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form submitted:', { email, isSignUp });
+    
+    if (!email || !password) {
+      toast({
+        title: "❌ Missing Information",
+        description: "Please enter both email and password.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
       if (isSignUp) {
+        console.log('Attempting sign up...');
         await signUp(email, password);
         toast({
           title: "✅ Account Created",
           description: "Welcome to Rentalizer! You now have trial access.",
         });
       } else {
+        console.log('Attempting sign in...');
         await signIn(email, password);
         toast({
           title: "✅ Signed In",
@@ -47,10 +60,11 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
       setIsOpen(false);
       setEmail('');
       setPassword('');
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Authentication error:', error);
       toast({
         title: "❌ Authentication Failed",
-        description: "Please check your credentials and try again.",
+        description: error.message || "Please check your credentials and try again.",
         variant: "destructive",
       });
     }
