@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 import Index from "./pages/Index";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
                 <Index />
               </SubscriptionGate>
             } />
+            <Route path="/reset-password" element={<ResetPassword />} />
           </Routes>
         </AuthProvider>
       </BrowserRouter>
