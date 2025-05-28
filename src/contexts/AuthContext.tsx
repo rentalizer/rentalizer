@@ -143,20 +143,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await processSession(session);
     });
 
-    // Get initial session with timeout
+    // Get initial session with shorter timeout and better error handling
     console.log('🚀 Getting initial session...');
     const getInitialSession = async () => {
       try {
+        console.log('📡 Attempting to connect to Supabase...');
+        
+        // Test basic connectivity first
+        const startTime = Date.now();
         const { data: { session }, error } = await supabase.auth.getSession();
+        const endTime = Date.now();
+        
+        console.log(`📊 Session request took ${endTime - startTime}ms`);
+        
         if (error) {
           console.error('❌ Error getting initial session:', error);
+          console.error('❌ Error details:', error.message, error.status);
         } else {
-          console.log('📋 Initial session loaded');
+          console.log('📋 Initial session loaded successfully');
         }
         await processSession(session);
       } catch (error) {
         console.error('💥 Exception getting initial session:', error);
+        console.error('💥 Error type:', typeof error);
+        console.error('💥 Error message:', error instanceof Error ? error.message : 'Unknown error');
+        
         if (mounted) {
+          console.log('🚨 Forcing auth completion due to error');
           setIsLoading(false);
         }
       }
@@ -164,13 +177,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     getInitialSession();
 
-    // Safety timeout to prevent infinite loading
+    // Shorter timeout to prevent infinite loading - 5 seconds instead of 10
     timeoutId = setTimeout(() => {
       if (mounted && isLoading) {
-        console.warn('⏰ Auth initialization timeout - forcing completion');
+        console.warn('⏰ Auth initialization timeout after 5s - forcing completion');
+        console.warn('⏰ This suggests a network or configuration issue with Supabase');
         setIsLoading(false);
       }
-    }, 10000);
+    }, 5000);
 
     return () => {
       console.log('🧹 Cleaning up auth subscription');
@@ -271,7 +285,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center justify-center">
-        <div className="text-cyan-300 text-xl">Loading...</div>
+        <div className="text-center space-y-4">
+          <div className="text-cyan-300 text-xl">Loading...</div>
+          <div className="text-gray-400 text-sm">Connecting to authentication service...</div>
+          <div className="text-gray-500 text-xs">Check console for details if this takes too long</div>
+        </div>
       </div>
     );
   }
