@@ -40,6 +40,15 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
       });
       return;
     }
+
+    if (password.length < 6) {
+      toast({
+        title: "❌ Password Too Short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     try {
       if (isSignUp) {
@@ -133,8 +142,9 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={isSignUp ? "Create a password" : "Enter your password"}
+              placeholder={isSignUp ? "Create a password (min 6 characters)" : "Enter your password"}
               required
+              minLength={6}
               className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
             />
           </div>

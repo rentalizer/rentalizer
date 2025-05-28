@@ -58,19 +58,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Get initial session
     const getSession = async () => {
       console.log('Getting initial session...');
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error('Error getting session:', error);
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting session:', error);
+          setIsLoading(false);
+          return;
+        }
+        
+        if (session?.user) {
+          console.log('Found existing session for user:', session.user.email);
+          await loadUserProfile(session.user);
+        } else {
+          console.log('No existing session found');
+        }
+      } catch (error) {
+        console.error('Session initialization error:', error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      if (session?.user) {
-        console.log('Found existing session for user:', session.user.email);
-        await loadUserProfile(session.user);
-      } else {
-        console.log('No existing session found');
-      }
-      setIsLoading(false);
     };
 
     getSession();
@@ -78,12 +85,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.email);
-      if (session?.user) {
-        await loadUserProfile(session.user);
-      } else {
+      setIsLoading(true);
+      
+      try {
+        if (session?.user) {
+          await loadUserProfile(session.user);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Auth state change error:', error);
         setUser(null);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -93,6 +108,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       console.log('Loading profile for user:', supabaseUser.email);
       
+      // Determine subscription status based on email
+      let subscriptionStatus: 'active' | 'inactive' | 'trial' = 'trial';
+      if (supabaseUser.email?.includes('premium') || supabaseUser.email?.includes('pro')) {
+        subscriptionStatus = 'active';
+      }
+      
       // First try to get existing profile
       const { data: profile, error } = await supabase
         .from('user_profiles')
@@ -100,13 +121,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .eq('id', supabaseUser.id)
         .maybeSingle();
 
-      if (error) {
+      if (error && error.code !== 'PGRST116') {
         console.error('Error loading user profile:', error);
-        // Set user with default trial status if we can't load profile
+        // Set user with determined status if we can't load profile
         setUser({
           id: supabaseUser.id,
           email: supabaseUser.email || '',
-          subscription_status: 'trial'
+          subscription_status: subscriptionStatus
         });
         return;
       }
@@ -119,30 +140,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           .insert({
             id: supabaseUser.id,
             email: supabaseUser.email || '',
-            subscription_status: 'trial'
+            subscription_status: subscriptionStatus
           })
           .select('subscription_status')
           .single();
 
         if (insertError) {
           console.error('Error creating user profile:', insertError);
-          // Even if profile creation fails, set user with trial status
+          // Even if profile creation fails, set user with determined status
           setUser({
             id: supabaseUser.id,
             email: supabaseUser.email || '',
-            subscription_status: 'trial'
+            subscription_status: subscriptionStatus
           });
           return;
         }
 
         // Send notification for new user signup
         if (isNewUser && supabaseUser.email) {
-          sendNewUserNotification(supabaseUser.email, supabaseUser.id);
+          setTimeout(() => {
+            sendNewUserNotification(supabaseUser.email!, supabaseUser.id);
+          }, 1000);
         }
 
         const validStatus = ['active', 'inactive', 'trial'].includes(newProfile?.subscription_status) 
           ? newProfile.subscription_status as 'active' | 'inactive' | 'trial'
-          : 'trial';
+          : subscriptionStatus;
 
         setUser({
           id: supabaseUser.id,
@@ -154,7 +177,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         const validStatus = ['active', 'inactive', 'trial'].includes(profile.subscription_status) 
           ? profile.subscription_status as 'active' | 'inactive' | 'trial'
-          : 'trial';
+          : subscriptionStatus;
 
         setUser({
           id: supabaseUser.id,
@@ -226,7 +249,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (data.user && data.user.email) {
         setTimeout(() => {
           sendNewUserNotification(data.user!.email!, data.user!.id);
-        }, 2000); // Slight delay to ensure profile is created
+        }, 2000);
       }
     } catch (error) {
       console.error('Sign up error:', error);
@@ -238,11 +261,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     console.log('Signing out user');
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Sign out error:', error);
+      } else {
+        console.log('Sign out successful');
+        setUser(null);
+      }
+    } catch (error) {
       console.error('Sign out error:', error);
-    } else {
-      console.log('Sign out successful');
+    } finally {
+      setIsLoading(false);
     }
   };
 
