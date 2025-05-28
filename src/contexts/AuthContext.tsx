@@ -177,14 +177,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     getInitialSession();
 
-    // Shorter timeout to prevent infinite loading - 5 seconds instead of 10
+    // Reduced timeout to 3 seconds to prevent long loading
     timeoutId = setTimeout(() => {
       if (mounted && isLoading) {
-        console.warn('⏰ Auth initialization timeout after 5s - forcing completion');
+        console.warn('⏰ Auth initialization timeout after 3s - forcing completion');
         console.warn('⏰ This suggests a network or configuration issue with Supabase');
         setIsLoading(false);
       }
-    }, 5000);
+    }, 3000);
 
     return () => {
       console.log('🧹 Cleaning up auth subscription');
@@ -288,7 +288,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         <div className="text-center space-y-4">
           <div className="text-cyan-300 text-xl">Loading...</div>
           <div className="text-gray-400 text-sm">Connecting to authentication service...</div>
-          <div className="text-gray-500 text-xs">Check console for details if this takes too long</div>
+          <div className="text-gray-500 text-xs">This should only take a moment...</div>
+          <div className="mt-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
+          </div>
         </div>
       </div>
     );
