@@ -208,7 +208,7 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
         </Card>
       </div>
 
-      {/* SUBMARKET MARKERS WITH PROPER WHITE TEXT */}
+      {/* SUBMARKET MARKERS WITH WHITE TEXT */}
       {results.map((submarket, index) => {
         const position = getSubmarketPosition(index);
         
@@ -220,14 +220,16 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
             onClick={() => setSelectedSubmarket(submarket)}
           >
             <div className="relative group flex flex-col items-center">
-              {/* SUBMARKET NAME - PURE WHITE TEXT WITH STRONG SHADOW */}
-              <div className="mb-2 text-center bg-black/80 px-3 py-1 rounded-md border-2 border-white shadow-2xl">
-                <span className="text-white font-bold text-sm tracking-wide select-none" 
-                      style={{ 
-                        textShadow: '2px 2px 4px rgba(0,0,0,1), -1px -1px 1px rgba(0,0,0,1), 1px -1px 1px rgba(0,0,0,1), -1px 1px 1px rgba(0,0,0,1), 1px 1px 1px rgba(0,0,0,1)',
-                        color: '#ffffff',
-                        fontWeight: '700'
-                      }}>
+              {/* SUBMARKET NAME - WHITE TEXT WITH BLACK BACKGROUND */}
+              <div className="mb-2 text-center bg-black px-3 py-1 rounded-md border-2 border-white shadow-2xl">
+                <span 
+                  className="font-bold text-sm tracking-wide select-none"
+                  style={{ 
+                    color: '#FFFFFF',
+                    textShadow: '2px 2px 4px rgba(0,0,0,1)',
+                    fontWeight: '700'
+                  }}
+                >
                   {submarket.submarket}
                 </span>
               </div>
@@ -240,13 +242,15 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
                    style={{ 
                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 0 0 2px white'
                    }}>
-                <span className="text-white font-black text-xl tracking-tight select-none" 
-                      style={{ 
-                        textShadow: '3px 3px 6px rgba(0,0,0,1), -1px -1px 0 rgba(0,0,0,1), 1px -1px 0 rgba(0,0,0,1), -1px 1px 0 rgba(0,0,0,1), 1px 1px 0 rgba(0,0,0,1)',
-                        fontSize: '16px',
-                        fontWeight: '900',
-                        color: '#ffffff'
-                      }}>
+                <span 
+                  className="font-black text-xl tracking-tight select-none" 
+                  style={{ 
+                    color: '#FFFFFF',
+                    textShadow: '3px 3px 6px rgba(0,0,0,1)',
+                    fontSize: '16px',
+                    fontWeight: '900'
+                  }}
+                >
                   {submarket.multiple.toFixed(2)}
                 </span>
               </div>
