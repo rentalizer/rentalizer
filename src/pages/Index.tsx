@@ -13,10 +13,12 @@ import { ContactChat } from '@/components/ContactChat';
 import { Footer } from '@/components/Footer';
 import { MarketDataInput } from '@/components/MarketDataInput';
 import { ApartmentCube } from '@/components/ApartmentCube';
+import { SubscriptionPricing } from '@/components/SubscriptionPricing';
 import { useToast } from '@/hooks/use-toast';
 import { calculateMarketMetrics, formatCurrency, formatMultiple } from '@/utils/marketCalculations';
 import { fetchMarketData, ApiConfig } from '@/services/marketDataService';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface MarketResult {
   submarket: string;
