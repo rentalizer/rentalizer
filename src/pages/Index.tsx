@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,7 @@ import { LoginDialog } from '@/components/LoginDialog';
 import { SubscriptionPricing } from '@/components/SubscriptionPricing';
 import { ContactChat } from '@/components/ContactChat';
 import { Footer } from '@/components/Footer';
+import { TopNavBar } from '@/components/TopNavBar';
 
 interface SubmarketData {
   submarket: string;
@@ -36,7 +36,7 @@ const Index = () => {
   // Show subscription gate for non-subscribed users
   if (!isSubscribed) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
         {/* Futuristic background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl animate-pulse"></div>
@@ -122,6 +122,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+      {/* Top Navigation Bar */}
+      <TopNavBar />
+
       {/* Futuristic background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl animate-pulse"></div>
@@ -131,7 +134,7 @@ const Index = () => {
 
       <div className="relative z-10">
         <div className="container mx-auto px-4 py-12">
-          {/* Header */}
+          {/* Header - simplified since we have the top nav */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-5 mb-6">
               <BarChart3 className="h-16 w-16 text-cyan-400" />
@@ -143,28 +146,6 @@ const Index = () => {
             <p className="text-2xl text-cyan-100 mb-8 max-w-3xl mx-auto">
               The All-In-One AI System To Earn Rental Income—No Mortgage Needed
             </p>
-            
-            {/* User info and sign out */}
-            {user && (
-              <div className="flex items-center justify-center gap-4 mb-8">
-                <div className="flex items-center gap-2 text-sm bg-gray-900/50 px-4 py-2 rounded-lg border border-cyan-500/20">
-                  <User className="h-4 w-4 text-cyan-400" />
-                  <span className="text-cyan-300">{user.email}</span>
-                  <Badge variant="outline" className="bg-green-900/30 border-green-500/30 text-green-300">
-                    Trial
-                  </Badge>
-                </div>
-                <Button
-                  onClick={signOut}
-                  variant="outline"
-                  size="sm"
-                  className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              </div>
-            )}
           </div>
 
           {/* Market Data Input - placeholder for now */}
