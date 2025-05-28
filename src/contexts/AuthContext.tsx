@@ -108,17 +108,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           return;
         }
 
+        const validStatus = ['active', 'inactive', 'trial'].includes(newProfile?.subscription_status) 
+          ? newProfile.subscription_status as 'active' | 'inactive' | 'trial'
+          : 'trial';
+
         setUser({
           id: supabaseUser.id,
           email: supabaseUser.email || '',
-          subscription_status: newProfile?.subscription_status || 'trial'
+          subscription_status: validStatus
         });
       } else {
         console.log('Profile loaded successfully:', profile);
+        
+        const validStatus = ['active', 'inactive', 'trial'].includes(profile.subscription_status) 
+          ? profile.subscription_status as 'active' | 'inactive' | 'trial'
+          : 'trial';
+
         setUser({
           id: supabaseUser.id,
           email: supabaseUser.email || '',
-          subscription_status: profile.subscription_status
+          subscription_status: validStatus
         });
       }
     } catch (error) {
