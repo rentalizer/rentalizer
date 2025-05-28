@@ -75,7 +75,7 @@ export interface ApiConfig {
   openaiApiKey?: string;
 }
 
-// Airbnb Search API - updated to use the API you're subscribed to
+// Airbnb Search API - updated to use a basic search endpoint
 export const fetchAirbnbListingsData = async (city: string, apiKey?: string): Promise<StrData[]> => {
   console.log(`🔍 Fetching Airbnb Search data for ${city}`);
   console.log(`🔑 API Key provided: ${apiKey ? 'Yes' : 'No'}`);
@@ -84,13 +84,12 @@ export const fetchAirbnbListingsData = async (city: string, apiKey?: string): Pr
     try {
       console.log(`📡 Searching for Airbnb properties in "${city}"`);
       
-      // Use the Airbnb Search API that you're subscribed to
-      const response = await fetch(`https://airbnb-search.p.rapidapi.com/property_rating?id=4691919`, {
+      // Use a basic search endpoint that should work with most Airbnb Search API subscriptions
+      const response = await fetch(`https://airbnb-search.p.rapidapi.com/search?location=${encodeURIComponent(city)}&checkin=2024-06-01&checkout=2024-06-07&adults=2&children=0&infants=0&pets=0&page=1&currency=USD`, {
         method: 'GET',
         headers: {
           'X-RapidAPI-Key': apiKey,
-          'X-RapidAPI-Host': 'airbnb-search.p.rapidapi.com',
-          'Content-Type': 'application/json'
+          'X-RapidAPI-Host': 'airbnb-search.p.rapidapi.com'
         }
       });
 
