@@ -53,26 +53,12 @@ const sendNewUserNotification = async (userEmail: string, userId: string) => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
     console.log('AuthProvider initializing...');
     
-    // Set up the auth state listener first
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change event:', event, 'Session exists:', !!session);
-      
-      if (session?.user) {
-        console.log('User found in session, loading profile...');
-        await loadUserProfile(session.user);
-      } else {
-        console.log('No user in session, clearing user state');
-        setUser(null);
-      }
-      
-      setIsLoading(false);
-    });
-
-    // Then get the initial session
+    // Get initial session first
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -85,16 +71,33 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (session?.user) {
           console.log('Initial session found for user:', session.user.email);
+          setSession(session);
           await loadUserProfile(session.user);
         } else {
           console.log('No initial session found');
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('Session initialization error:', error);
-      } finally {
         setIsLoading(false);
       }
     };
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change event:', event, 'Session exists:', !!session);
+      
+      setSession(session);
+      
+      if (session?.user) {
+        console.log('User found in session, loading profile...');
+        await loadUserProfile(session.user);
+      } else {
+        console.log('No user in session, clearing user state');
+        setUser(null);
+        setIsLoading(false);
+      }
+    });
 
     getInitialSession();
 
@@ -129,6 +132,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           email: supabaseUser.email || '',
           subscription_status: subscriptionStatus
         });
+        setIsLoading(false);
         return;
       }
 
@@ -153,6 +157,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             email: supabaseUser.email || '',
             subscription_status: subscriptionStatus
           });
+          setIsLoading(false);
           return;
         }
 
@@ -185,6 +190,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           subscription_status: validStatus
         });
       }
+      
+      setIsLoading(false);
     } catch (error) {
       console.error('Error in loadUserProfile:', error);
       // Fallback: set user with trial status
@@ -193,6 +200,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         email: supabaseUser.email || '',
         subscription_status: 'trial'
       });
+      setIsLoading(false);
     }
   };
 
@@ -263,6 +271,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         console.log('Sign out successful');
         setUser(null);
+        setSession(null);
       }
     } catch (error) {
       console.error('Sign out error:', error);
