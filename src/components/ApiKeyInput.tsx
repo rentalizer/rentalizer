@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Key, Eye, EyeOff, Search } from 'lucide-react';
 
 interface ApiKeyInputProps {
@@ -73,26 +72,6 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
-            <div className="space-y-2 text-sm text-blue-800">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs bg-white/50">Sample Data</Badge>
-                <span>Works without any API keys - includes Nashville, Miami, Austin, Denver, Seattle</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs bg-white/50">Professional Data</Badge>
-                <span>Live short-term rental market data (requires paid subscription)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs bg-white/50">AI Research</Badge>
-                <span>AI-powered rental data research for any city (~$5-20/month)</span>
-              </div>
-              <p className="text-xs text-green-600 mt-2">
-                ✅ Rentalizer automatically falls back to sample data if API keys don't work
-              </p>
-            </div>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="professional-key" className="text-sm font-medium">
