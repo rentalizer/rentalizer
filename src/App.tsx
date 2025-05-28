@@ -12,6 +12,7 @@ import ResetPassword from "./pages/ResetPassword";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import AnimationDraft from "./pages/AnimationDraft";
+import Test from "./pages/Test";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const AppRoutes = () => (
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
     <Route path="/terms-of-service" element={<TermsOfService />} />
     <Route path="/animation-draft" element={<AnimationDraft />} />
+    <Route path="/test" element={<Test />} />
   </Routes>
 );
 
