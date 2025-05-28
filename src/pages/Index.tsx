@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -354,7 +353,7 @@ const Index = () => {
                       <h3 className="text-lg font-semibold text-cyan-300">Data Table</h3>
                     </div>
                     <div className="h-[calc(100%-2rem)] overflow-auto">
-                      <ResultsTable results={results} />
+                      <ResultsTable results={results} city={city} />
                     </div>
                   </div>
                 </ResizablePanel>

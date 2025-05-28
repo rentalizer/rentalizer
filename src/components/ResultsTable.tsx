@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { TrendingUp, DollarSign, Star } from 'lucide-react';
+import { TrendingUp, DollarSign } from 'lucide-react';
 
 interface SubmarketData {
   submarket: string;
@@ -18,23 +17,11 @@ interface ResultsTableProps {
 }
 
 export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city }) => {
-  const getScoreColor = (multiple: number) => {
-    if (multiple >= 3.0) return 'bg-green-500 text-white';
-    if (multiple >= 2.5) return 'bg-blue-500 text-white';
-    return 'bg-yellow-500 text-black';
-  };
-
-  const getScoreLabel = (multiple: number) => {
-    if (multiple >= 3.0) return 'Excellent';
-    if (multiple >= 2.5) return 'Very Good';
-    return 'Good';
-  };
-
   if (!results || results.length === 0) {
     return (
       <Card className="w-full bg-gray-900/95 border-gray-700">
         <CardContent className="p-8 text-center">
-          <p className="text-gray-400">No results to display</p>
+          <p className="text-white">No results to display</p>
         </CardContent>
       </Card>
     );
@@ -47,28 +34,22 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city }) => 
           <TrendingUp className="h-6 w-6 text-cyan-400" />
           {city} Market Analysis
         </CardTitle>
-        <p className="text-gray-400">Revenue potential by submarket</p>
+        <p className="text-white">Revenue potential by submarket</p>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="border-gray-700 hover:bg-gray-800/50">
-                <TableHead className="text-gray-300 font-semibold">Submarket</TableHead>
-                <TableHead className="text-gray-300 font-semibold">
+                <TableHead className="text-white font-semibold">Submarket</TableHead>
+                <TableHead className="text-white font-semibold">
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-green-400" />
                     STR Revenue
                   </div>
                 </TableHead>
-                <TableHead className="text-gray-300 font-semibold">Median Rent</TableHead>
-                <TableHead className="text-gray-300 font-semibold">Revenue-to-Rent Multiple</TableHead>
-                <TableHead className="text-gray-300 font-semibold">
-                  <div className="flex items-center gap-2">
-                    <Star className="h-4 w-4 text-orange-400" />
-                    Rating
-                  </div>
-                </TableHead>
+                <TableHead className="text-white font-semibold">Median Rent</TableHead>
+                <TableHead className="text-white font-semibold">Revenue-to-Rent Multiple</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -80,21 +61,14 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city }) => 
                   <TableCell className="font-medium text-white">
                     {result.submarket}
                   </TableCell>
-                  <TableCell className="text-green-400 font-semibold">
+                  <TableCell className="text-white font-semibold">
                     ${result.strRevenue.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-blue-400 font-semibold">
+                  <TableCell className="text-white font-semibold">
                     ${result.medianRent.toLocaleString()}
                   </TableCell>
-                  <TableCell className="text-purple-400 font-semibold">
+                  <TableCell className="text-white font-semibold">
                     {result.multiple.toFixed(2)}x
-                  </TableCell>
-                  <TableCell>
-                    <Badge 
-                      className={`${getScoreColor(result.multiple)} font-semibold border-0`}
-                    >
-                      {getScoreLabel(result.multiple)}
-                    </Badge>
                   </TableCell>
                 </TableRow>
               ))}
