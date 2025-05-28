@@ -108,17 +108,17 @@ export interface ApiConfig {
   openaiApiKey?: string;
 }
 
-// AirDNA API data fetching with improved error handling - APARTMENTS ONLY
+// AirDNA Market Data API - using market data endpoint instead of individual listings
 export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Promise<StrData[]> => {
-  console.log(`🔍 Fetching AirDNA data for ${city} - APARTMENTS ONLY`);
+  console.log(`🔍 Fetching AirDNA MARKET data for ${city} - APARTMENTS ONLY`);
   console.log(`🔑 API Key provided: ${apiKey ? 'Yes' : 'No'}`);
   
   if (apiKey) {
     try {
-      console.log(`📡 Using AirDNA Properties API - APARTMENTS ONLY`);
+      console.log(`📡 Using AirDNA Market Data API - APARTMENTS ONLY`);
       
-      // STRICT apartment-only API endpoint - 2BR/2BA apartments ONLY that accommodate 6 people
-      const response = await fetch(`https://airdna1.p.rapidapi.com/properties?location=${encodeURIComponent(city)}&accommodates=6&bedrooms=2&property_type=apartment`, {
+      // Try AirDNA market data endpoint first (more appropriate for market analysis)
+      const marketResponse = await fetch(`https://airdna1.p.rapidapi.com/market?location=${encodeURIComponent(city)}&property_type=apartment&bedrooms=2`, {
         method: 'GET',
         headers: {
           'X-RapidAPI-Key': apiKey,
@@ -127,74 +127,129 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
         }
       });
 
-      console.log(`📊 AirDNA Response status: ${response.status}`);
+      console.log(`📊 AirDNA Market Response status: ${marketResponse.status}`);
       
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ AirDNA API Response received!', data);
+      if (marketResponse.ok) {
+        const marketData = await marketResponse.json();
+        console.log('✅ AirDNA Market API Response received!', marketData);
         
-        // Parse AirDNA response format and FILTER for apartments only
-        let properties = [];
-        if (data.properties) properties = data.properties;
-        else if (data.results) properties = data.results;
-        else if (data.data) properties = data.data;
-        else if (Array.isArray(data)) properties = data;
+        // Parse market data response format
+        let submarkets = [];
+        if (marketData.submarkets) submarkets = marketData.submarkets;
+        else if (marketData.neighborhoods) submarkets = marketData.neighborhoods;
+        else if (marketData.areas) submarkets = marketData.areas;
+        else if (marketData.data) submarkets = marketData.data;
+        else if (Array.isArray(marketData)) submarkets = marketData;
         
-        // Additional filtering to ensure ONLY apartments
-        properties = properties.filter((property: any) => {
-          const propertyType = (property.property_type || property.type || '').toLowerCase();
-          return propertyType.includes('apartment') || propertyType.includes('condo');
-        });
-        
-        if (properties.length > 0) {
-          const strData = properties.slice(0, 15).map((property: any, index: number) => {
-            // Extract revenue/pricing data from AirDNA format
+        if (submarkets.length > 0) {
+          const strData = submarkets.slice(0, 10).map((submarket: any, index: number) => {
+            // Extract market-level revenue data
             let monthlyRevenue = 0;
             
+            if (submarket.avg_revenue) {
+              monthlyRevenue = submarket.avg_revenue;
+            } else if (submarket.monthly_revenue) {
+              monthlyRevenue = submarket.monthly_revenue;
+            } else if (submarket.adr && submarket.occupancy) {
+              const adr = typeof submarket.adr === 'string' ? parseFloat(submarket.adr.replace(/[^0-9.]/g, '')) : submarket.adr;
+              const occupancy = typeof submarket.occupancy === 'string' ? parseFloat(submarket.occupancy.replace(/[^0-9.]/g, '')) / 100 : submarket.occupancy;
+              monthlyRevenue = Math.round(adr * 30 * occupancy);
+            } else {
+              monthlyRevenue = 4500 + (index * 300); // Fallback with variation
+            }
+            
+            const submarketName = submarket.name || 
+                                 submarket.neighborhood || 
+                                 submarket.area || 
+                                 submarket.submarket ||
+                                 `${city} Area ${index + 1}`;
+            
+            return {
+              submarket: `${submarketName} Apartments`,
+              revenue: monthlyRevenue
+            };
+          });
+          
+          console.log('✅ Processed AirDNA market data:', strData);
+          return strData;
+        }
+      } else {
+        const errorText = await marketResponse.text();
+        console.log(`❌ AirDNA Market API failed: ${marketResponse.status} - ${errorText}`);
+        
+        // If market endpoint fails, try the properties endpoint but aggregate the data
+        console.log(`🔄 Trying properties endpoint for aggregation...`);
+        
+        const propertiesResponse = await fetch(`https://airdna1.p.rapidapi.com/properties?location=${encodeURIComponent(city)}&accommodates=6&bedrooms=2&property_type=apartment`, {
+          method: 'GET',
+          headers: {
+            'X-RapidAPI-Key': apiKey,
+            'X-RapidAPI-Host': 'airdna1.p.rapidapi.com',
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (propertiesResponse.ok) {
+          const propertiesData = await propertiesResponse.json();
+          console.log('✅ AirDNA Properties API Response - will aggregate to market data:', propertiesData);
+          
+          // Aggregate individual properties into market data by neighborhood
+          let properties = [];
+          if (propertiesData.properties) properties = propertiesData.properties;
+          else if (propertiesData.results) properties = propertiesData.results;
+          else if (propertiesData.data) properties = propertiesData.data;
+          else if (Array.isArray(propertiesData)) properties = propertiesData;
+          
+          // Group by neighborhood and calculate averages
+          const neighborhoodMap = new Map();
+          
+          properties.forEach((property: any) => {
+            const neighborhood = property.neighborhood || 
+                               property.market || 
+                               property.area || 
+                               property.district ||
+                               'City Center';
+            
+            let monthlyRevenue = 0;
             if (property.revenue) {
               monthlyRevenue = property.revenue;
             } else if (property.monthly_revenue) {
               monthlyRevenue = property.monthly_revenue;
             } else if (property.adr && property.occupancy) {
-              // Calculate from ADR (Average Daily Rate) and occupancy
               const adr = typeof property.adr === 'string' ? parseFloat(property.adr.replace(/[^0-9.]/g, '')) : property.adr;
               const occupancy = typeof property.occupancy === 'string' ? parseFloat(property.occupancy.replace(/[^0-9.]/g, '')) / 100 : property.occupancy;
               monthlyRevenue = Math.round(adr * 30 * occupancy);
             } else if (property.price) {
-              // Estimate from nightly price
               const price = typeof property.price === 'string' ? parseFloat(property.price.replace(/[^0-9.]/g, '')) : property.price;
               monthlyRevenue = Math.round(price * 20); // Assume 65% occupancy
-            } else {
-              monthlyRevenue = 4500 + (index * 200); // Fallback with variation
             }
             
-            const neighborhood = property.neighborhood || 
-                               property.market || 
-                               property.area || 
-                               property.district ||
-                               `${city} Area ${index + 1}`;
-            
-            return {
-              submarket: `${neighborhood} Apartments`, // Ensure "Apartments" suffix
-              revenue: monthlyRevenue
-            };
+            if (!neighborhoodMap.has(neighborhood)) {
+              neighborhoodMap.set(neighborhood, []);
+            }
+            neighborhoodMap.get(neighborhood).push(monthlyRevenue);
           });
           
-          console.log('✅ Processed AirDNA apartment data:', strData);
-          return strData;
-        } else {
-          console.log('⚠️ No apartment properties found in AirDNA response');
+          // Calculate averages for each neighborhood
+          const strData = Array.from(neighborhoodMap.entries()).map(([neighborhood, revenues]) => {
+            const avgRevenue = Math.round(revenues.reduce((sum: number, rev: number) => sum + rev, 0) / revenues.length);
+            return {
+              submarket: `${neighborhood} Apartments`,
+              revenue: avgRevenue
+            };
+          }).slice(0, 8); // Limit to 8 submarkets
+          
+          if (strData.length > 0) {
+            console.log('✅ Aggregated market data from properties:', strData);
+            return strData;
+          }
         }
-      } else {
-        const errorText = await response.text();
-        console.log(`❌ AirDNA API failed: ${response.status} - ${errorText}`);
         
-        if (response.status === 403) {
+        if (marketResponse.status === 403) {
           console.log('🔄 AirDNA API key needs subscription - falling back to sample data');
-          // Don't throw error, fall back to sample data
-        } else if (response.status === 429) {
+        } else if (marketResponse.status === 429) {
           console.log('⏳ AirDNA rate limit exceeded - falling back to sample data');
-        } else if (response.status === 404) {
+        } else if (marketResponse.status === 404) {
           console.log('❓ AirDNA location not found - falling back to sample data');
         } else {
           console.log('⚠️ AirDNA API error - falling back to sample data');
