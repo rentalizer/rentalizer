@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-import { Download, Calculator, TrendingUp, Search, LogOut, User, Map, BarChart3 } from 'lucide-react';
+import { Download, Calculator, TrendingUp, Search, LogOut, User, Map, BarChart3, Target, Building, Zap } from 'lucide-react';
 import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
 import { Footer } from '@/components/Footer';
@@ -162,21 +163,55 @@ const Index = () => {
               </div>
             </div>
             
-            <div className="max-w-4xl mx-auto space-y-4">
+            <div className="max-w-4xl mx-auto space-y-6">
               <p className="text-3xl text-cyan-100 font-light tracking-wide leading-relaxed">
-                Save Weeks, Even Months Finding Cash-Flowing Rental Arbitrage Markets
+                The All-In-One AI System To Earn Rental Income—No Mortgage Needed
               </p>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Professional AI-powered platform that analyzes thousands of submarkets in minutes, 
-                not months. Find profitable short-term rental opportunities with data-driven precision.
-              </p>
+              
+              <div className="space-y-4 mt-8">
+                <p className="text-xl text-gray-300 font-medium">
+                  Rentalizer Uses Powerful AI To Help You:
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                  <div className="bg-gray-800/40 p-6 rounded-lg border border-cyan-500/20 hover:border-cyan-400/40 transition-all">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Target className="h-8 w-8 text-cyan-400" />
+                      <h3 className="text-lg font-semibold text-cyan-300">Find Profitable Markets</h3>
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      AI-powered analysis identifies cash-flowing rental arbitrage opportunities in minutes, not months
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gray-800/40 p-6 rounded-lg border border-purple-500/20 hover:border-purple-400/40 transition-all">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Building className="h-8 w-8 text-purple-400" />
+                      <h3 className="text-lg font-semibold text-purple-300">Acquire Properties</h3>
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      Smart property acquisition strategies without the need for traditional mortgages or huge down payments
+                    </p>
+                  </div>
+                  
+                  <div className="bg-gray-800/40 p-6 rounded-lg border border-blue-500/20 hover:border-blue-400/40 transition-all">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Zap className="h-8 w-8 text-blue-400" />
+                      <h3 className="text-lg font-semibold text-blue-300">Manage & Automate</h3>
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      Streamlined rental management and automation tools to maximize your passive income potential
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
             
-            <div className="flex items-center justify-center gap-4 text-sm">
-              <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">⚡ Instant Analysis</Badge>
-              <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 hover:bg-purple-500/10">📊 Professional Data</Badge>
-              <Badge variant="outline" className="bg-gray-800/50 border-blue-500/30 text-blue-300 hover:bg-blue-500/10">🎯 Cash Flow Focus</Badge>
-              <Badge variant="outline" className="bg-gray-800/50 border-green-500/30 text-green-300 hover:bg-green-500/10">💰 ROI Optimization</Badge>
+            <div className="flex items-center justify-center gap-4 text-sm mt-8">
+              <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">🎯 No Mortgage Required</Badge>
+              <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 hover:bg-purple-500/10">🤖 AI-Powered</Badge>
+              <Badge variant="outline" className="bg-gray-800/50 border-blue-500/30 text-blue-300 hover:bg-blue-500/10">⚡ All-In-One System</Badge>
+              <Badge variant="outline" className="bg-gray-800/50 border-green-500/30 text-green-300 hover:bg-green-500/10">💰 Passive Income</Badge>
             </div>
           </div>
 
@@ -187,7 +222,7 @@ const Index = () => {
                 size="lg"
                 className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-4 text-xl font-medium shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
               >
-                View Pricing & Get Started
+                Start Earning Rental Income Today
               </Button>
             </div>
           ) : (
@@ -243,13 +278,13 @@ const Index = () => {
             </div>
           </div>
           <p className="text-xl text-cyan-100 max-w-3xl mx-auto font-light tracking-wide">
-            Save Weeks, Even Months Finding Cash-Flowing Rental Arbitrage Markets
+            The All-In-One AI System To Earn Rental Income—No Mortgage Needed
           </p>
           <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
-            <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">2BR/2BA Properties</Badge>
-            <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 hover:bg-purple-500/10">Professional Data</Badge>
-            <Badge variant="outline" className="bg-gray-800/50 border-blue-500/30 text-blue-300 hover:bg-blue-500/10">Sample Data Available</Badge>
-            <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">AI Analysis</Badge>
+            <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">🎯 Market Analysis</Badge>
+            <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 hover:bg-purple-500/10">🏢 Property Intelligence</Badge>
+            <Badge variant="outline" className="bg-gray-800/50 border-blue-500/30 text-blue-300 hover:bg-blue-500/10">🤖 AI Automation</Badge>
+            <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">💰 Income Generation</Badge>
           </div>
         </div>
 
