@@ -178,7 +178,7 @@ const Index = () => {
                 <h4 className="font-medium text-blue-900 mb-2">Current Analysis Mode:</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
                   {apiConfig.airdnaApiKey ? (
-                    <li>• ✅ Live AirDNA professional data (2BR/2BA entire homes, FREE tier available)</li>
+                    <li>• ✅ Live AirDNA professional data (2BR/2BA apartments, accommodates 6, FREE tier available)</li>
                   ) : (
                     <li>• 📋 Sample STR data (for supported cities: Nashville, Miami, Austin)</li>
                   )}
@@ -243,7 +243,7 @@ const Index = () => {
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                   <h4 className="font-medium text-blue-900 mb-2">Data Sources:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• <strong>STR Revenue:</strong> {apiConfig.airdnaApiKey ? 'Live AirDNA professional data via RapidAPI' : 'Sample data'} (2BR/2BA Entire homes)</li>
+                    <li>• <strong>STR Revenue:</strong> {apiConfig.airdnaApiKey ? 'Live AirDNA professional data via RapidAPI' : 'Sample data'} (2BR/2BA Apartments)</li>
                     <li>• <strong>Rental Data:</strong> {apiConfig.openaiApiKey ? 'AI-powered research via OpenAI' : 'Sample data'}</li>
                     <li>• <strong>Calculations:</strong> Automated filtering and revenue-to-rent multiples</li>
                   </ul>
