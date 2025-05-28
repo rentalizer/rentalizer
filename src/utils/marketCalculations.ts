@@ -41,7 +41,7 @@ export const calculateMarketMetrics = (
       if (adjustedRevenue >= 4000 && multiple >= 2.0) {
         results.push({
           submarket: strItem.submarket,
-          strRevenue: Math.round(adjustedRevenue),
+          strRevenue: adjustedRevenue, // Keep realistic decimal values, don't round
           medianRent: rent,
           multiple: multiple
         });
