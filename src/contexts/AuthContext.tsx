@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
@@ -97,7 +98,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('🔄 AuthProvider initializing...');
     
     let mounted = true;
-    let timeoutId: NodeJS.Timeout;
     
     const processSession = async (session: Session | null) => {
       if (!mounted) {
@@ -142,22 +142,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await processSession(session);
     });
 
-    // Get initial session with improved error handling
+    // Get initial session
     console.log('🚀 Getting initial session...');
     const getInitialSession = async () => {
       try {
         console.log('📡 Attempting to connect to Supabase...');
         
-        // Much shorter timeout for initial connection
-        const sessionPromise = supabase.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Connection timeout')), 3000)
-        );
-        
-        const { data: { session }, error } = await Promise.race([
-          sessionPromise,
-          timeoutPromise
-        ]) as any;
+        const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('❌ Error getting initial session:', error);
@@ -177,20 +168,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     getInitialSession();
 
-    // Very short timeout for loading state
-    timeoutId = setTimeout(() => {
-      if (mounted && isLoading) {
-        console.warn('⏰ Auth initialization timeout after 1s - forcing completion');
-        setIsLoading(false);
-      }
-    }, 1000);
-
     return () => {
       console.log('🧹 Cleaning up auth subscription');
       mounted = false;
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
       subscription.unsubscribe();
     };
   }, []);
@@ -199,20 +179,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('🔑 Starting sign in for:', email);
     
     try {
-      // Create a timeout promise
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Sign in timeout - please try again')), 5000)
-      );
-      
-      const signInPromise = supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      
-      const { data, error } = await Promise.race([
-        signInPromise,
-        timeoutPromise
-      ]) as any;
 
       if (error) {
         console.error('❌ Sign in error:', error.message);
@@ -235,20 +205,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('📝 Starting sign up for:', email);
     
     try {
-      // Create a timeout promise
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Sign up timeout - please try again')), 5000)
-      );
-      
-      const signUpPromise = supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
-      
-      const { data, error } = await Promise.race([
-        signUpPromise,
-        timeoutPromise
-      ]) as any;
 
       if (error) {
         console.error('❌ Sign up error:', error.message);
@@ -307,9 +267,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           <div className="text-gray-400 text-sm">Connecting to authentication...</div>
           <div className="mt-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
-          </div>
-          <div className="text-xs text-gray-500 mt-4">
-            This should only take a moment
           </div>
         </div>
       </div>

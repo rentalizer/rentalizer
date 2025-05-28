@@ -85,9 +85,22 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
       
     } catch (error: any) {
       console.error('❌ Authentication error:', error);
+      
+      let errorMessage = "Please check your credentials and try again.";
+      
+      if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = "Invalid email or password. Please check and try again.";
+      } else if (error.message?.includes('User already registered')) {
+        errorMessage = "An account with this email already exists. Try signing in instead.";
+      } else if (error.message?.includes('timeout')) {
+        errorMessage = "Connection timeout. Please check your internet and try again.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "❌ Authentication Failed",
-        description: error.message || "Please check your credentials and try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -222,7 +235,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
                 {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    {isSignUp ? 'Creating...' : 'Signing In...'}
+                    {isSignUp ? 'Creating Account...' : 'Signing In...'}
                   </>
                 ) : isSignUp ? (
                   <>
