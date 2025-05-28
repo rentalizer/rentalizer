@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -209,7 +208,7 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
         </Card>
       </div>
 
-      {/* SUPER VISIBLE WHITE TEXT MARKERS */}
+      {/* SUBMARKET MARKERS WITH WHITE TEXT NAMES */}
       {results.map((submarket, index) => {
         const position = getSubmarketPosition(index);
         
@@ -220,8 +219,23 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
             style={{ top: position.top, left: position.left }}
             onClick={() => setSelectedSubmarket(submarket)}
           >
-            <div className="relative group">
-              {/* MASSIVE WHITE TEXT WITH BLACK SHADOW */}
+            <div className="relative group flex flex-col items-center">
+              {/* SUBMARKET NAME IN WHITE TEXT */}
+              <div className="mb-2 text-center">
+                <span className="text-white font-black text-sm tracking-tight select-none px-2 py-1 rounded" 
+                      style={{ 
+                        textShadow: '3px 3px 6px rgba(0,0,0,1), -1px -1px 0 rgba(0,0,0,1), 1px -1px 0 rgba(0,0,0,1), -1px 1px 0 rgba(0,0,0,1), 1px 1px 0 rgba(0,0,0,1)',
+                        fontSize: '14px',
+                        fontWeight: '900',
+                        color: '#ffffff !important',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        border: '2px solid white'
+                      }}>
+                  {submarket.submarket}
+                </span>
+              </div>
+
+              {/* MULTIPLE NUMBER CIRCLE */}
               <div className={`w-20 h-20 rounded-full ${getScoreColor(submarket.multiple)} 
                              flex items-center justify-center shadow-2xl border-4 border-white 
                              hover:scale-110 transition-all duration-200
