@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 
 interface SubmarketData {
   submarket: string;
@@ -15,16 +14,6 @@ interface ResultsTableProps {
 }
 
 export const ResultsTable: React.FC<ResultsTableProps> = ({ results }) => {
-  const getMultipleBadge = (multiple: number) => {
-    if (multiple >= 3.0) {
-      return <Badge className="bg-green-100 text-green-800 border-green-300">Excellent</Badge>;
-    } else if (multiple >= 2.5) {
-      return <Badge className="bg-blue-100 text-blue-800 border-blue-300">Very Good</Badge>;
-    } else {
-      return <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">Good</Badge>;
-    }
-  };
-
   if (results.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500">
@@ -43,7 +32,6 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results }) => {
             <TableHead className="font-semibold text-gray-900">STR Revenue (Top 25%)</TableHead>
             <TableHead className="font-semibold text-gray-900">Median Rent</TableHead>
             <TableHead className="font-semibold text-gray-900">Revenue-to-Rent Multiple</TableHead>
-            <TableHead className="font-semibold text-gray-900">Rating</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -58,9 +46,6 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results }) => {
               </TableCell>
               <TableCell className="font-semibold text-blue-600">
                 {row.multiple.toFixed(2)}x
-              </TableCell>
-              <TableCell>
-                {getMultipleBadge(row.multiple)}
               </TableCell>
             </TableRow>
           ))}
