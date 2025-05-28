@@ -209,7 +209,7 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
         </Card>
       </div>
 
-      {/* FIXED: Submarket Markers with BOLD WHITE TEXT */}
+      {/* SUPER VISIBLE WHITE TEXT MARKERS */}
       {results.map((submarket, index) => {
         const position = getSubmarketPosition(index);
         
@@ -221,24 +221,32 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
             onClick={() => setSelectedSubmarket(submarket)}
           >
             <div className="relative group">
-              {/* BOLD WHITE TEXT on colored background */}
-              <div className={`w-16 h-16 rounded-full ${getScoreColor(submarket.multiple)} 
+              {/* MASSIVE WHITE TEXT WITH BLACK SHADOW */}
+              <div className={`w-20 h-20 rounded-full ${getScoreColor(submarket.multiple)} 
                              flex items-center justify-center shadow-2xl border-4 border-white 
                              hover:scale-110 transition-all duration-200
-                             ${selectedSubmarket?.submarket === submarket.submarket ? 'ring-4 ring-cyan-400 scale-110' : ''}`}>
-                <span className="text-white font-black text-lg drop-shadow-2xl" 
-                      style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
+                             ${selectedSubmarket?.submarket === submarket.submarket ? 'ring-4 ring-cyan-400 scale-110' : ''}`}
+                   style={{ 
+                     boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 0 0 2px white'
+                   }}>
+                <span className="text-white font-black text-xl tracking-tight select-none" 
+                      style={{ 
+                        textShadow: '3px 3px 6px rgba(0,0,0,1), -1px -1px 0 rgba(0,0,0,1), 1px -1px 0 rgba(0,0,0,1), -1px 1px 0 rgba(0,0,0,1), 1px 1px 0 rgba(0,0,0,1)',
+                        fontSize: '16px',
+                        fontWeight: '900',
+                        color: '#ffffff !important'
+                      }}>
                   {submarket.multiple.toFixed(2)}
                 </span>
               </div>
               
-              {/* Tooltip */}
+              {/* Enhanced Tooltip */}
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 
                             opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
-                <div className="bg-gray-900 text-white text-sm rounded-lg px-4 py-3 whitespace-nowrap border border-gray-600 shadow-2xl">
+                <div className="bg-black text-white text-sm rounded-lg px-4 py-3 whitespace-nowrap border-2 border-white shadow-2xl">
                   <div className="font-bold text-white text-base">{submarket.submarket}</div>
-                  <div className="text-green-400 font-semibold">${submarket.strRevenue.toLocaleString()}</div>
-                  <div className="text-cyan-400 font-semibold">{submarket.multiple.toFixed(2)}x multiple</div>
+                  <div className="text-green-400 font-semibold">${submarket.strRevenue}</div>
+                  <div className="text-cyan-400 font-semibold">{submarket.multiple.toFixed(4)}x multiple</div>
                 </div>
               </div>
             </div>
@@ -254,9 +262,12 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className={`w-8 h-8 rounded-full ${getScoreColor(selectedSubmarket.multiple)} 
-                                   flex items-center justify-center text-white text-sm font-black border-2 border-white`}
-                         style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
+                    <div className={`w-10 h-10 rounded-full ${getScoreColor(selectedSubmarket.multiple)} 
+                                   flex items-center justify-center text-white text-base font-black border-2 border-white`}
+                         style={{ 
+                           textShadow: '2px 2px 4px rgba(0,0,0,1)',
+                           color: '#ffffff !important'
+                         }}>
                       {selectedSubmarket.multiple.toFixed(2)}
                     </div>
                     <h4 className="text-xl font-semibold text-white">{selectedSubmarket.submarket}</h4>
@@ -283,7 +294,7 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
                     <span className="text-sm font-medium text-gray-300">STR Revenue</span>
                   </div>
                   <div className="text-2xl font-bold text-green-400">
-                    ${selectedSubmarket.strRevenue.toLocaleString()}
+                    ${selectedSubmarket.strRevenue}
                   </div>
                   <div className="text-xs text-gray-500">Annual (Top 25%)</div>
                 </div>
@@ -294,7 +305,7 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
                     <span className="text-sm font-medium text-gray-300">Median Rent</span>
                   </div>
                   <div className="text-2xl font-bold text-blue-400">
-                    ${selectedSubmarket.medianRent.toLocaleString()}
+                    ${selectedSubmarket.medianRent}
                   </div>
                   <div className="text-xs text-gray-500">Monthly (2BR/2BA)</div>
                 </div>
@@ -305,7 +316,7 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
                     <span className="text-sm font-medium text-gray-300">Multiple</span>
                   </div>
                   <div className="text-2xl font-bold text-purple-400">
-                    {selectedSubmarket.multiple.toFixed(2)}x
+                    {selectedSubmarket.multiple.toFixed(4)}x
                   </div>
                   <div className="text-xs text-gray-500">Revenue/Rent Ratio</div>
                 </div>
@@ -316,7 +327,7 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
                     <span className="text-sm font-medium text-gray-300">Score</span>
                   </div>
                   <div className="text-2xl font-bold text-orange-400">
-                    {(selectedSubmarket.multiple * 10).toFixed(1)}
+                    {(selectedSubmarket.multiple * 10).toFixed(2)}
                   </div>
                   <div className="text-xs text-gray-500">Investment Rating</div>
                 </div>
