@@ -20,12 +20,13 @@ interface LoginDialogProps {
 }
 
 export const LoginDialog = ({ trigger }: LoginDialogProps) => {
-  const { signIn, signUp, isLoading } = useAuth();
+  const { signIn, signUp } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +51,8 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
       return;
     }
     
+    setIsSubmitting(true);
+    
     try {
       if (isSignUp) {
         console.log('Attempting sign up...');
@@ -66,9 +69,12 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
           description: "Welcome back to Rentalizer!",
         });
       }
+      
+      // Close dialog and reset form
       setIsOpen(false);
       setEmail('');
       setPassword('');
+      
     } catch (error: any) {
       console.error('Authentication error:', error);
       toast({
@@ -76,6 +82,8 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
         description: error.message || "Please check your credentials and try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -128,6 +136,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
+              disabled={isSubmitting}
               className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
             />
           </div>
@@ -145,6 +154,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
               placeholder={isSignUp ? "Create a password (min 6 characters)" : "Enter your password"}
               required
               minLength={6}
+              disabled={isSubmitting}
               className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
             />
           </div>
@@ -160,10 +170,10 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
           <div className="flex gap-3 pt-4">
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting}
               className="flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
             >
-              {isLoading ? (
+              {isSubmitting ? (
                 'Processing...'
               ) : isSignUp ? (
                 <>
@@ -181,6 +191,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
               type="button"
               variant="outline"
               onClick={() => setIsOpen(false)}
+              disabled={isSubmitting}
               className="border-gray-600 text-gray-300 hover:bg-gray-800"
             >
               Cancel
@@ -192,6 +203,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
               type="button"
               variant="ghost"
               onClick={() => setIsSignUp(!isSignUp)}
+              disabled={isSubmitting}
               className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
             >
               {isSignUp 

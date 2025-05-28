@@ -58,7 +58,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     console.log('AuthProvider initializing...');
     
-    // Get initial session first
+    // Set up auth state listener first
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change event:', event, 'Session exists:', !!session);
+      
+      setSession(session);
+      
+      if (session?.user) {
+        console.log('User found in session, loading profile...');
+        await loadUserProfile(session.user);
+      } else {
+        console.log('No user in session, clearing user state');
+        setUser(null);
+        setIsLoading(false);
+      }
+    });
+
+    // Get initial session
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -82,22 +98,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsLoading(false);
       }
     };
-
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change event:', event, 'Session exists:', !!session);
-      
-      setSession(session);
-      
-      if (session?.user) {
-        console.log('User found in session, loading profile...');
-        await loadUserProfile(session.user);
-      } else {
-        console.log('No user in session, clearing user state');
-        setUser(null);
-        setIsLoading(false);
-      }
-    });
 
     getInitialSession();
 
@@ -207,6 +207,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     try {
       console.log('Attempting to sign in user:', email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -223,6 +224,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       console.log('Sign in successful for:', email);
+      // Don't call loadUserProfile here - let the auth state change handler do it
+      
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;
@@ -232,6 +235,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string) => {
     try {
       console.log('Attempting to sign up user:', email);
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -249,12 +253,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       console.log('Sign up successful for:', email);
       
-      // Mark as new user for notification
+      // Send notification for new user signup
       if (data.user && data.user.email) {
         setTimeout(() => {
           sendNewUserNotification(data.user!.email!, data.user!.id);
         }, 2000);
       }
+      
     } catch (error) {
       console.error('Sign up error:', error);
       throw error;
