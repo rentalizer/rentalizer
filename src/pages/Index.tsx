@@ -4,13 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Download, Calculator, TrendingUp, Search } from 'lucide-react';
+import { Download, Calculator, TrendingUp, Search, LogOut, User } from 'lucide-react';
 import { ResultsTable } from '@/components/ResultsTable';
 import { ApiKeyInput } from '@/components/ApiKeyInput';
 import { calculateMarketMetrics } from '@/utils/marketCalculations';
 import { fetchMarketData, ApiConfig } from '@/services/marketDataService';
 import { useToast } from '@/hooks/use-toast';
-import { LoginDialog } from '@/components/LoginDialog';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SubmarketData {
   submarket: string;
@@ -21,6 +21,7 @@ interface SubmarketData {
 
 const Index = () => {
   const { toast } = useToast();
+  const { user, signOut, isSubscribed } = useAuth();
   const [city, setCity] = useState('');
   const [results, setResults] = useState<SubmarketData[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -176,8 +177,23 @@ const Index = () => {
                 RENTALIZER.AI
               </h1>
             </div>
-            <div className="flex-1 flex justify-end">
-              <LoginDialog />
+            <div className="flex-1 flex justify-end items-center gap-3">
+              <div className="flex items-center gap-2 text-cyan-300 text-sm">
+                <User className="h-4 w-4" />
+                {user?.email}
+                <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300">
+                  {user?.subscription_status === 'active' ? 'Pro' : 'Trial'}
+                </Badge>
+              </div>
+              <Button
+                onClick={signOut}
+                variant="outline"
+                size="sm"
+                className="border-gray-600 text-gray-300 hover:bg-gray-800"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
             </div>
           </div>
           <p className="text-xl text-cyan-100 max-w-3xl mx-auto font-light tracking-wide">

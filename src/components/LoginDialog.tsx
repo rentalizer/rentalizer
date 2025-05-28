@@ -12,22 +12,48 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { LogIn, User, Lock, UserPlus } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface LoginDialogProps {
   trigger?: React.ReactNode;
 }
 
 export const LoginDialog = ({ trigger }: LoginDialogProps) => {
+  const { signIn, signUp, isLoading } = useAuth();
+  const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(`${isSignUp ? 'Sign up' : 'Login'} attempted with:`, { email, password });
-    // Add your authentication logic here
-    setIsOpen(false);
+    
+    try {
+      if (isSignUp) {
+        await signUp(email, password);
+        toast({
+          title: "✅ Account Created",
+          description: "Welcome to Rentalizer! You now have trial access.",
+        });
+      } else {
+        await signIn(email, password);
+        toast({
+          title: "✅ Signed In",
+          description: "Welcome back to Rentalizer!",
+        });
+      }
+      setIsOpen(false);
+      setEmail('');
+      setPassword('');
+    } catch (error) {
+      toast({
+        title: "❌ Authentication Failed",
+        description: "Please check your credentials and try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -102,7 +128,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
           {isSignUp && (
             <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-3">
               <p className="text-xs text-cyan-200">
-                💎 Professional subscription required for live market data access
+                💎 New accounts get trial access. Use email with "premium" for demo subscription.
               </p>
             </div>
           )}
@@ -110,9 +136,12 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
           <div className="flex gap-3 pt-4">
             <Button
               type="submit"
+              disabled={isLoading}
               className="flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
             >
-              {isSignUp ? (
+              {isLoading ? (
+                'Processing...'
+              ) : isSignUp ? (
                 <>
                   <UserPlus className="h-4 w-4 mr-2" />
                   Sign Up
