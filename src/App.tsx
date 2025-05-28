@@ -11,6 +11,17 @@ import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
+const AppRoutes = () => (
+  <Routes>
+    <Route path="/" element={
+      <SubscriptionGate>
+        <Index />
+      </SubscriptionGate>
+    } />
+    <Route path="/reset-password" element={<ResetPassword />} />
+  </Routes>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -18,14 +29,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={
-              <SubscriptionGate>
-                <Index />
-              </SubscriptionGate>
-            } />
-            <Route path="/reset-password" element={<ResetPassword />} />
-          </Routes>
+          <AppRoutes />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
