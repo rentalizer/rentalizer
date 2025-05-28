@@ -79,28 +79,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
       }
       
+      // Always set loading to false after processing auth state
       setIsLoading(false);
     });
-
-    // Get initial session
-    const getInitialSession = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Error getting initial session:', error);
-        }
-        
-        // The auth state listener will handle setting the user
-        // Just ensure loading is false
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Session initialization error:', error);
-        setIsLoading(false);
-      }
-    };
-
-    getInitialSession();
 
     return () => {
       console.log('Cleaning up auth subscription');
@@ -192,7 +173,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isSubscribed
   };
 
-  // Show loading only briefly during initialization
+  // Only show loading screen for a brief moment during initial load
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center justify-center">
