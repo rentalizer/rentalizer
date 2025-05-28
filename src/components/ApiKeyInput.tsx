@@ -63,18 +63,18 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   }, [onApiKeysChange]);
 
   return (
-    <Card className="shadow-xl border-0 bg-gradient-to-br from-white/90 to-blue-50/90 backdrop-blur-sm">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2">
-          <Key className="h-5 w-5 text-blue-600" />
+    <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
+      <CardHeader className="pb-4 border-b border-gray-700/50">
+        <CardTitle className="flex items-center gap-2 text-cyan-300">
+          <Key className="h-5 w-5 text-cyan-400" />
           Data Configuration
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="professional-key" className="text-sm font-medium">
+              <Label htmlFor="professional-key" className="text-sm font-medium text-gray-300">
                 Professional Data Key (Optional)
               </Label>
               <Input
@@ -83,7 +83,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 value={professionalKey}
                 onChange={(e) => setProfessionalKey(e.target.value)}
                 placeholder="Enter professional data API key..."
-                className="mt-1 border-blue-200 focus:border-cyan-400"
+                className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Get from: rapidapi.com/hub (search for short-term rental data)
@@ -91,7 +91,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             </div>
 
             <div>
-              <Label htmlFor="openai-key" className="text-sm font-medium">
+              <Label htmlFor="openai-key" className="text-sm font-medium text-gray-300">
                 AI Research Key (Optional)
               </Label>
               <Input
@@ -100,7 +100,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 value={openaiKey}
                 onChange={(e) => setOpenaiKey(e.target.value)}
                 placeholder="Enter AI research API key..."
-                className="mt-1 border-blue-200 focus:border-cyan-400"
+                className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Get from: platform.openai.com/api-keys
@@ -109,18 +109,18 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           </div>
 
           {showStoredKeys && (
-            <div className="bg-gray-50 p-4 rounded-lg border">
-              <h4 className="font-medium text-gray-900 mb-2">Currently Stored Keys:</h4>
+            <div className="bg-gray-800/60 p-4 rounded-lg border border-gray-600/30">
+              <h4 className="font-medium text-gray-100 mb-2">Currently Stored Keys:</h4>
               <div className="space-y-2 text-sm">
                 <div>
-                  <span className="font-medium">Professional Data:</span> 
-                  <span className="ml-2 font-mono text-xs">
+                  <span className="font-medium text-gray-200">Professional Data:</span> 
+                  <span className="ml-2 font-mono text-xs text-gray-300">
                     {getStoredKeys().professional === 'Not set' ? 'Not set' : `${getStoredKeys().professional.substring(0, 8)}...`}
                   </span>
                 </div>
                 <div>
-                  <span className="font-medium">AI Research:</span> 
-                  <span className="ml-2 font-mono text-xs">
+                  <span className="font-medium text-gray-200">AI Research:</span> 
+                  <span className="ml-2 font-mono text-xs text-gray-300">
                     {getStoredKeys().openai === 'Not set' ? 'Not set' : `${getStoredKeys().openai.substring(0, 8)}...`}
                   </span>
                 </div>
@@ -135,7 +135,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 variant="outline"
                 size="sm"
                 onClick={() => setShowKeys(!showKeys)}
-                className="flex items-center gap-2 border-blue-200 hover:bg-blue-50"
+                className="flex items-center gap-2 border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"
               >
                 {showKeys ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 {showKeys ? 'Hide' : 'Show'} Keys
@@ -146,7 +146,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 variant="outline"
                 size="sm"
                 onClick={handleViewStoredKeys}
-                className="flex items-center gap-2 border-blue-200 hover:bg-blue-50"
+                className="flex items-center gap-2 border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"
               >
                 <Search className="h-4 w-4" />
                 {showStoredKeys ? 'Hide' : 'Find'} Stored Keys
@@ -156,7 +156,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             <Button
               onClick={handleSaveKeys}
               size="sm"
-              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg"
+              className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300"
             >
               Save Configuration
             </Button>
