@@ -14,36 +14,23 @@ import { SubscriptionPricing } from '@/components/SubscriptionPricing';
 import { ContactChat } from '@/components/ContactChat';
 import { Footer } from '@/components/Footer';
 
-interface MarketData {
-  city: string;
-  state: string;
+interface SubmarketData {
+  submarket: string;
+  strRevenue: number;
   medianRent: number;
-  averagePrice: number;
-  capRate: number;
-  cashOnCashReturn: number;
-  profitMargin: number;
-  riskScore: number;
-  marketTrend: 'increasing' | 'stable' | 'decreasing';
-  coordinates: [number, number];
-  population: number;
-  unemploymentRate: number;
-  crimeRate: number;
-  walkScore: number;
-  schoolRating: number;
+  multiple: number;
 }
 
 const Index = () => {
   const { user, signOut, isSubscribed } = useAuth();
-  const [marketData, setMarketData] = useState<MarketData[]>([]);
+  const [submarketData, setSubmarketData] = useState<SubmarketData[]>([]);
+  const [cityName, setCityName] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [showMap, setShowMap] = useState(false);
 
-  const handleDataGenerated = (data: MarketData[]) => {
-    setMarketData(data);
-  };
-
-  const handleLoadingChange = (loading: boolean) => {
-    setIsLoading(loading);
+  const handleUpgrade = (promoCode?: string) => {
+    console.log('Upgrade requested with promo code:', promoCode);
+    // Handle upgrade logic here
   };
 
   // Show subscription gate for non-subscribed users
@@ -123,7 +110,7 @@ const Index = () => {
             </div>
 
             {/* Subscription Pricing */}
-            <SubscriptionPricing />
+            <SubscriptionPricing onUpgrade={handleUpgrade} />
           </div>
         </div>
 
@@ -182,37 +169,25 @@ const Index = () => {
             )}
           </div>
 
-          {/* Market Data Input */}
-          <MarketDataInput 
-            onDataGenerated={handleDataGenerated}
-            onLoadingChange={handleLoadingChange}
-          />
+          {/* Market Data Input - placeholder for now */}
+          <div className="mb-8">
+            <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg">
+              <CardContent className="p-8 text-center">
+                <p className="text-cyan-300">Market data input will go here</p>
+              </CardContent>
+            </Card>
+          </div>
 
-          {/* Toggle View Button */}
-          {marketData.length > 0 && (
-            <div className="flex justify-center mb-8">
-              <Button
-                onClick={() => setShowMap(!showMap)}
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
-              >
-                {showMap ? 'Show Table View' : 'Show Map View'}
-              </Button>
+          {/* Results - placeholder for now */}
+          {submarketData.length > 0 && (
+            <div>
+              {showMap ? (
+                <MapView results={submarketData} city={cityName} />
+              ) : (
+                <ResultsTable results={submarketData} city={cityName} />
+              )}
             </div>
           )}
-
-          {/* Results */}
-          {isLoading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
-              <p className="text-cyan-300">Analyzing market data...</p>
-            </div>
-          ) : marketData.length > 0 ? (
-            showMap ? (
-              <MapView markets={marketData} />
-            ) : (
-              <ResultsTable data={marketData} />
-            )
-          ) : null}
         </div>
       </div>
 
