@@ -1,3 +1,4 @@
+
 interface StrData {
   submarket: string;
   revenue: number;
@@ -37,18 +38,18 @@ const sampleMarketDatabase: Record<string, CityMarketData> = {
   },
   'miami': {
     strData: [
-      { submarket: 'Brickell Apartments', revenue: 7200 },
-      { submarket: 'Downtown Miami Apartments', revenue: 6800 },
-      { submarket: 'Wynwood Apartments', revenue: 5400 },
-      { submarket: 'South Beach Apartments', revenue: 8500 },
-      { submarket: 'Coral Gables Apartments', revenue: 6200 }
+      { submarket: 'Brickell Apartments', revenue: 5800 },
+      { submarket: 'Downtown Miami Apartments', revenue: 5200 },
+      { submarket: 'Wynwood Apartments', revenue: 4600 },
+      { submarket: 'South Beach Apartments', revenue: 6400 },
+      { submarket: 'Coral Gables Apartments', revenue: 4800 }
     ],
     rentData: [
-      { submarket: 'Brickell Apartments', rent: 3200 },
-      { submarket: 'Downtown Miami Apartments', rent: 2900 },
-      { submarket: 'Wynwood Apartments', rent: 2400 },
-      { submarket: 'South Beach Apartments', rent: 3800 },
-      { submarket: 'Coral Gables Apartments', rent: 2800 }
+      { submarket: 'Brickell Apartments', rent: 2600 },
+      { submarket: 'Downtown Miami Apartments', rent: 2400 },
+      { submarket: 'Wynwood Apartments', rent: 2000 },
+      { submarket: 'South Beach Apartments', rent: 2800 },
+      { submarket: 'Coral Gables Apartments', rent: 2200 }
     ]
   },
   'austin': {
