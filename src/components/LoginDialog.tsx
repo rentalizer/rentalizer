@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { LogIn, User, Lock, UserPlus, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { ForgotPasswordForm } from './ForgotPasswordForm';
 
 interface LoginDialogProps {
   trigger?: React.ReactNode;
@@ -95,50 +96,6 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
     }
   };
 
-  const handlePasswordReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!email) {
-      toast({
-        title: "❌ Email Required",
-        description: "Please enter your email address to reset your password.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    
-    try {
-      const { supabase } = await import('@/integrations/supabase/client');
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      toast({
-        title: "✅ Reset Email Sent",
-        description: "Check your email for password reset instructions.",
-      });
-      
-      setShowPasswordReset(false);
-      setEmail('');
-      
-    } catch (error: any) {
-      console.error('Password reset error:', error);
-      toast({
-        title: "❌ Reset Failed",
-        description: error.message || "Failed to send reset email. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const resetForm = () => {
     setShowPasswordReset(false);
     setIsSignUp(false);
@@ -184,7 +141,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
           </DialogTitle>
           <DialogDescription className="text-gray-400">
             {showPasswordReset 
-              ? "Enter your email address and we'll send you a link to reset your password"
+              ? "Reset your password to regain access to your account"
               : isSignUp 
                 ? "Create your account to access professional STR market analysis"
                 : "Sign in to access your subscription and professional market data"
@@ -193,50 +150,10 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
         </DialogHeader>
         
         {showPasswordReset ? (
-          <form onSubmit={handlePasswordReset} className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label htmlFor="reset-email" className="text-gray-300 flex items-center gap-2">
-                <Mail className="h-4 w-4" />
-                Email
-              </Label>
-              <Input
-                id="reset-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                required
-                disabled={isSubmitting}
-                className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
-              />
-            </div>
-            
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white disabled:opacity-50"
-              >
-                {isSubmitting ? (
-                  'Sending...'
-                ) : (
-                  <>
-                    <Mail className="h-4 w-4 mr-2" />
-                    Send Reset Email
-                  </>
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowPasswordReset(false)}
-                disabled={isSubmitting}
-                className="border-gray-600 text-gray-300 hover:bg-gray-800"
-              >
-                Back
-              </Button>
-            </div>
-          </form>
+          <ForgotPasswordForm 
+            onBack={() => setShowPasswordReset(false)}
+            initialEmail={email}
+          />
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 pt-4">
             <div className="space-y-2">
