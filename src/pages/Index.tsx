@@ -162,10 +162,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* API Configuration */}
-        <ApiKeyInput onApiKeysChange={setApiConfig} />
-
-        {/* City Analysis */}
+        {/* City Analysis - moved to top */}
         <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
           <CardHeader className="pb-4 border-b border-gray-700/50">
             <CardTitle className="flex items-center gap-2 text-cyan-300">
@@ -188,23 +185,6 @@ const Index = () => {
                 {error && (
                   <p className="mt-2 text-sm text-red-400">{error}</p>
                 )}
-              </div>
-
-              <div className="bg-gradient-to-r from-gray-800/60 to-gray-700/60 p-4 rounded-lg border border-gray-600/30">
-                <h4 className="font-medium text-cyan-300 mb-2">Current Analysis Mode:</h4>
-                <ul className="text-sm text-gray-300 space-y-1">
-                  {apiConfig.airdnaApiKey ? (
-                    <li>• ✅ Live professional STR data (2BR/2BA apartments, accommodates 6)</li>
-                  ) : (
-                    <li>• 📋 Sample STR data (for supported cities: Nashville, Miami, Austin)</li>
-                  )}
-                  {apiConfig.openaiApiKey ? (
-                    <li>• 🤖 AI-powered rental data research via OpenAI (~$5-20/month)</li>
-                  ) : (
-                    <li>• 📋 Sample rental data (for supported cities only)</li>
-                  )}
-                  <li>• 🧮 Automated revenue-to-rent calculations and filtering (4k+ revenue, 2.0+ multiple)</li>
-                </ul>
               </div>
 
               <div className="text-center">
@@ -305,6 +285,9 @@ const Index = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* API Configuration - moved to bottom */}
+        <ApiKeyInput onApiKeysChange={setApiConfig} />
       </div>
     </div>
   );
