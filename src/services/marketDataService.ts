@@ -1,4 +1,3 @@
-
 interface StrData {
   submarket: string;
   revenue: number;
@@ -14,41 +13,41 @@ interface CityMarketData {
   rentData: RentData[];
 }
 
-// Sample data - will be replaced with real API calls
+// Sample data - APARTMENTS ONLY with updated values
 const sampleMarketDatabase: Record<string, CityMarketData> = {
   'nashville': {
     strData: [
-      { submarket: 'Downtown Apartments', revenue: 6794 },
-      { submarket: 'The Gulch Apartments', revenue: 6000 },
-      { submarket: 'East Nashville Apartments', revenue: 5200 },
-      { submarket: '12 South Apartments', revenue: 4800 },
-      { submarket: 'Midtown Apartments', revenue: 4640 },
-      { submarket: 'Music Row Apartments', revenue: 4200 },
-      { submarket: 'Germantown Apartments', revenue: 3800 }
+      { submarket: 'Downtown Nashville Apartments', revenue: 6800 },
+      { submarket: 'The Gulch Apartments', revenue: 6200 },
+      { submarket: 'East Nashville Apartments', revenue: 5400 },
+      { submarket: '12 South Apartments', revenue: 5000 },
+      { submarket: 'Midtown Apartments', revenue: 4800 },
+      { submarket: 'Music Row Apartments', revenue: 4400 },
+      { submarket: 'Germantown Apartments', revenue: 4000 }
     ],
     rentData: [
-      { submarket: 'Downtown Apartments', rent: 2513 },
-      { submarket: 'The Gulch Apartments', rent: 2456 },
-      { submarket: 'East Nashville Apartments', rent: 2307 },
-      { submarket: '12 South Apartments', rent: 2136 },
-      { submarket: 'Midtown Apartments', rent: 2272 },
-      { submarket: 'Music Row Apartments', rent: 2100 },
-      { submarket: 'Germantown Apartments', rent: 2200 }
+      { submarket: 'Downtown Nashville Apartments', rent: 2600 },
+      { submarket: 'The Gulch Apartments', rent: 2500 },
+      { submarket: 'East Nashville Apartments', rent: 2400 },
+      { submarket: '12 South Apartments', rent: 2200 },
+      { submarket: 'Midtown Apartments', rent: 2300 },
+      { submarket: 'Music Row Apartments', rent: 2150 },
+      { submarket: 'Germantown Apartments', rent: 2250 }
     ]
   },
   'miami': {
     strData: [
       { submarket: 'Brickell Apartments', revenue: 7200 },
-      { submarket: 'South Beach Apartments', revenue: 8500 },
       { submarket: 'Downtown Miami Apartments', revenue: 6800 },
       { submarket: 'Wynwood Apartments', revenue: 5400 },
+      { submarket: 'South Beach Apartments', revenue: 8500 },
       { submarket: 'Coral Gables Apartments', revenue: 6200 }
     ],
     rentData: [
       { submarket: 'Brickell Apartments', rent: 3200 },
-      { submarket: 'South Beach Apartments', rent: 3800 },
       { submarket: 'Downtown Miami Apartments', rent: 2900 },
       { submarket: 'Wynwood Apartments', rent: 2400 },
+      { submarket: 'South Beach Apartments', rent: 3800 },
       { submarket: 'Coral Gables Apartments', rent: 2800 }
     ]
   },
@@ -108,16 +107,16 @@ export interface ApiConfig {
   openaiApiKey?: string;
 }
 
-// AirDNA API data fetching with improved error handling
+// AirDNA API data fetching with improved error handling - APARTMENTS ONLY
 export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Promise<StrData[]> => {
-  console.log(`🔍 Fetching AirDNA data for ${city}`);
+  console.log(`🔍 Fetching AirDNA data for ${city} - APARTMENTS ONLY`);
   console.log(`🔑 API Key provided: ${apiKey ? 'Yes' : 'No'}`);
   
   if (apiKey) {
     try {
-      console.log(`📡 Using AirDNA Properties API`);
+      console.log(`📡 Using AirDNA Properties API - APARTMENTS ONLY`);
       
-      // Updated API endpoint for 2BR/2BA apartments ONLY that accommodate 6 people
+      // STRICT apartment-only API endpoint - 2BR/2BA apartments ONLY that accommodate 6 people
       const response = await fetch(`https://airdna1.p.rapidapi.com/properties?location=${encodeURIComponent(city)}&accommodates=6&bedrooms=2&property_type=apartment`, {
         method: 'GET',
         headers: {
@@ -133,12 +132,18 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
         const data = await response.json();
         console.log('✅ AirDNA API Response received!', data);
         
-        // Parse AirDNA response format
+        // Parse AirDNA response format and FILTER for apartments only
         let properties = [];
         if (data.properties) properties = data.properties;
         else if (data.results) properties = data.results;
         else if (data.data) properties = data.data;
         else if (Array.isArray(data)) properties = data;
+        
+        // Additional filtering to ensure ONLY apartments
+        properties = properties.filter((property: any) => {
+          const propertyType = (property.property_type || property.type || '').toLowerCase();
+          return propertyType.includes('apartment') || propertyType.includes('condo');
+        });
         
         if (properties.length > 0) {
           const strData = properties.slice(0, 15).map((property: any, index: number) => {
@@ -169,15 +174,15 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
                                `${city} Area ${index + 1}`;
             
             return {
-              submarket: neighborhood,
+              submarket: `${neighborhood} Apartments`, // Ensure "Apartments" suffix
               revenue: monthlyRevenue
             };
           });
           
-          console.log('✅ Processed AirDNA data:', strData);
+          console.log('✅ Processed AirDNA apartment data:', strData);
           return strData;
         } else {
-          console.log('⚠️ No properties found in AirDNA response');
+          console.log('⚠️ No apartment properties found in AirDNA response');
         }
       } else {
         const errorText = await response.text();
@@ -195,30 +200,30 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
         }
       }
     } catch (error) {
-      console.error('💥 Error with AirDNA API - falling back to sample data:', error);
+      console.error('💥 Error with AirDNA API - falling back to sample apartment data:', error);
     }
   }
   
-  // Fallback to sample data (always works)
-  console.log('📋 Using sample STR data');
+  // Fallback to sample apartment data (always works)
+  console.log('📋 Using sample apartment STR data');
   const cityKey = city.toLowerCase().trim().replace(/,.*/, '');
   const cityData = sampleMarketDatabase[cityKey];
   
   if (cityData) {
-    console.log(`✅ Found sample data for ${city}`);
+    console.log(`✅ Found sample apartment data for ${city}`);
     return cityData.strData;
   }
   
-  // If no sample data, generate realistic sample data for any city
-  console.log(`🎲 Generating sample data for ${city}`);
+  // If no sample data, generate realistic sample data for any city - APARTMENTS ONLY
+  console.log(`🎲 Generating sample apartment data for ${city}`);
   return [
-    { submarket: `Downtown ${city}`, revenue: 6200 },
-    { submarket: `${city} Center`, revenue: 5800 },
-    { submarket: `Historic ${city}`, revenue: 5400 },
-    { submarket: `${city} Heights`, revenue: 4900 },
-    { submarket: `East ${city}`, revenue: 4600 },
-    { submarket: `West ${city}`, revenue: 4300 },
-    { submarket: `South ${city}`, revenue: 4000 }
+    { submarket: `Downtown ${city} Apartments`, revenue: 6200 },
+    { submarket: `${city} Center Apartments`, revenue: 5800 },
+    { submarket: `Historic ${city} Apartments`, revenue: 5400 },
+    { submarket: `${city} Heights Apartments`, revenue: 4900 },
+    { submarket: `East ${city} Apartments`, revenue: 4600 },
+    { submarket: `West ${city} Apartments`, revenue: 4300 },
+    { submarket: `South ${city} Apartments`, revenue: 4000 }
   ];
 };
 
