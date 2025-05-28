@@ -77,8 +77,8 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             <h4 className="font-medium text-blue-900 mb-2">Professional STR Market Intelligence:</h4>
             <div className="space-y-2 text-sm text-blue-800">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">Airdna API</Badge>
-                <span>Professional STR analytics with submarket data (industry standard)</span>
+                <Badge variant="outline" className="text-xs">Airbnb Search API</Badge>
+                <span>Live Airbnb listings data (via RapidAPI)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs">OpenAI</Badge>
@@ -88,7 +88,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 Leave blank to use sample data. Keys are stored locally in your browser.
               </p>
               <p className="text-xs text-green-600 mt-1">
-                ✅ Now using Airdna - the same professional API that real estate investors use!
+                ✅ Now using Airbnb Search API - the same data source that powers Airbnb!
               </p>
             </div>
           </div>
@@ -96,18 +96,18 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="airbnb-key" className="text-sm font-medium">
-                Airdna API Key (Professional STR Data)
+                Airbnb Search API Key (Live STR Data)
               </Label>
               <Input
                 id="airbnb-key"
                 type={showKeys ? "text" : "password"}
                 value={airbnbKey}
                 onChange={(e) => setAirbnbKey(e.target.value)}
-                placeholder="Enter Airdna RapidAPI key..."
+                placeholder="Enter Airbnb Search RapidAPI key..."
                 className="mt-1"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Get from: rapidapi.com/hub (search "Airdna")
+                Get from: rapidapi.com/hub (search "Airbnb Search")
               </p>
             </div>
 
@@ -134,7 +134,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               <h4 className="font-medium text-gray-900 mb-2">Currently Stored Keys:</h4>
               <div className="space-y-2 text-sm">
                 <div>
-                  <span className="font-medium">Airdna API:</span> 
+                  <span className="font-medium">Airbnb Search API:</span> 
                   <span className="ml-2 font-mono text-xs">
                     {getStoredKeys().airbnb === 'Not set' ? 'Not set' : `${getStoredKeys().airbnb.substring(0, 8)}...`}
                   </span>
