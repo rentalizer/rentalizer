@@ -77,10 +77,13 @@ export interface ApiConfig {
 
 // Airdna Professional STR Data API
 export const fetchAirbnbListingsData = async (city: string, apiKey?: string): Promise<StrData[]> => {
-  console.log(`Fetching Airdna STR data for ${city}`);
+  console.log(`🔍 Fetching Airdna STR data for ${city}`);
+  console.log(`🔑 API Key provided: ${apiKey ? 'Yes' : 'No'}`);
   
   if (apiKey) {
     try {
+      console.log(`📡 Step 1: Getting market suggestions for "${city}"`);
+      
       // First, get region suggestions to find the market ID
       const regionResponse = await fetch(`https://airdna1.p.rapidapi.com/suggest_market?query=${encodeURIComponent(city)}`, {
         method: 'GET',
@@ -91,19 +94,36 @@ export const fetchAirbnbListingsData = async (city: string, apiKey?: string): Pr
         }
       });
 
+      console.log(`📊 Region API response status: ${regionResponse.status}`);
+
       if (!regionResponse.ok) {
+        const errorText = await regionResponse.text();
+        console.error(`❌ Airdna region API error: ${regionResponse.status} - ${errorText}`);
         throw new Error(`Airdna region API error: ${regionResponse.status}`);
       }
 
       const regionData = await regionResponse.json();
-      console.log('Airdna region data:', regionData);
+      console.log('🏙️ Airdna region data received:', regionData);
 
-      // Extract market ID from the first result
-      const marketId = regionData?.data?.[0]?.market_id || regionData?.[0]?.id;
+      // Extract market ID from the response - try multiple possible locations
+      let marketId = null;
+      
+      if (regionData?.data && Array.isArray(regionData.data) && regionData.data.length > 0) {
+        marketId = regionData.data[0]?.market_id || regionData.data[0]?.id;
+      } else if (Array.isArray(regionData) && regionData.length > 0) {
+        marketId = regionData[0]?.market_id || regionData[0]?.id;
+      } else if (regionData?.market_id) {
+        marketId = regionData.market_id;
+      }
+      
+      console.log(`🎯 Extracted market ID: ${marketId}`);
       
       if (!marketId) {
+        console.error(`❌ No market ID found for ${city} in response:`, regionData);
         throw new Error(`No market found for ${city}`);
       }
+
+      console.log(`📡 Step 2: Getting property listings for market ID: ${marketId}`);
 
       // Get STR listings data for the market
       const listingsResponse = await fetch(`https://airdna1.p.rapidapi.com/property_listings`, {
@@ -123,44 +143,64 @@ export const fetchAirbnbListingsData = async (city: string, apiKey?: string): Pr
         })
       });
 
+      console.log(`📊 Listings API response status: ${listingsResponse.status}`);
+
       if (listingsResponse.ok) {
         const listingsData = await listingsResponse.json();
-        console.log('Airdna listings data:', listingsData);
+        console.log('🏠 Airdna listings data received:', listingsData);
         
         // Process the professional STR data
         const processedData = processAirdnaListings(listingsData);
-        console.log('Airdna STR data processed successfully');
+        console.log('✅ Airdna STR data processed successfully:', processedData);
         return processedData;
       } else {
+        const errorText = await listingsResponse.text();
+        console.error(`❌ Airdna listings API error: ${listingsResponse.status} - ${errorText}`);
         throw new Error(`Airdna listings API error: ${listingsResponse.status}`);
       }
     } catch (error) {
-      console.error('Error fetching Airdna data:', error);
+      console.error('💥 Error fetching Airdna data:', error);
       throw error;
     }
   }
   
+  console.log('📋 No API key provided, falling back to sample data');
+  
   // Fallback to sample data
-  const cityKey = city.toLowerCase().trim();
+  const cityKey = city.toLowerCase().trim().replace(/,.*/, ''); // Remove state/country part
+  console.log(`🔍 Looking for sample data with key: "${cityKey}"`);
+  
   const cityData = sampleMarketDatabase[cityKey];
   
   if (cityData) {
+    console.log('✅ Found sample data for', cityKey);
     return cityData.strData;
   }
   
+  console.error(`❌ No sample data available for "${cityKey}"`);
   throw new Error(`No STR data available for ${city}`);
 };
 
 // Process Airdna professional STR data
 const processAirdnaListings = (data: any): StrData[] => {
-  const listings = data?.data || data?.listings || [];
+  console.log('🔄 Processing Airdna listings data...');
+  
+  const listings = data?.data || data?.listings || data || [];
+  console.log(`📊 Found ${listings.length} listings to process`);
+  
+  if (!Array.isArray(listings) || listings.length === 0) {
+    console.log('⚠️ No listings array found or empty array');
+    return [];
+  }
   
   // Group by neighborhood/submarket and calculate revenue
   const submarketData: { [key: string]: number[] } = {};
   
-  listings.forEach((listing: any) => {
-    const neighborhood = listing.neighborhood || listing.submarket || listing.location?.neighborhood || 'Unknown';
-    const monthlyRevenue = listing.revenue_ltm || listing.monthly_revenue || listing.estimated_revenue || 0;
+  listings.forEach((listing: any, index: number) => {
+    const neighborhood = listing.neighborhood || listing.submarket || listing.location?.neighborhood || listing.area || `Area ${index + 1}`;
+    const monthlyRevenue = listing.revenue_ltm || listing.monthly_revenue || listing.estimated_revenue || listing.revenue || 0;
+    
+    console.log(`🏠 Listing ${index + 1}: ${neighborhood} - $${monthlyRevenue}`);
     
     if (monthlyRevenue > 0) {
       if (!submarketData[neighborhood]) {
@@ -170,8 +210,10 @@ const processAirdnaListings = (data: any): StrData[] => {
     }
   });
   
+  console.log('🗺️ Submarket groups:', Object.keys(submarketData));
+  
   // Calculate top 25% performance for each neighborhood
-  return Object.entries(submarketData).map(([neighborhood, revenues]) => {
+  const results = Object.entries(submarketData).map(([neighborhood, revenues]) => {
     if (revenues.length === 0) return null;
     
     // Sort revenues and get top 25% average
@@ -180,16 +222,21 @@ const processAirdnaListings = (data: any): StrData[] => {
     const top25Revenues = sortedRevenues.slice(0, top25PercentCount);
     const averageTopRevenue = top25Revenues.reduce((sum, rev) => sum + rev, 0) / top25Revenues.length;
     
+    console.log(`📈 ${neighborhood}: ${revenues.length} listings, top 25% avg: $${Math.round(averageTopRevenue)}`);
+    
     return {
       submarket: neighborhood,
       revenue: Math.round(averageTopRevenue)
     };
   }).filter((item): item is StrData => item !== null && item.revenue > 0);
+  
+  console.log(`✅ Processed ${results.length} submarkets`);
+  return results;
 };
 
 // AI-powered rental data fetching (unchanged)
 export const fetchRentalDataWithAI = async (city: string, submarkets: string[], apiKey?: string): Promise<RentData[]> => {
-  console.log(`Fetching rental data for ${city} submarkets using AI`);
+  console.log(`🤖 Fetching rental data for ${city} submarkets using AI`);
   
   if (apiKey) {
     try {
@@ -222,23 +269,23 @@ export const fetchRentalDataWithAI = async (city: string, submarkets: string[], 
         
         try {
           const rentData = JSON.parse(content);
-          console.log('AI rental data fetched successfully:', rentData);
+          console.log('✅ AI rental data fetched successfully:', rentData);
           return rentData;
         } catch (parseError) {
-          console.error('Failed to parse AI response as JSON:', content);
+          console.error('❌ Failed to parse AI response as JSON:', content);
           throw new Error('Invalid AI response format');
         }
       } else {
         throw new Error(`OpenAI API error: ${response.status}`);
       }
     } catch (error) {
-      console.error('Error fetching AI rental data:', error);
+      console.error('💥 Error fetching AI rental data:', error);
       throw error;
     }
   }
   
   // Fallback to sample data
-  const cityKey = city.toLowerCase().trim();
+  const cityKey = city.toLowerCase().trim().replace(/,.*/, ''); // Remove state/country part
   const cityData = sampleMarketDatabase[cityKey];
   
   if (cityData) {
@@ -251,21 +298,27 @@ export const fetchRentalDataWithAI = async (city: string, submarkets: string[], 
 // Main market data fetching function - updated for Airdna
 export const fetchMarketData = async (city: string, config: ApiConfig = {}): Promise<CityMarketData> => {
   try {
-    console.log(`Fetching market data for ${city} using professional Airdna API...`);
+    console.log(`🚀 Starting market analysis for ${city}`);
+    console.log(`🔧 API Configuration:`, { 
+      hasAirdnaKey: !!config.airbnbApiKey, 
+      hasOpenAIKey: !!config.openaiApiKey 
+    });
     
     // Fetch STR data using professional Airdna API
     const strData = await fetchAirbnbListingsData(city, config.airbnbApiKey);
     
     // Extract submarket names for rental data lookup
     const submarkets = strData.map(item => item.submarket);
+    console.log(`🏘️ Found submarkets: ${submarkets.join(', ')}`);
     
     // Fetch rental data using AI or fallback
     const rentData = await fetchRentalDataWithAI(city, submarkets, config.openaiApiKey);
     
+    console.log(`✅ Market analysis complete for ${city}`);
     return { strData, rentData };
     
   } catch (error) {
-    console.error(`Error fetching market data for ${city}:`, error);
+    console.error(`💥 Error fetching market data for ${city}:`, error);
     throw error;
   }
 };
