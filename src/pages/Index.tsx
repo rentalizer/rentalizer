@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Download, Calculator, TrendingUp, Search, LogOut, User, Map, BarChart3 } from 'lucide-react';
 import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
+import { Footer } from '@/components/Footer';
 import { ApiKeyInput } from '@/components/ApiKeyInput';
 import { calculateMarketMetrics } from '@/utils/marketCalculations';
 import { fetchMarketData, ApiConfig } from '@/services/marketDataService';
@@ -147,7 +148,7 @@ const Index = () => {
             <div className="flex items-center justify-center gap-3">
               <BarChart3 className="h-12 w-12 text-cyan-400" />
               <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl">
-                RENTALIZER.AI
+                RENTALIZER
               </h1>
             </div>
             <div className="flex-1 flex justify-end items-center gap-3">
@@ -354,6 +355,9 @@ const Index = () => {
         {/* API Configuration - moved to bottom */}
         <ApiKeyInput onApiKeysChange={setApiConfig} />
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
