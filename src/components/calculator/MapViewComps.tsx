@@ -85,7 +85,7 @@ export const MapViewComps: React.FC<MapViewCompsProps> = ({ comps, address }) =>
                             opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
                 <div className="bg-black text-white text-sm rounded-lg px-3 py-2 whitespace-nowrap border-2 border-white shadow-xl">
                   <div className="font-bold text-white">{comp.name}</div>
-                  <div className="text-green-400 font-semibold flex items-center gap-1">
+                  <div className="text-cyan-400 font-semibold flex items-center gap-1">
                     <DollarSign className="h-3 w-3" />
                     {comp.price.toLocaleString()}/month
                   </div>

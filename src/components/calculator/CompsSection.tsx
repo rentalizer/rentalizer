@@ -149,12 +149,12 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
           </>
         )}
 
-        <div className="mt-6 p-4 bg-gradient-to-r from-cyan-600/20 to-purple-600/20 rounded-lg border border-cyan-500/30">
+        <div className="mt-6 p-4 bg-gradient-to-r from-cyan-600/20 to-cyan-800/20 rounded-lg border border-cyan-500/30">
           <div className="flex items-center justify-between">
             <Label className="text-cyan-300 font-medium">Average Comparable Revenue</Label>
             <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-green-400" />
-              <span className="text-2xl font-bold text-green-400">
+              <DollarSign className="h-5 w-5 text-cyan-400" />
+              <span className="text-2xl font-bold text-cyan-400">
                 ${data.averageComparable.toLocaleString()}
               </span>
             </div>
