@@ -11,13 +11,9 @@ export const TopNavBar = () => {
   return (
     <div className="w-full bg-slate-800/95 backdrop-blur-sm border-b border-cyan-500/20 px-6 py-3">
       <div className="flex items-center justify-between">
-        {/* Left side - Logo and title */}
+        {/* Left side - Logo only */}
         <div className="flex items-center gap-3">
           <BarChart3 className="h-8 w-8 text-cyan-400" />
-          <div>
-            <h1 className="text-xl font-bold text-cyan-300">Rentalizer</h1>
-            <p className="text-xs text-cyan-400/70">By Richie Matthews</p>
-          </div>
         </div>
 
         {/* Right side - User info and actions */}
