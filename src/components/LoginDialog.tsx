@@ -33,10 +33,10 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Form submitted:', { email, isSignUp, isSubmitting });
+    console.log('🔄 Form submitted:', { email, isSignUp, isSubmitting });
     
     if (isSubmitting) {
-      console.log('Already submitting, ignoring');
+      console.log('⚠️ Already submitting, ignoring');
       return;
     }
     
@@ -59,18 +59,29 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
     }
     
     setIsSubmitting(true);
-    console.log('Starting authentication process...');
+    console.log('🚀 Starting authentication process...');
+    
+    // Add timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.error('⏰ Authentication timeout after 10 seconds');
+      setIsSubmitting(false);
+      toast({
+        title: "❌ Authentication Timeout",
+        description: "Login took too long. Please try again.",
+        variant: "destructive",
+      });
+    }, 10000);
     
     try {
       if (isSignUp) {
-        console.log('Attempting sign up...');
+        console.log('📝 Attempting sign up...');
         await signUp(email, password);
         toast({
           title: "✅ Account Created",
           description: "Welcome to Rentalizer! You now have trial access.",
         });
       } else {
-        console.log('Attempting sign in...');
+        console.log('🔑 Attempting sign in...');
         await signIn(email, password);
         toast({
           title: "✅ Signed In",
@@ -78,20 +89,22 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
         });
       }
       
-      console.log('Authentication successful, closing dialog');
+      clearTimeout(timeoutId);
+      console.log('✅ Authentication successful, closing dialog');
       setIsOpen(false);
       setEmail('');
       setPassword('');
       
     } catch (error: any) {
-      console.error('Authentication error:', error);
+      clearTimeout(timeoutId);
+      console.error('❌ Authentication error:', error);
       toast({
         title: "❌ Authentication Failed",
         description: error.message || "Please check your credentials and try again.",
         variant: "destructive",
       });
     } finally {
-      console.log('Authentication process completed, resetting submitting state');
+      console.log('🏁 Authentication process completed');
       setIsSubmitting(false);
     }
   };
@@ -220,7 +233,10 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
                 className="flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white disabled:opacity-50"
               >
                 {isSubmitting ? (
-                  'Processing...'
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                  </>
                 ) : isSignUp ? (
                   <>
                     <UserPlus className="h-4 w-4 mr-2" />

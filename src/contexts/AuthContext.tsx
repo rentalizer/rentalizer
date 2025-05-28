@@ -143,13 +143,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await processSession(session);
     });
 
-    // Get initial session with shorter timeout and better error handling
+    // Get initial session with improved error handling
     console.log('🚀 Getting initial session...');
     const getInitialSession = async () => {
       try {
         console.log('📡 Attempting to connect to Supabase...');
         
-        // Test basic connectivity first
         const startTime = Date.now();
         const { data: { session }, error } = await supabase.auth.getSession();
         const endTime = Date.now();
@@ -158,15 +157,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (error) {
           console.error('❌ Error getting initial session:', error);
-          console.error('❌ Error details:', error.message, error.status);
         } else {
           console.log('📋 Initial session loaded successfully');
         }
         await processSession(session);
       } catch (error) {
         console.error('💥 Exception getting initial session:', error);
-        console.error('💥 Error type:', typeof error);
-        console.error('💥 Error message:', error instanceof Error ? error.message : 'Unknown error');
         
         if (mounted) {
           console.log('🚨 Forcing auth completion due to error');
@@ -177,14 +173,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     getInitialSession();
 
-    // Reduced timeout to 3 seconds to prevent long loading
+    // Shorter timeout to prevent long loading states
     timeoutId = setTimeout(() => {
       if (mounted && isLoading) {
-        console.warn('⏰ Auth initialization timeout after 3s - forcing completion');
-        console.warn('⏰ This suggests a network or configuration issue with Supabase');
+        console.warn('⏰ Auth initialization timeout after 2s - forcing completion');
         setIsLoading(false);
       }
-    }, 3000);
+    }, 2000);
 
     return () => {
       console.log('🧹 Cleaning up auth subscription');
@@ -197,53 +192,59 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    console.log('Attempting to sign in user:', email);
-    setIsLoading(true);
+    console.log('🔑 Starting sign in for:', email);
     
     try {
+      const startTime = Date.now();
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+      const endTime = Date.now();
+      
+      console.log(`📊 Sign in request took ${endTime - startTime}ms`);
 
       if (error) {
-        console.error('Sign in error:', error.message, error);
+        console.error('❌ Sign in error:', error.message);
         throw new Error(error.message);
       }
 
       if (!data.user) {
-        console.error('No user returned from sign in');
+        console.error('❌ No user returned from sign in');
         throw new Error('Authentication failed - no user returned');
       }
 
-      console.log('Sign in successful for:', email);
+      console.log('✅ Sign in successful for:', email);
     } catch (error) {
-      setIsLoading(false);
+      console.error('💥 Sign in failed:', error);
       throw error;
     }
   };
 
   const signUp = async (email: string, password: string) => {
-    console.log('Attempting to sign up user:', email);
-    setIsLoading(true);
+    console.log('📝 Starting sign up for:', email);
     
     try {
+      const startTime = Date.now();
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
+      const endTime = Date.now();
+      
+      console.log(`📊 Sign up request took ${endTime - startTime}ms`);
 
       if (error) {
-        console.error('Sign up error:', error.message, error);
+        console.error('❌ Sign up error:', error.message);
         throw new Error(error.message);
       }
 
       if (!data.user) {
-        console.error('No user returned from sign up');
+        console.error('❌ No user returned from sign up');
         throw new Error('Sign up failed - no user returned');
       }
 
-      console.log('Sign up successful for:', email);
+      console.log('✅ Sign up successful for:', email);
       
       // Send notification for new user signup
       if (data.user && data.user.email) {
@@ -252,19 +253,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }, 2000);
       }
     } catch (error) {
-      setIsLoading(false);
+      console.error('💥 Sign up failed:', error);
       throw error;
     }
   };
 
   const signOut = async () => {
-    console.log('Signing out user');
+    console.log('🚪 Signing out user');
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error('Sign out error:', error);
+      console.error('❌ Sign out error:', error);
       throw error;
     } else {
-      console.log('Sign out successful');
+      console.log('✅ Sign out successful');
       setUser(null);
     }
   };
@@ -287,8 +288,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="text-cyan-300 text-xl">Loading...</div>
-          <div className="text-gray-400 text-sm">Connecting to authentication service...</div>
-          <div className="text-gray-500 text-xs">This should only take a moment...</div>
+          <div className="text-gray-400 text-sm">Authenticating...</div>
           <div className="mt-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
           </div>
