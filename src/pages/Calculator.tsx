@@ -58,11 +58,11 @@ const Calculator = () => {
     power: 190,
     waterSewer: 0,
     internet: 70,
-    taxLicense: 29,
+    taxLicense: 0,
     insurance: 15,
     software: 70,
     miscellaneous: 0,
-    furnitureRental: 750,
+    furnitureRental: 0,
     squareFootage: 850,
     furnishingsPSF: 8,
   });
