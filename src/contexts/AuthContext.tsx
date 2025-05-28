@@ -1,5 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Session, User as SupabaseUser } from '@supabase/supabase-js';
 
 interface User {
   id: string;
@@ -12,7 +14,7 @@ interface AuthContextType {
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
-  signOut: () => void;
+  signOut: () => Promise<void>;
   isSubscribed: boolean;
 }
 
@@ -31,30 +33,89 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate checking for existing session
-    const checkAuth = () => {
-      const storedUser = localStorage.getItem('rentalizer_user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+    // Get initial session
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await loadUserProfile(session.user);
       }
       setIsLoading(false);
     };
 
-    checkAuth();
+    getSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        await loadUserProfile(session.user);
+      } else {
+        setUser(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  const loadUserProfile = async (supabaseUser: SupabaseUser) => {
+    try {
+      const { data: profile, error } = await supabase
+        .from('user_profiles')
+        .select('subscription_status')
+        .eq('id', supabaseUser.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        console.error('Error loading user profile:', error);
+      }
+
+      // If no profile exists, create one with trial status
+      if (!profile) {
+        const { error: insertError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: supabaseUser.id,
+            email: supabaseUser.email,
+            subscription_status: 'trial'
+          });
+
+        if (insertError) {
+          console.error('Error creating user profile:', insertError);
+        }
+
+        setUser({
+          id: supabaseUser.id,
+          email: supabaseUser.email || '',
+          subscription_status: 'trial'
+        });
+      } else {
+        setUser({
+          id: supabaseUser.id,
+          email: supabaseUser.email || '',
+          subscription_status: profile.subscription_status
+        });
+      }
+    } catch (error) {
+      console.error('Error in loadUserProfile:', error);
+      setUser({
+        id: supabaseUser.id,
+        email: supabaseUser.email || '',
+        subscription_status: 'trial'
+      });
+    }
+  };
 
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Simulate authentication - replace with actual Supabase auth
-      const mockUser: User = {
-        id: '1',
+      const { error } = await supabase.auth.signInWithPassword({
         email,
-        subscription_status: email.includes('premium') ? 'active' : 'inactive'
-      };
-      
-      localStorage.setItem('rentalizer_user', JSON.stringify(mockUser));
-      setUser(mockUser);
+        password,
+      });
+
+      if (error) {
+        throw error;
+      }
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;
@@ -66,15 +127,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Simulate sign up - replace with actual Supabase auth
-      const mockUser: User = {
-        id: Date.now().toString(),
+      const { error } = await supabase.auth.signUp({
         email,
-        subscription_status: 'trial' // New users get trial access
-      };
-      
-      localStorage.setItem('rentalizer_user', JSON.stringify(mockUser));
-      setUser(mockUser);
+        password,
+      });
+
+      if (error) {
+        throw error;
+      }
     } catch (error) {
       console.error('Sign up error:', error);
       throw error;
@@ -83,9 +143,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const signOut = () => {
-    localStorage.removeItem('rentalizer_user');
-    setUser(null);
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Sign out error:', error);
+    }
   };
 
   const isSubscribed = user?.subscription_status === 'active' || user?.subscription_status === 'trial';
