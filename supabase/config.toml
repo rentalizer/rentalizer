@@ -1,1 +1,16 @@
+
 project_id = "bmemylmcbmrieheutktb"
+
+[auth]
+# Use the actual preview URL instead of localhost
+site_url = "https://inspiring-genie-a1691.lovable.app"
+additional_redirect_urls = ["https://inspiring-genie-a1691.lovable.app/reset-password"]
+
+[auth.email]
+# Enable email confirmations in production
+enable_confirmations = true
+
+[local_development]
+# Keep localhost for local development
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/reset-password"]
