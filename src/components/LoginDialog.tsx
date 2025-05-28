@@ -31,7 +31,12 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Form submitted:', { email, isSignUp });
+    console.log('Form submitted:', { email, isSignUp, isSubmitting });
+    
+    if (isSubmitting) {
+      console.log('Already submitting, ignoring');
+      return;
+    }
     
     if (!email || !password) {
       toast({
@@ -52,6 +57,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
     }
     
     setIsSubmitting(true);
+    console.log('Starting authentication process...');
     
     try {
       if (isSignUp) {
@@ -70,7 +76,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
         });
       }
       
-      // Close dialog and reset form on success
+      console.log('Authentication successful, closing dialog');
       setIsOpen(false);
       setEmail('');
       setPassword('');
@@ -83,7 +89,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
         variant: "destructive",
       });
     } finally {
-      // Always reset submitting state
+      console.log('Authentication process completed, resetting submitting state');
       setIsSubmitting(false);
     }
   };
@@ -172,7 +178,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+              className="flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white disabled:opacity-50"
             >
               {isSubmitting ? (
                 'Processing...'

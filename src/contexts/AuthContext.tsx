@@ -53,18 +53,57 @@ const sendNewUserNotification = async (userEmail: string, userId: string) => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     console.log('AuthProvider initializing...');
     
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        // Get initial session
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting initial session:', error);
+        } else if (session?.user && mounted) {
+          console.log('Initial session found for user:', session.user.email);
+          
+          let subscriptionStatus: 'active' | 'inactive' | 'trial' = 'trial';
+          if (session.user.email?.includes('premium') || session.user.email?.includes('pro')) {
+            subscriptionStatus = 'active';
+          }
+          
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            subscription_status: subscriptionStatus
+          });
+        }
+        
+        if (mounted) {
+          setIsLoading(false);
+          setIsInitialized(true);
+        }
+      } catch (error) {
+        console.error('Session initialization error:', error);
+        if (mounted) {
+          setIsLoading(false);
+          setIsInitialized(true);
+        }
+      }
+    };
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state change event:', event, 'Session exists:', !!session);
       
+      if (!mounted) return;
+      
       if (session?.user) {
         console.log('User found in session, setting up user profile...');
         
-        // Determine subscription status based on email
         let subscriptionStatus: 'active' | 'inactive' | 'trial' = 'trial';
         if (session.user.email?.includes('premium') || session.user.email?.includes('pro')) {
           subscriptionStatus = 'active';
@@ -83,96 +122,73 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false);
     });
 
-    // Get initial session
-    const getInitialSession = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Error getting initial session:', error);
-          setIsLoading(false);
-          return;
-        }
-        
-        if (session?.user) {
-          console.log('Initial session found for user:', session.user.email);
-          
-          // Determine subscription status based on email
-          let subscriptionStatus: 'active' | 'inactive' | 'trial' = 'trial';
-          if (session.user.email?.includes('premium') || session.user.email?.includes('pro')) {
-            subscriptionStatus = 'active';
-          }
-          
-          setUser({
-            id: session.user.id,
-            email: session.user.email || '',
-            subscription_status: subscriptionStatus
-          });
-        } else {
-          console.log('No initial session found');
-        }
-        
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Session initialization error:', error);
-        setIsLoading(false);
-      }
-    };
-
-    getInitialSession();
+    initializeAuth();
 
     return () => {
       console.log('Cleaning up auth subscription');
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
 
   const signIn = async (email: string, password: string) => {
     console.log('Attempting to sign in user:', email);
+    setIsLoading(true);
     
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      console.error('Sign in error:', error.message, error);
-      throw new Error(error.message);
+      if (error) {
+        console.error('Sign in error:', error.message, error);
+        throw new Error(error.message);
+      }
+
+      if (!data.user) {
+        console.error('No user returned from sign in');
+        throw new Error('Authentication failed - no user returned');
+      }
+
+      console.log('Sign in successful for:', email);
+    } catch (error) {
+      setIsLoading(false);
+      throw error;
     }
-
-    if (!data.user) {
-      console.error('No user returned from sign in');
-      throw new Error('Authentication failed - no user returned');
-    }
-
-    console.log('Sign in successful for:', email);
   };
 
   const signUp = async (email: string, password: string) => {
     console.log('Attempting to sign up user:', email);
+    setIsLoading(true);
     
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
 
-    if (error) {
-      console.error('Sign up error:', error.message, error);
-      throw new Error(error.message);
-    }
+      if (error) {
+        console.error('Sign up error:', error.message, error);
+        throw new Error(error.message);
+      }
 
-    if (!data.user) {
-      console.error('No user returned from sign up');
-      throw new Error('Sign up failed - no user returned');
-    }
+      if (!data.user) {
+        console.error('No user returned from sign up');
+        throw new Error('Sign up failed - no user returned');
+      }
 
-    console.log('Sign up successful for:', email);
-    
-    // Send notification for new user signup
-    if (data.user && data.user.email) {
-      setTimeout(() => {
-        sendNewUserNotification(data.user!.email!, data.user!.id);
-      }, 2000);
+      console.log('Sign up successful for:', email);
+      
+      // Send notification for new user signup
+      if (data.user && data.user.email) {
+        setTimeout(() => {
+          sendNewUserNotification(data.user!.email!, data.user!.id);
+        }, 2000);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      throw error;
     }
   };
 
@@ -198,6 +214,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signOut,
     isSubscribed
   };
+
+  // Don't render children until auth is initialized
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center justify-center">
+        <div className="text-cyan-300 text-xl">Loading...</div>
+      </div>
+    );
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
