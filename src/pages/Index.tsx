@@ -245,21 +245,21 @@ const Index = () => {
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="target-city" className="text-sm font-medium text-gray-300">
-                      Enter Target City
-                    </Label>
-                    <Input
-                      id="target-city"
-                      value={targetCity}
-                      onChange={(e) => setTargetCity(e.target.value)}
-                      placeholder="Enter any US city name (e.g., Denver, Seattle, Atlanta)"
-                      className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
-                      onKeyPress={(e) => e.key === 'Enter' && handleMarketAnalysis()}
-                    />
-                  </div>
-                  
-                  <div className="flex justify-center">
+                  <div className="flex flex-col items-center space-y-4">
+                    <div className="w-full max-w-md">
+                      <Label htmlFor="target-city" className="text-sm font-medium text-gray-300">
+                        Enter Target City
+                      </Label>
+                      <Input
+                        id="target-city"
+                        value={targetCity}
+                        onChange={(e) => setTargetCity(e.target.value)}
+                        placeholder="Enter any US city name (e.g., Denver, Seattle, Atlanta)"
+                        className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                        onKeyPress={(e) => e.key === 'Enter' && handleMarketAnalysis()}
+                      />
+                    </div>
+                    
                     <Button
                       onClick={handleMarketAnalysis}
                       disabled={isLoading || !targetCity.trim()}
