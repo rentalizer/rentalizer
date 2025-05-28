@@ -128,24 +128,34 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black p-6 relative overflow-hidden">
+      {/* Futuristic background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-purple-500/10 blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 rounded-full bg-blue-500/5 blur-2xl animate-pulse delay-500"></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto space-y-8 relative z-10">
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <ApartmentCube size={48} className="animate-pulse" />
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-800 bg-clip-text text-transparent">
-              Rentalizer
+            <div className="relative">
+              <ApartmentCube size={48} className="animate-pulse text-cyan-400" />
+              <div className="absolute inset-0 rounded-lg bg-cyan-400/20 blur-lg animate-pulse"></div>
+            </div>
+            <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl">
+              RENTALIZER.AI
             </h1>
           </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-cyan-100 max-w-3xl mx-auto font-light tracking-wide">
             Rentalizer™ Helps Investors Analyze Short Term Rental Opportunities
           </p>
-          <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
-            <Badge variant="outline" className="bg-white/50 border-blue-200">2BR/2BA Properties</Badge>
-            <Badge variant="outline" className="bg-white/50 border-cyan-200">Professional Data</Badge>
-            <Badge variant="outline" className="bg-white/50 border-blue-200">Sample Data Available</Badge>
-            <Badge variant="outline" className="bg-white/50 border-cyan-200">AI Analysis</Badge>
+          <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
+            <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">2BR/2BA Properties</Badge>
+            <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 hover:bg-purple-500/10">Professional Data</Badge>
+            <Badge variant="outline" className="bg-gray-800/50 border-blue-500/30 text-blue-300 hover:bg-blue-500/10">Sample Data Available</Badge>
+            <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">AI Analysis</Badge>
           </div>
         </div>
 
@@ -153,33 +163,33 @@ const Index = () => {
         <ApiKeyInput onApiKeysChange={setApiConfig} />
 
         {/* City Analysis */}
-        <Card className="shadow-xl border-0 bg-gradient-to-br from-white/90 to-blue-50/90 backdrop-blur-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2">
-              <Search className="h-5 w-5 text-blue-600" />
+        <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
+          <CardHeader className="pb-4 border-b border-gray-700/50">
+            <CardTitle className="flex items-center gap-2 text-cyan-300">
+              <Search className="h-5 w-5 text-cyan-400" />
               Market Analysis
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="space-y-6">
               <div>
-                <Label htmlFor="city" className="text-base font-medium">Enter Target City</Label>
+                <Label htmlFor="city" className="text-base font-medium text-gray-300">Enter Target City</Label>
                 <Input
                   id="city"
                   type="text"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="Enter any US city name (e.g., Denver, Seattle, Atlanta)"
-                  className="mt-2 text-lg border-blue-200 focus:border-cyan-400"
+                  className="mt-2 text-lg border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
                 />
                 {error && (
-                  <p className="mt-2 text-sm text-red-600">{error}</p>
+                  <p className="mt-2 text-sm text-red-400">{error}</p>
                 )}
               </div>
 
-              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
-                <h4 className="font-medium text-blue-900 mb-2">Current Analysis Mode:</h4>
-                <ul className="text-sm text-blue-800 space-y-1">
+              <div className="bg-gradient-to-r from-gray-800/60 to-gray-700/60 p-4 rounded-lg border border-gray-600/30">
+                <h4 className="font-medium text-cyan-300 mb-2">Current Analysis Mode:</h4>
+                <ul className="text-sm text-gray-300 space-y-1">
                   {apiConfig.airdnaApiKey ? (
                     <li>• ✅ Live professional STR data (2BR/2BA apartments, accommodates 6)</li>
                   ) : (
@@ -199,7 +209,7 @@ const Index = () => {
                   onClick={handleAnalyze}
                   disabled={!city.trim() || isAnalyzing}
                   size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-3 text-lg font-medium shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                  className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-3 text-lg font-medium shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 border border-cyan-500/20"
                 >
                   <Calculator className="h-5 w-5 mr-2" />
                   {isAnalyzing ? 'Analyzing Market Data...' : 'Analyze Market'}
@@ -211,42 +221,42 @@ const Index = () => {
 
         {/* Results */}
         {results.length > 0 && (
-          <Card className="shadow-xl border-0 bg-gradient-to-br from-white/90 to-blue-50/90 backdrop-blur-sm">
-            <CardHeader className="pb-4">
+          <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
+            <CardHeader className="pb-4 border-b border-gray-700/50">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-2xl flex items-center gap-2">
+                  <CardTitle className="text-2xl flex items-center gap-2 text-cyan-300">
                     <ApartmentCube size={24} />
                     {city} STR vs. Rent Analysis (Top Submarkets)
                   </CardTitle>
-                  <p className="text-gray-600 mt-1">
+                  <p className="text-gray-400 mt-1">
                     Submarkets meeting criteria: $4,000+ revenue and 2.0+ multiple
                   </p>
                 </div>
                 <Button
                   onClick={handleExport}
                   variant="outline"
-                  className="flex items-center gap-2 border-blue-200 hover:bg-blue-50"
+                  className="flex items-center gap-2 border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"
                 >
                   <Download className="h-4 w-4" />
                   Export CSV
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-6">
               <ResultsTable results={results} />
               
               <div className="mt-6 space-y-4">
-                <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200">
-                  <h4 className="font-medium text-green-900 mb-2">✅ Analysis Complete</h4>
-                  <p className="text-sm text-green-800">
+                <div className="bg-gradient-to-r from-green-900/40 to-emerald-900/40 p-4 rounded-lg border border-green-500/30">
+                  <h4 className="font-medium text-green-300 mb-2">✅ Analysis Complete</h4>
+                  <p className="text-sm text-green-200">
                     Found {results.length} submarkets meeting investment criteria for {city}.
                   </p>
                 </div>
 
-                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
-                  <h4 className="font-medium text-blue-900 mb-2">Data Sources:</h4>
-                  <ul className="text-sm text-blue-800 space-y-1">
+                <div className="bg-gradient-to-r from-gray-800/60 to-gray-700/60 p-4 rounded-lg border border-gray-600/30">
+                  <h4 className="font-medium text-cyan-300 mb-2">Data Sources:</h4>
+                  <ul className="text-sm text-gray-300 space-y-1">
                     <li>• <strong>STR Revenue:</strong> {apiConfig.airdnaApiKey ? 'Live professional market data' : 'Sample data'} (2BR/2BA Apartments)</li>
                     <li>• <strong>Rental Data:</strong> {apiConfig.openaiApiKey ? 'AI-powered research via OpenAI' : 'Sample data'}</li>
                     <li>• <strong>Calculations:</strong> Automated filtering and revenue-to-rent multiples</li>
@@ -259,11 +269,11 @@ const Index = () => {
 
         {/* No Results Message */}
         {!isAnalyzing && error && (
-          <Card className="shadow-xl border-0 bg-gradient-to-br from-white/90 to-red-50/90 backdrop-blur-sm">
+          <Card className="shadow-2xl border border-red-500/20 bg-gray-900/80 backdrop-blur-lg">
             <CardContent className="py-12">
               <div className="text-center space-y-4">
-                <div className="text-red-500 text-5xl">⚠️</div>
-                <p className="text-lg text-gray-600">{error}</p>
+                <div className="text-red-400 text-5xl">⚠️</div>
+                <p className="text-lg text-gray-300">{error}</p>
                 <p className="text-sm text-gray-500">
                   {!apiConfig.airdnaApiKey && !apiConfig.openaiApiKey 
                     ? "Add your professional data API key above for any US city, or try: Nashville, Miami, Austin" 
@@ -275,11 +285,14 @@ const Index = () => {
         )}
 
         {isAnalyzing && (
-          <Card className="shadow-xl border-0 bg-gradient-to-br from-white/90 to-blue-50/90 backdrop-blur-sm">
+          <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
             <CardContent className="py-12">
               <div className="text-center space-y-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto"></div>
-                <p className="text-lg text-gray-600">Analyzing {city} market data...</p>
+                <div className="relative">
+                  <div className="animate-spin rounded-full h-12 w-12 border-2 border-transparent border-t-cyan-400 border-r-purple-400 mx-auto"></div>
+                  <div className="absolute inset-0 rounded-full bg-cyan-400/10 blur-lg animate-pulse"></div>
+                </div>
+                <p className="text-lg text-gray-300">Analyzing {city} market data...</p>
                 <p className="text-sm text-gray-500">{getAnalysisStatusText()}</p>
               </div>
             </CardContent>
