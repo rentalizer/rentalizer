@@ -1,0 +1,152 @@
+
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { fetchAirDNAListingsData } from '@/services/marketDataService';
+import { useToast } from '@/hooks/use-toast';
+import { CompsSection } from '@/components/calculator/CompsSection';
+import { BuildOutSection } from '@/components/calculator/BuildOutSection';
+import { ExpensesSection } from '@/components/calculator/ExpensesSection';
+import { NetProfitSection } from '@/components/calculator/NetProfitSection';
+import { FurnishingsSection } from '@/components/calculator/FurnishingsSection';
+
+export interface CalculatorData {
+  // Comps
+  address: string;
+  averageComparable: number;
+  
+  // Build Out
+  firstMonthRent: number;
+  securityDeposit: number;
+  furnishingsCost: number;
+  
+  // Expenses
+  rent: number;
+  serviceFees: number;
+  maintenance: number;
+  power: number;
+  waterSewer: number;
+  internet: number;
+  taxLicense: number;
+  insurance: number;
+  software: number;
+  miscellaneous: number;
+  furnitureRental: number;
+  
+  // Furnishings Calculator
+  squareFootage: number;
+  furnishingsPSF: number;
+}
+
+const Calculator = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  const [data, setData] = useState<CalculatorData>({
+    address: '',
+    averageComparable: 0,
+    firstMonthRent: 0,
+    securityDeposit: 500,
+    furnishingsCost: 0,
+    rent: 0,
+    serviceFees: 0,
+    maintenance: 0,
+    power: 190,
+    waterSewer: 0,
+    internet: 70,
+    taxLicense: 29,
+    insurance: 15,
+    software: 70,
+    miscellaneous: 0,
+    furnitureRental: 750,
+    squareFootage: 850,
+    furnishingsPSF: 8,
+  });
+
+  // Calculate derived values
+  const cashToLaunch = data.firstMonthRent + data.securityDeposit + data.furnishingsCost;
+  const serviceFeeCalculated = data.averageComparable * 0.029; // 2.9%
+  const monthlyExpenses = data.rent + serviceFeeCalculated + data.maintenance + data.power + 
+                         data.waterSewer + data.internet + data.taxLicense + data.insurance + 
+                         data.software + data.miscellaneous + data.furnitureRental;
+  const monthlyRevenue = data.averageComparable;
+  const netProfitMonthly = monthlyRevenue - monthlyExpenses;
+  const paybackMonths = cashToLaunch > 0 ? cashToLaunch / netProfitMonthly : 0;
+  const cashOnCashReturn = cashToLaunch > 0 ? (netProfitMonthly * 12 / cashToLaunch) * 100 : 0;
+  const calculatedFurnishings = data.squareFootage * data.furnishingsPSF;
+
+  // Update service fees when average comparable changes
+  useEffect(() => {
+    setData(prev => ({
+      ...prev,
+      serviceFees: prev.averageComparable * 0.029
+    }));
+  }, [data.averageComparable]);
+
+  const updateData = (updates: Partial<CalculatorData>) => {
+    setData(prev => ({ ...prev, ...updates }));
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/')}
+            className="text-gray-400 hover:text-gray-300"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Market Analysis
+          </Button>
+        </div>
+
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
+            <CalculatorIcon className="h-10 w-10 text-cyan-400" />
+            STR Profitability Calculator
+          </h1>
+          <p className="text-xl text-gray-300">
+            Assess property profitability and ROI for short-term rentals
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Left Column */}
+          <div className="space-y-8">
+            <CompsSection data={data} updateData={updateData} />
+            <BuildOutSection data={data} updateData={updateData} cashToLaunch={cashToLaunch} />
+            <FurnishingsSection 
+              data={data} 
+              updateData={updateData} 
+              calculatedFurnishings={calculatedFurnishings} 
+            />
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-8">
+            <ExpensesSection 
+              data={data} 
+              updateData={updateData} 
+              serviceFeeCalculated={serviceFeeCalculated}
+              monthlyExpenses={monthlyExpenses}
+            />
+            <NetProfitSection 
+              monthlyRevenue={monthlyRevenue}
+              netProfitMonthly={netProfitMonthly}
+              paybackMonths={paybackMonths}
+              cashOnCashReturn={cashOnCashReturn}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Calculator;
