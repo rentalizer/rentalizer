@@ -302,8 +302,9 @@ const Index = () => {
               <ApartmentCube />
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              STR Market <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">Intelligence</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">Rentalizer</span>
             </h1>
+            <p className="text-lg text-cyan-300/80 font-medium mb-6">By Richie Matthews</p>
             <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
               Discover the most profitable short-term rental opportunities with AI-powered market analysis and real-time data.
             </p>
