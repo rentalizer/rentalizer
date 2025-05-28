@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -33,7 +32,7 @@ const Index = () => {
     
     try {
       console.log(`Analyzing ${city} with API config:`, { 
-        hasAirdnaKey: !!apiConfig.airdnaApiKey,
+        hasAirbnbKey: !!apiConfig.airbnbApiKey,
         hasOpenaiKey: !!apiConfig.openaiApiKey 
       });
       
@@ -80,12 +79,12 @@ const Index = () => {
   };
 
   const getAnalysisStatusText = () => {
-    if (apiConfig.airdnaApiKey && apiConfig.openaiApiKey) {
-      return 'Fetching live AirDNA and AI rental data...';
+    if (apiConfig.airbnbApiKey && apiConfig.openaiApiKey) {
+      return 'Fetching live Airbnb listings and AI rental data...';
     } else if (apiConfig.openaiApiKey) {
       return 'Using sample STR data and fetching AI rental data...';
-    } else if (apiConfig.airdnaApiKey) {
-      return 'Fetching live AirDNA data and using sample rental data...';
+    } else if (apiConfig.airbnbApiKey) {
+      return 'Fetching live Airbnb listings and using sample rental data...';
     } else {
       return 'Using sample market data...';
     }
@@ -107,7 +106,7 @@ const Index = () => {
             <Badge variant="outline">2BR/2BA Properties</Badge>
             <Badge variant="outline">Upscale Tier</Badge>
             <Badge variant="outline">Top 25% Performance</Badge>
-            <Badge variant="outline">API Ready</Badge>
+            <Badge variant="outline">Affordable APIs</Badge>
           </div>
         </div>
 
@@ -142,13 +141,13 @@ const Index = () => {
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                 <h4 className="font-medium text-blue-900 mb-2">Current Analysis Mode:</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  {apiConfig.airdnaApiKey ? (
-                    <li>• ✅ Live AirDNA data (2BR/2BA upscale properties, top 25% performance)</li>
+                  {apiConfig.airbnbApiKey ? (
+                    <li>• ✅ Live Airbnb listings data (2BR/2BA entire homes, ~$10-50/month)</li>
                   ) : (
                     <li>• 📋 Sample STR data (for supported cities: Nashville, Miami, Austin)</li>
                   )}
                   {apiConfig.openaiApiKey ? (
-                    <li>• 🤖 AI-powered rental data research via OpenAI</li>
+                    <li>• 🤖 AI-powered rental data research via OpenAI (~$5-20/month)</li>
                   ) : (
                     <li>• 📋 Sample rental data (for supported cities only)</li>
                   )}
@@ -208,7 +207,7 @@ const Index = () => {
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                   <h4 className="font-medium text-blue-900 mb-2">Data Sources:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• <strong>STR Revenue:</strong> {apiConfig.airdnaApiKey ? 'Live AirDNA API data' : 'Sample data'} (2BR/2BA Upscale, Top 25%)</li>
+                    <li>• <strong>STR Revenue:</strong> {apiConfig.airbnbApiKey ? 'Live Airbnb listings data via RapidAPI' : 'Sample data'} (2BR/2BA Entire homes)</li>
                     <li>• <strong>Rental Data:</strong> {apiConfig.openaiApiKey ? 'AI-powered research via OpenAI' : 'Sample data'}</li>
                     <li>• <strong>Calculations:</strong> Automated filtering and revenue-to-rent multiples</li>
                   </ul>
@@ -226,8 +225,8 @@ const Index = () => {
                 <div className="text-red-500 text-5xl">⚠️</div>
                 <p className="text-lg text-gray-600">{error}</p>
                 <p className="text-sm text-gray-500">
-                  {!apiConfig.airdnaApiKey && !apiConfig.openaiApiKey 
-                    ? "Add API keys above for any US city, or try: Nashville, Miami, Austin" 
+                  {!apiConfig.airbnbApiKey && !apiConfig.openaiApiKey 
+                    ? "Add affordable API keys above for any US city, or try: Nashville, Miami, Austin" 
                     : "Please check the city name and try again"}
                 </p>
               </div>

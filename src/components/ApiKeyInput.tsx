@@ -8,32 +8,32 @@ import { Badge } from '@/components/ui/badge';
 import { Key, Eye, EyeOff, Search } from 'lucide-react';
 
 interface ApiKeyInputProps {
-  onApiKeysChange: (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => void;
+  onApiKeysChange: (keys: { airbnbApiKey?: string; openaiApiKey?: string }) => void;
 }
 
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
-  const [airdnaKey, setAirdnaKey] = useState('');
+  const [airbnbKey, setAirbnbKey] = useState('');
   const [openaiKey, setOpenaiKey] = useState('');
   const [showKeys, setShowKeys] = useState(false);
   const [showStoredKeys, setShowStoredKeys] = useState(false);
 
   const handleSaveKeys = () => {
     // Store in localStorage for session persistence
-    if (airdnaKey) localStorage.setItem('airdna_api_key', airdnaKey);
+    if (airbnbKey) localStorage.setItem('airbnb_api_key', airbnbKey);
     if (openaiKey) localStorage.setItem('openai_api_key', openaiKey);
     
     onApiKeysChange({
-      airdnaApiKey: airdnaKey || undefined,
+      airbnbApiKey: airbnbKey || undefined,
       openaiApiKey: openaiKey || undefined
     });
   };
 
   const handleViewStoredKeys = () => {
-    const storedAirdna = localStorage.getItem('airdna_api_key') || 'Not set';
+    const storedAirbnb = localStorage.getItem('airbnb_api_key') || 'Not set';
     const storedOpenai = localStorage.getItem('openai_api_key') || 'Not set';
     
     console.log('=== STORED API KEYS ===');
-    console.log('AirDNA API Key:', storedAirdna);
+    console.log('Airbnb API Key:', storedAirbnb);
     console.log('OpenAI API Key:', storedOpenai);
     console.log('=====================');
     
@@ -42,22 +42,22 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
   const getStoredKeys = () => {
     return {
-      airdna: localStorage.getItem('airdna_api_key') || 'Not set',
+      airbnb: localStorage.getItem('airbnb_api_key') || 'Not set',
       openai: localStorage.getItem('openai_api_key') || 'Not set'
     };
   };
 
   // Load keys from localStorage on component mount
   React.useEffect(() => {
-    const savedAirdnaKey = localStorage.getItem('airdna_api_key') || '';
+    const savedAirbnbKey = localStorage.getItem('airbnb_api_key') || '';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
     
-    setAirdnaKey(savedAirdnaKey);
+    setAirbnbKey(savedAirbnbKey);
     setOpenaiKey(savedOpenaiKey);
     
-    if (savedAirdnaKey || savedOpenaiKey) {
+    if (savedAirbnbKey || savedOpenaiKey) {
       onApiKeysChange({
-        airdnaApiKey: savedAirdnaKey || undefined,
+        airbnbApiKey: savedAirbnbKey || undefined,
         openaiApiKey: savedOpenaiKey || undefined
       });
     }
@@ -74,37 +74,40 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
       <CardContent>
         <div className="space-y-6">
           <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <h4 className="font-medium text-blue-900 mb-2">API Integration Options:</h4>
+            <h4 className="font-medium text-blue-900 mb-2">Affordable API Integration Options:</h4>
             <div className="space-y-2 text-sm text-blue-800">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">AirDNA</Badge>
-                <span>For real STR revenue data ($99+/month)</span>
+                <Badge variant="outline" className="text-xs">RapidAPI Airbnb</Badge>
+                <span>For real STR listings data ($10-50/month)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs">OpenAI</Badge>
-                <span>For AI-powered rental data research</span>
+                <span>For AI-powered rental data research ($5-20/month)</span>
               </div>
               <p className="text-xs text-blue-600 mt-2">
                 Leave blank to use sample data. Keys are stored locally in your browser.
+              </p>
+              <p className="text-xs text-red-600 mt-1">
+                Note: AirDNA costs $6,000/month - these alternatives provide similar data at affordable rates.
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="airdna-key" className="text-sm font-medium">
-                AirDNA API Key (Optional)
+              <Label htmlFor="airbnb-key" className="text-sm font-medium">
+                RapidAPI Airbnb Key (Optional)
               </Label>
               <Input
-                id="airdna-key"
+                id="airbnb-key"
                 type={showKeys ? "text" : "password"}
-                value={airdnaKey}
-                onChange={(e) => setAirdnaKey(e.target.value)}
-                placeholder="Enter AirDNA API key..."
+                value={airbnbKey}
+                onChange={(e) => setAirbnbKey(e.target.value)}
+                placeholder="Enter RapidAPI key..."
                 className="mt-1"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Get from: airdna.co/vacation-rental-data-api
+                Get from: rapidapi.com/hub (search "Airbnb Listings")
               </p>
             </div>
 
@@ -131,9 +134,9 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               <h4 className="font-medium text-gray-900 mb-2">Currently Stored Keys:</h4>
               <div className="space-y-2 text-sm">
                 <div>
-                  <span className="font-medium">AirDNA:</span> 
+                  <span className="font-medium">RapidAPI Airbnb:</span> 
                   <span className="ml-2 font-mono text-xs">
-                    {getStoredKeys().airdna === 'Not set' ? 'Not set' : `${getStoredKeys().airdna.substring(0, 8)}...`}
+                    {getStoredKeys().airbnb === 'Not set' ? 'Not set' : `${getStoredKeys().airbnb.substring(0, 8)}...`}
                   </span>
                 </div>
                 <div>

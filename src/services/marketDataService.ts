@@ -1,4 +1,3 @@
-
 interface StrData {
   submarket: string;
   revenue: number;
@@ -70,27 +69,51 @@ const sampleMarketDatabase: Record<string, CityMarketData> = {
   }
 };
 
-// API Configuration - ready for real API keys
+// API Configuration - updated with affordable alternatives
 export interface ApiConfig {
-  airdnaApiKey?: string;
+  airbnbApiKey?: string; // Airbnb public listings data
   openaiApiKey?: string;
+  mashapeKey?: string;   // RapidAPI marketplace
 }
 
-// AirDNA API Service (ready for real implementation)
-export const fetchAirDNAData = async (city: string, apiKey?: string): Promise<StrData[]> => {
-  console.log(`Fetching AirDNA data for ${city}`);
+// Airbnb Public Listings API (much more affordable alternative)
+export const fetchAirbnbListingsData = async (city: string, apiKey?: string): Promise<StrData[]> => {
+  console.log(`Fetching Airbnb listings data for ${city}`);
   
   if (apiKey) {
-    // TODO: Implement real AirDNA API call
-    // const response = await fetch(`https://api.airdna.co/v1/market/${city}`, {
-    //   headers: {
-    //     'Authorization': `Bearer ${apiKey}`,
-    //     'Content-Type': 'application/json'
-    //   }
-    // });
-    // return await response.json();
-    
-    console.log('AirDNA API key provided - ready for real API integration');
+    try {
+      // Using RapidAPI's Airbnb listings endpoints (much cheaper ~$10-50/month)
+      const response = await fetch(`https://airbnb-listings.p.rapidapi.com/v2/listingsByCity`, {
+        method: 'POST',
+        headers: {
+          'X-RapidAPI-Key': apiKey,
+          'X-RapidAPI-Host': 'airbnb-listings.p.rapidapi.com',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          city: city,
+          country: 'United States',
+          property_type: 'Apartment',
+          room_type: 'Entire home/apt',
+          bedrooms: 2,
+          bathrooms: 2
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Process the listings to estimate revenue by neighborhood
+        const processedData = processAirbnbListings(data);
+        console.log('Airbnb listings data fetched successfully');
+        return processedData;
+      } else {
+        throw new Error(`Airbnb API error: ${response.status}`);
+      }
+    } catch (error) {
+      console.error('Error fetching Airbnb listings:', error);
+      throw error;
+    }
   }
   
   // Fallback to sample data for now
@@ -104,7 +127,37 @@ export const fetchAirDNAData = async (city: string, apiKey?: string): Promise<St
   throw new Error(`No STR data available for ${city}`);
 };
 
-// AI-powered rental data fetching
+// Process Airbnb listings to estimate revenue
+const processAirbnbListings = (listings: any[]): StrData[] => {
+  // Group by neighborhood and calculate estimated monthly revenue
+  const neighborhoodData: { [key: string]: number[] } = {};
+  
+  listings.forEach(listing => {
+    const neighborhood = listing.neighborhood || listing.location?.neighborhood || 'Unknown';
+    const dailyRate = listing.price?.amount || 0;
+    
+    // Estimate monthly revenue: daily_rate * 22 days (70% occupancy)
+    const monthlyRevenue = dailyRate * 22;
+    
+    if (!neighborhoodData[neighborhood]) {
+      neighborhoodData[neighborhood] = [];
+    }
+    neighborhoodData[neighborhood].push(monthlyRevenue);
+  });
+  
+  // Calculate median revenue per neighborhood
+  return Object.entries(neighborhoodData).map(([neighborhood, revenues]) => {
+    const sortedRevenues = revenues.sort((a, b) => a - b);
+    const median = sortedRevenues[Math.floor(sortedRevenues.length / 2)];
+    
+    return {
+      submarket: neighborhood,
+      revenue: Math.round(median)
+    };
+  }).filter(item => item.revenue > 0);
+};
+
+// AI-powered rental data fetching (unchanged)
 export const fetchRentalDataWithAI = async (city: string, submarkets: string[], apiKey?: string): Promise<RentData[]> => {
   console.log(`Fetching rental data for ${city} submarkets using AI`);
   
@@ -138,7 +191,6 @@ export const fetchRentalDataWithAI = async (city: string, submarkets: string[], 
         const content = data.choices[0].message.content;
         
         try {
-          // Try to parse JSON from AI response
           const rentData = JSON.parse(content);
           console.log('AI rental data fetched successfully:', rentData);
           return rentData;
@@ -166,13 +218,13 @@ export const fetchRentalDataWithAI = async (city: string, submarkets: string[], 
   throw new Error(`No rental data available for ${city}`);
 };
 
-// Main market data fetching function
+// Main market data fetching function - updated
 export const fetchMarketData = async (city: string, config: ApiConfig = {}): Promise<CityMarketData> => {
   try {
     console.log(`Fetching market data for ${city}...`);
     
-    // Fetch STR data
-    const strData = await fetchAirDNAData(city, config.airdnaApiKey);
+    // Fetch STR data using affordable alternative
+    const strData = await fetchAirbnbListingsData(city, config.airbnbApiKey);
     
     // Extract submarket names for rental data lookup
     const submarkets = strData.map(item => item.submarket);
