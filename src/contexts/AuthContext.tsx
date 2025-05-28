@@ -95,15 +95,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log('AuthProvider initializing...');
+    console.log('🔄 AuthProvider initializing...');
     
     let mounted = true;
+    let timeoutId: NodeJS.Timeout;
     
     const processSession = async (session: Session | null) => {
-      if (!mounted) return;
+      if (!mounted) {
+        console.log('⚠️ Component unmounted, skipping session processing');
+        return;
+      }
+      
+      console.log('📝 Processing session:', session ? 'Session exists' : 'No session');
       
       if (session?.user) {
-        console.log('Processing user session...');
+        console.log('👤 User found, email:', session.user.email);
         
         // Ensure user profile exists
         await createUserProfile(session.user.id, session.user.email || '');
@@ -111,6 +117,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         let subscriptionStatus: 'active' | 'inactive' | 'trial' = 'trial';
         if (session.user.email?.includes('premium') || session.user.email?.includes('pro')) {
           subscriptionStatus = 'active';
+          console.log('✅ User has premium/pro subscription');
+        } else {
+          console.log('🆓 User on trial subscription');
         }
         
         setUser({
@@ -119,29 +128,56 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           subscription_status: subscriptionStatus
         });
       } else {
-        console.log('No user session found');
+        console.log('❌ No user session found');
         setUser(null);
       }
       
-      console.log('Setting isLoading to false');
+      console.log('✅ Setting isLoading to false');
       setIsLoading(false);
     };
     
     // Set up auth state listener
+    console.log('🔧 Setting up auth state listener...');
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event);
+      console.log('🔔 Auth state change event:', event);
       await processSession(session);
     });
 
-    // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      console.log('Initial session loaded');
-      await processSession(session);
-    });
+    // Get initial session with timeout
+    console.log('🚀 Getting initial session...');
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('❌ Error getting initial session:', error);
+        } else {
+          console.log('📋 Initial session loaded');
+        }
+        await processSession(session);
+      } catch (error) {
+        console.error('💥 Exception getting initial session:', error);
+        if (mounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    getInitialSession();
+
+    // Safety timeout to prevent infinite loading
+    timeoutId = setTimeout(() => {
+      if (mounted && isLoading) {
+        console.warn('⏰ Auth initialization timeout - forcing completion');
+        setIsLoading(false);
+      }
+    }, 10000);
 
     return () => {
-      console.log('Cleaning up auth subscription');
+      console.log('🧹 Cleaning up auth subscription');
       mounted = false;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
       subscription.unsubscribe();
     };
   }, []);
@@ -230,7 +266,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isSubscribed
   };
 
-  console.log('AuthProvider render - isLoading:', isLoading, 'user exists:', !!user);
+  console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user, 'isSubscribed:', isSubscribed);
 
   if (isLoading) {
     return (
