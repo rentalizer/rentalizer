@@ -213,7 +213,7 @@ const Index = () => {
             </div>
             <p className="text-lg text-cyan-300/80 font-medium mb-6">By Richie Matthews</p>
             <p className="text-2xl text-cyan-100 mb-8 max-w-3xl mx-auto">
-              The All-In-One AI System To Earn Rental Income—No Mortgage Needed
+              Save Weeks, Even Months Finding Cash-Flowing Rental Arbitrage Markets
             </p>
             
             {/* Property Type Badges */}
@@ -259,23 +259,26 @@ const Index = () => {
                     />
                   </div>
                   
-                  <Button
-                    onClick={handleMarketAnalysis}
-                    disabled={isLoading || !targetCity.trim()}
-                    className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300"
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Analyzing Market...
-                      </>
-                    ) : (
-                      <>
-                        <Search className="h-4 w-4 mr-2" />
-                        Rentalize Market
-                      </>
-                    )}
-                  </Button>
+                  <div className="flex justify-center">
+                    <Button
+                      onClick={handleMarketAnalysis}
+                      disabled={isLoading || !targetCity.trim()}
+                      size="sm"
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-300 px-6"
+                    >
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Analyzing Market...
+                        </>
+                      ) : (
+                        <>
+                          <Search className="h-4 w-4 mr-2" />
+                          Rentalize Market
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
