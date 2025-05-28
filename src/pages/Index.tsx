@@ -210,7 +210,7 @@ const Index = () => {
               </p>
               
               <p className="text-xl text-gray-300 font-medium leading-relaxed">
-                Rentalizer Is A Powerful AI System That Helps You Find The Best Rental Markets, Acquire Properties, Manage Your Properties, And Automate The Income.
+                Ill ceck - until the fix the page and update in the new copy I provided--use the tagline
               </p>
               
               <div className="space-y-4 mt-8">
