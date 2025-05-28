@@ -9,6 +9,8 @@ import { SubscriptionGate } from "@/components/SubscriptionGate";
 import Index from "./pages/Index";
 import Calculator from "./pages/Calculator";
 import ResetPassword from "./pages/ResetPassword";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,8 @@ const AppRoutes = () => (
       </SubscriptionGate>
     } />
     <Route path="/reset-password" element={<ResetPassword />} />
+    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+    <Route path="/terms-of-service" element={<TermsOfService />} />
   </Routes>
 );
 

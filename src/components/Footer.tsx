@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Mail, Globe, Twitter, Linkedin, Github } from 'lucide-react';
+import { BarChart3, Mail } from 'lucide-react';
 import { ContactChat } from './ContactChat';
+import { Link } from 'react-router-dom';
 
 export const Footer = () => {
   const handleProductLink = (feature: string) => {
@@ -28,15 +29,6 @@ export const Footer = () => {
               Make data-driven investment decisions with professional market insights.
             </p>
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-cyan-300">
-                <Twitter className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-cyan-300">
-                <Linkedin className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-cyan-300">
-                <Github className="h-4 w-4" />
-              </Button>
               <Button variant="ghost" size="sm" className="text-gray-400 hover:text-cyan-300">
                 <Mail className="h-4 w-4" />
               </Button>
@@ -98,14 +90,14 @@ export const Footer = () => {
                 <ContactChat />
               </li>
               <li>
-                <a href="/privacy-policy" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
+                <Link to="/privacy-policy" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="/terms-of-service" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
+                <Link to="/terms-of-service" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
                   Terms of Service
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
