@@ -206,7 +206,11 @@ const Index = () => {
             
             <div className="max-w-4xl mx-auto space-y-6">
               <p className="text-3xl text-cyan-100 font-light tracking-wide leading-relaxed">
-                The All-In-One AI System To Earn Rental Income—No Mortgage Needed
+                Save weeks or months of research:
+                • Professional STR revenue data for any US city
+                • AI-powered rental market research
+                • Revenue-to-rent multiple calculations
+                • Export capabilities for your analysis
               </p>
               
               <p className="text-xl text-gray-300 font-medium leading-relaxed">

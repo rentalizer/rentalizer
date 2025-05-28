@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -74,10 +73,10 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-white">
           <MapPin className="h-5 w-5 text-cyan-400" />
-          1. Comparable Properties (COMPS)
+          1. Comparable Properties
         </CardTitle>
         <p className="text-sm text-gray-300">
-          Find 2BR/2BA apartments in your target market using AirDNA data
+          Find 2BR/2BA apartments in your immediate target neighborhood
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
