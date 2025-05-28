@@ -1,12 +1,14 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Search, MapPin, DollarSign } from 'lucide-react';
+import { Search, MapPin, DollarSign, Map } from 'lucide-react';
 import { fetchAirDNAListingsData } from '@/services/marketDataService';
 import { useToast } from '@/hooks/use-toast';
 import { CalculatorData } from '@/pages/Calculator';
+import { MapViewComps } from './MapViewComps';
 
 interface CompsSectionProps {
   data: CalculatorData;
@@ -17,6 +19,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [comps, setComps] = useState<Array<{ name: string; price: number }>>([]);
+  const [showMap, setShowMap] = useState(false);
 
   const fetchComparables = async () => {
     if (!data.address.trim()) {
@@ -76,7 +79,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
           1. Comparable Properties
         </CardTitle>
         <p className="text-sm text-gray-300">
-          Find 2BR/2BA apartments in your immediate target neighborhood
+          Find 2BR/2BA apartments in your immediate target neighborhood (6 people capacity)
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -107,17 +110,43 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
         </div>
 
         {comps.length > 0 && (
-          <div className="mt-6">
-            <Label className="text-gray-200 mb-3 block">Comparable Properties</Label>
-            <div className="space-y-2">
-              {comps.map((comp, index) => (
-                <div key={index} className="flex justify-between items-center p-3 bg-gray-800/30 rounded-md">
-                  <span className="text-cyan-300 text-sm">{comp.name}</span>
-                  <span className="text-white font-medium">${comp.price.toLocaleString()}</span>
-                </div>
-              ))}
+          <>
+            <div className="flex justify-between items-center mt-6">
+              <Label className="text-gray-200">Comparable Properties</Label>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant={!showMap ? "default" : "outline"}
+                  onClick={() => setShowMap(false)}
+                  className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                >
+                  List View
+                </Button>
+                <Button
+                  size="sm"
+                  variant={showMap ? "default" : "outline"}
+                  onClick={() => setShowMap(true)}
+                  className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+                >
+                  <Map className="h-4 w-4 mr-1" />
+                  Map View
+                </Button>
+              </div>
             </div>
-          </div>
+
+            {showMap ? (
+              <MapViewComps comps={comps} address={data.address} />
+            ) : (
+              <div className="space-y-2">
+                {comps.map((comp, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 bg-gray-800/30 rounded-md">
+                    <span className="text-cyan-300 text-sm">{comp.name}</span>
+                    <span className="text-white font-medium">${comp.price.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         <div className="mt-6 p-4 bg-gradient-to-r from-cyan-600/20 to-purple-600/20 rounded-lg border border-cyan-500/30">
