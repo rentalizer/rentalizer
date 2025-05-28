@@ -207,16 +207,15 @@ const Index = () => {
             
             <div className="max-w-4xl mx-auto space-y-6">
               <p className="text-3xl text-cyan-100 font-light tracking-wide leading-relaxed">
-                Save weeks or months of research:
-                • Professional STR revenue data for any US city
-                • AI-powered rental market research
-                • Revenue-to-rent multiple calculations
-                • Export capabilities for your analysis
-              </p>
-              
-              <p className="text-xl text-gray-300 font-medium leading-relaxed">
                 Save Weeks, Even Months Finding Cash-Flowing Rental Arbitrage Markets
               </p>
+              
+              <div className="flex items-center justify-center gap-4 text-sm mt-8">
+                <Badge variant="outline" className="bg-slate-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">2BR/2BA Properties</Badge>
+                <Badge variant="outline" className="bg-slate-800/50 border-blue-500/30 text-blue-300 hover:bg-blue-500/10">Professional Data</Badge>
+                <Badge variant="outline" className="bg-slate-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">Sample Data Available</Badge>
+                <Badge variant="outline" className="bg-slate-800/50 border-green-500/30 text-green-300 hover:bg-green-500/10">AI Analysis</Badge>
+              </div>
               
               <div className="space-y-4 mt-8">
                 <p className="text-xl text-gray-300 font-medium">
@@ -256,13 +255,6 @@ const Index = () => {
                 </div>
               </div>
             </div>
-            
-            <div className="flex items-center justify-center gap-4 text-sm mt-8">
-              <Badge variant="outline" className="bg-slate-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">🎯 No Mortgage Required</Badge>
-              <Badge variant="outline" className="bg-slate-800/50 border-blue-500/30 text-blue-300 hover:bg-blue-500/10">🤖 AI-Powered</Badge>
-              <Badge variant="outline" className="bg-slate-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">⚡ All-In-One System</Badge>
-              <Badge variant="outline" className="bg-slate-800/50 border-green-500/30 text-green-300 hover:bg-green-500/10">💰 Passive Income</Badge>
-            </div>
           </div>
 
           {!showPricing ? (
@@ -299,16 +291,24 @@ const Index = () => {
           {/* Header */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-4 mb-6">
-              <Building2 className="h-16 w-16 text-cyan-400" />
+              <BarChart3 className="h-16 w-16 text-cyan-400" />
               <ApartmentCube />
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Rentalizer</span>
             </h1>
             <p className="text-lg text-cyan-300/80 font-medium mb-6">By Richie Matthews</p>
-            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Discover the most profitable short-term rental opportunities with AI-powered market analysis and real-time data.
+            <p className="text-2xl text-cyan-100 mb-8 max-w-3xl mx-auto">
+              Save Weeks, Even Months Finding Cash-Flowing Rental Arbitrage Markets
             </p>
+            
+            {/* Feature badges */}
+            <div className="flex items-center justify-center gap-4 text-sm mb-8">
+              <Badge variant="outline" className="bg-slate-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">2BR/2BA Properties</Badge>
+              <Badge variant="outline" className="bg-slate-800/50 border-blue-500/30 text-blue-300 hover:bg-blue-500/10">Professional Data</Badge>
+              <Badge variant="outline" className="bg-slate-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">Sample Data Available</Badge>
+              <Badge variant="outline" className="bg-slate-800/50 border-green-500/30 text-green-300 hover:bg-green-500/10">AI Analysis</Badge>
+            </div>
             
             {/* Navigation Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -331,8 +331,8 @@ const Index = () => {
             </div>
           </div>
 
-          {/* City Analysis - moved to top */}
-          <Card className="shadow-2xl border border-cyan-500/20 bg-slate-900/80 backdrop-blur-lg">
+          {/* City Analysis */}
+          <Card className="shadow-2xl border border-cyan-500/20 bg-slate-900/80 backdrop-blur-lg mb-8">
             <CardHeader className="pb-4 border-b border-slate-700/50">
               <CardTitle className="flex items-center gap-2 text-cyan-300">
                 <Search className="h-5 w-5 text-cyan-400" />
