@@ -94,18 +94,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     console.log('🔄 AuthProvider initializing...');
+    
+    // Set a maximum timeout for initialization
+    const initTimeout = setTimeout(() => {
+      console.log('⏰ Auth initialization timeout, setting loading to false');
+      setIsLoading(false);
+    }, 5000); // 5 second timeout
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('🔔 Auth state change event:', event);
+      console.log('🔔 Auth state change event:', event, 'Session exists:', !!session);
+      
+      clearTimeout(initTimeout); // Clear timeout since we got a response
       
       if (session?.user) {
         console.log('👤 User found, email:', session.user.email);
-        
-        // Create user profile if needed
-        setTimeout(() => {
-          createUserProfile(session.user.id, session.user.email || '');
-        }, 0);
         
         const subscriptionStatus: 'active' | 'inactive' | 'trial' = 
           (session.user.email?.includes('premium') || session.user.email?.includes('pro')) ? 'active' : 'trial';
@@ -115,6 +118,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           email: session.user.email || '',
           subscription_status: subscriptionStatus
         });
+        
+        // Create user profile if needed (non-blocking)
+        setTimeout(() => {
+          createUserProfile(session.user.id, session.user.email || '');
+        }, 0);
       } else {
         console.log('❌ No user session found');
         setUser(null);
@@ -123,11 +131,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false);
     });
 
-    // Get initial session
+    // Get initial session with timeout
     const getInitialSession = async () => {
       try {
         console.log('📡 Getting initial session...');
-        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session fetch timeout')), 3000)
+        );
+        
+        const { data: { session }, error } = await Promise.race([
+          sessionPromise,
+          timeoutPromise
+        ]) as any;
         
         if (error) {
           console.error('❌ Error getting initial session:', error);
@@ -148,9 +165,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           });
         }
         
+        clearTimeout(initTimeout);
         setIsLoading(false);
       } catch (error) {
         console.error('💥 Exception getting initial session:', error);
+        clearTimeout(initTimeout);
         setIsLoading(false);
       }
     };
@@ -159,6 +178,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => {
       console.log('🧹 Cleaning up auth subscription');
+      clearTimeout(initTimeout);
       subscription.unsubscribe();
     };
   }, []);
@@ -233,6 +253,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           <div className="text-gray-400 text-sm">Connecting to authentication...</div>
           <div className="mt-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
+          </div>
+          <div className="text-xs text-gray-500 mt-4">
+            If this takes too long, please refresh the page
           </div>
         </div>
       </div>
