@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Download, Calculator, TrendingUp, Search, LogOut, User, Map, BarChart3 } from 'lucide-react';
 import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
@@ -30,7 +32,6 @@ const Index = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState('');
   const [apiConfig, setApiConfig] = useState<ApiConfig>({});
-  const [viewMode, setViewMode] = useState<'table' | 'map'>('table');
   const [showPricing, setShowPricing] = useState(false);
 
   const handleUpgrade = (promoCode?: string) => {
@@ -293,7 +294,7 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        {/* Results */}
+        {/* Results - Split Screen Layout */}
         {results.length > 0 && (
           <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
             <CardHeader className="pb-4 border-b border-gray-700/50">
@@ -328,31 +329,10 @@ const Index = () => {
                     Market Overview: {city}
                   </CardTitle>
                   <p className="text-gray-400 mt-1">
-                    {results.length} Submarkets • Revenue Potential Analysis
+                    {results.length} Submarkets • Split Screen Analysis
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  {/* View Toggle */}
-                  <div className="flex bg-gray-800/50 rounded-lg p-1">
-                    <Button
-                      onClick={() => setViewMode('table')}
-                      variant={viewMode === 'table' ? 'default' : 'ghost'}
-                      size="sm"
-                      className={viewMode === 'table' ? 'bg-cyan-600 hover:bg-cyan-500' : 'text-gray-400 hover:text-cyan-300'}
-                    >
-                      <TrendingUp className="h-4 w-4 mr-2" />
-                      Table
-                    </Button>
-                    <Button
-                      onClick={() => setViewMode('map')}
-                      variant={viewMode === 'map' ? 'default' : 'ghost'}
-                      size="sm"
-                      className={viewMode === 'map' ? 'bg-cyan-600 hover:bg-cyan-500' : 'text-gray-400 hover:text-cyan-300'}
-                    >
-                      <Map className="h-4 w-4 mr-2" />
-                      Map
-                    </Button>
-                  </div>
                   <Button
                     onClick={handleExport}
                     variant="outline"
@@ -365,11 +345,34 @@ const Index = () => {
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              {viewMode === 'table' ? (
-                <ResultsTable results={results} />
-              ) : (
-                <MapView results={results} city={city} />
-              )}
+              {/* Split Screen Layout */}
+              <ResizablePanelGroup direction="horizontal" className="min-h-[700px] w-full rounded-lg border border-gray-700">
+                <ResizablePanel defaultSize={50} minSize={30}>
+                  <div className="h-full p-4 bg-gray-900/50">
+                    <div className="flex items-center gap-2 mb-4">
+                      <TrendingUp className="h-5 w-5 text-cyan-400" />
+                      <h3 className="text-lg font-semibold text-cyan-300">Data Table</h3>
+                    </div>
+                    <div className="h-[calc(100%-2rem)] overflow-auto">
+                      <ResultsTable results={results} />
+                    </div>
+                  </div>
+                </ResizablePanel>
+                
+                <ResizableHandle withHandle />
+                
+                <ResizablePanel defaultSize={50} minSize={30}>
+                  <div className="h-full p-4 bg-gray-900/50">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Map className="h-5 w-5 text-cyan-400" />
+                      <h3 className="text-lg font-semibold text-cyan-300">Market Map</h3>
+                    </div>
+                    <div className="h-[calc(100%-2rem)]">
+                      <MapView results={results} city={city} />
+                    </div>
+                  </div>
+                </ResizablePanel>
+              </ResizablePanelGroup>
               
               <div className="mt-6 space-y-4">
                 <div className="bg-gradient-to-r from-green-900/40 to-emerald-900/40 p-4 rounded-lg border border-green-500/30">
