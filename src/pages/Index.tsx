@@ -47,9 +47,9 @@ const Index = () => {
           <div className="container mx-auto px-4 py-12">
             {/* Header */}
             <div className="text-center mb-12">
-              <div className="flex items-center justify-center gap-3 mb-6">
-                <BarChart3 className="h-8 w-8 text-cyan-400" />
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <BarChart3 className="h-12 w-12 text-cyan-400" />
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                   RENTALIZER
                 </h1>
               </div>
@@ -132,9 +132,9 @@ const Index = () => {
         <div className="container mx-auto px-4 py-12">
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <BarChart3 className="h-8 w-8 text-cyan-400" />
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <BarChart3 className="h-12 w-12 text-cyan-400" />
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 RENTALIZER
               </h1>
             </div>
