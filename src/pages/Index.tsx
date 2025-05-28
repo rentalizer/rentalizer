@@ -139,7 +139,7 @@ const Index = () => {
             </h1>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            AI-powered rental market analysis for smart real estate investment decisions
+            Rentalizer™ Helps Investors Analyze Short Term Rental Opportunities
           </p>
           <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
             <Badge variant="outline" className="bg-white/50 border-blue-200">2BR/2BA Properties</Badge>
