@@ -3,8 +3,15 @@ import React from 'react';
 import { BarChart3 } from 'lucide-react';
 
 export const AnimatedBannerDraft = () => {
+  console.log('AnimatedBannerDraft component is rendering');
+  
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      {/* Test content to make sure it's visible */}
+      <div className="absolute top-4 left-4 z-50 bg-red-500 text-white p-2 rounded">
+        ANIMATION DRAFT PAGE - YOU CAN SEE THIS!
+      </div>
+      
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
         {/* Large floating circles */}
