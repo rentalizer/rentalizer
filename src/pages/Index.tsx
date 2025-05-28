@@ -9,6 +9,7 @@ import { ResultsTable } from '@/components/ResultsTable';
 import { ApiKeyInput } from '@/components/ApiKeyInput';
 import { calculateMarketMetrics } from '@/utils/marketCalculations';
 import { fetchMarketData, ApiConfig } from '@/services/marketDataService';
+import { useToast } from '@/hooks/use-toast';
 
 interface SubmarketData {
   submarket: string;
@@ -18,6 +19,7 @@ interface SubmarketData {
 }
 
 const Index = () => {
+  const { toast } = useToast();
   const [city, setCity] = useState('');
   const [results, setResults] = useState<SubmarketData[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -36,21 +38,55 @@ const Index = () => {
         hasOpenaiKey: !!apiConfig.openaiApiKey 
       });
       
+      // Show loading toast
+      toast({
+        title: "🔍 Analyzing Market",
+        description: `Fetching ${apiConfig.airbnbApiKey ? 'live Airbnb' : 'sample'} data for ${city}...`,
+      });
+      
       const marketData = await fetchMarketData(city, apiConfig);
       const calculatedResults = calculateMarketMetrics(marketData.strData, marketData.rentData);
       
       setResults(calculatedResults);
+      
+      // Show success toast
+      toast({
+        title: "✅ Analysis Complete",
+        description: `Found ${calculatedResults.length} qualifying submarkets in ${city}`,
+      });
+      
       console.log(`Analysis complete for ${city}:`, calculatedResults);
       
     } catch (error) {
       console.error('Market analysis error:', error);
       setResults([]);
       
+      let errorMessage = '';
       if (error instanceof Error) {
+        errorMessage = error.message;
         setError(error.message);
       } else {
-        setError(`Unable to analyze ${city}. Please check the city name or try again later.`);
+        errorMessage = `Unable to analyze ${city}. Please check the city name or try again later.`;
+        setError(errorMessage);
       }
+      
+      // Show error toast with helpful guidance
+      toast({
+        title: "❌ Analysis Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      
+      // If API error, suggest alternatives
+      if (errorMessage.includes('API') && apiConfig.airbnbApiKey) {
+        setTimeout(() => {
+          toast({
+            title: "💡 Suggestion",
+            description: "Try a different Airbnb API from RapidAPI, or use sample data by removing the API key.",
+          });
+        }, 2000);
+      }
+      
     } finally {
       setIsAnalyzing(false);
     }
