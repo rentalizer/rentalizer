@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Download, Calculator, TrendingUp, Search, LogOut, User } from 'lucide-react';
+import { Download, Calculator, TrendingUp, Search, LogOut, User, Map } from 'lucide-react';
 import { ResultsTable } from '@/components/ResultsTable';
+import { MapView } from '@/components/MapView';
 import { ApiKeyInput } from '@/components/ApiKeyInput';
 import { calculateMarketMetrics } from '@/utils/marketCalculations';
 import { fetchMarketData, ApiConfig } from '@/services/marketDataService';
@@ -27,6 +28,7 @@ const Index = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState('');
   const [apiConfig, setApiConfig] = useState<ApiConfig>({});
+  const [viewMode, setViewMode] = useState<'table' | 'map'>('table');
 
   const handleAnalyze = async () => {
     if (!city.trim()) return;
@@ -174,7 +176,7 @@ const Index = () => {
                 <div className="absolute inset-0 rounded-lg bg-cyan-400/20 blur-lg animate-pulse"></div>
               </div>
               <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl">
-                RENTALIZER.AI
+                RENTALIZER
               </h1>
             </div>
             <div className="flex-1 flex justify-end items-center gap-3">
@@ -197,7 +199,7 @@ const Index = () => {
             </div>
           </div>
           <p className="text-xl text-cyan-100 max-w-3xl mx-auto font-light tracking-wide">
-            Rentalizer™ Helps Investors Analyze Short Term Rental Opportunities
+            Helping Investors Analyze Short Term Rental Opportunities
           </p>
           <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
             <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">2BR/2BA Properties</Badge>
@@ -240,7 +242,7 @@ const Index = () => {
                   className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-3 text-lg font-medium shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 border border-cyan-500/20"
                 >
                   <Calculator className="h-5 w-5 mr-2" />
-                  {isAnalyzing ? 'Analyzing Market Data...' : 'Rentalize Market'}
+                  {isAnalyzing ? 'Analyzing Market Data...' : 'Analyze Market'}
                 </Button>
               </div>
             </div>
@@ -279,24 +281,51 @@ const Index = () => {
                       <circle cx="30" cy="6" r="2" fill="rgb(168, 85, 247)" />
                       <circle cx="42" cy="10" r="2" fill="rgb(34, 211, 238)" />
                     </svg>
-                    {city} STR vs. Rent Analysis (Top Submarkets)
+                    Market Overview: {city}
                   </CardTitle>
                   <p className="text-gray-400 mt-1">
-                    Submarkets meeting criteria: $4,000+ revenue and 2.0+ multiple
+                    {results.length} Submarkets • Revenue Potential Analysis
                   </p>
                 </div>
-                <Button
-                  onClick={handleExport}
-                  variant="outline"
-                  className="flex items-center gap-2 border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"
-                >
-                  <Download className="h-4 w-4" />
-                  Export CSV
-                </Button>
+                <div className="flex items-center gap-3">
+                  {/* View Toggle */}
+                  <div className="flex bg-gray-800/50 rounded-lg p-1">
+                    <Button
+                      onClick={() => setViewMode('table')}
+                      variant={viewMode === 'table' ? 'default' : 'ghost'}
+                      size="sm"
+                      className={viewMode === 'table' ? 'bg-cyan-600 hover:bg-cyan-500' : 'text-gray-400 hover:text-cyan-300'}
+                    >
+                      <TrendingUp className="h-4 w-4 mr-2" />
+                      Table
+                    </Button>
+                    <Button
+                      onClick={() => setViewMode('map')}
+                      variant={viewMode === 'map' ? 'default' : 'ghost'}
+                      size="sm"
+                      className={viewMode === 'map' ? 'bg-cyan-600 hover:bg-cyan-500' : 'text-gray-400 hover:text-cyan-300'}
+                    >
+                      <Map className="h-4 w-4 mr-2" />
+                      Map
+                    </Button>
+                  </div>
+                  <Button
+                    onClick={handleExport}
+                    variant="outline"
+                    className="flex items-center gap-2 border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"
+                  >
+                    <Download className="h-4 w-4" />
+                    Export CSV
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="pt-6">
-              <ResultsTable results={results} />
+              {viewMode === 'table' ? (
+                <ResultsTable results={results} />
+              ) : (
+                <MapView results={results} city={city} />
+              )}
               
               <div className="mt-6 space-y-4">
                 <div className="bg-gradient-to-r from-green-900/40 to-emerald-900/40 p-4 rounded-lg border border-green-500/30">
