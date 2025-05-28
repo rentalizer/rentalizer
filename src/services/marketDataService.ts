@@ -18,86 +18,86 @@ interface CityMarketData {
 const sampleMarketDatabase: Record<string, CityMarketData> = {
   'nashville': {
     strData: [
-      { submarket: 'Downtown', revenue: 6794 },
-      { submarket: 'The Gulch', revenue: 6000 },
-      { submarket: 'East Nashville', revenue: 5200 },
-      { submarket: '12 South', revenue: 4800 },
-      { submarket: 'Midtown', revenue: 4640 },
-      { submarket: 'Music Row', revenue: 4200 },
-      { submarket: 'Germantown', revenue: 3800 }
+      { submarket: 'Downtown Apartments', revenue: 6794 },
+      { submarket: 'The Gulch Apartments', revenue: 6000 },
+      { submarket: 'East Nashville Apartments', revenue: 5200 },
+      { submarket: '12 South Apartments', revenue: 4800 },
+      { submarket: 'Midtown Apartments', revenue: 4640 },
+      { submarket: 'Music Row Apartments', revenue: 4200 },
+      { submarket: 'Germantown Apartments', revenue: 3800 }
     ],
     rentData: [
-      { submarket: 'Downtown', rent: 2513 },
-      { submarket: 'The Gulch', rent: 2456 },
-      { submarket: 'East Nashville', rent: 2307 },
-      { submarket: '12 South', rent: 2136 },
-      { submarket: 'Midtown', rent: 2272 },
-      { submarket: 'Music Row', rent: 2100 },
-      { submarket: 'Germantown', rent: 2200 }
+      { submarket: 'Downtown Apartments', rent: 2513 },
+      { submarket: 'The Gulch Apartments', rent: 2456 },
+      { submarket: 'East Nashville Apartments', rent: 2307 },
+      { submarket: '12 South Apartments', rent: 2136 },
+      { submarket: 'Midtown Apartments', rent: 2272 },
+      { submarket: 'Music Row Apartments', rent: 2100 },
+      { submarket: 'Germantown Apartments', rent: 2200 }
     ]
   },
   'miami': {
     strData: [
-      { submarket: 'Brickell', revenue: 7200 },
-      { submarket: 'South Beach', revenue: 8500 },
-      { submarket: 'Downtown Miami', revenue: 6800 },
-      { submarket: 'Wynwood', revenue: 5400 },
-      { submarket: 'Coral Gables', revenue: 6200 }
+      { submarket: 'Brickell Apartments', revenue: 7200 },
+      { submarket: 'South Beach Apartments', revenue: 8500 },
+      { submarket: 'Downtown Miami Apartments', revenue: 6800 },
+      { submarket: 'Wynwood Apartments', revenue: 5400 },
+      { submarket: 'Coral Gables Apartments', revenue: 6200 }
     ],
     rentData: [
-      { submarket: 'Brickell', rent: 3200 },
-      { submarket: 'South Beach', rent: 3800 },
-      { submarket: 'Downtown Miami', rent: 2900 },
-      { submarket: 'Wynwood', rent: 2400 },
-      { submarket: 'Coral Gables', rent: 2800 }
+      { submarket: 'Brickell Apartments', rent: 3200 },
+      { submarket: 'South Beach Apartments', rent: 3800 },
+      { submarket: 'Downtown Miami Apartments', rent: 2900 },
+      { submarket: 'Wynwood Apartments', rent: 2400 },
+      { submarket: 'Coral Gables Apartments', rent: 2800 }
     ]
   },
   'austin': {
     strData: [
-      { submarket: 'Downtown Austin', revenue: 6500 },
-      { submarket: 'South Austin', revenue: 5800 },
-      { submarket: 'East Austin', revenue: 5200 },
-      { submarket: 'West Austin', revenue: 4800 },
-      { submarket: 'North Austin', revenue: 4200 }
+      { submarket: 'Downtown Austin Apartments', revenue: 6500 },
+      { submarket: 'South Austin Apartments', revenue: 5800 },
+      { submarket: 'East Austin Apartments', revenue: 5200 },
+      { submarket: 'West Austin Apartments', revenue: 4800 },
+      { submarket: 'North Austin Apartments', revenue: 4200 }
     ],
     rentData: [
-      { submarket: 'Downtown Austin', rent: 2800 },
-      { submarket: 'South Austin', rent: 2400 },
-      { submarket: 'East Austin', rent: 2200 },
-      { submarket: 'West Austin', rent: 2000 },
-      { submarket: 'North Austin', rent: 1900 }
+      { submarket: 'Downtown Austin Apartments', rent: 2800 },
+      { submarket: 'South Austin Apartments', rent: 2400 },
+      { submarket: 'East Austin Apartments', rent: 2200 },
+      { submarket: 'West Austin Apartments', rent: 2000 },
+      { submarket: 'North Austin Apartments', rent: 1900 }
     ]
   },
   'denver': {
     strData: [
-      { submarket: 'Downtown Denver', revenue: 5800 },
-      { submarket: 'LoDo', revenue: 5500 },
-      { submarket: 'Capitol Hill', revenue: 4900 },
-      { submarket: 'Highlands', revenue: 4600 },
-      { submarket: 'RiNo', revenue: 4300 }
+      { submarket: 'Downtown Denver Apartments', revenue: 5800 },
+      { submarket: 'LoDo Apartments', revenue: 5500 },
+      { submarket: 'Capitol Hill Apartments', revenue: 4900 },
+      { submarket: 'Highlands Apartments', revenue: 4600 },
+      { submarket: 'RiNo Apartments', revenue: 4300 }
     ],
     rentData: [
-      { submarket: 'Downtown Denver', rent: 2400 },
-      { submarket: 'LoDo', rent: 2300 },
-      { submarket: 'Capitol Hill', rent: 2100 },
-      { submarket: 'Highlands', rent: 2000 },
-      { submarket: 'RiNo', rent: 1900 }
+      { submarket: 'Downtown Denver Apartments', rent: 2400 },
+      { submarket: 'LoDo Apartments', rent: 2300 },
+      { submarket: 'Capitol Hill Apartments', rent: 2100 },
+      { submarket: 'Highlands Apartments', rent: 2000 },
+      { submarket: 'RiNo Apartments', rent: 1900 }
     ]
   },
   'seattle': {
     strData: [
-      { submarket: 'Downtown Seattle', revenue: 6200 },
-      { submarket: 'Capitol Hill', revenue: 5700 },
-      { submarket: 'Belltown', revenue: 5400 },
-      { submarket: 'Fremont', revenue: 4800 },
-      { submarket: 'Ballard', revenue: 4500 }
+      { submarket: 'Downtown Seattle Apartments', revenue: 6200 },
+      { submarket: 'Capitol Hill Apartments', revenue: 5700 },
+      { submarket: 'Belltown Apartments', revenue: 5400 },
+      { submarket: 'Fremont Apartments', revenue: 4800 },
+      { submarket: 'Ballard Apartments', revenue: 4500 }
     ],
     rentData: [
-      { submarket: 'Downtown Seattle', rent: 2800 },
-      { submarket: 'Capitol Hill', rent: 2600 },
-      { submarket: 'Belltown', rent: 2700 },
-      { submarket: 'Fremont', rent: 2200 },
-      { submarket: 'Ballard', rent: 2100 }
+      { submarket: 'Downtown Seattle Apartments', rent: 2800 },
+      { submarket: 'Capitol Hill Apartments', rent: 2600 },
+      { submarket: 'Belltown Apartments', rent: 2700 },
+      { submarket: 'Fremont Apartments', rent: 2200 },
+      { submarket: 'Ballard Apartments', rent: 2100 }
     ]
   }
 };
