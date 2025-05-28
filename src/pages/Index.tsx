@@ -34,14 +34,14 @@ const Index = () => {
     
     try {
       console.log(`Analyzing ${city} with API config:`, { 
-        hasAirbnbKey: !!apiConfig.airbnbApiKey,
+        hasAirDNAKey: !!apiConfig.airdnaApiKey,
         hasOpenaiKey: !!apiConfig.openaiApiKey 
       });
       
       // Show loading toast
       toast({
         title: "🔍 Analyzing Market",
-        description: `Fetching ${apiConfig.airbnbApiKey ? 'live Airbnb' : 'sample'} data for ${city}...`,
+        description: `Fetching ${apiConfig.airdnaApiKey ? 'live AirDNA' : 'sample'} data for ${city}...`,
       });
       
       const marketData = await fetchMarketData(city, apiConfig);
@@ -78,11 +78,11 @@ const Index = () => {
       });
       
       // If API error, suggest alternatives
-      if (errorMessage.includes('API') && apiConfig.airbnbApiKey) {
+      if (errorMessage.includes('API') && apiConfig.airdnaApiKey) {
         setTimeout(() => {
           toast({
             title: "💡 Suggestion",
-            description: "Try a different Airbnb API from RapidAPI, or use sample data by removing the API key.",
+            description: "Check your AirDNA subscription status, or use sample data by removing the API key.",
           });
         }, 2000);
       }
@@ -115,12 +115,12 @@ const Index = () => {
   };
 
   const getAnalysisStatusText = () => {
-    if (apiConfig.airbnbApiKey && apiConfig.openaiApiKey) {
-      return 'Fetching live Airbnb listings and AI rental data...';
+    if (apiConfig.airdnaApiKey && apiConfig.openaiApiKey) {
+      return 'Fetching live AirDNA professional data and AI rental data...';
     } else if (apiConfig.openaiApiKey) {
       return 'Using sample STR data and fetching AI rental data...';
-    } else if (apiConfig.airbnbApiKey) {
-      return 'Fetching live Airbnb listings and using sample rental data...';
+    } else if (apiConfig.airdnaApiKey) {
+      return 'Fetching live AirDNA professional data and using sample rental data...';
     } else {
       return 'Using sample market data...';
     }
@@ -136,13 +136,13 @@ const Index = () => {
             <h1 className="text-4xl font-bold text-gray-900">STR Market Analyzer</h1>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Analyze short-term rental markets vs. traditional rental markets with automated revenue-to-rent calculations
+            Analyze short-term rental markets vs. traditional rental markets with professional AirDNA data
           </p>
           <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
             <Badge variant="outline">2BR/2BA Properties</Badge>
-            <Badge variant="outline">Upscale Tier</Badge>
-            <Badge variant="outline">Top 25% Performance</Badge>
-            <Badge variant="outline">Affordable APIs</Badge>
+            <Badge variant="outline">Professional Data</Badge>
+            <Badge variant="outline">Free AirDNA Tier</Badge>
+            <Badge variant="outline">AI Analysis</Badge>
           </div>
         </div>
 
@@ -177,8 +177,8 @@ const Index = () => {
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                 <h4 className="font-medium text-blue-900 mb-2">Current Analysis Mode:</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  {apiConfig.airbnbApiKey ? (
-                    <li>• ✅ Live Airbnb listings data (2BR/2BA entire homes, ~$10-50/month)</li>
+                  {apiConfig.airdnaApiKey ? (
+                    <li>• ✅ Live AirDNA professional data (2BR/2BA entire homes, FREE tier available)</li>
                   ) : (
                     <li>• 📋 Sample STR data (for supported cities: Nashville, Miami, Austin)</li>
                   )}
@@ -243,7 +243,7 @@ const Index = () => {
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                   <h4 className="font-medium text-blue-900 mb-2">Data Sources:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• <strong>STR Revenue:</strong> {apiConfig.airbnbApiKey ? 'Live Airbnb listings data via RapidAPI' : 'Sample data'} (2BR/2BA Entire homes)</li>
+                    <li>• <strong>STR Revenue:</strong> {apiConfig.airdnaApiKey ? 'Live AirDNA professional data via RapidAPI' : 'Sample data'} (2BR/2BA Entire homes)</li>
                     <li>• <strong>Rental Data:</strong> {apiConfig.openaiApiKey ? 'AI-powered research via OpenAI' : 'Sample data'}</li>
                     <li>• <strong>Calculations:</strong> Automated filtering and revenue-to-rent multiples</li>
                   </ul>
@@ -261,8 +261,8 @@ const Index = () => {
                 <div className="text-red-500 text-5xl">⚠️</div>
                 <p className="text-lg text-gray-600">{error}</p>
                 <p className="text-sm text-gray-500">
-                  {!apiConfig.airbnbApiKey && !apiConfig.openaiApiKey 
-                    ? "Add affordable API keys above for any US city, or try: Nashville, Miami, Austin" 
+                  {!apiConfig.airdnaApiKey && !apiConfig.openaiApiKey 
+                    ? "Add your AirDNA API key above for any US city, or try: Nashville, Miami, Austin" 
                     : "Please check the city name and try again"}
                 </p>
               </div>

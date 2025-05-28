@@ -8,32 +8,32 @@ import { Badge } from '@/components/ui/badge';
 import { Key, Eye, EyeOff, Search } from 'lucide-react';
 
 interface ApiKeyInputProps {
-  onApiKeysChange: (keys: { airbnbApiKey?: string; openaiApiKey?: string }) => void;
+  onApiKeysChange: (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => void;
 }
 
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
-  const [airbnbKey, setAirbnbKey] = useState('');
+  const [airdnaKey, setAirdnaKey] = useState('');
   const [openaiKey, setOpenaiKey] = useState('');
   const [showKeys, setShowKeys] = useState(false);
   const [showStoredKeys, setShowStoredKeys] = useState(false);
 
   const handleSaveKeys = () => {
     // Store in localStorage for session persistence
-    if (airbnbKey) localStorage.setItem('airbnb_api_key', airbnbKey);
+    if (airdnaKey) localStorage.setItem('airdna_api_key', airdnaKey);
     if (openaiKey) localStorage.setItem('openai_api_key', openaiKey);
     
     onApiKeysChange({
-      airbnbApiKey: airbnbKey || undefined,
+      airdnaApiKey: airdnaKey || undefined,
       openaiApiKey: openaiKey || undefined
     });
   };
 
   const handleViewStoredKeys = () => {
-    const storedAirbnb = localStorage.getItem('airbnb_api_key') || 'Not set';
+    const storedAirDNA = localStorage.getItem('airdna_api_key') || 'Not set';
     const storedOpenai = localStorage.getItem('openai_api_key') || 'Not set';
     
     console.log('=== STORED API KEYS ===');
-    console.log('Airbnb API Key:', storedAirbnb);
+    console.log('AirDNA API Key:', storedAirDNA);
     console.log('OpenAI API Key:', storedOpenai);
     console.log('=====================');
     
@@ -42,22 +42,22 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
   const getStoredKeys = () => {
     return {
-      airbnb: localStorage.getItem('airbnb_api_key') || 'Not set',
+      airdna: localStorage.getItem('airdna_api_key') || 'Not set',
       openai: localStorage.getItem('openai_api_key') || 'Not set'
     };
   };
 
   // Load keys from localStorage on component mount
   React.useEffect(() => {
-    const savedAirbnbKey = localStorage.getItem('airbnb_api_key') || '';
+    const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
     
-    setAirbnbKey(savedAirbnbKey);
+    setAirdnaKey(savedAirDNAKey);
     setOpenaiKey(savedOpenaiKey);
     
-    if (savedAirbnbKey || savedOpenaiKey) {
+    if (savedAirDNAKey || savedOpenaiKey) {
       onApiKeysChange({
-        airbnbApiKey: savedAirbnbKey || undefined,
+        airdnaApiKey: savedAirDNAKey || undefined,
         openaiApiKey: savedOpenaiKey || undefined
       });
     }
@@ -77,37 +77,37 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             <h4 className="font-medium text-blue-900 mb-2">Professional STR Market Intelligence:</h4>
             <div className="space-y-2 text-sm text-blue-800">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">Airbnb Search API</Badge>
-                <span>Live Airbnb listings data (via RapidAPI)</span>
+                <Badge variant="outline" className="text-xs">AirDNA API</Badge>
+                <span>Professional STR data used by real estate investors (FREE tier available)</span>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs">OpenAI</Badge>
-                <span>AI-powered rental data research ($5-20/month)</span>
+                <span>AI-powered rental data research (~$5-20/month)</span>
               </div>
               <p className="text-xs text-blue-600 mt-2">
                 Leave blank to use sample data. Keys are stored locally in your browser.
               </p>
               <p className="text-xs text-green-600 mt-1">
-                ✅ Now using Airbnb Search API - the same data source that powers Airbnb!
+                ✅ Now using AirDNA - professional short-term rental market data!
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="airbnb-key" className="text-sm font-medium">
-                Airbnb Search API Key (Live STR Data)
+              <Label htmlFor="airdna-key" className="text-sm font-medium">
+                AirDNA API Key (Professional STR Data)
               </Label>
               <Input
-                id="airbnb-key"
+                id="airdna-key"
                 type={showKeys ? "text" : "password"}
-                value={airbnbKey}
-                onChange={(e) => setAirbnbKey(e.target.value)}
-                placeholder="Enter Airbnb Search RapidAPI key..."
+                value={airdnaKey}
+                onChange={(e) => setAirdnaKey(e.target.value)}
+                placeholder="Enter AirDNA RapidAPI key..."
                 className="mt-1"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Get from: rapidapi.com/hub (search "Airbnb Search")
+                Get from: rapidapi.com/hub (search "AirDNA")
               </p>
             </div>
 
@@ -134,9 +134,9 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               <h4 className="font-medium text-gray-900 mb-2">Currently Stored Keys:</h4>
               <div className="space-y-2 text-sm">
                 <div>
-                  <span className="font-medium">Airbnb Search API:</span> 
+                  <span className="font-medium">AirDNA API:</span> 
                   <span className="ml-2 font-mono text-xs">
-                    {getStoredKeys().airbnb === 'Not set' ? 'Not set' : `${getStoredKeys().airbnb.substring(0, 8)}...`}
+                    {getStoredKeys().airdna === 'Not set' ? 'Not set' : `${getStoredKeys().airdna.substring(0, 8)}...`}
                   </span>
                 </div>
                 <div>

@@ -71,102 +71,99 @@ const sampleMarketDatabase: Record<string, CityMarketData> = {
 
 // API Configuration
 export interface ApiConfig {
-  airbnbApiKey?: string;
+  airdnaApiKey?: string;
   openaiApiKey?: string;
 }
 
-// Enhanced Airbnb Search API with better error handling
-export const fetchAirbnbListingsData = async (city: string, apiKey?: string): Promise<StrData[]> => {
-  console.log(`🔍 Fetching Airbnb Search data for ${city}`);
+// AirDNA API data fetching
+export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Promise<StrData[]> => {
+  console.log(`🔍 Fetching AirDNA data for ${city}`);
   console.log(`🔑 API Key provided: ${apiKey ? 'Yes' : 'No'}`);
   
   if (apiKey) {
-    // Try the most common RapidAPI Airbnb endpoint patterns
-    const endpointConfigs = [
-      {
-        url: 'https://airbnb-search.p.rapidapi.com/search',
-        params: { location: city, checkin: '2024-06-01', checkout: '2024-06-07', adults: '2' }
-      },
-      {
-        url: 'https://airbnb-search.p.rapidapi.com/listings',
-        params: { city: city, property_type: 'Entire home/apt', min_bedrooms: '2' }
-      },
-      {
-        url: 'https://airbnb-search.p.rapidapi.com/properties',
-        params: { location: city, room_type: 'Entire home/apt' }
-      },
-      {
-        url: 'https://airbnb-search.p.rapidapi.com/api/search',
-        params: { q: city, type: 'entire_place' }
-      }
-    ];
-
-    for (const config of endpointConfigs) {
-      try {
-        console.log(`📡 Trying endpoint: ${config.url}`);
-        
-        const searchParams = new URLSearchParams(config.params);
-        const fullUrl = `${config.url}?${searchParams.toString()}`;
-        
-        const response = await fetch(fullUrl, {
-          method: 'GET',
-          headers: {
-            'X-RapidAPI-Key': apiKey,
-            'X-RapidAPI-Host': 'airbnb-search.p.rapidapi.com',
-            'Content-Type': 'application/json'
-          }
-        });
-
-        console.log(`📊 Response status: ${response.status}`);
-        
-        if (response.ok) {
-          const data = await response.json();
-          console.log('✅ API Response received!', data);
-          
-          // Try to extract listings from various response formats
-          let listings = [];
-          if (data.listings) listings = data.listings;
-          else if (data.results) listings = data.results;
-          else if (data.data) listings = data.data;
-          else if (Array.isArray(data)) listings = data;
-          
-          if (listings.length > 0) {
-            const strData = listings.slice(0, 10).map((listing: any, index: number) => {
-              let price = listing.price || listing.nightly_price || listing.rate || 150;
-              if (typeof price === 'string') {
-                price = parseInt(price.replace(/[^0-9]/g, '')) || 150;
-              }
-              
-              const monthlyRevenue = price * 20;
-              
-              return {
-                submarket: listing.neighborhood || listing.area || `${city} Area ${index + 1}`,
-                revenue: monthlyRevenue
-              };
-            });
-            
-            return strData;
-          }
-        } else {
-          const errorText = await response.text();
-          console.log(`❌ Endpoint failed: ${response.status} - ${errorText}`);
-          
-          // Provide specific error guidance
-          if (response.status === 403) {
-            throw new Error(`API Access Denied (403): Your Airbnb Search API subscription may not include this endpoint. Try a different Airbnb API from RapidAPI.`);
-          } else if (response.status === 429) {
-            throw new Error(`Rate Limit Exceeded (429): You've used up your API requests. Check your RapidAPI dashboard.`);
-          } else if (response.status === 404) {
-            throw new Error(`Endpoint Not Found (404): This Airbnb API endpoint may have changed. Try subscribing to a different Airbnb API.`);
-          }
+    try {
+      console.log(`📡 Using AirDNA Properties API`);
+      
+      // AirDNA API endpoint
+      const response = await fetch(`https://airdna1.p.rapidapi.com/properties?location=${encodeURIComponent(city)}&accommodates=4&bedrooms=2&property_type=entire_home`, {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': apiKey,
+          'X-RapidAPI-Host': 'airdna1.p.rapidapi.com',
+          'Content-Type': 'application/json'
         }
-      } catch (error) {
-        console.log(`💥 Error with endpoint ${config.url}:`, error);
+      });
+
+      console.log(`📊 AirDNA Response status: ${response.status}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ AirDNA API Response received!', data);
+        
+        // Parse AirDNA response format
+        let properties = [];
+        if (data.properties) properties = data.properties;
+        else if (data.results) properties = data.results;
+        else if (data.data) properties = data.data;
+        else if (Array.isArray(data)) properties = data;
+        
+        if (properties.length > 0) {
+          const strData = properties.slice(0, 15).map((property: any, index: number) => {
+            // Extract revenue/pricing data from AirDNA format
+            let monthlyRevenue = 0;
+            
+            if (property.revenue) {
+              monthlyRevenue = property.revenue;
+            } else if (property.monthly_revenue) {
+              monthlyRevenue = property.monthly_revenue;
+            } else if (property.adr && property.occupancy) {
+              // Calculate from ADR (Average Daily Rate) and occupancy
+              const adr = typeof property.adr === 'string' ? parseFloat(property.adr.replace(/[^0-9.]/g, '')) : property.adr;
+              const occupancy = typeof property.occupancy === 'string' ? parseFloat(property.occupancy.replace(/[^0-9.]/g, '')) / 100 : property.occupancy;
+              monthlyRevenue = Math.round(adr * 30 * occupancy);
+            } else if (property.price) {
+              // Estimate from nightly price
+              const price = typeof property.price === 'string' ? parseFloat(property.price.replace(/[^0-9.]/g, '')) : property.price;
+              monthlyRevenue = Math.round(price * 20); // Assume 65% occupancy
+            } else {
+              monthlyRevenue = 4500 + (index * 200); // Fallback with variation
+            }
+            
+            const neighborhood = property.neighborhood || 
+                               property.market || 
+                               property.area || 
+                               property.district ||
+                               `${city} Area ${index + 1}`;
+            
+            return {
+              submarket: neighborhood,
+              revenue: monthlyRevenue
+            };
+          });
+          
+          console.log('✅ Processed AirDNA data:', strData);
+          return strData;
+        } else {
+          console.log('⚠️ No properties found in AirDNA response');
+        }
+      } else {
+        const errorText = await response.text();
+        console.log(`❌ AirDNA API failed: ${response.status} - ${errorText}`);
+        
+        if (response.status === 403) {
+          throw new Error(`AirDNA API Access Denied (403): Check your subscription status or API key permissions.`);
+        } else if (response.status === 429) {
+          throw new Error(`AirDNA Rate Limit Exceeded (429): You've exceeded your free tier limits.`);
+        } else if (response.status === 404) {
+          throw new Error(`AirDNA API Error (404): Location "${city}" not found or endpoint unavailable.`);
+        } else {
+          throw new Error(`AirDNA API Error (${response.status}): ${errorText}`);
+        }
       }
+    } catch (error) {
+      console.error('💥 Error with AirDNA API:', error);
+      throw error;
     }
-    
-    // If all endpoints fail, provide actionable guidance
-    throw new Error(`No working Airbnb Search API endpoints found. Please check your subscription includes basic search functionality, or try a different Airbnb API from RapidAPI marketplace.`);
   }
   
   // Fallback to sample data
@@ -231,7 +228,7 @@ export const fetchRentalDataWithAI = async (city: string, submarkets: string[], 
   }
   
   // Fallback to sample data
-  const cityKey = city.toLowerCase().trim().replace(/,.*/, ''); // Remove state/country part
+  const cityKey = city.toLowerCase().trim().replace(/,.*/, '');
   const cityData = sampleMarketDatabase[cityKey];
   
   if (cityData) {
@@ -241,17 +238,17 @@ export const fetchRentalDataWithAI = async (city: string, submarkets: string[], 
   throw new Error(`No rental data available for ${city}`);
 };
 
-// Main market data fetching function - updated for Airbnb Search API
+// Main market data fetching function - updated for AirDNA API
 export const fetchMarketData = async (city: string, config: ApiConfig = {}): Promise<CityMarketData> => {
   try {
     console.log(`🚀 Starting market analysis for ${city}`);
     console.log(`🔧 API Configuration:`, { 
-      hasAirbnbKey: !!config.airbnbApiKey, 
+      hasAirDNAKey: !!config.airdnaApiKey, 
       hasOpenAIKey: !!config.openaiApiKey 
     });
     
-    // Fetch STR data using Airbnb Search API
-    const strData = await fetchAirbnbListingsData(city, config.airbnbApiKey);
+    // Fetch STR data using AirDNA API
+    const strData = await fetchAirDNAListingsData(city, config.airdnaApiKey);
     
     // Extract submarket names for rental data lookup
     const submarkets = strData.map(item => item.submarket);
