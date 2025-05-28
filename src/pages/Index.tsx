@@ -224,7 +224,7 @@ const Index = () => {
                   className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-3 text-lg font-medium shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 border border-cyan-500/20"
                 >
                   <Calculator className="h-5 w-5 mr-2" />
-                  {isAnalyzing ? 'Analyzing Market Data...' : 'Analyze Market'}
+                  {isAnalyzing ? 'Analyzing Market Data...' : 'Rentalize Market'}
                 </Button>
               </div>
             </div>
