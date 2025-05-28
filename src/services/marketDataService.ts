@@ -76,68 +76,120 @@ export interface ApiConfig {
   openaiApiKey?: string;
 }
 
-// Airbnb Search API - trying multiple endpoints to find what works
+// Airbnb Search API - Updated with more reliable endpoints
 export const fetchAirbnbListingsData = async (city: string, apiKey?: string): Promise<StrData[]> => {
   console.log(`🔍 Fetching Airbnb Search data for ${city}`);
   console.log(`🔑 API Key provided: ${apiKey ? 'Yes' : 'No'}`);
   
   if (apiKey) {
-    // Try different endpoints to see what's available with your subscription
+    // More common RapidAPI endpoint patterns for Airbnb APIs
     const endpoints = [
-      // Basic search endpoint
-      `https://airbnb-search.p.rapidapi.com/search?location=${encodeURIComponent(city)}&checkin=2024-06-01&checkout=2024-06-07&adults=2&children=0&infants=0&pets=0&page=1&currency=USD`,
-      // Alternative endpoint formats
-      `https://airbnb-search.p.rapidapi.com/listings?location=${encodeURIComponent(city)}`,
-      `https://airbnb-search.p.rapidapi.com/properties?city=${encodeURIComponent(city)}`,
+      // Most common pattern for RapidAPI Airbnb APIs
+      `https://airbnb-search.p.rapidapi.com/search`,
+      `https://airbnb-search.p.rapidapi.com/listings`,
+      `https://airbnb-search.p.rapidapi.com/properties`,
+      // Alternative patterns
+      `https://airbnb-search.p.rapidapi.com/api/search`,
+      `https://airbnb-search.p.rapidapi.com/v1/search`,
       // Simple test endpoint
-      `https://airbnb-search.p.rapidapi.com/test`
+      `https://airbnb-search.p.rapidapi.com/`
     ];
 
     for (const endpoint of endpoints) {
       try {
         console.log(`📡 Trying endpoint: ${endpoint}`);
         
-        const response = await fetch(endpoint, {
+        // Try different parameter formats
+        const searchParams = new URLSearchParams({
+          location: city,
+          checkin: '2024-06-01',
+          checkout: '2024-06-07',
+          adults: '2',
+          room_type: 'Entire home/apt',
+          property_type: 'Apartment',
+          min_bedrooms: '2'
+        });
+
+        const urlWithParams = `${endpoint}?${searchParams.toString()}`;
+        console.log(`🔗 Full URL: ${urlWithParams}`);
+        
+        const response = await fetch(urlWithParams, {
           method: 'GET',
           headers: {
             'X-RapidAPI-Key': apiKey,
-            'X-RapidAPI-Host': 'airbnb-search.p.rapidapi.com'
+            'X-RapidAPI-Host': 'airbnb-search.p.rapidapi.com',
+            'Content-Type': 'application/json'
           }
         });
 
         console.log(`📊 Response status for ${endpoint}: ${response.status}`);
+        console.log(`📋 Response headers:`, Object.fromEntries(response.headers.entries()));
 
         if (response.ok) {
           const data = await response.json();
-          console.log('✅ Found working endpoint! Data:', data);
+          console.log('✅ API Response received! Structure:', Object.keys(data));
+          console.log('🔍 First few items:', JSON.stringify(data, null, 2).substring(0, 500));
           
-          // For now, return sample data since we need to understand the API structure
-          console.log('📋 Using sample data while we analyze API structure');
-          const cityKey = city.toLowerCase().trim().replace(/,.*/, '');
-          const cityData = sampleMarketDatabase[cityKey];
+          // Try to extract listings from different possible response structures
+          let listings = [];
+          if (data.listings) listings = data.listings;
+          else if (data.results) listings = data.results;
+          else if (data.data) listings = data.data;
+          else if (Array.isArray(data)) listings = data;
+          else if (data.search_results) listings = data.search_results;
           
-          if (cityData) {
-            console.log('✅ Found sample data for', cityKey);
-            return cityData.strData;
+          console.log(`📈 Found ${listings.length} listings`);
+          
+          if (listings.length > 0) {
+            // Convert API response to our format
+            const strData = listings.slice(0, 10).map((listing: any, index: number) => {
+              // Try different price field names
+              let price = listing.price || listing.nightly_price || listing.rate || listing.cost || 150;
+              if (typeof price === 'string') {
+                price = parseInt(price.replace(/[^0-9]/g, '')) || 150;
+              }
+              
+              // Estimate monthly revenue (price * 20 days average occupancy)
+              const monthlyRevenue = price * 20;
+              
+              return {
+                submarket: listing.neighborhood || listing.area || listing.location || `${city} Area ${index + 1}`,
+                revenue: monthlyRevenue
+              };
+            });
+            
+            console.log('✅ Successfully converted API data:', strData);
+            return strData;
           }
-          
-          // Return generic data to show API is working
-          return [
-            { submarket: `${city} Downtown`, revenue: 5500 },
-            { submarket: `${city} Midtown`, revenue: 4800 },
-            { submarket: `${city} Uptown`, revenue: 4200 }
-          ];
         } else {
           const errorText = await response.text();
           console.log(`❌ Endpoint ${endpoint} failed: ${response.status} - ${errorText}`);
+          
+          // Check for specific error messages
+          if (response.status === 403) {
+            console.log('🔒 403 error - checking subscription details...');
+          } else if (response.status === 429) {
+            console.log('⏰ Rate limit hit');
+          }
         }
       } catch (error) {
         console.log(`💥 Error with endpoint ${endpoint}:`, error);
       }
     }
     
-    // If all endpoints fail, throw error
-    throw new Error(`No working Airbnb Search API endpoints found. Please check your subscription includes basic search functionality.`);
+    // If all endpoints fail, provide helpful error message
+    console.log('❌ All endpoints failed. Checking API subscription...');
+    throw new Error(`
+      Unable to connect to Airbnb Search API. This could be because:
+      
+      1. The API endpoint URL has changed
+      2. Your subscription needs to be activated (sometimes takes a few minutes)
+      3. The API requires different parameters
+      4. You may need to subscribe to a different Airbnb API
+      
+      Try refreshing the page in a few minutes, or check RapidAPI for other Airbnb APIs.
+      Using sample data for now.
+    `);
   }
   
   console.log('📋 No API key provided, falling back to sample data');
