@@ -209,7 +209,7 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
         </Card>
       </div>
 
-      {/* Submarket Markers */}
+      {/* Submarket Markers - WITH WHITE TEXT */}
       {results.map((submarket, index) => {
         const position = getSubmarketPosition(index);
         
@@ -221,22 +221,22 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
             onClick={() => setSelectedSubmarket(submarket)}
           >
             <div className="relative group">
-              {/* Marker with white text */}
-              <div className={`w-10 h-10 rounded-full ${getScoreColor(submarket.multiple)} 
+              {/* Marker with WHITE TEXT and contrasting background */}
+              <div className={`w-12 h-12 rounded-full ${getScoreColor(submarket.multiple)} 
                              flex items-center justify-center shadow-xl border-2 border-white 
                              hover:scale-125 transition-transform
-                             ${selectedSubmarket?.submarket === submarket.submarket ? 'ring-2 ring-cyan-400 scale-125' : ''}`}>
-                <span className="text-white font-bold text-xs">
+                             ${selectedSubmarket?.submarket === submarket.submarket ? 'ring-4 ring-cyan-400 scale-125' : ''}`}>
+                <span className="text-white font-bold text-sm drop-shadow-lg">
                   {submarket.multiple.toFixed(1)}
                 </span>
               </div>
               
-              {/* Hover tooltip with white text */}
+              {/* Hover tooltip with WHITE TEXT */}
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 
                             opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
                 <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap border border-gray-600 shadow-xl">
                   <div className="font-medium text-white">{submarket.submarket}</div>
-                  <div className="text-gray-300">${submarket.strRevenue.toLocaleString()}</div>
+                  <div className="text-green-400">${submarket.strRevenue.toLocaleString()}</div>
                   <div className="text-cyan-400">{submarket.multiple.toFixed(2)}x multiple</div>
                 </div>
               </div>
@@ -245,7 +245,7 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
         );
       })}
 
-      {/* Selected Submarket Details */}
+      {/* Selected Submarket Details - NO ROUNDING */}
       {selectedSubmarket && (
         <div className="absolute bottom-4 left-4 right-4 z-20">
           <Card className="bg-gray-900/98 backdrop-blur-sm shadow-2xl border border-gray-700">
@@ -254,7 +254,7 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <div className={`w-6 h-6 rounded-full ${getScoreColor(selectedSubmarket.multiple)} 
-                                   flex items-center justify-center text-white text-xs font-bold`}>
+                                   flex items-center justify-center text-white text-xs font-bold border border-white`}>
                       {selectedSubmarket.multiple.toFixed(1)}
                     </div>
                     <h4 className="text-xl font-semibold text-white">{selectedSubmarket.submarket}</h4>
