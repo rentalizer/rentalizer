@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -55,7 +56,7 @@ const Index = () => {
               </div>
               <p className="text-lg text-cyan-300/80 font-medium mb-6">By Richie Matthews</p>
               <p className="text-2xl text-cyan-100 mb-8 max-w-3xl mx-auto">
-                Save Weeks, Even Months Finding Cash-Flowing Rental Arbitrage Markets
+                The All-In-One AI System To Earn Rental Income—No Mortgage Needed
               </p>
               <div className="flex items-center justify-center gap-4 mb-8">
                 <LoginDialog />
@@ -140,7 +141,7 @@ const Index = () => {
             </div>
             <p className="text-lg text-cyan-300/80 font-medium mb-6">By Richie Matthews</p>
             <p className="text-2xl text-cyan-100 mb-8 max-w-3xl mx-auto">
-              Save Weeks, Even Months Finding Cash-Flowing Rental Arbitrage Markets
+              The All-In-One AI System To Earn Rental Income—No Mortgage Needed
             </p>
             
             {/* User info and sign out */}
