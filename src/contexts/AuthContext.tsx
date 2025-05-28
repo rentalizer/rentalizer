@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
@@ -149,11 +148,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         console.log('📡 Attempting to connect to Supabase...');
         
-        const startTime = Date.now();
-        const { data: { session }, error } = await supabase.auth.getSession();
-        const endTime = Date.now();
+        // Much shorter timeout for initial connection
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Connection timeout')), 3000)
+        );
         
-        console.log(`📊 Session request took ${endTime - startTime}ms`);
+        const { data: { session }, error } = await Promise.race([
+          sessionPromise,
+          timeoutPromise
+        ]) as any;
         
         if (error) {
           console.error('❌ Error getting initial session:', error);
@@ -173,13 +177,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     getInitialSession();
 
-    // Shorter timeout to prevent long loading states
+    // Very short timeout for loading state
     timeoutId = setTimeout(() => {
       if (mounted && isLoading) {
-        console.warn('⏰ Auth initialization timeout after 2s - forcing completion');
+        console.warn('⏰ Auth initialization timeout after 1s - forcing completion');
         setIsLoading(false);
       }
-    }, 2000);
+    }, 1000);
 
     return () => {
       console.log('🧹 Cleaning up auth subscription');
@@ -195,14 +199,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('🔑 Starting sign in for:', email);
     
     try {
-      const startTime = Date.now();
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // Create a timeout promise
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Sign in timeout - please try again')), 5000)
+      );
+      
+      const signInPromise = supabase.auth.signInWithPassword({
         email,
         password,
       });
-      const endTime = Date.now();
       
-      console.log(`📊 Sign in request took ${endTime - startTime}ms`);
+      const { data, error } = await Promise.race([
+        signInPromise,
+        timeoutPromise
+      ]) as any;
 
       if (error) {
         console.error('❌ Sign in error:', error.message);
@@ -225,14 +235,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('📝 Starting sign up for:', email);
     
     try {
-      const startTime = Date.now();
-      const { data, error } = await supabase.auth.signUp({
+      // Create a timeout promise
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Sign up timeout - please try again')), 5000)
+      );
+      
+      const signUpPromise = supabase.auth.signUp({
         email,
         password,
       });
-      const endTime = Date.now();
       
-      console.log(`📊 Sign up request took ${endTime - startTime}ms`);
+      const { data, error } = await Promise.race([
+        signUpPromise,
+        timeoutPromise
+      ]) as any;
 
       if (error) {
         console.error('❌ Sign up error:', error.message);
@@ -288,9 +304,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="text-cyan-300 text-xl">Loading...</div>
-          <div className="text-gray-400 text-sm">Authenticating...</div>
+          <div className="text-gray-400 text-sm">Connecting to authentication...</div>
           <div className="mt-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
+          </div>
+          <div className="text-xs text-gray-500 mt-4">
+            This should only take a moment
           </div>
         </div>
       </div>

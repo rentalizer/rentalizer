@@ -61,17 +61,6 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
     setIsSubmitting(true);
     console.log('🚀 Starting authentication process...');
     
-    // Add timeout to prevent infinite loading
-    const timeoutId = setTimeout(() => {
-      console.error('⏰ Authentication timeout after 10 seconds');
-      setIsSubmitting(false);
-      toast({
-        title: "❌ Authentication Timeout",
-        description: "Login took too long. Please try again.",
-        variant: "destructive",
-      });
-    }, 10000);
-    
     try {
       if (isSignUp) {
         console.log('📝 Attempting sign up...');
@@ -89,14 +78,12 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
         });
       }
       
-      clearTimeout(timeoutId);
       console.log('✅ Authentication successful, closing dialog');
       setIsOpen(false);
       setEmail('');
       setPassword('');
       
     } catch (error: any) {
-      clearTimeout(timeoutId);
       console.error('❌ Authentication error:', error);
       toast({
         title: "❌ Authentication Failed",
@@ -235,7 +222,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
                 {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                    {isSignUp ? 'Creating...' : 'Signing In...'}
                   </>
                 ) : isSignUp ? (
                   <>
