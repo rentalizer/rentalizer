@@ -117,8 +117,8 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
     try {
       console.log(`📡 Using AirDNA Properties API`);
       
-      // Updated API endpoint for 2BR/2BA apartments that accommodate 6 people
-      const response = await fetch(`https://airdna1.p.rapidapi.com/properties?location=${encodeURIComponent(city)}&accommodates=6&bedrooms=2&property_type=entire_home`, {
+      // Updated API endpoint for 2BR/2BA apartments ONLY that accommodate 6 people
+      const response = await fetch(`https://airdna1.p.rapidapi.com/properties?location=${encodeURIComponent(city)}&accommodates=6&bedrooms=2&property_type=apartment`, {
         method: 'GET',
         headers: {
           'X-RapidAPI-Key': apiKey,
