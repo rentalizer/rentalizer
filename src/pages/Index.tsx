@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +10,7 @@ import { ApiKeyInput } from '@/components/ApiKeyInput';
 import { calculateMarketMetrics } from '@/utils/marketCalculations';
 import { fetchMarketData, ApiConfig } from '@/services/marketDataService';
 import { useToast } from '@/hooks/use-toast';
+import { LoginDialog } from '@/components/LoginDialog';
 
 interface SubmarketData {
   submarket: string;
@@ -139,40 +139,46 @@ const Index = () => {
       <div className="max-w-7xl mx-auto space-y-8 relative z-10">
         {/* Header */}
         <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="relative">
-              <svg 
-                width="48" 
-                height="48" 
-                viewBox="0 0 48 48" 
-                className="text-cyan-400"
-                fill="none"
-              >
-                <defs>
-                  <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="rgb(34, 211, 238)" />
-                    <stop offset="50%" stopColor="rgb(96, 165, 250)" />
-                    <stop offset="100%" stopColor="rgb(168, 85, 247)" />
-                  </linearGradient>
-                </defs>
-                
-                {/* Building/Property Icon */}
-                <rect x="8" y="20" width="8" height="20" fill="url(#logoGradient)" rx="1" />
-                <rect x="20" y="12" width="8" height="28" fill="url(#logoGradient)" rx="1" />
-                <rect x="32" y="16" width="8" height="24" fill="url(#logoGradient)" rx="1" />
-                
-                {/* Analytics Lines */}
-                <path d="M6 8 L18 12 L30 6 L42 10" stroke="url(#logoGradient)" strokeWidth="2" fill="none" strokeLinecap="round" />
-                <circle cx="6" cy="8" r="2" fill="rgb(34, 211, 238)" />
-                <circle cx="18" cy="12" r="2" fill="rgb(96, 165, 250)" />
-                <circle cx="30" cy="6" r="2" fill="rgb(168, 85, 247)" />
-                <circle cx="42" cy="10" r="2" fill="rgb(34, 211, 238)" />
-              </svg>
-              <div className="absolute inset-0 rounded-lg bg-cyan-400/20 blur-lg animate-pulse"></div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex-1"></div>
+            <div className="flex items-center justify-center gap-3">
+              <div className="relative">
+                <svg 
+                  width="48" 
+                  height="48" 
+                  viewBox="0 0 48 48" 
+                  className="text-cyan-400"
+                  fill="none"
+                >
+                  <defs>
+                    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="rgb(34, 211, 238)" />
+                      <stop offset="50%" stopColor="rgb(96, 165, 250)" />
+                      <stop offset="100%" stopColor="rgb(168, 85, 247)" />
+                    </linearGradient>
+                  </defs>
+                  
+                  {/* Building/Property Icon */}
+                  <rect x="8" y="20" width="8" height="20" fill="url(#logoGradient)" rx="1" />
+                  <rect x="20" y="12" width="8" height="28" fill="url(#logoGradient)" rx="1" />
+                  <rect x="32" y="16" width="8" height="24" fill="url(#logoGradient)" rx="1" />
+                  
+                  {/* Analytics Lines */}
+                  <path d="M6 8 L18 12 L30 6 L42 10" stroke="url(#logoGradient)" strokeWidth="2" fill="none" strokeLinecap="round" />
+                  <circle cx="6" cy="8" r="2" fill="rgb(34, 211, 238)" />
+                  <circle cx="18" cy="12" r="2" fill="rgb(96, 165, 250)" />
+                  <circle cx="30" cy="6" r="2" fill="rgb(168, 85, 247)" />
+                  <circle cx="42" cy="10" r="2" fill="rgb(34, 211, 238)" />
+                </svg>
+                <div className="absolute inset-0 rounded-lg bg-cyan-400/20 blur-lg animate-pulse"></div>
+              </div>
+              <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl">
+                RENTALIZER.AI
+              </h1>
             </div>
-            <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl">
-              RENTALIZER.AI
-            </h1>
+            <div className="flex-1 flex justify-end">
+              <LoginDialog />
+            </div>
           </div>
           <p className="text-xl text-cyan-100 max-w-3xl mx-auto font-light tracking-wide">
             Rentalizer™ Helps Investors Analyze Short Term Rental Opportunities
