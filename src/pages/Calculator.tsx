@@ -49,7 +49,7 @@ const Calculator = () => {
     address: '',
     averageComparable: 0,
     firstMonthRent: 0,
-    securityDeposit: 500,
+    securityDeposit: 0,
     furnishingsCost: 0,
     rent: 0,
     serviceFees: 0,

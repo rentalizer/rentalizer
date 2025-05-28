@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -48,7 +47,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
                 type="number"
                 value={data.securityDeposit || ''}
                 onChange={(e) => updateData({ securityDeposit: parseFloat(e.target.value) || 0 })}
-                placeholder="500"
+                placeholder="0"
                 className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
