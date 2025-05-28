@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -140,11 +141,33 @@ const Index = () => {
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="relative">
-              <img 
-                src="/lovable-uploads/d6a5a46f-caad-4378-8869-7525c7e6f621.png" 
-                alt="Rentalizer Logo" 
-                className="h-12 w-12 object-contain"
-              />
+              <svg 
+                width="48" 
+                height="48" 
+                viewBox="0 0 48 48" 
+                className="text-cyan-400"
+                fill="none"
+              >
+                <defs>
+                  <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="rgb(34, 211, 238)" />
+                    <stop offset="50%" stopColor="rgb(96, 165, 250)" />
+                    <stop offset="100%" stopColor="rgb(168, 85, 247)" />
+                  </linearGradient>
+                </defs>
+                
+                {/* Building/Property Icon */}
+                <rect x="8" y="20" width="8" height="20" fill="url(#logoGradient)" rx="1" />
+                <rect x="20" y="12" width="8" height="28" fill="url(#logoGradient)" rx="1" />
+                <rect x="32" y="16" width="8" height="24" fill="url(#logoGradient)" rx="1" />
+                
+                {/* Analytics Lines */}
+                <path d="M6 8 L18 12 L30 6 L42 10" stroke="url(#logoGradient)" strokeWidth="2" fill="none" strokeLinecap="round" />
+                <circle cx="6" cy="8" r="2" fill="rgb(34, 211, 238)" />
+                <circle cx="18" cy="12" r="2" fill="rgb(96, 165, 250)" />
+                <circle cx="30" cy="6" r="2" fill="rgb(168, 85, 247)" />
+                <circle cx="42" cy="10" r="2" fill="rgb(34, 211, 238)" />
+              </svg>
               <div className="absolute inset-0 rounded-lg bg-cyan-400/20 blur-lg animate-pulse"></div>
             </div>
             <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl">
@@ -209,11 +232,31 @@ const Index = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-2xl flex items-center gap-2 text-cyan-300">
-                    <img 
-                      src="/lovable-uploads/d6a5a46f-caad-4378-8869-7525c7e6f621.png" 
-                      alt="Rentalizer Logo" 
-                      className="h-6 w-6 object-contain"
-                    />
+                    <svg 
+                      width="24" 
+                      height="24" 
+                      viewBox="0 0 48 48" 
+                      className="text-cyan-400"
+                      fill="none"
+                    >
+                      <defs>
+                        <linearGradient id="logoGradientSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="rgb(34, 211, 238)" />
+                          <stop offset="50%" stopColor="rgb(96, 165, 250)" />
+                          <stop offset="100%" stopColor="rgb(168, 85, 247)" />
+                        </linearGradient>
+                      </defs>
+                      
+                      <rect x="8" y="20" width="8" height="20" fill="url(#logoGradientSmall)" rx="1" />
+                      <rect x="20" y="12" width="8" height="28" fill="url(#logoGradientSmall)" rx="1" />
+                      <rect x="32" y="16" width="8" height="24" fill="url(#logoGradientSmall)" rx="1" />
+                      
+                      <path d="M6 8 L18 12 L30 6 L42 10" stroke="url(#logoGradientSmall)" strokeWidth="2" fill="none" strokeLinecap="round" />
+                      <circle cx="6" cy="8" r="2" fill="rgb(34, 211, 238)" />
+                      <circle cx="18" cy="12" r="2" fill="rgb(96, 165, 250)" />
+                      <circle cx="30" cy="6" r="2" fill="rgb(168, 85, 247)" />
+                      <circle cx="42" cy="10" r="2" fill="rgb(34, 211, 238)" />
+                    </svg>
                     {city} STR vs. Rent Analysis (Top Submarkets)
                   </CardTitle>
                   <p className="text-gray-400 mt-1">
