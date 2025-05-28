@@ -44,7 +44,9 @@ export const ForgotPasswordForm = ({ onBack, initialEmail = '' }: ForgotPassword
     setIsSubmitting(true);
     
     try {
-      const redirectTo = `${window.location.origin}/reset-password`;
+      // Use the current origin for the redirect URL
+      const currentOrigin = window.location.origin;
+      const redirectTo = `${currentOrigin}/reset-password`;
       console.log('🔗 Reset redirect URL:', redirectTo);
       
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -65,9 +67,20 @@ export const ForgotPasswordForm = ({ onBack, initialEmail = '' }: ForgotPassword
       
     } catch (error: any) {
       console.error('💥 Password reset failed:', error);
+      
+      let errorMessage = "Failed to send reset email. Please try again.";
+      
+      if (error.message?.includes('Email not confirmed')) {
+        errorMessage = "Please check your email and confirm your account first.";
+      } else if (error.message?.includes('User not found')) {
+        errorMessage = "No account found with this email address.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "❌ Reset Failed",
-        description: error.message || "Failed to send reset email. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

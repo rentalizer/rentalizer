@@ -23,17 +23,34 @@ export const ResetPassword = () => {
     const validateToken = async () => {
       console.log('🔐 Validating reset token...');
       console.log('🔗 Current URL:', window.location.href);
+      console.log('🔗 Search params:', window.location.search);
       
       // Check if we have the required tokens in the URL
       const accessToken = searchParams.get('access_token');
       const refreshToken = searchParams.get('refresh_token');
       const type = searchParams.get('type');
+      const error = searchParams.get('error');
+      const errorDescription = searchParams.get('error_description');
       
       console.log('📋 URL params:', { 
         accessToken: accessToken ? 'present' : 'missing', 
         refreshToken: refreshToken ? 'present' : 'missing', 
-        type 
+        type,
+        error,
+        errorDescription
       });
+      
+      // Check for error in URL first
+      if (error) {
+        console.error('❌ Error in URL:', error, errorDescription);
+        toast({
+          title: "❌ Reset Link Error",
+          description: errorDescription || "There was an error with your reset link.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
       
       if (accessToken && refreshToken && type === 'recovery') {
         try {
@@ -52,12 +69,21 @@ export const ResetPassword = () => {
           
           console.log('✅ Session set successfully:', !!data.session);
           console.log('👤 User in session:', data.session?.user?.email);
-          setIsValidToken(true);
-        } catch (error) {
+          
+          if (data.session?.user) {
+            setIsValidToken(true);
+            toast({
+              title: "✅ Reset Link Valid",
+              description: "You can now set your new password.",
+            });
+          } else {
+            throw new Error('No user session found');
+          }
+        } catch (error: any) {
           console.error('💥 Token validation failed:', error);
           toast({
             title: "❌ Invalid Reset Link",
-            description: "This password reset link is invalid or has expired.",
+            description: error.message || "This password reset link is invalid or has expired.",
             variant: "destructive",
           });
         }
@@ -66,7 +92,7 @@ export const ResetPassword = () => {
         console.log('Available URL params:', Object.fromEntries(searchParams.entries()));
         toast({
           title: "❌ Invalid Reset Link",
-          description: "This password reset link is invalid or has expired.",
+          description: "This password reset link is missing required information or has expired.",
           variant: "destructive",
         });
       }
@@ -172,7 +198,7 @@ export const ResetPassword = () => {
             <div>
               <h1 className="text-2xl font-bold text-cyan-300 mb-4">Invalid Reset Link</h1>
               <p className="text-gray-400 mb-6">
-                This password reset link is invalid or has expired. Please request a new one from the sign-in page.
+                This password reset link is invalid, has expired, or has already been used. Please request a new one from the sign-in page.
               </p>
             </div>
             <Button 
