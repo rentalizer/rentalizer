@@ -9,6 +9,7 @@ import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
 import { Footer } from '@/components/Footer';
 import { ApiKeyInput } from '@/components/ApiKeyInput';
+import { SubscriptionPricing } from '@/components/SubscriptionPricing';
 import { calculateMarketMetrics } from '@/utils/marketCalculations';
 import { fetchMarketData, ApiConfig } from '@/services/marketDataService';
 import { useToast } from '@/hooks/use-toast';
@@ -30,6 +31,15 @@ const Index = () => {
   const [error, setError] = useState('');
   const [apiConfig, setApiConfig] = useState<ApiConfig>({});
   const [viewMode, setViewMode] = useState<'table' | 'map'>('table');
+  const [showPricing, setShowPricing] = useState(false);
+
+  const handleUpgrade = (promoCode?: string) => {
+    console.log('Upgrade requested with promo code:', promoCode);
+    toast({
+      title: "🚀 Upgrade Coming Soon",
+      description: "Payment integration will be available soon. You'll be notified!",
+    });
+  };
 
   const handleAnalyze = async () => {
     if (!city.trim()) return;
@@ -131,6 +141,65 @@ const Index = () => {
     }
   };
 
+  if (!isSubscribed) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black p-6 relative overflow-hidden">
+        {/* Futuristic background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-purple-500/10 blur-3xl animate-pulse delay-1000"></div>
+        </div>
+
+        <div className="max-w-6xl mx-auto space-y-8 relative z-10 mt-20">
+          <div className="text-center space-y-6">
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <BarChart3 className="h-12 w-12 text-cyan-400" />
+              <div>
+                <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl">
+                  Rentalizer
+                </h1>
+                <p className="text-lg text-cyan-300/80 font-medium mt-2">By Richie Matthews</p>
+              </div>
+            </div>
+            
+            <div className="max-w-4xl mx-auto space-y-4">
+              <p className="text-3xl text-cyan-100 font-light tracking-wide leading-relaxed">
+                Save Weeks, Even Months Finding Cash-Flowing Rental Arbitrage Markets
+              </p>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                Professional AI-powered platform that analyzes thousands of submarkets in minutes, 
+                not months. Find profitable short-term rental opportunities with data-driven precision.
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-center gap-4 text-sm">
+              <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">⚡ Instant Analysis</Badge>
+              <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 hover:bg-purple-500/10">📊 Professional Data</Badge>
+              <Badge variant="outline" className="bg-gray-800/50 border-blue-500/30 text-blue-300 hover:bg-blue-500/10">🎯 Cash Flow Focus</Badge>
+              <Badge variant="outline" className="bg-gray-800/50 border-green-500/30 text-green-300 hover:bg-green-500/10">💰 ROI Optimization</Badge>
+            </div>
+          </div>
+
+          {!showPricing ? (
+            <div className="text-center">
+              <Button
+                onClick={() => setShowPricing(true)}
+                size="lg"
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-4 text-xl font-medium shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
+              >
+                View Pricing & Get Started
+              </Button>
+            </div>
+          ) : (
+            <SubscriptionPricing onUpgrade={handleUpgrade} />
+          )}
+        </div>
+
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black p-6 relative overflow-hidden">
       {/* Futuristic background elements */}
@@ -147,9 +216,12 @@ const Index = () => {
             <div className="flex-1"></div>
             <div className="flex items-center justify-center gap-3">
               <BarChart3 className="h-12 w-12 text-cyan-400" />
-              <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl">
-                RENTALIZER
-              </h1>
+              <div>
+                <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl">
+                  Rentalizer
+                </h1>
+                <p className="text-lg text-cyan-300/80 font-medium">By Richie Matthews</p>
+              </div>
             </div>
             <div className="flex-1 flex justify-end items-center gap-3">
               <div className="flex items-center gap-2 text-cyan-300 text-sm">
@@ -171,7 +243,7 @@ const Index = () => {
             </div>
           </div>
           <p className="text-xl text-cyan-100 max-w-3xl mx-auto font-light tracking-wide">
-            Helping Investors Analyze Short Term Rental Opportunities
+            Save Weeks, Even Months Finding Cash-Flowing Rental Arbitrage Markets
           </p>
           <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
             <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">2BR/2BA Properties</Badge>

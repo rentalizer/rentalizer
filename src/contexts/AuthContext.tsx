@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
@@ -26,6 +25,28 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
+};
+
+const sendNewUserNotification = async (userEmail: string, userId: string) => {
+  try {
+    console.log('Sending new user notification for:', userEmail);
+    
+    const { data, error } = await supabase.functions.invoke('notify-new-user', {
+      body: {
+        user_email: userEmail,
+        user_id: userId,
+        signup_timestamp: new Date().toISOString()
+      }
+    });
+
+    if (error) {
+      console.error('Error sending new user notification:', error);
+    } else {
+      console.log('New user notification sent successfully');
+    }
+  } catch (error) {
+    console.error('Failed to send new user notification:', error);
+  }
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -62,7 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const loadUserProfile = async (supabaseUser: SupabaseUser) => {
+  const loadUserProfile = async (supabaseUser: SupabaseUser, isNewUser = false) => {
     try {
       console.log('Loading profile for user:', supabaseUser.email);
       
@@ -106,6 +127,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             subscription_status: 'trial'
           });
           return;
+        }
+
+        // Send notification for new user signup
+        if (isNewUser && supabaseUser.email) {
+          sendNewUserNotification(supabaseUser.email, supabaseUser.id);
         }
 
         const validStatus = ['active', 'inactive', 'trial'].includes(newProfile?.subscription_status) 
@@ -179,6 +205,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       console.log('Sign up successful for:', email);
+      
+      // Mark as new user for notification
+      if (data.user && data.user.email) {
+        setTimeout(() => {
+          sendNewUserNotification(data.user!.email!, data.user!.id);
+        }, 2000); // Slight delay to ensure profile is created
+      }
     } catch (error) {
       console.error('Sign up error:', error);
       throw error;
