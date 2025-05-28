@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { Download, Calculator, TrendingUp, Search } from 'lucide-react';
 import { ResultsTable } from '@/components/ResultsTable';
 import { ApiKeyInput } from '@/components/ApiKeyInput';
-import { ApartmentCube } from '@/components/ApartmentCube';
 import { calculateMarketMetrics } from '@/utils/marketCalculations';
 import { fetchMarketData, ApiConfig } from '@/services/marketDataService';
 import { useToast } from '@/hooks/use-toast';
@@ -141,7 +140,11 @@ const Index = () => {
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="relative">
-              <ApartmentCube size={48} className="animate-pulse text-cyan-400" />
+              <img 
+                src="/lovable-uploads/d6a5a46f-caad-4378-8869-7525c7e6f621.png" 
+                alt="Rentalizer Logo" 
+                className="h-12 w-12 object-contain"
+              />
               <div className="absolute inset-0 rounded-lg bg-cyan-400/20 blur-lg animate-pulse"></div>
             </div>
             <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl">
@@ -226,7 +229,11 @@ const Index = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-2xl flex items-center gap-2 text-cyan-300">
-                    <ApartmentCube size={24} />
+                    <img 
+                      src="/lovable-uploads/d6a5a46f-caad-4378-8869-7525c7e6f621.png" 
+                      alt="Rentalizer Logo" 
+                      className="h-6 w-6 object-contain"
+                    />
                     {city} STR vs. Rent Analysis (Top Submarkets)
                   </CardTitle>
                   <p className="text-gray-400 mt-1">
