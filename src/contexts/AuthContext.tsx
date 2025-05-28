@@ -53,25 +53,34 @@ const sendNewUserNotification = async (userEmail: string, userId: string) => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
     console.log('AuthProvider initializing...');
     
-    // Set up auth state listener first
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state change event:', event, 'Session exists:', !!session);
       
-      setSession(session);
-      
       if (session?.user) {
-        console.log('User found in session, loading profile...');
-        await loadUserProfile(session.user);
+        console.log('User found in session, setting up user profile...');
+        
+        // Determine subscription status based on email
+        let subscriptionStatus: 'active' | 'inactive' | 'trial' = 'trial';
+        if (session.user.email?.includes('premium') || session.user.email?.includes('pro')) {
+          subscriptionStatus = 'active';
+        }
+        
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          subscription_status: subscriptionStatus
+        });
       } else {
         console.log('No user in session, clearing user state');
         setUser(null);
-        setIsLoading(false);
       }
+      
+      setIsLoading(false);
     });
 
     // Get initial session
@@ -87,12 +96,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (session?.user) {
           console.log('Initial session found for user:', session.user.email);
-          setSession(session);
-          await loadUserProfile(session.user);
+          
+          // Determine subscription status based on email
+          let subscriptionStatus: 'active' | 'inactive' | 'trial' = 'trial';
+          if (session.user.email?.includes('premium') || session.user.email?.includes('pro')) {
+            subscriptionStatus = 'active';
+          }
+          
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            subscription_status: subscriptionStatus
+          });
         } else {
           console.log('No initial session found');
-          setIsLoading(false);
         }
+        
+        setIsLoading(false);
       } catch (error) {
         console.error('Session initialization error:', error);
         setIsLoading(false);
@@ -107,180 +127,64 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  const loadUserProfile = async (supabaseUser: SupabaseUser, isNewUser = false) => {
-    try {
-      console.log('Loading profile for user:', supabaseUser.email);
-      
-      // Determine subscription status based on email
-      let subscriptionStatus: 'active' | 'inactive' | 'trial' = 'trial';
-      if (supabaseUser.email?.includes('premium') || supabaseUser.email?.includes('pro')) {
-        subscriptionStatus = 'active';
-      }
-      
-      // Try to get existing profile
-      const { data: profile, error } = await supabase
-        .from('user_profiles')
-        .select('subscription_status')
-        .eq('id', supabaseUser.id)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error loading user profile:', error);
-        // Set user with determined status if we can't load profile
-        setUser({
-          id: supabaseUser.id,
-          email: supabaseUser.email || '',
-          subscription_status: subscriptionStatus
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      if (!profile) {
-        console.log('No profile found, creating one...');
-        // Profile doesn't exist, try to create one
-        const { data: newProfile, error: insertError } = await supabase
-          .from('user_profiles')
-          .insert({
-            id: supabaseUser.id,
-            email: supabaseUser.email || '',
-            subscription_status: subscriptionStatus
-          })
-          .select('subscription_status')
-          .single();
-
-        if (insertError) {
-          console.error('Error creating user profile:', insertError);
-          // Even if profile creation fails, set user with determined status
-          setUser({
-            id: supabaseUser.id,
-            email: supabaseUser.email || '',
-            subscription_status: subscriptionStatus
-          });
-          setIsLoading(false);
-          return;
-        }
-
-        // Send notification for new user signup
-        if (isNewUser && supabaseUser.email) {
-          setTimeout(() => {
-            sendNewUserNotification(supabaseUser.email!, supabaseUser.id);
-          }, 1000);
-        }
-
-        const validStatus = ['active', 'inactive', 'trial'].includes(newProfile?.subscription_status) 
-          ? newProfile.subscription_status as 'active' | 'inactive' | 'trial'
-          : subscriptionStatus;
-
-        setUser({
-          id: supabaseUser.id,
-          email: supabaseUser.email || '',
-          subscription_status: validStatus
-        });
-      } else {
-        console.log('Profile loaded successfully:', profile);
-        
-        const validStatus = ['active', 'inactive', 'trial'].includes(profile.subscription_status) 
-          ? profile.subscription_status as 'active' | 'inactive' | 'trial'
-          : subscriptionStatus;
-
-        setUser({
-          id: supabaseUser.id,
-          email: supabaseUser.email || '',
-          subscription_status: validStatus
-        });
-      }
-      
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Error in loadUserProfile:', error);
-      // Fallback: set user with trial status
-      setUser({
-        id: supabaseUser.id,
-        email: supabaseUser.email || '',
-        subscription_status: 'trial'
-      });
-      setIsLoading(false);
-    }
-  };
-
   const signIn = async (email: string, password: string) => {
-    try {
-      console.log('Attempting to sign in user:', email);
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    console.log('Attempting to sign in user:', email);
+    
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-      if (error) {
-        console.error('Sign in error:', error.message, error);
-        throw new Error(error.message);
-      }
-
-      if (!data.user) {
-        console.error('No user returned from sign in');
-        throw new Error('Authentication failed - no user returned');
-      }
-
-      console.log('Sign in successful for:', email);
-      // Don't call loadUserProfile here - let the auth state change handler do it
-      
-    } catch (error) {
-      console.error('Sign in error:', error);
-      throw error;
+    if (error) {
+      console.error('Sign in error:', error.message, error);
+      throw new Error(error.message);
     }
+
+    if (!data.user) {
+      console.error('No user returned from sign in');
+      throw new Error('Authentication failed - no user returned');
+    }
+
+    console.log('Sign in successful for:', email);
   };
 
   const signUp = async (email: string, password: string) => {
-    try {
-      console.log('Attempting to sign up user:', email);
-      
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+    console.log('Attempting to sign up user:', email);
+    
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
-      if (error) {
-        console.error('Sign up error:', error.message, error);
-        throw new Error(error.message);
-      }
+    if (error) {
+      console.error('Sign up error:', error.message, error);
+      throw new Error(error.message);
+    }
 
-      if (!data.user) {
-        console.error('No user returned from sign up');
-        throw new Error('Sign up failed - no user returned');
-      }
+    if (!data.user) {
+      console.error('No user returned from sign up');
+      throw new Error('Sign up failed - no user returned');
+    }
 
-      console.log('Sign up successful for:', email);
-      
-      // Send notification for new user signup
-      if (data.user && data.user.email) {
-        setTimeout(() => {
-          sendNewUserNotification(data.user!.email!, data.user!.id);
-        }, 2000);
-      }
-      
-    } catch (error) {
-      console.error('Sign up error:', error);
-      throw error;
+    console.log('Sign up successful for:', email);
+    
+    // Send notification for new user signup
+    if (data.user && data.user.email) {
+      setTimeout(() => {
+        sendNewUserNotification(data.user!.email!, data.user!.id);
+      }, 2000);
     }
   };
 
   const signOut = async () => {
     console.log('Signing out user');
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Sign out error:', error);
-        throw error;
-      } else {
-        console.log('Sign out successful');
-        setUser(null);
-        setSession(null);
-      }
-    } catch (error) {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
       console.error('Sign out error:', error);
       throw error;
+    } else {
+      console.log('Sign out successful');
+      setUser(null);
     }
   };
 

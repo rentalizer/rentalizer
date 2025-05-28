@@ -70,7 +70,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
         });
       }
       
-      // Close dialog and reset form
+      // Close dialog and reset form on success
       setIsOpen(false);
       setEmail('');
       setPassword('');
@@ -83,6 +83,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
         variant: "destructive",
       });
     } finally {
+      // Always reset submitting state
       setIsSubmitting(false);
     }
   };
