@@ -35,9 +35,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Get initial session
     const getSession = async () => {
+      console.log('Getting initial session...');
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
+        console.log('Found existing session for user:', session.user.email);
         await loadUserProfile(session.user);
+      } else {
+        console.log('No existing session found');
       }
       setIsLoading(false);
     };
@@ -46,6 +50,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.email);
       if (session?.user) {
         await loadUserProfile(session.user);
       } else {
@@ -59,36 +64,57 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
+      console.log('Loading profile for user:', supabaseUser.email);
+      
+      // First try to get existing profile
       const { data: profile, error } = await supabase
         .from('user_profiles')
         .select('subscription_status')
         .eq('id', supabaseUser.id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+      if (error) {
         console.error('Error loading user profile:', error);
-      }
-
-      // If no profile exists, create one with trial status
-      if (!profile) {
-        const { error: insertError } = await supabase
-          .from('user_profiles')
-          .insert({
-            id: supabaseUser.id,
-            email: supabaseUser.email,
-            subscription_status: 'trial'
-          });
-
-        if (insertError) {
-          console.error('Error creating user profile:', insertError);
-        }
-
+        // Set user with default trial status if we can't load profile
         setUser({
           id: supabaseUser.id,
           email: supabaseUser.email || '',
           subscription_status: 'trial'
         });
+        return;
+      }
+
+      if (!profile) {
+        console.log('No profile found, creating one...');
+        // Profile doesn't exist, try to create one
+        const { data: newProfile, error: insertError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: supabaseUser.id,
+            email: supabaseUser.email || '',
+            subscription_status: 'trial'
+          })
+          .select('subscription_status')
+          .single();
+
+        if (insertError) {
+          console.error('Error creating user profile:', insertError);
+          // Even if profile creation fails, set user with trial status
+          setUser({
+            id: supabaseUser.id,
+            email: supabaseUser.email || '',
+            subscription_status: 'trial'
+          });
+          return;
+        }
+
+        setUser({
+          id: supabaseUser.id,
+          email: supabaseUser.email || '',
+          subscription_status: newProfile?.subscription_status || 'trial'
+        });
       } else {
+        console.log('Profile loaded successfully:', profile);
         setUser({
           id: supabaseUser.id,
           email: supabaseUser.email || '',
@@ -97,6 +123,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (error) {
       console.error('Error in loadUserProfile:', error);
+      // Fallback: set user with trial status
       setUser({
         id: supabaseUser.id,
         email: supabaseUser.email || '',
@@ -108,14 +135,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('Attempting to sign in user:', email);
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        console.error('Sign in error:', error);
         throw error;
       }
+
+      console.log('Sign in successful for:', email);
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;
@@ -127,14 +158,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      console.log('Attempting to sign up user:', email);
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
 
       if (error) {
+        console.error('Sign up error:', error);
         throw error;
       }
+
+      console.log('Sign up successful for:', email);
     } catch (error) {
       console.error('Sign up error:', error);
       throw error;
@@ -144,9 +179,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
+    console.log('Signing out user');
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error('Sign out error:', error);
+    } else {
+      console.log('Sign out successful');
     }
   };
 
