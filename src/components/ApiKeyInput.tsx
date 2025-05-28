@@ -65,7 +65,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   }, [onApiKeysChange]);
 
   return (
-    <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+    <Card className="shadow-xl border-0 bg-gradient-to-br from-white/90 to-blue-50/90 backdrop-blur-sm">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
           <Key className="h-5 w-5 text-blue-600" />
@@ -74,31 +74,31 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          <Alert className="border-orange-200 bg-orange-50">
-            <AlertTriangle className="h-4 w-4 text-orange-600" />
-            <AlertDescription className="text-orange-800">
+          <Alert className="border-cyan-200 bg-gradient-to-r from-cyan-50 to-blue-50">
+            <AlertTriangle className="h-4 w-4 text-cyan-600" />
+            <AlertDescription className="text-cyan-900">
               <strong>Professional data requires a subscription</strong> - The free tier doesn't include API access. 
-              If you don't have a subscription, the app will automatically use sample data for analysis.
+              If you don't have a subscription, Rentalizer will automatically use sample data for analysis.
             </AlertDescription>
           </Alert>
 
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <h4 className="font-medium text-blue-900 mb-2">How the app works:</h4>
+          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
+            <h4 className="font-medium text-blue-900 mb-2">How Rentalizer works:</h4>
             <div className="space-y-2 text-sm text-blue-800">
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">Sample Data</Badge>
+                <Badge variant="outline" className="text-xs bg-white/50">Sample Data</Badge>
                 <span>Works without any API keys - includes Nashville, Miami, Austin, Denver, Seattle</span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">Professional Data</Badge>
+                <Badge variant="outline" className="text-xs bg-white/50">Professional Data</Badge>
                 <span>Live short-term rental market data (requires paid subscription)</span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">AI Research</Badge>
+                <Badge variant="outline" className="text-xs bg-white/50">AI Research</Badge>
                 <span>AI-powered rental data research for any city (~$5-20/month)</span>
               </div>
               <p className="text-xs text-green-600 mt-2">
-                ✅ App automatically falls back to sample data if API keys don't work
+                ✅ Rentalizer automatically falls back to sample data if API keys don't work
               </p>
             </div>
           </div>
@@ -114,10 +114,10 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 value={professionalKey}
                 onChange={(e) => setProfessionalKey(e.target.value)}
                 placeholder="Enter professional data API key..."
-                className="mt-1"
+                className="mt-1 border-blue-200 focus:border-cyan-400"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Get from: rapidapi.com/hub (search "AirDNA" - paid subscription required)
+                Get from: rapidapi.com/hub (search for short-term rental data - paid subscription required)
               </p>
             </div>
 
@@ -131,7 +131,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 value={openaiKey}
                 onChange={(e) => setOpenaiKey(e.target.value)}
                 placeholder="Enter AI research API key..."
-                className="mt-1"
+                className="mt-1 border-blue-200 focus:border-cyan-400"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Get from: platform.openai.com/api-keys
@@ -166,7 +166,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 variant="outline"
                 size="sm"
                 onClick={() => setShowKeys(!showKeys)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 border-blue-200 hover:bg-blue-50"
               >
                 {showKeys ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 {showKeys ? 'Hide' : 'Show'} Keys
@@ -177,7 +177,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 variant="outline"
                 size="sm"
                 onClick={handleViewStoredKeys}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 border-blue-200 hover:bg-blue-50"
               >
                 <Search className="h-4 w-4" />
                 {showStoredKeys ? 'Hide' : 'Find'} Stored Keys
@@ -187,7 +187,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             <Button
               onClick={handleSaveKeys}
               size="sm"
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg"
             >
               Save Configuration
             </Button>

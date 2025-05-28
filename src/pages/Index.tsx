@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Download, Calculator, TrendingUp, Search } from 'lucide-react';
 import { ResultsTable } from '@/components/ResultsTable';
 import { ApiKeyInput } from '@/components/ApiKeyInput';
+import { ApartmentCube } from '@/components/ApartmentCube';
 import { calculateMarketMetrics } from '@/utils/marketCalculations';
 import { fetchMarketData, ApiConfig } from '@/services/marketDataService';
 import { useToast } from '@/hooks/use-toast';
@@ -128,22 +128,24 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <TrendingUp className="h-8 w-8 text-blue-600" />
-            <h1 className="text-4xl font-bold text-gray-900">STR Market Analyzer</h1>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <ApartmentCube size={48} className="animate-pulse" />
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-blue-800 bg-clip-text text-transparent">
+              Rentalizer
+            </h1>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Analyze short-term rental markets vs. traditional rental markets with professional data
+            AI-powered rental market analysis for smart real estate investment decisions
           </p>
           <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
-            <Badge variant="outline">2BR/2BA Properties</Badge>
-            <Badge variant="outline">Professional Data</Badge>
-            <Badge variant="outline">Sample Data Available</Badge>
-            <Badge variant="outline">AI Analysis</Badge>
+            <Badge variant="outline" className="bg-white/50 border-blue-200">2BR/2BA Properties</Badge>
+            <Badge variant="outline" className="bg-white/50 border-cyan-200">Professional Data</Badge>
+            <Badge variant="outline" className="bg-white/50 border-blue-200">Sample Data Available</Badge>
+            <Badge variant="outline" className="bg-white/50 border-cyan-200">AI Analysis</Badge>
           </div>
         </div>
 
@@ -151,7 +153,7 @@ const Index = () => {
         <ApiKeyInput onApiKeysChange={setApiConfig} />
 
         {/* City Analysis */}
-        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+        <Card className="shadow-xl border-0 bg-gradient-to-br from-white/90 to-blue-50/90 backdrop-blur-sm">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2">
               <Search className="h-5 w-5 text-blue-600" />
@@ -168,14 +170,14 @@ const Index = () => {
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="Enter any US city name (e.g., Denver, Seattle, Atlanta)"
-                  className="mt-2 text-lg"
+                  className="mt-2 text-lg border-blue-200 focus:border-cyan-400"
                 />
                 {error && (
                   <p className="mt-2 text-sm text-red-600">{error}</p>
                 )}
               </div>
 
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
                 <h4 className="font-medium text-blue-900 mb-2">Current Analysis Mode:</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
                   {apiConfig.airdnaApiKey ? (
@@ -197,7 +199,7 @@ const Index = () => {
                   onClick={handleAnalyze}
                   disabled={!city.trim() || isAnalyzing}
                   size="lg"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-3 text-lg font-medium shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
                 >
                   <Calculator className="h-5 w-5 mr-2" />
                   {isAnalyzing ? 'Analyzing Market Data...' : 'Analyze Market'}
@@ -209,12 +211,13 @@ const Index = () => {
 
         {/* Results */}
         {results.length > 0 && (
-          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+          <Card className="shadow-xl border-0 bg-gradient-to-br from-white/90 to-blue-50/90 backdrop-blur-sm">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-2xl">
-                    📊 {city} STR vs. Rent Analysis (Top Submarkets)
+                  <CardTitle className="text-2xl flex items-center gap-2">
+                    <ApartmentCube size={24} />
+                    {city} STR vs. Rent Analysis (Top Submarkets)
                   </CardTitle>
                   <p className="text-gray-600 mt-1">
                     Submarkets meeting criteria: $4,000+ revenue and 2.0+ multiple
@@ -223,7 +226,7 @@ const Index = () => {
                 <Button
                   onClick={handleExport}
                   variant="outline"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 border-blue-200 hover:bg-blue-50"
                 >
                   <Download className="h-4 w-4" />
                   Export CSV
@@ -234,14 +237,14 @@ const Index = () => {
               <ResultsTable results={results} />
               
               <div className="mt-6 space-y-4">
-                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200">
                   <h4 className="font-medium text-green-900 mb-2">✅ Analysis Complete</h4>
                   <p className="text-sm text-green-800">
                     Found {results.length} submarkets meeting investment criteria for {city}.
                   </p>
                 </div>
 
-                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
                   <h4 className="font-medium text-blue-900 mb-2">Data Sources:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
                     <li>• <strong>STR Revenue:</strong> {apiConfig.airdnaApiKey ? 'Live professional market data' : 'Sample data'} (2BR/2BA Apartments)</li>
@@ -256,7 +259,7 @@ const Index = () => {
 
         {/* No Results Message */}
         {!isAnalyzing && error && (
-          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+          <Card className="shadow-xl border-0 bg-gradient-to-br from-white/90 to-red-50/90 backdrop-blur-sm">
             <CardContent className="py-12">
               <div className="text-center space-y-4">
                 <div className="text-red-500 text-5xl">⚠️</div>
@@ -272,10 +275,10 @@ const Index = () => {
         )}
 
         {isAnalyzing && (
-          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+          <Card className="shadow-xl border-0 bg-gradient-to-br from-white/90 to-blue-50/90 backdrop-blur-sm">
             <CardContent className="py-12">
               <div className="text-center space-y-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto"></div>
                 <p className="text-lg text-gray-600">Analyzing {city} market data...</p>
                 <p className="text-sm text-gray-500">{getAnalysisStatusText()}</p>
               </div>
