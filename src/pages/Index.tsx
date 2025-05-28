@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -205,6 +204,10 @@ const Index = () => {
                 The All-In-One AI System To Earn Rental Income—No Mortgage Needed
               </p>
               
+              <p className="text-xl text-gray-300 font-medium leading-relaxed">
+                Rentalizer Is A Powerful AI System That Helps You Find The Best Rental Markets, Acquire Properties, Manage Your Properties, And Automate The Income.
+              </p>
+              
               <div className="space-y-4 mt-8">
                 <p className="text-xl text-gray-300 font-medium">
                   Rentalizer Uses Powerful AI To Help You:
@@ -316,6 +319,9 @@ const Index = () => {
           </div>
           <p className="text-xl text-cyan-100 max-w-3xl mx-auto font-light tracking-wide">
             The All-In-One AI System To Earn Rental Income—No Mortgage Needed
+          </p>
+          <p className="text-lg text-gray-300 max-w-4xl mx-auto font-medium leading-relaxed">
+            Rentalizer Is A Powerful AI System That Helps You Find The Best Rental Markets, Acquire Properties, Manage Your Properties, And Automate The Income.
           </p>
           <div className="flex items-center justify-center gap-4 text-sm text-gray-400">
             <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">🎯 Market Analysis</Badge>
