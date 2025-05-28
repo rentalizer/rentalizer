@@ -69,54 +69,78 @@ const sampleMarketDatabase: Record<string, CityMarketData> = {
   }
 };
 
-// API Configuration - updated with affordable alternatives
+// API Configuration - updated for Airdna API
 export interface ApiConfig {
-  airbnbApiKey?: string; // Airbnb public listings data
+  airbnbApiKey?: string; // Now using Airdna professional STR data
   openaiApiKey?: string;
-  mashapeKey?: string;   // RapidAPI marketplace
 }
 
-// Airbnb Public Listings API (much more affordable alternative)
+// Airdna Professional STR Data API
 export const fetchAirbnbListingsData = async (city: string, apiKey?: string): Promise<StrData[]> => {
-  console.log(`Fetching Airbnb listings data for ${city}`);
+  console.log(`Fetching Airdna STR data for ${city}`);
   
   if (apiKey) {
     try {
-      // Using RapidAPI's Airbnb listings endpoints (much cheaper ~$10-50/month)
-      const response = await fetch(`https://airbnb-listings.p.rapidapi.com/v2/listingsByCity`, {
+      // First, get region suggestions to find the market ID
+      const regionResponse = await fetch(`https://airdna1.p.rapidapi.com/suggest_market?query=${encodeURIComponent(city)}`, {
+        method: 'GET',
+        headers: {
+          'X-RapidAPI-Key': apiKey,
+          'X-RapidAPI-Host': 'airdna1.p.rapidapi.com',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!regionResponse.ok) {
+        throw new Error(`Airdna region API error: ${regionResponse.status}`);
+      }
+
+      const regionData = await regionResponse.json();
+      console.log('Airdna region data:', regionData);
+
+      // Extract market ID from the first result
+      const marketId = regionData?.data?.[0]?.market_id || regionData?.[0]?.id;
+      
+      if (!marketId) {
+        throw new Error(`No market found for ${city}`);
+      }
+
+      // Get STR listings data for the market
+      const listingsResponse = await fetch(`https://airdna1.p.rapidapi.com/property_listings`, {
         method: 'POST',
         headers: {
           'X-RapidAPI-Key': apiKey,
-          'X-RapidAPI-Host': 'airbnb-listings.p.rapidapi.com',
+          'X-RapidAPI-Host': 'airdna1.p.rapidapi.com',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          city: city,
-          country: 'United States',
-          property_type: 'Apartment',
-          room_type: 'Entire home/apt',
+          market_id: marketId,
           bedrooms: 2,
-          bathrooms: 2
+          bathrooms: 2,
+          property_type: "apartment",
+          room_type: "entire_home",
+          limit: 100
         })
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      if (listingsResponse.ok) {
+        const listingsData = await listingsResponse.json();
+        console.log('Airdna listings data:', listingsData);
         
-        // Process the listings to estimate revenue by neighborhood
-        const processedData = processAirbnbListings(data);
-        console.log('Airbnb listings data fetched successfully');
+        // Process the professional STR data
+        const processedData = processAirdnaListings(listingsData);
+        console.log('Airdna STR data processed successfully');
         return processedData;
       } else {
-        throw new Error(`Airbnb API error: ${response.status}`);
+        throw new Error(`Airdna listings API error: ${listingsResponse.status}`);
       }
     } catch (error) {
-      console.error('Error fetching Airbnb listings:', error);
+      console.error('Error fetching Airdna data:', error);
       throw error;
     }
   }
   
-  // Fallback to sample data for now
+  // Fallback to sample data
   const cityKey = city.toLowerCase().trim();
   const cityData = sampleMarketDatabase[cityKey];
   
@@ -127,34 +151,40 @@ export const fetchAirbnbListingsData = async (city: string, apiKey?: string): Pr
   throw new Error(`No STR data available for ${city}`);
 };
 
-// Process Airbnb listings to estimate revenue
-const processAirbnbListings = (listings: any[]): StrData[] => {
-  // Group by neighborhood and calculate estimated monthly revenue
-  const neighborhoodData: { [key: string]: number[] } = {};
+// Process Airdna professional STR data
+const processAirdnaListings = (data: any): StrData[] => {
+  const listings = data?.data || data?.listings || [];
   
-  listings.forEach(listing => {
-    const neighborhood = listing.neighborhood || listing.location?.neighborhood || 'Unknown';
-    const dailyRate = listing.price?.amount || 0;
+  // Group by neighborhood/submarket and calculate revenue
+  const submarketData: { [key: string]: number[] } = {};
+  
+  listings.forEach((listing: any) => {
+    const neighborhood = listing.neighborhood || listing.submarket || listing.location?.neighborhood || 'Unknown';
+    const monthlyRevenue = listing.revenue_ltm || listing.monthly_revenue || listing.estimated_revenue || 0;
     
-    // Estimate monthly revenue: daily_rate * 22 days (70% occupancy)
-    const monthlyRevenue = dailyRate * 22;
-    
-    if (!neighborhoodData[neighborhood]) {
-      neighborhoodData[neighborhood] = [];
+    if (monthlyRevenue > 0) {
+      if (!submarketData[neighborhood]) {
+        submarketData[neighborhood] = [];
+      }
+      submarketData[neighborhood].push(monthlyRevenue);
     }
-    neighborhoodData[neighborhood].push(monthlyRevenue);
   });
   
-  // Calculate median revenue per neighborhood
-  return Object.entries(neighborhoodData).map(([neighborhood, revenues]) => {
-    const sortedRevenues = revenues.sort((a, b) => a - b);
-    const median = sortedRevenues[Math.floor(sortedRevenues.length / 2)];
+  // Calculate top 25% performance for each neighborhood
+  return Object.entries(submarketData).map(([neighborhood, revenues]) => {
+    if (revenues.length === 0) return null;
+    
+    // Sort revenues and get top 25% average
+    const sortedRevenues = revenues.sort((a, b) => b - a);
+    const top25PercentCount = Math.max(1, Math.ceil(sortedRevenues.length * 0.25));
+    const top25Revenues = sortedRevenues.slice(0, top25PercentCount);
+    const averageTopRevenue = top25Revenues.reduce((sum, rev) => sum + rev, 0) / top25Revenues.length;
     
     return {
       submarket: neighborhood,
-      revenue: Math.round(median)
+      revenue: Math.round(averageTopRevenue)
     };
-  }).filter(item => item.revenue > 0);
+  }).filter((item): item is StrData => item !== null && item.revenue > 0);
 };
 
 // AI-powered rental data fetching (unchanged)
@@ -218,12 +248,12 @@ export const fetchRentalDataWithAI = async (city: string, submarkets: string[], 
   throw new Error(`No rental data available for ${city}`);
 };
 
-// Main market data fetching function - updated
+// Main market data fetching function - updated for Airdna
 export const fetchMarketData = async (city: string, config: ApiConfig = {}): Promise<CityMarketData> => {
   try {
-    console.log(`Fetching market data for ${city}...`);
+    console.log(`Fetching market data for ${city} using professional Airdna API...`);
     
-    // Fetch STR data using affordable alternative
+    // Fetch STR data using professional Airdna API
     const strData = await fetchAirbnbListingsData(city, config.airbnbApiKey);
     
     // Extract submarket names for rental data lookup
