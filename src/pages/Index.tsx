@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -187,6 +186,19 @@ const Index = () => {
   if (!isSubscribed) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 relative overflow-hidden">
+        {/* Header for non-subscribed users */}
+        <div className="flex items-center justify-between mb-8 px-4">
+          <div className="flex items-center gap-3">
+            <BarChart3 className="h-8 w-8 text-cyan-400" />
+            <div>
+              <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+                Rentalizer
+              </h1>
+              <p className="text-sm text-cyan-300/80">By Richie Matthews</p>
+            </div>
+          </div>
+        </div>
+
         {/* Futuristic background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl animate-pulse"></div>
@@ -279,6 +291,38 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-slate-700/50 bg-slate-900/80 backdrop-blur-lg">
+        <div className="flex items-center gap-3">
+          <BarChart3 className="h-8 w-8 text-cyan-400" />
+          <div>
+            <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
+              Rentalizer
+            </h1>
+            <p className="text-sm text-cyan-300/80">By Richie Matthews</p>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 text-sm">
+            <User className="h-4 w-4 text-cyan-400" />
+            <span className="text-cyan-300">{user?.email}</span>
+            <Badge variant="outline" className="bg-green-900/30 border-green-500/30 text-green-300">
+              Trial
+            </Badge>
+          </div>
+          <Button
+            onClick={signOut}
+            variant="outline"
+            size="sm"
+            className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign Out
+          </Button>
+        </div>
+      </div>
+
       {/* Futuristic background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl animate-pulse"></div>
@@ -288,16 +332,11 @@ const Index = () => {
 
       <div className="relative z-10">
         <div className="container mx-auto px-4 py-12">
-          {/* Header */}
+          {/* Main Content */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-4 mb-6">
-              <BarChart3 className="h-16 w-16 text-cyan-400" />
               <ApartmentCube />
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Rentalizer</span>
-            </h1>
-            <p className="text-lg text-cyan-300/80 font-medium mb-6">By Richie Matthews</p>
             <p className="text-2xl text-cyan-100 mb-8 max-w-3xl mx-auto">
               Save Weeks, Even Months Finding Cash-Flowing Rental Arbitrage Markets
             </p>
