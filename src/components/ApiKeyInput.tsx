@@ -5,8 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Key, Eye, EyeOff, Search, AlertTriangle } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Key, Eye, EyeOff, Search } from 'lucide-react';
 
 interface ApiKeyInputProps {
   onApiKeysChange: (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => void;
@@ -74,16 +73,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          <Alert className="border-cyan-200 bg-gradient-to-r from-cyan-50 to-blue-50">
-            <AlertTriangle className="h-4 w-4 text-cyan-600" />
-            <AlertDescription className="text-cyan-900">
-              <strong>Professional data requires a subscription</strong> - The free tier doesn't include API access. 
-              If you don't have a subscription, Rentalizer will automatically use sample data for analysis.
-            </AlertDescription>
-          </Alert>
-
           <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-lg border border-blue-200">
-            <h4 className="font-medium text-blue-900 mb-2">How Rentalizer works:</h4>
             <div className="space-y-2 text-sm text-blue-800">
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs bg-white/50">Sample Data</Badge>
@@ -106,7 +96,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="professional-key" className="text-sm font-medium">
-                Professional Data Key (Optional - Requires Subscription)
+                Professional Data Key (Optional)
               </Label>
               <Input
                 id="professional-key"
@@ -117,7 +107,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 className="mt-1 border-blue-200 focus:border-cyan-400"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Get from: rapidapi.com/hub (search for short-term rental data - paid subscription required)
+                Get from: rapidapi.com/hub (search for short-term rental data)
               </p>
             </div>
 
