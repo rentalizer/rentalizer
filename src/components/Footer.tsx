@@ -5,6 +5,12 @@ import { BarChart3, Mail, Globe, Twitter, Linkedin, Github } from 'lucide-react'
 import { ContactChat } from './ContactChat';
 
 export const Footer = () => {
+  const handleProductLink = (feature: string) => {
+    // Scroll to top and focus on the main feature
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    console.log(`Navigate to ${feature} feature`);
+  };
+
   return (
     <footer className="relative z-10 mt-16 border-t border-gray-700/50 bg-gray-900/60 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -42,29 +48,44 @@ export const Footer = () => {
             <h4 className="text-lg font-semibold text-cyan-300 mb-4">Product</h4>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
+                <button 
+                  onClick={() => handleProductLink('Market Analysis')}
+                  className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
+                >
                   Market Analysis
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
+                <button 
+                  onClick={() => handleProductLink('Revenue Calculator')}
+                  className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
+                >
                   Revenue Calculator
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
+                <button 
+                  onClick={() => handleProductLink('API Access')}
+                  className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
+                >
                   API Access
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
+                <button 
+                  onClick={() => handleProductLink('Professional Data')}
+                  className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
+                >
                   Professional Data
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
+                <button 
+                  onClick={() => handleProductLink('AI Insights')}
+                  className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
+                >
                   AI Insights
-                </a>
+                </button>
               </li>
             </ul>
           </div>
