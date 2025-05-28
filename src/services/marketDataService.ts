@@ -13,7 +13,7 @@ interface CityMarketData {
   rentData: RentData[];
 }
 
-// Sample data - MARKET SUBMARKETS with updated values
+// Sample data - ACTUAL NEIGHBORHOOD SUBMARKETS with updated values
 const sampleMarketDatabase: Record<string, CityMarketData> = {
   'nashville': {
     strData: [
@@ -98,6 +98,26 @@ const sampleMarketDatabase: Record<string, CityMarketData> = {
       { submarket: 'Fremont', rent: 2200 },
       { submarket: 'Ballard', rent: 2100 }
     ]
+  },
+  'san diego': {
+    strData: [
+      { submarket: 'Gaslamp Quarter', revenue: 7200 },
+      { submarket: 'Little Italy', revenue: 6800 },
+      { submarket: 'Pacific Beach', revenue: 6400 },
+      { submarket: 'Mission Beach', revenue: 6000 },
+      { submarket: 'Hillcrest', revenue: 5600 },
+      { submarket: 'North Park', revenue: 5200 },
+      { submarket: 'Mission Valley', revenue: 4800 }
+    ],
+    rentData: [
+      { submarket: 'Gaslamp Quarter', rent: 2900 },
+      { submarket: 'Little Italy', rent: 2800 },
+      { submarket: 'Pacific Beach', rent: 2600 },
+      { submarket: 'Mission Beach', rent: 2500 },
+      { submarket: 'Hillcrest', rent: 2300 },
+      { submarket: 'North Park', rent: 2200 },
+      { submarket: 'Mission Valley', rent: 2100 }
+    ]
   }
 };
 
@@ -141,36 +161,57 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
         else if (Array.isArray(marketData)) submarkets = marketData;
         
         if (submarkets.length > 0) {
-          const strData = submarkets.slice(0, 10).map((submarket: any, index: number) => {
-            // Extract market-level revenue data
-            let monthlyRevenue = 0;
-            
-            if (submarket.avg_revenue) {
-              monthlyRevenue = submarket.avg_revenue;
-            } else if (submarket.monthly_revenue) {
-              monthlyRevenue = submarket.monthly_revenue;
-            } else if (submarket.adr && submarket.occupancy) {
-              const adr = typeof submarket.adr === 'string' ? parseFloat(submarket.adr.replace(/[^0-9.]/g, '')) : submarket.adr;
-              const occupancy = typeof submarket.occupancy === 'string' ? parseFloat(submarket.occupancy.replace(/[^0-9.]/g, '')) / 100 : submarket.occupancy;
-              monthlyRevenue = Math.round(adr * 30 * occupancy);
-            } else {
-              monthlyRevenue = 4500 + (index * 300); // Fallback with variation
-            }
-            
-            const submarketName = submarket.name || 
-                                 submarket.neighborhood || 
-                                 submarket.area || 
-                                 submarket.submarket ||
-                                 `${city} Area ${index + 1}`;
-            
-            return {
-              submarket: `${submarketName} Apartments`,
-              revenue: monthlyRevenue
-            };
-          });
+          const strData = submarkets.slice(0, 10)
+            .filter((submarket: any) => {
+              // Filter out generic geographical areas - only include specific neighborhoods
+              const name = submarket.name || submarket.neighborhood || submarket.area || submarket.submarket || '';
+              const lowerName = name.toLowerCase();
+              
+              // Exclude generic terms like "downtown [city]", "[city] center", etc.
+              const cityName = city.toLowerCase();
+              const isGeneric = lowerName.includes(`downtown ${cityName}`) || 
+                              lowerName.includes(`${cityName} center`) || 
+                              lowerName.includes(`${cityName} area`) ||
+                              lowerName.includes(`east ${cityName}`) ||
+                              lowerName.includes(`west ${cityName}`) ||
+                              lowerName.includes(`north ${cityName}`) ||
+                              lowerName.includes(`south ${cityName}`) ||
+                              lowerName === cityName;
+              
+              return !isGeneric && name.length > 0;
+            })
+            .map((submarket: any, index: number) => {
+              // Extract market-level revenue data
+              let monthlyRevenue = 0;
+              
+              if (submarket.avg_revenue) {
+                monthlyRevenue = submarket.avg_revenue;
+              } else if (submarket.monthly_revenue) {
+                monthlyRevenue = submarket.monthly_revenue;
+              } else if (submarket.adr && submarket.occupancy) {
+                const adr = typeof submarket.adr === 'string' ? parseFloat(submarket.adr.replace(/[^0-9.]/g, '')) : submarket.adr;
+                const occupancy = typeof submarket.occupancy === 'string' ? parseFloat(submarket.occupancy.replace(/[^0-9.]/g, '')) / 100 : submarket.occupancy;
+                monthlyRevenue = Math.round(adr * 30 * occupancy);
+              } else {
+                monthlyRevenue = 4500 + (index * 300); // Fallback with variation
+              }
+              
+              const submarketName = submarket.name || 
+                                   submarket.neighborhood || 
+                                   submarket.area || 
+                                   submarket.submarket ||
+                                   `Neighborhood ${index + 1}`;
+              
+              return {
+                submarket: submarketName,
+                revenue: monthlyRevenue
+              };
+            });
           
-          console.log('✅ Processed AirDNA market data:', strData);
-          return strData;
+          if (strData.length > 0) {
+            console.log('✅ Processed AirDNA neighborhood data:', strData);
+            return strData;
+          }
         }
       } else {
         const errorText = await marketResponse.text();
@@ -190,7 +231,7 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
         
         if (propertiesResponse.ok) {
           const propertiesData = await propertiesResponse.json();
-          console.log('✅ AirDNA Properties API Response - will aggregate to market data:', propertiesData);
+          console.log('✅ AirDNA Properties API Response - will aggregate to neighborhood data:', propertiesData);
           
           // Aggregate individual properties into market data by neighborhood
           let properties = [];
@@ -208,6 +249,20 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
                                property.area || 
                                property.district ||
                                'City Center';
+            
+            // Filter out generic geographical areas
+            const cityName = city.toLowerCase();
+            const neighborhoodLower = neighborhood.toLowerCase();
+            const isGeneric = neighborhoodLower.includes(`downtown ${cityName}`) || 
+                            neighborhoodLower.includes(`${cityName} center`) || 
+                            neighborhoodLower.includes(`${cityName} area`) ||
+                            neighborhoodLower.includes(`east ${cityName}`) ||
+                            neighborhoodLower.includes(`west ${cityName}`) ||
+                            neighborhoodLower.includes(`north ${cityName}`) ||
+                            neighborhoodLower.includes(`south ${cityName}`) ||
+                            neighborhoodLower === cityName;
+            
+            if (isGeneric) return; // Skip generic areas
             
             let monthlyRevenue = 0;
             if (property.revenue) {
@@ -233,13 +288,13 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
           const strData = Array.from(neighborhoodMap.entries()).map(([neighborhood, revenues]) => {
             const avgRevenue = Math.round(revenues.reduce((sum: number, rev: number) => sum + rev, 0) / revenues.length);
             return {
-              submarket: `${neighborhood} Apartments`,
+              submarket: neighborhood,
               revenue: avgRevenue
             };
           }).slice(0, 8); // Limit to 8 submarkets
           
           if (strData.length > 0) {
-            console.log('✅ Aggregated market data from properties:', strData);
+            console.log('✅ Aggregated neighborhood data from properties:', strData);
             return strData;
           }
         }
@@ -255,30 +310,35 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
         }
       }
     } catch (error) {
-      console.error('💥 Error with AirDNA API - falling back to sample apartment data:', error);
+      console.error('💥 Error with AirDNA API - falling back to sample neighborhood data:', error);
     }
   }
   
-  // Fallback to sample apartment data (always works)
-  console.log('📋 Using sample apartment STR data');
+  // Fallback to sample neighborhood data (always works)
+  console.log('📋 Using sample neighborhood STR data');
   const cityKey = city.toLowerCase().trim().replace(/,.*/, '');
   const cityData = sampleMarketDatabase[cityKey];
   
   if (cityData) {
-    console.log(`✅ Found sample apartment data for ${city}`);
+    console.log(`✅ Found sample neighborhood data for ${city}`);
     return cityData.strData;
   }
   
-  // If no sample data, generate realistic sample data for any city - MARKET NEIGHBORHOODS
+  // If no sample data, generate realistic sample data for any city - ACTUAL NEIGHBORHOODS
   console.log(`🎲 Generating sample neighborhood data for ${city}`);
+  
+  // Generate more realistic neighborhood names instead of generic geographical areas
+  const neighborhoodSuffixes = ['Heights', 'Village', 'District', 'Quarter', 'Park', 'Hills', 'Grove'];
+  const neighborhoodPrefixes = ['Old Town', 'Historic', 'Arts', 'Cultural', 'Waterfront', 'University', 'Market'];
+  
   return [
-    { submarket: `Downtown ${city}`, revenue: 6200 },
-    { submarket: `${city} Center`, revenue: 5800 },
-    { submarket: `Historic ${city}`, revenue: 5400 },
-    { submarket: `${city} Heights`, revenue: 4900 },
-    { submarket: `East ${city}`, revenue: 4600 },
-    { submarket: `West ${city}`, revenue: 4300 },
-    { submarket: `South ${city}`, revenue: 4000 }
+    { submarket: `${neighborhoodPrefixes[0]} ${city}`, revenue: 6200 },
+    { submarket: `${city} ${neighborhoodSuffixes[0]}`, revenue: 5800 },
+    { submarket: `${neighborhoodPrefixes[1]} ${neighborhoodSuffixes[1]}`, revenue: 5400 },
+    { submarket: `${neighborhoodPrefixes[2]} ${neighborhoodSuffixes[2]}`, revenue: 4900 },
+    { submarket: `${city} ${neighborhoodSuffixes[3]}`, revenue: 4600 },
+    { submarket: `${neighborhoodPrefixes[3]} ${neighborhoodSuffixes[4]}`, revenue: 4300 },
+    { submarket: `${neighborhoodPrefixes[4]} ${neighborhoodSuffixes[5]}`, revenue: 4000 }
   ];
 };
 
