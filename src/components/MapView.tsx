@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -221,17 +220,9 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
             onClick={() => setSelectedSubmarket(submarket)}
           >
             <div className="relative group flex flex-col items-center">
-              {/* SUBMARKET NAME - BRIGHT WHITE TEXT WITH DARK SOLID BACKGROUND */}
-              <div className="mb-2 text-center bg-black/90 px-3 py-1 rounded-md border-2 border-white shadow-2xl backdrop-blur-sm">
-                <span 
-                  className="font-bold text-sm tracking-wide select-none text-white"
-                  style={{ 
-                    color: '#FFFFFF !important',
-                    textShadow: '0 0 8px rgba(0,0,0,1), 2px 2px 4px rgba(0,0,0,1)',
-                    fontWeight: '800',
-                    fontSize: '13px'
-                  }}
-                >
+              {/* SUBMARKET NAME - FORCE WHITE TEXT */}
+              <div className="mb-2 text-center bg-black px-3 py-1 rounded-md border-2 border-white shadow-2xl">
+                <span className="font-bold text-sm tracking-wide select-none !text-white">
                   {submarket.submarket}
                 </span>
               </div>
@@ -244,15 +235,7 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
                    style={{ 
                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 0 0 2px white'
                    }}>
-                <span 
-                  className="font-black text-xl tracking-tight select-none text-white" 
-                  style={{ 
-                    color: '#FFFFFF !important',
-                    textShadow: '0 0 8px rgba(0,0,0,1), 3px 3px 6px rgba(0,0,0,1)',
-                    fontSize: '16px',
-                    fontWeight: '900'
-                  }}
-                >
+                <span className="font-black text-xl tracking-tight select-none !text-white">
                   {submarket.multiple.toFixed(2)}
                 </span>
               </div>
@@ -260,8 +243,8 @@ export const MapView: React.FC<MapViewProps> = ({ results, city }) => {
               {/* Enhanced Tooltip */}
               <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 
                             opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
-                <div className="bg-black/95 text-white text-sm rounded-lg px-4 py-3 whitespace-nowrap border-2 border-white shadow-2xl backdrop-blur-sm">
-                  <div className="font-bold text-white text-base">{submarket.submarket}</div>
+                <div className="bg-black text-white text-sm rounded-lg px-4 py-3 whitespace-nowrap border-2 border-white shadow-2xl">
+                  <div className="font-bold !text-white text-base">{submarket.submarket}</div>
                   <div className="text-green-400 font-semibold">${submarket.strRevenue.toLocaleString()}</div>
                   <div className="text-cyan-400 font-semibold">{submarket.multiple.toFixed(2)}x multiple</div>
                 </div>
