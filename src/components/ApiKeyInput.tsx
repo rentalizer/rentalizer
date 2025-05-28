@@ -13,28 +13,28 @@ interface ApiKeyInputProps {
 }
 
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
-  const [airdnaKey, setAirdnaKey] = useState('');
+  const [professionalKey, setProfessionalKey] = useState('');
   const [openaiKey, setOpenaiKey] = useState('');
   const [showKeys, setShowKeys] = useState(false);
   const [showStoredKeys, setShowStoredKeys] = useState(false);
 
   const handleSaveKeys = () => {
     // Store in localStorage for session persistence
-    if (airdnaKey) localStorage.setItem('airdna_api_key', airdnaKey);
+    if (professionalKey) localStorage.setItem('professional_data_key', professionalKey);
     if (openaiKey) localStorage.setItem('openai_api_key', openaiKey);
     
     onApiKeysChange({
-      airdnaApiKey: airdnaKey || undefined,
+      airdnaApiKey: professionalKey || undefined,
       openaiApiKey: openaiKey || undefined
     });
   };
 
   const handleViewStoredKeys = () => {
-    const storedAirDNA = localStorage.getItem('airdna_api_key') || 'Not set';
+    const storedProfessional = localStorage.getItem('professional_data_key') || 'Not set';
     const storedOpenai = localStorage.getItem('openai_api_key') || 'Not set';
     
     console.log('=== STORED API KEYS ===');
-    console.log('AirDNA API Key:', storedAirDNA);
+    console.log('Professional Data Key:', storedProfessional);
     console.log('OpenAI API Key:', storedOpenai);
     console.log('=====================');
     
@@ -43,22 +43,22 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
   const getStoredKeys = () => {
     return {
-      airdna: localStorage.getItem('airdna_api_key') || 'Not set',
+      professional: localStorage.getItem('professional_data_key') || 'Not set',
       openai: localStorage.getItem('openai_api_key') || 'Not set'
     };
   };
 
   // Load keys from localStorage on component mount
   React.useEffect(() => {
-    const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '';
+    const savedProfessionalKey = localStorage.getItem('professional_data_key') || '';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
     
-    setAirdnaKey(savedAirDNAKey);
+    setProfessionalKey(savedProfessionalKey);
     setOpenaiKey(savedOpenaiKey);
     
-    if (savedAirDNAKey || savedOpenaiKey) {
+    if (savedProfessionalKey || savedOpenaiKey) {
       onApiKeysChange({
-        airdnaApiKey: savedAirDNAKey || undefined,
+        airdnaApiKey: savedProfessionalKey || undefined,
         openaiApiKey: savedOpenaiKey || undefined
       });
     }
@@ -69,7 +69,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
           <Key className="h-5 w-5 text-blue-600" />
-          API Configuration
+          Data Configuration
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -77,7 +77,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           <Alert className="border-orange-200 bg-orange-50">
             <AlertTriangle className="h-4 w-4 text-orange-600" />
             <AlertDescription className="text-orange-800">
-              <strong>AirDNA API requires a subscription</strong> - The free tier doesn't include API access. 
+              <strong>Professional data requires a subscription</strong> - The free tier doesn't include API access. 
               If you don't have a subscription, the app will automatically use sample data for analysis.
             </AlertDescription>
           </Alert>
@@ -90,11 +90,11 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 <span>Works without any API keys - includes Nashville, Miami, Austin, Denver, Seattle</span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">AirDNA API</Badge>
-                <span>Professional STR data (requires paid subscription on RapidAPI)</span>
+                <Badge variant="outline" className="text-xs">Professional Data</Badge>
+                <span>Live short-term rental market data (requires paid subscription)</span>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-xs">OpenAI</Badge>
+                <Badge variant="outline" className="text-xs">AI Research</Badge>
                 <span>AI-powered rental data research for any city (~$5-20/month)</span>
               </div>
               <p className="text-xs text-green-600 mt-2">
@@ -105,15 +105,15 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="airdna-key" className="text-sm font-medium">
-                AirDNA API Key (Optional - Requires Subscription)
+              <Label htmlFor="professional-key" className="text-sm font-medium">
+                Professional Data Key (Optional - Requires Subscription)
               </Label>
               <Input
-                id="airdna-key"
+                id="professional-key"
                 type={showKeys ? "text" : "password"}
-                value={airdnaKey}
-                onChange={(e) => setAirdnaKey(e.target.value)}
-                placeholder="Enter AirDNA RapidAPI key..."
+                value={professionalKey}
+                onChange={(e) => setProfessionalKey(e.target.value)}
+                placeholder="Enter professional data API key..."
                 className="mt-1"
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -123,14 +123,14 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
             <div>
               <Label htmlFor="openai-key" className="text-sm font-medium">
-                OpenAI API Key (Optional)
+                AI Research Key (Optional)
               </Label>
               <Input
                 id="openai-key"
                 type={showKeys ? "text" : "password"}
                 value={openaiKey}
                 onChange={(e) => setOpenaiKey(e.target.value)}
-                placeholder="Enter OpenAI API key..."
+                placeholder="Enter AI research API key..."
                 className="mt-1"
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -144,13 +144,13 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               <h4 className="font-medium text-gray-900 mb-2">Currently Stored Keys:</h4>
               <div className="space-y-2 text-sm">
                 <div>
-                  <span className="font-medium">AirDNA API:</span> 
+                  <span className="font-medium">Professional Data:</span> 
                   <span className="ml-2 font-mono text-xs">
-                    {getStoredKeys().airdna === 'Not set' ? 'Not set' : `${getStoredKeys().airdna.substring(0, 8)}...`}
+                    {getStoredKeys().professional === 'Not set' ? 'Not set' : `${getStoredKeys().professional.substring(0, 8)}...`}
                   </span>
                 </div>
                 <div>
-                  <span className="font-medium">OpenAI:</span> 
+                  <span className="font-medium">AI Research:</span> 
                   <span className="ml-2 font-mono text-xs">
                     {getStoredKeys().openai === 'Not set' ? 'Not set' : `${getStoredKeys().openai.substring(0, 8)}...`}
                   </span>

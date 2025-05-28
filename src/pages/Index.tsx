@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,14 +35,14 @@ const Index = () => {
     
     try {
       console.log(`Analyzing ${city} with API config:`, { 
-        hasAirDNAKey: !!apiConfig.airdnaApiKey,
-        hasOpenaiKey: !!apiConfig.openaiApiKey 
+        hasProfessionalKey: !!apiConfig.airdnaApiKey,
+        hasAIKey: !!apiConfig.openaiApiKey 
       });
       
       // Show loading toast
       toast({
         title: "🔍 Analyzing Market",
-        description: `Fetching ${apiConfig.airdnaApiKey ? 'live AirDNA' : 'sample'} data for ${city}...`,
+        description: `Fetching ${apiConfig.airdnaApiKey ? 'live professional' : 'sample'} data for ${city}...`,
       });
       
       const marketData = await fetchMarketData(city, apiConfig);
@@ -82,7 +83,7 @@ const Index = () => {
         setTimeout(() => {
           toast({
             title: "💡 Suggestion",
-            description: "Check your AirDNA subscription status, or use sample data by removing the API key.",
+            description: "Check your subscription status, or use sample data by removing the API key.",
           });
         }, 2000);
       }
@@ -116,11 +117,11 @@ const Index = () => {
 
   const getAnalysisStatusText = () => {
     if (apiConfig.airdnaApiKey && apiConfig.openaiApiKey) {
-      return 'Fetching live AirDNA professional data and AI rental data...';
+      return 'Fetching live professional data and AI rental research...';
     } else if (apiConfig.openaiApiKey) {
-      return 'Using sample STR data and fetching AI rental data...';
+      return 'Using sample STR data and fetching AI rental research...';
     } else if (apiConfig.airdnaApiKey) {
-      return 'Fetching live AirDNA professional data and using sample rental data...';
+      return 'Fetching live professional data and using sample rental data...';
     } else {
       return 'Using sample market data...';
     }
@@ -136,12 +137,12 @@ const Index = () => {
             <h1 className="text-4xl font-bold text-gray-900">STR Market Analyzer</h1>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Analyze short-term rental markets vs. traditional rental markets with professional AirDNA data
+            Analyze short-term rental markets vs. traditional rental markets with professional data
           </p>
           <div className="flex items-center justify-center gap-4 text-sm text-gray-500">
             <Badge variant="outline">2BR/2BA Properties</Badge>
             <Badge variant="outline">Professional Data</Badge>
-            <Badge variant="outline">Free AirDNA Tier</Badge>
+            <Badge variant="outline">Sample Data Available</Badge>
             <Badge variant="outline">AI Analysis</Badge>
           </div>
         </div>
@@ -178,7 +179,7 @@ const Index = () => {
                 <h4 className="font-medium text-blue-900 mb-2">Current Analysis Mode:</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
                   {apiConfig.airdnaApiKey ? (
-                    <li>• ✅ Live AirDNA professional data (2BR/2BA apartments, accommodates 6, FREE tier available)</li>
+                    <li>• ✅ Live professional STR data (2BR/2BA apartments, accommodates 6)</li>
                   ) : (
                     <li>• 📋 Sample STR data (for supported cities: Nashville, Miami, Austin)</li>
                   )}
@@ -243,7 +244,7 @@ const Index = () => {
                 <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                   <h4 className="font-medium text-blue-900 mb-2">Data Sources:</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• <strong>STR Revenue:</strong> {apiConfig.airdnaApiKey ? 'Live AirDNA professional data via RapidAPI' : 'Sample data'} (2BR/2BA Apartments)</li>
+                    <li>• <strong>STR Revenue:</strong> {apiConfig.airdnaApiKey ? 'Live professional market data' : 'Sample data'} (2BR/2BA Apartments)</li>
                     <li>• <strong>Rental Data:</strong> {apiConfig.openaiApiKey ? 'AI-powered research via OpenAI' : 'Sample data'}</li>
                     <li>• <strong>Calculations:</strong> Automated filtering and revenue-to-rent multiples</li>
                   </ul>
@@ -262,7 +263,7 @@ const Index = () => {
                 <p className="text-lg text-gray-600">{error}</p>
                 <p className="text-sm text-gray-500">
                   {!apiConfig.airdnaApiKey && !apiConfig.openaiApiKey 
-                    ? "Add your AirDNA API key above for any US city, or try: Nashville, Miami, Austin" 
+                    ? "Add your professional data API key above for any US city, or try: Nashville, Miami, Austin" 
                     : "Please check the city name and try again"}
                 </p>
               </div>
