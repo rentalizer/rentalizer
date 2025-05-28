@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -48,13 +47,12 @@ const Index = () => {
           <div className="container mx-auto px-4 py-12">
             {/* Header */}
             <div className="text-center mb-12">
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <BarChart3 className="h-16 w-16 text-cyan-400" />
-                <ApartmentCube />
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <BarChart3 className="h-8 w-8 text-cyan-400" />
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  RENTALIZER
+                </h1>
               </div>
-              <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Rentalizer</span>
-              </h1>
               <p className="text-lg text-cyan-300/80 font-medium mb-6">By Richie Matthews</p>
               <p className="text-2xl text-cyan-100 mb-8 max-w-3xl mx-auto">
                 Save Weeks, Even Months Finding Cash-Flowing Rental Arbitrage Markets
@@ -134,13 +132,12 @@ const Index = () => {
         <div className="container mx-auto px-4 py-12">
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <BarChart3 className="h-16 w-16 text-cyan-400" />
-              <ApartmentCube />
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <BarChart3 className="h-8 w-8 text-cyan-400" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                RENTALIZER
+              </h1>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Rentalizer</span>
-            </h1>
             <p className="text-lg text-cyan-300/80 font-medium mb-6">By Richie Matthews</p>
             <p className="text-2xl text-cyan-100 mb-8 max-w-3xl mx-auto">
               Save Weeks, Even Months Finding Cash-Flowing Rental Arbitrage Markets
