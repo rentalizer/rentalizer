@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,7 +12,6 @@ import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
 import { LoginDialog } from '@/components/LoginDialog';
 import { SubscriptionPricing } from '@/components/SubscriptionPricing';
-import { ContactChat } from '@/components/ContactChat';
 import { Footer } from '@/components/Footer';
 import { TopNavBar } from '@/components/TopNavBar';
 import { ApiKeyInput } from '@/components/ApiKeyInput';
@@ -182,8 +180,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Chat and Footer */}
-        <ContactChat />
+        {/* Footer only - no standalone ContactChat */}
         <Footer />
       </div>
     );
@@ -320,8 +317,7 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Chat and Footer */}
-      <ContactChat />
+      {/* Footer only - no standalone ContactChat */}
       <Footer />
     </div>
   );
