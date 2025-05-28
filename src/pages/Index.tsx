@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -185,11 +186,11 @@ const Index = () => {
 
   if (!isSubscribed) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black p-6 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 relative overflow-hidden">
         {/* Futuristic background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-purple-500/10 blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl animate-pulse delay-1000"></div>
         </div>
 
         <div className="max-w-6xl mx-auto space-y-8 relative z-10 mt-20">
@@ -197,7 +198,7 @@ const Index = () => {
             <div className="flex items-center justify-center gap-3 mb-8">
               <BarChart3 className="h-12 w-12 text-cyan-400" />
               <div>
-                <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent drop-shadow-2xl">
+                <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-300 bg-clip-text text-transparent drop-shadow-2xl">
                   Rentalizer
                 </h1>
                 <p className="text-lg text-cyan-300/80 font-medium mt-2">By Richie Matthews</p>
@@ -214,7 +215,7 @@ const Index = () => {
               </p>
               
               <p className="text-xl text-gray-300 font-medium leading-relaxed">
-                Ill ceck - until the fix the page and update in the new copy I provided--use the tagline
+                Save Weeks, Even Months Finding Cash-Flowing Rental Arbitrage Markets
               </p>
               
               <div className="space-y-4 mt-8">
@@ -223,7 +224,7 @@ const Index = () => {
                 </p>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                  <div className="bg-gray-800/40 p-6 rounded-lg border border-cyan-500/20 hover:border-cyan-400/40 transition-all">
+                  <div className="bg-slate-800/40 p-6 rounded-lg border border-cyan-500/20 hover:border-cyan-400/40 transition-all">
                     <div className="flex items-center gap-3 mb-3">
                       <Target className="h-8 w-8 text-cyan-400" />
                       <h3 className="text-lg font-semibold text-cyan-300">Find Profitable Markets</h3>
@@ -233,20 +234,20 @@ const Index = () => {
                     </p>
                   </div>
                   
-                  <div className="bg-gray-800/40 p-6 rounded-lg border border-purple-500/20 hover:border-purple-400/40 transition-all">
+                  <div className="bg-slate-800/40 p-6 rounded-lg border border-blue-500/20 hover:border-blue-400/40 transition-all">
                     <div className="flex items-center gap-3 mb-3">
-                      <Building className="h-8 w-8 text-purple-400" />
-                      <h3 className="text-lg font-semibold text-purple-300">Acquire Properties</h3>
+                      <Building className="h-8 w-8 text-blue-400" />
+                      <h3 className="text-lg font-semibold text-blue-300">Acquire Properties</h3>
                     </div>
                     <p className="text-gray-300 text-sm">
                       Smart property acquisition strategies without the need for traditional mortgages or huge down payments
                     </p>
                   </div>
                   
-                  <div className="bg-gray-800/40 p-6 rounded-lg border border-blue-500/20 hover:border-blue-400/40 transition-all">
+                  <div className="bg-slate-800/40 p-6 rounded-lg border border-cyan-500/20 hover:border-cyan-400/40 transition-all">
                     <div className="flex items-center gap-3 mb-3">
-                      <Zap className="h-8 w-8 text-blue-400" />
-                      <h3 className="text-lg font-semibold text-blue-300">Manage & Automate</h3>
+                      <Zap className="h-8 w-8 text-cyan-400" />
+                      <h3 className="text-lg font-semibold text-cyan-300">Manage & Automate</h3>
                     </div>
                     <p className="text-gray-300 text-sm">
                       Streamlined rental management and automation tools to maximize your passive income potential
@@ -257,10 +258,10 @@ const Index = () => {
             </div>
             
             <div className="flex items-center justify-center gap-4 text-sm mt-8">
-              <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">🎯 No Mortgage Required</Badge>
-              <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 hover:bg-purple-500/10">🤖 AI-Powered</Badge>
-              <Badge variant="outline" className="bg-gray-800/50 border-blue-500/30 text-blue-300 hover:bg-blue-500/10">⚡ All-In-One System</Badge>
-              <Badge variant="outline" className="bg-gray-800/50 border-green-500/30 text-green-300 hover:bg-green-500/10">💰 Passive Income</Badge>
+              <Badge variant="outline" className="bg-slate-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">🎯 No Mortgage Required</Badge>
+              <Badge variant="outline" className="bg-slate-800/50 border-blue-500/30 text-blue-300 hover:bg-blue-500/10">🤖 AI-Powered</Badge>
+              <Badge variant="outline" className="bg-slate-800/50 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">⚡ All-In-One System</Badge>
+              <Badge variant="outline" className="bg-slate-800/50 border-green-500/30 text-green-300 hover:bg-green-500/10">💰 Passive Income</Badge>
             </div>
           </div>
 
@@ -269,7 +270,7 @@ const Index = () => {
               <Button
                 onClick={() => setShowPricing(true)}
                 size="lg"
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-4 text-xl font-medium shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
+                className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-12 py-4 text-xl font-medium shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
               >
                 Start Earning Rental Income Today
               </Button>
@@ -285,12 +286,12 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
       {/* Futuristic background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-purple-500/10 blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 rounded-full bg-blue-500/5 blur-2xl animate-pulse delay-500"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 rounded-full bg-blue-500/10 blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 rounded-full bg-cyan-500/5 blur-2xl animate-pulse delay-500"></div>
       </div>
 
       <div className="relative z-10">
@@ -302,7 +303,7 @@ const Index = () => {
               <ApartmentCube />
             </div>
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">Rentalizer</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">Rentalizer</span>
             </h1>
             <p className="text-lg text-cyan-300/80 font-medium mb-6">By Richie Matthews</p>
             <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
@@ -313,7 +314,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-3 text-lg"
+                className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-8 py-3 text-lg"
               >
                 <BarChart3 className="h-5 w-5 mr-2" />
                 Market Analysis
@@ -331,8 +332,8 @@ const Index = () => {
           </div>
 
           {/* City Analysis - moved to top */}
-          <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
-            <CardHeader className="pb-4 border-b border-gray-700/50">
+          <Card className="shadow-2xl border border-cyan-500/20 bg-slate-900/80 backdrop-blur-lg">
+            <CardHeader className="pb-4 border-b border-slate-700/50">
               <CardTitle className="flex items-center gap-2 text-cyan-300">
                 <Search className="h-5 w-5 text-cyan-400" />
                 Market Analysis
@@ -348,7 +349,7 @@ const Index = () => {
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="Enter any US city name (e.g., Denver, Seattle, Atlanta)"
-                    className="mt-2 text-lg border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                    className="mt-2 text-lg border-cyan-500/30 bg-slate-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
                   />
                   {error && (
                     <p className="mt-2 text-sm text-red-400">{error}</p>
@@ -360,7 +361,7 @@ const Index = () => {
                     onClick={handleAnalyze}
                     disabled={!city.trim() || isAnalyzing}
                     size="lg"
-                    className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-3 text-lg font-medium shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 border border-cyan-500/20"
+                    className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-8 py-3 text-lg font-medium shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105 border border-cyan-500/20"
                   >
                     <CalculatorIcon className="h-5 w-5 mr-2" />
                     {isAnalyzing ? 'Rentalizing Market Data...' : 'Rentalize Market'}
@@ -372,8 +373,8 @@ const Index = () => {
 
           {/* Results - Split Screen Layout */}
           {results.length > 0 && (
-            <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
-              <CardHeader className="pb-4 border-b border-gray-700/50">
+            <Card className="shadow-2xl border border-cyan-500/20 bg-slate-900/80 backdrop-blur-lg">
+              <CardHeader className="pb-4 border-b border-slate-700/50">
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="text-2xl flex items-center gap-2 text-cyan-300">
@@ -387,8 +388,8 @@ const Index = () => {
                         <defs>
                           <linearGradient id="logoGradientSmall" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" stopColor="rgb(34, 211, 238)" />
-                            <stop offset="50%" stopColor="rgb(96, 165, 250)" />
-                            <stop offset="100%" stopColor="rgb(168, 85, 247)" />
+                            <stop offset="50%" stopColor="rgb(59, 130, 246)" />
+                            <stop offset="100%" stopColor="rgb(34, 211, 238)" />
                           </linearGradient>
                         </defs>
                         
@@ -398,8 +399,8 @@ const Index = () => {
                         
                         <path d="M6 8 L18 12 L30 6 L42 10" stroke="url(#logoGradientSmall)" strokeWidth="2" fill="none" strokeLinecap="round" />
                         <circle cx="6" cy="8" r="2" fill="rgb(34, 211, 238)" />
-                        <circle cx="18" cy="12" r="2" fill="rgb(96, 165, 250)" />
-                        <circle cx="30" cy="6" r="2" fill="rgb(168, 85, 247)" />
+                        <circle cx="18" cy="12" r="2" fill="rgb(59, 130, 246)" />
+                        <circle cx="30" cy="6" r="2" fill="rgb(34, 211, 238)" />
                         <circle cx="42" cy="10" r="2" fill="rgb(34, 211, 238)" />
                       </svg>
                       Market Overview: {city}
@@ -422,9 +423,9 @@ const Index = () => {
               </CardHeader>
               <CardContent className="pt-6">
                 {/* Split Screen Layout */}
-                <ResizablePanelGroup direction="horizontal" className="min-h-[700px] w-full rounded-lg border border-gray-700">
+                <ResizablePanelGroup direction="horizontal" className="min-h-[700px] w-full rounded-lg border border-slate-700">
                   <ResizablePanel defaultSize={50} minSize={30}>
-                    <div className="h-full p-4 bg-gray-900/50">
+                    <div className="h-full p-4 bg-slate-900/50">
                       <div className="flex items-center gap-2 mb-4">
                         <TrendingUpIcon className="h-5 w-5 text-cyan-400" />
                         <h3 className="text-lg font-semibold text-cyan-300">Data Table</h3>
@@ -438,7 +439,7 @@ const Index = () => {
                   <ResizableHandle withHandle />
                   
                   <ResizablePanel defaultSize={50} minSize={30}>
-                    <div className="h-full p-4 bg-gray-900/50">
+                    <div className="h-full p-4 bg-slate-900/50">
                       <div className="flex items-center gap-2 mb-4">
                         <MapPin className="h-5 w-5 text-cyan-400" />
                         <h3 className="text-lg font-semibold text-cyan-300">Market Map</h3>
@@ -458,7 +459,7 @@ const Index = () => {
                     </p>
                   </div>
 
-                  <div className="bg-gradient-to-r from-gray-800/60 to-gray-700/60 p-4 rounded-lg border border-gray-600/30">
+                  <div className="bg-gradient-to-r from-slate-800/60 to-slate-700/60 p-4 rounded-lg border border-slate-600/30">
                     <h4 className="font-medium text-cyan-300 mb-2">Data Sources:</h4>
                     <ul className="text-sm text-gray-300 space-y-1">
                       <li>• <strong>STR Revenue:</strong> {apiConfig.airdnaApiKey ? 'Live professional market data' : 'Sample data'} (2BR/2BA Apartments)</li>
@@ -473,7 +474,7 @@ const Index = () => {
 
           {/* No Results Message */}
           {!isAnalyzing && error && (
-            <Card className="shadow-2xl border border-red-500/20 bg-gray-900/80 backdrop-blur-lg">
+            <Card className="shadow-2xl border border-red-500/20 bg-slate-900/80 backdrop-blur-lg">
               <CardContent className="py-12">
                 <div className="text-center space-y-4">
                   <div className="text-red-400 text-5xl">⚠️</div>
@@ -489,11 +490,11 @@ const Index = () => {
           )}
 
           {isAnalyzing && (
-            <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
+            <Card className="shadow-2xl border border-cyan-500/20 bg-slate-900/80 backdrop-blur-lg">
               <CardContent className="py-12">
                 <div className="text-center space-y-4">
                   <div className="relative">
-                    <div className="animate-spin rounded-full h-12 w-12 border-2 border-transparent border-t-cyan-400 border-r-purple-400 mx-auto"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-2 border-transparent border-t-cyan-400 border-r-blue-400 mx-auto"></div>
                     <div className="absolute inset-0 rounded-full bg-cyan-400/10 blur-lg animate-pulse"></div>
                   </div>
                   <p className="text-lg text-gray-300">Rentalizing {city} market data...</p>
