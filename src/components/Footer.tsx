@@ -114,7 +114,7 @@ export const Footer = () => {
         {/* Bottom Section */}
         <div className="mt-12 pt-8 border-t border-gray-700/50 flex flex-col md:flex-row justify-between items-center">
           <div className="text-gray-400 text-sm mb-4 md:mb-0">
-            © 2024 iStay USA LLC. All rights reserved. Built with AI-powered market intelligence.
+            © 2025 Rentalizer. All rights reserved. Built with AI-powered market intelligence.
           </div>
           <div className="flex items-center gap-6 text-sm">
             <span className="text-gray-400">Powered by</span>
