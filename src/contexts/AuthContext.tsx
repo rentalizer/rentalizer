@@ -54,7 +54,6 @@ const createUserProfile = async (userId: string, email: string) => {
   try {
     console.log('Creating user profile for:', email);
     
-    // Check if profile already exists
     const { data: existingProfile, error: checkError } = await supabase
       .from('user_profiles')
       .select('id')
@@ -71,7 +70,6 @@ const createUserProfile = async (userId: string, email: string) => {
       return;
     }
 
-    // Create new profile
     const { error: insertError } = await supabase
       .from('user_profiles')
       .insert({
@@ -96,30 +94,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     console.log('🔄 AuthProvider initializing...');
-    
-    let mounted = true;
-    
-    const processSession = async (session: Session | null) => {
-      if (!mounted) {
-        console.log('⚠️ Component unmounted, skipping session processing');
-        return;
-      }
-      
-      console.log('📝 Processing session:', session ? 'Session exists' : 'No session');
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('🔔 Auth state change event:', event);
       
       if (session?.user) {
         console.log('👤 User found, email:', session.user.email);
         
-        // Ensure user profile exists
-        await createUserProfile(session.user.id, session.user.email || '');
+        // Create user profile if needed
+        setTimeout(() => {
+          createUserProfile(session.user.id, session.user.email || '');
+        }, 0);
         
-        let subscriptionStatus: 'active' | 'inactive' | 'trial' = 'trial';
-        if (session.user.email?.includes('premium') || session.user.email?.includes('pro')) {
-          subscriptionStatus = 'active';
-          console.log('✅ User has premium/pro subscription');
-        } else {
-          console.log('🆓 User on trial subscription');
-        }
+        const subscriptionStatus: 'active' | 'inactive' | 'trial' = 
+          (session.user.email?.includes('premium') || session.user.email?.includes('pro')) ? 'active' : 'trial';
         
         setUser({
           id: session.user.id,
@@ -131,38 +120,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(null);
       }
       
-      console.log('✅ Setting isLoading to false');
       setIsLoading(false);
-    };
-    
-    // Set up auth state listener
-    console.log('🔧 Setting up auth state listener...');
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('🔔 Auth state change event:', event);
-      await processSession(session);
     });
 
     // Get initial session
-    console.log('🚀 Getting initial session...');
     const getInitialSession = async () => {
       try {
-        console.log('📡 Attempting to connect to Supabase...');
-        
+        console.log('📡 Getting initial session...');
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('❌ Error getting initial session:', error);
-        } else {
-          console.log('📋 Initial session loaded successfully');
+          setIsLoading(false);
+          return;
         }
-        await processSession(session);
+
+        console.log('📋 Initial session loaded:', !!session);
+        
+        if (session?.user) {
+          const subscriptionStatus: 'active' | 'inactive' | 'trial' = 
+            (session.user.email?.includes('premium') || session.user.email?.includes('pro')) ? 'active' : 'trial';
+          
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            subscription_status: subscriptionStatus
+          });
+        }
+        
+        setIsLoading(false);
       } catch (error) {
         console.error('💥 Exception getting initial session:', error);
-        
-        if (mounted) {
-          console.log('🚨 Forcing auth completion due to error');
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       }
     };
 
@@ -170,7 +159,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => {
       console.log('🧹 Cleaning up auth subscription');
-      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
@@ -178,59 +166,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     console.log('🔑 Starting sign in for:', email);
     
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-      if (error) {
-        console.error('❌ Sign in error:', error.message);
-        throw new Error(error.message);
-      }
-
-      if (!data.user) {
-        console.error('❌ No user returned from sign in');
-        throw new Error('Authentication failed - no user returned');
-      }
-
-      console.log('✅ Sign in successful for:', email);
-    } catch (error) {
-      console.error('💥 Sign in failed:', error);
-      throw error;
+    if (error) {
+      console.error('❌ Sign in error:', error.message);
+      throw new Error(error.message);
     }
+
+    console.log('✅ Sign in successful for:', email);
   };
 
   const signUp = async (email: string, password: string) => {
     console.log('📝 Starting sign up for:', email);
     
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
 
-      if (error) {
-        console.error('❌ Sign up error:', error.message);
-        throw new Error(error.message);
-      }
+    if (error) {
+      console.error('❌ Sign up error:', error.message);
+      throw new Error(error.message);
+    }
 
-      if (!data.user) {
-        console.error('❌ No user returned from sign up');
-        throw new Error('Sign up failed - no user returned');
-      }
-
-      console.log('✅ Sign up successful for:', email);
-      
-      // Send notification for new user signup
-      if (data.user && data.user.email) {
-        setTimeout(() => {
-          sendNewUserNotification(data.user!.email!, data.user!.id);
-        }, 2000);
-      }
-    } catch (error) {
-      console.error('💥 Sign up failed:', error);
-      throw error;
+    console.log('✅ Sign up successful for:', email);
+    
+    if (data.user && data.user.email) {
+      setTimeout(() => {
+        sendNewUserNotification(data.user!.email!, data.user!.id);
+      }, 2000);
     }
   };
 
@@ -240,10 +207,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (error) {
       console.error('❌ Sign out error:', error);
       throw error;
-    } else {
-      console.log('✅ Sign out successful');
-      setUser(null);
     }
+    console.log('✅ Sign out successful');
+    setUser(null);
   };
 
   const isSubscribed = user?.subscription_status === 'active' || user?.subscription_status === 'trial';
@@ -257,7 +223,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isSubscribed
   };
 
-  console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user, 'isSubscribed:', isSubscribed);
+  console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user);
 
   if (isLoading) {
     return (
