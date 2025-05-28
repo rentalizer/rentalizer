@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
@@ -49,6 +50,46 @@ const sendNewUserNotification = async (userEmail: string, userId: string) => {
   }
 };
 
+const createUserProfile = async (userId: string, email: string) => {
+  try {
+    console.log('Creating user profile for:', email);
+    
+    // Check if profile already exists
+    const { data: existingProfile, error: checkError } = await supabase
+      .from('user_profiles')
+      .select('id')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error('Error checking existing profile:', checkError);
+      return;
+    }
+
+    if (existingProfile) {
+      console.log('Profile already exists for user:', userId);
+      return;
+    }
+
+    // Create new profile
+    const { error: insertError } = await supabase
+      .from('user_profiles')
+      .insert({
+        id: userId,
+        email: email,
+        subscription_status: email.includes('premium') || email.includes('pro') ? 'active' : 'trial'
+      });
+
+    if (insertError) {
+      console.error('Error creating user profile:', insertError);
+    } else {
+      console.log('User profile created successfully');
+    }
+  } catch (error) {
+    console.error('Failed to create user profile:', error);
+  }
+};
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -58,11 +99,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     let mounted = true;
     
-    const processSession = (session: Session | null) => {
+    const processSession = async (session: Session | null) => {
       if (!mounted) return;
       
       if (session?.user) {
         console.log('Processing user session...');
+        
+        // Ensure user profile exists
+        await createUserProfile(session.user.id, session.user.email || '');
+        
         let subscriptionStatus: 'active' | 'inactive' | 'trial' = 'trial';
         if (session.user.email?.includes('premium') || session.user.email?.includes('pro')) {
           subscriptionStatus = 'active';
@@ -83,15 +128,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
     
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state change:', event);
-      processSession(session);
+      await processSession(session);
     });
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       console.log('Initial session loaded');
-      processSession(session);
+      await processSession(session);
     });
 
     return () => {
