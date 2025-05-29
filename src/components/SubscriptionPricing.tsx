@@ -21,11 +21,22 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
   const [promoDiscount, setPromoDiscount] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<'essentials' | 'complete'>('essentials');
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
 
-  const essentialsPrice = 950;
-  const completePrice = 1900;
-  const basePrice = selectedPlan === 'essentials' ? essentialsPrice : completePrice;
-  const finalPrice = promoDiscount ? basePrice - (basePrice * promoDiscount / 100) : basePrice;
+  // Pricing configuration
+  const pricing = {
+    essentials: {
+      monthly: 950,
+      yearly: 4000,
+    },
+    complete: {
+      monthly: 1900,
+      yearly: 5000,
+    }
+  };
+
+  const currentPrice = pricing[selectedPlan][billingCycle];
+  const finalPrice = promoDiscount ? currentPrice - (currentPrice * promoDiscount / 100) : currentPrice;
 
   const validatePromoCode = async () => {
     if (!promoCode.trim()) return;
@@ -85,6 +96,35 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
 
   return (
     <div className="max-w-5xl mx-auto">
+      {/* Billing Cycle Toggle */}
+      <div className="flex justify-center mb-6">
+        <div className="bg-gray-800/50 p-1 rounded-lg flex">
+          <button
+            onClick={() => setBillingCycle('monthly')}
+            className={`px-6 py-3 rounded-md transition-all ${
+              billingCycle === 'monthly'
+                ? 'bg-cyan-600 text-white'
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            Monthly
+          </button>
+          <button
+            onClick={() => setBillingCycle('yearly')}
+            className={`px-6 py-3 rounded-md transition-all relative ${
+              billingCycle === 'yearly'
+                ? 'bg-green-600 text-white'
+                : 'text-gray-400 hover:text-gray-200'
+            }`}
+          >
+            Yearly
+            <Badge className="absolute -top-2 -right-2 bg-green-500 text-white text-xs">
+              Save 65%
+            </Badge>
+          </button>
+        </div>
+      </div>
+
       {/* Plan Selection */}
       <div className="flex justify-center mb-8">
         <div className="bg-gray-800/50 p-1 rounded-lg flex">
@@ -127,19 +167,26 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
             <div className="space-y-2">
               <div className="flex items-center justify-center gap-2">
                 {selectedPlan === 'essentials' && promoDiscount && promoDiscount < 100 && (
-                  <span className="text-xl text-gray-500 line-through">${essentialsPrice}</span>
+                  <span className="text-xl text-gray-500 line-through">
+                    ${pricing.essentials[billingCycle].toLocaleString()}
+                  </span>
                 )}
                 <span className="text-4xl font-bold text-white">
                   ${selectedPlan === 'essentials' && promoDiscount === 100 ? 'FREE' : 
-                    selectedPlan === 'essentials' ? (promoDiscount ? (essentialsPrice - (essentialsPrice * promoDiscount / 100)).toLocaleString() : essentialsPrice.toLocaleString()) : 
-                    essentialsPrice.toLocaleString()}
+                    selectedPlan === 'essentials' ? finalPrice.toLocaleString() : 
+                    pricing.essentials[billingCycle].toLocaleString()}
                 </span>
-                <span className="text-lg text-gray-400">/month</span>
+                <span className="text-lg text-gray-400">/{billingCycle === 'monthly' ? 'month' : 'year'}</span>
               </div>
               {selectedPlan === 'essentials' && promoDiscount && (
                 <Badge variant="outline" className="bg-green-500/20 border-green-500/50 text-green-300">
                   {promoDiscount}% OFF Applied!
                 </Badge>
+              )}
+              {billingCycle === 'yearly' && (
+                <div className="text-sm text-green-400">
+                  Save ${(pricing.essentials.monthly * 12 - pricing.essentials.yearly).toLocaleString()} per year
+                </div>
               )}
             </div>
           </CardHeader>
@@ -177,19 +224,26 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
             <div className="space-y-2">
               <div className="flex items-center justify-center gap-2">
                 {selectedPlan === 'complete' && promoDiscount && promoDiscount < 100 && (
-                  <span className="text-xl text-gray-500 line-through">${completePrice}</span>
+                  <span className="text-xl text-gray-500 line-through">
+                    ${pricing.complete[billingCycle].toLocaleString()}
+                  </span>
                 )}
                 <span className="text-4xl font-bold text-white">
                   ${selectedPlan === 'complete' && promoDiscount === 100 ? 'FREE' : 
-                    selectedPlan === 'complete' ? (promoDiscount ? (completePrice - (completePrice * promoDiscount / 100)).toLocaleString() : completePrice.toLocaleString()) : 
-                    completePrice.toLocaleString()}
+                    selectedPlan === 'complete' ? finalPrice.toLocaleString() : 
+                    pricing.complete[billingCycle].toLocaleString()}
                 </span>
-                <span className="text-lg text-gray-400">/month</span>
+                <span className="text-lg text-gray-400">/{billingCycle === 'monthly' ? 'month' : 'year'}</span>
               </div>
               {selectedPlan === 'complete' && promoDiscount && (
                 <Badge variant="outline" className="bg-green-500/20 border-green-500/50 text-green-300">
                   {promoDiscount}% OFF Applied!
                 </Badge>
+              )}
+              {billingCycle === 'yearly' && (
+                <div className="text-sm text-green-400">
+                  Save ${(pricing.complete.monthly * 12 - pricing.complete.yearly).toLocaleString()} per year
+                </div>
               )}
             </div>
           </CardHeader>
