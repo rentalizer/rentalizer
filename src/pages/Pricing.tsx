@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { TopNavBar } from '@/components/TopNavBar';
+import { supabase } from '@/integrations/supabase/client';
 
 const Pricing = () => {
   const { user } = useAuth();
@@ -32,11 +33,17 @@ const Pricing = () => {
     }
 
     try {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        console.error('No active session');
+        return;
+      }
+
       const response = await fetch('/supabase/functions/v1/create-checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user.session?.access_token}`,
+          'Authorization': `Bearer ${session.session.access_token}`,
         },
         body: JSON.stringify({
           plan: plan,
@@ -300,7 +307,7 @@ const Pricing = () => {
         </div>
       </div>
 
-      <Footer />
+      <Footer showLinks={false} />
     </div>
   );
 };
