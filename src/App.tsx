@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +16,7 @@ import TermsOfService from "./pages/TermsOfService";
 import AnimationDraft from "./pages/AnimationDraft";
 import Test from "./pages/Test";
 import Pricing from "./pages/Pricing";
+import AcquisitionsAgent from "./pages/AcquisitionsAgent";
 
 const queryClient = new QueryClient();
 
@@ -60,7 +60,7 @@ const AppRoutes = () => (
           moduleDescription="AI-powered deal sourcing and landlord outreach automation."
           moduleIcon={<User className="h-8 w-8 text-purple-400" />}
         >
-          <Index />
+          <AcquisitionsAgent />
         </AccessGate>
       </SubscriptionGate>
     } />
