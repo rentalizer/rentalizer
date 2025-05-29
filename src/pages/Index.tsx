@@ -220,71 +220,119 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Clean Features Grid */}
+          {/* Clean Features Grid with Action Buttons */}
           <div className="grid md:grid-cols-4 gap-8 mb-16">
-            <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
-                  <MapPin className="h-8 w-8 text-cyan-400" />
-                </div>
-                <CardTitle className="text-cyan-300 text-lg">
-                  Market Intelligence
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-slate-400 text-sm">
-                  Find The Best Rental Arbitrage Markets
-                </p>
-              </CardContent>
-            </Card>
+            <div className="flex flex-col">
+              <Card 
+                className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
+                onClick={() => navigate('/markets')}
+              >
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                    <MapPin className="h-8 w-8 text-cyan-400" />
+                  </div>
+                  <CardTitle className="text-cyan-300 text-lg">
+                    Market Intelligence
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-slate-400 text-sm">
+                    Find The Best Rental Arbitrage Markets
+                  </p>
+                </CardContent>
+              </Card>
+              <Button
+                onClick={() => navigate('/markets')}
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+              >
+                <MapPin className="h-4 w-4 mr-2" />
+                Market Intelligence
+              </Button>
+            </div>
 
-            <Card className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                  <Calculator className="h-8 w-8 text-blue-400" />
-                </div>
-                <CardTitle className="text-blue-300 text-lg">
-                  Calculator
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-slate-400 text-sm">
-                  Assess Property Profitability And ROI
-                </p>
-              </CardContent>
-            </Card>
+            <div className="flex flex-col">
+              <Card 
+                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
+                onClick={() => navigate('/calculator')}
+              >
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                    <Calculator className="h-8 w-8 text-blue-400" />
+                  </div>
+                  <CardTitle className="text-blue-300 text-lg">
+                    Calculator
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-slate-400 text-sm">
+                    Assess Property Profitability And ROI
+                  </p>
+                </CardContent>
+              </Card>
+              <Button
+                onClick={() => navigate('/calculator')}
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+              >
+                <Calculator className="h-4 w-4 mr-2" />
+                Calculator
+              </Button>
+            </div>
 
-            <Card className="bg-slate-800/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                  <User className="h-8 w-8 text-purple-400" />
-                </div>
-                <CardTitle className="text-purple-300 text-lg">
-                  Acquisitions Agent
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-slate-400 text-sm">
-                  Contact Landlords & Close Deals
-                </p>
-              </CardContent>
-            </Card>
+            <div className="flex flex-col">
+              <Card 
+                className="bg-slate-800/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
+                onClick={() => navigate('/deals')}
+              >
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                    <User className="h-8 w-8 text-purple-400" />
+                  </div>
+                  <CardTitle className="text-purple-300 text-lg">
+                    Acquisitions Agent
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-slate-400 text-sm">
+                    Contact Landlords & Close Deals
+                  </p>
+                </CardContent>
+              </Card>
+              <Button
+                onClick={() => navigate('/deals')}
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+              >
+                <User className="h-4 w-4 mr-2" />
+                Acquisitions Agent
+              </Button>
+            </div>
 
-            <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
-                  <DollarSign className="h-8 w-8 text-cyan-400" />
-                </div>
-                <CardTitle className="text-cyan-300 text-lg">
-                  Front Desk
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-slate-400 text-sm">
-                  Property Management & Automations
-                </p>
-              </CardContent>
-            </Card>
+            <div className="flex flex-col">
+              <Card 
+                className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
+                onClick={() => navigate('/front-desk')}
+              >
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                    <DollarSign className="h-8 w-8 text-cyan-400" />
+                  </div>
+                  <CardTitle className="text-cyan-300 text-lg">
+                    Front Desk
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-slate-400 text-sm">
+                    Property Management & Automations
+                  </p>
+                </CardContent>
+              </Card>
+              <Button
+                onClick={() => navigate('/front-desk')}
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+              >
+                <DollarSign className="h-4 w-4 mr-2" />
+                Front Desk
+              </Button>
+            </div>
           </div>
         </div>
       </div>
