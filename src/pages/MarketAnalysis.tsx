@@ -39,15 +39,19 @@ const MarketAnalysis = () => {
 
   // Load API keys from localStorage on component mount
   React.useEffect(() => {
+    console.log('📋 MarketAnalysis component mounted - initializing...');
+    
     const savedProfessionalKey = localStorage.getItem('professional_data_key') || '';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
     
     console.log('🔑 Loading stored API keys:', {
       professionalKey: savedProfessionalKey ? `${savedProfessionalKey.substring(0, 8)}...` : 'Not found',
-      openaiKey: savedOpenaiKey ? `${savedOpenaiKey.substring(0, 8)}...` : 'Not found'
+      openaiKey: savedOpenaiKey ? `${savedOpenaiKey.substring(0, 8)}...` : 'Not found',
+      localStorage_keys: Object.keys(localStorage).filter(key => key.includes('api') || key.includes('key'))
     });
     
     if (savedProfessionalKey || savedOpenaiKey) {
+      console.log('✅ API keys found in localStorage, setting state...');
       setApiConfig({
         airdnaApiKey: savedProfessionalKey || undefined,
         openaiApiKey: savedOpenaiKey || undefined
@@ -58,6 +62,7 @@ const MarketAnalysis = () => {
         description: `Found stored API keys - ready for market analysis`,
       });
     } else {
+      console.log('❌ No API keys found in localStorage');
       toast({
         title: "⚠️ No API Keys Found",
         description: "Please configure your API keys below to run market analysis",
@@ -67,11 +72,24 @@ const MarketAnalysis = () => {
   }, [toast]);
 
   const handleApiKeysChange = (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => {
+    console.log('🔄 API keys changed:', {
+      airdna: keys.airdnaApiKey ? 'Updated' : 'Not provided',
+      openai: keys.openaiApiKey ? 'Updated' : 'Not provided'
+    });
     setApiConfig(keys);
   };
 
   const handleMarketAnalysis = async () => {
+    console.log('🚀 Market analysis started for:', {
+      targetCity,
+      propertyType,
+      bathrooms,
+      hasAirdnaKey: !!apiConfig.airdnaApiKey,
+      hasOpenaiKey: !!apiConfig.openaiApiKey
+    });
+
     if (!targetCity.trim()) {
+      console.log('❌ Analysis failed: No city provided');
       toast({
         title: "City Required",
         description: "Please enter a target city for analysis.",
@@ -82,6 +100,7 @@ const MarketAnalysis = () => {
 
     // Check if we have the required API keys
     if (!apiConfig.airdnaApiKey || !apiConfig.openaiApiKey) {
+      console.log('❌ Analysis failed: Missing API keys');
       toast({
         title: "API Keys Required",
         description: "Please configure your AirDNA and OpenAI API keys in the configuration section below.",
@@ -98,13 +117,27 @@ const MarketAnalysis = () => {
         openai: apiConfig.openaiApiKey ? 'Present' : 'Missing'
       });
       
+      console.log('📡 Calling fetchMarketData...');
       const marketData = await fetchMarketData(targetCity, apiConfig, propertyType, bathrooms);
+      console.log('📊 Market data received:', {
+        strDataCount: marketData.strData?.length || 0,
+        rentDataCount: marketData.rentData?.length || 0,
+        strData: marketData.strData,
+        rentData: marketData.rentData
+      });
       
       // Combine STR and rent data
       const combinedData: SubmarketData[] = marketData.strData.map(strItem => {
         const rentItem = marketData.rentData.find(r => r.submarket === strItem.submarket);
         const medianRent = rentItem?.rent || 2000; // Default fallback
         const multiple = strItem.revenue / medianRent;
+        
+        console.log('🔗 Combining data for submarket:', {
+          submarket: strItem.submarket,
+          strRevenue: strItem.revenue,
+          medianRent,
+          multiple: multiple.toFixed(2)
+        });
         
         return {
           submarket: strItem.submarket,
@@ -116,6 +149,7 @@ const MarketAnalysis = () => {
 
       // Sort by revenue potential (highest first)
       combinedData.sort((a, b) => b.multiple - a.multiple);
+      console.log('📈 Final sorted data:', combinedData);
 
       setSubmarketData(combinedData);
       setCityName(targetCity);
@@ -125,8 +159,14 @@ const MarketAnalysis = () => {
         description: `Found ${combinedData.length} submarkets in ${targetCity} for ${propertyType}BR/${bathrooms}BA properties`,
       });
 
+      console.log('✅ Analysis completed successfully');
+
     } catch (error) {
-      console.error('Market analysis error:', error);
+      console.error('💥 Market analysis error:', {
+        error: error,
+        message: error.message,
+        stack: error.stack
+      });
       toast({
         title: "Analysis Failed",
         description: error.message || "Unable to complete market analysis. Please check your API keys and try again.",
@@ -134,11 +174,20 @@ const MarketAnalysis = () => {
       });
     } finally {
       setIsLoading(false);
+      console.log('🏁 Analysis process finished (loading state cleared)');
     }
   };
 
   const handleExportData = () => {
+    console.log('📤 Export data requested:', {
+      dataAvailable: submarketData.length > 0,
+      city: cityName,
+      propertyType,
+      bathrooms
+    });
+
     if (submarketData.length === 0) {
+      console.log('❌ Export failed: No data available');
       toast({
         title: "No Data to Export",
         description: "Please run a market analysis first to generate data.",
@@ -148,39 +197,61 @@ const MarketAnalysis = () => {
     }
 
     const filename = `${cityName.toLowerCase().replace(/\s+/g, '-')}-market-analysis-${propertyType}br-${bathrooms}ba`;
+    console.log('💾 Exporting to CSV:', filename);
     exportToCSV(submarketData, filename);
     
     toast({
       title: "12-Month Data Exported",
       description: `12 months of market data for ${cityName} has been downloaded as CSV with seasonal variations.`,
     });
+    console.log('✅ Export completed successfully');
   };
 
   const getBathroomOptions = () => {
-    if (propertyType === '1') {
-      return [{ value: '1', label: '1 Bathroom' }];
-    } else if (propertyType === '2') {
-      return [
-        { value: '1', label: '1 Bathroom' },
-        { value: '2', label: '2 Bathrooms' }
-      ];
-    } else if (propertyType === '3') {
-      return [
-        { value: '1', label: '1 Bathroom' },
-        { value: '2', label: '2 Bathrooms' },
-        { value: '3', label: '3 Bathrooms' }
-      ];
-    }
-    return [{ value: '1', label: '1 Bathroom' }];
+    const options = propertyType === '1' ? [{ value: '1', label: '1 Bathroom' }] :
+                   propertyType === '2' ? [
+                     { value: '1', label: '1 Bathroom' },
+                     { value: '2', label: '2 Bathrooms' }
+                   ] :
+                   propertyType === '3' ? [
+                     { value: '1', label: '1 Bathroom' },
+                     { value: '2', label: '2 Bathrooms' },
+                     { value: '3', label: '3 Bathrooms' }
+                   ] : [{ value: '1', label: '1 Bathroom' }];
+    
+    console.log('🚿 Bathroom options updated:', {
+      propertyType,
+      availableOptions: options
+    });
+    
+    return options;
   };
 
   // Update bathrooms when property type changes
   React.useEffect(() => {
+    console.log('🔄 Property type changed:', propertyType);
     const options = getBathroomOptions();
     if (!options.find(opt => opt.value === bathrooms)) {
+      console.log('🔄 Bathroom selection invalid, updating to:', options[0].value);
       setBathrooms(options[0].value);
     }
   }, [propertyType]);
+
+  // Log state changes
+  React.useEffect(() => {
+    console.log('🏠 Target city changed:', targetCity);
+  }, [targetCity]);
+
+  React.useEffect(() => {
+    console.log('🛏️ Bathrooms changed:', bathrooms);
+  }, [bathrooms]);
+
+  React.useEffect(() => {
+    console.log('🔧 API config changed:', {
+      hasAirdna: !!apiConfig.airdnaApiKey,
+      hasOpenai: !!apiConfig.openaiApiKey
+    });
+  }, [apiConfig]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
