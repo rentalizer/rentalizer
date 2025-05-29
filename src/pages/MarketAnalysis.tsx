@@ -109,8 +109,8 @@ const MarketAnalysis = () => {
     exportToCSV(submarketData, filename);
     
     toast({
-      title: "Data Exported",
-      description: `Market analysis data for ${cityName} has been downloaded as CSV.`,
+      title: "12-Month Data Exported",
+      description: `12 months of market data for ${cityName} has been downloaded as CSV with seasonal variations.`,
     });
   };
 
