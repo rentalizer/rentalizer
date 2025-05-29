@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,7 +30,7 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
       yearly: 3950,
     },
     complete: {
-      monthly: 5950,
+      monthly: 2950,
       yearly: 5950,
     }
   };
@@ -118,7 +119,7 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
           >
             Yearly
             <Badge className="absolute -top-2 -right-2 bg-green-500 text-white text-xs">
-              Save 65%
+              Save 50%
             </Badge>
           </button>
         </div>

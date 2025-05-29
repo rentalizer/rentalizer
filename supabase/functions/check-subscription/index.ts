@@ -82,10 +82,10 @@ serve(async (req) => {
       const price = await stripe.prices.retrieve(priceId);
       const amount = price.unit_amount || 0;
       
-      // Map pricing to tiers based on the new pricing structure
+      // Map pricing to tiers based on the updated pricing structure
       // $1950/month or $3950/year = Professional (Market Insights + Calculator)
-      // $5950/month or $5950/year = Premium (All-In-One System)
-      if (amount >= 595000) { // $5950 or higher
+      // $2950/month or $5950/year = Premium (All-In-One System)
+      if (amount >= 295000) { // $2950 or higher
         subscriptionTier = "Premium";
       } else if (amount >= 195000 || amount >= 395000) { // $1950 monthly or $3950 yearly
         subscriptionTier = "Professional";
