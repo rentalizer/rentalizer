@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { User, DollarSign } from "lucide-react";
 import Index from "./pages/Index";
 import LandingPage from "./pages/LandingPage";
+import Demo from "./pages/Demo";
 import Calculator from "./pages/Calculator";
 import MarketAnalysis from "./pages/MarketAnalysis";
 import ResetPassword from "./pages/ResetPassword";
