@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,9 +38,6 @@ const Index = () => {
                 </h1>
               </div>
               <p className="text-lg text-cyan-300/80 font-medium mb-8">By Richie Matthews</p>
-              <p className="text-2xl text-slate-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-                AI System To Earn Rental Income—No Mortgage Needed
-              </p>
             </div>
 
             {/* Clean Features Grid with Action Buttons */}
