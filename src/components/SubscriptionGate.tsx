@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -168,18 +167,14 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
                     <span className="text-gray-300 text-sm ml-2">4.9/5 Average Rating</span>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
                   <div className="bg-gray-800/40 p-3 rounded">
-                    <div className="text-2xl font-bold text-green-400">$2.1M+</div>
+                    <div className="text-2xl font-bold text-green-400">$7M+</div>
                     <div className="text-xs text-gray-400">Revenue Generated</div>
                   </div>
                   <div className="bg-gray-800/40 p-3 rounded">
                     <div className="text-2xl font-bold text-purple-400">15,000+</div>
                     <div className="text-xs text-gray-400">Properties Analyzed</div>
-                  </div>
-                  <div className="bg-gray-800/40 p-3 rounded">
-                    <div className="text-2xl font-bold text-cyan-400">850+</div>
-                    <div className="text-xs text-gray-400">Deals Closed</div>
                   </div>
                 </div>
               </div>
