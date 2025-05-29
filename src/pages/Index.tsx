@@ -62,28 +62,28 @@ const Index = () => {
               <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto mb-12">
                 <Button 
                   size="lg"
-                  className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-cyan-500/25 transition-all duration-300"
+                  className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-cyan-500/25 transition-all duration-300"
                 >
                   <BarChart3 className="h-5 w-5 mr-2" />
                   Market Analysis
                 </Button>
                 <Button 
                   size="lg"
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
                 >
                   <Calculator className="h-5 w-5 mr-2" />
                   Deal Calculator
                 </Button>
                 <Button 
                   size="lg"
-                  className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+                  className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
                 >
                   <User className="h-5 w-5 mr-2" />
                   Property Outreach
                 </Button>
                 <Button 
                   size="lg"
-                  className="bg-gradient-to-r from-pink-500 to-red-600 hover:from-pink-400 hover:to-red-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-pink-500/25 transition-all duration-300"
+                  className="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-slate-500/25 transition-all duration-300"
                 >
                   <DollarSign className="h-5 w-5 mr-2" />
                   Property Management
@@ -188,7 +188,7 @@ const Index = () => {
               <Button
                 onClick={() => navigate('/market-analysis')}
                 size="lg"
-                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-cyan-500/25 transition-all duration-300"
+                className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-cyan-500/25 transition-all duration-300"
               >
                 <BarChart3 className="h-5 w-5 mr-2" />
                 Market Analysis
@@ -196,21 +196,21 @@ const Index = () => {
               <Button
                 onClick={() => navigate('/calculator')}
                 size="lg"
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
               >
                 <Calculator className="h-5 w-5 mr-2" />
                 Deal Calculator
               </Button>
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+                className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-400 hover:to-purple-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
               >
                 <User className="h-5 w-5 mr-2" />
                 Property Outreach
               </Button>
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-pink-500 to-red-600 hover:from-pink-400 hover:to-red-500 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-pink-500/25 transition-all duration-300"
+                className="bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-500 hover:to-slate-600 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-slate-500/25 transition-all duration-300"
               >
                 <DollarSign className="h-5 w-5 mr-2" />
                 Property Management
