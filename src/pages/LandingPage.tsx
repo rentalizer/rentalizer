@@ -16,19 +16,43 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-      {/* Header with Dashboard link */}
-      <div className="relative z-20 w-full px-6 py-4">
-        <div className="flex justify-end">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/dashboard')}
-            className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
-          >
-            <LayoutDashboard className="h-4 w-4 mr-2" />
-            Dashboard
-          </Button>
+      {/* Header */}
+      <header className="relative z-20 w-full border-b border-gray-700/30 bg-slate-900/60 backdrop-blur-lg">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <div className="flex items-center gap-3">
+              <BarChart3 className="h-8 w-8 text-cyan-400" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                RENTALIZER
+              </h1>
+            </div>
+
+            {/* Navigation */}
+            <nav className="flex items-center gap-6">
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/dashboard')}
+                className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
+              >
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+              <LoginDialog 
+                trigger={
+                  <Button 
+                    variant="outline"
+                    className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"
+                  >
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Login
+                  </Button>
+                }
+              />
+            </nav>
+          </div>
         </div>
-      </div>
+      </header>
 
       {/* Subtle background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -38,14 +62,8 @@ const LandingPage = () => {
 
       <div className="relative z-10">
         <div className="container mx-auto px-4 py-16">
-          {/* Header */}
+          {/* Main Content */}
           <div className="text-center mb-16">
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <BarChart3 className="h-12 w-12 text-cyan-400" />
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                RENTALIZER
-              </h1>
-            </div>
             <p className="text-lg text-cyan-300/80 font-medium mb-8">By Richie Matthews</p>
             
             {/* Tagline */}
