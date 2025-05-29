@@ -25,48 +25,37 @@ export const ResetPassword = () => {
       console.log('🔗 Current URL:', window.location.href);
       
       try {
-        // First try to get tokens from URL hash (Supabase's default behavior)
+        // Get tokens from URL - try hash first, then search params
         const hash = window.location.hash.substring(1);
         const hashParams = new URLSearchParams(hash);
         
-        let accessToken = hashParams.get('access_token');
-        let refreshToken = hashParams.get('refresh_token');
-        let type = hashParams.get('type');
-        let error = hashParams.get('error');
-        let errorDescription = hashParams.get('error_description');
+        const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token');
+        const type = hashParams.get('type') || searchParams.get('type');
+        const error = hashParams.get('error') || searchParams.get('error');
         
-        // Fallback to search params if hash is empty
-        if (!accessToken) {
-          accessToken = searchParams.get('access_token');
-          refreshToken = searchParams.get('refresh_token');
-          type = searchParams.get('type');
-          error = searchParams.get('error');
-          errorDescription = searchParams.get('error_description');
-        }
-        
-        console.log('📋 Token validation params:', { 
+        console.log('📋 Reset tokens found:', { 
           hasAccessToken: !!accessToken,
           hasRefreshToken: !!refreshToken,
           type,
-          error,
-          errorDescription
+          error: error || 'none'
         });
         
-        // Check for errors first
+        // Check for errors in the URL
         if (error) {
-          console.error('❌ Error in reset URL:', error, errorDescription);
+          console.error('❌ Error in reset URL:', error);
           toast({
             title: "❌ Reset Link Error",
-            description: errorDescription || "There was an error with your reset link.",
+            description: "There was an error with your password reset link. Please request a new one.",
             variant: "destructive",
           });
           setIsLoading(false);
           return;
         }
         
-        // Validate we have the required tokens and correct type
+        // Validate required tokens and type
         if (!accessToken || !refreshToken || type !== 'recovery') {
-          console.error('❌ Missing or invalid tokens:', { accessToken: !!accessToken, refreshToken: !!refreshToken, type });
+          console.error('❌ Invalid or missing reset tokens');
           toast({
             title: "❌ Invalid Reset Link",
             description: "This password reset link is invalid or has expired. Please request a new one.",
@@ -76,8 +65,8 @@ export const ResetPassword = () => {
           return;
         }
         
-        // Set the session with the recovery tokens
-        console.log('🔄 Setting session with recovery tokens...');
+        // Set session with recovery tokens
+        console.log('🔄 Setting recovery session...');
         const { data, error: sessionError } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
@@ -89,21 +78,21 @@ export const ResetPassword = () => {
         }
         
         if (!data.session?.user) {
-          throw new Error('No user found in session');
+          throw new Error('No user session created');
         }
         
-        console.log('✅ Recovery session established for user:', data.session.user.email);
+        console.log('✅ Recovery session established successfully');
         setIsValidToken(true);
         toast({
           title: "✅ Reset Link Valid",
-          description: "You can now set your new password.",
+          description: "You can now enter your new password.",
         });
         
       } catch (error: any) {
         console.error('💥 Token validation failed:', error);
         toast({
           title: "❌ Invalid Reset Link",
-          description: error.message || "This password reset link is invalid or has expired.",
+          description: "This password reset link is invalid or has expired. Please request a new one.",
           variant: "destructive",
         });
       } finally {
@@ -165,7 +154,7 @@ export const ResetPassword = () => {
       
       toast({
         title: "✅ Password Updated",
-        description: "Your password has been successfully reset.",
+        description: "Your password has been successfully reset. You can now sign in with your new password.",
       });
       
     } catch (error: any) {

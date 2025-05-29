@@ -44,9 +44,8 @@ export const ForgotPasswordForm = ({ onBack, initialEmail = '' }: ForgotPassword
     setIsSubmitting(true);
     
     try {
-      // Use the current origin as the base URL and ensure the reset-password route is correct
-      const currentOrigin = window.location.origin;
-      const redirectTo = `${currentOrigin}/reset-password`;
+      // Simplified redirect URL - use current domain with reset-password path
+      const redirectTo = `${window.location.origin}/reset-password`;
       
       console.log('🔗 Using redirect URL:', redirectTo);
       
@@ -63,7 +62,7 @@ export const ForgotPasswordForm = ({ onBack, initialEmail = '' }: ForgotPassword
       setEmailSent(true);
       toast({
         title: "✅ Reset Email Sent",
-        description: "Check your email for password reset instructions. The link may take a few minutes to arrive.",
+        description: "Check your email for password reset instructions. Click the link in the email to reset your password.",
       });
       
     } catch (error: any) {
@@ -75,10 +74,8 @@ export const ForgotPasswordForm = ({ onBack, initialEmail = '' }: ForgotPassword
         errorMessage = "Please check your email and confirm your account first.";
       } else if (error.message?.includes('User not found')) {
         errorMessage = "No account found with this email address.";
-      } else if (error.message?.includes('too_many_requests')) {
+      } else if (error.message?.includes('too_many_requests') || error.message?.includes('rate limit')) {
         errorMessage = "Too many requests. Please wait a few minutes before trying again.";
-      } else if (error.message?.includes('rate limit')) {
-        errorMessage = "Please wait a minute before requesting another reset email.";
       } else if (error.message) {
         errorMessage = error.message;
       }
