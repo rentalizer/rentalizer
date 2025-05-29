@@ -68,7 +68,7 @@ const Demo = () => {
             </div>
             <p className="text-lg text-cyan-300/80 font-medium mb-8">By Richie Matthews</p>
             <p className="text-2xl text-slate-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Book a personalized demo to see how Rentalizer can help you earn rental income without a mortgage
+              Book A Personalized Demo To See How Rentalizer Can Help You Earn Rental Income Without A Mortgage
             </p>
           </div>
 
