@@ -33,6 +33,7 @@ const MarketAnalysis = () => {
   const [cityName, setCityName] = useState<string>('');
   const [targetCity, setTargetCity] = useState<string>('');
   const [propertyType, setPropertyType] = useState<string>('2');
+  const [bathrooms, setBathrooms] = useState<string>('1');
   const [isLoading, setIsLoading] = useState(false);
   const [apiConfig, setApiConfig] = useState<{ airdnaApiKey?: string; openaiApiKey?: string }>({});
 
@@ -52,9 +53,9 @@ const MarketAnalysis = () => {
 
     setIsLoading(true);
     try {
-      console.log(`🚀 Starting market analysis for: ${targetCity} (${propertyType}BR properties)`);
+      console.log(`🚀 Starting market analysis for: ${targetCity} (${propertyType}BR/${bathrooms}BA properties)`);
       
-      const marketData = await fetchMarketData(targetCity, apiConfig, propertyType);
+      const marketData = await fetchMarketData(targetCity, apiConfig, propertyType, bathrooms);
       
       // Combine STR and rent data
       const combinedData: SubmarketData[] = marketData.strData.map(strItem => {
@@ -78,7 +79,7 @@ const MarketAnalysis = () => {
       
       toast({
         title: "Analysis Complete",
-        description: `Found ${combinedData.length} submarkets in ${targetCity} for ${propertyType}BR properties`,
+        description: `Found ${combinedData.length} submarkets in ${targetCity} for ${propertyType}BR/${bathrooms}BA properties`,
       });
 
     } catch (error) {
@@ -92,6 +93,31 @@ const MarketAnalysis = () => {
       setIsLoading(false);
     }
   };
+
+  const getBathroomOptions = () => {
+    if (propertyType === '1') {
+      return [{ value: '1', label: '1 Bathroom' }];
+    } else if (propertyType === '2') {
+      return [
+        { value: '1', label: '1 Bathroom' },
+        { value: '2', label: '2 Bathrooms' }
+      ];
+    } else if (propertyType === '3') {
+      return [
+        { value: '2', label: '2 Bathrooms' },
+        { value: '3', label: '3 Bathrooms' }
+      ];
+    }
+    return [{ value: '1', label: '1 Bathroom' }];
+  };
+
+  // Update bathrooms when property type changes
+  React.useEffect(() => {
+    const options = getBathroomOptions();
+    if (!options.find(opt => opt.value === bathrooms)) {
+      setBathrooms(options[0].value);
+    }
+  }, [propertyType]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
@@ -173,26 +199,50 @@ const MarketAnalysis = () => {
                       />
                     </div>
 
-                    <div className="w-full max-w-md">
-                      <Label htmlFor="property-type" className="text-sm font-medium text-gray-300">
-                        Property Type
-                      </Label>
-                      <Select value={propertyType} onValueChange={setPropertyType}>
-                        <SelectTrigger className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20">
-                          <SelectValue placeholder="Select property type" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-gray-800 border-gray-700">
-                          <SelectItem value="1" className="text-gray-100 focus:bg-gray-700 focus:text-white">
-                            1 Bedroom Apartments
-                          </SelectItem>
-                          <SelectItem value="2" className="text-gray-100 focus:bg-gray-700 focus:text-white">
-                            2 Bedroom Apartments
-                          </SelectItem>
-                          <SelectItem value="3" className="text-gray-100 focus:bg-gray-700 focus:text-white">
-                            3 Bedroom Apartments
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                    <div className="w-full max-w-md grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="property-type" className="text-sm font-medium text-gray-300">
+                          Property Type
+                        </Label>
+                        <Select value={propertyType} onValueChange={setPropertyType}>
+                          <SelectTrigger className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20">
+                            <SelectValue placeholder="Select property type" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-800 border-gray-700">
+                            <SelectItem value="1" className="text-gray-100 focus:bg-gray-700 focus:text-white">
+                              1 Bedroom
+                            </SelectItem>
+                            <SelectItem value="2" className="text-gray-100 focus:bg-gray-700 focus:text-white">
+                              2 Bedrooms
+                            </SelectItem>
+                            <SelectItem value="3" className="text-gray-100 focus:bg-gray-700 focus:text-white">
+                              3 Bedrooms
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label htmlFor="bathrooms" className="text-sm font-medium text-gray-300">
+                          Bathrooms
+                        </Label>
+                        <Select value={bathrooms} onValueChange={setBathrooms}>
+                          <SelectTrigger className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20">
+                            <SelectValue placeholder="Select bathrooms" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-gray-800 border-gray-700">
+                            {getBathroomOptions().map((option) => (
+                              <SelectItem 
+                                key={option.value} 
+                                value={option.value} 
+                                className="text-gray-100 focus:bg-gray-700 focus:text-white"
+                              >
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                     
                     <Button
@@ -228,7 +278,7 @@ const MarketAnalysis = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold text-cyan-300">Market Analysis Results</h2>
-                  <p className="text-gray-400 mt-1">{propertyType}BR properties in {cityName}</p>
+                  <p className="text-gray-400 mt-1">{propertyType}BR/{bathrooms}BA properties in {cityName}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 px-3 py-1">
