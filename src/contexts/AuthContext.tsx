@@ -6,6 +6,7 @@ interface User {
   id: string;
   email: string;
   subscription_status: 'active' | 'inactive' | 'trial';
+  subscription_tier?: string | null;
 }
 
 interface AuthContextType {
@@ -15,6 +16,8 @@ interface AuthContextType {
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   isSubscribed: boolean;
+  hasEssentialsAccess: boolean;
+  hasCompleteAccess: boolean;
   checkSubscription: () => Promise<void>;
   upgradeSubscription: () => Promise<void>;
   manageSubscription: () => Promise<void>;
@@ -116,7 +119,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (user) {
         setUser({
           ...user,
-          subscription_status: data.subscribed ? 'active' : 'trial'
+          subscription_status: data.subscribed ? 'active' : 'trial',
+          subscription_tier: data.subscription_tier
         });
       }
     } catch (error) {
@@ -187,7 +191,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser({
           id: session.user.id,
           email: session.user.email || '',
-          subscription_status: 'trial'
+          subscription_status: 'trial',
+          subscription_tier: null
         });
         
         setTimeout(() => {
@@ -228,7 +233,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser({
             id: session.user.id,
             email: session.user.email || '',
-            subscription_status: 'trial'
+            subscription_status: 'trial',
+            subscription_tier: null
           });
           
           setTimeout(() => {
@@ -313,6 +319,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const isSubscribed = user?.subscription_status === 'active';
+  const hasEssentialsAccess = isSubscribed && (user?.subscription_tier === 'Professional' || user?.subscription_tier === 'Premium' || user?.subscription_tier === 'Enterprise');
+  const hasCompleteAccess = isSubscribed && (user?.subscription_tier === 'Premium' || user?.subscription_tier === 'Enterprise');
 
   const value = {
     user,
@@ -321,12 +329,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signUp,
     signOut,
     isSubscribed,
+    hasEssentialsAccess,
+    hasCompleteAccess,
     checkSubscription,
     upgradeSubscription,
     manageSubscription
   };
 
-  console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user, 'isSubscribed:', isSubscribed);
+  console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user, 'isSubscribed:', isSubscribed, 'tier:', user?.subscription_tier);
 
   if (isLoading) {
     return (
