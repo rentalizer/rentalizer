@@ -44,10 +44,12 @@ export const ForgotPasswordForm = ({ onBack, initialEmail = '' }: ForgotPassword
     setIsSubmitting(true);
     
     try {
-      // Use current origin for redirect URL to work on both preview and production
-      const currentOrigin = window.location.origin;
-      const redirectTo = `${currentOrigin}/reset-password`;
-      console.log('🔗 Reset redirect URL:', redirectTo);
+      // Use a more robust redirect URL that works across environments
+      const isProduction = window.location.hostname === 'rentalizer.ai';
+      const baseUrl = isProduction ? 'https://rentalizer.ai' : window.location.origin;
+      const redirectTo = `${baseUrl}/reset-password`;
+      
+      console.log('🔗 Using redirect URL:', redirectTo);
       
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: redirectTo,
@@ -62,7 +64,7 @@ export const ForgotPasswordForm = ({ onBack, initialEmail = '' }: ForgotPassword
       setEmailSent(true);
       toast({
         title: "✅ Reset Email Sent",
-        description: "Check your email for password reset instructions.",
+        description: "Check your email for password reset instructions. The link may take a few minutes to arrive.",
       });
       
     } catch (error: any) {
@@ -74,6 +76,8 @@ export const ForgotPasswordForm = ({ onBack, initialEmail = '' }: ForgotPassword
         errorMessage = "Please check your email and confirm your account first.";
       } else if (error.message?.includes('User not found')) {
         errorMessage = "No account found with this email address.";
+      } else if (error.message?.includes('too_many_requests')) {
+        errorMessage = "Too many requests. Please wait a few minutes before trying again.";
       } else if (error.message) {
         errorMessage = error.message;
       }

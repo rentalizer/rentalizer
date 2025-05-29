@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -21,80 +20,143 @@ export const ResetPassword = () => {
 
   useEffect(() => {
     const validateToken = async () => {
-      console.log('🔐 Validating reset token...');
+      console.log('🔐 Starting password reset validation...');
       console.log('🔗 Current URL:', window.location.href);
-      console.log('🔗 Search params:', window.location.search);
+      console.log('🔗 Search params:', Object.fromEntries(searchParams.entries()));
       
-      // Check if we have the required tokens in the URL
-      const accessToken = searchParams.get('access_token');
-      const refreshToken = searchParams.get('refresh_token');
-      const type = searchParams.get('type');
-      const error = searchParams.get('error');
-      const errorDescription = searchParams.get('error_description');
+      // Get URL fragments (after #) which is where Supabase puts the tokens
+      const hash = window.location.hash;
+      console.log('🔗 URL hash:', hash);
       
-      console.log('📋 URL params:', { 
-        accessToken: accessToken ? 'present' : 'missing', 
-        refreshToken: refreshToken ? 'present' : 'missing', 
-        type,
-        error,
-        errorDescription
-      });
-      
-      // Check for error in URL first
-      if (error) {
-        console.error('❌ Error in URL:', error, errorDescription);
-        toast({
-          title: "❌ Reset Link Error",
-          description: errorDescription || "There was an error with your reset link.",
-          variant: "destructive",
+      if (hash) {
+        // Parse the hash parameters
+        const hashParams = new URLSearchParams(hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        const type = hashParams.get('type');
+        const error = hashParams.get('error');
+        const errorDescription = hashParams.get('error_description');
+        
+        console.log('📋 Hash params:', { 
+          accessToken: accessToken ? 'present' : 'missing', 
+          refreshToken: refreshToken ? 'present' : 'missing', 
+          type,
+          error,
+          errorDescription
         });
-        setIsLoading(false);
-        return;
-      }
-      
-      if (accessToken && refreshToken && type === 'recovery') {
-        try {
-          console.log('🔄 Setting session with tokens...');
-          
-          // Set the session with the tokens from the URL
-          const { data, error } = await supabase.auth.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
+        
+        // Check for error in URL first
+        if (error) {
+          console.error('❌ Error in URL hash:', error, errorDescription);
+          toast({
+            title: "❌ Reset Link Error",
+            description: errorDescription || "There was an error with your reset link.",
+            variant: "destructive",
           });
-          
-          if (error) {
-            console.error('❌ Session error:', error);
-            throw error;
-          }
-          
-          console.log('✅ Session set successfully:', !!data.session);
-          console.log('👤 User in session:', data.session?.user?.email);
-          
-          if (data.session?.user) {
-            setIsValidToken(true);
-            toast({
-              title: "✅ Reset Link Valid",
-              description: "You can now set your new password.",
+          setIsLoading(false);
+          return;
+        }
+        
+        if (accessToken && refreshToken && type === 'recovery') {
+          try {
+            console.log('🔄 Setting session with tokens from hash...');
+            
+            // Set the session with the tokens from the URL hash
+            const { data, error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
             });
-          } else {
-            throw new Error('No user session found');
+            
+            if (error) {
+              console.error('❌ Session error:', error);
+              throw error;
+            }
+            
+            console.log('✅ Session set successfully:', !!data.session);
+            console.log('👤 User in session:', data.session?.user?.email);
+            
+            if (data.session?.user) {
+              setIsValidToken(true);
+              toast({
+                title: "✅ Reset Link Valid",
+                description: "You can now set your new password.",
+              });
+            } else {
+              throw new Error('No user session found');
+            }
+          } catch (error: any) {
+            console.error('💥 Token validation failed:', error);
+            toast({
+              title: "❌ Invalid Reset Link",
+              description: error.message || "This password reset link is invalid or has expired.",
+              variant: "destructive",
+            });
           }
-        } catch (error: any) {
-          console.error('💥 Token validation failed:', error);
+        } else {
+          console.log('❌ Missing required tokens in hash or invalid type');
           toast({
             title: "❌ Invalid Reset Link",
-            description: error.message || "This password reset link is invalid or has expired.",
+            description: "This password reset link is missing required information or has expired.",
             variant: "destructive",
           });
         }
       } else {
-        console.log('❌ Missing required tokens or invalid type');
-        console.log('Available URL params:', Object.fromEntries(searchParams.entries()));
-        toast({
-          title: "❌ Invalid Reset Link",
-          description: "This password reset link is missing required information or has expired.",
-          variant: "destructive",
+        // Also check URL search params as fallback
+        const accessToken = searchParams.get('access_token');
+        const refreshToken = searchParams.get('refresh_token');
+        const type = searchParams.get('type');
+        const error = searchParams.get('error');
+        const errorDescription = searchParams.get('error_description');
+        
+        console.log('📋 Search params fallback:', { 
+          accessToken: accessToken ? 'present' : 'missing', 
+          refreshToken: refreshToken ? 'present' : 'missing', 
+          type,
+          error,
+          errorDescription
         });
+        
+        if (error) {
+          console.error('❌ Error in search params:', error, errorDescription);
+          toast({
+            title: "❌ Reset Link Error",
+            description: errorDescription || "There was an error with your reset link.",
+            variant: "destructive",
+          });
+        } else if (accessToken && refreshToken && type === 'recovery') {
+          try {
+            const { data, error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+            
+            if (error) throw error;
+            
+            if (data.session?.user) {
+              setIsValidToken(true);
+              toast({
+                title: "✅ Reset Link Valid",
+                description: "You can now set your new password.",
+              });
+            } else {
+              throw new Error('No user session found');
+            }
+          } catch (error: any) {
+            console.error('💥 Token validation failed:', error);
+            toast({
+              title: "❌ Invalid Reset Link",
+              description: error.message || "This password reset link is invalid or has expired.",
+              variant: "destructive",
+            });
+          }
+        } else {
+          console.log('❌ No valid reset tokens found in URL');
+          toast({
+            title: "❌ Invalid Reset Link",
+            description: "This password reset link is missing required information or has expired.",
+            variant: "destructive",
+          });
+        }
       }
       
       setIsLoading(false);
