@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -95,7 +96,10 @@ const Index = () => {
 
             {/* Features Grid */}
             <div className="grid md:grid-cols-4 gap-8 mb-16">
-              <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group">
+              <Card 
+                className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer"
+                onClick={() => navigate('/market-analysis')}
+              >
                 <CardHeader className="text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
                     <MapPin className="h-8 w-8 text-cyan-400" />
@@ -111,7 +115,10 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-900/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group">
+              <Card 
+                className="bg-gray-900/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group cursor-pointer"
+                onClick={() => navigate('/calculator')}
+              >
                 <CardHeader className="text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
                     <Calculator className="h-8 w-8 text-blue-400" />
@@ -234,7 +241,10 @@ const Index = () => {
 
           {/* Features Grid */}
           <div className="grid md:grid-cols-4 gap-8 mb-16">
-            <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group">
+            <Card 
+              className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer"
+              onClick={() => navigate('/market-analysis')}
+            >
               <CardHeader className="text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
                   <MapPin className="h-8 w-8 text-cyan-400" />
@@ -250,7 +260,10 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-900/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group">
+            <Card 
+              className="bg-gray-900/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group cursor-pointer"
+              onClick={() => navigate('/calculator')}
+            >
               <CardHeader className="text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
                   <Calculator className="h-8 w-8 text-blue-400" />
