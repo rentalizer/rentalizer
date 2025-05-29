@@ -67,7 +67,7 @@ const Index = () => {
               <div className="flex flex-col h-full">
                 <Card 
                   className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 h-80 flex flex-col"
-                  onClick={() => navigate('/market-analysis')}
+                  onClick={() => navigate('/markets')}
                 >
                   <CardHeader className="text-center pb-4 flex-shrink-0">
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
@@ -86,7 +86,7 @@ const Index = () => {
                 <Button 
                   size="lg"
                   className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300 w-full"
-                  onClick={() => navigate('/market-analysis')}
+                  onClick={() => navigate('/markets')}
                 >
                   <MapPin className="h-5 w-5 mr-2" />
                   Market Intelligence
@@ -123,7 +123,10 @@ const Index = () => {
               </div>
 
               <div className="flex flex-col h-full">
-                <Card className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group mb-4 h-80 flex flex-col">
+                <Card 
+                  className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 h-80 flex flex-col"
+                  onClick={() => navigate('/deals')}
+                >
                   <CardHeader className="text-center pb-4 flex-shrink-0">
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
                       <User className="h-10 w-10 text-purple-400" />
@@ -141,6 +144,7 @@ const Index = () => {
                 <Button 
                   size="lg"
                   className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300 w-full"
+                  onClick={() => navigate('/deals')}
                 >
                   <User className="h-5 w-5 mr-2" />
                   Acquisitions Agent
@@ -148,7 +152,10 @@ const Index = () => {
               </div>
 
               <div className="flex flex-col h-full">
-                <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group mb-4 h-80 flex flex-col">
+                <Card 
+                  className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 h-80 flex flex-col"
+                  onClick={() => navigate('/front-desk')}
+                >
                   <CardHeader className="text-center pb-4 flex-shrink-0">
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
                       <DollarSign className="h-10 w-10 text-cyan-400" />
@@ -166,6 +173,7 @@ const Index = () => {
                 <Button 
                   size="lg"
                   className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300 w-full"
+                  onClick={() => navigate('/front-desk')}
                 >
                   <DollarSign className="h-5 w-5 mr-2" />
                   Front Desk
@@ -216,7 +224,7 @@ const Index = () => {
             <div className="flex flex-col h-full">
               <Card 
                 className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 h-80 flex flex-col"
-                onClick={() => navigate('/market-analysis')}
+                onClick={() => navigate('/markets')}
               >
                 <CardHeader className="text-center pb-4 flex-shrink-0">
                   <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
@@ -233,7 +241,7 @@ const Index = () => {
                 </CardContent>
               </Card>
               <Button
-                onClick={() => navigate('/market-analysis')}
+                onClick={() => navigate('/markets')}
                 size="lg"
                 className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300 w-full"
               >
@@ -272,7 +280,10 @@ const Index = () => {
             </div>
 
             <div className="flex flex-col h-full">
-              <Card className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group mb-4 h-80 flex flex-col">
+              <Card 
+                className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 h-80 flex flex-col"
+                onClick={() => navigate('/deals')}
+              >
                 <CardHeader className="text-center pb-4 flex-shrink-0">
                   <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
                     <User className="h-10 w-10 text-purple-400" />
@@ -288,6 +299,7 @@ const Index = () => {
                 </CardContent>
               </Card>
               <Button
+                onClick={() => navigate('/deals')}
                 size="lg"
                 className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300 w-full"
               >
@@ -297,7 +309,10 @@ const Index = () => {
             </div>
 
             <div className="flex flex-col h-full">
-              <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group mb-4 h-80 flex flex-col">
+              <Card 
+                className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 h-80 flex flex-col"
+                onClick={() => navigate('/front-desk')}
+              >
                 <CardHeader className="text-center pb-4 flex-shrink-0">
                   <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
                     <DollarSign className="h-10 w-10 text-cyan-400" />
@@ -313,6 +328,7 @@ const Index = () => {
                 </CardContent>
               </Card>
               <Button
+                onClick={() => navigate('/front-desk')}
                 size="lg"
                 className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300 w-full"
               >

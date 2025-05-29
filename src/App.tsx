@@ -24,14 +24,24 @@ const AppRoutes = () => (
         <Index />
       </SubscriptionGate>
     } />
+    <Route path="/markets" element={
+      <SubscriptionGate>
+        <MarketAnalysis />
+      </SubscriptionGate>
+    } />
     <Route path="/calculator" element={
       <SubscriptionGate>
         <Calculator />
       </SubscriptionGate>
     } />
-    <Route path="/market-analysis" element={
+    <Route path="/deals" element={
       <SubscriptionGate>
-        <MarketAnalysis />
+        <Index />
+      </SubscriptionGate>
+    } />
+    <Route path="/front-desk" element={
+      <SubscriptionGate>
+        <Index />
       </SubscriptionGate>
     } />
     <Route path="/reset-password" element={<ResetPassword />} />
