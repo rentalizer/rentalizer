@@ -18,14 +18,14 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
   cashOnCashReturn
 }) => {
   const isProfit = netProfitMonthly > 0;
-  const profitColor = isProfit ? 'text-green-400' : 'text-red-400';
-  const profitBgColor = isProfit ? 'from-green-600/20 to-emerald-600/20 border-green-500/30' : 'from-red-600/20 to-pink-600/20 border-red-500/30';
+  const profitColor = isProfit ? 'text-cyan-400' : 'text-blue-400';
+  const profitBgColor = isProfit ? 'from-cyan-600/20 to-blue-600/20 border-cyan-500/30' : 'from-blue-600/20 to-slate-600/20 border-blue-500/30';
 
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-white">
-          <TrendingUp className="h-5 w-5 text-green-400" />
+          <TrendingUp className="h-5 w-5 text-cyan-400" />
           4. Net Profit Analysis
         </CardTitle>
         <p className="text-sm text-gray-300">
@@ -68,12 +68,12 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
         </div>
 
         {/* Payback Period */}
-        <div className="p-4 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 rounded-lg border border-purple-500/30">
+        <div className="p-4 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-purple-300 font-medium">Payback in Months</Label>
+            <Label className="text-cyan-300 font-medium">Payback in Months</Label>
             <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-purple-400" />
-              <span className="text-xl font-bold text-purple-400">
+              <Calendar className="h-5 w-5 text-cyan-400" />
+              <span className="text-xl font-bold text-cyan-400">
                 {paybackMonths > 0 && isFinite(paybackMonths) ? paybackMonths.toFixed(1) : '∞'}
               </span>
             </div>
@@ -81,12 +81,12 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
         </div>
 
         {/* Cash on Cash Return */}
-        <div className="p-4 bg-gradient-to-r from-yellow-600/20 to-orange-600/20 rounded-lg border border-yellow-500/30">
+        <div className="p-4 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-lg border border-blue-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-yellow-300 font-medium">Cash on Cash Return</Label>
+            <Label className="text-blue-300 font-medium">Cash on Cash Return</Label>
             <div className="flex items-center gap-2">
-              <Percent className="h-5 w-5 text-yellow-400" />
-              <span className="text-xl font-bold text-yellow-400">
+              <Percent className="h-5 w-5 text-blue-400" />
+              <span className="text-xl font-bold text-blue-400">
                 {isFinite(cashOnCashReturn) ? cashOnCashReturn.toFixed(2) : '0.00'}%
               </span>
             </div>
@@ -94,7 +94,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
         </div>
 
         {/* Profit Status Indicator */}
-        <div className={`p-4 rounded-lg border-2 ${isProfit ? 'bg-green-900/20 border-green-500' : 'bg-red-900/20 border-red-500'}`}>
+        <div className={`p-4 rounded-lg border-2 ${isProfit ? 'bg-cyan-900/20 border-cyan-500' : 'bg-blue-900/20 border-blue-500'}`}>
           <div className="text-center">
             <div className={`text-lg font-semibold ${profitColor} mb-1`}>
               {isProfit ? '✅ Profitable Investment' : '❌ Unprofitable Investment'}

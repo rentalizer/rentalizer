@@ -26,7 +26,7 @@ export const FurnishingsSection: React.FC<FurnishingsSectionProps> = ({
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-white">
-          <Sofa className="h-5 w-5 text-purple-400" />
+          <Sofa className="h-5 w-5 text-cyan-400" />
           5. Furnishings Calculator
         </CardTitle>
         <p className="text-sm text-gray-300">
@@ -67,38 +67,38 @@ export const FurnishingsSection: React.FC<FurnishingsSectionProps> = ({
           <div className="grid grid-cols-3 gap-2 text-sm">
             <div className="p-3 bg-gray-800/30 rounded text-center">
               <div className="text-gray-300">Low ($6)</div>
-              <div className="text-green-400 font-medium">
+              <div className="text-cyan-400 font-medium">
                 ${(data.squareFootage * 6).toLocaleString()}
               </div>
             </div>
             <div className="p-3 bg-gray-800/30 rounded text-center">
               <div className="text-gray-300">Medium ($7)</div>
-              <div className="text-yellow-400 font-medium">
+              <div className="text-cyan-400 font-medium">
                 ${(data.squareFootage * 7).toLocaleString()}
               </div>
             </div>
             <div className="p-3 bg-gray-800/30 rounded text-center">
               <div className="text-gray-300">High ($8)</div>
-              <div className="text-red-400 font-medium">
+              <div className="text-cyan-400 font-medium">
                 ${(data.squareFootage * 8).toLocaleString()}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 p-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-lg border border-purple-500/30">
+        <div className="mt-6 p-4 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
           <div className="flex items-center justify-between mb-3">
-            <Label className="text-purple-300 font-medium">Calculated Furnishings Cost</Label>
+            <Label className="text-cyan-300 font-medium">Calculated Furnishings Cost</Label>
             <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-purple-400" />
-              <span className="text-2xl font-bold text-purple-400">
+              <DollarSign className="h-5 w-5 text-cyan-400" />
+              <span className="text-2xl font-bold text-cyan-400">
                 ${calculatedFurnishings.toLocaleString()}
               </span>
             </div>
           </div>
           <Button 
             onClick={applyCalculatedFurnishings}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+            className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
           >
             <CalculatorIcon className="h-4 w-4 mr-2" />
             Apply to Build Out Costs

@@ -23,7 +23,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-white">
-          <Receipt className="h-5 w-5 text-red-400" />
+          <Receipt className="h-5 w-5 text-blue-400" />
           3. Monthly Expenses
         </CardTitle>
         <p className="text-sm text-gray-300">
@@ -186,12 +186,12 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
         </div>
 
-        <div className="mt-6 p-4 bg-gradient-to-r from-red-600/20 to-pink-600/20 rounded-lg border border-red-500/30">
+        <div className="mt-6 p-4 bg-gradient-to-r from-blue-600/20 to-slate-600/20 rounded-lg border border-blue-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-red-300 font-medium">Total Monthly Expenses</Label>
+            <Label className="text-blue-300 font-medium">Total Monthly Expenses</Label>
             <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-red-400" />
-              <span className="text-2xl font-bold text-red-400">
+              <DollarSign className="h-5 w-5 text-blue-400" />
+              <span className="text-2xl font-bold text-blue-400">
                 ${monthlyExpenses.toLocaleString()}
               </span>
             </div>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,7 +17,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-white">
-          <Hammer className="h-5 w-5 text-orange-400" />
+          <Hammer className="h-5 w-5 text-cyan-400" />
           2. Build Out Costs
         </CardTitle>
         <p className="text-sm text-gray-300">
@@ -68,12 +69,12 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
           </div>
         </div>
 
-        <div className="mt-6 p-4 bg-gradient-to-r from-orange-600/20 to-red-600/20 rounded-lg border border-orange-500/30">
+        <div className="mt-6 p-4 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-orange-300 font-medium">Cash to Launch</Label>
+            <Label className="text-cyan-300 font-medium">Cash to Launch</Label>
             <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-orange-400" />
-              <span className="text-2xl font-bold text-orange-400">
+              <DollarSign className="h-5 w-5 text-cyan-400" />
+              <span className="text-2xl font-bold text-cyan-400">
                 ${cashToLaunch.toLocaleString()}
               </span>
             </div>
