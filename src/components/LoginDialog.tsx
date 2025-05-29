@@ -149,70 +149,42 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
               The All-In-One AI System To Earn Rental Income—No Mortgage Needed
             </h2>
 
-            {/* Professional Access Required */}
-            <div className="bg-gray-800/50 border border-cyan-500/30 rounded-lg p-6 mb-6">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Lock className="h-5 w-5 text-cyan-400" />
-                <h3 className="text-xl font-semibold text-cyan-300">Professional Access Required</h3>
-              </div>
-              <p className="text-gray-300 mb-4">
-                Sign in or create an account to access professional STR market analysis
-              </p>
-              
-              {/* Feature badges */}
-              <div className="flex justify-center gap-4 mb-6">
-                <span className="bg-cyan-600/20 text-cyan-300 px-3 py-1 rounded-full text-sm border border-cyan-500/30">
-                  📊 Live Market Data
-                </span>
-                <span className="bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full text-sm border border-blue-500/30">
-                  🤖 AI Analysis
-                </span>
-                <span className="bg-purple-600/20 text-purple-300 px-3 py-1 rounded-full text-sm border border-purple-500/30">
-                  🛠️ Professional Tools
-                </span>
-              </div>
-
-              <Button 
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-3 text-lg font-semibold"
-                onClick={() => setIsOpen(false)}
-              >
-                Get Started
-              </Button>
-            </div>
-
-            {/* Features grid - matching the 4 categories from the site */}
+            {/* Features grid - 4 icons */}
             <div className="bg-gray-800/30 border border-cyan-500/20 rounded-lg p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-cyan-400 mt-1 flex-shrink-0" />
                   <div>
                     <h5 className="text-cyan-300 font-medium">Market Intelligence</h5>
-                    <p className="text-gray-400 text-sm">Professional STR revenue data for any US city</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Calculator className="h-5 w-5 text-blue-400 mt-1 flex-shrink-0" />
-                  <div>
-                    <h5 className="text-blue-300 font-medium">Calculator</h5>
-                    <p className="text-gray-400 text-sm">AI-powered rental market research</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <User className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
                   <div>
                     <h5 className="text-purple-300 font-medium">Acquisitions Agent</h5>
-                    <p className="text-gray-400 text-sm">Revenue-to-rent multiple calculations</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <DollarSign className="h-5 w-5 text-cyan-400 mt-1 flex-shrink-0" />
                   <div>
                     <h5 className="text-cyan-300 font-medium">Front Desk</h5>
-                    <p className="text-gray-400 text-sm">Export capabilities for your analysis</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Calculator className="h-5 w-5 text-blue-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <h5 className="text-blue-300 font-medium">Property Automations</h5>
                   </div>
                 </div>
               </div>
             </div>
+
+            <Button 
+              className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-3 text-lg font-semibold"
+              onClick={() => setIsOpen(false)}
+            >
+              Get Started
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
