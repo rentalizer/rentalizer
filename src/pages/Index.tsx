@@ -1,8 +1,6 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { BarChart3, MapPin, DollarSign, TrendingUp, Calculator, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginDialog } from '@/components/LoginDialog';
@@ -215,22 +213,6 @@ const Index = () => {
                 <DollarSign className="h-5 w-5 mr-2" />
                 Property Management
               </Button>
-            </div>
-            
-            {/* Property Type Badges */}
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 px-4 py-2">
-                2BR/2BA Properties
-              </Badge>
-              <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 px-4 py-2">
-                Professional Data
-              </Badge>
-              <Badge variant="outline" className="bg-gray-800/50 border-blue-500/30 text-blue-300 px-4 py-2">
-                Sample Data Available
-              </Badge>
-              <Badge variant="outline" className="bg-gray-800/50 border-green-500/30 text-green-300 px-4 py-2">
-                AI Analysis
-              </Badge>
             </div>
           </div>
 
