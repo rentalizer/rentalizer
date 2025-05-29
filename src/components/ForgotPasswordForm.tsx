@@ -44,8 +44,9 @@ export const ForgotPasswordForm = ({ onBack, initialEmail = '' }: ForgotPassword
     setIsSubmitting(true);
     
     try {
-      // Use the production domain for reset URL
-      const redirectTo = `https://rentalizer.ai/reset-password`;
+      // Use current origin for redirect URL to work on both preview and production
+      const currentOrigin = window.location.origin;
+      const redirectTo = `${currentOrigin}/reset-password`;
       console.log('🔗 Reset redirect URL:', redirectTo);
       
       const { error } = await supabase.auth.resetPasswordForEmail(email, {

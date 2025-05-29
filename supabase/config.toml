@@ -9,7 +9,10 @@ additional_redirect_urls = [
   "https://rentalizer.ai/**",
   "https://inspiring-genie-a1691.lovable.app",
   "https://inspiring-genie-a1691.lovable.app/reset-password",
-  "https://inspiring-genie-a1691.lovable.app/**"
+  "https://inspiring-genie-a1691.lovable.app/**",
+  "http://localhost:3000",
+  "http://localhost:3000/reset-password",
+  "http://localhost:3000/**"
 ]
 
 [auth.email]
