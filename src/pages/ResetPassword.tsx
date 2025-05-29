@@ -25,20 +25,29 @@ export const ResetPassword = () => {
       console.log('🔗 Current URL:', window.location.href);
       
       try {
-        // Get tokens from URL - try hash first, then search params
+        // Check URL for tokens - try hash first (new Supabase format), then search params
         const hash = window.location.hash.substring(1);
         const hashParams = new URLSearchParams(hash);
         
-        const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
-        const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token');
-        const type = hashParams.get('type') || searchParams.get('type');
-        const error = hashParams.get('error') || searchParams.get('error');
+        let accessToken = hashParams.get('access_token');
+        let refreshToken = hashParams.get('refresh_token');
+        let type = hashParams.get('type');
+        let error = hashParams.get('error');
+        
+        // Fallback to search params if not in hash
+        if (!accessToken) {
+          accessToken = searchParams.get('access_token');
+          refreshToken = searchParams.get('refresh_token');
+          type = searchParams.get('type');
+          error = searchParams.get('error');
+        }
         
         console.log('📋 Reset tokens found:', { 
           hasAccessToken: !!accessToken,
           hasRefreshToken: !!refreshToken,
           type,
-          error: error || 'none'
+          error: error || 'none',
+          fromHash: !!hashParams.get('access_token')
         });
         
         // Check for errors in the URL
@@ -54,7 +63,7 @@ export const ResetPassword = () => {
         }
         
         // Validate required tokens and type
-        if (!accessToken || !refreshToken || type !== 'recovery') {
+        if (!accessToken || type !== 'recovery') {
           console.error('❌ Invalid or missing reset tokens');
           toast({
             title: "❌ Invalid Reset Link",
@@ -69,7 +78,7 @@ export const ResetPassword = () => {
         console.log('🔄 Setting recovery session...');
         const { data, error: sessionError } = await supabase.auth.setSession({
           access_token: accessToken,
-          refresh_token: refreshToken,
+          refresh_token: refreshToken || '',
         });
         
         if (sessionError) {

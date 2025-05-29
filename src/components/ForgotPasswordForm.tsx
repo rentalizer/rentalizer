@@ -44,8 +44,9 @@ export const ForgotPasswordForm = ({ onBack, initialEmail = '' }: ForgotPassword
     setIsSubmitting(true);
     
     try {
-      // Simplified redirect URL - use current domain with reset-password path
-      const redirectTo = `${window.location.origin}/reset-password`;
+      // Use the current domain for redirect
+      const currentDomain = window.location.origin;
+      const redirectTo = `${currentDomain}/reset-password`;
       
       console.log('🔗 Using redirect URL:', redirectTo);
       
