@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { BarChart3, MapPin, Search, Loader2, ArrowLeft } from 'lucide-react';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
+import { BarChart3, MapPin, Search, Loader2, ArrowLeft, Map, Table2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
@@ -31,7 +32,6 @@ const MarketAnalysis = () => {
   const [cityName, setCityName] = useState<string>('');
   const [targetCity, setTargetCity] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showMap, setShowMap] = useState(false);
   const [apiConfig, setApiConfig] = useState<{ airdnaApiKey?: string; openaiApiKey?: string }>({});
 
   const handleApiKeysChange = (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => {
@@ -197,34 +197,54 @@ const MarketAnalysis = () => {
             <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
           </div>
 
-          {/* Results Section */}
+          {/* Split Screen Results Section */}
           {submarketData.length > 0 && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-cyan-300">Market Analysis Results</h2>
-                <div className="flex gap-2">
-                  <Button
-                    variant={showMap ? "outline" : "default"}
-                    onClick={() => setShowMap(false)}
-                    className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
-                  >
-                    Table View
-                  </Button>
-                  <Button
-                    variant={showMap ? "default" : "outline"}
-                    onClick={() => setShowMap(true)}
-                    className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
-                  >
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 px-3 py-1">
+                    <Map className="h-4 w-4 mr-1" />
                     Map View
-                  </Button>
+                  </Badge>
+                  <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 px-3 py-1">
+                    <Table2 className="h-4 w-4 mr-1" />
+                    Table View
+                  </Badge>
                 </div>
               </div>
 
-              {showMap ? (
-                <MapView results={submarketData} city={cityName} />
-              ) : (
-                <ResultsTable results={submarketData} city={cityName} />
-              )}
+              <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
+                <CardContent className="p-0">
+                  <ResizablePanelGroup direction="horizontal" className="min-h-[700px]">
+                    {/* Map View Panel */}
+                    <ResizablePanel defaultSize={60} minSize={40}>
+                      <div className="h-full p-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Map className="h-5 w-5 text-cyan-400" />
+                          <h3 className="text-lg font-semibold text-cyan-300">Map View</h3>
+                        </div>
+                        <MapView results={submarketData} city={cityName} />
+                      </div>
+                    </ResizablePanel>
+
+                    <ResizableHandle withHandle />
+
+                    {/* Table View Panel */}
+                    <ResizablePanel defaultSize={40} minSize={30}>
+                      <div className="h-full p-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Table2 className="h-5 w-5 text-purple-400" />
+                          <h3 className="text-lg font-semibold text-purple-300">Table View</h3>
+                        </div>
+                        <div className="h-[620px] overflow-hidden">
+                          <ResultsTable results={submarketData} city={cityName} />
+                        </div>
+                      </div>
+                    </ResizablePanel>
+                  </ResizablePanelGroup>
+                </CardContent>
+              </Card>
             </div>
           )}
         </div>
