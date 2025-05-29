@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { BarChart3, ArrowRight, LogIn, ExternalLink } from 'lucide-react';
@@ -6,9 +7,9 @@ import { Footer } from '@/components/Footer';
 
 const LandingPage = () => {
   const handleGetStarted = () => {
-    console.log('Get Started button clicked');
-    // Use location.href for better compatibility
-    window.location.href = 'https://04622531-a8c2-4857-b132-9017f45b7571.lovableproject.com';
+    console.log('Get Started button clicked - navigating to demo');
+    // Navigate to the demo page
+    window.open('https://rentalizer.ai/dashboard', '_blank');
   };
 
   return (
