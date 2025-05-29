@@ -94,7 +94,7 @@ const Index = () => {
             </div>
 
             {/* Features Grid */}
-            <div className="grid md:grid-cols-3 gap-8 mb-16">
+            <div className="grid md:grid-cols-4 gap-8 mb-16">
               <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group">
                 <CardHeader className="text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
@@ -111,34 +111,50 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group">
-                <CardHeader className="text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                    <TrendingUp className="h-8 w-8 text-purple-400" />
-                  </div>
-                  <CardTitle className="text-purple-300 text-xl">
-                    Profit Analysis
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <p className="text-gray-400">
-                    Advanced algorithms calculate potential returns and risk scores for informed decisions.
-                  </p>
-                </CardContent>
-              </Card>
-
               <Card className="bg-gray-900/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group">
                 <CardHeader className="text-center">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
                     <Calculator className="h-8 w-8 text-blue-400" />
                   </div>
                   <CardTitle className="text-blue-300 text-xl">
-                    ROI Calculator
+                    Calculator
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-gray-400">
                     Built-in calculator to model your specific investment scenarios and projections.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group">
+                <CardHeader className="text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                    <User className="h-8 w-8 text-purple-400" />
+                  </div>
+                  <CardTitle className="text-purple-300 text-xl">
+                    Acquisitions Agent
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-gray-400">
+                    Contact landlords with preloaded scripts in smart sequences based on landlord responses. Handles follow-ups and basic qualification.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-900/50 border-green-500/20 backdrop-blur-lg hover:border-green-400/40 transition-all duration-300 group">
+                <CardHeader className="text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
+                    <DollarSign className="h-8 w-8 text-green-400" />
+                  </div>
+                  <CardTitle className="text-green-300 text-xl">
+                    Front Desk
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-gray-400">
+                    Property Management & Automations
                   </p>
                 </CardContent>
               </Card>
@@ -217,7 +233,7 @@ const Index = () => {
           </div>
 
           {/* Features Grid */}
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="grid md:grid-cols-4 gap-8 mb-16">
             <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group">
               <CardHeader className="text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
@@ -234,34 +250,50 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group">
-              <CardHeader className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                  <TrendingUp className="h-8 w-8 text-purple-400" />
-                </div>
-                <CardTitle className="text-purple-300 text-xl">
-                  Profit Analysis
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-gray-400">
-                  Advanced algorithms calculate potential returns and risk scores for informed decisions.
-                </p>
-              </CardContent>
-            </Card>
-
             <Card className="bg-gray-900/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group">
               <CardHeader className="text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
                   <Calculator className="h-8 w-8 text-blue-400" />
                 </div>
                 <CardTitle className="text-blue-300 text-xl">
-                  ROI Calculator
+                  Calculator
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center">
                 <p className="text-gray-400">
                   Built-in calculator to model your specific investment scenarios and projections.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group">
+              <CardHeader className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                  <User className="h-8 w-8 text-purple-400" />
+                </div>
+                <CardTitle className="text-purple-300 text-xl">
+                  Acquisitions Agent
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-400">
+                  Contact landlords with preloaded scripts in smart sequences based on landlord responses. Handles follow-ups and basic qualification.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900/50 border-green-500/20 backdrop-blur-lg hover:border-green-400/40 transition-all duration-300 group">
+              <CardHeader className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
+                  <DollarSign className="h-8 w-8 text-green-400" />
+                </div>
+                <CardTitle className="text-green-300 text-xl">
+                  Front Desk
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-gray-400">
+                  Property Management & Automations
                 </p>
               </CardContent>
             </Card>
