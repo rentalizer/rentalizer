@@ -13,7 +13,7 @@ interface CityMarketData {
   rentData: RentData[];
 }
 
-// Sample data - ACTUAL NEIGHBORHOOD SUBMARKETS with updated values
+// Sample data - COMPREHENSIVE NEIGHBORHOOD SUBMARKETS with realistic values
 const sampleMarketDatabase: Record<string, CityMarketData> = {
   'nashville': {
     strData: [
@@ -23,7 +23,14 @@ const sampleMarketDatabase: Record<string, CityMarketData> = {
       { submarket: '12 South', revenue: 5000 },
       { submarket: 'Midtown', revenue: 4800 },
       { submarket: 'Music Row', revenue: 4400 },
-      { submarket: 'Germantown', revenue: 4000 }
+      { submarket: 'Germantown', revenue: 4600 },
+      { submarket: 'Green Hills', revenue: 4800 },
+      { submarket: 'Belle Meade', revenue: 5200 },
+      { submarket: 'Vanderbilt Area', revenue: 4700 },
+      { submarket: 'Sobro', revenue: 5800 },
+      { submarket: 'The Nations', revenue: 4300 },
+      { submarket: 'Sylvan Park', revenue: 4500 },
+      { submarket: 'Berry Hill', revenue: 4200 }
     ],
     rentData: [
       { submarket: 'Downtown Nashville', rent: 2600 },
@@ -32,7 +39,14 @@ const sampleMarketDatabase: Record<string, CityMarketData> = {
       { submarket: '12 South', rent: 2200 },
       { submarket: 'Midtown', rent: 2300 },
       { submarket: 'Music Row', rent: 2150 },
-      { submarket: 'Germantown', rent: 2250 }
+      { submarket: 'Germantown', rent: 2100 },
+      { submarket: 'Green Hills', rent: 2200 },
+      { submarket: 'Belle Meade', rent: 2400 },
+      { submarket: 'Vanderbilt Area', rent: 2150 },
+      { submarket: 'Sobro', rent: 2600 },
+      { submarket: 'The Nations', rent: 1950 },
+      { submarket: 'Sylvan Park', rent: 2000 },
+      { submarket: 'Berry Hill', rent: 1900 }
     ]
   },
   'miami': {
@@ -41,14 +55,30 @@ const sampleMarketDatabase: Record<string, CityMarketData> = {
       { submarket: 'Downtown Miami', revenue: 5200 },
       { submarket: 'Wynwood', revenue: 4600 },
       { submarket: 'South Beach', revenue: 6400 },
-      { submarket: 'Coral Gables', revenue: 4800 }
+      { submarket: 'Coral Gables', revenue: 4800 },
+      { submarket: 'Coconut Grove', revenue: 5000 },
+      { submarket: 'Design District', revenue: 4700 },
+      { submarket: 'Midtown Miami', revenue: 4900 },
+      { submarket: 'Aventura', revenue: 4400 },
+      { submarket: 'Key Biscayne', revenue: 5600 },
+      { submarket: 'Bal Harbour', revenue: 6000 },
+      { submarket: 'Doral', revenue: 4200 },
+      { submarket: 'Miami Lakes', revenue: 4100 }
     ],
     rentData: [
       { submarket: 'Brickell', rent: 2600 },
       { submarket: 'Downtown Miami', rent: 2400 },
       { submarket: 'Wynwood', rent: 2000 },
       { submarket: 'South Beach', rent: 2800 },
-      { submarket: 'Coral Gables', rent: 2200 }
+      { submarket: 'Coral Gables', rent: 2200 },
+      { submarket: 'Coconut Grove', rent: 2300 },
+      { submarket: 'Design District', rent: 2100 },
+      { submarket: 'Midtown Miami', rent: 2200 },
+      { submarket: 'Aventura', rent: 2000 },
+      { submarket: 'Key Biscayne', rent: 2500 },
+      { submarket: 'Bal Harbour', rent: 2700 },
+      { submarket: 'Doral', rent: 1900 },
+      { submarket: 'Miami Lakes', rent: 1850 }
     ]
   },
   'austin': {
@@ -57,14 +87,30 @@ const sampleMarketDatabase: Record<string, CityMarketData> = {
       { submarket: 'South Austin', revenue: 5800 },
       { submarket: 'East Austin', revenue: 5200 },
       { submarket: 'West Austin', revenue: 4800 },
-      { submarket: 'North Austin', revenue: 4200 }
+      { submarket: 'North Austin', revenue: 4200 },
+      { submarket: 'Zilker', revenue: 5400 },
+      { submarket: 'Rainey Street', revenue: 6200 },
+      { submarket: 'The Domain', revenue: 4600 },
+      { submarket: 'Mueller', revenue: 4400 },
+      { submarket: 'Clarksville', revenue: 5000 },
+      { submarket: 'Tarrytown', revenue: 4700 },
+      { submarket: 'Riverside', revenue: 4300 },
+      { submarket: 'Shoal Creek', revenue: 4500 }
     ],
     rentData: [
       { submarket: 'Downtown Austin', rent: 2800 },
       { submarket: 'South Austin', rent: 2400 },
       { submarket: 'East Austin', rent: 2200 },
       { submarket: 'West Austin', rent: 2000 },
-      { submarket: 'North Austin', rent: 1900 }
+      { submarket: 'North Austin', rent: 1900 },
+      { submarket: 'Zilker', rent: 2300 },
+      { submarket: 'Rainey Street', rent: 2700 },
+      { submarket: 'The Domain', rent: 2100 },
+      { submarket: 'Mueller', rent: 2000 },
+      { submarket: 'Clarksville', rent: 2200 },
+      { submarket: 'Tarrytown', rent: 2100 },
+      { submarket: 'Riverside', rent: 1950 },
+      { submarket: 'Shoal Creek', rent: 2000 }
     ]
   },
   'denver': {
@@ -73,14 +119,30 @@ const sampleMarketDatabase: Record<string, CityMarketData> = {
       { submarket: 'LoDo', revenue: 5500 },
       { submarket: 'Capitol Hill', revenue: 4900 },
       { submarket: 'Highlands', revenue: 4600 },
-      { submarket: 'RiNo', revenue: 4300 }
+      { submarket: 'RiNo', revenue: 4300 },
+      { submarket: 'Cherry Creek', revenue: 5200 },
+      { submarket: 'Five Points', revenue: 4400 },
+      { submarket: 'Ballpark', revenue: 5000 },
+      { submarket: 'Baker', revenue: 4500 },
+      { submarket: 'Congress Park', revenue: 4300 },
+      { submarket: 'Wash Park', revenue: 4700 },
+      { submarket: 'LoHi', revenue: 4800 },
+      { submarket: 'Stapleton', revenue: 4200 }
     ],
     rentData: [
       { submarket: 'Downtown Denver', rent: 2400 },
       { submarket: 'LoDo', rent: 2300 },
       { submarket: 'Capitol Hill', rent: 2100 },
       { submarket: 'Highlands', rent: 2000 },
-      { submarket: 'RiNo', rent: 1900 }
+      { submarket: 'RiNo', rent: 1900 },
+      { submarket: 'Cherry Creek', rent: 2300 },
+      { submarket: 'Five Points', rent: 1950 },
+      { submarket: 'Ballpark', rent: 2200 },
+      { submarket: 'Baker', rent: 2000 },
+      { submarket: 'Congress Park', rent: 1950 },
+      { submarket: 'Wash Park', rent: 2100 },
+      { submarket: 'LoHi', rent: 2200 },
+      { submarket: 'Stapleton', rent: 1900 }
     ]
   },
   'seattle': {
@@ -89,14 +151,30 @@ const sampleMarketDatabase: Record<string, CityMarketData> = {
       { submarket: 'Capitol Hill', revenue: 5700 },
       { submarket: 'Belltown', revenue: 5400 },
       { submarket: 'Fremont', revenue: 4800 },
-      { submarket: 'Ballard', revenue: 4500 }
+      { submarket: 'Ballard', revenue: 4500 },
+      { submarket: 'Queen Anne', revenue: 5500 },
+      { submarket: 'Pike Place', revenue: 5800 },
+      { submarket: 'Pioneer Square', revenue: 5200 },
+      { submarket: 'Wallingford', revenue: 4600 },
+      { submarket: 'University District', revenue: 4400 },
+      { submarket: 'Georgetown', revenue: 4300 },
+      { submarket: 'Eastlake', revenue: 4700 },
+      { submarket: 'South Lake Union', revenue: 5000 }
     ],
     rentData: [
       { submarket: 'Downtown Seattle', rent: 2800 },
       { submarket: 'Capitol Hill', rent: 2600 },
       { submarket: 'Belltown', rent: 2700 },
       { submarket: 'Fremont', rent: 2200 },
-      { submarket: 'Ballard', rent: 2100 }
+      { submarket: 'Ballard', rent: 2100 },
+      { submarket: 'Queen Anne', rent: 2500 },
+      { submarket: 'Pike Place', rent: 2600 },
+      { submarket: 'Pioneer Square', rent: 2300 },
+      { submarket: 'Wallingford', rent: 2100 },
+      { submarket: 'University District', rent: 2000 },
+      { submarket: 'Georgetown', rent: 1950 },
+      { submarket: 'Eastlake', rent: 2100 },
+      { submarket: 'South Lake Union', rent: 2200 }
     ]
   },
   'san diego': {
@@ -107,7 +185,16 @@ const sampleMarketDatabase: Record<string, CityMarketData> = {
       { submarket: 'Mission Beach', revenue: 6000 },
       { submarket: 'Hillcrest', revenue: 5600 },
       { submarket: 'North Park', revenue: 5200 },
-      { submarket: 'Mission Valley', revenue: 4800 }
+      { submarket: 'Mission Valley', revenue: 4800 },
+      { submarket: 'La Jolla', revenue: 7000 },
+      { submarket: 'Ocean Beach', revenue: 5800 },
+      { submarket: 'Balboa Park', revenue: 5400 },
+      { submarket: 'University Heights', revenue: 5000 },
+      { submarket: 'Point Loma', revenue: 5600 },
+      { submarket: 'Banker\'s Hill', revenue: 5800 },
+      { submarket: 'Mission Hills', revenue: 5400 },
+      { submarket: 'Kensington', revenue: 4800 },
+      { submarket: 'Normal Heights', revenue: 4600 }
     ],
     rentData: [
       { submarket: 'Gaslamp Quarter', rent: 2900 },
@@ -116,7 +203,16 @@ const sampleMarketDatabase: Record<string, CityMarketData> = {
       { submarket: 'Mission Beach', rent: 2500 },
       { submarket: 'Hillcrest', rent: 2300 },
       { submarket: 'North Park', rent: 2200 },
-      { submarket: 'Mission Valley', rent: 2100 }
+      { submarket: 'Mission Valley', rent: 2100 },
+      { submarket: 'La Jolla', rent: 3000 },
+      { submarket: 'Ocean Beach', rent: 2400 },
+      { submarket: 'Balboa Park', rent: 2300 },
+      { submarket: 'University Heights', rent: 2100 },
+      { submarket: 'Point Loma', rent: 2400 },
+      { submarket: 'Banker\'s Hill', rent: 2500 },
+      { submarket: 'Mission Hills', rent: 2300 },
+      { submarket: 'Kensington', rent: 2100 },
+      { submarket: 'Normal Heights', rent: 2000 }
     ]
   }
 };
@@ -317,33 +413,23 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
         }
       }
     } catch (error) {
-      console.error('💥 Error with AirDNA API - falling back to sample immediate area data:', error);
+      console.error('💥 Error with AirDNA API - falling back to sample data:', error);
     }
   }
   
-  // Fallback to sample immediate neighborhood data (always works)
-  console.log('📋 Using sample immediate neighborhood STR data');
+  // Fallback to comprehensive sample data (always works)
+  console.log('📋 Using comprehensive sample STR data');
   const cityKey = city.toLowerCase().trim().replace(/,.*/, '');
-  
-  // For San Diego, focus on immediate downtown area
-  if (cityKey.includes('san diego') || cityKey.includes('diego')) {
-    return [
-      { submarket: 'Gaslamp Quarter', revenue: 7200 },
-      { submarket: 'Little Italy', revenue: 6800 },
-      { submarket: 'Marina District', revenue: 6400 },
-      { submarket: 'Downtown Core', revenue: 6000 }
-    ];
-  }
   
   const cityData = sampleMarketDatabase[cityKey];
   
   if (cityData) {
-    console.log(`✅ Found sample immediate neighborhood data for ${city}`);
-    return cityData.strData.slice(0, 4); // Limit to immediate area
+    console.log(`✅ Found comprehensive sample data for ${city}`);
+    return cityData.strData;
   }
   
-  // If no sample data, generate realistic immediate area data
-  console.log(`🎲 Generating sample immediate neighborhood data for ${city}`);
+  // If no sample data, generate realistic comprehensive data
+  console.log(`🎲 Generating comprehensive sample data for ${city}`);
   
   const addressParts = city.split(',');
   const cityName = addressParts[1]?.trim() || addressParts[0];
@@ -352,7 +438,12 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
     { submarket: `Downtown ${cityName}`, revenue: 6200 },
     { submarket: `${cityName} Core`, revenue: 5800 },
     { submarket: `Urban ${cityName}`, revenue: 5400 },
-    { submarket: `${cityName} Center`, revenue: 4900 }
+    { submarket: `${cityName} Center`, revenue: 4900 },
+    { submarket: `${cityName} Heights`, revenue: 4600 },
+    { submarket: `East ${cityName}`, revenue: 4400 },
+    { submarket: `West ${cityName}`, revenue: 4300 },
+    { submarket: `North ${cityName}`, revenue: 4200 },
+    { submarket: `South ${cityName}`, revenue: 4100 }
   ];
 };
 
