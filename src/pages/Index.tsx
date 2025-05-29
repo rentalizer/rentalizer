@@ -70,8 +70,8 @@ const Index = () => {
                   onClick={() => navigate('/market-analysis')}
                 >
                   <CardHeader className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
-                      <MapPin className="h-8 w-8 text-cyan-400" />
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                      <MapPin className="h-10 w-10 text-cyan-400" />
                     </div>
                     <CardTitle className="text-cyan-300 text-xl">
                       Market Intelligence
@@ -99,8 +99,8 @@ const Index = () => {
                   onClick={() => navigate('/calculator')}
                 >
                   <CardHeader className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                      <Calculator className="h-8 w-8 text-blue-400" />
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                      <Calculator className="h-10 w-10 text-blue-400" />
                     </div>
                     <CardTitle className="text-blue-300 text-xl">
                       Calculator
@@ -125,8 +125,8 @@ const Index = () => {
               <div className="flex flex-col items-center">
                 <Card className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group mb-4 w-full">
                   <CardHeader className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                      <User className="h-8 w-8 text-purple-400" />
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                      <User className="h-10 w-10 text-purple-400" />
                     </div>
                     <CardTitle className="text-purple-300 text-xl">
                       Acquisitions Agent
@@ -150,8 +150,8 @@ const Index = () => {
               <div className="flex flex-col items-center">
                 <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group mb-4 w-full">
                   <CardHeader className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
-                      <DollarSign className="h-8 w-8 text-cyan-400" />
+                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                      <DollarSign className="h-10 w-10 text-cyan-400" />
                     </div>
                     <CardTitle className="text-cyan-300 text-xl">
                       Front Desk
@@ -219,8 +219,8 @@ const Index = () => {
                 onClick={() => navigate('/market-analysis')}
               >
                 <CardHeader className="text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
-                    <MapPin className="h-8 w-8 text-cyan-400" />
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                    <MapPin className="h-10 w-10 text-cyan-400" />
                   </div>
                   <CardTitle className="text-cyan-300 text-xl">
                     Market Intelligence
@@ -248,8 +248,8 @@ const Index = () => {
                 onClick={() => navigate('/calculator')}
               >
                 <CardHeader className="text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                    <Calculator className="h-8 w-8 text-blue-400" />
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                    <Calculator className="h-10 w-10 text-blue-400" />
                   </div>
                   <CardTitle className="text-blue-300 text-xl">
                     Calculator
@@ -274,8 +274,8 @@ const Index = () => {
             <div className="flex flex-col items-center">
               <Card className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group mb-4 w-full">
                 <CardHeader className="text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                    <User className="h-8 w-8 text-purple-400" />
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                    <User className="h-10 w-10 text-purple-400" />
                   </div>
                   <CardTitle className="text-purple-300 text-xl">
                     Acquisitions Agent
@@ -299,8 +299,8 @@ const Index = () => {
             <div className="flex flex-col items-center">
               <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group mb-4 w-full">
                 <CardHeader className="text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
-                    <DollarSign className="h-8 w-8 text-cyan-400" />
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                    <DollarSign className="h-10 w-10 text-cyan-400" />
                   </div>
                   <CardTitle className="text-cyan-300 text-xl">
                     Front Desk
