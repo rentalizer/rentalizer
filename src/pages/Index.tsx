@@ -56,38 +56,6 @@ const Index = () => {
               <p className="text-3xl text-cyan-100 mb-12 max-w-4xl mx-auto leading-tight">
                 The All-In-One AI System To Earn Rental Income—No Mortgage Needed
               </p>
-              
-              {/* 4 Main Action Buttons */}
-              <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto mb-12">
-                <Button 
-                  size="lg"
-                  className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
-                >
-                  <BarChart3 className="h-5 w-5 mr-2" />
-                  Market Analysis
-                </Button>
-                <Button 
-                  size="lg"
-                  className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
-                >
-                  <Calculator className="h-5 w-5 mr-2" />
-                  Deal Calculator
-                </Button>
-                <Button 
-                  size="lg"
-                  className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
-                >
-                  <User className="h-5 w-5 mr-2" />
-                  Property Outreach
-                </Button>
-                <Button 
-                  size="lg"
-                  className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
-                >
-                  <DollarSign className="h-5 w-5 mr-2" />
-                  Property Management
-                </Button>
-              </div>
 
               <div className="flex items-center justify-center gap-4 mb-8">
                 <LoginDialog />
@@ -169,6 +137,40 @@ const Index = () => {
 
             {/* Subscription Pricing */}
             <SubscriptionPricing onUpgrade={handleUpgrade} />
+
+            {/* 4 Main Action Buttons - Moved to Bottom */}
+            <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto mt-16">
+              <Button 
+                size="lg"
+                className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+                onClick={() => navigate('/market-analysis')}
+              >
+                <MapPin className="h-5 w-5 mr-2" />
+                Market Intelligence
+              </Button>
+              <Button 
+                size="lg"
+                className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+                onClick={() => navigate('/calculator')}
+              >
+                <Calculator className="h-5 w-5 mr-2" />
+                Calculator
+              </Button>
+              <Button 
+                size="lg"
+                className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+              >
+                <User className="h-5 w-5 mr-2" />
+                Acquisitions Agent
+              </Button>
+              <Button 
+                size="lg"
+                className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+              >
+                <DollarSign className="h-5 w-5 mr-2" />
+                Front Desk
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -203,40 +205,6 @@ const Index = () => {
             <p className="text-2xl text-cyan-100 mb-8 max-w-3xl mx-auto">
               The All-In-One AI System To Earn Rental Income—No Mortgage Needed
             </p>
-            
-            {/* 4 Main Action Buttons */}
-            <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto mb-8">
-              <Button
-                onClick={() => navigate('/market-analysis')}
-                size="lg"
-                className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
-              >
-                <BarChart3 className="h-5 w-5 mr-2" />
-                Market Analysis
-              </Button>
-              <Button
-                onClick={() => navigate('/calculator')}
-                size="lg"
-                className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
-              >
-                <Calculator className="h-5 w-5 mr-2" />
-                Deal Calculator
-              </Button>
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
-              >
-                <User className="h-5 w-5 mr-2" />
-                Property Outreach
-              </Button>
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
-              >
-                <DollarSign className="h-5 w-5 mr-2" />
-                Property Management
-              </Button>
-            </div>
           </div>
 
           {/* Features Grid */}
@@ -310,6 +278,40 @@ const Index = () => {
                 </p>
               </CardContent>
             </Card>
+          </div>
+
+          {/* 4 Main Action Buttons - Moved to Bottom */}
+          <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto mt-16">
+            <Button
+              onClick={() => navigate('/market-analysis')}
+              size="lg"
+              className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+            >
+              <MapPin className="h-5 w-5 mr-2" />
+              Market Intelligence
+            </Button>
+            <Button
+              onClick={() => navigate('/calculator')}
+              size="lg"
+              className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+            >
+              <Calculator className="h-5 w-5 mr-2" />
+              Calculator
+            </Button>
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+            >
+              <User className="h-5 w-5 mr-2" />
+              Acquisitions Agent
+            </Button>
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 hover:from-cyan-300 hover:via-blue-300 hover:to-purple-300 text-white px-6 py-4 text-lg font-semibold shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+            >
+              <DollarSign className="h-5 w-5 mr-2" />
+              Front Desk
+            </Button>
           </div>
         </div>
       </div>
