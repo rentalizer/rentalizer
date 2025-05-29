@@ -332,8 +332,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     hasEssentialsAccess,
     hasCompleteAccess,
     checkSubscription,
-    upgradeSubscription,
-    manageSubscription
+    upgradeSubscription: () => Promise.resolve(), // Placeholder since we handle this in components now
+    manageSubscription: async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) throw new Error('Not authenticated');
+
+        console.log('🔄 Creating customer portal session...');
+        const { data, error } = await supabase.functions.invoke('customer-portal', {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+
+        if (error) throw error;
+
+        // Open customer portal in a new tab
+        window.open(data.url, '_blank');
+      } catch (error) {
+        console.error('❌ Error opening customer portal:', error);
+        throw error;
+      }
+    }
   };
 
   console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user, 'isSubscribed:', isSubscribed, 'tier:', user?.subscription_tier);

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Crown, Zap, TrendingUp, Calculator, MapPin, User, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SubscriptionPricingProps {
   onUpgrade?: (promoCode?: string) => void;
@@ -15,7 +16,7 @@ interface SubscriptionPricingProps {
 
 export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => {
   const { toast } = useToast();
-  const { upgradeSubscription } = useAuth();
+  const { user } = useAuth();
   const [promoCode, setPromoCode] = useState('');
   const [isValidatingPromo, setIsValidatingPromo] = useState(false);
   const [promoDiscount, setPromoDiscount] = useState<number | null>(null);
@@ -72,18 +73,60 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
   };
 
   const handleUpgrade = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to upgrade your subscription.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
-      await upgradeSubscription();
-      toast({
-        title: "Redirecting to Stripe...",
-        description: "Opening payment page in a new tab.",
+      
+      console.log('🔄 Creating checkout session...', { plan: selectedPlan, billing: billingCycle });
+      
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        throw new Error('Not authenticated');
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          plan: selectedPlan,
+          billing: billingCycle,
+          promo_code: promoCode || null
+        },
+        headers: {
+          Authorization: `Bearer ${session.session.access_token}`,
+        },
       });
+
+      if (error) {
+        console.error('❌ Checkout error:', error);
+        throw error;
+      }
+
+      console.log('✅ Checkout session created:', data);
+      
+      if (data?.url) {
+        // Open Stripe checkout in a new tab
+        window.open(data.url, '_blank');
+        
+        toast({
+          title: "Redirecting to Stripe...",
+          description: "Opening payment page in a new tab.",
+        });
+      } else {
+        throw new Error('No checkout URL received');
+      }
       
       if (onUpgrade) {
         onUpgrade(promoCode);
       }
     } catch (error) {
+      console.error('💥 Upgrade error:', error);
       toast({
         title: "Error",
         description: "Failed to start checkout process. Please try again.",
@@ -318,7 +361,7 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
 
         <Button
           onClick={handleUpgrade}
-          disabled={isLoading}
+          disabled={isLoading || !user}
           size="lg"
           className={`w-full mt-6 py-4 text-lg font-medium shadow-2xl transition-all duration-300 transform hover:scale-105 ${
             selectedPlan === 'essentials'
@@ -334,7 +377,7 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
           ) : (
             <Crown className="h-5 w-5 mr-2" />
           )}
-          {isLoading ? 'Processing...' : (promoDiscount === 100 ? 'Start Free Trial' : 
+          {isLoading ? 'Processing...' : !user ? 'Sign In to Upgrade' : (promoDiscount === 100 ? 'Start Free Trial' : 
             `Upgrade to ${selectedPlan === 'essentials' ? 'Market Insights + Calculator' : 'All-In-One System'}`)}
         </Button>
 
