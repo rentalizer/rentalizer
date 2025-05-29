@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -38,6 +37,35 @@ const MarketAnalysis = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [apiConfig, setApiConfig] = useState<{ airdnaApiKey?: string; openaiApiKey?: string }>({});
 
+  // Load API keys from localStorage on component mount
+  React.useEffect(() => {
+    const savedProfessionalKey = localStorage.getItem('professional_data_key') || '';
+    const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
+    
+    console.log('🔑 Loading stored API keys:', {
+      professionalKey: savedProfessionalKey ? `${savedProfessionalKey.substring(0, 8)}...` : 'Not found',
+      openaiKey: savedOpenaiKey ? `${savedOpenaiKey.substring(0, 8)}...` : 'Not found'
+    });
+    
+    if (savedProfessionalKey || savedOpenaiKey) {
+      setApiConfig({
+        airdnaApiKey: savedProfessionalKey || undefined,
+        openaiApiKey: savedOpenaiKey || undefined
+      });
+      
+      toast({
+        title: "✅ API Keys Loaded",
+        description: `Found stored API keys - ready for market analysis`,
+      });
+    } else {
+      toast({
+        title: "⚠️ No API Keys Found",
+        description: "Please configure your API keys below to run market analysis",
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
+
   const handleApiKeysChange = (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => {
     setApiConfig(keys);
   };
@@ -52,9 +80,23 @@ const MarketAnalysis = () => {
       return;
     }
 
+    // Check if we have the required API keys
+    if (!apiConfig.airdnaApiKey || !apiConfig.openaiApiKey) {
+      toast({
+        title: "API Keys Required",
+        description: "Please configure your AirDNA and OpenAI API keys in the configuration section below.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       console.log(`🚀 Starting market analysis for: ${targetCity} (${propertyType}BR/${bathrooms}BA properties)`);
+      console.log('🔑 Using API keys:', {
+        airdna: apiConfig.airdnaApiKey ? 'Present' : 'Missing',
+        openai: apiConfig.openaiApiKey ? 'Present' : 'Missing'
+      });
       
       const marketData = await fetchMarketData(targetCity, apiConfig, propertyType, bathrooms);
       
@@ -87,7 +129,7 @@ const MarketAnalysis = () => {
       console.error('Market analysis error:', error);
       toast({
         title: "Analysis Failed",
-        description: "Unable to complete market analysis. Please try again.",
+        description: error.message || "Unable to complete market analysis. Please check your API keys and try again.",
         variant: "destructive",
       });
     } finally {
@@ -355,6 +397,13 @@ const MarketAnalysis = () => {
               <div className="mt-8">
                 <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
               </div>
+            </div>
+          )}
+
+          {/* Show API Configuration if no results yet */}
+          {submarketData.length === 0 && (
+            <div className="mt-8">
+              <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
             </div>
           )}
         </div>
