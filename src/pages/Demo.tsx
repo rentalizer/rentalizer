@@ -6,10 +6,15 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
 const Demo = () => {
+  console.log('Demo component is rendering');
   const navigate = useNavigate();
+
+  console.log('Demo component navigate function:', navigate);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+      {console.log('Demo component main div rendering')}
+      
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl"></div>
@@ -22,7 +27,10 @@ const Demo = () => {
           <div className="text-center mb-12">
             <Button
               variant="ghost"
-              onClick={() => navigate('/')}
+              onClick={() => {
+                console.log('Back button clicked');
+                navigate('/');
+              }}
               className="mb-8 text-cyan-300 hover:text-cyan-200"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -52,6 +60,7 @@ const Demo = () => {
               </CardHeader>
               <CardContent className="p-0">
                 <div className="h-[700px] w-full">
+                  {console.log('About to render Calendly iframe')}
                   <iframe
                     src="https://calendly.com/richies-schedule/scale"
                     width="100%"
@@ -59,6 +68,8 @@ const Demo = () => {
                     frameBorder="0"
                     title="Schedule Demo Call"
                     className="rounded-b-lg"
+                    onLoad={() => console.log('Calendly iframe loaded successfully')}
+                    onError={(e) => console.error('Calendly iframe error:', e)}
                   ></iframe>
                 </div>
               </CardContent>
