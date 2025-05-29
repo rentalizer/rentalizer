@@ -17,6 +17,7 @@ import { TopNavBar } from '@/components/TopNavBar';
 import { ApiKeyInput } from '@/components/ApiKeyInput';
 import { fetchMarketData } from '@/services/marketDataService';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface SubmarketData {
   submarket: string;
@@ -28,6 +29,7 @@ interface SubmarketData {
 const Index = () => {
   const { user, signOut, isSubscribed } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [submarketData, setSubmarketData] = useState<SubmarketData[]>([]);
   const [cityName, setCityName] = useState<string>('');
   const [targetCity, setTargetCity] = useState<string>('');
@@ -245,6 +247,18 @@ const Index = () => {
             <p className="text-2xl text-cyan-100 mb-8 max-w-3xl mx-auto">
               The All-In-One AI System To Earn Rental Income—No Mortgage Needed
             </p>
+            
+            {/* Action Buttons */}
+            <div className="flex items-center justify-center gap-4 mb-8">
+              <Button
+                onClick={() => navigate('/calculator')}
+                size="lg"
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-green-500/25 transition-all duration-300"
+              >
+                <Calculator className="h-5 w-5 mr-2" />
+                Open Calculator
+              </Button>
+            </div>
             
             {/* Property Type Badges */}
             <div className="flex items-center justify-center gap-4 mb-8">
