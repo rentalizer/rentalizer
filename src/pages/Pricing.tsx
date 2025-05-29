@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +10,19 @@ import { TopNavBar } from '@/components/TopNavBar';
 
 const Pricing = () => {
   const { user } = useAuth();
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+
+  // Pricing configuration
+  const pricing = {
+    essentials: {
+      monthly: 1950,
+      yearly: 3950,
+    },
+    complete: {
+      monthly: 2950,
+      yearly: 5950,
+    }
+  };
 
   const handleBookDemo = () => {
     window.open('https://calendly.com/richies-schedule/scale', '_blank');
@@ -47,6 +59,35 @@ const Pricing = () => {
             </p>
           </div>
 
+          {/* Billing Cycle Toggle */}
+          <div className="flex justify-center mb-8">
+            <div className="bg-slate-800/50 p-1 rounded-lg flex">
+              <button
+                onClick={() => setBillingCycle('monthly')}
+                className={`px-6 py-3 rounded-md transition-all ${
+                  billingCycle === 'monthly'
+                    ? 'bg-cyan-600 text-white'
+                    : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setBillingCycle('yearly')}
+                className={`px-6 py-3 rounded-md transition-all relative ${
+                  billingCycle === 'yearly'
+                    ? 'bg-green-600 text-white'
+                    : 'text-gray-400 hover:text-gray-200'
+                }`}
+              >
+                Yearly
+                <Badge className="absolute -top-2 -right-2 bg-green-500 text-white text-xs">
+                  Save 50%
+                </Badge>
+              </button>
+            </div>
+          </div>
+
           {/* Pricing Cards */}
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-16">
             {/* Market Insights + Calculator Plan */}
@@ -58,8 +99,16 @@ const Pricing = () => {
                     Market Insights + Calculator
                   </CardTitle>
                 </div>
-                <div className="text-4xl font-bold text-white mb-2">
-                  $1,950<span className="text-lg text-gray-400">/month</span>
+                <div className="space-y-2">
+                  <div className="text-4xl font-bold text-white mb-2">
+                    ${pricing.essentials[billingCycle].toLocaleString()}
+                    <span className="text-lg text-gray-400">/{billingCycle === 'monthly' ? 'month' : 'year'}</span>
+                  </div>
+                  {billingCycle === 'yearly' && (
+                    <div className="text-sm text-green-400">
+                      Save ${(pricing.essentials.monthly * 12 - pricing.essentials.yearly).toLocaleString()} per year
+                    </div>
+                  )}
                 </div>
                 <p className="text-gray-400">Perfect for getting started</p>
               </CardHeader>
@@ -107,8 +156,16 @@ const Pricing = () => {
                     All-In-One System
                   </CardTitle>
                 </div>
-                <div className="text-4xl font-bold text-white mb-2">
-                  $2,950<span className="text-lg text-gray-400">/month</span>
+                <div className="space-y-2">
+                  <div className="text-4xl font-bold text-white mb-2">
+                    ${pricing.complete[billingCycle].toLocaleString()}
+                    <span className="text-lg text-gray-400">/{billingCycle === 'monthly' ? 'month' : 'year'}</span>
+                  </div>
+                  {billingCycle === 'yearly' && (
+                    <div className="text-sm text-green-400">
+                      Save ${(pricing.complete.monthly * 12 - pricing.complete.yearly).toLocaleString()} per year
+                    </div>
+                  )}
                 </div>
                 <p className="text-gray-400">Complete rental arbitrage solution</p>
               </CardHeader>
