@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -158,16 +157,13 @@ const MarketAnalysis = () => {
             <div className="flex items-center justify-center gap-4 mb-8">
               <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 px-4 py-2">
                 <Home className="h-4 w-4 mr-1" />
-                1BR - 3BR Properties
+                1BR - 3BR Apartments
               </Badge>
               <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 px-4 py-2">
-                Professional Data
+                Revenue/Rent Ratio
               </Badge>
               <Badge variant="outline" className="bg-gray-800/50 border-blue-500/30 text-blue-300 px-4 py-2">
-                Sample Data Available
-              </Badge>
-              <Badge variant="outline" className="bg-gray-800/50 border-green-500/30 text-green-300 px-4 py-2">
-                AI Analysis
+                Heat Map
               </Badge>
             </div>
           </div>
@@ -202,11 +198,11 @@ const MarketAnalysis = () => {
                     <div className="w-full max-w-md grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="property-type" className="text-sm font-medium text-gray-300">
-                          Property Type
+                          Bedrooms
                         </Label>
                         <Select value={propertyType} onValueChange={setPropertyType}>
                           <SelectTrigger className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20">
-                            <SelectValue placeholder="Select property type" />
+                            <SelectValue placeholder="Select bedrooms" />
                           </SelectTrigger>
                           <SelectContent className="bg-gray-800 border-gray-700 z-50">
                             <SelectItem value="1" className="text-gray-100 focus:bg-gray-700 focus:text-white">
