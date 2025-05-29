@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { SubscriptionGate } from "@/components/SubscriptionGate";
 import Index from "./pages/Index";
 import Calculator from "./pages/Calculator";
+import MarketAnalysis from "./pages/MarketAnalysis";
 import ResetPassword from "./pages/ResetPassword";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -26,6 +27,11 @@ const AppRoutes = () => (
     <Route path="/calculator" element={
       <SubscriptionGate>
         <Calculator />
+      </SubscriptionGate>
+    } />
+    <Route path="/market-analysis" element={
+      <SubscriptionGate>
+        <MarketAnalysis />
       </SubscriptionGate>
     } />
     <Route path="/reset-password" element={<ResetPassword />} />
