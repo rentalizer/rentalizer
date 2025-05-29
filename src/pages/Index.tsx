@@ -186,9 +186,6 @@ const Index = () => {
               </h1>
             </div>
             <p className="text-lg text-cyan-300/80 font-medium mb-8">By Richie Matthews</p>
-            <p className="text-2xl text-slate-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-              AI System To Earn Rental Income—No Mortgage Needed
-            </p>
 
             {/* Two Button Layout */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
