@@ -116,33 +116,38 @@ const Calculator = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Left Column */}
-          <div className="space-y-8">
-            <CompsSection data={data} updateData={updateData} />
-            <BuildOutSection data={data} updateData={updateData} cashToLaunch={cashToLaunch} />
-            <FurnishingsSection 
-              data={data} 
-              updateData={updateData} 
-              calculatedFurnishings={calculatedFurnishings} 
-            />
-          </div>
+        {/* Symmetrical 2x2 Grid Layout */}
+        <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+          {/* Top Left */}
+          <CompsSection data={data} updateData={updateData} />
+          
+          {/* Top Right */}
+          <BuildOutSection data={data} updateData={updateData} cashToLaunch={cashToLaunch} />
+          
+          {/* Bottom Left */}
+          <ExpensesSection 
+            data={data} 
+            updateData={updateData} 
+            serviceFeeCalculated={serviceFeeCalculated}
+            monthlyExpenses={monthlyExpenses}
+          />
+          
+          {/* Bottom Right */}
+          <NetProfitSection 
+            monthlyRevenue={monthlyRevenue}
+            netProfitMonthly={netProfitMonthly}
+            paybackMonths={paybackMonths}
+            cashOnCashReturn={cashOnCashReturn}
+          />
+        </div>
 
-          {/* Right Column */}
-          <div className="space-y-8">
-            <ExpensesSection 
-              data={data} 
-              updateData={updateData} 
-              serviceFeeCalculated={serviceFeeCalculated}
-              monthlyExpenses={monthlyExpenses}
-            />
-            <NetProfitSection 
-              monthlyRevenue={monthlyRevenue}
-              netProfitMonthly={netProfitMonthly}
-              paybackMonths={paybackMonths}
-              cashOnCashReturn={cashOnCashReturn}
-            />
-          </div>
+        {/* Furnishings Calculator - Full Width Below */}
+        <div className="mt-8 max-w-4xl mx-auto">
+          <FurnishingsSection 
+            data={data} 
+            updateData={updateData} 
+            calculatedFurnishings={calculatedFurnishings} 
+          />
         </div>
       </div>
     </div>
