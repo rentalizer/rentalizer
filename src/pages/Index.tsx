@@ -14,7 +14,7 @@ const Index = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    window.open('https://04622531-a8c2-4857-b132-9017f45b7571.lovableproject.com/', '_blank');
+    navigate('/demo');
   };
 
   // For authenticated and subscribed users, show the dashboard
