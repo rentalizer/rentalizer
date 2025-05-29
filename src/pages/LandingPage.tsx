@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -66,11 +65,6 @@ const LandingPage = () => {
               </h1>
             </div>
             <p className="text-lg text-cyan-300/80 font-medium mb-8">By Richie Matthews</p>
-            
-            {/* Tagline */}
-            <p className="text-3xl text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed font-semibold">
-              AI System To Earn Rental Income—No Mortgage Needed
-            </p>
 
             {/* Two Button Layout */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
