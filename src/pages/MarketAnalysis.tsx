@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -131,7 +132,7 @@ const MarketAnalysis = () => {
       </div>
 
       <div className="relative z-10">
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-6 py-12">
           {/* Header */}
           <div className="text-center mb-12">
             <Button
@@ -143,9 +144,9 @@ const MarketAnalysis = () => {
               Back to Home
             </Button>
             
-            <div className="flex items-center justify-center gap-5 mb-6">
+            <div className="flex items-center justify-center gap-5 mb-8">
               <BarChart3 className="h-16 w-16 text-cyan-400" />
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent px-4">
                 Market Intelligence
               </h1>
             </div>
