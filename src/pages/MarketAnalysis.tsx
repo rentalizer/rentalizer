@@ -288,9 +288,6 @@ const MarketAnalysis = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* API Configuration */}
-            <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
           </div>
 
           {/* Split Screen Results Section */}
@@ -353,6 +350,11 @@ const MarketAnalysis = () => {
                   </ResizablePanelGroup>
                 </CardContent>
               </Card>
+
+              {/* API Configuration - Now moved after results */}
+              <div className="mt-8">
+                <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
+              </div>
             </div>
           )}
         </div>
