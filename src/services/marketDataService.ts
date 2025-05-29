@@ -150,6 +150,48 @@ const getSampleMarketData = (city: string, propertyType: string, bathrooms: stri
       ]
     };
   }
+
+  if (city.includes('boston')) {
+    return {
+      strData: [
+        { submarket: 'Back Bay', revenue: Math.round(4800 * totalMultiplier) },
+        { submarket: 'North End', revenue: Math.round(4500 * totalMultiplier) },
+        { submarket: 'Beacon Hill', revenue: Math.round(4200 * totalMultiplier) },
+        { submarket: 'South End', revenue: Math.round(4000 * totalMultiplier) },
+        { submarket: 'Cambridge', revenue: Math.round(3800 * totalMultiplier) },
+        { submarket: 'Charlestown', revenue: Math.round(3600 * totalMultiplier) }
+      ],
+      rentData: [
+        { submarket: 'Back Bay', rent: Math.round(2400 * totalMultiplier) },
+        { submarket: 'North End', rent: Math.round(2200 * totalMultiplier) },
+        { submarket: 'Beacon Hill', rent: Math.round(2500 * totalMultiplier) },
+        { submarket: 'South End', rent: Math.round(2100 * totalMultiplier) },
+        { submarket: 'Cambridge', rent: Math.round(2000 * totalMultiplier) },
+        { submarket: 'Charlestown', rent: Math.round(1900 * totalMultiplier) }
+      ]
+    };
+  }
+
+  if (city.includes('san diego')) {
+    return {
+      strData: [
+        { submarket: 'Downtown', revenue: Math.round(3325 * totalMultiplier) },
+        { submarket: 'Midtown', revenue: Math.round(3040 * totalMultiplier) },
+        { submarket: 'Arts District', revenue: Math.round(2850 * totalMultiplier) },
+        { submarket: 'Business District', revenue: Math.round(2660 * totalMultiplier) },
+        { submarket: 'Historic District', revenue: Math.round(2470 * totalMultiplier) },
+        { submarket: 'Riverside', revenue: Math.round(2280 * totalMultiplier) }
+      ],
+      rentData: [
+        { submarket: 'Downtown', rent: Math.round(1710 * totalMultiplier) },
+        { submarket: 'Midtown', rent: Math.round(1615 * totalMultiplier) },
+        { submarket: 'Arts District', rent: Math.round(1520 * totalMultiplier) },
+        { submarket: 'Business District', rent: Math.round(1473 * totalMultiplier) },
+        { submarket: 'Historic District', rent: Math.round(1425 * totalMultiplier) },
+        { submarket: 'Riverside', rent: Math.round(1330 * totalMultiplier) }
+      ]
+    };
+  }
   
   // Default sample data for any other city
   return {
