@@ -121,11 +121,11 @@ const MarketAnalysis = () => {
             <div className="flex items-center justify-center gap-5 mb-6">
               <BarChart3 className="h-16 w-16 text-cyan-400" />
               <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Market Analysis
+                Market Intelligence
               </h1>
             </div>
             <p className="text-2xl text-cyan-100 mb-8 max-w-3xl mx-auto">
-              Analyze rental arbitrage opportunities across US markets
+              Find The Best Rental Arbitrage Markets
             </p>
             
             {/* Property Type Badges */}
