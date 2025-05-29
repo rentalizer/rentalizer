@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -198,7 +199,7 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Button 
                 size="lg"
-                onClick={() => navigate('/pricing')}
+                onClick={() => window.open('https://04622531-a8c2-4857-b132-9017f45b7571.lovableproject.com/', '_blank')}
                 className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-4 text-lg font-semibold"
               >
                 <ArrowRight className="h-5 w-5 mr-2" />
