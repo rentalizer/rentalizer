@@ -64,12 +64,12 @@ const Index = () => {
 
             {/* Features Grid with Buttons */}
             <div className="grid md:grid-cols-4 gap-8 mb-16">
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col h-full">
                 <Card 
-                  className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 w-full"
+                  className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1 flex flex-col"
                   onClick={() => navigate('/market-analysis')}
                 >
-                  <CardHeader className="text-center">
+                  <CardHeader className="text-center pb-4">
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
                       <MapPin className="h-10 w-10 text-cyan-400" />
                     </div>
@@ -77,7 +77,7 @@ const Index = () => {
                       Market Intelligence
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="text-center">
+                  <CardContent className="text-center flex-1 flex items-center">
                     <p className="text-gray-400">
                       Find The Best Rental Arbitrage Markets
                     </p>
@@ -93,12 +93,12 @@ const Index = () => {
                 </Button>
               </div>
 
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col h-full">
                 <Card 
-                  className="bg-gray-900/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group cursor-pointer mb-4 w-full"
+                  className="bg-gray-900/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1 flex flex-col"
                   onClick={() => navigate('/calculator')}
                 >
-                  <CardHeader className="text-center">
+                  <CardHeader className="text-center pb-4">
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
                       <Calculator className="h-10 w-10 text-blue-400" />
                     </div>
@@ -106,7 +106,7 @@ const Index = () => {
                       Calculator
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="text-center">
+                  <CardContent className="text-center flex-1 flex items-center">
                     <p className="text-gray-400">
                       Built-In Calculator To Model Your Specific Investment Scenarios And Projections
                     </p>
@@ -122,9 +122,9 @@ const Index = () => {
                 </Button>
               </div>
 
-              <div className="flex flex-col items-center">
-                <Card className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group mb-4 w-full">
-                  <CardHeader className="text-center">
+              <div className="flex flex-col h-full">
+                <Card className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group mb-4 flex-1 flex flex-col">
+                  <CardHeader className="text-center pb-4">
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
                       <User className="h-10 w-10 text-purple-400" />
                     </div>
@@ -132,7 +132,7 @@ const Index = () => {
                       Acquisitions Agent
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="text-center">
+                  <CardContent className="text-center flex-1 flex items-center">
                     <p className="text-gray-400">
                       Contact Landlords With Preloaded Scripts In ITTT Sequences Based On Landlord Responses
                     </p>
@@ -147,9 +147,9 @@ const Index = () => {
                 </Button>
               </div>
 
-              <div className="flex flex-col items-center">
-                <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group mb-4 w-full">
-                  <CardHeader className="text-center">
+              <div className="flex flex-col h-full">
+                <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group mb-4 flex-1 flex flex-col">
+                  <CardHeader className="text-center pb-4">
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
                       <DollarSign className="h-10 w-10 text-cyan-400" />
                     </div>
@@ -157,7 +157,7 @@ const Index = () => {
                       Front Desk
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="text-center">
+                  <CardContent className="text-center flex-1 flex items-center">
                     <p className="text-gray-400">
                       Property Management & Automations
                     </p>
@@ -213,12 +213,12 @@ const Index = () => {
 
           {/* Features Grid with Buttons */}
           <div className="grid md:grid-cols-4 gap-8 mb-16">
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col h-full">
               <Card 
-                className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 w-full"
+                className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1 flex flex-col"
                 onClick={() => navigate('/market-analysis')}
               >
-                <CardHeader className="text-center">
+                <CardHeader className="text-center pb-4">
                   <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
                     <MapPin className="h-10 w-10 text-cyan-400" />
                   </div>
@@ -226,7 +226,7 @@ const Index = () => {
                     Market Intelligence
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-center">
+                <CardContent className="text-center flex-1 flex items-center">
                   <p className="text-gray-400">
                     Find The Best Rental Arbitrage Markets
                   </p>
@@ -242,12 +242,12 @@ const Index = () => {
               </Button>
             </div>
 
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col h-full">
               <Card 
-                className="bg-gray-900/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group cursor-pointer mb-4 w-full"
+                className="bg-gray-900/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1 flex flex-col"
                 onClick={() => navigate('/calculator')}
               >
-                <CardHeader className="text-center">
+                <CardHeader className="text-center pb-4">
                   <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
                     <Calculator className="h-10 w-10 text-blue-400" />
                   </div>
@@ -255,7 +255,7 @@ const Index = () => {
                     Calculator
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-center">
+                <CardContent className="text-center flex-1 flex items-center">
                   <p className="text-gray-400">
                     Built-In Calculator To Model Your Specific Investment Scenarios And Projections
                   </p>
@@ -271,9 +271,9 @@ const Index = () => {
               </Button>
             </div>
 
-            <div className="flex flex-col items-center">
-              <Card className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group mb-4 w-full">
-                <CardHeader className="text-center">
+            <div className="flex flex-col h-full">
+              <Card className="bg-gray-900/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group mb-4 flex-1 flex flex-col">
+                <CardHeader className="text-center pb-4">
                   <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
                     <User className="h-10 w-10 text-purple-400" />
                   </div>
@@ -281,7 +281,7 @@ const Index = () => {
                     Acquisitions Agent
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-center">
+                <CardContent className="text-center flex-1 flex items-center">
                   <p className="text-gray-400">
                     Contact Landlords With Preloaded Scripts In ITTT Sequences Based On Landlord Responses
                   </p>
@@ -296,9 +296,9 @@ const Index = () => {
               </Button>
             </div>
 
-            <div className="flex flex-col items-center">
-              <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group mb-4 w-full">
-                <CardHeader className="text-center">
+            <div className="flex flex-col h-full">
+              <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group mb-4 flex-1 flex flex-col">
+                <CardHeader className="text-center pb-4">
                   <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
                     <DollarSign className="h-10 w-10 text-cyan-400" />
                   </div>
@@ -306,7 +306,7 @@ const Index = () => {
                     Front Desk
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="text-center">
+                <CardContent className="text-center flex-1 flex items-center">
                   <p className="text-gray-400">
                     Property Management & Automations
                   </p>
