@@ -30,7 +30,6 @@ const AppRoutes = () => (
     <Route path="/markets" element={<MarketAnalysis />} />
     <Route path="/calculator" element={<Calculator />} />
     <Route path="/deals" element={<AcquisitionsAgent />} />
-    <Route path="/front-desk" element={<Index />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
     <Route path="/terms-of-service" element={<TermsOfService />} />
