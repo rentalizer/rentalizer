@@ -39,6 +39,9 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    const { plan, billing } = await req.json();
+    logStep("Request data received", { plan, billing });
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     
     // Check if customer already exists
@@ -51,6 +54,29 @@ serve(async (req) => {
       logStep("Creating new customer");
     }
 
+    // Define pricing based on plan and billing cycle
+    const pricing = {
+      essentials: {
+        monthly: 195000, // $1,950 in cents
+        yearly: 395000,  // $3,950 in cents
+      },
+      complete: {
+        monthly: 295000, // $2,950 in cents
+        yearly: 595000,  // $5,950 in cents
+      }
+    };
+
+    const planNames = {
+      essentials: "Market Insights + Calculator",
+      complete: "All-In-One System"
+    };
+
+    const amount = pricing[plan][billing];
+    const planName = planNames[plan];
+    const interval = billing === 'monthly' ? 'month' : 'year';
+
+    logStep("Pricing calculated", { plan, billing, amount, planName, interval });
+
     const origin = req.headers.get("origin") || "http://localhost:3000";
     
     const session = await stripe.checkout.sessions.create({
@@ -61,11 +87,13 @@ serve(async (req) => {
           price_data: {
             currency: "usd",
             product_data: { 
-              name: "Rentalizer Professional Plan",
-              description: "Access to all rental arbitrage tools and market intelligence"
+              name: planName,
+              description: plan === 'essentials' 
+                ? "AI-powered market research and rental arbitrage calculator"
+                : "Complete rental arbitrage system with acquisitions and property management"
             },
-            unit_amount: 95000, // $950 in cents
-            recurring: { interval: "month" },
+            unit_amount: amount,
+            recurring: { interval },
           },
           quantity: 1,
         },
@@ -75,7 +103,9 @@ serve(async (req) => {
       cancel_url: `${origin}/?canceled=true`,
       metadata: {
         user_id: user.id,
-        user_email: user.email
+        user_email: user.email,
+        plan: plan,
+        billing: billing
       }
     });
 
