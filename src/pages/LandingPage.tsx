@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { BarChart3, ArrowRight, LogIn, ExternalLink } from 'lucide-react';
@@ -8,8 +7,8 @@ import { Footer } from '@/components/Footer';
 const LandingPage = () => {
   const handleGetStarted = () => {
     console.log('Get Started button clicked');
-    const demoUrl = 'https://04622531-a8c2-4857-b132-9017f45b7571.lovableproject.com/';
-    window.open(demoUrl, '_blank', 'noopener,noreferrer');
+    const demoUrl = 'https://04622531-a8c2-4857-b132-9017f45b7571.lovableproject.com';
+    window.open(demoUrl, '_blank');
   };
 
   return (
