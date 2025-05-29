@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -123,6 +124,7 @@ const MarketAnalysis = () => {
       ];
     } else if (propertyType === '3') {
       return [
+        { value: '1', label: '1 Bathroom' },
         { value: '2', label: '2 Bathrooms' },
         { value: '3', label: '3 Bathrooms' }
       ];
@@ -151,7 +153,7 @@ const MarketAnalysis = () => {
       </div>
 
       <div className="relative z-10">
-        <div className="container mx-auto px-6 py-12">
+        <div className="container mx-auto px-6 py-8">
           {/* Header */}
           <div className="text-center mb-12">
             <Button
@@ -163,9 +165,9 @@ const MarketAnalysis = () => {
               Back to Home
             </Button>
             
-            <div className="flex items-center justify-center gap-5 mb-8">
-              <BarChart3 className="h-16 w-16 text-cyan-400" />
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <div className="flex items-center justify-center gap-6 mb-8 px-4">
+              <BarChart3 className="h-16 w-16 text-cyan-400 flex-shrink-0" />
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight">
                 Market Intelligence
               </h1>
             </div>
@@ -174,7 +176,7 @@ const MarketAnalysis = () => {
             </p>
             
             {/* Property Type Badges */}
-            <div className="flex items-center justify-center gap-4 mb-8">
+            <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
               <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 px-4 py-2">
                 <Home className="h-4 w-4 mr-1" />
                 1BR - 3BR Apartments
