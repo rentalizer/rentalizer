@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -156,19 +157,19 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
                 <h3 className="text-xl font-semibold text-cyan-300">Professional Access Required</h3>
               </div>
               <p className="text-gray-300 mb-4">
-                Unlock comprehensive STR market analysis and professional tools
+                Sign in or create an account to access professional STR market analysis
               </p>
               
               {/* Feature badges */}
               <div className="flex justify-center gap-4 mb-6">
                 <span className="bg-cyan-600/20 text-cyan-300 px-3 py-1 rounded-full text-sm border border-cyan-500/30">
-                  📊 Real-Time Data
+                  📊 Live Market Data
                 </span>
                 <span className="bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full text-sm border border-blue-500/30">
-                  🤖 AI-Powered Analysis
+                  🤖 AI Analysis
                 </span>
                 <span className="bg-purple-600/20 text-purple-300 px-3 py-1 rounded-full text-sm border border-purple-500/30">
-                  🛠️ Pro Tools
+                  🛠️ Professional Tools
                 </span>
               </div>
 
@@ -176,7 +177,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
                 className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-3 text-lg font-semibold"
                 onClick={() => setIsOpen(false)}
               >
-                Access Professional Tools
+                Get Started
               </Button>
             </div>
 
@@ -187,28 +188,28 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
                   <MapPin className="h-5 w-5 text-cyan-400 mt-1 flex-shrink-0" />
                   <div>
                     <h5 className="text-cyan-300 font-medium">Market Intelligence</h5>
-                    <p className="text-gray-400 text-sm">Comprehensive STR revenue data for any US market</p>
+                    <p className="text-gray-400 text-sm">Professional STR revenue data for any US city</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Calculator className="h-5 w-5 text-blue-400 mt-1 flex-shrink-0" />
                   <div>
-                    <h5 className="text-blue-300 font-medium">ROI Calculator</h5>
-                    <p className="text-gray-400 text-sm">AI-powered profitability analysis and projections</p>
+                    <h5 className="text-blue-300 font-medium">Calculator</h5>
+                    <p className="text-gray-400 text-sm">AI-powered rental market research</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <User className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
                   <div>
                     <h5 className="text-purple-300 font-medium">Acquisitions Agent</h5>
-                    <p className="text-gray-400 text-sm">Automated landlord outreach with proven scripts</p>
+                    <p className="text-gray-400 text-sm">Revenue-to-rent multiple calculations</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <DollarSign className="h-5 w-5 text-cyan-400 mt-1 flex-shrink-0" />
                   <div>
-                    <h5 className="text-cyan-300 font-medium">Front Desk Management</h5>
-                    <p className="text-gray-400 text-sm">Complete property management automation</p>
+                    <h5 className="text-cyan-300 font-medium">Front Desk</h5>
+                    <p className="text-gray-400 text-sm">Export capabilities for your analysis</p>
                   </div>
                 </div>
               </div>
