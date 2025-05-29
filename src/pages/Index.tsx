@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,12 +11,46 @@ const Index = () => {
   const { user, isSubscribed } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect non-authenticated users to landing page
-  React.useEffect(() => {
-    if (!user) {
-      navigate('/');
-    }
-  }, [user, navigate]);
+  // Show login prompt for non-authenticated users instead of redirecting
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500/5 blur-3xl"></div>
+        </div>
+
+        <div className="relative z-10">
+          <div className="container mx-auto px-4 py-16">
+            <div className="text-center mb-16">
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <BarChart3 className="h-12 w-12 text-cyan-400" />
+                <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  RENTALIZER
+                </h1>
+              </div>
+              <p className="text-lg text-cyan-300/80 font-medium mb-8">By Richie Matthews</p>
+              
+              <div className="bg-slate-800/50 border border-cyan-500/20 rounded-lg p-8 max-w-md mx-auto">
+                <h2 className="text-2xl font-bold text-cyan-300 mb-4">Login Required</h2>
+                <p className="text-gray-300 mb-6">
+                  Please log in to access your Rentalizer dashboard.
+                </p>
+                <Button
+                  onClick={() => navigate('/')}
+                  className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+                >
+                  Go to Home Page
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Footer />
+      </div>
+    );
+  }
 
   // Only show dashboard for authenticated and subscribed users
   if (user && isSubscribed) {
