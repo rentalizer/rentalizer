@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +25,7 @@ const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<LandingPage />} />
     <Route path="/dashboard" element={<Index />} />
+    <Route path="/demo" element={<Demo />} />
     <Route path="/pricing" element={<Pricing />} />
     <Route path="/markets" element={<MarketAnalysis />} />
     <Route path="/calculator" element={<Calculator />} />
