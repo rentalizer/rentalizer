@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,13 +25,36 @@ const Pricing = () => {
     }
   };
 
-  const handleBookDemo = () => {
-    window.open('https://calendly.com/richies-schedule/scale', '_blank');
-  };
+  const handleGetStarted = async (plan: string) => {
+    if (!user) {
+      // Show login dialog if user is not authenticated
+      return;
+    }
 
-  const handleGetStarted = () => {
-    // Handle subscription logic here
-    console.log('Get started clicked');
+    try {
+      const response = await fetch('/supabase/functions/v1/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.session?.access_token}`,
+        },
+        body: JSON.stringify({
+          plan: plan,
+          billing: billingCycle
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.url) {
+        // Open Stripe checkout in a new tab
+        window.open(data.url, '_blank');
+      } else {
+        console.error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+    }
   };
 
   return (
@@ -133,13 +157,24 @@ const Pricing = () => {
                   </div>
                 </div>
 
-                <Button
-                  onClick={handleGetStarted}
-                  className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white"
-                  size="lg"
-                >
-                  Get Started
-                </Button>
+                {user ? (
+                  <Button
+                    onClick={() => handleGetStarted('essentials')}
+                    className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white"
+                    size="lg"
+                  >
+                    Get Started
+                  </Button>
+                ) : (
+                  <LoginDialog>
+                    <Button
+                      className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white"
+                      size="lg"
+                    >
+                      Get Started
+                    </Button>
+                  </LoginDialog>
+                )}
               </CardContent>
             </Card>
 
@@ -198,13 +233,24 @@ const Pricing = () => {
                   </div>
                 </div>
 
-                <Button
-                  onClick={handleGetStarted}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white"
-                  size="lg"
-                >
-                  Get Started
-                </Button>
+                {user ? (
+                  <Button
+                    onClick={() => handleGetStarted('complete')}
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white"
+                    size="lg"
+                  >
+                    Get Started
+                  </Button>
+                ) : (
+                  <LoginDialog>
+                    <Button
+                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white"
+                      size="lg"
+                    >
+                      Get Started
+                    </Button>
+                  </LoginDialog>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -237,13 +283,13 @@ const Pricing = () => {
           {/* CTA Section */}
           <div className="text-center">
             <h3 className="text-2xl font-bold text-white mb-4">
-              Ready to Start Your Rental Arbitrage Journey?
+              Need to See It First?
             </h3>
             <p className="text-gray-300 mb-8">
               Book a personalized demo to see the system in action
             </p>
             <Button
-              onClick={handleBookDemo}
+              onClick={() => window.open('/demo', '_self')}
               size="lg"
               variant="outline"
               className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 px-12 py-4 text-xl"
