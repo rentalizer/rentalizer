@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,7 @@ import { BarChart3, MapPin, DollarSign, Calculator, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Footer } from '@/components/Footer';
 import { TopNavBar } from '@/components/TopNavBar';
+import { LoginDialog } from '@/components/LoginDialog';
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
@@ -36,12 +38,11 @@ const Index = () => {
                 <p className="text-gray-300 mb-6">
                   Please log in to access your Rentalizer dashboard.
                 </p>
-                <Button
-                  onClick={() => navigate('/')}
-                  className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
-                >
-                  Go to Home Page
-                </Button>
+                <LoginDialog trigger={
+                  <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white">
+                    Login
+                  </Button>
+                } />
               </div>
             </div>
           </div>
