@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { BarChart3, Mail } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import { ContactChat } from './ContactChat';
 import { Link } from 'react-router-dom';
 
@@ -32,11 +31,6 @@ export const Footer = ({ showLinks = true }: FooterProps) => {
               The ultimate AI-powered platform for analyzing short-term rental market opportunities. 
               Make data-driven investment decisions with professional market insights.
             </p>
-            <div className="flex items-center gap-4 justify-center">
-              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-cyan-300">
-                <Mail className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
 
           {/* Product Links - only show if showLinks is true */}
