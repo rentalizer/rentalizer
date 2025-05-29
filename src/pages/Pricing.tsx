@@ -39,21 +39,22 @@ const Pricing = () => {
         return;
       }
 
-      const response = await fetch('/supabase/functions/v1/create-checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.session.access_token}`,
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
           plan: plan,
           billing: billingCycle
-        }),
+        },
+        headers: {
+          Authorization: `Bearer ${session.session.access_token}`,
+        },
       });
 
-      const data = await response.json();
-      
-      if (data.url) {
+      if (error) {
+        console.error('Checkout error:', error);
+        return;
+      }
+
+      if (data?.url) {
         // Open Stripe checkout in a new tab
         window.open(data.url, '_blank');
       } else {
@@ -173,14 +174,14 @@ const Pricing = () => {
                     Get Started
                   </Button>
                 ) : (
-                  <LoginDialog>
+                  <LoginDialog trigger={
                     <Button
                       className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white"
                       size="lg"
                     >
                       Get Started
                     </Button>
-                  </LoginDialog>
+                  } />
                 )}
               </CardContent>
             </Card>
@@ -249,14 +250,14 @@ const Pricing = () => {
                     Get Started
                   </Button>
                 ) : (
-                  <LoginDialog>
+                  <LoginDialog trigger={
                     <Button
                       className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white"
                       size="lg"
                     >
                       Get Started
                     </Button>
-                  </LoginDialog>
+                  } />
                 )}
               </CardContent>
             </Card>
