@@ -18,7 +18,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-white">
           <Hammer className="h-5 w-5 text-cyan-400" />
-          2. Build Out Costs
+          Build Out Costs
         </CardTitle>
         <p className="text-sm text-gray-300">
           Initial costs required to launch your STR property

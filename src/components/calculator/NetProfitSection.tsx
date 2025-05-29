@@ -26,7 +26,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-white">
           <TrendingUp className="h-5 w-5 text-cyan-400" />
-          4. Net Profit Analysis
+          Net Profit Analysis
         </CardTitle>
         <p className="text-sm text-gray-300">
           Calculate monthly profit and return on investment

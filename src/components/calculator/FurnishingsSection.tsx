@@ -27,7 +27,7 @@ export const FurnishingsSection: React.FC<FurnishingsSectionProps> = ({
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-white">
           <Sofa className="h-5 w-5 text-cyan-400" />
-          5. Furnishings Calculator
+          Furnishings Calculator
         </CardTitle>
         <p className="text-sm text-gray-300">
           Calculate furnishing costs based on property square footage

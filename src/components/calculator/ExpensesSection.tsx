@@ -23,8 +23,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-white">
-          <Receipt className="h-5 w-5 text-blue-400" />
-          3. Monthly Expenses
+          <Receipt className="h-5 w-5 text-cyan-400" />
+          Monthly Expenses
         </CardTitle>
         <p className="text-sm text-gray-300">
           All monthly operating costs for your STR property
