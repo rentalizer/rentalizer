@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -11,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LogIn, User, Lock, UserPlus, Mail } from 'lucide-react';
+import { LogIn, User, Lock, UserPlus, Mail, MapPin, Calculator, DollarSign, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { ForgotPasswordForm } from './ForgotPasswordForm';
@@ -21,7 +20,7 @@ interface LoginDialogProps {
 }
 
 export const LoginDialog = ({ trigger }: LoginDialogProps) => {
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user, isSubscribed } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -115,6 +114,111 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
     setEmail('');
     setPassword('');
   };
+
+  // Show full professional access page for non-subscribed users
+  if (user && !isSubscribed) {
+    return (
+      <Dialog open={isOpen} onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) resetForm();
+      }}>
+        <DialogTrigger asChild>
+          {trigger || (
+            <Button 
+              variant="outline" 
+              className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"
+            >
+              <LogIn className="h-4 w-4 mr-2" />
+              Get Started
+            </Button>
+          )}
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-2xl bg-gray-900/95 border border-cyan-500/20 backdrop-blur-lg">
+          <div className="text-center space-y-6">
+            {/* Header with logo and title */}
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <BarChart3 className="h-8 w-8 text-cyan-400" />
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Rentalizer
+              </h1>
+            </div>
+            <p className="text-cyan-300/80 font-medium">By Richie Matthews</p>
+            
+            {/* Tagline */}
+            <h2 className="text-xl text-cyan-100 max-w-lg mx-auto leading-tight">
+              The All-In-One AI System To Earn Rental Income—No Mortgage Needed
+            </h2>
+
+            {/* Professional Access Required */}
+            <div className="bg-gray-800/50 border border-cyan-500/30 rounded-lg p-6 mb-6">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Lock className="h-5 w-5 text-cyan-400" />
+                <h3 className="text-xl font-semibold text-cyan-300">Professional Access Required</h3>
+              </div>
+              <p className="text-gray-300 mb-4">
+                Sign in or create an account to access professional STR market analysis
+              </p>
+              
+              {/* Feature badges */}
+              <div className="flex justify-center gap-4 mb-6">
+                <span className="bg-cyan-600/20 text-cyan-300 px-3 py-1 rounded-full text-sm border border-cyan-500/30">
+                  📊 Live Market Data
+                </span>
+                <span className="bg-blue-600/20 text-blue-300 px-3 py-1 rounded-full text-sm border border-blue-500/30">
+                  🤖 AI Analysis
+                </span>
+                <span className="bg-purple-600/20 text-purple-300 px-3 py-1 rounded-full text-sm border border-purple-500/30">
+                  🛠️ Professional Tools
+                </span>
+              </div>
+
+              <Button 
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-3 text-lg font-semibold"
+                onClick={() => setIsOpen(false)}
+              >
+                Get Started
+              </Button>
+            </div>
+
+            {/* Features grid */}
+            <div className="bg-gray-800/30 border border-cyan-500/20 rounded-lg p-6">
+              <h4 className="text-lg font-semibold text-cyan-300 mb-4">Save weeks or months of research:</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-5 w-5 text-cyan-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <h5 className="text-cyan-300 font-medium">Market Intelligence</h5>
+                    <p className="text-gray-400 text-sm">Professional STR revenue data for any US city</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Calculator className="h-5 w-5 text-blue-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <h5 className="text-blue-300 font-medium">Calculator</h5>
+                    <p className="text-gray-400 text-sm">AI-powered rental market research</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <User className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <h5 className="text-purple-300 font-medium">Acquisitions Agent</h5>
+                    <p className="text-gray-400 text-sm">Revenue-to-rent multiple calculations</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <DollarSign className="h-5 w-5 text-cyan-400 mt-1 flex-shrink-0" />
+                  <div>
+                    <h5 className="text-cyan-300 font-medium">Front Desk</h5>
+                    <p className="text-gray-400 text-sm">Export capabilities for your analysis</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
