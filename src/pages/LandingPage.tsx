@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { BarChart3, ArrowRight, LogIn, ExternalLink } from 'lucide-react';
+import { BarChart3, ArrowRight, LogIn, ExternalLink, LayoutDashboard } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +16,20 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+      {/* Header with Dashboard link */}
+      <div className="relative z-20 w-full px-6 py-4">
+        <div className="flex justify-end">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/dashboard')}
+            className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
+          >
+            <LayoutDashboard className="h-4 w-4 mr-2" />
+            Dashboard
+          </Button>
+        </div>
+      </div>
+
       {/* Subtle background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl"></div>
@@ -67,7 +81,7 @@ const LandingPage = () => {
         </div>
       </div>
 
-      <Footer />
+      <Footer showLinks={false} />
     </div>
   );
 };

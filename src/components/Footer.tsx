@@ -5,7 +5,11 @@ import { BarChart3, Mail } from 'lucide-react';
 import { ContactChat } from './ContactChat';
 import { Link } from 'react-router-dom';
 
-export const Footer = () => {
+interface FooterProps {
+  showLinks?: boolean;
+}
+
+export const Footer = ({ showLinks = true }: FooterProps) => {
   const handleProductLink = (feature: string) => {
     // Scroll to top and focus on the main feature
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -15,92 +19,96 @@ export const Footer = () => {
   return (
     <footer className="relative z-10 mt-16 border-t border-gray-700/50 bg-gray-900/60 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className={`grid grid-cols-1 ${showLinks ? 'md:grid-cols-4' : 'md:grid-cols-1'} gap-8`}>
           {/* Logo and Description */}
-          <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
+          <div className={`col-span-1 ${showLinks ? 'md:col-span-2' : 'text-center'}`}>
+            <div className="flex items-center gap-3 mb-4 justify-center">
               <BarChart3 className="h-8 w-8 text-cyan-400" />
               <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 RENTALIZER
               </h3>
             </div>
-            <p className="text-gray-300 mb-6 max-w-md">
+            <p className="text-gray-300 mb-6 max-w-md mx-auto">
               The ultimate AI-powered platform for analyzing short-term rental market opportunities. 
               Make data-driven investment decisions with professional market insights.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 justify-center">
               <Button variant="ghost" size="sm" className="text-gray-400 hover:text-cyan-300">
                 <Mail className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
-          {/* Product Links */}
-          <div>
-            <h4 className="text-lg font-semibold text-cyan-300 mb-4">Product</h4>
-            <ul className="space-y-3">
-              <li>
-                <button 
-                  onClick={() => handleProductLink('Market Analysis')}
-                  className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
-                >
-                  Market Analysis
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => handleProductLink('Revenue Calculator')}
-                  className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
-                >
-                  Revenue Calculator
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => handleProductLink('API Access')}
-                  className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
-                >
-                  API Access
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => handleProductLink('Professional Data')}
-                  className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
-                >
-                  Professional Data
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => handleProductLink('AI Insights')}
-                  className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
-                >
-                  AI Insights
-                </button>
-              </li>
-            </ul>
-          </div>
+          {/* Product Links - only show if showLinks is true */}
+          {showLinks && (
+            <div>
+              <h4 className="text-lg font-semibold text-cyan-300 mb-4">Product</h4>
+              <ul className="space-y-3">
+                <li>
+                  <button 
+                    onClick={() => handleProductLink('Market Analysis')}
+                    className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
+                  >
+                    Market Analysis
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleProductLink('Revenue Calculator')}
+                    className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
+                  >
+                    Revenue Calculator
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleProductLink('API Access')}
+                    className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
+                  >
+                    API Access
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleProductLink('Professional Data')}
+                    className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
+                  >
+                    Professional Data
+                  </button>
+                </li>
+                <li>
+                  <button 
+                    onClick={() => handleProductLink('AI Insights')}
+                    className="text-gray-300 hover:text-cyan-300 transition-colors text-sm text-left"
+                  >
+                    AI Insights
+                  </button>
+                </li>
+              </ul>
+            </div>
+          )}
 
-          {/* Support Links */}
-          <div>
-            <h4 className="text-lg font-semibold text-cyan-300 mb-4">Support</h4>
-            <ul className="space-y-3">
-              <li>
-                <ContactChat />
-              </li>
-              <li>
-                <Link to="/privacy-policy" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link to="/terms-of-service" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
-                  Terms of Service
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {/* Support Links - only show if showLinks is true */}
+          {showLinks && (
+            <div>
+              <h4 className="text-lg font-semibold text-cyan-300 mb-4">Support</h4>
+              <ul className="space-y-3">
+                <li>
+                  <ContactChat />
+                </li>
+                <li>
+                  <Link to="/privacy-policy" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/terms-of-service" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
+                    Terms of Service
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Bottom Section */}
