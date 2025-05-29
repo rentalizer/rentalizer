@@ -253,7 +253,7 @@ const Index = () => {
               <Button
                 onClick={() => navigate('/calculator')}
                 size="lg"
-                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-green-500/25 transition-all duration-300"
+                className="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-cyan-500/25 transition-all duration-300"
               >
                 <Calculator className="h-5 w-5 mr-2" />
                 Open Calculator
