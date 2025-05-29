@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -145,9 +144,9 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
             </div>
             <p className="text-cyan-300/80 font-medium">By Richie Matthews</p>
             
-            {/* Tagline - matching the site */}
+            {/* Tagline */}
             <h2 className="text-xl text-cyan-100 max-w-lg mx-auto leading-tight">
-              Identify profitable short-term rental arbitrage opportunities with professional market intelligence
+              The All-In-One AI System To Earn Rental Income—No Mortgage Needed
             </h2>
 
             {/* Professional Access Required */}
@@ -183,7 +182,6 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
 
             {/* Features grid - matching the 4 categories from the site */}
             <div className="bg-gray-800/30 border border-cyan-500/20 rounded-lg p-6">
-              <h4 className="text-lg font-semibold text-cyan-300 mb-4">Save weeks or months of research:</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-cyan-400 mt-1 flex-shrink-0" />
