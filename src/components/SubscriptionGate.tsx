@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,10 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
   const handleUpgrade = (promoCode?: string) => {
     console.log('Upgrade requested with promo code:', promoCode);
     // TODO: Implement actual payment processing
+  };
+
+  const handleBookDemo = () => {
+    window.open('https://calendly.com/richies-schedule/scale', '_blank');
   };
 
   if (!user) {
@@ -180,22 +185,19 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
               </div>
 
               <div className="flex justify-center">
-                <LoginDialog 
-                  trigger={
-                    <Button 
-                      size="lg"
-                      className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-4 text-xl font-semibold shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
-                    >
-                      Start Your Rental Empire Today
-                      <TrendingUp className="h-5 w-5 ml-2" />
-                    </Button>
-                  }
-                />
+                <Button 
+                  onClick={handleBookDemo}
+                  size="lg"
+                  className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-4 text-xl font-semibold shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
+                >
+                  Book Your Demo Call
+                  <TrendingUp className="h-5 w-5 ml-2" />
+                </Button>
               </div>
               
               <div className="text-center">
                 <p className="text-sm text-gray-400">
-                  ⚡ Get instant access • 🚀 No credit card required • 💎 7-day free trial
+                  ⚡ Get a personalized demo • 🚀 See the system in action • 💎 Book your call now
                 </p>
               </div>
             </CardContent>
