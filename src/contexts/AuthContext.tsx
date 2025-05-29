@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
@@ -16,6 +15,9 @@ interface AuthContextType {
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   isSubscribed: boolean;
+  checkSubscription: () => Promise<void>;
+  upgradeSubscription: () => Promise<void>;
+  manageSubscription: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -92,36 +94,105 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const checkSubscription = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      console.log('🔄 Checking subscription status...');
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('❌ Error checking subscription:', error);
+        return;
+      }
+
+      console.log('✅ Subscription check result:', data);
+      
+      if (user) {
+        setUser({
+          ...user,
+          subscription_status: data.subscribed ? 'active' : 'trial'
+        });
+      }
+    } catch (error) {
+      console.error('💥 Exception checking subscription:', error);
+    }
+  };
+
+  const upgradeSubscription = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      console.log('🔄 Creating checkout session...');
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      // Open Stripe checkout in a new tab
+      window.open(data.url, '_blank');
+    } catch (error) {
+      console.error('❌ Error creating checkout:', error);
+      throw error;
+    }
+  };
+
+  const manageSubscription = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      console.log('🔄 Creating customer portal session...');
+      const { data, error } = await supabase.functions.invoke('customer-portal', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      // Open customer portal in a new tab
+      window.open(data.url, '_blank');
+    } catch (error) {
+      console.error('❌ Error opening customer portal:', error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     console.log('🔄 AuthProvider initializing...');
     
-    // Set a maximum timeout for initialization
     const initTimeout = setTimeout(() => {
       console.log('⏰ Auth initialization timeout, setting loading to false');
       setIsLoading(false);
-    }, 5000); // 5 second timeout
+    }, 5000);
 
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('🔔 Auth state change event:', event, 'Session exists:', !!session);
       
-      clearTimeout(initTimeout); // Clear timeout since we got a response
+      clearTimeout(initTimeout);
       
       if (session?.user) {
         console.log('👤 User found, email:', session.user.email);
         
-        const subscriptionStatus: 'active' | 'inactive' | 'trial' = 
-          (session.user.email?.includes('premium') || session.user.email?.includes('pro')) ? 'active' : 'trial';
-        
         setUser({
           id: session.user.id,
           email: session.user.email || '',
-          subscription_status: subscriptionStatus
+          subscription_status: 'trial'
         });
         
-        // Create user profile if needed (non-blocking)
         setTimeout(() => {
           createUserProfile(session.user.id, session.user.email || '');
+          checkSubscription();
         }, 0);
       } else {
         console.log('❌ No user session found');
@@ -131,7 +202,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false);
     });
 
-    // Get initial session with timeout
     const getInitialSession = async () => {
       try {
         console.log('📡 Getting initial session...');
@@ -155,14 +225,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log('📋 Initial session loaded:', !!session);
         
         if (session?.user) {
-          const subscriptionStatus: 'active' | 'inactive' | 'trial' = 
-            (session.user.email?.includes('premium') || session.user.email?.includes('pro')) ? 'active' : 'trial';
-          
           setUser({
             id: session.user.id,
             email: session.user.email || '',
-            subscription_status: subscriptionStatus
+            subscription_status: 'trial'
           });
+          
+          setTimeout(() => {
+            checkSubscription();
+          }, 0);
         }
         
         clearTimeout(initTimeout);
@@ -175,6 +246,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     getInitialSession();
+
+    // Check for success/cancel URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+      console.log('✅ Payment successful, checking subscription status');
+      setTimeout(() => {
+        checkSubscription();
+      }, 2000);
+    }
 
     return () => {
       console.log('🧹 Cleaning up auth subscription');
@@ -232,7 +312,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
   };
 
-  const isSubscribed = user?.subscription_status === 'active' || user?.subscription_status === 'trial';
+  const isSubscribed = user?.subscription_status === 'active';
 
   const value = {
     user,
@@ -240,10 +320,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signIn,
     signUp,
     signOut,
-    isSubscribed
+    isSubscribed,
+    checkSubscription,
+    upgradeSubscription,
+    manageSubscription
   };
 
-  console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user);
+  console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user, 'isSubscribed:', isSubscribed);
 
   if (isLoading) {
     return (

@@ -7,16 +7,19 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Check, Crown, Zap, TrendingUp, Calculator } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SubscriptionPricingProps {
-  onUpgrade: (promoCode?: string) => void;
+  onUpgrade?: (promoCode?: string) => void;
 }
 
 export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => {
   const { toast } = useToast();
+  const { upgradeSubscription } = useAuth();
   const [promoCode, setPromoCode] = useState('');
   const [isValidatingPromo, setIsValidatingPromo] = useState(false);
   const [promoDiscount, setPromoDiscount] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const basePrice = 950;
   const finalPrice = promoDiscount ? basePrice - (basePrice * promoDiscount / 100) : basePrice;
@@ -26,7 +29,6 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
     
     setIsValidatingPromo(true);
     
-    // Simulate promo code validation
     setTimeout(() => {
       const validPromoCodes = {
         'BETA50': 50,
@@ -55,8 +57,28 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
     }, 1000);
   };
 
-  const handleUpgrade = () => {
-    onUpgrade(promoCode);
+  const handleUpgrade = async () => {
+    try {
+      setIsLoading(true);
+      await upgradeSubscription();
+      toast({
+        title: "Redirecting to Stripe...",
+        description: "Opening payment page in a new tab.",
+      });
+      
+      // Call the optional onUpgrade callback if provided
+      if (onUpgrade) {
+        onUpgrade(promoCode);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to start checkout process. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -149,11 +171,12 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
 
           <Button
             onClick={handleUpgrade}
+            disabled={isLoading}
             size="lg"
             className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white py-4 text-lg font-medium shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300 transform hover:scale-105"
           >
             <Calculator className="h-5 w-5 mr-2" />
-            {promoDiscount === 100 ? 'Start Free Trial' : 'Upgrade to Professional'}
+            {isLoading ? 'Processing...' : (promoDiscount === 100 ? 'Start Free Trial' : 'Upgrade to Professional')}
           </Button>
 
           <p className="text-center text-sm text-gray-500">
