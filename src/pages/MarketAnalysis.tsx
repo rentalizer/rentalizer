@@ -166,6 +166,9 @@ const MarketAnalysis = () => {
               <Badge variant="outline" className="bg-gray-800/50 border-blue-500/30 text-blue-300 px-4 py-2">
                 Heat Map
               </Badge>
+              <Badge variant="outline" className="bg-gray-800/50 border-green-500/30 text-green-300 px-4 py-2">
+                Export Data
+              </Badge>
             </div>
           </div>
 
