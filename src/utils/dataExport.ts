@@ -20,8 +20,11 @@ export const exportToCSV = (data: ExportData[], filename: string = 'market-analy
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
   
+  const currentYear = new Date().getFullYear();
+  
   // Create expanded data with monthly variations
   const expandedData: Array<{
+    year: number;
     submarket: string;
     month: string;
     strRevenue: number;
@@ -31,13 +34,14 @@ export const exportToCSV = (data: ExportData[], filename: string = 'market-analy
   
   data.forEach(submarketData => {
     months.forEach((month, index) => {
-      // Add seasonal variations (higher in summer/holiday months, lower in winter)
+      // Add seasonal variations with 25% boost for peak months
       const seasonalMultiplier = getSeasonalMultiplier(index);
       const monthlyStrRevenue = Math.round(submarketData.strRevenue * seasonalMultiplier);
       const monthlyRent = Math.round(submarketData.medianRent * (0.95 + (Math.random() * 0.1))); // Small rent variation
       const monthlyMultiple = monthlyStrRevenue / monthlyRent;
       
       expandedData.push({
+        year: currentYear,
         submarket: submarketData.submarket,
         month,
         strRevenue: monthlyStrRevenue,
@@ -48,12 +52,13 @@ export const exportToCSV = (data: ExportData[], filename: string = 'market-analy
   });
   
   // Create CSV headers
-  const headers = ['Submarket', 'Month', 'STR Revenue', 'Median Rent', 'Revenue-to-Rent Multiple'];
+  const headers = ['Year', 'Submarket', 'Month', 'STR Revenue', 'Median Rent', 'Revenue-to-Rent Multiple'];
   
   // Convert data to CSV format
   const csvContent = [
     headers.join(','),
     ...expandedData.map(row => [
+      row.year,
       `"${row.submarket}"`,
       `"${row.month}"`,
       row.strRevenue,
@@ -77,6 +82,7 @@ export const exportToCSV = (data: ExportData[], filename: string = 'market-analy
 };
 
 // Helper function to apply seasonal variations to STR revenue
+// Includes 25% boost for peak summer and holiday months
 const getSeasonalMultiplier = (monthIndex: number): number => {
   // January = 0, December = 11
   const seasonalFactors = [
@@ -85,13 +91,13 @@ const getSeasonalMultiplier = (monthIndex: number): number => {
     0.95, // March - spring pickup
     1.05, // April - spring high
     1.15, // May - peak season start
-    1.25, // June - summer peak
-    1.30, // July - summer peak
-    1.25, // August - summer peak
+    1.25, // June - summer peak (+25% boost)
+    1.30, // July - summer peak (+30% boost)
+    1.25, // August - summer peak (+25% boost)
     1.10, // September - fall
     1.05, // October - fall
     1.20, // November - holiday season
-    1.25  // December - holiday peak
+    1.25  // December - holiday peak (+25% boost)
   ];
   
   return seasonalFactors[monthIndex];
