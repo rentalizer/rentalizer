@@ -23,8 +23,7 @@ const queryClient = new QueryClient();
 
 const AppRoutes = () => (
   <Routes>
-    <Route path="/" element={<Index />} />
-    <Route path="/landing" element={<LandingPage />} />
+    <Route path="/" element={<LandingPage />} />
     <Route path="/dashboard" element={<Index />} />
     <Route path="/demo" element={<Demo />} />
     <Route path="/pricing" element={<Pricing />} />
