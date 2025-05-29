@@ -1,15 +1,17 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { BarChart3, ArrowRight, LogIn, ExternalLink } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
+import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+
   const handleGetStarted = () => {
-    console.log('Get Started button clicked - navigating to demo');
-    // Navigate to the demo page
-    window.open('https://rentalizer.ai/dashboard', '_blank');
+    console.log('Get Started button clicked - navigating to dashboard');
+    // Navigate to the local dashboard
+    navigate('/dashboard');
   };
 
   return (
