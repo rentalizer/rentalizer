@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,6 +9,7 @@ import { SubscriptionGate } from "@/components/SubscriptionGate";
 import { AccessGate } from "@/components/AccessGate";
 import { User, DollarSign } from "lucide-react";
 import Index from "./pages/Index";
+import LandingPage from "./pages/LandingPage";
 import Calculator from "./pages/Calculator";
 import MarketAnalysis from "./pages/MarketAnalysis";
 import ResetPassword from "./pages/ResetPassword";
@@ -22,7 +24,8 @@ const queryClient = new QueryClient();
 
 const AppRoutes = () => (
   <Routes>
-    <Route path="/" element={
+    <Route path="/" element={<LandingPage />} />
+    <Route path="/dashboard" element={
       <SubscriptionGate>
         <Index />
       </SubscriptionGate>
