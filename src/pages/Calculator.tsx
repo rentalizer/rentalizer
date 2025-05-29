@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -111,7 +112,7 @@ const Calculator = () => {
             Calculator
           </h1>
           <p className="text-xl text-gray-300">
-            Assess property profitability and ROI for short-term rentals
+            Assess Property Profitability And ROI For Short-Term Rentals
           </p>
         </div>
 
