@@ -44,10 +44,9 @@ export const ForgotPasswordForm = ({ onBack, initialEmail = '' }: ForgotPassword
     setIsSubmitting(true);
     
     try {
-      // Use a more robust redirect URL that works across environments
-      const isProduction = window.location.hostname === 'rentalizer.ai';
-      const baseUrl = isProduction ? 'https://rentalizer.ai' : window.location.origin;
-      const redirectTo = `${baseUrl}/reset-password`;
+      // Use the current origin as the base URL and ensure the reset-password route is correct
+      const currentOrigin = window.location.origin;
+      const redirectTo = `${currentOrigin}/reset-password`;
       
       console.log('🔗 Using redirect URL:', redirectTo);
       
@@ -78,6 +77,8 @@ export const ForgotPasswordForm = ({ onBack, initialEmail = '' }: ForgotPassword
         errorMessage = "No account found with this email address.";
       } else if (error.message?.includes('too_many_requests')) {
         errorMessage = "Too many requests. Please wait a few minutes before trying again.";
+      } else if (error.message?.includes('rate limit')) {
+        errorMessage = "Please wait a minute before requesting another reset email.";
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -105,7 +106,7 @@ export const ForgotPasswordForm = ({ onBack, initialEmail = '' }: ForgotPassword
           </p>
           <p className="text-cyan-200 font-medium mb-4">{email}</p>
           <p className="text-sm text-gray-500">
-            Click the link in the email to reset your password. If you don't see it, check your spam folder.
+            Click the link in the email to reset your password. If you don't see it, check your spam folder. The link will expire in 1 hour.
           </p>
         </div>
         <div className="space-y-3">
