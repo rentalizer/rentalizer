@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,9 +44,6 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
             </div>
             <p className="text-3xl text-cyan-100 mb-6 max-w-4xl mx-auto leading-tight">
               The All-In-One AI System To Earn Rental Income—No Mortgage Needed
-            </p>
-            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Generate <span className="text-cyan-400 font-semibold">$3,000-$8,000+</span> monthly from rental arbitrage using our AI-powered market intelligence and automation tools
             </p>
           </div>
 
