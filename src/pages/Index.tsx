@@ -143,12 +143,12 @@ const Index = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-900/50 border-green-500/20 backdrop-blur-lg hover:border-green-400/40 transition-all duration-300 group">
+              <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group">
                 <CardHeader className="text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
-                    <DollarSign className="h-8 w-8 text-green-400" />
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                    <DollarSign className="h-8 w-8 text-cyan-400" />
                   </div>
-                  <CardTitle className="text-green-300 text-xl">
+                  <CardTitle className="text-cyan-300 text-xl">
                     Front Desk
                   </CardTitle>
                 </CardHeader>
@@ -282,12 +282,12 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-900/50 border-green-500/20 backdrop-blur-lg hover:border-green-400/40 transition-all duration-300 group">
+            <Card className="bg-gray-900/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group">
               <CardHeader className="text-center">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
-                  <DollarSign className="h-8 w-8 text-green-400" />
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                  <DollarSign className="h-8 w-8 text-cyan-400" />
                 </div>
-                <CardTitle className="text-green-300 text-xl">
+                <CardTitle className="text-cyan-300 text-xl">
                   Front Desk
                 </CardTitle>
               </CardHeader>
