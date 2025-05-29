@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,12 +25,12 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
   // Pricing configuration
   const pricing = {
     essentials: {
-      monthly: 950,
-      yearly: 4000,
+      monthly: 1950,
+      yearly: 3950,
     },
     complete: {
-      monthly: 1900,
-      yearly: 5000,
+      monthly: 5950,
+      yearly: 5950,
     }
   };
 
@@ -201,7 +200,8 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
                 'Export Capabilities (CSV)',
                 'Priority Support',
                 'Advanced Filtering Options',
-                'Market Trend Analysis'
+                'Market Trend Analysis',
+                'Time & Money Savings'
               ].map((feature, index) => (
                 <div key={index} className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-green-400 flex-shrink-0" />
@@ -240,7 +240,7 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
                   {promoDiscount}% OFF Applied!
                 </Badge>
               )}
-              {billingCycle === 'yearly' && (
+              {billingCycle === 'yearly' && selectedPlan === 'complete' && (
                 <div className="text-sm text-green-400">
                   Save ${(pricing.complete.monthly * 12 - pricing.complete.yearly).toLocaleString()} per year
                 </div>
