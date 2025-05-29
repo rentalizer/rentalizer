@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Search, MapPin, DollarSign, Map } from 'lucide-react';
-import { fetchAirDNAListingsData } from '@/services/marketDataService';
+import { fetchMarketData } from '@/services/marketDataService';
 import { useToast } from '@/hooks/use-toast';
 import { CalculatorData } from '@/pages/Calculator';
 import { MapViewComps } from './MapViewComps';
@@ -35,10 +34,10 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
     console.log('🔍 Fetching comparables for:', data.address);
     
     try {
-      const strData = await fetchAirDNAListingsData(data.address);
+      const marketData = await fetchMarketData(data.address, {}, '2', '1');
       
-      // Filter for 2BR properties and take top 4
-      const comparableProperties = strData
+      // Use STR data for comparables
+      const comparableProperties = marketData.strData
         .slice(0, 4)
         .map((item, index) => ({
           name: item.submarket || `Comp Property #${index + 1}`,
