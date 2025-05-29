@@ -1,13 +1,15 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { BarChart3, ArrowRight, LogIn } from 'lucide-react';
+import { BarChart3, ArrowRight, LogIn, ExternalLink } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 
 const LandingPage = () => {
   const handleGetStarted = () => {
-    window.open('https://04622531-a8c2-4857-b132-9017f45b7571.lovableproject.com/', '_blank');
+    console.log('Get Started button clicked');
+    const demoUrl = 'https://04622531-a8c2-4857-b132-9017f45b7571.lovableproject.com/';
+    window.open(demoUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -42,7 +44,7 @@ const LandingPage = () => {
                 onClick={handleGetStarted}
                 className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-6 text-xl font-semibold min-w-[200px]"
               >
-                <ArrowRight className="h-6 w-6 mr-3" />
+                <ExternalLink className="h-6 w-6 mr-3" />
                 Get Started
               </Button>
               
