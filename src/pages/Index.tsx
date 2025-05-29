@@ -79,7 +79,7 @@ const Index = () => {
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-gray-400">
-                      Get comprehensive market data for rental arbitrage opportunities across the US.
+                      Find The Best Rental Arbitrage Markets
                     </p>
                   </CardContent>
                 </Card>
@@ -108,7 +108,7 @@ const Index = () => {
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-gray-400">
-                      Built-in calculator to model your specific investment scenarios and projections.
+                      Built-In Calculator To Model Your Specific Investment Scenarios And Projections
                     </p>
                   </CardContent>
                 </Card>
@@ -134,7 +134,7 @@ const Index = () => {
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-gray-400">
-                      Contact landlords with preloaded scripts in smart sequences based on landlord responses. Handles follow-ups and basic qualification.
+                      Contact Landlords With Preloaded Scripts In ITTT Sequences Based On Landlord Responses
                     </p>
                   </CardContent>
                 </Card>
@@ -228,7 +228,7 @@ const Index = () => {
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-gray-400">
-                    Get comprehensive market data for rental arbitrage opportunities across the US.
+                    Find The Best Rental Arbitrage Markets
                   </p>
                 </CardContent>
               </Card>
@@ -257,7 +257,7 @@ const Index = () => {
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-gray-400">
-                    Built-in calculator to model your specific investment scenarios and projections.
+                    Built-In Calculator To Model Your Specific Investment Scenarios And Projections
                   </p>
                 </CardContent>
               </Card>
@@ -283,7 +283,7 @@ const Index = () => {
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-gray-400">
-                    Contact landlords with preloaded scripts in smart sequences based on landlord responses. Handles follow-ups and basic qualification.
+                    Contact Landlords With Preloaded Scripts In ITTT Sequences Based On Landlord Responses
                   </p>
                 </CardContent>
               </Card>
