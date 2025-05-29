@@ -13,8 +13,6 @@ const Demo = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-      {console.log('Demo component main div rendering')}
-      
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl"></div>
@@ -60,7 +58,6 @@ const Demo = () => {
               </CardHeader>
               <CardContent className="p-0">
                 <div className="h-[700px] w-full">
-                  {console.log('About to render Calendly iframe')}
                   <iframe
                     src="https://calendly.com/richies-schedule/scale"
                     width="100%"
