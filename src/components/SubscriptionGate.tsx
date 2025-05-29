@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Crown, Lock, Zap, BarChart3, MapPin, Calculator, DollarSign, User, TrendingUp, Star, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginDialog } from './LoginDialog';
-import { SubscriptionPricing } from './SubscriptionPricing';
+import { useNavigate } from 'react-router-dom';
 
 interface SubscriptionGateProps {
   children: React.ReactNode;
@@ -13,14 +14,14 @@ interface SubscriptionGateProps {
 
 export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
   const { user, isSubscribed } = useAuth();
-
-  const handleUpgrade = (promoCode?: string) => {
-    console.log('Upgrade requested with promo code:', promoCode);
-    // TODO: Implement actual payment processing
-  };
+  const navigate = useNavigate();
 
   const handleBookDemo = () => {
     window.open('https://calendly.com/richies-schedule/scale', '_blank');
+  };
+
+  const handleViewPricing = () => {
+    navigate('/pricing');
   };
 
   if (!user) {
@@ -222,12 +223,40 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
                 <p className="text-lg text-cyan-300/80 font-medium">By Richie Matthews</p>
               </div>
             </div>
-            <p className="text-xl text-gray-300">
+            <p className="text-xl text-gray-300 mb-6">
               Welcome {user.email}! Choose your plan to unlock your rental income potential.
             </p>
           </div>
 
-          <SubscriptionPricing onUpgrade={handleUpgrade} />
+          <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
+            <CardContent className="space-y-8 pt-8">
+              <div className="text-center space-y-6">
+                <h2 className="text-2xl font-bold text-cyan-300">Subscription Required</h2>
+                <p className="text-gray-300">
+                  You need an active subscription to access Rentalizer's powerful rental arbitrage tools.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button
+                    onClick={handleViewPricing}
+                    size="lg"
+                    className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-4 text-xl font-semibold"
+                  >
+                    View Pricing Plans
+                  </Button>
+                  
+                  <Button
+                    onClick={handleBookDemo}
+                    size="lg"
+                    variant="outline"
+                    className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 px-12 py-4 text-xl font-semibold"
+                  >
+                    Book Demo Call
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
