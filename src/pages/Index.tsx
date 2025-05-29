@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { BarChart3, MapPin, DollarSign, Calculator, User, LogIn, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginDialog } from '@/components/LoginDialog';
-import { SubscriptionPricing } from '@/components/SubscriptionPricing';
 import { Footer } from '@/components/Footer';
 import { TopNavBar } from '@/components/TopNavBar';
 import { useNavigate } from 'react-router-dom';
@@ -13,10 +12,6 @@ import { useNavigate } from 'react-router-dom';
 const Index = () => {
   const { user, isSubscribed } = useAuth();
   const navigate = useNavigate();
-
-  const handleUpgrade = (promoCode?: string) => {
-    console.log('Upgrade requested with promo code:', promoCode);
-  };
 
   const handleGetStarted = () => {
     window.open('https://04622531-a8c2-4857-b132-9017f45b7571.lovableproject.com/', '_blank');
@@ -291,9 +286,6 @@ const Index = () => {
               </CardContent>
             </Card>
           </div>
-
-          {/* Subscription Pricing */}
-          <SubscriptionPricing onUpgrade={handleUpgrade} />
         </div>
       </div>
 
