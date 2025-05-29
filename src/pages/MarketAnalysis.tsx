@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-import { BarChart3, MapPin, Search, Loader2, ArrowLeft, Map, Table2 } from 'lucide-react';
+import { BarChart3, MapPin, Search, Loader2, ArrowLeft, Map, Table2, Home } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
@@ -31,6 +32,7 @@ const MarketAnalysis = () => {
   const [submarketData, setSubmarketData] = useState<SubmarketData[]>([]);
   const [cityName, setCityName] = useState<string>('');
   const [targetCity, setTargetCity] = useState<string>('');
+  const [propertyType, setPropertyType] = useState<string>('2');
   const [isLoading, setIsLoading] = useState(false);
   const [apiConfig, setApiConfig] = useState<{ airdnaApiKey?: string; openaiApiKey?: string }>({});
 
@@ -50,9 +52,9 @@ const MarketAnalysis = () => {
 
     setIsLoading(true);
     try {
-      console.log(`🚀 Starting market analysis for: ${targetCity}`);
+      console.log(`🚀 Starting market analysis for: ${targetCity} (${propertyType}BR properties)`);
       
-      const marketData = await fetchMarketData(targetCity, apiConfig);
+      const marketData = await fetchMarketData(targetCity, apiConfig, propertyType);
       
       // Combine STR and rent data
       const combinedData: SubmarketData[] = marketData.strData.map(strItem => {
@@ -76,7 +78,7 @@ const MarketAnalysis = () => {
       
       toast({
         title: "Analysis Complete",
-        description: `Found ${combinedData.length} submarkets in ${targetCity}`,
+        description: `Found ${combinedData.length} submarkets in ${targetCity} for ${propertyType}BR properties`,
       });
 
     } catch (error) {
@@ -129,7 +131,8 @@ const MarketAnalysis = () => {
             {/* Property Type Badges */}
             <div className="flex items-center justify-center gap-4 mb-8">
               <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 px-4 py-2">
-                2BR/2BA Properties
+                <Home className="h-4 w-4 mr-1" />
+                1BR - 3BR Properties
               </Badge>
               <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 px-4 py-2">
                 Professional Data
@@ -169,6 +172,28 @@ const MarketAnalysis = () => {
                         onKeyPress={(e) => e.key === 'Enter' && handleMarketAnalysis()}
                       />
                     </div>
+
+                    <div className="w-full max-w-md">
+                      <Label htmlFor="property-type" className="text-sm font-medium text-gray-300">
+                        Property Type
+                      </Label>
+                      <Select value={propertyType} onValueChange={setPropertyType}>
+                        <SelectTrigger className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20">
+                          <SelectValue placeholder="Select property type" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-800 border-gray-700">
+                          <SelectItem value="1" className="text-gray-100 focus:bg-gray-700 focus:text-white">
+                            1 Bedroom Apartments
+                          </SelectItem>
+                          <SelectItem value="2" className="text-gray-100 focus:bg-gray-700 focus:text-white">
+                            2 Bedroom Apartments
+                          </SelectItem>
+                          <SelectItem value="3" className="text-gray-100 focus:bg-gray-700 focus:text-white">
+                            3 Bedroom Apartments
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                     
                     <Button
                       onClick={handleMarketAnalysis}
@@ -201,7 +226,10 @@ const MarketAnalysis = () => {
           {submarketData.length > 0 && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-cyan-300">Market Analysis Results</h2>
+                <div>
+                  <h2 className="text-2xl font-bold text-cyan-300">Market Analysis Results</h2>
+                  <p className="text-gray-400 mt-1">{propertyType}BR properties in {cityName}</p>
+                </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 px-3 py-1">
                     <Table2 className="h-4 w-4 mr-1" />

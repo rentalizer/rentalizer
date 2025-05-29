@@ -14,40 +14,111 @@ interface CityMarketData {
 }
 
 // Sample data - COMPREHENSIVE NEIGHBORHOOD SUBMARKETS with realistic values
-const sampleMarketDatabase: Record<string, CityMarketData> = {
+// Data organized by bedroom count for more accurate pricing
+const sampleMarketDatabase: Record<string, Record<string, CityMarketData>> = {
   'nashville': {
-    strData: [
-      { submarket: 'Downtown Nashville', revenue: 6800 },
-      { submarket: 'The Gulch', revenue: 6200 },
-      { submarket: 'East Nashville', revenue: 5400 },
-      { submarket: '12 South', revenue: 5000 },
-      { submarket: 'Midtown', revenue: 4800 },
-      { submarket: 'Music Row', revenue: 4400 },
-      { submarket: 'Germantown', revenue: 4600 },
-      { submarket: 'Green Hills', revenue: 4800 },
-      { submarket: 'Belle Meade', revenue: 5200 },
-      { submarket: 'Vanderbilt Area', revenue: 4700 },
-      { submarket: 'Sobro', revenue: 5800 },
-      { submarket: 'The Nations', revenue: 4300 },
-      { submarket: 'Sylvan Park', revenue: 4500 },
-      { submarket: 'Berry Hill', revenue: 4200 }
-    ],
-    rentData: [
-      { submarket: 'Downtown Nashville', rent: 2600 },
-      { submarket: 'The Gulch', rent: 2500 },
-      { submarket: 'East Nashville', rent: 2400 },
-      { submarket: '12 South', rent: 2200 },
-      { submarket: 'Midtown', rent: 2300 },
-      { submarket: 'Music Row', rent: 2150 },
-      { submarket: 'Germantown', rent: 2100 },
-      { submarket: 'Green Hills', rent: 2200 },
-      { submarket: 'Belle Meade', rent: 2400 },
-      { submarket: 'Vanderbilt Area', rent: 2150 },
-      { submarket: 'Sobro', rent: 2600 },
-      { submarket: 'The Nations', rent: 1950 },
-      { submarket: 'Sylvan Park', rent: 2000 },
-      { submarket: 'Berry Hill', rent: 1900 }
-    ]
+    '1': {
+      strData: [
+        { submarket: 'Downtown Nashville', revenue: 4800 },
+        { submarket: 'The Gulch', revenue: 4400 },
+        { submarket: 'East Nashville', revenue: 3800 },
+        { submarket: '12 South', revenue: 3500 },
+        { submarket: 'Midtown', revenue: 3400 },
+        { submarket: 'Music Row', revenue: 3200 },
+        { submarket: 'Germantown', revenue: 3300 },
+        { submarket: 'Green Hills', revenue: 3400 },
+        { submarket: 'Belle Meade', revenue: 3700 },
+        { submarket: 'Vanderbilt Area', revenue: 3300 },
+        { submarket: 'Sobro', revenue: 4100 },
+        { submarket: 'The Nations', revenue: 3100 },
+        { submarket: 'Sylvan Park', revenue: 3200 },
+        { submarket: 'Berry Hill', revenue: 3000 }
+      ],
+      rentData: [
+        { submarket: 'Downtown Nashville', rent: 1800 },
+        { submarket: 'The Gulch', rent: 1750 },
+        { submarket: 'East Nashville', rent: 1650 },
+        { submarket: '12 South', rent: 1500 },
+        { submarket: 'Midtown', rent: 1600 },
+        { submarket: 'Music Row', rent: 1450 },
+        { submarket: 'Germantown', rent: 1400 },
+        { submarket: 'Green Hills', rent: 1500 },
+        { submarket: 'Belle Meade', rent: 1650 },
+        { submarket: 'Vanderbilt Area', rent: 1450 },
+        { submarket: 'Sobro', rent: 1800 },
+        { submarket: 'The Nations', rent: 1300 },
+        { submarket: 'Sylvan Park', rent: 1350 },
+        { submarket: 'Berry Hill', rent: 1250 }
+      ]
+    },
+    '2': {
+      strData: [
+        { submarket: 'Downtown Nashville', revenue: 6800 },
+        { submarket: 'The Gulch', revenue: 6200 },
+        { submarket: 'East Nashville', revenue: 5400 },
+        { submarket: '12 South', revenue: 5000 },
+        { submarket: 'Midtown', revenue: 4800 },
+        { submarket: 'Music Row', revenue: 4400 },
+        { submarket: 'Germantown', revenue: 4600 },
+        { submarket: 'Green Hills', revenue: 4800 },
+        { submarket: 'Belle Meade', revenue: 5200 },
+        { submarket: 'Vanderbilt Area', revenue: 4700 },
+        { submarket: 'Sobro', revenue: 5800 },
+        { submarket: 'The Nations', revenue: 4300 },
+        { submarket: 'Sylvan Park', revenue: 4500 },
+        { submarket: 'Berry Hill', revenue: 4200 }
+      ],
+      rentData: [
+        { submarket: 'Downtown Nashville', rent: 2600 },
+        { submarket: 'The Gulch', rent: 2500 },
+        { submarket: 'East Nashville', rent: 2400 },
+        { submarket: '12 South', rent: 2200 },
+        { submarket: 'Midtown', rent: 2300 },
+        { submarket: 'Music Row', rent: 2150 },
+        { submarket: 'Germantown', rent: 2100 },
+        { submarket: 'Green Hills', rent: 2200 },
+        { submarket: 'Belle Meade', rent: 2400 },
+        { submarket: 'Vanderbilt Area', rent: 2150 },
+        { submarket: 'Sobro', rent: 2600 },
+        { submarket: 'The Nations', rent: 1950 },
+        { submarket: 'Sylvan Park', rent: 2000 },
+        { submarket: 'Berry Hill', rent: 1900 }
+      ]
+    },
+    '3': {
+      strData: [
+        { submarket: 'Downtown Nashville', revenue: 8800 },
+        { submarket: 'The Gulch', revenue: 8200 },
+        { submarket: 'East Nashville', revenue: 7200 },
+        { submarket: '12 South', revenue: 6800 },
+        { submarket: 'Midtown', revenue: 6500 },
+        { submarket: 'Music Row', revenue: 6000 },
+        { submarket: 'Germantown', revenue: 6200 },
+        { submarket: 'Green Hills', revenue: 6500 },
+        { submarket: 'Belle Meade', revenue: 7000 },
+        { submarket: 'Vanderbilt Area', revenue: 6300 },
+        { submarket: 'Sobro', revenue: 7800 },
+        { submarket: 'The Nations', revenue: 5800 },
+        { submarket: 'Sylvan Park', revenue: 6000 },
+        { submarket: 'Berry Hill', revenue: 5600 }
+      ],
+      rentData: [
+        { submarket: 'Downtown Nashville', rent: 3400 },
+        { submarket: 'The Gulch', rent: 3300 },
+        { submarket: 'East Nashville', rent: 3200 },
+        { submarket: '12 South', rent: 2900 },
+        { submarket: 'Midtown', rent: 3000 },
+        { submarket: 'Music Row', rent: 2800 },
+        { submarket: 'Germantown', rent: 2750 },
+        { submarket: 'Green Hills', rent: 2900 },
+        { submarket: 'Belle Meade', rent: 3200 },
+        { submarket: 'Vanderbilt Area', rent: 2800 },
+        { submarket: 'Sobro', rent: 3400 },
+        { submarket: 'The Nations', rent: 2600 },
+        { submarket: 'Sylvan Park', rent: 2650 },
+        { submarket: 'Berry Hill', rent: 2500 }
+      ]
+    }
   },
   'miami': {
     strData: [
@@ -223,17 +294,17 @@ export interface ApiConfig {
   openaiApiKey?: string;
 }
 
-// AirDNA Market Data API - using market data endpoint instead of individual listings
-export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Promise<StrData[]> => {
-  console.log(`🔍 Fetching AirDNA MARKET data for ${city} - APARTMENTS ONLY`);
+// AirDNA Market Data API - updated to handle bedroom count
+export const fetchAirDNAListingsData = async (city: string, apiKey?: string, bedrooms: string = '2'): Promise<StrData[]> => {
+  console.log(`🔍 Fetching AirDNA MARKET data for ${city} - ${bedrooms}BR APARTMENTS ONLY`);
   console.log(`🔑 API Key provided: ${apiKey ? 'Yes' : 'No'}`);
   
   if (apiKey) {
     try {
-      console.log(`📡 Using AirDNA Market Data API - APARTMENTS ONLY`);
+      console.log(`📡 Using AirDNA Market Data API - ${bedrooms}BR APARTMENTS ONLY`);
       
       // Try AirDNA market data endpoint first (more appropriate for market analysis)
-      const marketResponse = await fetch(`https://airdna1.p.rapidapi.com/market?location=${encodeURIComponent(city)}&property_type=apartment&bedrooms=2`, {
+      const marketResponse = await fetch(`https://airdna1.p.rapidapi.com/market?location=${encodeURIComponent(city)}&property_type=apartment&bedrooms=${bedrooms}`, {
         method: 'GET',
         headers: {
           'X-RapidAPI-Key': apiKey,
@@ -295,7 +366,9 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
                 const occupancy = typeof submarket.occupancy === 'string' ? parseFloat(submarket.occupancy.replace(/[^0-9.]/g, '')) / 100 : submarket.occupancy;
                 monthlyRevenue = Math.round(adr * 30 * occupancy);
               } else {
-                monthlyRevenue = 4500 + (index * 300); // Fallback with variation
+                // Adjust fallback revenue based on bedroom count
+                const baseRevenue = bedrooms === '1' ? 3500 : bedrooms === '3' ? 6500 : 4500;
+                monthlyRevenue = baseRevenue + (index * 300);
               }
               
               const submarketName = submarket.name || 
@@ -322,7 +395,7 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
         // If market endpoint fails, try the properties endpoint but filter for immediate area
         console.log(`🔄 Trying properties endpoint for immediate area...`);
         
-        const propertiesResponse = await fetch(`https://airdna1.p.rapidapi.com/properties?location=${encodeURIComponent(city)}&accommodates=6&bedrooms=2&property_type=apartment`, {
+        const propertiesResponse = await fetch(`https://airdna1.p.rapidapi.com/properties?location=${encodeURIComponent(city)}&accommodates=${parseInt(bedrooms) * 2}&bedrooms=${bedrooms}&property_type=apartment`, {
           method: 'GET',
           headers: {
             'X-RapidAPI-Key': apiKey,
@@ -418,38 +491,41 @@ export const fetchAirDNAListingsData = async (city: string, apiKey?: string): Pr
   }
   
   // Fallback to comprehensive sample data (always works)
-  console.log('📋 Using comprehensive sample STR data');
+  console.log(`📋 Using comprehensive sample STR data for ${bedrooms}BR`);
   const cityKey = city.toLowerCase().trim().replace(/,.*/, '');
   
-  const cityData = sampleMarketDatabase[cityKey];
+  const cityData = sampleMarketDatabase[cityKey]?.[bedrooms];
   
   if (cityData) {
-    console.log(`✅ Found comprehensive sample data for ${city}`);
+    console.log(`✅ Found comprehensive sample data for ${city} (${bedrooms}BR)`);
     return cityData.strData;
   }
   
-  // If no sample data, generate realistic comprehensive data
-  console.log(`🎲 Generating comprehensive sample data for ${city}`);
+  // If no sample data, generate realistic comprehensive data based on bedroom count
+  console.log(`🎲 Generating comprehensive sample data for ${city} (${bedrooms}BR)`);
   
   const addressParts = city.split(',');
   const cityName = addressParts[1]?.trim() || addressParts[0];
   
+  // Adjust revenue based on bedroom count
+  const revenueMultiplier = bedrooms === '1' ? 0.7 : bedrooms === '3' ? 1.4 : 1.0;
+  
   return [
-    { submarket: `Downtown ${cityName}`, revenue: 6200 },
-    { submarket: `${cityName} Core`, revenue: 5800 },
-    { submarket: `Urban ${cityName}`, revenue: 5400 },
-    { submarket: `${cityName} Center`, revenue: 4900 },
-    { submarket: `${cityName} Heights`, revenue: 4600 },
-    { submarket: `East ${cityName}`, revenue: 4400 },
-    { submarket: `West ${cityName}`, revenue: 4300 },
-    { submarket: `North ${cityName}`, revenue: 4200 },
-    { submarket: `South ${cityName}`, revenue: 4100 }
+    { submarket: `Downtown ${cityName}`, revenue: Math.round(6200 * revenueMultiplier) },
+    { submarket: `${cityName} Core`, revenue: Math.round(5800 * revenueMultiplier) },
+    { submarket: `Urban ${cityName}`, revenue: Math.round(5400 * revenueMultiplier) },
+    { submarket: `${cityName} Center`, revenue: Math.round(4900 * revenueMultiplier) },
+    { submarket: `${cityName} Heights`, revenue: Math.round(4600 * revenueMultiplier) },
+    { submarket: `East ${cityName}`, revenue: Math.round(4400 * revenueMultiplier) },
+    { submarket: `West ${cityName}`, revenue: Math.round(4300 * revenueMultiplier) },
+    { submarket: `North ${cityName}`, revenue: Math.round(4200 * revenueMultiplier) },
+    { submarket: `South ${cityName}`, revenue: Math.round(4100 * revenueMultiplier) }
   ];
 };
 
-// AI-powered rental data fetching (unchanged)
-export const fetchRentalDataWithAI = async (city: string, submarkets: string[], apiKey?: string): Promise<RentData[]> => {
-  console.log(`🤖 Fetching rental data for ${city} submarkets using AI`);
+// AI-powered rental data fetching (updated to handle bedroom count)
+export const fetchRentalDataWithAI = async (city: string, submarkets: string[], apiKey?: string, bedrooms: string = '2'): Promise<RentData[]> => {
+  console.log(`🤖 Fetching rental data for ${city} submarkets using AI (${bedrooms}BR)`);
   
   if (apiKey) {
     try {
@@ -464,11 +540,11 @@ export const fetchRentalDataWithAI = async (city: string, submarkets: string[], 
           messages: [
             {
               role: 'system',
-              content: 'You are a real estate data expert. Provide current median rent data for 2BR/2BA apartments in specific submarkets. Return data in JSON format with exact submarket names and monthly rent amounts.'
+              content: 'You are a real estate data expert. Provide current median rent data for apartments in specific submarkets. Return data in JSON format with exact submarket names and monthly rent amounts.'
             },
             {
               role: 'user',
-              content: `Find current median monthly rent for 2BR/2BA apartments in these ${city} submarkets: ${submarkets.join(', ')}. Return as JSON array with format: [{"submarket": "exact name", "rent": number}]`
+              content: `Find current median monthly rent for ${bedrooms}BR apartments in these ${city} submarkets: ${submarkets.join(', ')}. Return as JSON array with format: [{"submarket": "exact name", "rent": number}]`
             }
           ],
           temperature: 0.2,
@@ -496,41 +572,44 @@ export const fetchRentalDataWithAI = async (city: string, submarkets: string[], 
   }
   
   // Fallback to sample data
-  console.log('📋 Using sample rental data');
+  console.log(`📋 Using sample rental data for ${bedrooms}BR`);
   const cityKey = city.toLowerCase().trim().replace(/,.*/, '');
-  const cityData = sampleMarketDatabase[cityKey];
+  const cityData = sampleMarketDatabase[cityKey]?.[bedrooms];
   
   if (cityData) {
     return cityData.rentData;
   }
   
-  // Generate matching rental data for the submarkets
+  // Generate matching rental data for the submarkets based on bedroom count
+  const rentMultiplier = bedrooms === '1' ? 0.7 : bedrooms === '3' ? 1.4 : 1.0;
+  const baseRent = 2000;
+  
   return submarkets.map(submarket => ({
     submarket,
-    rent: Math.round(2000 + Math.random() * 800) // Random rent between $2000-$2800
+    rent: Math.round((baseRent + Math.random() * 800) * rentMultiplier) // Adjust rent based on bedroom count
   }));
 };
 
-// Main market data fetching function - updated with better error handling
-export const fetchMarketData = async (city: string, config: ApiConfig = {}): Promise<CityMarketData> => {
+// Main market data fetching function - updated with bedroom parameter
+export const fetchMarketData = async (city: string, config: ApiConfig = {}, bedrooms: string = '2'): Promise<CityMarketData> => {
   try {
-    console.log(`🚀 Starting market analysis for ${city}`);
+    console.log(`🚀 Starting market analysis for ${city} (${bedrooms}BR properties)`);
     console.log(`🔧 API Configuration:`, { 
       hasAirDNAKey: !!config.airdnaApiKey, 
       hasOpenAIKey: !!config.openaiApiKey 
     });
     
     // Fetch STR data using AirDNA API (with fallback to sample data)
-    const strData = await fetchAirDNAListingsData(city, config.airdnaApiKey);
+    const strData = await fetchAirDNAListingsData(city, config.airdnaApiKey, bedrooms);
     
     // Extract submarket names for rental data lookup
     const submarkets = strData.map(item => item.submarket);
     console.log(`🏘️ Found submarkets: ${submarkets.join(', ')}`);
     
     // Fetch rental data using AI or fallback
-    const rentData = await fetchRentalDataWithAI(city, submarkets, config.openaiApiKey);
+    const rentData = await fetchRentalDataWithAI(city, submarkets, config.openaiApiKey, bedrooms);
     
-    console.log(`✅ Market analysis complete for ${city}`);
+    console.log(`✅ Market analysis complete for ${city} (${bedrooms}BR properties)`);
     return { strData, rentData };
     
   } catch (error) {
