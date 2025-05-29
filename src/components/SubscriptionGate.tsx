@@ -43,7 +43,7 @@ export const SubscriptionGate = ({ children }: SubscriptionGateProps) => {
               </div>
             </div>
             <p className="text-3xl text-cyan-100 mb-6 max-w-4xl mx-auto leading-tight">
-              The All-In-One AI System To Earn Rental Income—No Mortgage Needed
+              AI System To Earn Rental Income—No Mortgage Needed
             </p>
           </div>
 

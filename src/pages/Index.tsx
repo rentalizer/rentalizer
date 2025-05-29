@@ -43,7 +43,7 @@ const Index = () => {
               </div>
               <p className="text-lg text-cyan-300/80 font-medium mb-8">By Richie Matthews</p>
               <p className="text-2xl text-slate-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-                The All-In-One AI System To Earn Rental Income—No Mortgage Needed
+                AI System To Earn Rental Income—No Mortgage Needed
               </p>
 
               <div className="mb-12">
@@ -171,7 +171,7 @@ const Index = () => {
             </div>
             <p className="text-lg text-cyan-300/80 font-medium mb-8">By Richie Matthews</p>
             <p className="text-2xl text-slate-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              The All-In-One AI System To Earn Rental Income—No Mortgage Needed
+              AI System To Earn Rental Income—No Mortgage Needed
             </p>
           </div>
 
