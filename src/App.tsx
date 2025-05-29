@@ -16,6 +16,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import AnimationDraft from "./pages/AnimationDraft";
 import Test from "./pages/Test";
+import Pricing from "./pages/Pricing";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const AppRoutes = () => (
         <Index />
       </SubscriptionGate>
     } />
+    <Route path="/pricing" element={<Pricing />} />
     <Route path="/markets" element={
       <SubscriptionGate>
         <AccessGate
