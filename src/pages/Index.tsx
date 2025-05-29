@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, MapPin, DollarSign, Calculator, User } from 'lucide-react';
+import { BarChart3, MapPin, DollarSign, Calculator, User, LogIn, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginDialog } from '@/components/LoginDialog';
 import { SubscriptionPricing } from '@/components/SubscriptionPricing';
@@ -168,7 +167,7 @@ const Index = () => {
   }
 
   // For non-authenticated users OR authenticated but non-subscribed users
-  // Show the landing page with subscription options
+  // Show the landing page with separate Get Started and Login buttons
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
       {/* Top Navigation Bar for authenticated users */}
@@ -195,14 +194,26 @@ const Index = () => {
               AI System To Earn Rental Income—No Mortgage Needed
             </p>
 
-            <div className="mb-12">
+            {/* Two Button Layout */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              <Button 
+                size="lg"
+                onClick={() => navigate('/pricing')}
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-4 text-lg font-semibold"
+              >
+                <ArrowRight className="h-5 w-5 mr-2" />
+                Get Started
+              </Button>
+              
               <LoginDialog 
                 trigger={
                   <Button 
                     size="lg"
-                    className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-4 text-lg font-semibold"
+                    variant="outline"
+                    className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 px-8 py-4 text-lg font-semibold"
                   >
-                    Get Started Free
+                    <LogIn className="h-5 w-5 mr-2" />
+                    Login
                   </Button>
                 }
               />
