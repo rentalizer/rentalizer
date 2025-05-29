@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, ArrowRight, LogIn, ExternalLink, LayoutDashboard, MapPin, Calculator, User, DollarSign } from 'lucide-react';
+import { BarChart3, ArrowRight, LogIn, MapPin, Calculator, User, DollarSign } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +12,11 @@ const LandingPage = () => {
 
   const handleGetStarted = () => {
     console.log('Get Started button clicked - navigating to demo page');
+    navigate('/demo');
+  };
+
+  const handleFeatureClick = (feature: string) => {
+    console.log(`${feature} clicked - navigating to demo page for public users`);
     navigate('/demo');
   };
 
@@ -28,14 +33,6 @@ const LandingPage = () => {
 
             {/* Navigation */}
             <nav className="flex items-center gap-6">
-              <Button
-                variant="ghost"
-                onClick={() => navigate('/dashboard')}
-                className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
-              >
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                Dashboard
-              </Button>
               <LoginDialog 
                 trigger={
                   <Button 
@@ -106,7 +103,7 @@ const LandingPage = () => {
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => navigate('/markets')}
+                onClick={() => handleFeatureClick('Market Intelligence')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
@@ -123,7 +120,7 @@ const LandingPage = () => {
                 </CardContent>
               </Card>
               <Button
-                onClick={() => navigate('/markets')}
+                onClick={() => handleFeatureClick('Market Intelligence')}
                 className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
               >
                 <MapPin className="h-4 w-4 mr-2" />
@@ -134,7 +131,7 @@ const LandingPage = () => {
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => navigate('/calculator')}
+                onClick={() => handleFeatureClick('Calculator')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
@@ -151,7 +148,7 @@ const LandingPage = () => {
                 </CardContent>
               </Card>
               <Button
-                onClick={() => navigate('/calculator')}
+                onClick={() => handleFeatureClick('Calculator')}
                 className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
               >
                 <Calculator className="h-4 w-4 mr-2" />
@@ -162,7 +159,7 @@ const LandingPage = () => {
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => navigate('/deals')}
+                onClick={() => handleFeatureClick('Acquisitions Agent')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
@@ -179,7 +176,7 @@ const LandingPage = () => {
                 </CardContent>
               </Card>
               <Button
-                onClick={() => navigate('/deals')}
+                onClick={() => handleFeatureClick('Acquisitions Agent')}
                 className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
               >
                 <User className="h-4 w-4 mr-2" />
@@ -190,7 +187,7 @@ const LandingPage = () => {
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => navigate('/front-desk')}
+                onClick={() => handleFeatureClick('Front Desk')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
@@ -207,7 +204,7 @@ const LandingPage = () => {
                 </CardContent>
               </Card>
               <Button
-                onClick={() => navigate('/front-desk')}
+                onClick={() => handleFeatureClick('Front Desk')}
                 className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
               >
                 <DollarSign className="h-4 w-4 mr-2" />
