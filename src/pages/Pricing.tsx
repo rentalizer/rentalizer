@@ -59,7 +59,7 @@ const Pricing = () => {
                   </CardTitle>
                 </div>
                 <div className="text-4xl font-bold text-white mb-2">
-                  $97<span className="text-lg text-gray-400">/month</span>
+                  $1,950<span className="text-lg text-gray-400">/month</span>
                 </div>
                 <p className="text-gray-400">Perfect for getting started</p>
               </CardHeader>
@@ -108,7 +108,7 @@ const Pricing = () => {
                   </CardTitle>
                 </div>
                 <div className="text-4xl font-bold text-white mb-2">
-                  $197<span className="text-lg text-gray-400">/month</span>
+                  $2,950<span className="text-lg text-gray-400">/month</span>
                 </div>
                 <p className="text-gray-400">Complete rental arbitrage solution</p>
               </CardHeader>
