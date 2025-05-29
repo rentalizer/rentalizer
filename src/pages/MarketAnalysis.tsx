@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-import { BarChart3, MapPin, Search, Loader2, ArrowLeft, Map, Table2, Home } from 'lucide-react';
+import { BarChart3, MapPin, Search, Loader2, ArrowLeft, Map, Table2, Home, Download } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
@@ -17,6 +16,7 @@ import { Footer } from '@/components/Footer';
 import { fetchMarketData } from '@/services/marketDataService';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { exportToCSV } from '@/utils/dataExport';
 
 interface SubmarketData {
   submarket: string;
@@ -94,6 +94,25 @@ const MarketAnalysis = () => {
     }
   };
 
+  const handleExportData = () => {
+    if (submarketData.length === 0) {
+      toast({
+        title: "No Data to Export",
+        description: "Please run a market analysis first to generate data.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const filename = `${cityName.toLowerCase().replace(/\s+/g, '-')}-market-analysis-${propertyType}br-${bathrooms}ba`;
+    exportToCSV(submarketData, filename);
+    
+    toast({
+      title: "Data Exported",
+      description: `Market analysis data for ${cityName} has been downloaded as CSV.`,
+    });
+  };
+
   const getBathroomOptions = () => {
     if (propertyType === '1') {
       return [{ value: '1', label: '1 Bathroom' }];
@@ -146,7 +165,7 @@ const MarketAnalysis = () => {
             
             <div className="flex items-center justify-center gap-5 mb-8">
               <BarChart3 className="h-16 w-16 text-cyan-400" />
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent px-4">
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 Market Intelligence
               </h1>
             </div>
@@ -289,6 +308,15 @@ const MarketAnalysis = () => {
                     <Map className="h-4 w-4 mr-1" />
                     Map View
                   </Badge>
+                  <Button
+                    onClick={handleExportData}
+                    variant="outline"
+                    size="sm"
+                    className="border-green-500/30 text-green-300 hover:bg-green-500/10"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Export CSV
+                  </Button>
                 </div>
               </div>
 
