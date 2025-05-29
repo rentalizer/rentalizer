@@ -203,13 +203,13 @@ const MarketAnalysis = () => {
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-cyan-300">Market Analysis Results</h2>
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 px-3 py-1">
-                    <Map className="h-4 w-4 mr-1" />
-                    Map View
-                  </Badge>
                   <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 px-3 py-1">
                     <Table2 className="h-4 w-4 mr-1" />
                     Table View
+                  </Badge>
+                  <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 px-3 py-1">
+                    <Map className="h-4 w-4 mr-1" />
+                    Map View
                   </Badge>
                 </div>
               </div>
@@ -217,19 +217,6 @@ const MarketAnalysis = () => {
               <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
                 <CardContent className="p-0">
                   <ResizablePanelGroup direction="horizontal" className="min-h-[700px]">
-                    {/* Map View Panel */}
-                    <ResizablePanel defaultSize={60} minSize={40}>
-                      <div className="h-full p-4">
-                        <div className="flex items-center gap-2 mb-4">
-                          <Map className="h-5 w-5 text-cyan-400" />
-                          <h3 className="text-lg font-semibold text-cyan-300">Map View</h3>
-                        </div>
-                        <MapView results={submarketData} city={cityName} />
-                      </div>
-                    </ResizablePanel>
-
-                    <ResizableHandle withHandle />
-
                     {/* Table View Panel */}
                     <ResizablePanel defaultSize={40} minSize={30}>
                       <div className="h-full p-4">
@@ -240,6 +227,19 @@ const MarketAnalysis = () => {
                         <div className="h-[620px] overflow-hidden">
                           <ResultsTable results={submarketData} city={cityName} />
                         </div>
+                      </div>
+                    </ResizablePanel>
+
+                    <ResizableHandle withHandle />
+
+                    {/* Map View Panel */}
+                    <ResizablePanel defaultSize={60} minSize={40}>
+                      <div className="h-full p-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Map className="h-5 w-5 text-cyan-400" />
+                          <h3 className="text-lg font-semibold text-cyan-300">Map View</h3>
+                        </div>
+                        <MapView results={submarketData} city={cityName} />
                       </div>
                     </ResizablePanel>
                   </ResizablePanelGroup>
