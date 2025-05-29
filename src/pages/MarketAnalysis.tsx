@@ -208,7 +208,7 @@ const MarketAnalysis = () => {
                           <SelectTrigger className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20">
                             <SelectValue placeholder="Select property type" />
                           </SelectTrigger>
-                          <SelectContent className="bg-gray-800 border-gray-700">
+                          <SelectContent className="bg-gray-800 border-gray-700 z-50">
                             <SelectItem value="1" className="text-gray-100 focus:bg-gray-700 focus:text-white">
                               1 Bedroom
                             </SelectItem>
@@ -230,7 +230,7 @@ const MarketAnalysis = () => {
                           <SelectTrigger className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20">
                             <SelectValue placeholder="Select bathrooms" />
                           </SelectTrigger>
-                          <SelectContent className="bg-gray-800 border-gray-700">
+                          <SelectContent className="bg-gray-800 border-gray-700 z-50">
                             {getBathroomOptions().map((option) => (
                               <SelectItem 
                                 key={option.value} 
