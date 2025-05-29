@@ -3,15 +3,12 @@ import { Button } from '@/components/ui/button';
 import { BarChart3, ArrowRight, LogIn, ExternalLink } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
-import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
-  const navigate = useNavigate();
-
   const handleGetStarted = () => {
-    console.log('Get Started button clicked - navigating to dashboard');
-    // Navigate to the local dashboard
-    navigate('/dashboard');
+    console.log('Get Started button clicked - opening demo page');
+    // Open the external demo page in a new tab
+    window.open('https://04622531-a8c2-4857-b132-9017f45b7571.lovableproject.com/', '_blank');
   };
 
   return (
