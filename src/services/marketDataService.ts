@@ -24,17 +24,18 @@ const fetchAirDNAData = async (city: string, apiKey: string, propertyType: strin
   try {
     console.log(`🔗 Calling AirDNA API for ${city} (${propertyType}BR/${bathrooms}BA)`);
     
-    const response = await fetch(`https://api.airdna.co/v1/market/property_type_data`, {
+    const params = new URLSearchParams({
+      location: city,
+      property_type: `${propertyType}br_${bathrooms}ba`,
+      metrics: 'revenue,occupancy,adr'
+    });
+
+    const response = await fetch(`https://api.airdna.co/v1/market/property_type_data?${params.toString()}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-      },
-      params: new URLSearchParams({
-        location: city,
-        property_type: `${propertyType}br_${bathrooms}ba`,
-        metrics: 'revenue,occupancy,adr'
-      })
+      }
     });
 
     if (!response.ok) {
@@ -61,18 +62,18 @@ const fetchRentData = async (city: string, propertyType: string, bathrooms: stri
   try {
     console.log(`🏠 Fetching rent data for ${city} (${propertyType}BR/${bathrooms}BA)`);
     
-    // Using RentSpree API or similar rent data service
-    const response = await fetch(`https://api.rentspree.com/v1/market/rent_data`, {
+    const params = new URLSearchParams({
+      city: city,
+      bedrooms: propertyType,
+      bathrooms: bathrooms,
+      property_type: 'apartment'
+    });
+
+    const response = await fetch(`https://api.rentspree.com/v1/market/rent_data?${params.toString()}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-      },
-      params: new URLSearchParams({
-        city: city,
-        bedrooms: propertyType,
-        bathrooms: bathrooms,
-        property_type: 'apartment'
-      })
+      }
     });
 
     if (!response.ok) {
