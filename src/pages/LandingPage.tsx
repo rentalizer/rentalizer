@@ -1,14 +1,17 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { BarChart3, ArrowRight, LogIn, ExternalLink } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
+import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+
   const handleGetStarted = () => {
-    console.log('Get Started button clicked - opening demo page');
-    // Open the external demo page in a new tab
-    window.open('https://04622531-a8c2-4857-b132-9017f45b7571.lovableproject.com/', '_blank');
+    console.log('Get Started button clicked - navigating to demo page');
+    navigate('/demo');
   };
 
   return (
@@ -43,7 +46,7 @@ const LandingPage = () => {
                 onClick={handleGetStarted}
                 className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-6 text-xl font-semibold min-w-[200px]"
               >
-                <ExternalLink className="h-6 w-6 mr-3" />
+                <ArrowRight className="h-6 w-6 mr-3" />
                 Get Started
               </Button>
               
