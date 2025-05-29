@@ -2,9 +2,12 @@
 project_id = "bmemylmcbmrieheutktb"
 
 [auth]
-# Use the actual preview URL instead of localhost
-site_url = "https://inspiring-genie-a1691.lovable.app"
+# Use the production domain
+site_url = "https://rentalizer.ai"
 additional_redirect_urls = [
+  "https://rentalizer.ai/reset-password",
+  "https://rentalizer.ai/**",
+  "https://inspiring-genie-a1691.lovable.app",
   "https://inspiring-genie-a1691.lovable.app/reset-password",
   "https://inspiring-genie-a1691.lovable.app/**"
 ]
