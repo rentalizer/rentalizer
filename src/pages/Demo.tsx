@@ -1,15 +1,43 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, Calendar, ArrowLeft } from 'lucide-react';
+import { BarChart3, Calendar, ArrowLeft, MapPin, Calculator, User, DollarSign, CheckCircle, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
 const Demo = () => {
-  console.log('Demo component is rendering');
   const navigate = useNavigate();
 
-  console.log('Demo component navigate function:', navigate);
+  const features = [
+    {
+      icon: MapPin,
+      title: "Market Intelligence",
+      description: "Find the best rental arbitrage markets with AI-powered analysis"
+    },
+    {
+      icon: Calculator,
+      title: "ROI Calculator",
+      description: "Assess property profitability and return on investment instantly"
+    },
+    {
+      icon: User,
+      title: "Acquisitions Agent",
+      description: "AI agent to contact landlords and close deals automatically"
+    },
+    {
+      icon: DollarSign,
+      title: "Property Management",
+      description: "Automated front desk operations and guest communications"
+    }
+  ];
+
+  const benefits = [
+    "No mortgage required - start with rental arbitrage",
+    "AI-powered market analysis and deal sourcing",
+    "Automated guest communication and management",
+    "Proven ROI calculation and profit optimization",
+    "24/7 property management automation"
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
@@ -25,10 +53,7 @@ const Demo = () => {
           <div className="text-center mb-12">
             <Button
               variant="ghost"
-              onClick={() => {
-                console.log('Back button clicked');
-                navigate('/');
-              }}
+              onClick={() => navigate('/')}
               className="mb-8 text-cyan-300 hover:text-cyan-200"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -47,14 +72,69 @@ const Demo = () => {
             </p>
           </div>
 
-          {/* Calendly Embed */}
+          {/* Features Overview */}
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold text-center text-cyan-300 mb-8">What You'll See in the Demo</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {features.map((feature, index) => (
+                <Card key={index} className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300">
+                  <CardHeader className="text-center pb-4">
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-cyan-500/10 flex items-center justify-center">
+                      <feature.icon className="h-6 w-6 text-cyan-400" />
+                    </div>
+                    <CardTitle className="text-cyan-300 text-lg">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <p className="text-slate-400 text-sm">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Benefits Section */}
+          <div className="mb-16">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-3xl font-bold text-cyan-300 mb-6">Why Choose Rentalizer?</h2>
+                <div className="space-y-4">
+                  {benefits.map((benefit, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" />
+                      <p className="text-slate-300">{benefit}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <Card className="bg-slate-800/50 border-purple-500/20 backdrop-blur-lg">
+                <CardHeader>
+                  <CardTitle className="text-purple-300 flex items-center gap-2">
+                    <Star className="h-5 w-5" />
+                    Success Story
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <blockquote className="text-slate-300 italic mb-4">
+                    "Rentalizer helped me identify profitable markets and automate my rental arbitrage business. 
+                    I went from zero to $5,000/month in rental income within 6 months - all without buying property!"
+                  </blockquote>
+                  <p className="text-cyan-400 font-medium">- Sarah K., Rental Arbitrage Entrepreneur</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Demo Booking Section */}
           <div className="max-w-4xl mx-auto">
             <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl text-cyan-300 flex items-center justify-center gap-3">
                   <Calendar className="h-8 w-8" />
-                  Schedule Your Demo Call
+                  Schedule Your Personalized Demo
                 </CardTitle>
+                <p className="text-slate-400 mt-2">
+                  Book a 30-minute call to see Rentalizer in action and learn how it can work for your situation
+                </p>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="h-[700px] w-full">
