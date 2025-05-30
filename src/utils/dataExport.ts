@@ -28,7 +28,7 @@ export const exportToCSV = (data: ExportData[], filename: string = 'market-analy
   
   data.forEach(submarketData => {
     months.forEach((month) => {
-      // Use the actual revenue as-is, no seasonal factors
+      // Use the actual STR revenue from the market analysis as-is
       const actualMonthlyRevenue = submarketData.strRevenue;
       
       // Add 25% to the actual revenue
