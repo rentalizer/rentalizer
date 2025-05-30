@@ -7,31 +7,15 @@ interface ExportData {
 }
 
 export const exportToCSV = (data: ExportData[], filename: string = 'market-analysis') => {
-  // Generate 12 months of data for each submarket with realistic seasonal variations
+  // Generate 12 months of data for each submarket using actual revenue data
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
   
-  // Seasonal multipliers based on typical STR patterns (higher in summer/holidays)
-  const seasonalMultipliers = [
-    0.85, // January - lower after holidays
-    0.80, // February - lowest month
-    0.90, // March - spring pickup
-    0.95, // April - spring continues
-    1.05, // May - good weather starts
-    1.20, // June - peak summer begins
-    1.25, // July - peak summer
-    1.22, // August - still peak
-    1.10, // September - good weather continues
-    1.00, // October - baseline
-    0.95, // November - cooling down
-    1.15  // December - holiday boost
-  ];
-  
   const currentYear = new Date().getFullYear();
   
-  // Create expanded data with seasonal variations
+  // Create expanded data using actual market analysis data
   const expandedData: Array<{
     year: number;
     submarket: string;
@@ -43,13 +27,12 @@ export const exportToCSV = (data: ExportData[], filename: string = 'market-analy
   }> = [];
   
   data.forEach(submarketData => {
-    months.forEach((month, monthIndex) => {
-      // Apply seasonal variation to the base STR revenue
-      const seasonalMultiplier = seasonalMultipliers[monthIndex];
-      const monthlyRevenue = Math.round(submarketData.strRevenue * seasonalMultiplier);
+    months.forEach((month) => {
+      // Use the actual STR revenue from the market analysis as-is
+      const actualRevenue = submarketData.strRevenue;
       
-      // Add 25% to the seasonal revenue
-      const revenuePlus25 = Math.round(monthlyRevenue * 1.25);
+      // Add 25% to the actual revenue
+      const revenuePlus25 = Math.round(actualRevenue * 1.25);
       
       // Calculate multiple based on revenue + 25%
       const monthlyMultiple = revenuePlus25 / submarketData.medianRent;
@@ -58,7 +41,7 @@ export const exportToCSV = (data: ExportData[], filename: string = 'market-analy
         year: currentYear,
         submarket: submarketData.submarket,
         month,
-        actualRevenue: monthlyRevenue,
+        actualRevenue: actualRevenue,
         revenuePlus25: revenuePlus25,
         medianRent: submarketData.medianRent,
         multiple: monthlyMultiple
