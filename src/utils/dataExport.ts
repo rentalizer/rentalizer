@@ -6,13 +6,6 @@ interface ExportData {
   multiple: number;
 }
 
-interface MonthlyData {
-  month: string;
-  strRevenue: number;
-  medianRent: number;
-  multiple: number;
-}
-
 export const exportToCSV = (data: ExportData[], filename: string = 'market-analysis') => {
   // Generate 12 months of data for each submarket
   const months = [
@@ -22,7 +15,7 @@ export const exportToCSV = (data: ExportData[], filename: string = 'market-analy
   
   const currentYear = new Date().getFullYear();
   
-  // Create expanded data with monthly variations
+  // Create expanded data with consistent monthly calculations
   const expandedData: Array<{
     year: number;
     submarket: string;
@@ -33,19 +26,21 @@ export const exportToCSV = (data: ExportData[], filename: string = 'market-analy
   }> = [];
   
   data.forEach(submarketData => {
-    months.forEach((month, index) => {
-      // Add seasonal variations with 25% boost for peak months
-      const seasonalMultiplier = getSeasonalMultiplier(index);
-      const monthlyStrRevenue = Math.round(submarketData.strRevenue * seasonalMultiplier);
-      const monthlyRent = Math.round(submarketData.medianRent * (0.95 + (Math.random() * 0.1))); // Small rent variation
-      const monthlyMultiple = monthlyStrRevenue / monthlyRent;
+    // Calculate annual revenue (add 25% to monthly revenue then multiply by 12)
+    const annualRevenue = submarketData.strRevenue * 1.25 * 12;
+    
+    // Calculate gross monthly earnings (divide annual by 12)
+    const grossMonthlyEarnings = Math.round(annualRevenue / 12);
+    
+    months.forEach((month) => {
+      const monthlyMultiple = grossMonthlyEarnings / submarketData.medianRent;
       
       expandedData.push({
         year: currentYear,
         submarket: submarketData.submarket,
         month,
-        strRevenue: monthlyStrRevenue,
-        medianRent: monthlyRent,
+        strRevenue: grossMonthlyEarnings,
+        medianRent: submarketData.medianRent,
         multiple: monthlyMultiple
       });
     });
@@ -79,26 +74,4 @@ export const exportToCSV = (data: ExportData[], filename: string = 'market-analy
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-};
-
-// Helper function to apply seasonal variations to STR revenue
-// Includes 25% boost for peak summer and holiday months
-const getSeasonalMultiplier = (monthIndex: number): number => {
-  // January = 0, December = 11
-  const seasonalFactors = [
-    0.85, // January - low season
-    0.88, // February - low season
-    0.95, // March - spring pickup
-    1.05, // April - spring high
-    1.15, // May - peak season start
-    1.25, // June - summer peak (+25% boost)
-    1.30, // July - summer peak (+30% boost)
-    1.25, // August - summer peak (+25% boost)
-    1.10, // September - fall
-    1.05, // October - fall
-    1.20, // November - holiday season
-    1.25  // December - holiday peak (+25% boost)
-  ];
-  
-  return seasonalFactors[monthIndex];
 };
