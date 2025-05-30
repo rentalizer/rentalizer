@@ -13,7 +13,7 @@ const mockProperties = [
   {
     id: '1',
     title: 'Luxury Downtown Apartment',
-    address: '123 Main St, Downtown, NY 10001',
+    address: '123 Main St, Downtown, San Diego, CA 92101',
     price: 2500,
     bedrooms: 2,
     bathrooms: 2,
@@ -25,12 +25,13 @@ const mockProperties = [
     contactInfo: {
       phone: '(555) 123-4567',
       email: 'contact@luxurydowntown.com'
-    }
+    },
+    city: 'san diego'
   },
   {
     id: '2',
     title: 'Modern Studio Loft',
-    address: '456 Oak Ave, Midtown, NY 10002',
+    address: '456 Oak Ave, Midtown, San Diego, CA 92102',
     price: 1800,
     bedrooms: 1,
     bathrooms: 1,
@@ -42,12 +43,13 @@ const mockProperties = [
     contactInfo: {
       phone: '(555) 987-6543',
       email: 'leasing@modernstudio.com'
-    }
+    },
+    city: 'san diego'
   },
   {
     id: '3',
     title: 'Spacious 3BR Family Home',
-    address: '789 Pine St, Suburbs, NY 10003',
+    address: '789 Pine St, Suburbs, San Diego, CA 92103',
     price: 3200,
     bedrooms: 3,
     bathrooms: 2.5,
@@ -59,7 +61,62 @@ const mockProperties = [
     contactInfo: {
       phone: '(555) 456-7890',
       email: 'rent@familyhome.com'
-    }
+    },
+    city: 'san diego'
+  },
+  {
+    id: '4',
+    title: 'Urban Loft With City Views',
+    address: '321 Broadway, Downtown, Denver, CO 80202',
+    price: 2200,
+    bedrooms: 2,
+    bathrooms: 2,
+    sqft: 1100,
+    images: ['/placeholder.svg', '/placeholder.svg'],
+    rating: 4.3,
+    amenities: ['City Views', 'Exposed Brick', 'High Ceilings', 'Walk Score 95'],
+    availability: 'Available Now',
+    contactInfo: {
+      phone: '(303) 555-0123',
+      email: 'info@urbanloft.com'
+    },
+    city: 'denver'
+  },
+  {
+    id: '5',
+    title: 'Cozy Capitol Hill Apartment',
+    address: '654 Colfax Ave, Capitol Hill, Denver, CO 80203',
+    price: 1950,
+    bedrooms: 1,
+    bathrooms: 1,
+    sqft: 750,
+    images: ['/placeholder.svg'],
+    rating: 4.1,
+    amenities: ['Hardwood Floors', 'Near Transit', 'Pet Friendly'],
+    availability: 'Available Feb 1',
+    contactInfo: {
+      phone: '(303) 555-0456',
+      email: 'rentals@capitolhill.com'
+    },
+    city: 'denver'
+  },
+  {
+    id: '6',
+    title: 'Belltown High-Rise Studio',
+    address: '987 1st Ave, Belltown, Seattle, WA 98121',
+    price: 2100,
+    bedrooms: 1,
+    bathrooms: 1,
+    sqft: 650,
+    images: ['/placeholder.svg', '/placeholder.svg'],
+    rating: 4.4,
+    amenities: ['Concierge', 'Rooftop Terrace', 'Sound Views'],
+    availability: 'Available Now',
+    contactInfo: {
+      phone: '(206) 555-0789',
+      email: 'leasing@belltowntower.com'
+    },
+    city: 'seattle'
   }
 ];
 
@@ -75,8 +132,10 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
   const [showFilters, setShowFilters] = useState(false);
 
   const filteredProperties = mockProperties.filter(property => {
-    const matchesSearch = property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         property.address.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = searchTerm === '' || 
+                         property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         property.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         property.city.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesPrice = priceRange === 'all' || 
                         (priceRange === 'under-2000' && property.price < 2000) ||
@@ -104,6 +163,22 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
     // This would typically save to a favorites list or database
   };
 
+  // Get the search location display
+  const getSearchLocation = () => {
+    if (searchTerm === '') return 'All Areas';
+    
+    // Check if search matches a city
+    const searchLower = searchTerm.toLowerCase();
+    const cities = ['san diego', 'denver', 'seattle', 'miami', 'austin', 'atlanta'];
+    const matchedCity = cities.find(city => city.includes(searchLower) || searchLower.includes(city));
+    
+    if (matchedCity) {
+      return matchedCity.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + ' Area';
+    }
+    
+    return searchTerm.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + ' Area';
+  };
+
   return (
     <div className="space-y-6">
       {/* Search and Filter Header */}
@@ -117,7 +192,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
                 placeholder="Search by location, property name, or address..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-12 text-lg"
+                className="pl-10 h-12 text-lg text-gray-900 bg-white"
               />
             </div>
 
@@ -126,14 +201,14 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-gray-700 border-gray-300 hover:bg-gray-50"
               >
                 <SlidersHorizontal className="h-4 w-4" />
                 Filters
               </Button>
               
               <Select value={priceRange} onValueChange={setPriceRange}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px] text-gray-700 bg-white border-gray-300">
                   <SelectValue placeholder="Price Range" />
                 </SelectTrigger>
                 <SelectContent>
@@ -145,7 +220,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
               </Select>
 
               <Select value={bedrooms} onValueChange={setBedrooms}>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-[140px] text-gray-700 bg-white border-gray-300">
                   <SelectValue placeholder="Bedrooms" />
                 </SelectTrigger>
                 <SelectContent>
@@ -157,12 +232,12 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
               </Select>
 
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[160px]">
+                <SelectTrigger className="w-[160px] text-gray-700 bg-white border-gray-300">
                   <SelectValue placeholder="Sort By" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="price-low">Price: Low to High</SelectItem>
-                  <SelectItem value="price-high">Price: High to Low</SelectItem>
+                  <SelectItem value="price-low">Price: Low To High</SelectItem>
+                  <SelectItem value="price-high">Price: High To Low</SelectItem>
                   <SelectItem value="bedrooms">Most Bedrooms</SelectItem>
                   <SelectItem value="sqft">Largest First</SelectItem>
                 </SelectContent>
@@ -179,25 +254,25 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             {sortedProperties.length} Properties Found
           </span>
           <MapPin className="h-4 w-4 text-gray-500" />
-          <span className="text-gray-600">New York Area</span>
+          <span className="text-gray-600">{getSearchLocation()}</span>
         </div>
         
         {(searchTerm || priceRange !== 'all' || bedrooms !== 'all') && (
           <div className="flex gap-2">
             {searchTerm && (
-              <Badge variant="secondary" className="flex items-center gap-1">
+              <Badge variant="secondary" className="flex items-center gap-1 bg-gray-100 text-gray-700">
                 "{searchTerm}"
                 <button onClick={() => setSearchTerm('')} className="ml-1 text-xs">×</button>
               </Badge>
             )}
             {priceRange !== 'all' && (
-              <Badge variant="secondary" className="flex items-center gap-1">
+              <Badge variant="secondary" className="flex items-center gap-1 bg-gray-100 text-gray-700">
                 {priceRange.replace('-', ' - $').replace('under', 'Under $').replace('over', 'Over $')}
                 <button onClick={() => setPriceRange('all')} className="ml-1 text-xs">×</button>
               </Badge>
             )}
             {bedrooms !== 'all' && (
-              <Badge variant="secondary" className="flex items-center gap-1">
+              <Badge variant="secondary" className="flex items-center gap-1 bg-gray-100 text-gray-700">
                 {bedrooms} bedroom{bedrooms !== '1' ? 's' : ''}
                 <button onClick={() => setBedrooms('all')} className="ml-1 text-xs">×</button>
               </Badge>
@@ -221,8 +296,8 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
       {sortedProperties.length === 0 && (
         <Card className="bg-gray-50 border-gray-200">
           <CardContent className="p-12 text-center">
-            <div className="text-gray-500 text-lg mb-2">No properties found</div>
-            <div className="text-gray-400">Try adjusting your search criteria</div>
+            <div className="text-gray-500 text-lg mb-2">No Properties Found</div>
+            <div className="text-gray-400">Try Adjusting Your Search Criteria</div>
           </CardContent>
         </Card>
       )}
