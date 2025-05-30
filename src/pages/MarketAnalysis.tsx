@@ -80,16 +80,12 @@ const MarketAnalysis = () => {
         openaiApiKey: foundOpenaiKey || undefined
       });
       
-      const qualityLevel = (foundAirdnaKey || foundOpenaiKey) ? 'enhanced' : 'basic';
-      setDataQuality(qualityLevel);
-      
       toast({
         title: "✅ API Keys Found",
         description: `Enhanced data quality enabled`,
       });
     } else {
       console.log('❌ No API keys found');
-      setDataQuality('basic');
     }
   }, [toast]);
 
@@ -119,8 +115,7 @@ const MarketAnalysis = () => {
       const marketData = await fetchMarketData(targetCity, apiConfig, propertyType, bathrooms);
       console.log('📊 Market data received:', {
         strDataCount: marketData.strData?.length || 0,
-        rentDataCount: marketData.rentData?.length || 0,
-        qualityLevel: dataQuality
+        rentDataCount: marketData.rentData?.length || 0
       });
       
       // Combine STR and rent data
