@@ -27,23 +27,21 @@ export const calculateMarketMetrics = (
     rentData.map(item => [item.submarket.toLowerCase().trim(), item.rent])
   );
 
-  // Process each STR data point
+  // Process each STR data point with REAL data processing
   strData.forEach(strItem => {
     const submarketKey = strItem.submarket.toLowerCase().trim();
     const rent = rentMap.get(submarketKey);
 
     if (rent && rent > 0) {
-      // Use realistic revenue calculations with slight variation
-      const baseMultiplier = 1.1; // More conservative boost
-      const variation = (Math.random() - 0.5) * 0.15; // ±7.5% variation for realism
-      const adjustedRevenue = strItem.revenue * (baseMultiplier + variation);
-      const multiple = adjustedRevenue / rent;
+      // Use actual revenue from RapidAPI subscription without artificial inflation
+      const actualRevenue = strItem.revenue;
+      const multiple = actualRevenue / rent;
 
-      // Include all markets with 2.0x+ multiple - no minimum revenue filter
-      if (multiple >= 2.0) {
+      // Include markets with realistic multiples from REAL data
+      if (multiple >= 1.5) { // More realistic threshold for real data
         results.push({
           submarket: strItem.submarket,
-          strRevenue: Math.round(adjustedRevenue),
+          strRevenue: Math.round(actualRevenue),
           medianRent: rent,
           multiple: multiple
         });
