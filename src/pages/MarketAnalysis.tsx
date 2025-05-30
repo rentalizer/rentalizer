@@ -31,6 +31,7 @@ const MarketAnalysis = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [submarketData, setSubmarketData] = useState<SubmarketData[]>([]);
+  const [selectedSubmarkets, setSelectedSubmarkets] = useState<SubmarketData[]>([]);
   const [cityName, setCityName] = useState<string>('');
   const [targetCity, setTargetCity] = useState<string>('');
   const [propertyType, setPropertyType] = useState<string>('2');
@@ -158,22 +159,31 @@ const MarketAnalysis = () => {
   };
 
   const handleExportData = () => {
-    if (submarketData.length === 0) {
+    const dataToExport = selectedSubmarkets.length > 0 ? selectedSubmarkets : submarketData;
+    
+    if (dataToExport.length === 0) {
       toast({
         title: "No Data to Export",
-        description: "Please run a market analysis first.",
+        description: "Please run a market analysis first or select submarkets to export.",
         variant: "destructive",
       });
       return;
     }
 
     const filename = `${cityName.toLowerCase().replace(/\s+/g, '-')}-market-analysis-${propertyType}br-${bathrooms}ba`;
-    exportToCSV(submarketData, filename);
+    exportToCSV(dataToExport, filename);
+    
+    const exportCount = selectedSubmarkets.length > 0 ? selectedSubmarkets.length : submarketData.length;
+    const exportType = selectedSubmarkets.length > 0 ? 'selected' : 'all';
     
     toast({
       title: "Data Exported",
-      description: `Market data for ${cityName} downloaded.`,
+      description: `${exportCount} ${exportType} submarkets from ${cityName} downloaded.`,
     });
+  };
+
+  const handleSelectionChange = (selected: SubmarketData[]) => {
+    setSelectedSubmarkets(selected);
   };
 
   const getBathroomOptions = () => {
@@ -377,7 +387,7 @@ const MarketAnalysis = () => {
                     className="border-green-500/30 text-green-300 hover:bg-green-500/10"
                   >
                     <Download className="h-4 w-4 mr-2" />
-                    Export CSV
+                    Export {selectedSubmarkets.length > 0 ? `Selected (${selectedSubmarkets.length})` : 'All'} CSV
                   </Button>
                 </div>
               </div>
@@ -392,7 +402,11 @@ const MarketAnalysis = () => {
                           <h3 className="text-lg font-semibold text-purple-300">Table View</h3>
                         </div>
                         <div className="h-[620px] overflow-hidden">
-                          <ResultsTable results={submarketData} city={cityName} />
+                          <ResultsTable 
+                            results={submarketData} 
+                            city={cityName} 
+                            onSelectionChange={handleSelectionChange}
+                          />
                         </div>
                       </div>
                     </ResizablePanel>
