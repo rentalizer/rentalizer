@@ -1,10 +1,13 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Receipt, DollarSign } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Receipt, DollarSign, Search, Loader2 } from 'lucide-react';
 import { CalculatorData } from '@/pages/Calculator';
+import { fetchMarketExpenses } from '@/services/expenseService';
+import { useToast } from '@/hooks/use-toast';
 
 interface ExpensesSectionProps {
   data: CalculatorData;
@@ -19,16 +22,91 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
   serviceFeeCalculated, 
   monthlyExpenses 
 }) => {
+  const [isLoadingExpenses, setIsLoadingExpenses] = useState(false);
+  const { toast } = useToast();
+
+  const fetchAutoExpenses = async () => {
+    if (!data.address.trim()) {
+      toast({
+        title: "Address Required",
+        description: "Please enter an address to search for local expenses.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoadingExpenses(true);
+    console.log('🔍 Fetching market expenses for:', data.address);
+    
+    try {
+      const openaiApiKey = localStorage.getItem('openai_api_key');
+      
+      if (!openaiApiKey) {
+        toast({
+          title: "API Key Required",
+          description: "Please set your OpenAI API key in the settings to use auto-expense lookup.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const expenses = await fetchMarketExpenses(data.address, openaiApiKey);
+      
+      updateData({
+        power: expenses.power,
+        internet: expenses.internet,
+        taxLicense: expenses.license
+      });
+      
+      toast({
+        title: "Expenses Updated",
+        description: `Updated local expenses for ${data.address}`,
+      });
+      
+    } catch (error) {
+      console.error('Error fetching expenses:', error);
+      toast({
+        title: "Lookup Failed",
+        description: "Unable to fetch local expenses. Please enter manually.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingExpenses(false);
+    }
+  };
+
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-white">
-          <Receipt className="h-5 w-5 text-cyan-400" />
-          Monthly Expenses
-        </CardTitle>
-        <p className="text-sm text-gray-300">
-          All monthly operating costs for your STR property
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-white">
+              <Receipt className="h-5 w-5 text-cyan-400" />
+              Monthly Expenses
+            </CardTitle>
+            <p className="text-sm text-gray-300">
+              All monthly operating costs for your STR property
+            </p>
+          </div>
+          <Button
+            onClick={fetchAutoExpenses}
+            disabled={isLoadingExpenses || !data.address.trim()}
+            size="sm"
+            className="bg-cyan-600 hover:bg-cyan-700 text-white"
+          >
+            {isLoadingExpenses ? (
+              <>
+                <Loader2 className="h-3 w-3 mr-2 animate-spin" />
+                Searching...
+              </>
+            ) : (
+              <>
+                <Search className="h-3 w-3 mr-2" />
+                Auto-Fill Local Costs
+              </>
+            )}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -116,7 +194,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200">Tax & License</Label>
+            <Label className="text-gray-200">License</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
