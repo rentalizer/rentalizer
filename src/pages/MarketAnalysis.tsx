@@ -159,6 +159,7 @@ const MarketAnalysis = () => {
   };
 
   const handleExportData = () => {
+    // Use the exact same data that's displayed in the ResultsTable
     const dataToExport = selectedSubmarkets.length > 0 ? selectedSubmarkets : submarketData;
     
     if (dataToExport.length === 0) {
@@ -169,6 +170,8 @@ const MarketAnalysis = () => {
       });
       return;
     }
+
+    console.log('Exporting data:', dataToExport); // Debug log to see what's being exported
 
     const filename = `${cityName.toLowerCase().replace(/\s+/g, '-')}-market-analysis-${propertyType}br-${bathrooms}ba`;
     exportToCSV(dataToExport, filename);
