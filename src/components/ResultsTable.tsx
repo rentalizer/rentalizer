@@ -29,7 +29,6 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city }) => 
   }
 
   const avgMultiple = results.reduce((sum, r) => sum + r.multiple, 0) / results.length;
-  const hasQualityData = results.length >= 8 && avgMultiple > 1.5;
 
   return (
     <Card className="w-full bg-gray-900/95 border-gray-700 shadow-2xl">
@@ -60,14 +59,11 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city }) => 
                 </TableHead>
                 <TableHead className="text-white font-semibold">Median Rent</TableHead>
                 <TableHead className="text-white font-semibold">Revenue Multiple</TableHead>
-                <TableHead className="text-white font-semibold">Quality</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {results.map((result, index) => {
                 const isTopPerformer = result.multiple >= avgMultiple * 1.1;
-                const qualityScore = result.multiple > 2.0 ? 'Excellent' : result.multiple > 1.5 ? 'Good' : 'Fair';
-                const qualityColor = result.multiple > 2.0 ? 'text-green-400' : result.multiple > 1.5 ? 'text-yellow-400' : 'text-orange-400';
                 
                 return (
                   <TableRow 
@@ -94,9 +90,6 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city }) => 
                       <span className={isTopPerformer ? 'text-cyan-400' : ''}>
                         {result.multiple.toFixed(2)}x
                       </span>
-                    </TableCell>
-                    <TableCell className={`font-medium ${qualityColor}`}>
-                      {qualityScore}
                     </TableCell>
                   </TableRow>
                 );

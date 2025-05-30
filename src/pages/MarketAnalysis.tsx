@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,10 +34,9 @@ const MarketAnalysis = () => {
   const [cityName, setCityName] = useState<string>('');
   const [targetCity, setTargetCity] = useState<string>('');
   const [propertyType, setPropertyType] = useState<string>('2');
-  const [bathrooms, setBathrooms] = useState<string>('1');
+  const [bathrooms, setBathrooms] = useState<string>('2');
   const [isLoading, setIsLoading] = useState(false);
   const [apiConfig, setApiConfig] = useState<{ airdnaApiKey?: string; openaiApiKey?: string }>({});
-  const [dataQuality, setDataQuality] = useState<'basic' | 'enhanced'>('basic');
 
   // Load API keys from localStorage on component mount
   React.useEffect(() => {
@@ -101,9 +99,6 @@ const MarketAnalysis = () => {
       openai: keys.openaiApiKey ? 'Updated' : 'Not provided'
     });
     setApiConfig(keys);
-    
-    const qualityLevel = (keys.airdnaApiKey || keys.openaiApiKey) ? 'enhanced' : 'basic';
-    setDataQuality(qualityLevel);
   };
 
   const handleMarketAnalysis = async () => {
@@ -204,7 +199,12 @@ const MarketAnalysis = () => {
   React.useEffect(() => {
     const options = getBathroomOptions();
     if (!options.find(opt => opt.value === bathrooms)) {
-      setBathrooms(options[0].value);
+      // Set default based on property type
+      if (propertyType === '2') {
+        setBathrooms('2');
+      } else {
+        setBathrooms(options[0].value);
+      }
     }
   }, [propertyType]);
 
