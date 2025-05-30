@@ -13,9 +13,25 @@ export const exportToCSV = (data: ExportData[], filename: string = 'market-analy
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
   
+  // Monthly variation factors for STR revenue (typical seasonal patterns)
+  const monthlyFactors: { [key: string]: number } = {
+    'January': 0.85,    // Post-holiday low
+    'February': 0.88,   // Winter low
+    'March': 0.95,      // Spring pickup
+    'April': 1.02,      // Spring increase
+    'May': 1.08,        // Peak season starts
+    'June': 1.15,       // Summer peak
+    'July': 1.20,       // Peak summer
+    'August': 1.18,     // Late summer peak
+    'September': 1.05,  // Fall shoulder
+    'October': 0.98,    // Fall decrease
+    'November': 0.92,   // Pre-holiday low
+    'December': 1.12    // Holiday boost
+  };
+  
   const currentYear = new Date().getFullYear();
   
-  // Create expanded data with consistent monthly calculations
+  // Create expanded data with monthly variations
   const expandedData: Array<{
     year: number;
     submarket: string;
@@ -26,20 +42,25 @@ export const exportToCSV = (data: ExportData[], filename: string = 'market-analy
   }> = [];
   
   data.forEach(submarketData => {
-    // Calculate annual revenue (add 25% to monthly revenue then multiply by 12)
-    const annualRevenue = submarketData.strRevenue * 1.25 * 12;
+    // Base annual calculation: add 25% to monthly revenue then multiply by 12
+    const baseAnnualRevenue = submarketData.strRevenue * 1.25 * 12;
     
-    // Calculate gross monthly earnings (divide annual by 12)
-    const grossMonthlyEarnings = Math.round(annualRevenue / 12);
+    // Calculate base monthly earnings (divide annual by 12)
+    const baseMonthlyEarnings = baseAnnualRevenue / 12;
     
     months.forEach((month) => {
-      const monthlyMultiple = grossMonthlyEarnings / submarketData.medianRent;
+      // Apply seasonal variation to monthly revenue
+      const monthlyFactor = monthlyFactors[month];
+      const adjustedMonthlyRevenue = Math.round(baseMonthlyEarnings * monthlyFactor);
+      
+      // Rent stays consistent month-to-month
+      const monthlyMultiple = adjustedMonthlyRevenue / submarketData.medianRent;
       
       expandedData.push({
         year: currentYear,
         submarket: submarketData.submarket,
         month,
-        strRevenue: grossMonthlyEarnings,
+        strRevenue: adjustedMonthlyRevenue,
         medianRent: submarketData.medianRent,
         multiple: monthlyMultiple
       });

@@ -83,7 +83,6 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
                 <TableHead className="text-white font-semibold w-12">
                   <Checkbox
                     checked={isAllSelected}
-                    indeterminate={isPartiallySelected}
                     onCheckedChange={handleSelectAll}
                     className="border-cyan-500/50 data-[state=checked]:bg-cyan-600 data-[state=checked]:border-cyan-600"
                   />
