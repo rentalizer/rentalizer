@@ -15,6 +15,8 @@ import { NetProfitSection } from '@/components/calculator/NetProfitSection';
 export interface CalculatorData {
   // Comps
   address: string;
+  bedrooms: number;
+  bathrooms: number;
   averageComparable: number;
   
   // Build Out
@@ -46,6 +48,8 @@ const Calculator = () => {
   
   const [data, setData] = useState<CalculatorData>({
     address: '',
+    bedrooms: 2,
+    bathrooms: 1,
     averageComparable: 0,
     firstMonthRent: 0,
     securityDeposit: 0,
