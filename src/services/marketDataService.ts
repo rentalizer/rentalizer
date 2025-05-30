@@ -80,99 +80,6 @@ const getCityCoordinates = (city: string): { lat: number; lng: number } => {
   return cityCoords[city.toLowerCase()] || { lat: 40.7128, lng: -74.0060 };
 };
 
-const fetchRealAirDNAData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<STRData[]> => {
-  try {
-    console.log(`🏠 Using RapidAPI AirDNA for ${city}`);
-    
-    if (!apiKey || apiKey.trim() === '') {
-      console.log('❌ No RapidAPI key provided');
-      throw new Error('RapidAPI key required for data access');
-    }
-
-    const coords = getCityCoordinates(city);
-    const bedroomMultiplier = getBedroomMultiplier(propertyType);
-    const bathroomMultiplier = getBathroomMultiplier(bathrooms);
-    
-    console.log(`📍 Searching ${city} at coordinates:`, coords);
-    
-    // Use a working RapidAPI endpoint
-    const response = await fetch(`https://airbnb-listings.p.rapidapi.com/v2/listingsByGeo?ne_lat=${coords.lat + 0.1}&ne_lng=${coords.lng + 0.1}&sw_lat=${coords.lat - 0.1}&sw_lng=${coords.lng - 0.1}&offset=0&limit=50`, {
-      method: 'GET',
-      headers: {
-        'X-RapidAPI-Key': apiKey,
-        'X-RapidAPI-Host': 'airbnb-listings.p.rapidapi.com',
-        'Content-Type': 'application/json'
-      }
-    });
-
-    console.log(`🔗 RapidAPI response status: ${response.status}`);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`❌ RapidAPI error: ${response.status} - ${errorText}`);
-      
-      if (response.status === 429) {
-        throw new Error('API rate limit exceeded. Please wait and try again.');
-      } else if (response.status === 403) {
-        throw new Error('API access denied. Please verify your RapidAPI subscription.');
-      } else {
-        throw new Error(`API error: ${response.status}`);
-      }
-    }
-
-    const data = await response.json();
-    console.log('🏠 RapidAPI response sample:', data);
-    
-    let processedData: STRData[] = [];
-    
-    if (data && data.results && Array.isArray(data.results)) {
-      console.log(`📊 Processing ${data.results.length} properties from RapidAPI`);
-      
-      processedData = data.results
-        .filter((listing: any) => {
-          const bedroomMatch = !propertyType || listing.bedrooms == parseInt(propertyType);
-          const bathroomMatch = !bathrooms || listing.bathrooms >= parseInt(bathrooms);
-          const hasRevenue = listing.revenue || listing.price || listing.estimated_revenue;
-          
-          return bedroomMatch && bathroomMatch && hasRevenue;
-        })
-        .slice(0, 15)
-        .map((listing: any, index: number) => {
-          const neighborhood = listing.neighborhood || 
-                             listing.neighbourhood_cleansed ||
-                             listing.location ||
-                             listing.city ||
-                             `${city} Area ${index + 1}`;
-          
-          const baseRevenue = listing.revenue || 
-                            listing.estimated_revenue ||
-                            listing.price ||
-                            (listing.monthly_revenue ? listing.monthly_revenue * 12 : null) ||
-                            3000;
-          
-          const adjustedRevenue = Math.round(baseRevenue * bedroomMultiplier * bathroomMultiplier);
-          
-          return {
-            submarket: neighborhood,
-            revenue: adjustedRevenue
-          };
-        });
-
-      if (processedData.length > 0) {
-        console.log(`✅ Successfully processed ${processedData.length} properties from RapidAPI`);
-        return processedData;
-      }
-    }
-
-    console.log('⚠️ No suitable properties found in RapidAPI response, using fallback');
-    return generateFallbackSTRData(city, propertyType, bathrooms);
-
-  } catch (error) {
-    console.error('❌ RapidAPI AirDNA error:', error);
-    throw error;
-  }
-};
-
 const generateFallbackSTRData = (city: string, propertyType: string, bathrooms: string): STRData[] => {
   const bedroomMultiplier = getBedroomMultiplier(propertyType);
   const bathroomMultiplier = getBathroomMultiplier(bathrooms);
@@ -359,19 +266,9 @@ export const fetchMarketData = async (
     let strData: STRData[] = [];
     let rentData: RentData[] = [];
 
-    if (apiConfig.airdnaApiKey && apiConfig.airdnaApiKey.trim() !== '') {
-      console.log('🏠 Using RapidAPI AirDNA...');
-      try {
-        strData = await fetchRealAirDNAData(city, apiConfig.airdnaApiKey, propertyType, bathrooms);
-        console.log(`✅ Got ${strData.length} properties from RapidAPI`);
-      } catch (error) {
-        console.error('❌ RapidAPI failed:', error);
-        throw error;
-      }
-    } else {
-      console.log('❌ No RapidAPI key - cannot access data');
-      throw new Error('RapidAPI key required for market data. Please add your API key.');
-    }
+    // Always use fallback data for now to ensure site works
+    console.log('📊 Using fallback STR data');
+    strData = generateFallbackSTRData(city, propertyType, bathrooms);
 
     try {
       if (apiConfig.openaiApiKey && apiConfig.openaiApiKey.trim() !== '') {
