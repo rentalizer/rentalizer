@@ -7,16 +7,13 @@ interface ExportData {
 }
 
 export const exportToCSV = (data: ExportData[], filename: string = 'market-analysis') => {
-  // Create CSV headers - simplified to actual useful data
-  const headers = ['Year', 'Submarket', 'STR Revenue', 'Median Rent', 'Revenue-to-Rent Multiple'];
+  // Create CSV headers
+  const headers = ['Submarket', 'STR Revenue', 'Median Rent', 'Revenue-to-Rent Multiple'];
   
-  const currentYear = new Date().getFullYear();
-  
-  // Convert data to CSV format - one row per submarket with actual data
+  // Convert data to CSV format - use the exact raw data passed in
   const csvContent = [
     headers.join(','),
     ...data.map(row => [
-      currentYear,
       `"${row.submarket}"`,
       row.strRevenue,
       row.medianRent,
