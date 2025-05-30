@@ -11,28 +11,36 @@ interface ApiKeyInputProps {
 }
 
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
-  const [professionalKey, setProfessionalKey] = useState('563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3');
+  const [airbnbKey, setAirbnbKey] = useState('');
+  const [mashvisorKey, setMashvisorKey] = useState('');
+  const [airdnaKey, setAirdnaKey] = useState('563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3');
   const [openaiKey, setOpenaiKey] = useState('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');
   const [showKeys, setShowKeys] = useState(false);
   const [showStoredKeys, setShowStoredKeys] = useState(false);
 
   const handleSaveKeys = () => {
     // Store in localStorage for session persistence
-    if (professionalKey) localStorage.setItem('professional_data_key', professionalKey);
+    if (airbnbKey) localStorage.setItem('airbnb_api_key', airbnbKey);
+    if (mashvisorKey) localStorage.setItem('mashvisor_api_key', mashvisorKey);
+    if (airdnaKey) localStorage.setItem('airdna_api_key', airdnaKey);
     if (openaiKey) localStorage.setItem('openai_api_key', openaiKey);
     
     onApiKeysChange({
-      airdnaApiKey: professionalKey || undefined,
+      airdnaApiKey: airdnaKey || undefined,
       openaiApiKey: openaiKey || undefined
     });
   };
 
   const handleViewStoredKeys = () => {
-    const storedProfessional = localStorage.getItem('professional_data_key') || 'Not set';
+    const storedAirbnb = localStorage.getItem('airbnb_api_key') || 'Not set';
+    const storedMashvisor = localStorage.getItem('mashvisor_api_key') || 'Not set';
+    const storedAirDNA = localStorage.getItem('airdna_api_key') || 'Not set';
     const storedOpenai = localStorage.getItem('openai_api_key') || 'Not set';
     
     console.log('=== STORED API KEYS ===');
-    console.log('Professional Data Key:', storedProfessional);
+    console.log('Airbnb API Key:', storedAirbnb);
+    console.log('Mashvisor API Key:', storedMashvisor);
+    console.log('AirDNA API Key:', storedAirDNA);
     console.log('OpenAI API Key:', storedOpenai);
     console.log('=====================');
     
@@ -41,33 +49,39 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
   const getStoredKeys = () => {
     return {
-      professional: localStorage.getItem('professional_data_key') || 'Not set',
+      airbnb: localStorage.getItem('airbnb_api_key') || 'Not set',
+      mashvisor: localStorage.getItem('mashvisor_api_key') || 'Not set',
+      airdna: localStorage.getItem('airdna_api_key') || 'Not set',
       openai: localStorage.getItem('openai_api_key') || 'Not set'
     };
   };
 
   // Load keys from localStorage on component mount
   React.useEffect(() => {
-    const savedProfessionalKey = localStorage.getItem('professional_data_key') || '563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3';
+    const savedAirbnbKey = localStorage.getItem('airbnb_api_key') || '';
+    const savedMashvisorKey = localStorage.getItem('mashvisor_api_key') || '';
+    const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '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';
     
-    setProfessionalKey(savedProfessionalKey);
+    setAirbnbKey(savedAirbnbKey);
+    setMashvisorKey(savedMashvisorKey);
+    setAirdnaKey(savedAirDNAKey);
     setOpenaiKey(savedOpenaiKey);
     
-    if (savedProfessionalKey || savedOpenaiKey) {
+    if (savedAirDNAKey || savedOpenaiKey) {
       onApiKeysChange({
-        airdnaApiKey: savedProfessionalKey || undefined,
+        airdnaApiKey: savedAirDNAKey || undefined,
         openaiApiKey: savedOpenaiKey || undefined
       });
     }
   }, [onApiKeysChange]);
 
-  // Auto-save both API keys on component mount
+  // Auto-save API keys on component mount
   React.useEffect(() => {
-    localStorage.setItem('professional_data_key', professionalKey);
+    localStorage.setItem('airdna_api_key', airdnaKey);
     localStorage.setItem('openai_api_key', openaiKey);
     onApiKeysChange({
-      airdnaApiKey: professionalKey,
+      airdnaApiKey: airdnaKey,
       openaiApiKey: openaiKey
     });
   }, []);
@@ -77,44 +91,88 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
       <CardHeader className="pb-4 border-b border-gray-700/50">
         <CardTitle className="flex items-center gap-2 text-cyan-300">
           <Key className="h-5 w-5 text-cyan-400" />
-          Data Configuration
+          Aggregate Data Configuration
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6">
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="professional-key" className="text-sm font-medium text-gray-300">
-                Professional Data Key (AirDNA) ✅
-              </Label>
-              <Input
-                id="professional-key"
-                type={showKeys ? "text" : "password"}
-                value={professionalKey}
-                onChange={(e) => setProfessionalKey(e.target.value)}
-                placeholder="Enter professional data API key..."
-                className="mt-1 border-green-500/30 bg-gray-800/50 text-gray-100 focus:border-green-400 focus:ring-green-400/20 placeholder:text-gray-500"
-              />
-              <p className="text-xs text-green-400 mt-1">
-                ✅ AirDNA API key configured
-              </p>
-            </div>
+          {/* Professional Data Keys Section */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-200 mb-4">Professional Data Keys</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="airbnb-key" className="text-sm font-medium text-gray-300">
+                  Airbnb API Key
+                </Label>
+                <Input
+                  id="airbnb-key"
+                  type={showKeys ? "text" : "password"}
+                  value={airbnbKey}
+                  onChange={(e) => setAirbnbKey(e.target.value)}
+                  placeholder="Enter Airbnb API key..."
+                  className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Direct Airbnb listing data
+                </p>
+              </div>
 
-            <div>
-              <Label htmlFor="openai-key" className="text-sm font-medium text-gray-300">
-                AI Research Key (OpenAI) ✅
-              </Label>
-              <Input
-                id="openai-key"
-                type={showKeys ? "text" : "password"}
-                value={openaiKey}
-                onChange={(e) => setOpenaiKey(e.target.value)}
-                placeholder="Enter OpenAI API key (sk-...)..."
-                className="mt-1 border-green-500/30 bg-gray-800/50 text-gray-100 focus:border-green-400 focus:ring-green-400/20 placeholder:text-gray-500"
-              />
-              <p className="text-xs text-green-400 mt-1">
-                ✅ OpenAI API key configured
-              </p>
+              <div>
+                <Label htmlFor="mashvisor-key" className="text-sm font-medium text-gray-300">
+                  Mashvisor API Key
+                </Label>
+                <Input
+                  id="mashvisor-key"
+                  type={showKeys ? "text" : "password"}
+                  value={mashvisorKey}
+                  onChange={(e) => setMashvisorKey(e.target.value)}
+                  placeholder="Enter Mashvisor API key..."
+                  className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  Investment analysis data
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="airdna-key" className="text-sm font-medium text-gray-300">
+                  AirDNA API Key ✅
+                </Label>
+                <Input
+                  id="airdna-key"
+                  type={showKeys ? "text" : "password"}
+                  value={airdnaKey}
+                  onChange={(e) => setAirdnaKey(e.target.value)}
+                  placeholder="Enter AirDNA API key..."
+                  className="mt-1 border-green-500/30 bg-gray-800/50 text-gray-100 focus:border-green-400 focus:ring-green-400/20 placeholder:text-gray-500"
+                />
+                <p className="text-xs text-green-400 mt-1">
+                  ✅ Market analytics data
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* AI Research Key Section */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-200 mb-4">AI Research Key</h3>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <Label htmlFor="openai-key" className="text-sm font-medium text-gray-300">
+                  OpenAI API Key ✅
+                </Label>
+                <Input
+                  id="openai-key"
+                  type={showKeys ? "text" : "password"}
+                  value={openaiKey}
+                  onChange={(e) => setOpenaiKey(e.target.value)}
+                  placeholder="Enter OpenAI API key (sk-...)..."
+                  className="mt-1 border-green-500/30 bg-gray-800/50 text-gray-100 focus:border-green-400 focus:ring-green-400/20 placeholder:text-gray-500"
+                />
+                <p className="text-xs text-green-400 mt-1">
+                  ✅ OpenAI API key configured
+                </p>
+              </div>
             </div>
           </div>
 
@@ -123,9 +181,21 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               <h4 className="font-medium text-gray-100 mb-2">Currently Stored Keys:</h4>
               <div className="space-y-2 text-sm">
                 <div>
-                  <span className="font-medium text-gray-200">Professional Data:</span> 
+                  <span className="font-medium text-gray-200">Airbnb:</span> 
                   <span className="ml-2 font-mono text-xs text-gray-300">
-                    {getStoredKeys().professional === 'Not set' ? 'Not set' : `${getStoredKeys().professional.substring(0, 8)}...`}
+                    {getStoredKeys().airbnb === 'Not set' ? 'Not set' : `${getStoredKeys().airbnb.substring(0, 8)}...`}
+                  </span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-200">Mashvisor:</span> 
+                  <span className="ml-2 font-mono text-xs text-gray-300">
+                    {getStoredKeys().mashvisor === 'Not set' ? 'Not set' : `${getStoredKeys().mashvisor.substring(0, 8)}...`}
+                  </span>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-200">AirDNA:</span> 
+                  <span className="ml-2 font-mono text-xs text-gray-300">
+                    {getStoredKeys().airdna === 'Not set' ? 'Not set' : `${getStoredKeys().airdna.substring(0, 8)}...`}
                   </span>
                 </div>
                 <div>
