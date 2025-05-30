@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Key, Eye, EyeOff, Search } from 'lucide-react';
+import { Key, Eye, EyeOff, Search, Copy, AlertCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface ApiKeyInputProps {
   onApiKeysChange: (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => void;
@@ -17,6 +17,8 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   const [openaiKey, setOpenaiKey] = useState('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');
   const [showKeys, setShowKeys] = useState(false);
   const [showStoredKeys, setShowStoredKeys] = useState(false);
+  const [foundKeys, setFoundKeys] = useState<{[key: string]: string}>({});
+  const { toast } = useToast();
 
   const handleSaveKeys = () => {
     // Store in localStorage for session persistence
@@ -31,29 +33,60 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     });
   };
 
-  const handleViewStoredKeys = () => {
-    const storedAirbnb = localStorage.getItem('airbnb_api_key') || 'Not set';
-    const storedMashvisor = localStorage.getItem('mashvisor_api_key') || 'Not set';
-    const storedAirDNA = localStorage.getItem('airdna_api_key') || 'Not set';
-    const storedOpenai = localStorage.getItem('openai_api_key') || 'Not set';
+  const findAllStoredKeys = () => {
+    console.log('🔍 SEARCHING FOR ALL API KEYS...');
     
-    console.log('=== STORED API KEYS ===');
-    console.log('Airbnb API Key:', storedAirbnb);
-    console.log('Mashvisor API Key:', storedMashvisor);
-    console.log('AirDNA API Key:', storedAirDNA);
-    console.log('OpenAI API Key:', storedOpenai);
-    console.log('=====================');
+    const allKeys: {[key: string]: string} = {};
     
+    // Search all localStorage keys
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) {
+        const value = localStorage.getItem(key);
+        if (value) {
+          allKeys[key] = value;
+        }
+      }
+    }
+    
+    console.log('🗂️ ALL STORED KEYS FOUND:', allKeys);
+    
+    // Show specific API keys
+    const apiKeys = {
+      'openai_api_key': localStorage.getItem('openai_api_key') || 'NOT FOUND',
+      'airdna_api_key': localStorage.getItem('airdna_api_key') || 'NOT FOUND', 
+      'mashvisor_api_key': localStorage.getItem('mashvisor_api_key') || 'NOT FOUND',
+      'airbnb_api_key': localStorage.getItem('airbnb_api_key') || 'NOT FOUND',
+      'professional_data_key': localStorage.getItem('professional_data_key') || 'NOT FOUND'
+    };
+    
+    console.log('🔑 SPECIFIC API KEYS:', apiKeys);
+    
+    setFoundKeys(allKeys);
     setShowStoredKeys(!showStoredKeys);
+    
+    const keyCount = Object.keys(allKeys).length;
+    toast({
+      title: `🔍 Found ${keyCount} Total Keys`,
+      description: "All stored keys are now displayed below. Check browser console for full details.",
+    });
   };
 
-  const getStoredKeys = () => {
-    return {
-      airbnb: localStorage.getItem('airbnb_api_key') || 'Not set',
-      mashvisor: localStorage.getItem('mashvisor_api_key') || 'Not set',
-      airdna: localStorage.getItem('airdna_api_key') || 'Not set',
-      openai: localStorage.getItem('openai_api_key') || 'Not set'
-    };
+  const copyToClipboard = async (text: string, keyName: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: "✅ Copied!",
+        description: `${keyName} copied to clipboard`,
+      });
+    } catch (error) {
+      console.error('Copy failed:', error);
+      toast({
+        title: "❌ Copy Failed",
+        description: "Could not copy to clipboard",
+        variant: "destructive",
+      });
+    }
   };
 
   // Load keys from localStorage on component mount
@@ -90,13 +123,57 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   return (
     <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
       <CardHeader className="pb-4 border-b border-gray-700/50">
-        <CardTitle className="flex items-center gap-2 text-cyan-300">
-          <Key className="h-5 w-5 text-cyan-400" />
-          Aggregate Data Configuration
+        <CardTitle className="flex items-center justify-between text-cyan-300">
+          <div className="flex items-center gap-2">
+            <Key className="h-5 w-5 text-cyan-400" />
+            Aggregate Data Configuration
+          </div>
+          <Button
+            onClick={findAllStoredKeys}
+            size="sm"
+            className="bg-yellow-600 hover:bg-yellow-500 text-white"
+          >
+            <Search className="h-4 w-4 mr-1" />
+            Find All Stored Keys
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-6">
         <div className="space-y-6">
+          {/* Show Found Keys Section */}
+          {showStoredKeys && (
+            <div className="bg-gray-800/60 p-4 rounded-lg border border-yellow-500/30">
+              <div className="flex items-center gap-2 mb-3">
+                <AlertCircle className="h-5 w-5 text-yellow-400" />
+                <h4 className="font-medium text-yellow-300">All Stored Keys Found:</h4>
+              </div>
+              <div className="space-y-3 max-h-60 overflow-y-auto">
+                {Object.keys(foundKeys).length > 0 ? (
+                  Object.entries(foundKeys).map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between p-2 bg-gray-700/50 rounded">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium text-gray-200">{key}</div>
+                        <div className="text-xs font-mono text-gray-400 truncate">
+                          {showKeys ? value : `${value.substring(0, 10)}...`}
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => copyToClipboard(value, key)}
+                        className="h-8 w-8 p-0 text-gray-400 hover:text-white"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-gray-400 text-sm">No keys found in storage</div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Professional Data Keys Section */}
           <div>
             <h3 className="text-lg font-semibold text-gray-200 mb-4">Professional Data Keys</h3>
@@ -177,62 +254,17 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             </div>
           </div>
 
-          {showStoredKeys && (
-            <div className="bg-gray-800/60 p-4 rounded-lg border border-gray-600/30">
-              <h4 className="font-medium text-gray-100 mb-2">Currently Stored Keys:</h4>
-              <div className="space-y-2 text-sm">
-                <div>
-                  <span className="font-medium text-gray-200">Airbnb:</span> 
-                  <span className="ml-2 font-mono text-xs text-gray-300">
-                    {getStoredKeys().airbnb === 'Not set' ? 'Not set' : `${getStoredKeys().airbnb.substring(0, 8)}...`}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-200">Mashvisor:</span> 
-                  <span className="ml-2 font-mono text-xs text-gray-300">
-                    {getStoredKeys().mashvisor === 'Not set' ? 'Not set' : `${getStoredKeys().mashvisor.substring(0, 8)}...`}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-200">AirDNA:</span> 
-                  <span className="ml-2 font-mono text-xs text-gray-300">
-                    {getStoredKeys().airdna === 'Not set' ? 'Not set' : `${getStoredKeys().airdna.substring(0, 8)}...`}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-200">AI Research:</span> 
-                  <span className="ml-2 font-mono text-xs text-gray-300">
-                    {getStoredKeys().openai === 'Not set' ? 'Not set' : `${getStoredKeys().openai.substring(0, 8)}...`}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setShowKeys(!showKeys)}
-                className="flex items-center gap-2 border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"
-              >
-                {showKeys ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                {showKeys ? 'Hide' : 'Show'} Keys
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleViewStoredKeys}
-                className="flex items-center gap-2 border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"
-              >
-                <Search className="h-4 w-4" />
-                {showStoredKeys ? 'Hide' : 'Find'} Stored Keys
-              </Button>
-            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowKeys(!showKeys)}
+              className="flex items-center gap-2 border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"
+            >
+              {showKeys ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showKeys ? 'Hide' : 'Show'} Keys
+            </Button>
 
             <Button
               onClick={handleSaveKeys}
