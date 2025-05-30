@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,9 +13,9 @@ interface ApiKeyInputProps {
 
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
   const [airbnbKey, setAirbnbKey] = useState('');
-  const [mashvisorKey, setMashvisorKey] = useState('563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3');
-  const [airdnaKey, setAirdnaKey] = useState('563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3');
-  const [openaiKey, setOpenaiKey] = useState('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');
+  const [mashvisorKey, setMashvisorKey] = useState('');
+  const [airdnaKey, setAirdnaKey] = useState('');
+  const [openaiKey, setOpenaiKey] = useState('');
   const [showKeys, setShowKeys] = useState(false);
   const [showStoredKeys, setShowStoredKeys] = useState(false);
   const [foundKeys, setFoundKeys] = useState<{[key: string]: string}>({});
@@ -30,6 +31,11 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     onApiKeysChange({
       airdnaApiKey: airdnaKey || undefined,
       openaiApiKey: openaiKey || undefined
+    });
+
+    toast({
+      title: "✅ API Keys Saved",
+      description: "Your API keys have been saved successfully.",
     });
   };
 
@@ -92,9 +98,9 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   // Load keys from localStorage on component mount
   React.useEffect(() => {
     const savedAirbnbKey = localStorage.getItem('airbnb_api_key') || '';
-    const savedMashvisorKey = localStorage.getItem('mashvisor_api_key') || '563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3';
-    const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3';
-    const savedOpenaiKey = localStorage.getItem('openai_api_key') || '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';
+    const savedMashvisorKey = localStorage.getItem('mashvisor_api_key') || '';
+    const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '';
+    const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
     
     setAirbnbKey(savedAirbnbKey);
     setMashvisorKey(savedMashvisorKey);
@@ -109,24 +115,13 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     }
   }, [onApiKeysChange]);
 
-  // Auto-save API keys on component mount
-  React.useEffect(() => {
-    localStorage.setItem('mashvisor_api_key', mashvisorKey);
-    localStorage.setItem('airdna_api_key', airdnaKey);
-    localStorage.setItem('openai_api_key', openaiKey);
-    onApiKeysChange({
-      airdnaApiKey: airdnaKey,
-      openaiApiKey: openaiKey
-    });
-  }, []);
-
   return (
     <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
       <CardHeader className="pb-4 border-b border-gray-700/50">
         <CardTitle className="flex items-center justify-between text-cyan-300">
           <div className="flex items-center gap-2">
             <Key className="h-5 w-5 text-cyan-400" />
-            Aggregate Data Configuration
+            API Configuration
           </div>
           <Button
             onClick={findAllStoredKeys}
@@ -197,7 +192,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
               <div>
                 <Label htmlFor="mashvisor-key" className="text-sm font-medium text-gray-300">
-                  Mashvisor API Key ✅
+                  Mashvisor API Key {mashvisorKey ? '✅' : '❌'}
                 </Label>
                 <Input
                   id="mashvisor-key"
@@ -205,16 +200,16 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                   value={mashvisorKey}
                   onChange={(e) => setMashvisorKey(e.target.value)}
                   placeholder="Enter Mashvisor API key..."
-                  className="mt-1 border-green-500/30 bg-gray-800/50 text-gray-100 focus:border-green-400 focus:ring-green-400/20 placeholder:text-gray-500"
+                  className={`mt-1 ${mashvisorKey ? 'border-green-500/30' : 'border-red-500/30'} bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500`}
                 />
-                <p className="text-xs text-green-400 mt-1">
-                  ✅ Investment analysis data
+                <p className={`text-xs mt-1 ${mashvisorKey ? 'text-green-400' : 'text-red-400'}`}>
+                  {mashvisorKey ? '✅ Investment analysis data' : '❌ Required for investment analysis'}
                 </p>
               </div>
 
               <div>
                 <Label htmlFor="airdna-key" className="text-sm font-medium text-gray-300">
-                  AirDNA API Key ✅
+                  AirDNA API Key {airdnaKey ? '✅' : '❌'}
                 </Label>
                 <Input
                   id="airdna-key"
@@ -222,10 +217,10 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                   value={airdnaKey}
                   onChange={(e) => setAirdnaKey(e.target.value)}
                   placeholder="Enter AirDNA API key..."
-                  className="mt-1 border-green-500/30 bg-gray-800/50 text-gray-100 focus:border-green-400 focus:ring-green-400/20 placeholder:text-gray-500"
+                  className={`mt-1 ${airdnaKey ? 'border-green-500/30' : 'border-red-500/30'} bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500`}
                 />
-                <p className="text-xs text-green-400 mt-1">
-                  ✅ Market analytics data
+                <p className={`text-xs mt-1 ${airdnaKey ? 'text-green-400' : 'text-red-400'}`}>
+                  {airdnaKey ? '✅ Market analytics data' : '❌ Required for market analytics'}
                 </p>
               </div>
             </div>
@@ -237,7 +232,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <Label htmlFor="openai-key" className="text-sm font-medium text-gray-300">
-                  OpenAI API Key ✅
+                  OpenAI API Key {openaiKey ? '✅' : '❌'}
                 </Label>
                 <Input
                   id="openai-key"
@@ -245,10 +240,10 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                   value={openaiKey}
                   onChange={(e) => setOpenaiKey(e.target.value)}
                   placeholder="Enter OpenAI API key (sk-...)..."
-                  className="mt-1 border-green-500/30 bg-gray-800/50 text-gray-100 focus:border-green-400 focus:ring-green-400/20 placeholder:text-gray-500"
+                  className={`mt-1 ${openaiKey ? 'border-green-500/30' : 'border-red-500/30'} bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500`}
                 />
-                <p className="text-xs text-green-400 mt-1">
-                  ✅ OpenAI API key configured
+                <p className={`text-xs mt-1 ${openaiKey ? 'text-green-400' : 'text-red-400'}`}>
+                  {openaiKey ? '✅ OpenAI API key configured' : '❌ Required for AI research'}
                 </p>
               </div>
             </div>
