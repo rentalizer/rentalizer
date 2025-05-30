@@ -159,8 +159,18 @@ const MarketAnalysis = () => {
   };
 
   const handleExportData = () => {
+    console.log('=== EXPORT DEBUG START ===');
+    console.log('submarketData length:', submarketData.length);
+    console.log('selectedSubmarkets length:', selectedSubmarkets.length);
+    console.log('submarketData:', submarketData);
+    console.log('selectedSubmarkets:', selectedSubmarkets);
+    
     // Use the exact same data that's displayed in the ResultsTable
     const dataToExport = selectedSubmarkets.length > 0 ? selectedSubmarkets : submarketData;
+    
+    console.log('dataToExport length:', dataToExport.length);
+    console.log('dataToExport:', dataToExport);
+    console.log('=== EXPORT DEBUG END ===');
     
     if (dataToExport.length === 0) {
       toast({
@@ -170,8 +180,6 @@ const MarketAnalysis = () => {
       });
       return;
     }
-
-    console.log('Exporting data:', dataToExport); // Debug log to see what's being exported
 
     const filename = `${cityName.toLowerCase().replace(/\s+/g, '-')}-market-analysis-${propertyType}br-${bathrooms}ba`;
     exportToCSV(dataToExport, filename);
