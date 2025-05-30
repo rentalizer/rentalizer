@@ -3,7 +3,6 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TrendingUp, DollarSign, CheckCircle } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 
 interface SubmarketData {
   submarket: string;
@@ -62,38 +61,25 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city }) => 
               </TableRow>
             </TableHeader>
             <TableBody>
-              {results.map((result, index) => {
-                const isTopPerformer = result.multiple >= avgMultiple * 1.1;
-                
-                return (
-                  <TableRow 
-                    key={index} 
-                    className={`border-gray-700 hover:bg-gray-800/50 transition-colors ${isTopPerformer ? 'bg-cyan-500/5' : ''}`}
-                  >
-                    <TableCell className="font-medium text-white">
-                      <div className="flex items-center gap-2">
-                        {result.submarket}
-                        {isTopPerformer && (
-                          <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30 text-xs">
-                            Top Pick
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-white font-semibold">
-                      ${result.strRevenue.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="text-white font-semibold">
-                      ${result.medianRent.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="text-white font-semibold">
-                      <span className={isTopPerformer ? 'text-cyan-400' : ''}>
-                        {result.multiple.toFixed(2)}x
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+              {results.map((result, index) => (
+                <TableRow 
+                  key={index} 
+                  className="border-gray-700 hover:bg-gray-800/50 transition-colors"
+                >
+                  <TableCell className="font-medium text-white">
+                    {result.submarket}
+                  </TableCell>
+                  <TableCell className="text-white font-semibold">
+                    ${result.strRevenue.toLocaleString()}
+                  </TableCell>
+                  <TableCell className="text-white font-semibold">
+                    ${result.medianRent.toLocaleString()}
+                  </TableCell>
+                  <TableCell className="text-white font-semibold">
+                    {result.multiple.toFixed(2)}x
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>
