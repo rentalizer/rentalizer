@@ -1,24 +1,24 @@
+
 import { CityMarketData, STRData, RentData } from '@/types';
 
 const getBedroomMultiplier = (propertyType: string): number => {
   switch (propertyType) {
-    case '1': return 0.75;  // 1BR
-    case '2': return 1;     // 2BR
-    case '3': return 1.25;  // 3BR
-    default: return 1;       // Default to 2BR
+    case '1': return 0.75;
+    case '2': return 1;
+    case '3': return 1.25;
+    default: return 1;
   }
 };
 
 const getBathroomMultiplier = (bathrooms: string): number => {
   switch (bathrooms) {
-    case '1': return 0.95;  // 1 bathroom
-    case '2': return 1;     // 2 bathrooms 
-    case '3': return 1.05;  // 3 bathrooms
-    default: return 1;      // Default
+    case '1': return 0.95;
+    case '2': return 1;
+    case '3': return 1.05;
+    default: return 1;
   }
 };
 
-// Real neighborhood data by city
 const REAL_NEIGHBORHOODS = {
   'san diego': [
     'Gaslamp Quarter', 'Little Italy', 'Hillcrest', 'Mission Valley', 'La Jolla', 
@@ -63,7 +63,6 @@ const REAL_NEIGHBORHOODS = {
   ]
 };
 
-// Get city coordinates for RapidAPI search
 const getCityCoordinates = (city: string): { lat: number; lng: number } => {
   const cityCoords: { [key: string]: { lat: number; lng: number } } = {
     'san diego': { lat: 32.7157, lng: -117.1611 },
@@ -78,17 +77,16 @@ const getCityCoordinates = (city: string): { lat: number; lng: number } => {
     'orlando': { lat: 28.5383, lng: -81.3792 }
   };
   
-  return cityCoords[city.toLowerCase()] || { lat: 40.7128, lng: -74.0060 }; // Default to NYC
+  return cityCoords[city.toLowerCase()] || { lat: 40.7128, lng: -74.0060 };
 };
 
-// ACTUAL RapidAPI AirDNA integration using your subscription
 const fetchRealAirDNAData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<STRData[]> => {
   try {
-    console.log(`🏠 Using REAL RapidAPI AirDNA for ${city} with subscription`);
+    console.log(`🏠 Using RapidAPI AirDNA for ${city}`);
     
     if (!apiKey || apiKey.trim() === '') {
       console.log('❌ No RapidAPI key provided');
-      throw new Error('RapidAPI key required for premium data');
+      throw new Error('RapidAPI key required for data access');
     }
 
     const coords = getCityCoordinates(city);
@@ -97,7 +95,7 @@ const fetchRealAirDNAData = async (city: string, apiKey: string, propertyType: s
     
     console.log(`📍 Searching ${city} at coordinates:`, coords);
     
-    // Use the ACTUAL RapidAPI AirDNA endpoint you have access to
+    // Use a working RapidAPI endpoint
     const response = await fetch(`https://airbnb-listings.p.rapidapi.com/v2/listingsByGeo?ne_lat=${coords.lat + 0.1}&ne_lng=${coords.lng + 0.1}&sw_lat=${coords.lat - 0.1}&sw_lng=${coords.lng - 0.1}&offset=0&limit=50`, {
       method: 'GET',
       headers: {
@@ -114,42 +112,38 @@ const fetchRealAirDNAData = async (city: string, apiKey: string, propertyType: s
       console.error(`❌ RapidAPI error: ${response.status} - ${errorText}`);
       
       if (response.status === 429) {
-        throw new Error('API rate limit exceeded. Please wait a moment and try again.');
+        throw new Error('API rate limit exceeded. Please wait and try again.');
       } else if (response.status === 403) {
-        throw new Error('API access denied. Please check your RapidAPI subscription status.');
+        throw new Error('API access denied. Please verify your RapidAPI subscription.');
       } else {
         throw new Error(`API error: ${response.status}`);
       }
     }
 
     const data = await response.json();
-    console.log('🏠 Real RapidAPI response sample:', data);
+    console.log('🏠 RapidAPI response sample:', data);
     
-    // Process the REAL data from your subscription
     let processedData: STRData[] = [];
     
     if (data && data.results && Array.isArray(data.results)) {
-      console.log(`📊 Processing ${data.results.length} real properties from RapidAPI`);
+      console.log(`📊 Processing ${data.results.length} properties from RapidAPI`);
       
       processedData = data.results
         .filter((listing: any) => {
-          // Filter by bedroom/bathroom requirements
           const bedroomMatch = !propertyType || listing.bedrooms == parseInt(propertyType);
           const bathroomMatch = !bathrooms || listing.bathrooms >= parseInt(bathrooms);
           const hasRevenue = listing.revenue || listing.price || listing.estimated_revenue;
           
           return bedroomMatch && bathroomMatch && hasRevenue;
         })
-        .slice(0, 15) // Get top 15 properties
+        .slice(0, 15)
         .map((listing: any, index: number) => {
-          // Extract neighborhood from the real listing data
           const neighborhood = listing.neighborhood || 
                              listing.neighbourhood_cleansed ||
                              listing.location ||
                              listing.city ||
                              `${city} Area ${index + 1}`;
           
-          // Calculate revenue from real data
           const baseRevenue = listing.revenue || 
                             listing.estimated_revenue ||
                             listing.price ||
@@ -158,8 +152,6 @@ const fetchRealAirDNAData = async (city: string, apiKey: string, propertyType: s
           
           const adjustedRevenue = Math.round(baseRevenue * bedroomMultiplier * bathroomMultiplier);
           
-          console.log(`🏘️ Processing property: ${neighborhood}, Revenue: $${adjustedRevenue}`);
-          
           return {
             submarket: neighborhood,
             revenue: adjustedRevenue
@@ -167,26 +159,25 @@ const fetchRealAirDNAData = async (city: string, apiKey: string, propertyType: s
         });
 
       if (processedData.length > 0) {
-        console.log(`✅ Successfully processed ${processedData.length} REAL properties from RapidAPI`);
+        console.log(`✅ Successfully processed ${processedData.length} properties from RapidAPI`);
         return processedData;
       }
     }
 
-    console.log('⚠️ No suitable properties found in RapidAPI response, using enhanced fallback');
-    return generateEnhancedSTRData(city, propertyType, bathrooms);
+    console.log('⚠️ No suitable properties found in RapidAPI response, using fallback');
+    return generateFallbackSTRData(city, propertyType, bathrooms);
 
   } catch (error) {
     console.error('❌ RapidAPI AirDNA error:', error);
-    throw error; // Re-throw to show user the real error
+    throw error;
   }
 };
 
-// Enhanced STR data generation as fallback only
-const generateEnhancedSTRData = (city: string, propertyType: string, bathrooms: string): STRData[] => {
+const generateFallbackSTRData = (city: string, propertyType: string, bathrooms: string): STRData[] => {
   const bedroomMultiplier = getBedroomMultiplier(propertyType);
   const bathroomMultiplier = getBathroomMultiplier(bathrooms);
   
-  const premiumCityData: { [key: string]: { base: number; neighborhoods: Array<{ name: string; multiplier: number }> } } = {
+  const cityData: { [key: string]: { base: number; neighborhoods: Array<{ name: string; multiplier: number }> } } = {
     'san diego': {
       base: 6500,
       neighborhoods: [
@@ -205,98 +196,66 @@ const generateEnhancedSTRData = (city: string, propertyType: string, bathrooms: 
         { name: 'Normal Heights', multiplier: 0.82 },
         { name: 'Kensington', multiplier: 0.94 }
       ]
-    },
-    'denver': {
-      base: 5200,
-      neighborhoods: [
-        { name: 'LoDo', multiplier: 1.30 },
-        { name: 'Capitol Hill', multiplier: 1.15 },
-        { name: 'Highland', multiplier: 1.20 },
-        { name: 'RiNo', multiplier: 1.25 },
-        { name: 'Cherry Creek', multiplier: 1.35 },
-        { name: 'Washington Park', multiplier: 1.10 },
-        { name: 'Five Points', multiplier: 1.05 },
-        { name: 'Stapleton', multiplier: 0.95 },
-        { name: 'Baker', multiplier: 1.08 },
-        { name: 'Berkeley', multiplier: 0.90 }
-      ]
-    },
-    'seattle': {
-      base: 5800,
-      neighborhoods: [
-        { name: 'Capitol Hill', multiplier: 1.25 },
-        { name: 'Belltown', multiplier: 1.30 },
-        { name: 'Queen Anne', multiplier: 1.20 },
-        { name: 'Fremont', multiplier: 1.10 },
-        { name: 'Ballard', multiplier: 1.15 },
-        { name: 'Wallingford', multiplier: 1.05 },
-        { name: 'University District', multiplier: 0.95 },
-        { name: 'Georgetown', multiplier: 0.85 },
-        { name: 'Pioneer Square', multiplier: 1.12 },
-        { name: 'Green Lake', multiplier: 1.08 }
-      ]
     }
   };
   
   const cityKey = city.toLowerCase();
-  const premiumCityInfo = premiumCityData[cityKey];
+  const cityInfo = cityData[cityKey];
   
-  if (!premiumCityInfo) {
+  if (!cityInfo) {
     const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Downtown`, `${city} Midtown`];
-    const enhancedBaseRevenue = 4800 * bedroomMultiplier * bathroomMultiplier;
+    const baseRevenue = 4800 * bedroomMultiplier * bathroomMultiplier;
     
     return neighborhoods.slice(0, 10).map((neighborhood, index) => {
-      const premiumVariation = 0.85 + (index * 0.04) + (Math.random() * 0.25);
+      const variation = 0.85 + (index * 0.04) + (Math.random() * 0.25);
       return {
         submarket: neighborhood,
-        revenue: Math.round(enhancedBaseRevenue * premiumVariation)
+        revenue: Math.round(baseRevenue * variation)
       };
     });
   }
   
-  return premiumCityInfo.neighborhoods.map(neighborhood => ({
+  return cityInfo.neighborhoods.map(neighborhood => ({
     submarket: neighborhood.name,
-    revenue: Math.round(premiumCityInfo.base * neighborhood.multiplier * bedroomMultiplier * bathroomMultiplier)
+    revenue: Math.round(cityInfo.base * neighborhood.multiplier * bedroomMultiplier * bathroomMultiplier)
   }));
 };
 
-// Enhanced OpenAI rent research with better prompting
-const fetchEnhancedOpenAIRentData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<RentData[]> => {
+const fetchOpenAIRentData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<RentData[]> => {
   try {
-    console.log(`🤖 Using enhanced OpenAI research for ${city}`);
+    console.log(`🤖 Using OpenAI for rent research in ${city}`);
     
     if (!apiKey || apiKey.trim() === '') {
-      console.log('⚠️ No OpenAI API key, using premium fallback data');
-      return generateEnhancedRentData(city, propertyType, bathrooms);
+      console.log('⚠️ No OpenAI API key, using fallback data');
+      return generateFallbackRentData(city, propertyType, bathrooms);
     }
     
     const cityKey = city.toLowerCase();
     const knownNeighborhoods = REAL_NEIGHBORHOODS[cityKey];
     
-    let enhancedPrompt = `As a premium real estate analyst, research ${city} rental market for ${propertyType}-bedroom, ${bathrooms}-bathroom apartments with subscription-quality accuracy.
+    let prompt = `Research ${city} rental market for ${propertyType}-bedroom, ${bathrooms}-bathroom apartments.
 
-I need REAL neighborhood names and current median monthly rent prices for each specific neighborhood.`;
+I need real neighborhood names and current median monthly rent prices.`;
 
     if (knownNeighborhoods) {
-      enhancedPrompt += `\n\nFocus on these verified neighborhoods in ${city}: ${knownNeighborhoods.join(', ')}.`;
+      prompt += `\n\nFocus on these neighborhoods in ${city}: ${knownNeighborhoods.join(', ')}.`;
     }
 
-    enhancedPrompt += `\n\nReturn a JSON object with this exact structure:
+    prompt += `\n\nReturn a JSON object with this structure:
 {
   "rentData": [
     {
-      "submarket": "Exact Neighborhood Name",
+      "submarket": "Neighborhood Name",
       "rent": 2400
     }
   ]
 }
 
-Premium Requirements:
-- Use ONLY verified real neighborhood names (no generic "North/South/East/West" areas)
-- Provide 10-12 actual neighborhoods for comprehensive coverage
-- Include accurate Q4 2024 median rent estimates for ${propertyType}BR/${bathrooms}BA apartments
-- Focus on rental arbitrage viable areas
-- Use specific neighborhood/district names like "Capitol Hill", "Mission Bay", etc.`;
+Requirements:
+- Use real neighborhood names
+- Provide 10-12 neighborhoods
+- Include current Q4 2024 median rent for ${propertyType}BR/${bathrooms}BA apartments
+- Focus on rental-viable areas`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -309,11 +268,11 @@ Premium Requirements:
         messages: [
           {
             role: 'system',
-            content: 'You are a premium real estate market analyst with access to current rental data. Always use specific, real neighborhood names - never generic directions. Provide subscription-quality accuracy. Return valid JSON only.'
+            content: 'You are a real estate analyst. Return valid JSON only.'
           },
           {
             role: 'user',
-            content: enhancedPrompt
+            content: prompt
           }
         ],
         temperature: 0.05,
@@ -321,55 +280,38 @@ Premium Requirements:
       })
     });
 
-    console.log(`🤖 Enhanced OpenAI response status: ${response.status}`);
-
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`❌ OpenAI API error: ${response.status} - ${errorText}`);
-      console.log('⚠️ OpenAI failed, using premium fallback data');
-      return generateEnhancedRentData(city, propertyType, bathrooms);
+      console.log('⚠️ OpenAI failed, using fallback data');
+      return generateFallbackRentData(city, propertyType, bathrooms);
     }
 
     const data = await response.json();
     const content = data.choices[0].message.content;
     
-    console.log('🤖 Enhanced OpenAI rent response:', content);
-    
     try {
       const parsedContent = JSON.parse(content);
       const rentData = parsedContent.rentData || [];
       
-      if (rentData.length < 8 || rentData.some((item: any) => 
-        item.submarket.includes('North') || 
-        item.submarket.includes('South') || 
-        item.submarket.includes('East') || 
-        item.submarket.includes('West') ||
-        item.submarket.includes('Area') ||
-        item.submarket.includes('District') ||
-        !item.submarket || !item.rent
-      )) {
-        console.log('🔄 OpenAI provided generic/incomplete data, using premium fallback');
-        return generateEnhancedRentData(city, propertyType, bathrooms);
+      if (rentData.length >= 8) {
+        console.log('✅ Got quality rent data from OpenAI');
+        return rentData;
       }
-      
-      console.log('✅ Premium OpenAI data validated and approved');
-      return rentData;
     } catch (parseError) {
-      console.error('Failed to parse enhanced OpenAI response:', parseError);
-      return generateEnhancedRentData(city, propertyType, bathrooms);
+      console.error('Failed to parse OpenAI response:', parseError);
     }
 
+    return generateFallbackRentData(city, propertyType, bathrooms);
+
   } catch (error) {
-    console.error('❌ Enhanced OpenAI rent research error:', error);
-    return generateEnhancedRentData(city, propertyType, bathrooms);
+    console.error('❌ OpenAI rent research error:', error);
+    return generateFallbackRentData(city, propertyType, bathrooms);
   }
 };
 
-// Enhanced rent data generation with subscription quality
-const generateEnhancedRentData = (city: string, propertyType: string, bathrooms: string): RentData[] => {
+const generateFallbackRentData = (city: string, propertyType: string, bathrooms: string): RentData[] => {
   const cityKey = city.toLowerCase();
   
-  const premiumRentData: { [key: string]: Array<{ name: string; rent: number }> } = {
+  const rentData: { [key: string]: Array<{ name: string; rent: number }> } = {
     'san diego': [
       { name: 'Gaslamp Quarter', rent: 3100 },
       { name: 'Pacific Beach', rent: 2750 },
@@ -380,49 +322,21 @@ const generateEnhancedRentData = (city: string, propertyType: string, bathrooms:
       { name: 'Ocean Beach', rent: 2550 },
       { name: 'Balboa Park', rent: 2350 },
       { name: 'North Park', rent: 2250 },
-      { name: 'Mission Valley', rent: 2450 },
-      { name: 'South Park', rent: 2150 },
-      { name: 'University Heights', rent: 2050 },
-      { name: 'Normal Heights', rent: 1950 },
-      { name: 'Kensington', rent: 2300 }
-    ],
-    'denver': [
-      { name: 'LoDo', rent: 2800 },
-      { name: 'Capitol Hill', rent: 2400 },
-      { name: 'Highland', rent: 2600 },
-      { name: 'RiNo', rent: 2750 },
-      { name: 'Cherry Creek', rent: 3200 },
-      { name: 'Washington Park', rent: 2900 },
-      { name: 'Five Points', rent: 2300 },
-      { name: 'Stapleton', rent: 2500 },
-      { name: 'Baker', rent: 2350 },
-      { name: 'Berkeley', rent: 2200 }
-    ],
-    'seattle': [
-      { name: 'Capitol Hill', rent: 3000 },
-      { name: 'Belltown', rent: 3200 },
-      { name: 'Queen Anne', rent: 2900 },
-      { name: 'Fremont', rent: 2600 },
-      { name: 'Ballard', rent: 2750 },
-      { name: 'Wallingford', rent: 2650 },
-      { name: 'University District', rent: 2400 },
-      { name: 'Georgetown', rent: 2200 },
-      { name: 'Pioneer Square', rent: 2800 },
-      { name: 'Green Lake', rent: 2700 }
+      { name: 'Mission Valley', rent: 2450 }
     ]
   };
   
-  const cityRentData = premiumRentData[cityKey];
+  const cityRentData = rentData[cityKey];
   
   if (!cityRentData) {
     const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Downtown`, `${city} Midtown`];
-    const premiumBaseRent = propertyType === '1' ? 1600 : propertyType === '2' ? 2100 : 2800;
+    const baseRent = propertyType === '1' ? 1600 : propertyType === '2' ? 2100 : 2800;
     
     return neighborhoods.slice(0, 10).map((neighborhood, index) => {
-      const premiumVariation = 0.80 + (index * 0.05) + (Math.random() * 0.20);
+      const variation = 0.80 + (index * 0.05) + (Math.random() * 0.20);
       return {
         submarket: neighborhood,
-        rent: Math.round(premiumBaseRent * premiumVariation)
+        rent: Math.round(baseRent * variation)
       };
     });
   }
@@ -439,53 +353,40 @@ export const fetchMarketData = async (
   propertyType: string = '2',
   bathrooms: string = '1'
 ): Promise<CityMarketData> => {
-  console.log(`🔍 Fetching REAL subscription data for ${city} (${propertyType}BR/${bathrooms}BA properties)`);
-  console.log('🔑 API Config:', {
-    hasAirdnaKey: !!apiConfig.airdnaApiKey,
-    hasOpenaiKey: !!apiConfig.openaiApiKey,
-    airdnaKeyStart: apiConfig.airdnaApiKey ? apiConfig.airdnaApiKey.substring(0, 12) + '...' : 'None',
-    openaiKeyStart: apiConfig.openaiApiKey ? apiConfig.openaiApiKey.substring(0, 8) + '...' : 'None'
-  });
+  console.log(`🔍 Fetching market data for ${city} (${propertyType}BR/${bathrooms}BA properties)`);
 
   try {
     let strData: STRData[] = [];
     let rentData: RentData[] = [];
 
-    // Use REAL RapidAPI AirDNA with your subscription
     if (apiConfig.airdnaApiKey && apiConfig.airdnaApiKey.trim() !== '') {
-      console.log('🏠 Using REAL RapidAPI AirDNA subscription data...');
+      console.log('🏠 Using RapidAPI AirDNA...');
       try {
         strData = await fetchRealAirDNAData(city, apiConfig.airdnaApiKey, propertyType, bathrooms);
-        console.log(`✅ Got ${strData.length} REAL properties from RapidAPI subscription`);
+        console.log(`✅ Got ${strData.length} properties from RapidAPI`);
       } catch (error) {
         console.error('❌ RapidAPI failed:', error);
-        throw error; // Show the real error to user
+        throw error;
       }
     } else {
-      console.log('❌ No RapidAPI key - cannot access subscription data');
-      throw new Error('RapidAPI key required for real market data. Please add your subscription key.');
+      console.log('❌ No RapidAPI key - cannot access data');
+      throw new Error('RapidAPI key required for market data. Please add your API key.');
     }
 
-    // Try enhanced OpenAI for premium rent data
     try {
       if (apiConfig.openaiApiKey && apiConfig.openaiApiKey.trim() !== '') {
-        rentData = await fetchEnhancedOpenAIRentData(city, apiConfig.openaiApiKey, propertyType, bathrooms);
-        console.log('✅ Got premium rent data from OpenAI or enhanced fallback:', rentData.length, 'submarkets');
+        rentData = await fetchOpenAIRentData(city, apiConfig.openaiApiKey, propertyType, bathrooms);
       } else {
-        console.log('⚠️ No OpenAI key, using enhanced rent fallback');
-        rentData = generateEnhancedRentData(city, propertyType, bathrooms);
+        rentData = generateFallbackRentData(city, propertyType, bathrooms);
       }
     } catch (error) {
-      console.warn('⚠️ OpenAI failed, using enhanced fallback:', error);
-      rentData = generateEnhancedRentData(city, propertyType, bathrooms);
+      console.warn('⚠️ OpenAI failed, using fallback:', error);
+      rentData = generateFallbackRentData(city, propertyType, bathrooms);
     }
 
-    console.log(`✅ REAL subscription data compiled for ${city}:`, {
+    console.log(`✅ Market data compiled for ${city}:`, {
       strSubmarkets: strData.length,
-      rentSubmarkets: rentData.length,
-      avgRevenue: Math.round(strData.reduce((sum, s) => sum + s.revenue, 0) / strData.length),
-      avgRent: Math.round(rentData.reduce((sum, r) => sum + r.rent, 0) / rentData.length),
-      qualityLevel: 'REAL RAPIDAPI SUBSCRIPTION'
+      rentSubmarkets: rentData.length
     });
 
     return {
@@ -494,7 +395,7 @@ export const fetchMarketData = async (
     };
 
   } catch (error) {
-    console.error('❌ Failed to fetch real subscription data:', error);
+    console.error('❌ Failed to fetch market data:', error);
     throw error;
   }
 };
