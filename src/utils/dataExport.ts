@@ -7,60 +7,18 @@ interface ExportData {
 }
 
 export const exportToCSV = (data: ExportData[], filename: string = 'market-analysis') => {
-  // Generate 12 months of data for each submarket using actual revenue data
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
+  // Create CSV headers - simplified to actual useful data
+  const headers = ['Year', 'Submarket', 'STR Revenue', 'Median Rent', 'Revenue-to-Rent Multiple'];
   
   const currentYear = new Date().getFullYear();
   
-  // Create expanded data using actual market analysis data
-  const expandedData: Array<{
-    year: number;
-    submarket: string;
-    month: string;
-    actualRevenue: number;
-    revenuePlus25: number;
-    medianRent: number;
-    multiple: number;
-  }> = [];
-  
-  data.forEach(submarketData => {
-    months.forEach((month) => {
-      // Use the actual STR revenue from the market analysis as-is
-      const actualRevenue = submarketData.strRevenue;
-      
-      // Add 25% to the actual revenue
-      const revenuePlus25 = Math.round(actualRevenue * 1.25);
-      
-      // Calculate multiple based on revenue + 25%
-      const monthlyMultiple = revenuePlus25 / submarketData.medianRent;
-      
-      expandedData.push({
-        year: currentYear,
-        submarket: submarketData.submarket,
-        month,
-        actualRevenue: actualRevenue,
-        revenuePlus25: revenuePlus25,
-        medianRent: submarketData.medianRent,
-        multiple: monthlyMultiple
-      });
-    });
-  });
-  
-  // Create CSV headers
-  const headers = ['Year', 'Submarket', 'Month', 'STR Revenue', 'Revenue + 25%', 'Median Rent', 'Revenue-to-Rent Multiple'];
-  
-  // Convert data to CSV format
+  // Convert data to CSV format - one row per submarket with actual data
   const csvContent = [
     headers.join(','),
-    ...expandedData.map(row => [
-      row.year,
+    ...data.map(row => [
+      currentYear,
       `"${row.submarket}"`,
-      `"${row.month}"`,
-      row.actualRevenue,
-      row.revenuePlus25,
+      row.strRevenue,
       row.medianRent,
       row.multiple.toFixed(2)
     ].join(','))
@@ -72,7 +30,7 @@ export const exportToCSV = (data: ExportData[], filename: string = 'market-analy
   const url = URL.createObjectURL(blob);
   
   link.setAttribute('href', url);
-  link.setAttribute('download', `${filename}-12-months.csv`);
+  link.setAttribute('download', `${filename}.csv`);
   link.style.visibility = 'hidden';
   
   document.body.appendChild(link);
