@@ -77,14 +77,14 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
 
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <Receipt className="h-5 w-5 text-cyan-400" />
+            <CardTitle className="flex items-center gap-2 text-white text-lg">
+              <Receipt className="h-4 w-4 text-cyan-400" />
               Monthly Expenses
             </CardTitle>
-            <p className="text-sm text-gray-300">
+            <p className="text-xs text-gray-300">
               All monthly operating costs for your STR property
             </p>
           </div>
@@ -92,182 +92,182 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
             onClick={fetchAutoExpenses}
             disabled={isLoadingExpenses || !data.address.trim()}
             size="sm"
-            className="bg-cyan-600 hover:bg-cyan-700 text-white"
+            className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs"
           >
             {isLoadingExpenses ? (
               <>
-                <Loader2 className="h-3 w-3 mr-2 animate-spin" />
+                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
                 Searching...
               </>
             ) : (
               <>
-                <Search className="h-3 w-3 mr-2" />
-                Auto-Fill Local Costs
+                <Search className="h-3 w-3 mr-1" />
+                Auto-Fill
               </>
             )}
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label className="text-gray-200">Rent</Label>
+      <CardContent className="space-y-3">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="space-y-1">
+            <Label className="text-gray-200 text-xs">Rent</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
                 value={data.rent || ''}
                 onChange={(e) => updateData({ rent: parseFloat(e.target.value) || 0 })}
                 placeholder="1975"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-200">Service Fees (2.9% of revenue)</Label>
+          <div className="space-y-1">
+            <Label className="text-gray-200 text-xs">Service Fees (2.9%)</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
                 value={Math.round(serviceFeeCalculated)}
                 readOnly
-                className="pl-10 bg-gray-700/50 border-gray-600 text-gray-300"
+                className="pl-7 h-8 text-sm bg-gray-700/50 border-gray-600 text-gray-300"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-200">Maintenance</Label>
+          <div className="space-y-1">
+            <Label className="text-gray-200 text-xs">Maintenance</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
                 value={data.maintenance || ''}
                 onChange={(e) => updateData({ maintenance: parseFloat(e.target.value) || 0 })}
                 placeholder="0"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-200">Power/Electricity</Label>
+          <div className="space-y-1">
+            <Label className="text-gray-200 text-xs">Power/Electricity</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
                 value={data.power || ''}
                 onChange={(e) => updateData({ power: parseFloat(e.target.value) || 0 })}
                 placeholder="190"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-200">Water/Sewer</Label>
+          <div className="space-y-1">
+            <Label className="text-gray-200 text-xs">Water/Sewer</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
                 value={data.waterSewer || ''}
                 onChange={(e) => updateData({ waterSewer: parseFloat(e.target.value) || 0 })}
                 placeholder="0"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-200">Internet</Label>
+          <div className="space-y-1">
+            <Label className="text-gray-200 text-xs">Internet</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
                 value={data.internet || ''}
                 onChange={(e) => updateData({ internet: parseFloat(e.target.value) || 0 })}
                 placeholder="70"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-200">License</Label>
+          <div className="space-y-1">
+            <Label className="text-gray-200 text-xs">License</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
                 value={data.taxLicense || ''}
                 onChange={(e) => updateData({ taxLicense: parseFloat(e.target.value) || 0 })}
                 placeholder="29"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-200">Insurance</Label>
+          <div className="space-y-1">
+            <Label className="text-gray-200 text-xs">Insurance</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
                 value={data.insurance || ''}
                 onChange={(e) => updateData({ insurance: parseFloat(e.target.value) || 0 })}
                 placeholder="15"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-200">Software</Label>
+          <div className="space-y-1">
+            <Label className="text-gray-200 text-xs">Software</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
                 value={data.software || ''}
                 onChange={(e) => updateData({ software: parseFloat(e.target.value) || 0 })}
                 placeholder="70"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-200">Miscellaneous</Label>
+          <div className="space-y-1">
+            <Label className="text-gray-200 text-xs">Miscellaneous</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
                 value={data.miscellaneous || ''}
                 onChange={(e) => updateData({ miscellaneous: parseFloat(e.target.value) || 0 })}
                 placeholder="0"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-200">Furniture Rental</Label>
+          <div className="space-y-1">
+            <Label className="text-gray-200 text-xs">Furniture Rental</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
                 value={data.furnitureRental || ''}
                 onChange={(e) => updateData({ furnitureRental: parseFloat(e.target.value) || 0 })}
                 placeholder="750"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
         </div>
 
-        <div className="mt-6 p-4 bg-gradient-to-r from-blue-600/20 to-slate-600/20 rounded-lg border border-blue-500/30">
+        <div className="mt-4 p-3 bg-gradient-to-r from-blue-600/20 to-slate-600/20 rounded-lg border border-blue-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-blue-300 font-medium">Total Monthly Expenses</Label>
-            <span className="text-2xl font-bold text-blue-400">
+            <Label className="text-blue-300 font-medium text-sm">Total Monthly Expenses</Label>
+            <span className="text-xl font-bold text-blue-400">
               ${monthlyExpenses.toLocaleString()}
             </span>
           </div>
