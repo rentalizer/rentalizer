@@ -86,7 +86,7 @@ const generateFallbackSTRData = (city: string, propertyType: string, bathrooms: 
   
   const cityData: { [key: string]: { base: number; neighborhoods: Array<{ name: string; multiplier: number }> } } = {
     'san diego': {
-      base: 6500,
+      base: 3200, // Reduced from 6500 to more realistic value
       neighborhoods: [
         { name: 'Gaslamp Quarter', multiplier: 1.25 },
         { name: 'Pacific Beach', multiplier: 1.12 },
@@ -111,7 +111,7 @@ const generateFallbackSTRData = (city: string, propertyType: string, bathrooms: 
   
   if (!cityInfo) {
     const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Downtown`, `${city} Midtown`];
-    const baseRevenue = 4800 * bedroomMultiplier * bathroomMultiplier;
+    const baseRevenue = 2800 * bedroomMultiplier * bathroomMultiplier; // Reduced from 4800
     
     return neighborhoods.slice(0, 10).map((neighborhood, index) => {
       const variation = 0.85 + (index * 0.04) + (Math.random() * 0.25);
