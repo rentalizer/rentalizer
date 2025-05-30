@@ -11,7 +11,6 @@ import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
 import { ExpensesSection } from '@/components/calculator/ExpensesSection';
 import { NetProfitSection } from '@/components/calculator/NetProfitSection';
-import { FurnishingsSection } from '@/components/calculator/FurnishingsSection';
 
 export interface CalculatorData {
   // Comps
@@ -76,7 +75,6 @@ const Calculator = () => {
   const netProfitMonthly = monthlyRevenue - monthlyExpenses;
   const paybackMonths = cashToLaunch > 0 ? cashToLaunch / netProfitMonthly : 0;
   const cashOnCashReturn = cashToLaunch > 0 ? (netProfitMonthly * 12 / cashToLaunch) * 100 : 0;
-  const calculatedFurnishings = data.squareFootage * data.furnishingsPSF;
 
   // Update service fees when average comparable changes
   useEffect(() => {
@@ -115,15 +113,15 @@ const Calculator = () => {
           </p>
         </div>
 
-        {/* Symmetrical 2x2 Grid Layout */}
-        <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
-          {/* Top Left */}
+        {/* Optimized 2x2 Grid Layout */}
+        <div className="grid lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
+          {/* Top Left - Comps */}
           <CompsSection data={data} updateData={updateData} />
           
-          {/* Top Right */}
+          {/* Top Right - Build Out with Integrated Furnishings */}
           <BuildOutSection data={data} updateData={updateData} cashToLaunch={cashToLaunch} />
           
-          {/* Bottom Left */}
+          {/* Bottom Left - Expenses */}
           <ExpensesSection 
             data={data} 
             updateData={updateData} 
@@ -131,21 +129,12 @@ const Calculator = () => {
             monthlyExpenses={monthlyExpenses}
           />
           
-          {/* Bottom Right */}
+          {/* Bottom Right - Net Profit */}
           <NetProfitSection 
             monthlyRevenue={monthlyRevenue}
             netProfitMonthly={netProfitMonthly}
             paybackMonths={paybackMonths}
             cashOnCashReturn={cashOnCashReturn}
-          />
-        </div>
-
-        {/* Furnishings Calculator - Full Width Below */}
-        <div className="mt-8 max-w-4xl mx-auto">
-          <FurnishingsSection 
-            data={data} 
-            updateData={updateData} 
-            calculatedFurnishings={calculatedFurnishings} 
           />
         </div>
       </div>

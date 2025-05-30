@@ -32,14 +32,14 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
           Calculate monthly profit and return on investment
         </p>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         {/* Monthly Revenue */}
-        <div className="p-4 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-lg border border-blue-500/30">
+        <div className="p-3 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-lg border border-blue-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-blue-300 font-medium">Monthly Revenue</Label>
+            <Label className="text-blue-300 font-medium text-sm">Monthly Revenue</Label>
             <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-blue-400" />
-              <span className="text-xl font-bold text-blue-400">
+              <DollarSign className="h-4 w-4 text-blue-400" />
+              <span className="text-lg font-bold text-blue-400">
                 ${monthlyRevenue.toLocaleString()}
               </span>
             </div>
@@ -47,33 +47,31 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
         </div>
 
         {/* Net Profit */}
-        <div className={`p-4 bg-gradient-to-r ${profitBgColor} rounded-lg border`}>
+        <div className={`p-3 bg-gradient-to-r ${profitBgColor} rounded-lg border`}>
           <div className="flex items-center justify-between mb-2">
-            <Label className={`${profitColor} font-medium`}>Net Profit (Monthly)</Label>
+            <Label className={`${profitColor} font-medium text-sm`}>Monthly Profit</Label>
             <div className="flex items-center gap-2">
-              <DollarSign className={`h-5 w-5 ${profitColor}`} />
-              <span className={`text-2xl font-bold ${profitColor}`}>
+              <DollarSign className={`h-4 w-4 ${profitColor}`} />
+              <span className={`text-lg font-bold ${profitColor}`}>
                 ${Math.abs(netProfitMonthly).toLocaleString()}
               </span>
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <Label className={`${profitColor} font-medium`}>Net Profit (Annual)</Label>
-            <div className="flex items-center gap-2">
-              <span className={`text-lg font-semibold ${profitColor}`}>
-                ${Math.abs(netProfitMonthly * 12).toLocaleString()}
-              </span>
-            </div>
+            <Label className={`${profitColor} font-medium text-sm`}>Annual Profit</Label>
+            <span className={`text-sm font-semibold ${profitColor}`}>
+              ${Math.abs(netProfitMonthly * 12).toLocaleString()}
+            </span>
           </div>
         </div>
 
         {/* Payback Period */}
-        <div className="p-4 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
+        <div className="p-3 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-cyan-300 font-medium">Payback in Months</Label>
+            <Label className="text-cyan-300 font-medium text-sm">Payback Months</Label>
             <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-cyan-400" />
-              <span className="text-xl font-bold text-cyan-400">
+              <Calendar className="h-4 w-4 text-cyan-400" />
+              <span className="text-lg font-bold text-cyan-400">
                 {paybackMonths > 0 && isFinite(paybackMonths) ? paybackMonths.toFixed(1) : '∞'}
               </span>
             </div>
@@ -81,29 +79,14 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
         </div>
 
         {/* Cash on Cash Return */}
-        <div className="p-4 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-lg border border-blue-500/30">
+        <div className="p-3 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-lg border border-blue-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-blue-300 font-medium">Cash on Cash Return</Label>
+            <Label className="text-blue-300 font-medium text-sm">Cash on Cash Return</Label>
             <div className="flex items-center gap-2">
-              <Percent className="h-5 w-5 text-blue-400" />
-              <span className="text-xl font-bold text-blue-400">
+              <Percent className="h-4 w-4 text-blue-400" />
+              <span className="text-lg font-bold text-blue-400">
                 {isFinite(cashOnCashReturn) ? cashOnCashReturn.toFixed(2) : '0.00'}%
               </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Profit Status Indicator */}
-        <div className={`p-4 rounded-lg border-2 ${isProfit ? 'bg-cyan-900/20 border-cyan-500' : 'bg-blue-900/20 border-blue-500'}`}>
-          <div className="text-center">
-            <div className={`text-lg font-semibold ${profitColor} mb-1`}>
-              {isProfit ? '✅ Profitable Investment' : '❌ Unprofitable Investment'}
-            </div>
-            <div className="text-sm text-gray-300">
-              {isProfit 
-                ? `This property generates $${netProfitMonthly.toLocaleString()} monthly profit`
-                : `This property loses $${Math.abs(netProfitMonthly).toLocaleString()} monthly`
-              }
             </div>
           </div>
         </div>

@@ -3,7 +3,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Hammer, DollarSign } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Hammer, DollarSign, Calculator as CalculatorIcon } from 'lucide-react';
 import { CalculatorData } from '@/pages/Calculator';
 
 interface BuildOutSectionProps {
@@ -13,6 +14,12 @@ interface BuildOutSectionProps {
 }
 
 export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateData, cashToLaunch }) => {
+  const calculatedFurnishings = data.squareFootage * data.furnishingsPSF;
+
+  const applyCalculatedFurnishings = () => {
+    updateData({ furnishingsCost: calculatedFurnishings });
+  };
+
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
@@ -24,7 +31,8 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
           Initial costs required to launch your STR property
         </p>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
+        {/* Basic Costs */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label className="text-gray-200">First Month's Rent</Label>
@@ -55,6 +63,78 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
           </div>
         </div>
 
+        {/* Furnishings Calculator */}
+        <div className="space-y-4 p-4 bg-gray-800/20 rounded-lg border border-gray-600/50">
+          <Label className="text-cyan-300 font-medium">Furnishings Calculator</Label>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-gray-200 text-sm">Square Footage</Label>
+              <Input
+                type="number"
+                value={data.squareFootage || ''}
+                onChange={(e) => updateData({ squareFootage: parseFloat(e.target.value) || 0 })}
+                placeholder="850"
+                className="bg-gray-800/50 border-gray-600 text-gray-100"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-gray-200 text-sm">Price per Sq Ft</Label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  type="number"
+                  value={data.furnishingsPSF || ''}
+                  onChange={(e) => updateData({ furnishingsPSF: parseFloat(e.target.value) || 0 })}
+                  placeholder="8"
+                  className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Quality Tiers */}
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <div className="p-2 bg-gray-800/30 rounded text-center">
+              <div className="text-gray-300">Low ($6)</div>
+              <div className="text-cyan-400 font-medium">
+                ${(data.squareFootage * 6).toLocaleString()}
+              </div>
+            </div>
+            <div className="p-2 bg-gray-800/30 rounded text-center">
+              <div className="text-gray-300">Med ($7)</div>
+              <div className="text-cyan-400 font-medium">
+                ${(data.squareFootage * 7).toLocaleString()}
+              </div>
+            </div>
+            <div className="p-2 bg-gray-800/30 rounded text-center">
+              <div className="text-gray-300">High ($8)</div>
+              <div className="text-cyan-400 font-medium">
+                ${(data.squareFootage * 8).toLocaleString()}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between p-3 bg-cyan-600/20 rounded border border-cyan-500/30">
+            <div>
+              <div className="text-cyan-300 font-medium text-sm">Calculated Cost</div>
+              <div className="text-cyan-400 font-bold text-lg">
+                ${calculatedFurnishings.toLocaleString()}
+              </div>
+            </div>
+            <Button 
+              onClick={applyCalculatedFurnishings}
+              size="sm"
+              className="bg-cyan-600 hover:bg-cyan-700 text-white"
+            >
+              <CalculatorIcon className="h-3 w-3 mr-1" />
+              Apply
+            </Button>
+          </div>
+        </div>
+
+        {/* Manual Furnishings Input */}
         <div className="space-y-2">
           <Label className="text-gray-200">Furnishings Cost</Label>
           <div className="relative">
@@ -69,6 +149,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
           </div>
         </div>
 
+        {/* Cash to Launch Summary */}
         <div className="mt-6 p-4 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
           <div className="flex items-center justify-between">
             <Label className="text-cyan-300 font-medium">Cash to Launch</Label>

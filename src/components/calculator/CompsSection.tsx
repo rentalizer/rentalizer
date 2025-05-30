@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, MapPin, DollarSign, Map } from 'lucide-react';
 import { fetchMarketData } from '@/services/marketDataService';
 import { useToast } from '@/hooks/use-toast';
@@ -20,6 +21,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
   const [isLoading, setIsLoading] = useState(false);
   const [comps, setComps] = useState<Array<{ name: string; price: number }>>([]);
   const [showMap, setShowMap] = useState(false);
+  const [bedrooms, setBedrooms] = useState('2');
 
   const fetchComparables = async () => {
     if (!data.address.trim()) {
@@ -32,7 +34,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
     }
 
     setIsLoading(true);
-    console.log('🔍 Fetching comparables for:', data.address);
+    console.log('🔍 Fetching comparables for:', data.address, 'Bedrooms:', bedrooms);
     
     try {
       const apiKeys = {
@@ -40,12 +42,12 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
         openaiApiKey: localStorage.getItem('openai_api_key') || undefined
       };
       
-      const marketData = await fetchMarketData(data.address, apiKeys, '2', '1');
+      const marketData = await fetchMarketData(data.address, apiKeys, bedrooms, '1');
       
       const comparableProperties = marketData.strData
         .slice(0, 5)
         .map((item, index) => ({
-          name: item.submarket || `Comp Property #${index + 1}`,
+          name: item.submarket || `${bedrooms}BR Comp #${index + 1}`,
           price: item.revenue
         }));
       
@@ -59,7 +61,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
       
       toast({
         title: "Comparables Found",
-        description: `Found ${comparableProperties.length} comparable properties with average revenue of $${average.toLocaleString()}`,
+        description: `Found ${comparableProperties.length} ${bedrooms}BR comparable properties with average revenue of $${average.toLocaleString()}`,
       });
       
     } catch (error) {
@@ -82,35 +84,50 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
           Comparable Properties
         </CardTitle>
         <p className="text-sm text-gray-300">
-          Find 2BR/2BA apartments in your immediate target neighborhood (6 people capacity)
+          Find comparable apartments in your target neighborhood
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label className="text-gray-200">Property Address</Label>
-          <div className="flex gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label className="text-gray-200">Property Address</Label>
             <Input
               value={data.address}
               onChange={(e) => updateData({ address: e.target.value })}
               placeholder="Enter address or city"
-              className="flex-1 bg-gray-800/50 border-gray-600 text-gray-100 placeholder-gray-400"
+              className="bg-gray-800/50 border-gray-600 text-gray-100 placeholder-gray-400"
             />
-            <Button 
-              onClick={fetchComparables}
-              disabled={isLoading}
-              className="bg-cyan-600 hover:bg-cyan-700 text-white"
-            >
-              {isLoading ? (
-                'Searching...'
-              ) : (
-                <>
-                  <Search className="h-4 w-4 mr-2" />
-                  Search
-                </>
-              )}
-            </Button>
+          </div>
+          
+          <div className="space-y-2">
+            <Label className="text-gray-200">Bedrooms</Label>
+            <Select value={bedrooms} onValueChange={setBedrooms}>
+              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100">
+                <SelectValue placeholder="Select bedrooms" />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800 border-gray-600">
+                <SelectItem value="1" className="text-gray-100">1 Bedroom</SelectItem>
+                <SelectItem value="2" className="text-gray-100">2 Bedrooms</SelectItem>
+                <SelectItem value="3" className="text-gray-100">3 Bedrooms</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
+
+        <Button 
+          onClick={fetchComparables}
+          disabled={isLoading}
+          className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
+        >
+          {isLoading ? (
+            'Searching...'
+          ) : (
+            <>
+              <Search className="h-4 w-4 mr-2" />
+              Search {bedrooms}BR Properties
+            </>
+          )}
+        </Button>
 
         {comps.length > 0 && (
           <>
