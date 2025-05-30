@@ -11,7 +11,7 @@ interface ApiKeyInputProps {
 }
 
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
-  const [professionalKey, setProfessionalKey] = useState('');
+  const [professionalKey, setProfessionalKey] = useState('563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3');
   const [openaiKey, setOpenaiKey] = useState('');
   const [showKeys, setShowKeys] = useState(false);
   const [showStoredKeys, setShowStoredKeys] = useState(false);
@@ -48,7 +48,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
   // Load keys from localStorage on component mount
   React.useEffect(() => {
-    const savedProfessionalKey = localStorage.getItem('professional_data_key') || '';
+    const savedProfessionalKey = localStorage.getItem('professional_data_key') || '563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
     
     setProfessionalKey(savedProfessionalKey);
@@ -61,6 +61,17 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
       });
     }
   }, [onApiKeysChange]);
+
+  // Auto-save the AirDNA key on component mount
+  React.useEffect(() => {
+    if (professionalKey === '563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3') {
+      localStorage.setItem('professional_data_key', professionalKey);
+      onApiKeysChange({
+        airdnaApiKey: professionalKey,
+        openaiApiKey: openaiKey || undefined
+      });
+    }
+  }, []);
 
   return (
     <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
@@ -75,7 +86,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="professional-key" className="text-sm font-medium text-gray-300">
-                Professional Data Key (Optional)
+                Professional Data Key (AirDNA) ✅
               </Label>
               <Input
                 id="professional-key"
@@ -83,23 +94,23 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 value={professionalKey}
                 onChange={(e) => setProfessionalKey(e.target.value)}
                 placeholder="Enter professional data API key..."
-                className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                className="mt-1 border-green-500/30 bg-gray-800/50 text-gray-100 focus:border-green-400 focus:ring-green-400/20 placeholder:text-gray-500"
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Get from: rapidapi.com/hub (search for short-term rental data)
+              <p className="text-xs text-green-400 mt-1">
+                ✅ AirDNA API key configured
               </p>
             </div>
 
             <div>
               <Label htmlFor="openai-key" className="text-sm font-medium text-gray-300">
-                AI Research Key (Optional)
+                AI Research Key (OpenAI) - Required
               </Label>
               <Input
                 id="openai-key"
                 type={showKeys ? "text" : "password"}
                 value={openaiKey}
                 onChange={(e) => setOpenaiKey(e.target.value)}
-                placeholder="Enter AI research API key..."
+                placeholder="Enter OpenAI API key (sk-...)..."
                 className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
               />
               <p className="text-xs text-gray-500 mt-1">
