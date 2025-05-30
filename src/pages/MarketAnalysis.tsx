@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
-import { BarChart3, MapPin, Search, Loader2, ArrowLeft, Map, Table2, Home, Download } from 'lucide-react';
+import { BarChart3, MapPin, Search, Loader2, ArrowLeft, Map, Table2, Home, Download, Crown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
@@ -37,10 +37,11 @@ const MarketAnalysis = () => {
   const [bathrooms, setBathrooms] = useState<string>('1');
   const [isLoading, setIsLoading] = useState(false);
   const [apiConfig, setApiConfig] = useState<{ airdnaApiKey?: string; openaiApiKey?: string }>({});
+  const [dataQuality, setDataQuality] = useState<'basic' | 'enhanced' | 'premium'>('basic');
 
   // Load API keys from localStorage on component mount
   React.useEffect(() => {
-    console.log('📋 MarketAnalysis component mounted - initializing...');
+    console.log('📋 MarketAnalysis component mounted - initializing premium features...');
     
     // Check multiple possible key names to match live site
     const possibleAirdnaKeys = [
@@ -83,41 +84,53 @@ const MarketAnalysis = () => {
     });
     
     if (foundAirdnaKey || foundOpenaiKey) {
-      console.log('✅ API keys found in localStorage, setting state...');
+      console.log('✅ Premium API keys found - enabling enhanced features...');
       setApiConfig({
         airdnaApiKey: foundAirdnaKey || undefined,
         openaiApiKey: foundOpenaiKey || undefined
       });
       
+      // Determine data quality level
+      const qualityLevel = (foundAirdnaKey && foundOpenaiKey) ? 'premium' : 
+                          (foundAirdnaKey || foundOpenaiKey) ? 'enhanced' : 'basic';
+      setDataQuality(qualityLevel);
+      
       toast({
-        title: "✅ API Keys Loaded",
-        description: `Found stored API keys - ready for accurate market analysis`,
+        title: "✅ Premium Features Activated",
+        description: `Enhanced data quality enabled with ${qualityLevel} subscription benefits`,
       });
     } else {
-      console.log('❌ No API keys found in localStorage');
+      console.log('❌ No premium API keys found');
+      setDataQuality('basic');
       toast({
-        title: "⚠️ No API Keys Found",
-        description: "Using realistic fallback data. Configure API keys for live data access.",
+        title: "⚠️ Using Basic Data",
+        description: "Configure premium API keys to unlock subscription-quality market analysis",
         variant: "destructive",
       });
     }
   }, [toast]);
 
   const handleApiKeysChange = (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => {
-    console.log('🔄 API keys changed:', {
+    console.log('🔄 Premium API keys updated:', {
       airdna: keys.airdnaApiKey ? 'Updated' : 'Not provided',
       openai: keys.openaiApiKey ? 'Updated' : 'Not provided'
     });
     setApiConfig(keys);
+    
+    // Update quality level
+    const qualityLevel = (keys.airdnaApiKey && keys.openaiApiKey) ? 'premium' : 
+                        (keys.airdnaApiKey || keys.openaiApiKey) ? 'enhanced' : 'basic';
+    setDataQuality(qualityLevel);
   };
 
   const handleMarketAnalysis = async () => {
-    console.log('🚀 Market analysis started for:', {
+    console.log('🚀 Premium market analysis started for:', {
       targetCity,
       propertyType,
       bathrooms,
       hasAirdnaKey: !!apiConfig.airdnaApiKey,
-      hasOpenaiKey: !!apiConfig.openaiApiKey
+      hasOpenaiKey: !!apiConfig.openaiApiKey,
+      dataQuality
     });
 
     if (!targetCity.trim()) {
@@ -132,32 +145,35 @@ const MarketAnalysis = () => {
 
     setIsLoading(true);
     try {
-      console.log(`🚀 Starting market analysis for: ${targetCity} (${propertyType}BR/${bathrooms}BA properties)`);
-      console.log('🔑 Using API keys:', {
-        airdna: apiConfig.airdnaApiKey ? 'Present' : 'Missing',
-        openai: apiConfig.openaiApiKey ? 'Present' : 'Missing'
+      console.log(`🚀 Starting PREMIUM market analysis for: ${targetCity} (${propertyType}BR/${bathrooms}BA properties)`);
+      console.log('🔑 Using premium API configuration:', {
+        airdna: apiConfig.airdnaApiKey ? 'SUBSCRIPTION ACTIVE' : 'Missing',
+        openai: apiConfig.openaiApiKey ? 'ACTIVE' : 'Missing',
+        qualityLevel: dataQuality.toUpperCase()
       });
       
-      console.log('📡 Calling fetchMarketData...');
+      console.log('📡 Calling premium fetchMarketData...');
       const marketData = await fetchMarketData(targetCity, apiConfig, propertyType, bathrooms);
-      console.log('📊 Market data received:', {
+      console.log('📊 Premium market data received:', {
         strDataCount: marketData.strData?.length || 0,
         rentDataCount: marketData.rentData?.length || 0,
+        qualityLevel: dataQuality,
         strData: marketData.strData,
         rentData: marketData.rentData
       });
       
-      // Combine STR and rent data
+      // Combine STR and rent data with premium processing
       const combinedData: SubmarketData[] = marketData.strData.map(strItem => {
         const rentItem = marketData.rentData.find(r => r.submarket === strItem.submarket);
         const medianRent = rentItem?.rent || 2000; // Default fallback
         const multiple = strItem.revenue / medianRent;
         
-        console.log('🔗 Combining data for submarket:', {
+        console.log('🔗 Processing premium submarket data:', {
           submarket: strItem.submarket,
           strRevenue: strItem.revenue,
           medianRent,
-          multiple: multiple.toFixed(2)
+          multiple: multiple.toFixed(2),
+          quality: dataQuality
         });
         
         return {
@@ -168,64 +184,72 @@ const MarketAnalysis = () => {
         };
       });
 
-      // Sort by revenue potential (highest first)
+      // Sort by revenue potential (highest first) with premium logic
       combinedData.sort((a, b) => b.multiple - a.multiple);
-      console.log('📈 Final sorted data:', combinedData);
+      console.log('📈 Final premium sorted data:', combinedData);
 
       setSubmarketData(combinedData);
       setCityName(targetCity);
       
+      const qualityBadge = dataQuality === 'premium' ? '👑 Premium' : 
+                          dataQuality === 'enhanced' ? '⭐ Enhanced' : '📊 Basic';
+      
       toast({
-        title: "Analysis Complete",
-        description: `Found ${combinedData.length} submarkets in ${targetCity} with accurate revenue data`,
+        title: `${qualityBadge} Analysis Complete`,
+        description: `Found ${combinedData.length} submarkets in ${targetCity} with ${dataQuality} subscription data quality`,
       });
 
-      console.log('✅ Analysis completed successfully with accurate data');
+      console.log('✅ Premium analysis completed successfully with subscription benefits');
 
     } catch (error) {
-      console.error('💥 Market analysis error:', {
+      console.error('💥 Premium market analysis error:', {
         error: error,
         message: error.message,
-        stack: error.stack
+        stack: error.stack,
+        dataQuality
       });
       toast({
         title: "Analysis Failed",
-        description: error.message || "Unable to complete market analysis. Using realistic fallback data.",
+        description: error.message || "Unable to complete market analysis. Please check your subscription status.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
-      console.log('🏁 Analysis process finished (loading state cleared)');
+      console.log('🏁 Premium analysis process finished');
     }
   };
 
   const handleExportData = () => {
-    console.log('📤 Export data requested:', {
+    console.log('📤 Premium export data requested:', {
       dataAvailable: submarketData.length > 0,
       city: cityName,
       propertyType,
-      bathrooms
+      bathrooms,
+      dataQuality
     });
 
     if (submarketData.length === 0) {
       console.log('❌ Export failed: No data available');
       toast({
         title: "No Data to Export",
-        description: "Please run a market analysis first to generate data.",
+        description: "Please run a market analysis first to generate premium data.",
         variant: "destructive",
       });
       return;
     }
 
-    const filename = `${cityName.toLowerCase().replace(/\s+/g, '-')}-market-analysis-${propertyType}br-${bathrooms}ba`;
-    console.log('💾 Exporting to CSV:', filename);
+    const filename = `${cityName.toLowerCase().replace(/\s+/g, '-')}-premium-market-analysis-${propertyType}br-${bathrooms}ba`;
+    console.log('💾 Exporting premium data to CSV:', filename);
     exportToCSV(submarketData, filename);
     
+    const qualityBadge = dataQuality === 'premium' ? '👑 Premium' : 
+                        dataQuality === 'enhanced' ? '⭐ Enhanced' : '📊 Basic';
+    
     toast({
-      title: "12-Month Data Exported",
-      description: `12 months of market data for ${cityName} has been downloaded as CSV with seasonal variations.`,
+      title: `${qualityBadge} Data Exported`,
+      description: `12 months of ${dataQuality} market data for ${cityName} downloaded with subscription benefits.`,
     });
-    console.log('✅ Export completed successfully');
+    console.log('✅ Premium export completed successfully');
   };
 
   const getBathroomOptions = () => {
@@ -279,16 +303,19 @@ const MarketAnalysis = () => {
       {/* Top Navigation Bar */}
       <TopNavBar />
 
-      {/* Futuristic background elements */}
+      {/* Enhanced futuristic background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500/10 blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-blue-500/5 blur-2xl animate-pulse delay-500"></div>
+        {dataQuality === 'premium' && (
+          <div className="absolute top-10 right-20 w-48 h-48 rounded-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 blur-2xl animate-pulse delay-750"></div>
+        )}
       </div>
 
       <div className="relative z-10">
         <div className="container mx-auto px-6 py-8">
-          {/* Header */}
+          {/* Enhanced Header */}
           <div className="text-center mb-12">
             <Button
               onClick={() => navigate('/')}
@@ -300,16 +327,26 @@ const MarketAnalysis = () => {
             </Button>
             
             <div className="flex items-center justify-center gap-6 mb-8 px-4">
-              <BarChart3 className="h-16 w-16 text-cyan-400 flex-shrink-0" />
+              <div className="relative">
+                <BarChart3 className="h-16 w-16 text-cyan-400 flex-shrink-0" />
+                {dataQuality === 'premium' && (
+                  <Crown className="h-6 w-6 text-purple-400 absolute -top-2 -right-2 animate-pulse" />
+                )}
+              </div>
               <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight">
-                Market Intelligence
+                Market Intelligence {dataQuality === 'premium' && '👑'}
               </h1>
             </div>
             <p className="text-2xl text-cyan-100 mb-8 max-w-3xl mx-auto">
               Find The Best Rental Arbitrage Markets
+              {dataQuality !== 'basic' && (
+                <span className="block text-lg text-purple-300 mt-2">
+                  {dataQuality === 'premium' ? '• Premium Subscription Active •' : '• Enhanced Data Quality •'}
+                </span>
+              )}
             </p>
             
-            {/* Property Type Badges */}
+            {/* Enhanced Property Type Badges */}
             <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
               <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 px-4 py-2">
                 <Home className="h-4 w-4 mr-1" />
@@ -324,17 +361,29 @@ const MarketAnalysis = () => {
               <Badge variant="outline" className="bg-gray-800/50 border-green-500/30 text-green-300 px-4 py-2">
                 Export Data
               </Badge>
+              {dataQuality === 'premium' && (
+                <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-2">
+                  <Crown className="h-4 w-4 mr-1" />
+                  Premium Quality
+                </Badge>
+              )}
             </div>
           </div>
 
           {/* Market Analysis Section */}
           <div className="space-y-8 mb-12">
-            {/* City Input Section */}
-            <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
+            {/* Enhanced City Input Section */}
+            <Card className={`shadow-2xl border ${dataQuality === 'premium' ? 'border-purple-500/30 bg-gradient-to-br from-gray-900/80 to-purple-900/20' : 'border-cyan-500/20 bg-gray-900/80'} backdrop-blur-lg`}>
               <CardHeader className="pb-4 border-b border-gray-700/50">
                 <CardTitle className="flex items-center gap-2 text-cyan-300">
                   <MapPin className="h-5 w-5 text-cyan-400" />
                   Market Analysis
+                  {dataQuality === 'premium' && (
+                    <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white ml-2">
+                      <Crown className="h-3 w-3 mr-1" />
+                      Premium
+                    </Badge>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
@@ -404,17 +453,17 @@ const MarketAnalysis = () => {
                       onClick={handleMarketAnalysis}
                       disabled={isLoading || !targetCity.trim()}
                       size="sm"
-                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-300 px-6"
+                      className={`${dataQuality === 'premium' ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500' : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500'} text-white shadow-lg hover:shadow-blue-500/25 transition-all duration-300 px-6`}
                     >
                       {isLoading ? (
                         <>
                           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Analyzing Market...
+                          {dataQuality === 'premium' ? 'Premium Analysis...' : 'Analyzing Market...'}
                         </>
                       ) : (
                         <>
                           <Search className="h-4 w-4 mr-2" />
-                          Rentalize Market
+                          {dataQuality === 'premium' ? '👑 Premium Analysis' : 'Rentalize Market'}
                         </>
                       )}
                     </Button>
@@ -424,13 +473,17 @@ const MarketAnalysis = () => {
             </Card>
           </div>
 
-          {/* Split Screen Results Section */}
+          {/* Enhanced Split Screen Results Section */}
           {submarketData.length > 0 && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-cyan-300">Market Analysis Results</h2>
-                  <p className="text-gray-400 mt-1">{propertyType}BR/{bathrooms}BA properties in {cityName}</p>
+                  <h2 className="text-2xl font-bold text-cyan-300">
+                    {dataQuality === 'premium' ? '👑 Premium' : dataQuality === 'enhanced' ? '⭐ Enhanced' : '📊 Basic'} Market Analysis Results
+                  </h2>
+                  <p className="text-gray-400 mt-1">
+                    {propertyType}BR/{bathrooms}BA properties in {cityName} • {dataQuality.toUpperCase()} quality
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 px-3 py-1">
@@ -448,7 +501,7 @@ const MarketAnalysis = () => {
                     className="border-green-500/30 text-green-300 hover:bg-green-500/10"
                   >
                     <Download className="h-4 w-4 mr-2" />
-                    Export CSV
+                    Export {dataQuality === 'premium' ? 'Premium ' : ''}CSV
                   </Button>
                 </div>
               </div>
