@@ -65,7 +65,7 @@ const Calculator = () => {
     software: 70,
     miscellaneous: 0,
     furnitureRental: 0,
-    squareFootage: 850,
+    squareFootage: 0,
     furnishingsPSF: 8,
   });
 

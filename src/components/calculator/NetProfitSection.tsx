@@ -26,11 +26,8 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-white">
           <TrendingUp className="h-5 w-5 text-cyan-400" />
-          Net Profit Analysis
+          Analysis Results
         </CardTitle>
-        <p className="text-sm text-gray-300">
-          Calculate monthly profit and return on investment
-        </p>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Monthly Revenue */}
@@ -48,7 +45,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
 
         {/* Net Profit */}
         <div className={`p-3 bg-gradient-to-r ${profitBgColor} rounded-lg border`}>
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between">
             <Label className={`${profitColor} font-medium text-sm`}>Monthly Profit</Label>
             <div className="flex items-center gap-2">
               <DollarSign className={`h-4 w-4 ${profitColor}`} />
@@ -56,12 +53,6 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
                 ${Math.abs(netProfitMonthly).toLocaleString()}
               </span>
             </div>
-          </div>
-          <div className="flex items-center justify-between">
-            <Label className={`${profitColor} font-medium text-sm`}>Annual Profit</Label>
-            <span className={`text-sm font-semibold ${profitColor}`}>
-              ${Math.abs(netProfitMonthly * 12).toLocaleString()}
-            </span>
           </div>
         </div>
 

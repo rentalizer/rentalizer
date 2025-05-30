@@ -74,7 +74,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
                 type="number"
                 value={data.squareFootage || ''}
                 onChange={(e) => updateData({ squareFootage: parseFloat(e.target.value) || 0 })}
-                placeholder="850"
+                placeholder=""
                 className="bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
