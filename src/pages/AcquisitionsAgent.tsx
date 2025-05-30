@@ -81,6 +81,50 @@ export default function AcquisitionsAgent() {
           ))}
         </div>
 
+        {/* How It Works Section - Moved to top */}
+        <Card className="bg-white/5 border-white/20 backdrop-blur-sm mb-8">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Zap className="h-5 w-5 text-yellow-400" />
+              How the Acquisitions Agent Works
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center space-y-3">
+              <div className="p-4 bg-blue-600 rounded-full w-16 h-16 mx-auto flex items-center justify-center">
+                <Building2 className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-white">1. Property Discovery</h3>
+              <p className="text-gray-300 text-sm">
+                Our AI continuously monitors property listings across multiple platforms, 
+                identifying potential rental arbitrage opportunities.
+              </p>
+            </div>
+            
+            <div className="text-center space-y-3">
+              <div className="p-4 bg-purple-600 rounded-full w-16 h-16 mx-auto flex items-center justify-center">
+                <Bot className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-white">2. Smart Outreach</h3>
+              <p className="text-gray-300 text-sm">
+                Automated email sequences engage property owners with personalized, 
+                professional messages using IFTTT smart automation.
+              </p>
+            </div>
+            
+            <div className="text-center space-y-3">
+              <div className="p-4 bg-green-600 rounded-full w-16 h-16 mx-auto flex items-center justify-center">
+                <Target className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-white">3. Lead Conversion</h3>
+              <p className="text-gray-300 text-sm">
+                Track responses, schedule viewings, and convert leads into profitable 
+                rental arbitrage deals with our integrated CRM system.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Selected Property Banner */}
         {selectedProperty && (
           <Card className="bg-purple-100 border-purple-200 mb-6">
@@ -164,50 +208,6 @@ export default function AcquisitionsAgent() {
             </Card>
           </TabsContent>
         </Tabs>
-
-        {/* How It Works Section */}
-        <Card className="bg-white/5 border-white/20 backdrop-blur-sm mt-8">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Zap className="h-5 w-5 text-yellow-400" />
-              How the Acquisitions Agent Works
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center space-y-3">
-              <div className="p-4 bg-blue-600 rounded-full w-16 h-16 mx-auto flex items-center justify-center">
-                <Building2 className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold text-white">1. Property Discovery</h3>
-              <p className="text-gray-300 text-sm">
-                Our AI continuously monitors property listings across multiple platforms, 
-                identifying potential rental arbitrage opportunities.
-              </p>
-            </div>
-            
-            <div className="text-center space-y-3">
-              <div className="p-4 bg-purple-600 rounded-full w-16 h-16 mx-auto flex items-center justify-center">
-                <Bot className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold text-white">2. Smart Outreach</h3>
-              <p className="text-gray-300 text-sm">
-                Automated email sequences engage property owners with personalized, 
-                professional messages using IFTTT smart automation.
-              </p>
-            </div>
-            
-            <div className="text-center space-y-3">
-              <div className="p-4 bg-green-600 rounded-full w-16 h-16 mx-auto flex items-center justify-center">
-                <Target className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold text-white">3. Lead Conversion</h3>
-              <p className="text-gray-300 text-sm">
-                Track responses, schedule viewings, and convert leads into profitable 
-                rental arbitrage deals with our integrated CRM system.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
