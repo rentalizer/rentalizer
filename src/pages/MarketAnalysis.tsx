@@ -12,6 +12,7 @@ import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
 import { TopNavBar } from '@/components/TopNavBar';
 import { ApiKeyInput } from '@/components/ApiKeyInput';
+import { ApiKeyStatus } from '@/components/ApiKeyStatus';
 import { Footer } from '@/components/Footer';
 import { fetchMarketData } from '@/services/marketDataService';
 import { useToast } from '@/hooks/use-toast';
@@ -464,17 +465,19 @@ const MarketAnalysis = () => {
                 </CardContent>
               </Card>
 
-              {/* API Configuration - Now moved after results */}
-              <div className="mt-8">
+              {/* API Configuration and Status - Now moved after results */}
+              <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
+                <ApiKeyStatus />
               </div>
             </div>
           )}
 
-          {/* Show API Configuration if no results yet */}
+          {/* Show API Configuration and Status if no results yet */}
           {submarketData.length === 0 && (
-            <div className="mt-8">
+            <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
+              <ApiKeyStatus />
             </div>
           )}
         </div>
