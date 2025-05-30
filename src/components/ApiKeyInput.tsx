@@ -12,7 +12,7 @@ interface ApiKeyInputProps {
 
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
   const [professionalKey, setProfessionalKey] = useState('563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3');
-  const [openaiKey, setOpenaiKey] = useState('');
+  const [openaiKey, setOpenaiKey] = useState('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');
   const [showKeys, setShowKeys] = useState(false);
   const [showStoredKeys, setShowStoredKeys] = useState(false);
 
@@ -49,7 +49,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   // Load keys from localStorage on component mount
   React.useEffect(() => {
     const savedProfessionalKey = localStorage.getItem('professional_data_key') || '563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3';
-    const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
+    const savedOpenaiKey = localStorage.getItem('openai_api_key') || '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';
     
     setProfessionalKey(savedProfessionalKey);
     setOpenaiKey(savedOpenaiKey);
@@ -62,15 +62,14 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     }
   }, [onApiKeysChange]);
 
-  // Auto-save the AirDNA key on component mount
+  // Auto-save both API keys on component mount
   React.useEffect(() => {
-    if (professionalKey === '563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3') {
-      localStorage.setItem('professional_data_key', professionalKey);
-      onApiKeysChange({
-        airdnaApiKey: professionalKey,
-        openaiApiKey: openaiKey || undefined
-      });
-    }
+    localStorage.setItem('professional_data_key', professionalKey);
+    localStorage.setItem('openai_api_key', openaiKey);
+    onApiKeysChange({
+      airdnaApiKey: professionalKey,
+      openaiApiKey: openaiKey
+    });
   }, []);
 
   return (
@@ -103,7 +102,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
             <div>
               <Label htmlFor="openai-key" className="text-sm font-medium text-gray-300">
-                AI Research Key (OpenAI) - Required
+                AI Research Key (OpenAI) ✅
               </Label>
               <Input
                 id="openai-key"
@@ -111,10 +110,10 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                 value={openaiKey}
                 onChange={(e) => setOpenaiKey(e.target.value)}
                 placeholder="Enter OpenAI API key (sk-...)..."
-                className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                className="mt-1 border-green-500/30 bg-gray-800/50 text-gray-100 focus:border-green-400 focus:ring-green-400/20 placeholder:text-gray-500"
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Get from: platform.openai.com/api-keys
+              <p className="text-xs text-green-400 mt-1">
+                ✅ OpenAI API key configured
               </p>
             </div>
           </div>
