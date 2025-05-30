@@ -12,7 +12,7 @@ interface ApiKeyInputProps {
 
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
   const [airbnbKey, setAirbnbKey] = useState('');
-  const [mashvisorKey, setMashvisorKey] = useState('');
+  const [mashvisorKey, setMashvisorKey] = useState('563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3');
   const [airdnaKey, setAirdnaKey] = useState('563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3');
   const [openaiKey, setOpenaiKey] = useState('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');
   const [showKeys, setShowKeys] = useState(false);
@@ -59,7 +59,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   // Load keys from localStorage on component mount
   React.useEffect(() => {
     const savedAirbnbKey = localStorage.getItem('airbnb_api_key') || '';
-    const savedMashvisorKey = localStorage.getItem('mashvisor_api_key') || '';
+    const savedMashvisorKey = localStorage.getItem('mashvisor_api_key') || '563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3';
     const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '563ec2eceemshee4a0b6d8e03f721b10e5cjen566818f3fc3';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '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';
     
@@ -78,6 +78,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
   // Auto-save API keys on component mount
   React.useEffect(() => {
+    localStorage.setItem('mashvisor_api_key', mashvisorKey);
     localStorage.setItem('airdna_api_key', airdnaKey);
     localStorage.setItem('openai_api_key', openaiKey);
     onApiKeysChange({
@@ -119,7 +120,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
               <div>
                 <Label htmlFor="mashvisor-key" className="text-sm font-medium text-gray-300">
-                  Mashvisor API Key
+                  Mashvisor API Key ✅
                 </Label>
                 <Input
                   id="mashvisor-key"
@@ -127,10 +128,10 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                   value={mashvisorKey}
                   onChange={(e) => setMashvisorKey(e.target.value)}
                   placeholder="Enter Mashvisor API key..."
-                  className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                  className="mt-1 border-green-500/30 bg-gray-800/50 text-gray-100 focus:border-green-400 focus:ring-green-400/20 placeholder:text-gray-500"
                 />
-                <p className="text-xs text-gray-400 mt-1">
-                  Investment analysis data
+                <p className="text-xs text-green-400 mt-1">
+                  ✅ Investment analysis data
                 </p>
               </div>
 
