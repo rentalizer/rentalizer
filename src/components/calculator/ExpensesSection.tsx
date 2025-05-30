@@ -267,12 +267,9 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
         <div className="mt-6 p-4 bg-gradient-to-r from-blue-600/20 to-slate-600/20 rounded-lg border border-blue-500/30">
           <div className="flex items-center justify-between">
             <Label className="text-blue-300 font-medium">Total Monthly Expenses</Label>
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-blue-400" />
-              <span className="text-2xl font-bold text-blue-400">
-                ${monthlyExpenses.toLocaleString()}
-              </span>
-            </div>
+            <span className="text-2xl font-bold text-blue-400">
+              ${monthlyExpenses.toLocaleString()}
+            </span>
           </div>
         </div>
       </CardContent>
