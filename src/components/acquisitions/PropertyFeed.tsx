@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { PropertyCard } from './PropertyCard';
 import { Input } from '@/components/ui/input';
@@ -6,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Search, Filter, MapPin, SlidersHorizontal, AlertCircle, Key } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { searchRentals } from '@/services/zillowService';
+import { searchRentals } from '@/services/rentcastService';
 import { useToast } from '@/hooks/use-toast';
 
 interface PropertyFeedProps {
@@ -26,7 +27,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
   // Check if API key is configured
   const hasApiKey = !!(
     localStorage.getItem('professional_data_key') || 
-    localStorage.getItem('airdna_api_key') || 
+    localStorage.getItem('rentcast_api_key') || 
     localStorage.getItem('rapidapi_key')
   );
 
@@ -73,7 +74,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
     if (!hasApiKey) {
       toast({
         title: "API Key Required",
-        description: "Please configure your RapidAPI key in the settings to search for properties.",
+        description: "Please configure your RentCast API key in the settings to search for properties.",
         variant: "destructive"
       });
       return;
@@ -110,14 +111,14 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
         state = 'FL'; // Default state
       }
 
-      console.log('🔍 Searching Zillow for:', { city, state });
+      console.log('🔍 Searching RentCast for:', { city, state });
       const results = await searchRentals(city, state, 100);
       setProperties(results);
       
       if (results.length === 0) {
         toast({
           title: "No Properties Found",
-          description: "The Zillow API returned no rental properties for this location. Try a different city or check your API key.",
+          description: "The RentCast API returned no rental properties for this location. Try a different city or check your API key.",
           variant: "destructive"
         });
       } else {
@@ -130,7 +131,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
       console.error('Search error:', error);
       toast({
         title: "Search Error",
-        description: "Unable to fetch properties from Zillow. Check console for details.",
+        description: "Unable to fetch properties from RentCast. Check console for details.",
         variant: "destructive"
       });
     } finally {
@@ -195,9 +196,9 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             <div className="flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-red-400" />
               <div>
-                <h3 className="text-red-200 font-semibold">RapidAPI Key Required</h3>
+                <h3 className="text-red-200 font-semibold">RentCast API Key Required</h3>
                 <p className="text-red-300 text-sm">
-                  Configure your RapidAPI key in the settings to search for real properties from Zillow.
+                  Configure your RentCast API key in the settings to search for real properties.
                 </p>
               </div>
             </div>
@@ -283,7 +284,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg font-semibold text-white">
-              {loading ? 'Searching Zillow...' : `${sortedProperties.length} Properties Found`}
+              {loading ? 'Searching RentCast...' : `${sortedProperties.length} Properties Found`}
             </span>
             <MapPin className="h-4 w-4 text-cyan-400" />
             <span className="text-cyan-200">{getSearchLocation()}</span>
@@ -332,11 +333,11 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
               <CardContent className="p-12 text-center">
                 <div className="text-white text-lg mb-2">No Rental Properties Found</div>
-                <div className="text-gray-300 mb-4">The Zillow API returned no results for this location. Try searching for a different city or verify your API key is configured correctly.</div>
+                <div className="text-gray-300 mb-4">The RentCast API returned no results for this location. Try searching for a different city or verify your API key is configured correctly.</div>
                 {!hasApiKey && (
                   <div className="flex items-center justify-center gap-2 text-yellow-400">
                     <Key className="h-4 w-4" />
-                    <span className="text-sm">Configure RapidAPI key to search real data</span>
+                    <span className="text-sm">Configure RentCast API key to search real data</span>
                   </div>
                 )}
               </CardContent>
@@ -346,8 +347,8 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
       ) : (
         <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
           <CardContent className="p-12 text-center">
-            <div className="text-white text-xl mb-3">Find Rental Properties on Zillow</div>
-            <div className="text-gray-300 mb-6">Search for rental properties across major markets using real Zillow data</div>
+            <div className="text-white text-xl mb-3">Find Rental Properties with RentCast</div>
+            <div className="text-gray-300 mb-6">Search for rental properties across major markets using real RentCast data</div>
             <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
               <Button 
                 variant="outline" 
@@ -399,7 +400,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             {!hasApiKey && (
               <div className="mt-4 flex items-center justify-center gap-2 text-yellow-400">
                 <Key className="h-4 w-4" />
-                <span className="text-sm">Configure your RapidAPI key to access real Zillow data</span>
+                <span className="text-sm">Configure your RentCast API key to access real data</span>
               </div>
             )}
           </CardContent>
