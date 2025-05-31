@@ -36,10 +36,10 @@ export default function AcquisitionsAgent() {
   };
 
   const stats = [
-    { label: 'Properties Monitored', value: '1,247', icon: Building2, color: 'text-blue-400' },
-    { label: 'Active Email Sequences', value: '12', icon: Bot, color: 'text-purple-400' },
-    { label: 'Leads Generated', value: '89', icon: Target, color: 'text-blue-400' },
-    { label: 'Response Rate', value: '23%', icon: TrendingUp, color: 'text-purple-400' },
+    { label: 'Properties Monitored', icon: Building2, color: 'text-blue-400' },
+    { label: 'Active Email Sequences', icon: Bot, color: 'text-purple-400' },
+    { label: 'Leads Generated', icon: Target, color: 'text-blue-400' },
+    { label: 'Response Rate', icon: TrendingUp, color: 'text-purple-400' },
   ];
 
   return (
@@ -58,7 +58,7 @@ export default function AcquisitionsAgent() {
             </h1>
           </div>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            AI-powered apartment sourcing and automated landlord outreach system
+            AI-Powered Apartment Sourcing And Automated Landlord Outreach System
           </p>
         </div>
 
@@ -114,7 +114,7 @@ export default function AcquisitionsAgent() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-300 text-sm">{stat.label}</p>
-                    <p className="text-3xl font-bold text-white mt-1">{stat.value}</p>
+                    <p className="text-lg font-medium text-gray-400 mt-1">Coming Soon</p>
                   </div>
                   <div className={`p-3 rounded-lg bg-slate-700/50`}>
                     <stat.icon className={`h-6 w-6 ${stat.color}`} />
