@@ -36,10 +36,10 @@ export default function AcquisitionsAgent() {
   };
 
   const stats = [
-    { label: 'Properties Monitored', value: '1,247', icon: Building2, color: 'text-cyan-400' },
-    { label: 'Active Email Sequences', value: '12', icon: Bot, color: 'text-blue-400' },
-    { label: 'Leads Generated', value: '89', icon: Target, color: 'text-purple-400' },
-    { label: 'Response Rate', value: '23%', icon: TrendingUp, color: 'text-cyan-400' },
+    { label: 'Properties Monitored', value: '1,247', icon: Building2, color: 'text-blue-400' },
+    { label: 'Active Email Sequences', value: '12', icon: Bot, color: 'text-purple-400' },
+    { label: 'Leads Generated', value: '89', icon: Target, color: 'text-blue-400' },
+    { label: 'Response Rate', value: '23%', icon: TrendingUp, color: 'text-purple-400' },
   ];
 
   return (
@@ -50,10 +50,10 @@ export default function AcquisitionsAgent() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl">
+            <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl">
               <Target className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Acquisitions CRM
             </h1>
           </div>
@@ -63,16 +63,16 @@ export default function AcquisitionsAgent() {
         </div>
 
         {/* How It Works Section */}
-        <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm mb-8">
+        <Card className="bg-slate-800/50 border-blue-500/20 backdrop-blur-sm mb-8">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
-              <Zap className="h-5 w-5 text-cyan-400" />
+              <Zap className="h-5 w-5 text-blue-400" />
               How Acquisitions CRM Works
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center space-y-3">
-              <div className="p-4 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full w-16 h-16 mx-auto flex items-center justify-center">
+              <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-16 h-16 mx-auto flex items-center justify-center">
                 <Building2 className="h-8 w-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-white">1. Property Discovery</h3>
@@ -94,7 +94,7 @@ export default function AcquisitionsAgent() {
             </div>
             
             <div className="text-center space-y-3">
-              <div className="p-4 bg-gradient-to-r from-purple-500 to-cyan-600 rounded-full w-16 h-16 mx-auto flex items-center justify-center">
+              <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-16 h-16 mx-auto flex items-center justify-center">
                 <Target className="h-8 w-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-white">3. Lead Conversion</h3>
@@ -109,7 +109,7 @@ export default function AcquisitionsAgent() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (
-            <Card key={index} className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
+            <Card key={index} className="bg-slate-800/50 border-blue-500/20 backdrop-blur-sm">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -127,22 +127,22 @@ export default function AcquisitionsAgent() {
 
         {/* Selected Property Banner */}
         {selectedProperty && (
-          <Card className="bg-cyan-900/20 border-cyan-400/30 mb-6">
+          <Card className="bg-blue-900/20 border-blue-400/30 mb-6">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="p-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg">
+                  <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg">
                     <Building2 className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-cyan-100">{selectedProperty.title}</h3>
-                    <div className="flex items-center gap-4 text-sm text-cyan-200">
+                    <h3 className="font-semibold text-blue-100">{selectedProperty.title}</h3>
+                    <div className="flex items-center gap-4 text-sm text-blue-200">
                       <span className="flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
                         {selectedProperty.address}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Badge variant="outline" className="border-cyan-400/30 text-cyan-200">
+                        <Badge variant="outline" className="border-blue-400/30 text-blue-200">
                           ${selectedProperty.price.toLocaleString()}/mo
                         </Badge>
                       </span>
@@ -153,7 +153,7 @@ export default function AcquisitionsAgent() {
                   variant="outline" 
                   size="sm"
                   onClick={() => setSelectedProperty(null)}
-                  className="border-cyan-400/30 text-cyan-200 hover:bg-cyan-500/10"
+                  className="border-blue-400/30 text-blue-200 hover:bg-blue-500/10"
                 >
                   Clear Selection
                 </Button>
@@ -164,17 +164,17 @@ export default function AcquisitionsAgent() {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-slate-800/50 border-cyan-500/20">
+          <TabsList className="grid w-full grid-cols-2 bg-slate-800/50 border-blue-500/20">
             <TabsTrigger 
               value="properties" 
-              className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-600 data-[state=active]:text-white text-gray-300"
+              className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white text-gray-300"
             >
               <Building2 className="h-4 w-4" />
               Property Feed
             </TabsTrigger>
             <TabsTrigger 
               value="agent" 
-              className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-blue-600 data-[state=active]:text-white text-gray-300"
+              className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-600 data-[state=active]:text-white text-gray-300"
             >
               <Bot className="h-4 w-4" />
               AI Email Agent
@@ -186,7 +186,7 @@ export default function AcquisitionsAgent() {
           </TabsContent>
 
           <TabsContent value="agent" className="space-y-6">
-            <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
+            <Card className="bg-slate-800/50 border-blue-500/20 backdrop-blur-sm">
               <CardContent className="p-6">
                 <AIEmailAgent selectedProperty={selectedProperty} />
               </CardContent>
