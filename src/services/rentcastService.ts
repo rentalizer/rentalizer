@@ -1,4 +1,3 @@
-
 const RENTCAST_API_BASE = 'https://api.rentcast.io/v1';
 const RENTCAST_API_KEY = '550bdd9779e1471cb9ddcd3505437a95';
 
@@ -105,6 +104,9 @@ export const searchRentals = async (
       console.log(`🔧 Processing RentCast property ${index + 1}:`, property);
       
       const propertyId = property.id || property.listingId || `${city}-${index}-${Date.now()}`;
+      const contactInfo = extractContactInfo(property, index);
+      
+      console.log(`📞 Extracted contact info for property ${index + 1}:`, contactInfo);
       
       return {
         id: propertyId.toString(),
@@ -120,10 +122,7 @@ export const searchRentals = async (
         rating: 4.0 + Math.random() * 1,
         amenities: extractAmenities(property),
         availability: 'Available Now',
-        contactInfo: {
-          phone: property.contactPhone || '(555) 123-4567',
-          email: property.contactEmail || 'contact@property.com'
-        },
+        contactInfo: contactInfo,
         city: city.toLowerCase(),
         propertyType: property.propertyType || property.type || 'Apartment',
         description: property.description || ''
@@ -158,10 +157,7 @@ function generateSampleProperties(city: string, state: string, limit: number): R
       rating: 4.0 + Math.random() * 1,
       amenities: ['Parking', 'Laundry', 'Air Conditioning'],
       availability: 'Available Now',
-      contactInfo: {
-        phone: '(555) 123-4567',
-        email: 'contact@property.com'
-      },
+      contactInfo: generateRealisticContactInfo(i),
       city: city.toLowerCase(),
       propertyType: 'Apartment',
       description: `Beautiful ${Math.floor(Math.random() * 3) + 1} bedroom apartment in ${city}`
@@ -169,6 +165,69 @@ function generateSampleProperties(city: string, state: string, limit: number): R
   }
   
   return sampleProperties;
+}
+
+// Extract contact information from RentCast property data
+function extractContactInfo(property: any, index: number): { phone: string; email: string } {
+  console.log(`🔍 Extracting contact info from property:`, property);
+  
+  // Try to extract real contact info from various possible fields
+  let phone = property.contactPhone || 
+              property.phone || 
+              property.contact?.phone || 
+              property.listingAgent?.phone ||
+              property.agent?.phone ||
+              null;
+              
+  let email = property.contactEmail || 
+              property.email || 
+              property.contact?.email || 
+              property.listingAgent?.email ||
+              property.agent?.email ||
+              null;
+  
+  // If no real contact info found, generate realistic sample data
+  if (!phone || !email) {
+    console.log(`⚠️ No real contact info found, generating sample data for property ${index + 1}`);
+    const fallbackContact = generateRealisticContactInfo(index);
+    return {
+      phone: phone || fallbackContact.phone,
+      email: email || fallbackContact.email
+    };
+  }
+  
+  console.log(`✅ Found real contact info - Phone: ${phone}, Email: ${email}`);
+  return { phone, email };
+}
+
+// Generate realistic contact information for sample/fallback data
+function generateRealisticContactInfo(index: number): { phone: string; email: string } {
+  const phoneNumbers = [
+    '(555) 234-5678',
+    '(555) 345-6789', 
+    '(555) 456-7890',
+    '(555) 567-8901',
+    '(555) 678-9012',
+    '(555) 789-0123',
+    '(555) 890-1234',
+    '(555) 901-2345'
+  ];
+  
+  const emailDomains = [
+    'propertymanager.com',
+    'rentals-inc.com', 
+    'realestate-pro.com',
+    'housing-solutions.com',
+    'apartments-now.com'
+  ];
+  
+  const phoneIndex = (index - 1) % phoneNumbers.length;
+  const emailIndex = (index - 1) % emailDomains.length;
+  
+  return {
+    phone: phoneNumbers[phoneIndex],
+    email: `contact${index}@${emailDomains[emailIndex]}`
+  };
 }
 
 // Helper function to extract images from RentCast property data
@@ -189,7 +248,7 @@ function extractImages(property: any): string[] {
   }
   
   // Generate different fallback images to avoid duplication
-  const imageIds = [1522708323590, 1560472354050, 1570129477492, 1484154218-1, 1493809842364];
+  const imageIds = [1522708323590, 1560472354050, 1570129477492, 1484154218, 1493809842364];
   const randomId = imageIds[Math.floor(Math.random() * imageIds.length)];
   return [`https://images.unsplash.com/photo-${randomId}?w=800&h=600&fit=crop&crop=edges`];
 }
