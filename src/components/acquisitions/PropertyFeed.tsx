@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, MapPin, SlidersHorizontal } from 'lucide-react';
+import { Search, Filter, MapPin, SlidersHorizontal, AlertCircle, Key } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { searchRentals } from '@/services/zillowService';
 import { useToast } from '@/hooks/use-toast';
@@ -23,10 +23,18 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  // Check if API key is configured
+  const hasApiKey = !!(
+    localStorage.getItem('professional_data_key') || 
+    localStorage.getItem('airdna_api_key') || 
+    localStorage.getItem('rapidapi_key')
+  );
+
   // Show properties when user has searched (even with just 1 character)
   const hasSearched = searchTerm.length > 0;
   
   const filteredProperties = hasSearched ? properties.filter(property => {
+    // ... keep existing code (filtering logic)
     const searchLower = searchTerm.toLowerCase();
     const matchesSearch = property.title.toLowerCase().includes(searchLower) ||
                          property.address.toLowerCase().includes(searchLower) ||
@@ -59,6 +67,15 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
   const handleSearch = async (searchQuery: string) => {
     if (!searchQuery) {
       setProperties([]);
+      return;
+    }
+
+    if (!hasApiKey) {
+      toast({
+        title: "API Key Required",
+        description: "Please configure your RapidAPI key in the settings to search for properties.",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -99,20 +116,24 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
       
       if (results.length === 0) {
         toast({
-          title: "No Results",
-          description: "No rental properties found for this search. Try a different city.",
+          title: "No Results Found",
+          description: "The Zillow API returned no results. Check the console for detailed debugging information.",
+          variant: "destructive"
         });
       } else {
+        const isMockData = results[0]?.id?.includes('mock-');
         toast({
-          title: "Properties Found",
-          description: `Found ${results.length} rental properties in ${city}`,
+          title: isMockData ? "Sample Data Loaded" : "Properties Found",
+          description: isMockData ? 
+            `Showing ${results.length} sample properties. Check console for API debugging info.` :
+            `Found ${results.length} rental properties in ${city}`,
         });
       }
     } catch (error) {
       console.error('Search error:', error);
       toast({
         title: "Search Error",
-        description: "Unable to fetch properties from Zillow. Please try again.",
+        description: "Unable to fetch properties from Zillow. Check console for details.",
         variant: "destructive"
       });
     } finally {
@@ -170,6 +191,23 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
 
   return (
     <div className="space-y-6">
+      {/* API Key Warning */}
+      {!hasApiKey && (
+        <Card className="bg-red-900/20 border-red-500/30 backdrop-blur-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="h-5 w-5 text-red-400" />
+              <div>
+                <h3 className="text-red-200 font-semibold">RapidAPI Key Required</h3>
+                <p className="text-red-300 text-sm">
+                  Configure your RapidAPI key in the settings to search for real properties from Zillow.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Search and Filter Header */}
       <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
         <CardContent className="p-6">
@@ -248,10 +286,15 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg font-semibold text-white">
-              {loading ? 'Searching Zillow...' : `${sortedProperties.length} Rental Properties Found`}
+              {loading ? 'Searching Zillow...' : `${sortedProperties.length} Properties Found`}
             </span>
             <MapPin className="h-4 w-4 text-cyan-400" />
             <span className="text-cyan-200">{getSearchLocation()}</span>
+            {sortedProperties.length > 0 && sortedProperties[0]?.id?.includes('mock-') && (
+              <Badge variant="outline" className="bg-yellow-900/20 text-yellow-300 border-yellow-500/30">
+                Sample Data
+              </Badge>
+            )}
           </div>
           
           {(searchTerm || priceRange !== 'all' || bedrooms !== 'all') && (
@@ -297,7 +340,13 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
               <CardContent className="p-12 text-center">
                 <div className="text-white text-lg mb-2">No Rental Properties Found</div>
-                <div className="text-gray-300">Try searching for a different city or adjust your filters</div>
+                <div className="text-gray-300 mb-4">Try searching for a different city or adjust your filters</div>
+                {!hasApiKey && (
+                  <div className="flex items-center justify-center gap-2 text-yellow-400">
+                    <Key className="h-4 w-4" />
+                    <span className="text-sm">Configure RapidAPI key to search real data</span>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ) : null}
@@ -355,6 +404,12 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
               <Search className="h-5 w-5" />
               <span>Click a city above or search to find real rental property listings!</span>
             </div>
+            {!hasApiKey && (
+              <div className="mt-4 flex items-center justify-center gap-2 text-yellow-400">
+                <Key className="h-4 w-4" />
+                <span className="text-sm">Configure your RapidAPI key to access real Zillow data</span>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
