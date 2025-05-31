@@ -182,17 +182,17 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
   return (
     <div className="space-y-6">
       {/* Search and Filter Header */}
-      <Card className="bg-slate-800/80 border-slate-700 backdrop-blur-sm">
+      <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
         <CardContent className="p-6">
           <div className="space-y-4">
             {/* Search Bar */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 h-5 w-5" />
               <Input
                 placeholder="Search by location, property name, or address..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-12 text-lg text-white bg-slate-700/50 border-slate-600 placeholder:text-gray-400 focus:border-blue-400"
+                className="pl-10 h-12 text-lg text-white bg-slate-700/50 border-cyan-500/30 placeholder:text-gray-400 focus:border-cyan-400"
               />
             </div>
 
@@ -201,17 +201,17 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
               <Button
                 variant="outline"
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 text-white border-slate-600 hover:bg-slate-700 bg-slate-700/50"
+                className="flex items-center gap-2 text-cyan-200 border-cyan-500/30 hover:bg-cyan-500/10 bg-slate-700/50"
               >
                 <SlidersHorizontal className="h-4 w-4" />
                 Filters
               </Button>
               
               <Select value={priceRange} onValueChange={setPriceRange}>
-                <SelectTrigger className="w-[180px] text-white bg-slate-700/50 border-slate-600 hover:bg-slate-700">
+                <SelectTrigger className="w-[180px] text-cyan-200 bg-slate-700/50 border-cyan-500/30 hover:bg-slate-700">
                   <SelectValue placeholder="Price Range" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                <SelectContent className="bg-slate-800 border-cyan-500/30 text-white">
                   <SelectItem value="all">All Prices</SelectItem>
                   <SelectItem value="under-2000">Under $2,000</SelectItem>
                   <SelectItem value="2000-3000">$2,000 - $3,000</SelectItem>
@@ -220,10 +220,10 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
               </Select>
 
               <Select value={bedrooms} onValueChange={setBedrooms}>
-                <SelectTrigger className="w-[140px] text-white bg-slate-700/50 border-slate-600 hover:bg-slate-700">
+                <SelectTrigger className="w-[140px] text-cyan-200 bg-slate-700/50 border-cyan-500/30 hover:bg-slate-700">
                   <SelectValue placeholder="Bedrooms" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                <SelectContent className="bg-slate-800 border-cyan-500/30 text-white">
                   <SelectItem value="all">Any Beds</SelectItem>
                   <SelectItem value="1">1 Bedroom</SelectItem>
                   <SelectItem value="2">2 Bedrooms</SelectItem>
@@ -232,10 +232,10 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
               </Select>
 
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-[160px] text-white bg-slate-700/50 border-slate-600 hover:bg-slate-700">
+                <SelectTrigger className="w-[160px] text-cyan-200 bg-slate-700/50 border-cyan-500/30 hover:bg-slate-700">
                   <SelectValue placeholder="Sort By" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                <SelectContent className="bg-slate-800 border-cyan-500/30 text-white">
                   <SelectItem value="price-low">Price: Low To High</SelectItem>
                   <SelectItem value="price-high">Price: High To Low</SelectItem>
                   <SelectItem value="bedrooms">Most Bedrooms</SelectItem>
@@ -254,26 +254,26 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             <span className="text-lg font-semibold text-white">
               {sortedProperties.length} Properties Found
             </span>
-            <MapPin className="h-4 w-4 text-gray-400" />
-            <span className="text-gray-300">{getSearchLocation()}</span>
+            <MapPin className="h-4 w-4 text-cyan-400" />
+            <span className="text-cyan-200">{getSearchLocation()}</span>
           </div>
           
           {(searchTerm || priceRange !== 'all' || bedrooms !== 'all') && (
             <div className="flex gap-2">
               {searchTerm && (
-                <Badge variant="secondary" className="flex items-center gap-1 bg-slate-700 text-white border-slate-600">
+                <Badge variant="secondary" className="flex items-center gap-1 bg-slate-700/50 text-cyan-200 border-cyan-500/30">
                   "{searchTerm}"
                   <button onClick={() => setSearchTerm('')} className="ml-1 text-xs">×</button>
                 </Badge>
               )}
               {priceRange !== 'all' && (
-                <Badge variant="secondary" className="flex items-center gap-1 bg-slate-700 text-white border-slate-600">
+                <Badge variant="secondary" className="flex items-center gap-1 bg-slate-700/50 text-cyan-200 border-cyan-500/30">
                   {priceRange.replace('-', ' - $').replace('under', 'Under $').replace('over', 'Over $')}
                   <button onClick={() => setPriceRange('all')} className="ml-1 text-xs">×</button>
                 </Badge>
               )}
               {bedrooms !== 'all' && (
-                <Badge variant="secondary" className="flex items-center gap-1 bg-slate-700 text-white border-slate-600">
+                <Badge variant="secondary" className="flex items-center gap-1 bg-slate-700/50 text-cyan-200 border-cyan-500/30">
                   {bedrooms} bedroom{bedrooms !== '1' ? 's' : ''}
                   <button onClick={() => setBedrooms('all')} className="ml-1 text-xs">×</button>
                 </Badge>
@@ -298,7 +298,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
               ))}
             </div>
           ) : (
-            <Card className="bg-slate-800/80 border-slate-700 backdrop-blur-sm">
+            <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
               <CardContent className="p-12 text-center">
                 <div className="text-white text-lg mb-2">No Properties Found</div>
                 <div className="text-gray-300">Try Adjusting Your Search Criteria</div>
@@ -307,11 +307,11 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
           )}
         </>
       ) : (
-        <Card className="bg-slate-800/80 border-slate-700 backdrop-blur-sm">
+        <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
           <CardContent className="p-12 text-center">
             <div className="text-white text-xl mb-3">Start Your Property Search</div>
             <div className="text-gray-300 mb-6">Enter a city name or address to find available rental properties</div>
-            <div className="flex items-center justify-center gap-2 text-gray-400">
+            <div className="flex items-center justify-center gap-2 text-cyan-400">
               <Search className="h-5 w-5" />
               <span>Search above to see properties</span>
             </div>
