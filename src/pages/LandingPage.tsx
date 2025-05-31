@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -101,14 +102,14 @@ const LandingPage = () => {
           <div className="grid md:grid-cols-5 gap-8 mb-16">
             <div className="flex flex-col">
               <Card 
-                className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
+                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
                 onClick={() => handleFeatureClick('Market Intelligence')}
               >
                 <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
-                    <MapPin className="h-8 w-8 text-cyan-400" />
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
+                    <MapPin className="h-8 w-8 text-blue-400" />
                   </div>
-                  <CardTitle className="text-cyan-300 text-lg">
+                  <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
                     Market Intelligence
                   </CardTitle>
                 </CardHeader>
@@ -120,7 +121,7 @@ const LandingPage = () => {
               </Card>
               <Button
                 onClick={() => handleFeatureClick('Market Intelligence')}
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
               >
                 <MapPin className="h-4 w-4 mr-2" />
                 Market Intelligence
@@ -129,14 +130,14 @@ const LandingPage = () => {
 
             <div className="flex flex-col">
               <Card 
-                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-blue-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
+                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
                 onClick={() => handleFeatureClick('Calculator')}
               >
                 <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
                     <Calculator className="h-8 w-8 text-blue-400" />
                   </div>
-                  <CardTitle className="text-blue-300 text-lg">
+                  <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
                     Calculator
                   </CardTitle>
                 </CardHeader>
@@ -148,7 +149,7 @@ const LandingPage = () => {
               </Card>
               <Button
                 onClick={() => handleFeatureClick('Calculator')}
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
               >
                 <Calculator className="h-4 w-4 mr-2" />
                 Calculator
@@ -157,14 +158,14 @@ const LandingPage = () => {
 
             <div className="flex flex-col">
               <Card 
-                className="bg-slate-800/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
+                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
                 onClick={() => handleFeatureClick('Acquisitions CRM')}
               >
                 <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                    <User className="h-8 w-8 text-purple-400" />
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
+                    <User className="h-8 w-8 text-blue-400" />
                   </div>
-                  <CardTitle className="text-purple-300 text-lg">
+                  <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
                     Acquisitions CRM
                   </CardTitle>
                 </CardHeader>
@@ -176,7 +177,7 @@ const LandingPage = () => {
               </Card>
               <Button
                 onClick={() => handleFeatureClick('Acquisitions CRM')}
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
               >
                 <User className="h-4 w-4 mr-2" />
                 Acquisitions CRM
@@ -185,14 +186,14 @@ const LandingPage = () => {
 
             <div className="flex flex-col">
               <Card 
-                className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
+                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
                 onClick={() => handleFeatureClick('Front Desk')}
               >
                 <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
-                    <DollarSign className="h-8 w-8 text-cyan-400" />
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
+                    <DollarSign className="h-8 w-8 text-blue-400" />
                   </div>
-                  <CardTitle className="text-cyan-300 text-lg">
+                  <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
                     Front Desk
                   </CardTitle>
                 </CardHeader>
@@ -204,7 +205,7 @@ const LandingPage = () => {
               </Card>
               <Button
                 onClick={() => handleFeatureClick('Front Desk')}
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
               >
                 <DollarSign className="h-4 w-4 mr-2" />
                 Front Desk
@@ -213,14 +214,14 @@ const LandingPage = () => {
 
             <div className="flex flex-col">
               <Card 
-                className="bg-slate-800/50 border-green-500/20 backdrop-blur-lg hover:border-green-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
+                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
                 onClick={() => handleFeatureClick('Community')}
               >
                 <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
-                    <Users className="h-8 w-8 text-cyan-400" />
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
+                    <Users className="h-8 w-8 text-blue-400" />
                   </div>
-                  <CardTitle className="text-cyan-300 text-lg">
+                  <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
                     Community
                   </CardTitle>
                 </CardHeader>
@@ -232,7 +233,7 @@ const LandingPage = () => {
               </Card>
               <Button
                 onClick={() => handleFeatureClick('Community')}
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
               >
                 <Users className="h-4 w-4 mr-2" />
                 Community
