@@ -1,7 +1,6 @@
-
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, Calendar, ArrowLeft, MapPin, Calculator, User, DollarSign, CheckCircle, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { BarChart3, Calendar, ArrowLeft, MapPin, Calculator, User, DollarSign, CheckCircle, Star, ChevronLeft, ChevronRight, Building, Users, Headphones } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
@@ -15,32 +14,27 @@ const Demo = () => {
     {
       icon: MapPin,
       title: "Market Intelligence",
-      description: "Find The Best Rental Arbitrage Markets",
-      thumbnail: "/lovable-uploads/3094bcc7-d39b-4765-89d3-ce4f2146e7f1.png"
+      description: "Find The Best Rental Arbitrage Markets"
     },
     {
       icon: Calculator,
       title: "Calculator",
-      description: "Assess Property Profitability And ROI",
-      thumbnail: "/lovable-uploads/3094bcc7-d39b-4765-89d3-ce4f2146e7f1.png"
+      description: "Assess Property Profitability And ROI"
     },
     {
-      icon: User,
+      icon: Building,
       title: "Acquisitions CRM",
-      description: "Contact Landlords & Close Deals",
-      thumbnail: "/lovable-uploads/3094bcc7-d39b-4765-89d3-ce4f2146e7f1.png"
+      description: "Contact Landlords & Close Deals"
     },
     {
-      icon: DollarSign,
+      icon: Headphones,
       title: "Front Desk",
-      description: "Property Management & Automations",
-      thumbnail: "/lovable-uploads/3094bcc7-d39b-4765-89d3-ce4f2146e7f1.png"
+      description: "Property Management & Automations"
     },
     {
-      icon: User,
+      icon: Users,
       title: "Community",
-      description: "Connect With Other Rental Arbitrage Investors",
-      thumbnail: "/lovable-uploads/3094bcc7-d39b-4765-89d3-ce4f2146e7f1.png"
+      description: "Connect With Other Rental Arbitrage Investors"
     }
   ];
 
@@ -148,26 +142,16 @@ const Demo = () => {
             </p>
           </div>
 
-          {/* Features Overview with Thumbnails */}
+          {/* Features Overview */}
           <div className="mb-16">
             <h2 className="text-3xl font-bold text-center text-cyan-300 mb-8">What You'll See in the Demo</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
               {features.map((feature, index) => (
-                <Card key={index} className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 overflow-hidden">
-                  {/* Thumbnail */}
-                  <div className="relative h-32 overflow-hidden">
-                    <img 
-                      src={feature.thumbnail} 
-                      alt={feature.title}
-                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-800/80 to-transparent"></div>
-                    <div className="absolute top-3 left-3 w-8 h-8 rounded-full bg-cyan-500/20 backdrop-blur-sm flex items-center justify-center">
-                      <feature.icon className="h-4 w-4 text-cyan-400" />
+                <Card key={index} className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300">
+                  <CardHeader className="text-center pb-4">
+                    <div className="w-12 h-12 rounded-full bg-cyan-500/20 backdrop-blur-sm flex items-center justify-center mx-auto mb-3">
+                      <feature.icon className="h-6 w-6 text-cyan-400" />
                     </div>
-                  </div>
-                  
-                  <CardHeader className="text-center pb-2">
                     <CardTitle className="text-cyan-300 text-lg">{feature.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="text-center pt-0">
