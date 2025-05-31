@@ -54,11 +54,11 @@ export default function AcquisitionsAgent() {
               <Target className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Acquisitions CRM
+              Properties CRM
             </h1>
           </div>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            AI-powered property sourcing and automated landlord outreach system
+            AI-powered apartment sourcing and automated landlord outreach system
           </p>
         </div>
 
@@ -67,7 +67,7 @@ export default function AcquisitionsAgent() {
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Zap className="h-5 w-5 text-blue-400" />
-              How Acquisitions CRM Works
+              How Properties CRM Works
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -75,9 +75,9 @@ export default function AcquisitionsAgent() {
               <div className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-16 h-16 mx-auto flex items-center justify-center">
                 <Building2 className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-white">1. Property Discovery</h3>
+              <h3 className="text-lg font-semibold text-white">1. Apartment Discovery</h3>
               <p className="text-gray-300 text-sm">
-                Our AI continuously monitors property listings across multiple platforms, 
+                Our system searches for apartments across multiple platforms, 
                 identifying potential rental arbitrage opportunities.
               </p>
             </div>
@@ -89,7 +89,7 @@ export default function AcquisitionsAgent() {
               <h3 className="text-lg font-semibold text-white">2. Smart Outreach</h3>
               <p className="text-gray-300 text-sm">
                 Automated email sequences engage property owners with personalized, 
-                professional messages using IFTTT smart automation.
+                professional messages using smart automation.
               </p>
             </div>
             

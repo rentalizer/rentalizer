@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PropertyCard } from './PropertyCard';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -7,223 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Search, Filter, MapPin, SlidersHorizontal } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-
-// Expanded real property data with more variety and actual property images
-const realProperties = [
-  {
-    id: '1',
-    title: 'Modern Downtown Loft',
-    address: '1234 Broadway St, Downtown, San Diego, CA 92101',
-    price: 2800,
-    bedrooms: 2,
-    bathrooms: 2,
-    sqft: 1400,
-    images: [
-      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop&crop=edges',
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop&crop=edges',
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&crop=edges'
-    ],
-    rating: 4.7,
-    amenities: ['Pool', 'Gym', 'Parking', 'Pet Friendly', 'Concierge'],
-    availability: 'Available Now',
-    contactInfo: {
-      phone: '(619) 555-0123',
-      email: 'leasing@modernloft.com'
-    },
-    city: 'san diego'
-  },
-  {
-    id: '2',
-    title: 'Luxury High-Rise Studio',
-    address: '567 Fifth Ave, Gaslamp, San Diego, CA 92101',
-    price: 2200,
-    bedrooms: 1,
-    bathrooms: 1,
-    sqft: 900,
-    images: [
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop&crop=edges',
-      'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&h=600&fit=crop&crop=edges'
-    ],
-    rating: 4.5,
-    amenities: ['Rooftop Deck', 'Fitness Center', 'City Views'],
-    availability: 'Available Dec 15',
-    contactInfo: {
-      phone: '(619) 555-0456',
-      email: 'info@luxurytower.com'
-    },
-    city: 'san diego'
-  },
-  {
-    id: '3',
-    title: 'Spacious Family Townhome',
-    address: '890 Maple Ave, Mission Valley, San Diego, CA 92108',
-    price: 3500,
-    bedrooms: 3,
-    bathrooms: 2.5,
-    sqft: 2000,
-    images: [
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop&crop=edges',
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop&crop=edges',
-      'https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=800&h=600&fit=crop&crop=edges'
-    ],
-    rating: 4.8,
-    amenities: ['Garage', 'Yard', 'School District', 'Quiet Area'],
-    availability: 'Available Jan 1',
-    contactInfo: {
-      phone: '(619) 555-0789',
-      email: 'rent@familytownhome.com'
-    },
-    city: 'san diego'
-  },
-  {
-    id: '4',
-    title: 'Urban Loft With Mountain Views',
-    address: '123 Cherry Creek Dr, Downtown, Denver, CO 80202',
-    price: 2400,
-    bedrooms: 2,
-    bathrooms: 2,
-    sqft: 1200,
-    images: [
-      'https://images.unsplash.com/photo-1493663284031-b7e3aaa4c4ae?w=800&h=600&fit=crop&crop=edges',
-      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop&crop=edges'
-    ],
-    rating: 4.6,
-    amenities: ['Mountain Views', 'Exposed Brick', 'High Ceilings', 'Walk Score 98'],
-    availability: 'Available Now',
-    contactInfo: {
-      phone: '(303) 555-0234',
-      email: 'info@urbanloft.com'
-    },
-    city: 'denver'
-  },
-  {
-    id: '5',
-    title: 'Capitol Hill Modern Apartment',
-    address: '456 Colfax Ave, Capitol Hill, Denver, CO 80203',
-    price: 2100,
-    bedrooms: 1,
-    bathrooms: 1,
-    sqft: 800,
-    images: [
-      'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop&crop=edges',
-      'https://images.unsplash.com/photo-1560185009-5bf9f2849488?w=800&h=600&fit=crop&crop=edges'
-    ],
-    rating: 4.3,
-    amenities: ['Hardwood Floors', 'Near Transit', 'Pet Friendly'],
-    availability: 'Available Feb 1',
-    contactInfo: {
-      phone: '(303) 555-0567',
-      email: 'rentals@capitolhill.com'
-    },
-    city: 'denver'
-  },
-  {
-    id: '6',
-    title: 'Belltown Waterfront Studio',
-    address: '789 1st Ave, Belltown, Seattle, WA 98121',
-    price: 2300,
-    bedrooms: 1,
-    bathrooms: 1,
-    sqft: 700,
-    images: [
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop&crop=edges',
-      'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&h=600&fit=crop&crop=edges'
-    ],
-    rating: 4.4,
-    amenities: ['Concierge', 'Rooftop Terrace', 'Water Views'],
-    availability: 'Available Now',
-    contactInfo: {
-      phone: '(206) 555-0890',
-      email: 'leasing@belltowntower.com'
-    },
-    city: 'seattle'
-  },
-  {
-    id: '7',
-    title: 'Victorian Era Converted Apartment',
-    address: '345 Castro St, Castro District, San Francisco, CA 94114',
-    price: 3200,
-    bedrooms: 2,
-    bathrooms: 1,
-    sqft: 1100,
-    images: [
-      'https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=800&h=600&fit=crop&crop=edges',
-      'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&h=600&fit=crop&crop=edges'
-    ],
-    rating: 4.2,
-    amenities: ['Original Hardwood', 'Bay Windows', 'Historic Charm'],
-    availability: 'Available Jan 15',
-    contactInfo: {
-      phone: '(415) 555-0321',
-      email: 'contact@victorianrentals.com'
-    },
-    city: 'san francisco'
-  },
-  {
-    id: '8',
-    title: 'Tech Hub Penthouse',
-    address: '888 Market St, SOMA, San Francisco, CA 94103',
-    price: 4500,
-    bedrooms: 3,
-    bathrooms: 2,
-    sqft: 1800,
-    images: [
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop&crop=edges',
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop&crop=edges',
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop&crop=edges'
-    ],
-    rating: 4.9,
-    amenities: ['City Views', 'Rooftop Access', 'Smart Home', 'Parking'],
-    availability: 'Available Now',
-    contactInfo: {
-      phone: '(415) 555-0654',
-      email: 'luxury@techpenthouse.com'
-    },
-    city: 'san francisco'
-  },
-  {
-    id: '9',
-    title: 'Cozy Brooklyn Brownstone',
-    address: '246 Park Slope Ave, Brooklyn, NY 11215',
-    price: 2900,
-    bedrooms: 2,
-    bathrooms: 1,
-    sqft: 1000,
-    images: [
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop&crop=edges',
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop&crop=edges'
-    ],
-    rating: 4.6,
-    amenities: ['Original Details', 'Garden Access', 'Near Subway'],
-    availability: 'Available Mar 1',
-    contactInfo: {
-      phone: '(718) 555-0987',
-      email: 'rentals@brooklynbrownstone.com'
-    },
-    city: 'new york'
-  },
-  {
-    id: '10',
-    title: 'Manhattan Midtown Studio',
-    address: '500 W 42nd St, Hell\'s Kitchen, New York, NY 10036',
-    price: 3100,
-    bedrooms: 1,
-    bathrooms: 1,
-    sqft: 550,
-    images: [
-      'https://images.unsplash.com/photo-1493663284031-b7e3aaa4c4ae?w=800&h=600&fit=crop&crop=edges',
-      'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop&crop=edges'
-    ],
-    rating: 4.4,
-    amenities: ['Doorman', 'Fitness Center', 'Times Square Proximity'],
-    availability: 'Available Now',
-    contactInfo: {
-      phone: '(212) 555-0456',
-      email: 'leasing@midtownstudio.com'
-    },
-    city: 'new york'
-  }
-];
+import { searchRentals } from '@/services/realtyMoleService';
+import { useToast } from '@/hooks/use-toast';
 
 interface PropertyFeedProps {
   onContactProperty: (property: any) => void;
@@ -235,16 +20,19 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
   const [bedrooms, setBedrooms] = useState('all');
   const [sortBy, setSortBy] = useState('price-low');
   const [showFilters, setShowFilters] = useState(false);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   // Show properties when user has searched (even with just 1 character)
   const hasSearched = searchTerm.length > 0;
   
-  const filteredProperties = hasSearched ? realProperties.filter(property => {
+  const filteredProperties = hasSearched ? properties.filter(property => {
     const searchLower = searchTerm.toLowerCase();
     const matchesSearch = property.title.toLowerCase().includes(searchLower) ||
                          property.address.toLowerCase().includes(searchLower) ||
                          property.city.toLowerCase().includes(searchLower) ||
-                         property.amenities.some(amenity => amenity.toLowerCase().includes(searchLower));
+                         property.amenities.some((amenity: string) => amenity.toLowerCase().includes(searchLower));
     
     const matchesPrice = priceRange === 'all' || 
                         (priceRange === 'under-2000' && property.price < 2000) ||
@@ -269,12 +57,82 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
     }
   });
 
+  const handleSearch = async (searchQuery: string) => {
+    if (!searchQuery) {
+      setProperties([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Extract city and state from search
+      const searchLower = searchQuery.toLowerCase();
+      let city = '';
+      let state = '';
+
+      if (searchLower.includes('san diego')) {
+        city = 'San Diego';
+        state = 'CA';
+      } else if (searchLower.includes('denver')) {
+        city = 'Denver';
+        state = 'CO';
+      } else if (searchLower.includes('seattle')) {
+        city = 'Seattle';
+        state = 'WA';
+      } else if (searchLower.includes('san francisco') || searchLower.includes('sf')) {
+        city = 'San Francisco';
+        state = 'CA';
+      } else if (searchLower.includes('new york') || searchLower.includes('nyc') || searchLower.includes('brooklyn') || searchLower.includes('manhattan')) {
+        city = 'New York';
+        state = 'NY';
+      } else {
+        // Use the search term as city
+        city = searchQuery;
+        state = 'CA'; // Default state
+      }
+
+      const results = await searchRentals(city, state, 100);
+      setProperties(results);
+      
+      if (results.length === 0) {
+        toast({
+          title: "No Results",
+          description: "No apartments found for this search. Try a different city.",
+        });
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      toast({
+        title: "Search Error",
+        description: "Unable to fetch properties. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (searchTerm) {
+      const debounceTimer = setTimeout(() => {
+        handleSearch(searchTerm);
+      }, 500);
+      return () => clearTimeout(debounceTimer);
+    } else {
+      setProperties([]);
+    }
+  }, [searchTerm]);
+
   const handleSaveProperty = (property: any) => {
     console.log('Saving property:', property);
+    toast({
+      title: "Property Saved",
+      description: `${property.title} has been saved to your list.`,
+    });
   };
 
   const getSearchLocation = () => {
-    if (searchTerm === '') return 'Search For Properties';
+    if (searchTerm === '') return 'Search For Apartments';
     
     const searchLower = searchTerm.toLowerCase();
     
@@ -309,11 +167,16 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 h-5 w-5" />
               <Input
-                placeholder="Search by city, property name, address, or amenities... (Try: San Diego, Denver, Seattle, San Francisco, NYC)"
+                placeholder="Search for apartments by city... (Try: San Diego, Denver, Seattle, San Francisco, NYC)"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-12 text-lg text-white bg-slate-700/50 border-cyan-500/30 placeholder:text-gray-400 focus:border-cyan-400"
               />
+              {loading && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-cyan-400"></div>
+                </div>
+              )}
             </div>
 
             {/* Quick Filters */}
@@ -374,7 +237,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg font-semibold text-white">
-              {sortedProperties.length} Properties Found
+              {loading ? 'Searching...' : `${sortedProperties.length} Apartments Found`}
             </span>
             <MapPin className="h-4 w-4 text-cyan-400" />
             <span className="text-cyan-200">{getSearchLocation()}</span>
@@ -408,7 +271,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
       {/* Property Grid or Welcome Message */}
       {hasSearched ? (
         <>
-          {sortedProperties.length > 0 ? (
+          {!loading && sortedProperties.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {sortedProperties.map((property) => (
                 <PropertyCard
@@ -419,20 +282,20 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
                 />
               ))}
             </div>
-          ) : (
+          ) : !loading ? (
             <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
               <CardContent className="p-12 text-center">
-                <div className="text-white text-lg mb-2">No Properties Found</div>
-                <div className="text-gray-300">Try Adjusting Your Search Criteria</div>
+                <div className="text-white text-lg mb-2">No Apartments Found</div>
+                <div className="text-gray-300">Try searching for a different city or adjust your filters</div>
               </CardContent>
             </Card>
-          )}
+          ) : null}
         </>
       ) : (
         <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
           <CardContent className="p-12 text-center">
-            <div className="text-white text-xl mb-3">Discover Your Next Rental Investment</div>
-            <div className="text-gray-300 mb-6">Search across major markets to find the perfect rental arbitrage opportunities</div>
+            <div className="text-white text-xl mb-3">Find Your Next Rental Investment</div>
+            <div className="text-gray-300 mb-6">Search for apartments across major markets to find profitable rental arbitrage opportunities</div>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
               <Button 
                 variant="outline" 
@@ -472,7 +335,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             </div>
             <div className="flex items-center justify-center gap-2 text-cyan-400">
               <Search className="h-5 w-5" />
-              <span>Click a city above or search to see real properties!</span>
+              <span>Click a city above or search to find real apartment listings!</span>
             </div>
           </CardContent>
         </Card>
