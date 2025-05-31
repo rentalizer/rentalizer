@@ -40,27 +40,27 @@ export const searchRentals = async (
   console.log('🔑 Using API key (first 10 chars):', rapidApiKey.substring(0, 10) + '...');
 
   try {
-    // Try multiple different endpoints and approaches
+    // Updated search options with correct Zillow API endpoints
     const searchOptions = [
-      // Option 1: Standard property search
+      // Option 1: Properties endpoint with correct parameters
       {
-        url: `${ZILLOW_API_BASE}/properties/search?location=${encodeURIComponent(city + ', ' + state)}&status_type=ForRent&home_type=Houses,Townhomes,Condos,Apartments`,
-        name: 'Standard Search'
+        url: `${ZILLOW_API_BASE}/properties?location=${encodeURIComponent(city + ', ' + state)}&status=forRent&sortSelection=priorityScore&doz=any`,
+        name: 'Properties Endpoint'
       },
-      // Option 2: Rentals endpoint
+      // Option 2: Property search with different parameters
       {
-        url: `${ZILLOW_API_BASE}/rentals?location=${encodeURIComponent(city + ', ' + state)}&home_type=Houses,Townhomes,Condos,Apartments`,
-        name: 'Rentals Endpoint'
+        url: `${ZILLOW_API_BASE}/property-search?location=${encodeURIComponent(city + ', ' + state)}&status_type=ForRent&home_type=Houses,Townhomes,Condos,Apartments&sort=Price_Low_High`,
+        name: 'Property Search'
       },
-      // Option 3: Properties list
+      // Option 3: Direct search endpoint
       {
-        url: `${ZILLOW_API_BASE}/properties/list?location=${encodeURIComponent(city + ', ' + state)}&status_type=ForRent`,
-        name: 'Properties List'
+        url: `${ZILLOW_API_BASE}/search?location=${encodeURIComponent(city + ', ' + state)}&statusType=ForRent&homeType=Houses,Townhomes,Condos,Apartments`,
+        name: 'Search Endpoint'
       },
-      // Option 4: Just city name without state
+      // Option 4: Rentals specific endpoint
       {
-        url: `${ZILLOW_API_BASE}/properties/search?location=${encodeURIComponent(city)}&status_type=ForRent`,
-        name: 'City Only Search'
+        url: `${ZILLOW_API_BASE}/for-rent?location=${encodeURIComponent(city + ', ' + state)}&homeType=Houses,Townhomes,Condos,Apartments`,
+        name: 'For Rent Endpoint'
       }
     ];
 
@@ -72,7 +72,8 @@ export const searchRentals = async (
           method: 'GET',
           headers: {
             'X-RapidAPI-Key': rapidApiKey,
-            'X-RapidAPI-Host': 'zillow-com1.p.rapidapi.com'
+            'X-RapidAPI-Host': 'zillow-com1.p.rapidapi.com',
+            'Accept': 'application/json'
           }
         });
 
@@ -83,66 +84,132 @@ export const searchRentals = async (
           const data = await response.json();
           console.log(`✅ ${option.name} Raw API Data:`, data);
           
-          // Check various possible data structures
+          // Check various possible data structures from Zillow API
           let properties = [];
-          if (data && data.props && data.props.length > 0) {
-            properties = data.props;
-          } else if (data && data.results && data.results.length > 0) {
-            properties = data.results;
-          } else if (data && data.data && data.data.length > 0) {
-            properties = data.data;
-          } else if (data && Array.isArray(data) && data.length > 0) {
-            properties = data;
-          } else if (data && data.searchResults && data.searchResults.listResults) {
+          
+          // Common Zillow API response structures
+          if (data && data.searchResults && data.searchResults.listResults) {
             properties = data.searchResults.listResults;
+          } else if (data && data.props && Array.isArray(data.props)) {
+            properties = data.props;
+          } else if (data && data.results && Array.isArray(data.results)) {
+            properties = data.results;
+          } else if (data && data.data && Array.isArray(data.data)) {
+            properties = data.data;
+          } else if (data && data.properties && Array.isArray(data.properties)) {
+            properties = data.properties;
+          } else if (data && data.listings && Array.isArray(data.listings)) {
+            properties = data.listings;
+          } else if (Array.isArray(data)) {
+            properties = data;
           }
 
-          if (properties.length > 0) {
-            console.log(`🎯 Found ${properties.length} properties using ${option.name}`);
-            
-            // Transform data to our format
-            const transformedProperties = properties.slice(0, limit).map((property: any, index: number) => ({
-              id: property.zpid || property.id || `${city}-${index}-${Math.random().toString(36).substr(2, 9)}`,
-              title: property.address?.streetAddress || property.formattedChip || property.title || `Property in ${city}`,
-              address: property.address ? 
-                `${property.address.streetAddress || ''}, ${property.address.city || city}, ${property.address.state || state}`.trim() :
-                property.fullAddress || property.address || `${city}, ${state}`,
-              price: property.price || property.unformattedPrice || property.rentZestimate || 2000,
-              bedrooms: property.bedrooms || property.beds || 2,
-              bathrooms: property.bathrooms || property.baths || 2,
-              sqft: property.livingArea || property.lotAreaValue || property.sqft || 1000,
-              images: property.photos ? property.photos.slice(0, 5).map((p: any) => p.url || p) : [
-                'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop&crop=edges'
-              ],
-              rating: 4.0 + Math.random() * 1,
-              amenities: ['Parking', 'Laundry'],
-              availability: 'Available Now',
-              contactInfo: {
-                phone: property.contactPhone || '(555) 123-4567',
-                email: property.contactEmail || 'contact@property.com'
-              },
-              city: property.address?.city?.toLowerCase() || city.toLowerCase(),
-              propertyType: property.propertyType || property.homeType || 'Apartment',
-              description: property.description || ''
-            }));
+          console.log(`🔍 Found ${properties.length} raw properties from ${option.name}`);
 
-            console.log('✅ Transformed Properties:', transformedProperties);
+          if (properties.length > 0) {
+            console.log(`🎯 Processing ${properties.length} properties using ${option.name}`);
+            console.log('📋 Sample property structure:', properties[0]);
+            
+            // Transform data to our format with better field mapping
+            const transformedProperties = properties.slice(0, limit).map((property: any, index: number) => {
+              // Handle different Zillow property data structures
+              const zpid = property.zpid || property.id || property.listingId || `${city}-${index}-${Date.now()}`;
+              const addressData = property.address || property.addressStreet || property.location || {};
+              const priceData = property.price || property.rentZestimate || property.unformattedPrice || 0;
+              
+              return {
+                id: zpid.toString(),
+                title: property.address?.streetAddress || 
+                       property.streetAddress || 
+                       property.title || 
+                       `${addressData.streetAddress || 'Property'} in ${city}`,
+                address: `${addressData.streetAddress || property.streetAddress || ''}, ${addressData.city || city}, ${addressData.state || state}`.replace(/^, /, ''),
+                price: typeof priceData === 'string' ? parseInt(priceData.replace(/[^0-9]/g, '')) || 2000 : priceData || 2000,
+                bedrooms: property.bedrooms || property.beds || property.bedroomCount || 2,
+                bathrooms: property.bathrooms || property.baths || property.bathroomCount || 2,
+                sqft: property.livingArea || property.finishedSqFt || property.sqft || property.lotAreaValue || 1000,
+                images: this.extractImages(property),
+                rating: 4.0 + Math.random() * 1,
+                amenities: this.extractAmenities(property),
+                availability: 'Available Now',
+                contactInfo: {
+                  phone: property.contactPhone || property.phone || '(555) 123-4567',
+                  email: property.contactEmail || property.email || 'contact@property.com'
+                },
+                city: (addressData.city || city).toLowerCase(),
+                propertyType: property.propertyType || property.homeType || property.type || 'Apartment',
+                description: property.description || property.remarks || ''
+              };
+            });
+
+            console.log('✅ Final transformed properties:', transformedProperties);
             return transformedProperties;
           }
         } else {
           const errorText = await response.text();
-          console.error(`❌ ${option.name} API Error:`, response.status, errorText);
+          console.error(`❌ ${option.name} API Error:`, response.status, response.statusText);
+          console.error(`❌ Error details:`, errorText);
+          
+          // Check if it's an authentication error
+          if (response.status === 401 || response.status === 403) {
+            console.error('🔑 Authentication failed - check your RapidAPI key');
+          }
         }
       } catch (optionError) {
-        console.error(`❌ Error with ${option.name}:`, optionError);
+        console.error(`❌ Network error with ${option.name}:`, optionError);
       }
     }
 
     console.error('❌ No data found from any Zillow API endpoint for:', { city, state });
+    console.error('💡 This could be due to:');
+    console.error('   - Invalid or expired RapidAPI key');
+    console.error('   - Zillow API endpoint changes');
+    console.error('   - Rate limiting');
+    console.error('   - Location not found in Zillow database');
+    
     return [];
     
   } catch (error) {
     console.error('❌ Error fetching from Zillow API:', error);
     return [];
   }
-};
+}
+
+// Helper method to extract images from property data
+function extractImages(property: any): string[] {
+  if (property.photos && Array.isArray(property.photos)) {
+    return property.photos.slice(0, 5).map((photo: any) => {
+      if (typeof photo === 'string') return photo;
+      return photo.url || photo.href || photo.src || '';
+    }).filter(Boolean);
+  }
+  
+  if (property.images && Array.isArray(property.images)) {
+    return property.images.slice(0, 5);
+  }
+  
+  if (property.photo) {
+    return [property.photo];
+  }
+  
+  // Fallback image
+  return ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop&crop=edges'];
+}
+
+// Helper method to extract amenities from property data
+function extractAmenities(property: any): string[] {
+  const amenities = [];
+  
+  if (property.hasParking || property.parking) amenities.push('Parking');
+  if (property.hasLaundry || property.laundry) amenities.push('Laundry');
+  if (property.hasAC || property.airConditioning) amenities.push('Air Conditioning');
+  if (property.hasPool || property.pool) amenities.push('Pool');
+  if (property.hasFitness || property.gym) amenities.push('Fitness Center');
+  if (property.petFriendly || property.pets) amenities.push('Pet Friendly');
+  
+  if (property.amenities && Array.isArray(property.amenities)) {
+    amenities.push(...property.amenities);
+  }
+  
+  return amenities.length > 0 ? amenities : ['Parking', 'Laundry'];
+}
