@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Calendar, ArrowLeft, MapPin, Calculator, User, DollarSign, CheckCircle, Star, ChevronLeft, ChevronRight, Building, Users, Headphones } from 'lucide-react';
@@ -15,7 +14,7 @@ const Demo = () => {
     {
       icon: MapPin,
       title: "Market Intelligence",
-      description: "Find The Best Rental Arbitrage Markets"
+      description: "Identify the most profitable rental markets in seconds."
     },
     {
       icon: Calculator,
@@ -24,18 +23,18 @@ const Demo = () => {
     },
     {
       icon: Building,
-      title: "Acquisitions CRM",
-      description: "Contact Landlords & Close Deals"
+      title: "Acquisition CRM",
+      description: "Property Outreach, Close Deals & Manage relationships with property owners seamlessly"
     },
     {
       icon: Headphones,
-      title: "Property Management",
-      description: "Property Management & Automations"
+      title: "Property Management System",
+      description: "Automates Operations"
     },
     {
       icon: Users,
-      title: "Community",
-      description: "Connect With Other Rental Arbitrage Investors"
+      title: "Supportive Community",
+      description: "Learn from peers, share insights, and stay ahead of the curve"
     }
   ];
 
