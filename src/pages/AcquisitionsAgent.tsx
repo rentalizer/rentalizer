@@ -54,7 +54,7 @@ export default function AcquisitionsAgent() {
               <Target className="h-8 w-8 text-white" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Properties CRM
+              Acquisition CRM
             </h1>
           </div>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -67,7 +67,7 @@ export default function AcquisitionsAgent() {
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Zap className="h-5 w-5 text-blue-400" />
-              How Properties CRM Works
+              How Acquisition CRM Works
             </CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
