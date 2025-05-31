@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,7 +23,7 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
       {/* Header */}
-      <header className="relative z-20 w-full border-b border-gray-700/30 bg-slate-900/60 backdrop-blur-lg">
+      <header className="relative z-20 w-full border-b border-gray-600/40 bg-slate-800/80 backdrop-blur-lg">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
