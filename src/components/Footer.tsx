@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BarChart3 } from 'lucide-react';
 import { ContactChat } from './ContactChat';
@@ -22,8 +21,7 @@ export const Footer = ({ showLinks = true }: FooterProps) => {
               </h3>
             </div>
             <p className="text-gray-300 max-w-2xl mx-auto">
-              The ultimate AI-powered platform for analyzing short-term rental market opportunities. 
-              Make data-driven investment decisions with professional market insights.
+              Create new income streams without owning property. Rentalizer.ai combines powerful market analysis, deal sourcing, and automation tools with a built-in CRM and a thriving community—everything you need to launch and scale your rental arbitrage business
             </p>
           </div>
 
