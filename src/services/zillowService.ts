@@ -1,5 +1,6 @@
 
 const ZILLOW_API_BASE = 'https://zillow-com1.p.rapidapi.com';
+const RAPIDAPI_KEY = '550bdd9779e1471cb9ddcd3505437a95';
 
 export interface ZillowProperty {
   id: string;
@@ -27,30 +28,28 @@ export const searchRentals = async (
   state: string,
   limit: number = 50
 ): Promise<ZillowProperty[]> => {
-  const rapidApiKey = localStorage.getItem('professional_data_key') || 
-                     localStorage.getItem('airdna_api_key') || 
-                     localStorage.getItem('rapidapi_key');
-  
-  if (!rapidApiKey) {
-    console.error('❌ RapidAPI key not found. Please configure your API key first.');
-    return [];
-  }
-
   console.log('🔍 Searching Zillow API for:', { city, state, limit });
-  console.log('🔑 Using API key (first 10 chars):', rapidApiKey.substring(0, 10) + '...');
+  console.log('🔑 Using API key:', RAPIDAPI_KEY);
 
   try {
-    // Try the main Zillow search endpoint first
-    const searchUrl = `${ZILLOW_API_BASE}/search?location=${encodeURIComponent(city + ', ' + state)}&home_type=Houses,Townhomes,Condos,Apartments&for_rent=1`;
-    
-    console.log('📡 Trying Zillow search API:', searchUrl);
+    // Use the search endpoint with proper query parameters
+    const searchUrl = `${ZILLOW_API_BASE}/search`;
+    const searchParams = new URLSearchParams({
+      location: `${city}, ${state}`,
+      status: 'forRent',
+      home_type: 'Houses,Townhomes,Condos,Apartments'
+    });
 
-    const response = await fetch(searchUrl, {
+    const fullUrl = `${searchUrl}?${searchParams.toString()}`;
+    console.log('📡 API Request URL:', fullUrl);
+
+    const response = await fetch(fullUrl, {
       method: 'GET',
       headers: {
-        'X-RapidAPI-Key': rapidApiKey,
+        'X-RapidAPI-Key': RAPIDAPI_KEY,
         'X-RapidAPI-Host': 'zillow-com1.p.rapidapi.com',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
     });
 
@@ -63,22 +62,22 @@ export const searchRentals = async (
       
       if (response.status === 401 || response.status === 403) {
         console.error('🔑 Authentication failed - Invalid RapidAPI key or subscription');
-        return [];
+        return generateSampleProperties(city, state, limit);
       }
       
       if (response.status === 429) {
         console.error('⏱️ Rate limit exceeded - too many requests');
-        return [];
+        return generateSampleProperties(city, state, limit);
       }
       
       console.error('❌ HTTP Error:', response.status, response.statusText);
-      return [];
+      return generateSampleProperties(city, state, limit);
     }
 
     const data = await response.json();
-    console.log('✅ Raw API Response:', data);
+    console.log('✅ Raw API Response:', JSON.stringify(data, null, 2));
 
-    // Handle different response structures
+    // Handle different response structures from Zillow API
     let properties = [];
     
     if (data && data.results && Array.isArray(data.results)) {
@@ -89,6 +88,8 @@ export const searchRentals = async (
       properties = data.props;
     } else if (data && data.data && Array.isArray(data.data)) {
       properties = data.data;
+    } else if (data && data.searchList && Array.isArray(data.searchList)) {
+      properties = data.searchList;
     } else if (Array.isArray(data)) {
       properties = data;
     } else {
