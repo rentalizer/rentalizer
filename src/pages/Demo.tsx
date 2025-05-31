@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Calendar, ArrowLeft, MapPin, Calculator, User, DollarSign, CheckCircle, Star, ChevronLeft, ChevronRight, Building, Users, Headphones } from 'lucide-react';
@@ -28,7 +29,7 @@ const Demo = () => {
     },
     {
       icon: Headphones,
-      title: "Front Desk",
+      title: "Property Management",
       description: "Property Management & Automations"
     },
     {
