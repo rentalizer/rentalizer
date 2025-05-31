@@ -217,10 +217,10 @@ const LandingPage = () => {
                 onClick={() => handleFeatureClick('Community')}
               >
                 <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
-                    <Users className="h-8 w-8 text-green-400" />
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                    <Users className="h-8 w-8 text-cyan-400" />
                   </div>
-                  <CardTitle className="text-green-300 text-lg">
+                  <CardTitle className="text-cyan-300 text-lg">
                     Community
                   </CardTitle>
                 </CardHeader>
