@@ -178,12 +178,84 @@ const getMockApartmentData = (searchCity?: string): RealtyMoleProperty[] => {
       contactInfo: { phone: '(206) 555-0890', email: 'leasing@belltownapt.com' },
       city: 'seattle',
       propertyType: 'apartment'
+    },
+    // Tampa Apartments
+    {
+      id: '7',
+      title: 'Downtown Tampa High-Rise',
+      address: '100 N Tampa St, Downtown, Tampa, FL 33602',
+      price: 2200,
+      bedrooms: 2,
+      bathrooms: 2,
+      sqft: 1100,
+      images: [
+        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop&crop=edges',
+        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop&crop=edges'
+      ],
+      rating: 4.5,
+      amenities: ['Pool', 'Gym', 'City Views', 'Parking'],
+      availability: 'Available Now',
+      contactInfo: { phone: '(813) 555-0123', email: 'leasing@tampadowntown.com' },
+      city: 'tampa',
+      propertyType: 'apartment'
+    },
+    {
+      id: '8',
+      title: 'Ybor City Loft Apartment',
+      address: '789 E 7th Ave, Ybor City, Tampa, FL 33605',
+      price: 1800,
+      bedrooms: 1,
+      bathrooms: 1,
+      sqft: 850,
+      images: [
+        'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&h=600&fit=crop&crop=edges',
+        'https://images.unsplash.com/photo-1493663284031-b7e3aaa4c4ae?w=800&h=600&fit=crop&crop=edges'
+      ],
+      rating: 4.2,
+      amenities: ['Historic Building', 'Exposed Brick', 'Nightlife District'],
+      availability: 'Available Jan 15',
+      contactInfo: { phone: '(813) 555-0456', email: 'info@yborlofts.com' },
+      city: 'tampa',
+      propertyType: 'apartment'
+    },
+    {
+      id: '9',
+      title: 'Hyde Park Luxury Condo',
+      address: '456 S Hyde Park Ave, Hyde Park, Tampa, FL 33606',
+      price: 2600,
+      bedrooms: 2,
+      bathrooms: 2,
+      sqft: 1300,
+      images: [
+        'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&h=600&fit=crop&crop=edges',
+        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop&crop=edges'
+      ],
+      rating: 4.6,
+      amenities: ['Upscale Neighborhood', 'Shopping District', 'Restaurants'],
+      availability: 'Available Now',
+      contactInfo: { phone: '(813) 555-0789', email: 'rentals@hydeparkcondo.com' },
+      city: 'tampa',
+      propertyType: 'condo'
     }
-    // Add more apartments for other cities...
   ];
 
   if (searchCity) {
-    return apartments.filter(apt => apt.city.includes(searchCity.toLowerCase()));
+    const cityResults = apartments.filter(apt => apt.city.includes(searchCity.toLowerCase()));
+    // If no specific city match, return a few apartments and modify them for the searched city
+    if (cityResults.length === 0) {
+      return apartments.slice(0, 3).map((apt, index) => ({
+        ...apt,
+        id: `${searchCity}-${index + 1}`,
+        title: `${apt.propertyType.charAt(0).toUpperCase() + apt.propertyType.slice(1)} in ${searchCity}`,
+        address: `${index + 1}23 Main St, ${searchCity}, FL 33602`,
+        city: searchCity.toLowerCase(),
+        contactInfo: {
+          phone: '(555) 123-4567',
+          email: `contact@${searchCity.toLowerCase()}apts.com`
+        }
+      }));
+    }
+    return cityResults;
   }
   return apartments;
 };

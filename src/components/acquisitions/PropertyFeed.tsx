@@ -85,10 +85,13 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
       } else if (searchLower.includes('new york') || searchLower.includes('nyc') || searchLower.includes('brooklyn') || searchLower.includes('manhattan')) {
         city = 'New York';
         state = 'NY';
+      } else if (searchLower.includes('tampa')) {
+        city = 'Tampa';
+        state = 'FL';
       } else {
         // Use the search term as city
         city = searchQuery;
-        state = 'CA'; // Default state
+        state = 'FL'; // Default state
       }
 
       const results = await searchRentals(city, state, 100);
@@ -152,6 +155,9 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
     if (searchLower.includes('new york') || searchLower.includes('nyc') || searchLower.includes('brooklyn') || searchLower.includes('manhattan')) {
       return 'New York Area';
     }
+    if (searchLower.includes('tampa')) {
+      return 'Tampa Area';
+    }
     
     // If no direct match, capitalize the search term
     return searchTerm.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + ' Area';
@@ -167,7 +173,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 h-5 w-5" />
               <Input
-                placeholder="Search for apartments by city... (Try: San Diego, Denver, Seattle, San Francisco, NYC)"
+                placeholder="Search for apartments by city... (Try: San Diego, Denver, Seattle, Tampa, NYC)"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-12 text-lg text-white bg-slate-700/50 border-cyan-500/30 placeholder:text-gray-400 focus:border-cyan-400"
@@ -296,7 +302,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
           <CardContent className="p-12 text-center">
             <div className="text-white text-xl mb-3">Find Your Next Rental Investment</div>
             <div className="text-gray-300 mb-6">Search for apartments across major markets to find profitable rental arbitrage opportunities</div>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
               <Button 
                 variant="outline" 
                 onClick={() => setSearchTerm('San Diego')}
@@ -317,6 +323,13 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
                 className="text-cyan-300 border-cyan-500/30 hover:bg-cyan-500/10"
               >
                 Seattle
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setSearchTerm('Tampa')}
+                className="text-cyan-300 border-cyan-500/30 hover:bg-cyan-500/10"
+              >
+                Tampa
               </Button>
               <Button 
                 variant="outline" 
