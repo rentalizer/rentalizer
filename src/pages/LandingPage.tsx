@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -159,14 +158,14 @@ const LandingPage = () => {
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-purple-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => handleFeatureClick('Acquisitions Agent')}
+                onClick={() => handleFeatureClick('Acquisitions CRM')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
                     <User className="h-8 w-8 text-purple-400" />
                   </div>
                   <CardTitle className="text-purple-300 text-lg">
-                    Acquisitions Agent
+                    Acquisitions CRM
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-center">
@@ -176,11 +175,11 @@ const LandingPage = () => {
                 </CardContent>
               </Card>
               <Button
-                onClick={() => handleFeatureClick('Acquisitions Agent')}
+                onClick={() => handleFeatureClick('Acquisitions CRM')}
                 className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
               >
                 <User className="h-4 w-4 mr-2" />
-                Acquisitions Agent
+                Acquisitions CRM
               </Button>
             </div>
 
