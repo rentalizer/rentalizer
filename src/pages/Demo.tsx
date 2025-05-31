@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, Calendar, ArrowLeft, MapPin, Calculator, User, DollarSign, CheckCircle, Star } from 'lucide-react';
+import { BarChart3, Calendar, ArrowLeft, MapPin, Calculator, User, DollarSign, CheckCircle, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const Demo = () => {
   const navigate = useNavigate();
@@ -37,6 +38,69 @@ const Demo = () => {
     "Automated guest communication and management",
     "Proven ROI calculation and profit optimization",
     "24/7 property management automation"
+  ];
+
+  const testimonials = [
+    {
+      quote: "I went from zero to $8,000/month in rental income within 4 months using rental arbitrage. The key was finding the right markets and landlords.",
+      author: "Sarah M.",
+      title: "Real Estate Entrepreneur"
+    },
+    {
+      quote: "Rental arbitrage completely changed my life. I'm now earning $12,000/month from 6 properties without owning any of them.",
+      author: "Michael R.",
+      title: "Former Software Engineer"
+    },
+    {
+      quote: "Started with just $3,000 and now I'm making $15,000/month. The automation tools made all the difference in scaling.",
+      author: "Jessica L.",
+      title: "Stay-at-Home Mom"
+    },
+    {
+      quote: "I replaced my corporate salary in 8 months. Now earning $18,000/month with 10 rental arbitrage units across 3 cities.",
+      author: "David K.",
+      title: "Former Marketing Director"
+    },
+    {
+      quote: "The market analysis helped me identify untapped opportunities. I'm now earning $6,500/month from just 3 properties.",
+      author: "Amanda T.",
+      title: "Teacher Turned Entrepreneur"
+    },
+    {
+      quote: "Rental arbitrage gave me financial freedom. I went from struggling to pay bills to earning $22,000/month consistently.",
+      author: "Robert C.",
+      title: "Former Retail Manager"
+    },
+    {
+      quote: "The automated systems saved me 20+ hours per week. Now I focus on growth while earning $14,000/month passively.",
+      author: "Lisa P.",
+      title: "Working Mother"
+    },
+    {
+      quote: "I scaled from 1 to 12 properties in 18 months. The key was systemizing everything from day one.",
+      author: "James W.",
+      title: "Former Accountant"
+    },
+    {
+      quote: "Rental arbitrage allowed me to quit my 9-5 and travel while earning $9,500/month from anywhere in the world.",
+      author: "Emily D.",
+      title: "Digital Nomad"
+    },
+    {
+      quote: "Started during college and now earning $7,200/month. This business model changed my entire future trajectory.",
+      author: "Tyler N.",
+      title: "College Graduate"
+    },
+    {
+      quote: "The ROI calculator helped me avoid bad deals and focus on winners. Now consistently earning $16,000/month.",
+      author: "Maria G.",
+      title: "Former Nurse"
+    },
+    {
+      quote: "From zero real estate experience to $11,000/month in 10 months. The training and tools made it possible.",
+      author: "Chris H.",
+      title: "Former Sales Rep"
+    }
   ];
 
   return (
@@ -106,21 +170,35 @@ const Demo = () => {
                   ))}
                 </div>
               </div>
-              <Card className="bg-slate-800/50 border-purple-500/20 backdrop-blur-lg">
-                <CardHeader>
-                  <CardTitle className="text-purple-300 flex items-center gap-2">
-                    <Star className="h-5 w-5" />
-                    Success Story
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <blockquote className="text-slate-300 italic mb-4">
-                    "Rentalizer helped me identify profitable markets and automate my rental arbitrage business. 
-                    I went from zero to $5,000/month in rental income within 6 months - all without buying property!"
-                  </blockquote>
-                  <p className="text-cyan-400 font-medium">- Sarah K., Rental Arbitrage Entrepreneur</p>
-                </CardContent>
-              </Card>
+              
+              {/* Testimonials Carousel */}
+              <div className="relative">
+                <h3 className="text-2xl font-bold text-purple-300 mb-6 flex items-center gap-2">
+                  <Star className="h-6 w-6" />
+                  Success Stories
+                </h3>
+                <Carousel className="w-full max-w-md mx-auto">
+                  <CarouselContent>
+                    {testimonials.map((testimonial, index) => (
+                      <CarouselItem key={index}>
+                        <Card className="bg-slate-800/50 border-purple-500/20 backdrop-blur-lg">
+                          <CardContent className="p-6">
+                            <blockquote className="text-slate-300 italic mb-4 text-sm leading-relaxed">
+                              "{testimonial.quote}"
+                            </blockquote>
+                            <div className="text-right">
+                              <p className="text-cyan-400 font-medium text-sm">{testimonial.author}</p>
+                              <p className="text-slate-500 text-xs">{testimonial.title}</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="left-2" />
+                  <CarouselNext className="right-2" />
+                </Carousel>
+              </div>
             </div>
           </div>
 
