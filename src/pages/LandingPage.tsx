@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, ArrowRight, LogIn, MapPin, Calculator, User, DollarSign } from 'lucide-react';
+import { BarChart3, ArrowRight, LogIn, MapPin, Calculator, User, DollarSign, Users } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
@@ -98,7 +99,7 @@ const LandingPage = () => {
           </div>
 
           {/* Features Grid */}
-          <div className="grid md:grid-cols-4 gap-8 mb-16">
+          <div className="grid md:grid-cols-5 gap-8 mb-16">
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
@@ -208,6 +209,34 @@ const LandingPage = () => {
               >
                 <DollarSign className="h-4 w-4 mr-2" />
                 Front Desk
+              </Button>
+            </div>
+
+            <div className="flex flex-col">
+              <Card 
+                className="bg-slate-800/50 border-green-500/20 backdrop-blur-lg hover:border-green-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
+                onClick={() => handleFeatureClick('Community')}
+              >
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/10 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
+                    <Users className="h-8 w-8 text-green-400" />
+                  </div>
+                  <CardTitle className="text-green-300 text-lg">
+                    Community
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-slate-400 text-sm">
+                    Connect With Other Rental Arbitrage Investors
+                  </p>
+                </CardContent>
+              </Card>
+              <Button
+                onClick={() => handleFeatureClick('Community')}
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Community
               </Button>
             </div>
           </div>
