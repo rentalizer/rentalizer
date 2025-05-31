@@ -87,7 +87,7 @@ export const ManualContactDialog = ({ isOpen, onClose, property }: ManualContact
             </div>
           </div>
 
-          {/* Contact Information - Real Data */}
+          {/* Contact Information Section - This was missing */}
           <div className="space-y-3">
             <h4 className="font-semibold text-gray-900">Property Contact Information</h4>
             
