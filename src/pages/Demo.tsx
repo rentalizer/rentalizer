@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Calendar, ArrowLeft, MapPin, Calculator, User, DollarSign, CheckCircle, Star, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -26,15 +25,21 @@ const Demo = () => {
     },
     {
       icon: User,
-      title: "Acquisitions Agent",
+      title: "Acquisitions CRM",
       description: "Contact Landlords & Close Deals",
       thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=300&fit=crop"
     },
     {
       icon: DollarSign,
-      title: "RentalHub",
-      description: "Property Management, Automations & Command Center For Your Listings",
+      title: "Front Desk",
+      description: "Property Management & Automations",
       thumbnail: "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop"
+    },
+    {
+      icon: User,
+      title: "Community",
+      description: "Connect With Other Rental Arbitrage Investors",
+      thumbnail: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=300&fit=crop"
     }
   ];
 
