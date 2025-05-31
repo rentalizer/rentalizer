@@ -15,31 +15,31 @@ const Demo = () => {
       icon: MapPin,
       title: "Market Intelligence",
       description: "Find The Best Rental Arbitrage Markets",
-      thumbnail: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop"
+      thumbnail: "/lovable-uploads/3094bcc7-d39b-4765-89d3-ce4f2146e7f1.png"
     },
     {
       icon: Calculator,
       title: "Calculator",
       description: "Assess Property Profitability And ROI",
-      thumbnail: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=300&fit=crop"
+      thumbnail: "/lovable-uploads/3094bcc7-d39b-4765-89d3-ce4f2146e7f1.png"
     },
     {
       icon: User,
       title: "Acquisitions CRM",
       description: "Contact Landlords & Close Deals",
-      thumbnail: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=400&h=300&fit=crop"
+      thumbnail: "/lovable-uploads/3094bcc7-d39b-4765-89d3-ce4f2146e7f1.png"
     },
     {
       icon: DollarSign,
       title: "Front Desk",
       description: "Property Management & Automations",
-      thumbnail: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop"
+      thumbnail: "/lovable-uploads/3094bcc7-d39b-4765-89d3-ce4f2146e7f1.png"
     },
     {
       icon: User,
       title: "Community",
       description: "Connect With Other Rental Arbitrage Investors",
-      thumbnail: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=400&h=300&fit=crop"
+      thumbnail: "/lovable-uploads/3094bcc7-d39b-4765-89d3-ce4f2146e7f1.png"
     }
   ];
 
