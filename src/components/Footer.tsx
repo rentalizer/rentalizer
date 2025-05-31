@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BarChart3 } from 'lucide-react';
 import { ContactChat } from './ContactChat';
@@ -9,7 +10,7 @@ interface FooterProps {
 
 export const Footer = ({ showLinks = true }: FooterProps) => {
   return (
-    <footer className="relative z-10 mt-16 border-t border-gray-700/50 bg-gray-900/60 backdrop-blur-lg">
+    <footer className="relative z-10 mt-16 border-t border-gray-500/50 bg-slate-700/90 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="text-center">
           {/* Logo and Description */}
