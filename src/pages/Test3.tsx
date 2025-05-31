@@ -18,13 +18,10 @@ const Test3 = () => {
           </div>
           
           {/* Company Name */}
-          <div>
+          <div className="flex items-center">
             <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent tracking-wider">
               RENTALIZER
             </h1>
-            <p className="text-cyan-300/80 text-lg font-light tracking-widest mt-2">
-              .AI
-            </p>
           </div>
         </div>
 
