@@ -67,9 +67,9 @@ const LandingPage = () => {
             </div>
             <p className="text-lg text-cyan-300/80 font-medium mb-8">By Richie Matthews</p>
             
-            {/* Tagline */}
+            {/* Updated Tagline */}
             <p className="text-3xl text-slate-300 mb-12 max-w-4xl mx-auto leading-relaxed font-semibold">
-              AI System To Earn Rental Income—No Mortgage Needed
+              The All-in-One AI-Powered Rental Arbitrage System, CRM, and Community
             </p>
 
             {/* Two Button Layout */}
