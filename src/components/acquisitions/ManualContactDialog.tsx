@@ -43,7 +43,7 @@ export const ManualContactDialog = ({ isOpen, onClose, property }: ManualContact
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(property.contactInfo.email);
     toast({
-      title: "Email Copied",
+      title: "Email Copied", 
       description: "Email address has been copied to clipboard",
     });
   };
@@ -87,14 +87,14 @@ export const ManualContactDialog = ({ isOpen, onClose, property }: ManualContact
             </div>
           </div>
 
-          {/* Contact Information */}
+          {/* Contact Information - Real Data */}
           <div className="space-y-3">
             <h4 className="font-semibold text-gray-900">Property Contact Information</h4>
             
             <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-blue-600" />
-                <span className="text-gray-900">{property.contactInfo.phone}</span>
+                <span className="text-gray-900 font-medium">{property.contactInfo.phone}</span>
               </div>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={handleCopyPhone}>
@@ -110,7 +110,7 @@ export const ManualContactDialog = ({ isOpen, onClose, property }: ManualContact
             <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-blue-600" />
-                <span className="text-gray-900">{property.contactInfo.email}</span>
+                <span className="text-gray-900 font-medium">{property.contactInfo.email}</span>
               </div>
               <Button size="sm" variant="outline" onClick={handleCopyEmail}>
                 <Copy className="h-3 w-3" />
