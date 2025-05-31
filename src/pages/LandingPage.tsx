@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -60,8 +59,8 @@ const LandingPage = () => {
           {/* Main Content */}
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-4 mb-6">
-              <BarChart3 className="h-12 w-12 text-cyan-400 neon-text" />
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <BarChart3 className="h-16 w-16 text-cyan-400 neon-text" />
+              <h1 className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 RENTALIZER
               </h1>
             </div>
@@ -72,8 +71,8 @@ const LandingPage = () => {
               AI-Powered Rental Arbitrage System, CRM & Community
             </p>
 
-            {/* Two Button Layout */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
+            {/* Single Button Layout */}
+            <div className="flex justify-center items-center mb-16">
               <Button 
                 size="lg"
                 onClick={handleGetStarted}
@@ -82,19 +81,6 @@ const LandingPage = () => {
                 <ArrowRight className="h-6 w-6 mr-3" />
                 Get Started
               </Button>
-              
-              <LoginDialog 
-                trigger={
-                  <Button 
-                    size="lg"
-                    variant="outline"
-                    className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 px-12 py-6 text-xl font-semibold min-w-[200px]"
-                  >
-                    <LogIn className="h-6 w-6 mr-3" />
-                    Login
-                  </Button>
-                }
-              />
             </div>
           </div>
 
