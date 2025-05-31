@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -68,7 +67,7 @@ const LandingPage = () => {
             <p className="text-lg text-white font-medium mb-8">By Richie Matthews</p>
             
             {/* Updated Tagline */}
-            <p className="text-2xl md:text-3xl text-slate-300 mb-12 max-w-6xl mx-auto leading-relaxed font-semibold">
+            <p className="text-2xl md:text-3xl text-white mb-12 max-w-4xl mx-auto leading-relaxed font-semibold">
               The All-in-One AI-Powered Rental Arbitrage System, CRM, and Community
             </p>
 
