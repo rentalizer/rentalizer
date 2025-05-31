@@ -128,9 +128,9 @@ export const searchRentals = async (
                 bedrooms: property.bedrooms || property.beds || property.bedroomCount || 2,
                 bathrooms: property.bathrooms || property.baths || property.bathroomCount || 2,
                 sqft: property.livingArea || property.finishedSqFt || property.sqft || property.lotAreaValue || 1000,
-                images: this.extractImages(property),
+                images: extractImages(property),
                 rating: 4.0 + Math.random() * 1,
-                amenities: this.extractAmenities(property),
+                amenities: extractAmenities(property),
                 availability: 'Available Now',
                 contactInfo: {
                   phone: property.contactPhone || property.phone || '(555) 123-4567',
@@ -175,7 +175,7 @@ export const searchRentals = async (
   }
 }
 
-// Helper method to extract images from property data
+// Helper function to extract images from property data
 function extractImages(property: any): string[] {
   if (property.photos && Array.isArray(property.photos)) {
     return property.photos.slice(0, 5).map((photo: any) => {
@@ -196,7 +196,7 @@ function extractImages(property: any): string[] {
   return ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop&crop=edges'];
 }
 
-// Helper method to extract amenities from property data
+// Helper function to extract amenities from property data
 function extractAmenities(property: any): string[] {
   const amenities = [];
   
