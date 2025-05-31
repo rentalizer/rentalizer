@@ -32,6 +32,9 @@ export const ManualContactDialog = ({ isOpen, onClose, property }: ManualContact
   });
   const { toast } = useToast();
 
+  console.log('ManualContactDialog - Property data:', property);
+  console.log('ManualContactDialog - Contact info:', property.contactInfo);
+
   const handleCopyPhone = () => {
     navigator.clipboard.writeText(property.contactInfo.phone);
     toast({
@@ -87,34 +90,45 @@ export const ManualContactDialog = ({ isOpen, onClose, property }: ManualContact
             </div>
           </div>
 
-          {/* Contact Information Section - This was missing */}
-          <div className="space-y-3">
-            <h4 className="font-semibold text-gray-900">Property Contact Information</h4>
+          {/* Contact Information Section */}
+          <div className="space-y-3 bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+              <Phone className="h-4 w-4 text-blue-600" />
+              Property Contact Information
+            </h4>
             
-            <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4 text-blue-600" />
-                <span className="text-gray-900 font-medium">{property.contactInfo.phone}</span>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between bg-white p-3 rounded-lg border">
+                <div className="flex items-center gap-3">
+                  <Phone className="h-4 w-4 text-blue-600" />
+                  <div>
+                    <div className="text-sm text-gray-500">Phone</div>
+                    <div className="text-gray-900 font-medium">{property.contactInfo?.phone || 'No phone provided'}</div>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={handleCopyPhone} disabled={!property.contactInfo?.phone}>
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                  <Button size="sm" onClick={handleCall} className="bg-green-600 hover:bg-green-700" disabled={!property.contactInfo?.phone}>
+                    <Phone className="h-3 w-3" />
+                    Call
+                  </Button>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={handleCopyPhone}>
+
+              <div className="flex items-center justify-between bg-white p-3 rounded-lg border">
+                <div className="flex items-center gap-3">
+                  <Mail className="h-4 w-4 text-blue-600" />
+                  <div>
+                    <div className="text-sm text-gray-500">Email</div>
+                    <div className="text-gray-900 font-medium">{property.contactInfo?.email || 'No email provided'}</div>
+                  </div>
+                </div>
+                <Button size="sm" variant="outline" onClick={handleCopyEmail} disabled={!property.contactInfo?.email}>
                   <Copy className="h-3 w-3" />
                 </Button>
-                <Button size="sm" onClick={handleCall} className="bg-green-600 hover:bg-green-700">
-                  <Phone className="h-3 w-3" />
-                  Call
-                </Button>
               </div>
-            </div>
-
-            <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-              <div className="flex items-center gap-3">
-                <Mail className="h-4 w-4 text-blue-600" />
-                <span className="text-gray-900 font-medium">{property.contactInfo.email}</span>
-              </div>
-              <Button size="sm" variant="outline" onClick={handleCopyEmail}>
-                <Copy className="h-3 w-3" />
-              </Button>
             </div>
           </div>
 
@@ -171,7 +185,7 @@ export const ManualContactDialog = ({ isOpen, onClose, property }: ManualContact
             <Button variant="outline" onClick={onClose} className="flex-1">
               Cancel
             </Button>
-            <Button onClick={handleSendEmail} className="flex-1 bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handleSendEmail} className="flex-1 bg-blue-600 hover:bg-blue-700" disabled={!property.contactInfo?.email}>
               <Send className="h-4 w-4 mr-2" />
               Send Email
             </Button>
