@@ -6,21 +6,23 @@ const RAPIDAPI_KEY = 'your-rapidapi-key-here'; // User will need to replace this
 
 export interface RealtyMoleProperty {
   id: string;
+  title: string;
   address: string;
-  city: string;
-  state: string;
-  zipCode: string;
   price: number;
   bedrooms: number;
   bathrooms: number;
-  squareFootage: number;
-  propertyType: string;
-  listingType: string;
-  photos: string[];
-  description: string;
+  sqft: number;
+  images: string[];
+  rating?: number;
   amenities: string[];
-  latitude: number;
-  longitude: number;
+  availability: string;
+  contactInfo: {
+    phone: string;
+    email: string;
+  };
+  city: string;
+  propertyType: string;
+  description?: string;
 }
 
 export const searchRentals = async (
@@ -77,7 +79,7 @@ export const searchRentals = async (
 };
 
 // Expanded mock data focused on apartments, condos, and townhouses only
-const getMockApartmentData = (searchCity?: string) => {
+const getMockApartmentData = (searchCity?: string): RealtyMoleProperty[] => {
   const apartments = [
     // San Diego Apartments
     {
