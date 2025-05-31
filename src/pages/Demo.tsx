@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Calendar, ArrowLeft, MapPin, Calculator, User, DollarSign, CheckCircle, Star, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -14,19 +15,19 @@ const Demo = () => {
     {
       icon: MapPin,
       title: "Market Intelligence",
-      description: "Find the best rental arbitrage markets with AI-powered analysis",
+      description: "Find The Best Rental Arbitrage Markets",
       thumbnail: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=300&fit=crop"
     },
     {
       icon: Calculator,
-      title: "ROI Calculator",
-      description: "Assess property profitability and return on investment instantly",
+      title: "Calculator",
+      description: "Assess Property Profitability And ROI",
       thumbnail: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop"
     },
     {
       icon: User,
       title: "Acquisitions Agent",
-      description: "AI agent to contact landlords and close deals automatically",
+      description: "Contact Landlords & Close Deals",
       thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=300&fit=crop"
     },
     {
