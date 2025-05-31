@@ -16,6 +16,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import AnimationDraft from "./pages/AnimationDraft";
 import Test from "./pages/Test";
+import Test3 from "./pages/Test3";
 import Pricing from "./pages/Pricing";
 import AcquisitionsAgent from "./pages/AcquisitionsAgent";
 
@@ -35,6 +36,7 @@ const AppRoutes = () => (
     <Route path="/terms-of-service" element={<TermsOfService />} />
     <Route path="/animation-draft" element={<AnimationDraft />} />
     <Route path="/test" element={<Test />} />
+    <Route path="/test3" element={<Test3 />} />
   </Routes>
 );
 
