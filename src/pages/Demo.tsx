@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Calendar, ArrowLeft, MapPin, Calculator, User, DollarSign, CheckCircle, Star, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -15,22 +14,26 @@ const Demo = () => {
     {
       icon: MapPin,
       title: "Market Intelligence",
-      description: "Find the best rental arbitrage markets with AI-powered analysis"
+      description: "Find the best rental arbitrage markets with AI-powered analysis",
+      thumbnail: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=300&fit=crop"
     },
     {
       icon: Calculator,
       title: "ROI Calculator",
-      description: "Assess property profitability and return on investment instantly"
+      description: "Assess property profitability and return on investment instantly",
+      thumbnail: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop"
     },
     {
       icon: User,
       title: "Acquisitions Agent",
-      description: "AI agent to contact landlords and close deals automatically"
+      description: "AI agent to contact landlords and close deals automatically",
+      thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=300&fit=crop"
     },
     {
       icon: DollarSign,
       title: "Property Management",
-      description: "Automated front desk operations and guest communications"
+      description: "Automated front desk operations and guest communications",
+      thumbnail: "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop"
     }
   ];
 
@@ -138,19 +141,29 @@ const Demo = () => {
             </p>
           </div>
 
-          {/* Features Overview */}
+          {/* Features Overview with Thumbnails */}
           <div className="mb-16">
             <h2 className="text-3xl font-bold text-center text-cyan-300 mb-8">What You'll See in the Demo</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {features.map((feature, index) => (
-                <Card key={index} className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300">
-                  <CardHeader className="text-center pb-4">
-                    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-cyan-500/10 flex items-center justify-center">
-                      <feature.icon className="h-6 w-6 text-cyan-400" />
+                <Card key={index} className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg hover:border-cyan-400/40 transition-all duration-300 overflow-hidden">
+                  {/* Thumbnail */}
+                  <div className="relative h-32 overflow-hidden">
+                    <img 
+                      src={feature.thumbnail} 
+                      alt={feature.title}
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-800/80 to-transparent"></div>
+                    <div className="absolute top-3 left-3 w-8 h-8 rounded-full bg-cyan-500/20 backdrop-blur-sm flex items-center justify-center">
+                      <feature.icon className="h-4 w-4 text-cyan-400" />
                     </div>
+                  </div>
+                  
+                  <CardHeader className="text-center pb-2">
                     <CardTitle className="text-cyan-300 text-lg">{feature.title}</CardTitle>
                   </CardHeader>
-                  <CardContent className="text-center">
+                  <CardContent className="text-center pt-0">
                     <p className="text-slate-400 text-sm">{feature.description}</p>
                   </CardContent>
                 </Card>
