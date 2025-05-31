@@ -31,8 +31,8 @@ const Demo = () => {
     },
     {
       icon: DollarSign,
-      title: "Property Management",
-      description: "Automated front desk operations and guest communications",
+      title: "RentalHub",
+      description: "Property Management, Automations & Command Center For Your Listings",
       thumbnail: "https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop"
     }
   ];
