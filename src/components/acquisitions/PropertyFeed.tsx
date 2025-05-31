@@ -131,14 +131,14 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
   const [sortBy, setSortBy] = useState('price-low');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Only show properties when user has searched
+  // Show properties when user has searched (even with just 1 character)
   const hasSearched = searchTerm.length > 0;
   
   const filteredProperties = hasSearched ? realProperties.filter(property => {
-    const matchesSearch = searchTerm === '' || 
-                         property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         property.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         property.city.toLowerCase().includes(searchTerm.toLowerCase());
+    const searchLower = searchTerm.toLowerCase();
+    const matchesSearch = property.title.toLowerCase().includes(searchLower) ||
+                         property.address.toLowerCase().includes(searchLower) ||
+                         property.city.toLowerCase().includes(searchLower);
     
     const matchesPrice = priceRange === 'all' || 
                         (priceRange === 'under-2000' && property.price < 2000) ||
@@ -169,13 +169,19 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
     if (searchTerm === '') return 'Search For Properties';
     
     const searchLower = searchTerm.toLowerCase();
-    const cities = ['san diego', 'denver', 'seattle', 'miami', 'austin', 'atlanta'];
-    const matchedCity = cities.find(city => city.includes(searchLower) || searchLower.includes(city));
     
-    if (matchedCity) {
-      return matchedCity.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + ' Area';
+    // Check if search matches any city directly
+    if (searchLower.includes('san diego') || searchLower.includes('sandiego')) {
+      return 'San Diego Area';
+    }
+    if (searchLower.includes('denver')) {
+      return 'Denver Area';
+    }
+    if (searchLower.includes('seattle')) {
+      return 'Seattle Area';
     }
     
+    // If no direct match, capitalize the search term
     return searchTerm.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') + ' Area';
   };
 
@@ -189,7 +195,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 h-5 w-5" />
               <Input
-                placeholder="Search by location, property name, or address..."
+                placeholder="Search by location, property name, or address... (No search button needed - just type!)"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-12 text-lg text-white bg-slate-700/50 border-cyan-500/30 placeholder:text-gray-400 focus:border-cyan-400"
@@ -313,7 +319,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             <div className="text-gray-300 mb-6">Enter a city name or address to find available rental properties</div>
             <div className="flex items-center justify-center gap-2 text-cyan-400">
               <Search className="h-5 w-5" />
-              <span>Search above to see properties</span>
+              <span>Search above to see properties - no button needed!</span>
             </div>
           </CardContent>
         </Card>
