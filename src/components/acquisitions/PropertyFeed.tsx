@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { PropertyCard } from './PropertyCard';
 import { Input } from '@/components/ui/input';
@@ -7,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Search, Filter, MapPin, SlidersHorizontal } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { searchRentals } from '@/services/realtyMoleService';
+import { searchRentals } from '@/services/zillowService';
 import { useToast } from '@/hooks/use-toast';
 
 interface PropertyFeedProps {
@@ -94,20 +93,26 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
         state = 'FL'; // Default state
       }
 
+      console.log('🔍 Searching Zillow for:', { city, state });
       const results = await searchRentals(city, state, 100);
       setProperties(results);
       
       if (results.length === 0) {
         toast({
           title: "No Results",
-          description: "No apartments found for this search. Try a different city.",
+          description: "No rental properties found for this search. Try a different city.",
+        });
+      } else {
+        toast({
+          title: "Properties Found",
+          description: `Found ${results.length} rental properties in ${city}`,
         });
       }
     } catch (error) {
       console.error('Search error:', error);
       toast({
         title: "Search Error",
-        description: "Unable to fetch properties. Please try again.",
+        description: "Unable to fetch properties from Zillow. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -135,7 +140,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
   };
 
   const getSearchLocation = () => {
-    if (searchTerm === '') return 'Search For Apartments';
+    if (searchTerm === '') return 'Search For Rental Properties';
     
     const searchLower = searchTerm.toLowerCase();
     
@@ -173,7 +178,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400 h-5 w-5" />
               <Input
-                placeholder="Search for apartments by city... (Try: San Diego, Denver, Seattle, Tampa, NYC)"
+                placeholder="Search for rental properties by city... (Try: San Diego, Denver, Seattle, Tampa, NYC)"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 h-12 text-lg text-white bg-slate-700/50 border-cyan-500/30 placeholder:text-gray-400 focus:border-cyan-400"
@@ -243,7 +248,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg font-semibold text-white">
-              {loading ? 'Searching...' : `${sortedProperties.length} Apartments Found`}
+              {loading ? 'Searching Zillow...' : `${sortedProperties.length} Rental Properties Found`}
             </span>
             <MapPin className="h-4 w-4 text-cyan-400" />
             <span className="text-cyan-200">{getSearchLocation()}</span>
@@ -291,7 +296,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
           ) : !loading ? (
             <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
               <CardContent className="p-12 text-center">
-                <div className="text-white text-lg mb-2">No Apartments Found</div>
+                <div className="text-white text-lg mb-2">No Rental Properties Found</div>
                 <div className="text-gray-300">Try searching for a different city or adjust your filters</div>
               </CardContent>
             </Card>
@@ -300,8 +305,8 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
       ) : (
         <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
           <CardContent className="p-12 text-center">
-            <div className="text-white text-xl mb-3">Find Your Next Rental Investment</div>
-            <div className="text-gray-300 mb-6">Search for apartments across major markets to find profitable rental arbitrage opportunities</div>
+            <div className="text-white text-xl mb-3">Find Rental Properties on Zillow</div>
+            <div className="text-gray-300 mb-6">Search for rental properties across major markets using real Zillow data</div>
             <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
               <Button 
                 variant="outline" 
@@ -348,7 +353,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             </div>
             <div className="flex items-center justify-center gap-2 text-cyan-400">
               <Search className="h-5 w-5" />
-              <span>Click a city above or search to find real apartment listings!</span>
+              <span>Click a city above or search to find real rental property listings!</span>
             </div>
           </CardContent>
         </Card>
