@@ -116,17 +116,14 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
       
       if (results.length === 0) {
         toast({
-          title: "No Results Found",
-          description: "The Zillow API returned no results. Check the console for detailed debugging information.",
+          title: "No Properties Found",
+          description: "The Zillow API returned no rental properties for this location. Try a different city or check your API key.",
           variant: "destructive"
         });
       } else {
-        const isMockData = results[0]?.id?.includes('mock-');
         toast({
-          title: isMockData ? "Sample Data Loaded" : "Properties Found",
-          description: isMockData ? 
-            `Showing ${results.length} sample properties. Check console for API debugging info.` :
-            `Found ${results.length} rental properties in ${city}`,
+          title: "Properties Found",
+          description: `Found ${results.length} rental properties in ${city}`,
         });
       }
     } catch (error) {
@@ -290,11 +287,6 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             </span>
             <MapPin className="h-4 w-4 text-cyan-400" />
             <span className="text-cyan-200">{getSearchLocation()}</span>
-            {sortedProperties.length > 0 && sortedProperties[0]?.id?.includes('mock-') && (
-              <Badge variant="outline" className="bg-yellow-900/20 text-yellow-300 border-yellow-500/30">
-                Sample Data
-              </Badge>
-            )}
           </div>
           
           {(searchTerm || priceRange !== 'all' || bedrooms !== 'all') && (
@@ -340,7 +332,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
               <CardContent className="p-12 text-center">
                 <div className="text-white text-lg mb-2">No Rental Properties Found</div>
-                <div className="text-gray-300 mb-4">Try searching for a different city or adjust your filters</div>
+                <div className="text-gray-300 mb-4">The Zillow API returned no results for this location. Try searching for a different city or verify your API key is configured correctly.</div>
                 {!hasApiKey && (
                   <div className="flex items-center justify-center gap-2 text-yellow-400">
                     <Key className="h-4 w-4" />

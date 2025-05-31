@@ -139,33 +139,7 @@ export const searchRentals = async (
     }
 
     console.error('❌ No data found from any Zillow API endpoint for:', { city, state });
-    
-    // Generate some mock data as fallback so user can see the interface works
-    console.log('🔄 Generating sample data for demonstration...');
-    const mockProperties = Array.from({ length: 6 }, (_, i) => ({
-      id: `mock-${city}-${i}`,
-      title: `Sample Rental Property ${i + 1}`,
-      address: `${100 + i * 50} Sample St, ${city}, ${state}`,
-      price: 1800 + (i * 200),
-      bedrooms: 1 + (i % 3),
-      bathrooms: 1 + (i % 2),
-      sqft: 800 + (i * 100),
-      images: [
-        `https://images.unsplash.com/photo-${1522708323590 + i}?w=800&h=600&fit=crop&crop=edges`
-      ],
-      rating: 4.0 + Math.random() * 1,
-      amenities: ['Parking', 'Laundry', 'Air Conditioning'][Math.floor(Math.random() * 3)] ? ['Parking'] : ['Laundry'],
-      availability: 'Available Now',
-      contactInfo: {
-        phone: `(555) 123-45${60 + i}`,
-        email: `property${i + 1}@example.com`
-      },
-      city: city.toLowerCase(),
-      propertyType: ['Apartment', 'House', 'Condo'][i % 3],
-      description: `Sample rental property in ${city}. API integration in progress.`
-    }));
-
-    return mockProperties;
+    return [];
     
   } catch (error) {
     console.error('❌ Error fetching from Zillow API:', error);
