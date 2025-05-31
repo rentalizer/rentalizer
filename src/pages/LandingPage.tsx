@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,7 +28,7 @@ const LandingPage = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <BarChart3 className="h-8 w-8 text-cyan-400" />
+              <BarChart3 className="h-8 w-8 text-cyan-400 neon-text" />
             </div>
 
             {/* Navigation */}
@@ -59,7 +60,7 @@ const LandingPage = () => {
           {/* Main Content */}
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-4 mb-6">
-              <BarChart3 className="h-12 w-12 text-cyan-400" />
+              <BarChart3 className="h-12 w-12 text-cyan-400 neon-text" />
               <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 RENTALIZER
               </h1>
