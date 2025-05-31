@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Calendar, ArrowLeft, MapPin, Calculator, User, DollarSign, CheckCircle, Star, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -159,7 +160,7 @@ const Demo = () => {
 
           {/* Benefits Section */}
           <div className="mb-16">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="grid lg:grid-cols-2 gap-12 items-start">
               <div>
                 <h2 className="text-3xl font-bold text-cyan-300 mb-6">Why Choose Rentalizer?</h2>
                 <div className="space-y-4">
@@ -172,44 +173,46 @@ const Demo = () => {
                 </div>
               </div>
               
-              {/* Testimonials Carousel with Autoplay */}
-              <div className="relative">
+              {/* Testimonials Carousel with Autoplay - Centered */}
+              <div className="flex flex-col items-center">
                 <h3 className="text-2xl font-bold text-purple-300 mb-6 flex items-center gap-2">
                   <Star className="h-6 w-6" />
                   Success Stories
                 </h3>
-                <Carousel 
-                  className="w-full max-w-md mx-auto"
-                  opts={{
-                    align: "start",
-                    loop: true,
-                  }}
-                  plugins={[
-                    Autoplay({
-                      delay: 4000,
-                    }),
-                  ]}
-                >
-                  <CarouselContent>
-                    {testimonials.map((testimonial, index) => (
-                      <CarouselItem key={index}>
-                        <Card className="bg-slate-800/50 border-purple-500/20 backdrop-blur-lg">
-                          <CardContent className="p-6">
-                            <blockquote className="text-slate-300 italic mb-4 text-sm leading-relaxed">
-                              "{testimonial.quote}"
-                            </blockquote>
-                            <div className="text-right">
-                              <p className="text-cyan-400 font-medium text-sm">{testimonial.author}</p>
-                              <p className="text-slate-500 text-xs">{testimonial.title}</p>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="left-2" />
-                  <CarouselNext className="right-2" />
-                </Carousel>
+                <div className="w-full max-w-md">
+                  <Carousel 
+                    className="w-full"
+                    opts={{
+                      align: "start",
+                      loop: true,
+                    }}
+                    plugins={[
+                      Autoplay({
+                        delay: 4000,
+                      }),
+                    ]}
+                  >
+                    <CarouselContent>
+                      {testimonials.map((testimonial, index) => (
+                        <CarouselItem key={index}>
+                          <Card className="bg-slate-800/50 border-purple-500/20 backdrop-blur-lg">
+                            <CardContent className="p-6">
+                              <blockquote className="text-slate-300 italic mb-4 text-sm leading-relaxed">
+                                "{testimonial.quote}"
+                              </blockquote>
+                              <div className="text-right">
+                                <p className="text-cyan-400 font-medium text-sm">{testimonial.author}</p>
+                                <p className="text-slate-500 text-xs">{testimonial.title}</p>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="left-2" />
+                    <CarouselNext className="right-2" />
+                  </Carousel>
+                </div>
               </div>
             </div>
           </div>
