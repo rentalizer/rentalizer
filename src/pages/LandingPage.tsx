@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -98,8 +97,8 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Features Grid */}
-          <div className="grid md:grid-cols-5 gap-8 mb-16">
+          {/* Features Grid - reduced bottom margin */}
+          <div className="grid md:grid-cols-5 gap-8 mb-8">
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
@@ -243,6 +242,7 @@ const LandingPage = () => {
         </div>
       </div>
 
+      {/* Footer with reduced top margin */}
       <Footer showLinks={false} />
     </div>
   );
