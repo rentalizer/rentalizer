@@ -1,10 +1,11 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart3, Calendar, ArrowLeft, MapPin, Calculator, User, DollarSign, CheckCircle, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import useEmblaCarousel from 'embla-carousel-react';
+import Autoplay from 'embla-carousel-autoplay';
 
 const Demo = () => {
   const navigate = useNavigate();
@@ -42,64 +43,64 @@ const Demo = () => {
 
   const testimonials = [
     {
-      quote: "I went from zero to $8,000/month in rental income within 4 months using rental arbitrage. The key was finding the right markets and landlords.",
-      author: "Sarah M.",
-      title: "Real Estate Entrepreneur"
+      quote: "In my first month, I made $4,800 in profit. By month 3, I was consistently making $8,000+ per month. The system works if you follow it.",
+      author: "Marcus Johnson",
+      title: "Former Corporate Manager"
     },
     {
-      quote: "Rental arbitrage completely changed my life. I'm now earning $12,000/month from 6 properties without owning any of them.",
-      author: "Michael R.",
-      title: "Former Software Engineer"
-    },
-    {
-      quote: "Started with just $3,000 and now I'm making $15,000/month. The automation tools made all the difference in scaling.",
-      author: "Jessica L.",
-      title: "Stay-at-Home Mom"
-    },
-    {
-      quote: "I replaced my corporate salary in 8 months. Now earning $18,000/month with 10 rental arbitrage units across 3 cities.",
-      author: "David K.",
-      title: "Former Marketing Director"
-    },
-    {
-      quote: "The market analysis helped me identify untapped opportunities. I'm now earning $6,500/month from just 3 properties.",
-      author: "Amanda T.",
+      quote: "I went from zero real estate knowledge to $12,000/month in rental arbitrage within 6 months. The training gave me everything I needed.",
+      author: "Sarah Chen",
       title: "Teacher Turned Entrepreneur"
     },
     {
-      quote: "Rental arbitrage gave me financial freedom. I went from struggling to pay bills to earning $22,000/month consistently.",
-      author: "Robert C.",
-      title: "Former Retail Manager"
+      quote: "Started with $5,000 and now I'm pulling in $15,000/month from 8 properties. This completely changed my family's financial future.",
+      author: "David Rodriguez",
+      title: "Former Restaurant Worker"
     },
     {
-      quote: "The automated systems saved me 20+ hours per week. Now I focus on growth while earning $14,000/month passively.",
-      author: "Lisa P.",
-      title: "Working Mother"
+      quote: "I replaced my $75,000 salary in 10 months. Now I'm making $18,000/month and have complete time freedom.",
+      author: "Jennifer Kim",
+      title: "Ex-Marketing Director"
     },
     {
-      quote: "I scaled from 1 to 12 properties in 18 months. The key was systemizing everything from day one.",
-      author: "James W.",
-      title: "Former Accountant"
+      quote: "The market analysis tools helped me find profitable markets nobody else was targeting. I'm now earning $9,500/month consistently.",
+      author: "Robert Thompson",
+      title: "Retired Veteran"
     },
     {
-      quote: "Rental arbitrage allowed me to quit my 9-5 and travel while earning $9,500/month from anywhere in the world.",
-      author: "Emily D.",
-      title: "Digital Nomad"
+      quote: "From struggling to pay bills to earning $22,000/month. Rental arbitrage gave me the financial freedom I never thought was possible.",
+      author: "Maria Santos",
+      title: "Single Mother"
     },
     {
-      quote: "Started during college and now earning $7,200/month. This business model changed my entire future trajectory.",
-      author: "Tyler N.",
-      title: "College Graduate"
+      quote: "The automation systems save me 25+ hours per week. I focus on growth while earning $14,000/month mostly passively.",
+      author: "Alex Parker",
+      title: "Working Dad"
     },
     {
-      quote: "The ROI calculator helped me avoid bad deals and focus on winners. Now consistently earning $16,000/month.",
-      author: "Maria G.",
+      quote: "I scaled from 1 to 15 properties in 18 months using the exact strategies taught. The systematic approach is everything.",
+      author: "Lisa Washington",
       title: "Former Nurse"
     },
     {
-      quote: "From zero real estate experience to $11,000/month in 10 months. The training and tools made it possible.",
-      author: "Chris H.",
+      quote: "Started in college and now I'm earning $11,200/month while traveling. This business model changed my entire life trajectory.",
+      author: "Tyler Brooks",
+      title: "Recent Graduate"
+    },
+    {
+      quote: "The ROI calculator helped me avoid costly mistakes and focus only on profitable deals. Now consistently earning $16,500/month.",
+      author: "Christine Lee",
+      title: "Former Accountant"
+    },
+    {
+      quote: "From zero experience to $13,800/month in 14 months. The step-by-step training made what seemed impossible, achievable.",
+      author: "James Wilson",
       title: "Former Sales Rep"
+    },
+    {
+      quote: "I thought rental arbitrage was too good to be true until I started making $10,600/month. Now I'm a believer and helping others do the same.",
+      author: "Amanda Foster",
+      title: "Former Retail Manager"
     }
   ];
 
@@ -171,13 +172,24 @@ const Demo = () => {
                 </div>
               </div>
               
-              {/* Testimonials Carousel */}
+              {/* Testimonials Carousel with Autoplay */}
               <div className="relative">
                 <h3 className="text-2xl font-bold text-purple-300 mb-6 flex items-center gap-2">
                   <Star className="h-6 w-6" />
                   Success Stories
                 </h3>
-                <Carousel className="w-full max-w-md mx-auto">
+                <Carousel 
+                  className="w-full max-w-md mx-auto"
+                  opts={{
+                    align: "start",
+                    loop: true,
+                  }}
+                  plugins={[
+                    Autoplay({
+                      delay: 4000,
+                    }),
+                  ]}
+                >
                   <CarouselContent>
                     {testimonials.map((testimonial, index) => (
                       <CarouselItem key={index}>
