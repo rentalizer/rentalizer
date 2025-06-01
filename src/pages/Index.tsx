@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -183,7 +182,7 @@ const Index = () => {
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-slate-400 text-sm">
-                    Automate operations
+                    Automate Operations
                   </p>
                 </CardContent>
               </Card>
