@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -178,12 +179,12 @@ const Index = () => {
                     <Headphones className="h-8 w-8 text-blue-400" />
                   </div>
                   <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
-                    Front Desk
+                    Property Management System
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-slate-400 text-sm">
-                    Property Management & Automations
+                    Automates Operations
                   </p>
                 </CardContent>
               </Card>
@@ -192,7 +193,7 @@ const Index = () => {
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
               >
                 <Headphones className="h-4 w-4 mr-2" />
-                Front Desk
+                Property Management System
               </Button>
             </div>
 
@@ -234,3 +235,4 @@ const Index = () => {
 };
 
 export default Index;
+
