@@ -160,7 +160,7 @@ const LandingPage = () => {
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-slate-400 text-sm">
-                    Property Outreach, Close Deals & Manage Relationships with Property Owners
+                    Property Outreach, Close Deals & Manage Relationships
                   </p>
                 </CardContent>
               </Card>
