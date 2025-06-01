@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,7 +21,7 @@ const LandingPage = () => {
   };
 
   // Add console log to verify what we're rendering
-  console.log('Landing Page rendering - Front Desk should show: Property Management System, Property Management & Automations');
+  console.log('Landing Page rendering - PMS should show: PMS, Property Management System Automates Operations');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
@@ -176,28 +177,28 @@ const LandingPage = () => {
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => handleFeatureClick('Property Management System')}
+                onClick={() => handleFeatureClick('PMS')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
                     <DollarSign className="h-8 w-8 text-blue-400" />
                   </div>
                   <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
-                    Property Management System
+                    PMS
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-slate-400 text-sm">
-                    Property Management & Automations
+                    Property Management System Automates Operations
                   </p>
                 </CardContent>
               </Card>
               <Button
-                onClick={() => handleFeatureClick('Property Management System')}
+                onClick={() => handleFeatureClick('PMS')}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
               >
                 <DollarSign className="h-4 w-4 mr-2" />
-                Property Management System
+                PMS
               </Button>
             </div>
 
