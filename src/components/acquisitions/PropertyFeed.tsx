@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { PropertyCard } from './PropertyCard';
 import { Input } from '@/components/ui/input';
@@ -315,7 +314,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
         </div>
       )}
 
-      {/* Property Grid or Welcome Message */}
+      {/* Property Grid or No Results Message */}
       {hasSearched ? (
         <>
           {!loading && sortedProperties.length > 0 ? (
@@ -344,68 +343,7 @@ export const PropertyFeed = ({ onContactProperty }: PropertyFeedProps) => {
             </Card>
           ) : null}
         </>
-      ) : (
-        <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-sm">
-          <CardContent className="p-12 text-center">
-            <div className="text-white text-xl mb-3">Find Rental Properties with RentCast</div>
-            <div className="text-gray-300 mb-6">Search for rental properties across major markets using real RentCast data</div>
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
-              <Button 
-                variant="outline" 
-                onClick={() => setSearchTerm('San Diego')}
-                className="text-cyan-300 border-cyan-500/30 hover:bg-cyan-500/10"
-              >
-                San Diego
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setSearchTerm('Denver')}
-                className="text-cyan-300 border-cyan-500/30 hover:bg-cyan-500/10"
-              >
-                Denver
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setSearchTerm('Seattle')}
-                className="text-cyan-300 border-cyan-500/30 hover:bg-cyan-500/10"
-              >
-                Seattle
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setSearchTerm('Tampa')}
-                className="text-cyan-300 border-cyan-500/30 hover:bg-cyan-500/10"
-              >
-                Tampa
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setSearchTerm('San Francisco')}
-                className="text-cyan-300 border-cyan-500/30 hover:bg-cyan-500/10"
-              >
-                San Francisco
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => setSearchTerm('New York')}
-                className="text-cyan-300 border-cyan-500/30 hover:bg-cyan-500/10"
-              >
-                New York
-              </Button>
-            </div>
-            <div className="flex items-center justify-center gap-2 text-cyan-400">
-              <Search className="h-5 w-5" />
-              <span>Click a city above or search to find real rental property listings!</span>
-            </div>
-            {!hasApiKey && (
-              <div className="mt-4 flex items-center justify-center gap-2 text-yellow-400">
-                <Key className="h-4 w-4" />
-                <span className="text-sm">Configure your RentCast API key to access real data</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+      ) : null}
     </div>
   );
 };
