@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -83,7 +81,7 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Features Grid - Updated descriptions */}
+          {/* Features Grid - Updated descriptions to match demo page */}
           <div className="grid md:grid-cols-5 gap-8 mb-8">
             <div className="flex flex-col">
               <Card 
@@ -179,12 +177,12 @@ const Index = () => {
                     <Headphones className="h-8 w-8 text-blue-400" />
                   </div>
                   <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
-                    Property Management System
+                    Front Desk
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-slate-400 text-sm">
-                    Automates Operations
+                    Property Management & Automations
                   </p>
                 </CardContent>
               </Card>
@@ -193,7 +191,7 @@ const Index = () => {
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
               >
                 <Headphones className="h-4 w-4 mr-2" />
-                Property Management System
+                Front Desk
               </Button>
             </div>
 
@@ -235,4 +233,3 @@ const Index = () => {
 };
 
 export default Index;
-
