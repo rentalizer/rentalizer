@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +19,9 @@ const LandingPage = () => {
     console.log(`${feature} clicked - navigating to demo page for public users`);
     navigate('/demo');
   };
+
+  // Add console log to verify what we're rendering
+  console.log('Landing Page rendering - Front Desk should show: Front Desk, Property Management & Automations');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
