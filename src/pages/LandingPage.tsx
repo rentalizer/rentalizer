@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -128,12 +129,12 @@ const LandingPage = () => {
                     <Building className="h-8 w-8 text-blue-400" />
                   </div>
                   <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
-                    Acquisition CRM
+                    Acquisition CRM & Calculator
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-slate-400 text-sm">
-                    Property Outreach, Close Deals, Calculator, Manage Relationships
+                    Property Outreach, Close Deals, Profit Calculator, Manage Relationships
                   </p>
                 </CardContent>
               </Card>
@@ -142,7 +143,7 @@ const LandingPage = () => {
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
               >
                 <Building className="h-4 w-4 mr-2" />
-                Acquisition CRM
+                Acquisition CRM & Calculator
               </Button>
             </div>
 
@@ -212,3 +213,4 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
+
