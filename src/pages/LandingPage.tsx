@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, ArrowRight, LogIn, MapPin, Calculator, Building, DollarSign, Users } from 'lucide-react';
+import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
@@ -87,8 +88,8 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Features Grid - Updated to match demo page descriptions */}
-          <div className="grid md:grid-cols-5 gap-8 mb-8">
+          {/* Features Grid - Updated to 4 columns */}
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
@@ -120,34 +121,6 @@ const LandingPage = () => {
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => handleFeatureClick('Calculator')}
-              >
-                <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
-                    <Calculator className="h-8 w-8 text-blue-400" />
-                  </div>
-                  <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
-                    Calculator
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <p className="text-slate-400 text-sm">
-                    Assess Property Profitability And ROI
-                  </p>
-                </CardContent>
-              </Card>
-              <Button
-                onClick={() => handleFeatureClick('Calculator')}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
-              >
-                <Calculator className="h-4 w-4 mr-2" />
-                Calculator
-              </Button>
-            </div>
-
-            <div className="flex flex-col">
-              <Card 
-                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
                 onClick={() => handleFeatureClick('Acquisition CRM')}
               >
                 <CardHeader className="text-center pb-4">
@@ -160,7 +133,7 @@ const LandingPage = () => {
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-slate-400 text-sm">
-                    Property Outreach, Close Deals & Manage Relationships
+                    Property Outreach, Close Deals, Calculator, Manage Relationships
                   </p>
                 </CardContent>
               </Card>
