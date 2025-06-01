@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, ArrowRight, LogIn, MapPin, Calculator, User, DollarSign, Users } from 'lucide-react';
+import { BarChart3, ArrowRight, LogIn, MapPin, Calculator, Building, DollarSign, Users } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
@@ -84,7 +85,7 @@ const LandingPage = () => {
             </div>
           </div>
 
-          {/* Features Grid - reduced bottom margin */}
+          {/* Features Grid - Updated to match demo page descriptions */}
           <div className="grid md:grid-cols-5 gap-8 mb-8">
             <div className="flex flex-col">
               <Card 
@@ -149,7 +150,7 @@ const LandingPage = () => {
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
-                    <User className="h-8 w-8 text-blue-400" />
+                    <Building className="h-8 w-8 text-blue-400" />
                   </div>
                   <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
                     Acquisitions CRM
@@ -165,7 +166,7 @@ const LandingPage = () => {
                 onClick={() => handleFeatureClick('Acquisitions CRM')}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
               >
-                <User className="h-4 w-4 mr-2" />
+                <Building className="h-4 w-4 mr-2" />
                 Acquisitions CRM
               </Button>
             </div>
