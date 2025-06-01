@@ -97,15 +97,6 @@ export const ManualContactDialog = ({ isOpen, onClose, property }: ManualContact
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Debug Info - Remove this after testing */}
-          <div className="bg-yellow-50 border border-yellow-200 p-3 rounded text-xs">
-            <div className="font-semibold text-yellow-800 mb-1">DEBUG INFO:</div>
-            <div>Has Contact Info: {hasContactInfo ? 'YES' : 'NO'}</div>
-            <div>Phone: {hasPhone ? property.contactInfo.phone : 'MISSING'}</div>
-            <div>Email: {hasEmail ? property.contactInfo.email : 'MISSING'}</div>
-            <div>Property ID: {property?.id || 'MISSING'}</div>
-          </div>
-
           {/* Property Details */}
           <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="font-semibold text-gray-900 mb-2">{property.title}</h3>
