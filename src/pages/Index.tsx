@@ -127,7 +127,7 @@ const Index = () => {
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-slate-400 text-sm">
-                    Assess property profitability and ROI
+                    Assess Property Profitability And ROI
                   </p>
                 </CardContent>
               </Card>
@@ -155,7 +155,7 @@ const Index = () => {
                 </CardHeader>
                 <CardContent className="text-center">
                   <p className="text-slate-400 text-sm">
-                    Property outreach, close deals & manage relationships with property owners seamlessly
+                    Property Outreach, Close Deals & Manage relationships with property owners seamlessly
                   </p>
                 </CardContent>
               </Card>
