@@ -17,6 +17,7 @@ import TermsOfService from "./pages/TermsOfService";
 import AnimationDraft from "./pages/AnimationDraft";
 import Test from "./pages/Test";
 import Test3 from "./pages/Test3";
+import Test4 from "./pages/Test4";
 import Pricing from "./pages/Pricing";
 import AcquisitionsAgent from "./pages/AcquisitionsAgent";
 
@@ -37,6 +38,7 @@ const AppRoutes = () => (
     <Route path="/animation-draft" element={<AnimationDraft />} />
     <Route path="/test" element={<Test />} />
     <Route path="/test3" element={<Test3 />} />
+    <Route path="/test4" element={<Test4 />} />
   </Routes>
 );
 
