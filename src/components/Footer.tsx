@@ -22,7 +22,7 @@ export const Footer = ({ showLinks = true }: FooterProps) => {
               </h3>
             </div>
             <p className="text-gray-300 max-w-2xl mx-auto">
-              Create new income streams without owning property. Rentalizer.ai combines powerful market analysis, deal sourcing, and automation tools with a built-in CRM and a thriving community—everything you need to launch and scale your rental arbitrage business.
+              Rentalizer.ai combines powerful market analysis, deal sourcing, and automation tools with a built-in CRM and a thriving community—everything you need to launch and scale your rental arbitrage business.
             </p>
           </div>
 
