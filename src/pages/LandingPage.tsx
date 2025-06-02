@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -73,7 +71,7 @@ const LandingPage = () => {
             
             {/* Updated Tagline */}
             <p className="text-2xl md:text-3xl text-white mb-12 max-w-5xl mx-auto leading-relaxed font-semibold">
-              AI-Powered Rental Arbitrage Training System, CRM & Community
+              Rentalizer.ai combines powerful market analysis, deal sourcing, and automation tools with a built-in CRM and a thriving community—everything you need to launch and scale your rental arbitrage business.
             </p>
 
             {/* Single Button Layout */}
@@ -213,4 +211,3 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
-
