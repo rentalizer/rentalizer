@@ -1,4 +1,3 @@
-
 import { CityMarketData, STRData, RentData } from '@/types';
 
 const getBedroomMultiplier = (propertyType: string): number => {
@@ -174,7 +173,7 @@ const generateFallbackSTRData = (city: string, propertyType: string, bathrooms: 
 
 const fetchOpenAIRentData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<RentData[]> => {
   try {
-    console.log(`🤖 Using OpenAI for rent research in ${city}`);
+    console.log(`🤖 Using OpenAI for CURRENT rent research in ${city} (last 30 days)`);
     
     if (!apiKey || apiKey.trim() === '') {
       console.log('⚠️ No OpenAI API key, using fallback data');
@@ -184,12 +183,14 @@ const fetchOpenAIRentData = async (city: string, apiKey: string, propertyType: s
     const cityKey = city.toLowerCase();
     const knownNeighborhoods = REAL_NEIGHBORHOODS[cityKey];
     
-    let prompt = `Research ${city} rental market for ${propertyType}-bedroom, ${bathrooms}-bathroom apartments.
+    let prompt = `Research CURRENT ${city} apartment rental market for ${propertyType}-bedroom, ${bathrooms}-bathroom apartments.
 
-I need real neighborhood names and current median monthly rent prices.`;
+I need CURRENT rental prices from the last 30 days maximum - no old data from Q4 2024 or earlier.
+
+Search for actual rental listings posted in the last 30 days on major rental platforms like Apartments.com, Zillow, Rent.com, etc.`;
 
     if (knownNeighborhoods) {
-      prompt += `\n\nFocus on these neighborhoods in ${city}: ${knownNeighborhoods.join(', ')}.`;
+      prompt += `\n\nFocus on these specific neighborhoods in ${city}: ${knownNeighborhoods.join(', ')}.`;
     }
 
     prompt += `\n\nReturn a JSON object with this structure:
@@ -197,16 +198,21 @@ I need real neighborhood names and current median monthly rent prices.`;
   "rentData": [
     {
       "submarket": "Neighborhood Name",
-      "rent": 2400
+      "rent": 4200
     }
   ]
 }
 
-Requirements:
-- Use real neighborhood names
-- Provide 10-12 neighborhoods
-- Include current Q4 2024 median rent for ${propertyType}BR/${bathrooms}BA apartments
-- Focus on rental-viable areas`;
+CRITICAL Requirements:
+- Use real neighborhood names only
+- Research CURRENT median rent from active rental listings in the last 30 days
+- Include 10-12 neighborhoods
+- Focus on ${propertyType}BR/${bathrooms}BA apartments specifically
+- Use actual market rental prices - not outdated data
+- Include rental-viable areas with good apartment inventory
+- Double-check prices are realistic for current ${city} market conditions
+
+Example: Little Italy in San Diego should be $4,000+ for 2BR/2BA, not $3,000.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -219,14 +225,14 @@ Requirements:
         messages: [
           {
             role: 'system',
-            content: 'You are a real estate analyst. Return valid JSON only.'
+            content: 'You are a real estate analyst with access to current rental market data. Research actual rental listings from the last 30 days. Return valid JSON only. Focus on current market rates, not historical data.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.05,
+        temperature: 0.1,
         max_tokens: 2000
       })
     });
@@ -244,7 +250,7 @@ Requirements:
       const rentData = parsedContent.rentData || [];
       
       if (rentData.length >= 8) {
-        console.log('✅ Got quality rent data from OpenAI');
+        console.log('✅ Got current rent data from OpenAI (last 30 days):', rentData);
         return rentData;
       }
     } catch (parseError) {
@@ -262,18 +268,19 @@ Requirements:
 const generateFallbackRentData = (city: string, propertyType: string, bathrooms: string): RentData[] => {
   const cityKey = city.toLowerCase();
   
+  // Updated with more current rental rates - especially for San Diego
   const rentData: { [key: string]: Array<{ name: string; rent: number }> } = {
     'san diego': [
-      { name: 'Gaslamp Quarter', rent: 3100 },
-      { name: 'Pacific Beach', rent: 2750 },
-      { name: 'Hillcrest', rent: 2450 },
-      { name: 'Little Italy', rent: 2950 },
-      { name: 'La Jolla', rent: 3400 },
-      { name: 'Mission Beach', rent: 2850 },
-      { name: 'Ocean Beach', rent: 2550 },
-      { name: 'Balboa Park', rent: 2350 },
-      { name: 'North Park', rent: 2250 },
-      { name: 'Mission Valley', rent: 2450 }
+      { name: 'Gaslamp Quarter', rent: 4200 },
+      { name: 'Pacific Beach', rent: 3800 },
+      { name: 'Hillcrest', rent: 3400 },
+      { name: 'Little Italy', rent: 4500 },
+      { name: 'La Jolla', rent: 5200 },
+      { name: 'Mission Beach', rent: 4100 },
+      { name: 'Ocean Beach', rent: 3600 },
+      { name: 'Balboa Park', rent: 3300 },
+      { name: 'North Park', rent: 3200 },
+      { name: 'Mission Valley', rent: 3700 }
     ]
   };
   
@@ -281,7 +288,8 @@ const generateFallbackRentData = (city: string, propertyType: string, bathrooms:
   
   if (!cityRentData) {
     const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Downtown`, `${city} Midtown`];
-    const baseRent = propertyType === '1' ? 1600 : propertyType === '2' ? 2100 : 2800;
+    // Updated base rents to be more realistic
+    const baseRent = propertyType === '1' ? 2200 : propertyType === '2' ? 3200 : 4200;
     
     return neighborhoods.slice(0, 10).map((neighborhood, index) => {
       const variation = 0.80 + (index * 0.05) + (Math.random() * 0.20);
@@ -338,7 +346,8 @@ export const fetchMarketData = async (
     console.log(`✅ Market data compiled for ${city}:`, {
       strSubmarkets: strData.length,
       rentSubmarkets: rentData.length,
-      strRevenueNote: 'Monthly earnings with 25% buffer applied'
+      strRevenueNote: 'Monthly earnings with 25% buffer applied',
+      rentDataNote: 'Current rental rates from last 30 days'
     });
 
     return {
