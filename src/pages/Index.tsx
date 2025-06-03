@@ -76,9 +76,9 @@ const Index = () => {
             </div>
             <p className="text-lg text-white font-medium mb-8">By Richie Matthews</p>
             
-            {/* Updated Tagline - Much smaller text to fit on one line */}
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white mb-12 max-w-7xl mx-auto leading-relaxed font-semibold">
-              All-in-One AI Platform to Launch and Scale a Rental Arbitrage Business
+            {/* Updated Tagline - Smaller font to fit on one line */}
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg text-white mb-12 max-w-7xl mx-auto leading-relaxed font-semibold">
+              All-in-One Platform to Launch and Scale a Rental Arbitrage Business
             </p>
           </div>
 
