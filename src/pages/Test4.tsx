@@ -218,7 +218,7 @@ const Test4 = () => {
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-gray-300 text-sm leading-relaxed">
-                      Property Management System Automates Operations
+                      Streamline Property Management And Automate Operations
                     </p>
                     <div className="mt-4 grid grid-cols-3 gap-1">
                       {[...Array(6)].map((_, i) => (
