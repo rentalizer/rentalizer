@@ -159,9 +159,9 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             </div>
           )}
 
-          {/* Professional Data Keys Section */}
+          {/* STR Earnings Data Key Section */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-200 mb-4">Professional Data Keys</h3>
+            <h3 className="text-lg font-semibold text-gray-200 mb-4">STR Earnings Data Key</h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <Label htmlFor="airdna-key" className="text-sm font-medium text-gray-300">
@@ -182,9 +182,9 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             </div>
           </div>
 
-          {/* AI Research Key Section */}
+          {/* Apartment Rental Data Key Section */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-200 mb-4">AI Research Key</h3>
+            <h3 className="text-lg font-semibold text-gray-200 mb-4">Apartment Rental Data Key</h3>
             <div className="grid grid-cols-1 gap-4">
               <div>
                 <Label htmlFor="openai-key" className="text-sm font-medium text-gray-300">
