@@ -18,6 +18,7 @@ import AnimationDraft from "./pages/AnimationDraft";
 import Test from "./pages/Test";
 import Test3 from "./pages/Test3";
 import Test4 from "./pages/Test4";
+import Test5 from "./pages/Test5";
 import Pricing from "./pages/Pricing";
 import AcquisitionsAgent from "./pages/AcquisitionsAgent";
 import Community from "./pages/Community";
@@ -41,6 +42,7 @@ const AppRoutes = () => (
     <Route path="/test" element={<Test />} />
     <Route path="/test3" element={<Test3 />} />
     <Route path="/test4" element={<Test4 />} />
+    <Route path="/test5" element={<Test5 />} />
   </Routes>
 );
 
