@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -45,7 +44,7 @@ const Test4 = () => {
     {
       name: "Elena Ashley",
       text: "Rentalizer's program has meant the difference in my business from just being a hobby to moving it into an actual business.",
-      earningsImage: "/lovable-uploads/f475d8b4-915e-4c34-b435-fe9e431107e3.png"
+      earningsImage: "/lovable-uploads/15a50a5b-6be3-4748-890e-e21cc49858d6.png"
     },
     {
       name: "Liz Garcia",
