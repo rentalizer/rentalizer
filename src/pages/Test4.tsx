@@ -325,10 +325,14 @@ const Test4 = () => {
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                   <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105">
                     <CardContent className="p-6">
-                      {/* Quote Icon */}
+                      {/* Avatar Image */}
                       <div className="flex justify-center mb-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center">
-                          <span className="text-white text-2xl font-bold">"</span>
+                        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-cyan-400/50">
+                          <img 
+                            src={testimonial.avatar} 
+                            alt={testimonial.name}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                       </div>
 
@@ -340,7 +344,7 @@ const Test4 = () => {
                       {/* Stars */}
                       <div className="flex justify-center gap-1 mb-4">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="h-4 w-4 fill-red-500 text-red-500" />
+                          <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         ))}
                       </div>
 
