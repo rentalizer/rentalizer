@@ -13,7 +13,7 @@ export const Footer = ({ showLinks = true }: FooterProps) => {
     <footer className="relative z-10 mt-16 border-t border-gray-500/50 bg-slate-700/90 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="text-center">
-          {/* Logo and Description */}
+          {/* Logo */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4 justify-center">
               <BarChart3 className="h-8 w-8 text-cyan-400" />
@@ -21,9 +21,6 @@ export const Footer = ({ showLinks = true }: FooterProps) => {
                 RENTALIZER
               </h3>
             </div>
-            <p className="text-gray-300 max-w-2xl mx-auto">
-              Rentalizer.ai combines powerful market analysis, deal sourcing, and automation tools with a built-in CRM and a thriving community—everything you need to launch and scale your rental arbitrage business.
-            </p>
           </div>
 
           {/* Support Links - only show if showLinks is true */}
