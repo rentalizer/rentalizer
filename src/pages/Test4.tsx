@@ -110,6 +110,57 @@ const Test4 = () => {
     }
   ];
 
+  const earningsScreenshots = [
+    {
+      id: 1,
+      title: "January Earnings",
+      amount: "$40,819.93",
+      image: "/lovable-uploads/89726636-685c-405f-b66b-5429eb0d7431.png"
+    },
+    {
+      id: 2,
+      title: "March Progress",
+      amount: "$19,483.03",
+      image: "/lovable-uploads/d21f97f7-ec22-4fdf-9adc-269fa47fec73.png"
+    },
+    {
+      id: 3,
+      title: "March Growth",
+      amount: "$22,476.13",
+      image: "/lovable-uploads/ac252f51-954e-41f5-ad68-79dabaee7002.png"
+    },
+    {
+      id: 4,
+      title: "March Success",
+      amount: "$28,321.52",
+      image: "/lovable-uploads/d68927c6-c7f4-4dd4-8d17-979d51a48dad.png"
+    },
+    {
+      id: 5,
+      title: "March Peak",
+      amount: "$31,708.70",
+      image: "/lovable-uploads/63fa0f83-9854-40b9-9b31-5e8cb09b7e76.png"
+    },
+    {
+      id: 6,
+      title: "February Milestone",
+      amount: "$26,421.27",
+      image: "/lovable-uploads/cc871989-f17d-460e-80bc-faaebd584236.png"
+    },
+    {
+      id: 7,
+      title: "February Results",
+      amount: "$12,848.22",
+      image: "/lovable-uploads/70c9252d-ac0e-4032-ba29-4f8266b1376e.png"
+    },
+    {
+      id: 8,
+      title: "December Achievement",
+      amount: "$18,374.67",
+      image: "/lovable-uploads/22d0aaf6-1675-429d-8460-84635d496d31.png"
+    }
+  ];
+
   useEffect(() => {
     // Load Calendly script
     const script = document.createElement('script');
@@ -464,6 +515,64 @@ const Test4 = () => {
           >
             <Calendar className="h-6 w-6 mr-3" />
             Book Your Demo Now
+          </Button>
+        </div>
+      </div>
+
+      {/* Student Earnings Section */}
+      <div className="max-w-7xl mx-auto mb-20">
+        <div className="text-center mb-12">
+          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+            Real Student Earnings Screenshots
+          </h2>
+          <p className="text-gray-400 text-lg max-w-3xl mx-auto">
+            These are actual earnings reports from our students showing their monthly rental arbitrage income
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {earningsScreenshots.map((earning) => (
+            <div key={earning.id} className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-green-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+              <Card className="relative bg-slate-800/90 backdrop-blur-lg border border-yellow-500/30 hover:border-yellow-400/60 transition-all duration-500 h-full group-hover:scale-105">
+                <CardContent className="p-6">
+                  {/* Earnings Screenshot */}
+                  <div className="mb-6 rounded-lg overflow-hidden bg-slate-700/50 border border-slate-600/50">
+                    <img 
+                      src={earning.image} 
+                      alt={`${earning.title} - ${earning.amount}`}
+                      className="w-full h-auto object-cover"
+                    />
+                  </div>
+
+                  {/* Earnings Info */}
+                  <div className="text-center">
+                    <h4 className="text-yellow-300 font-semibold text-lg mb-2">{earning.title}</h4>
+                    <div className="text-green-400 font-bold text-xl mb-4">{earning.amount}</div>
+                    <div className="flex justify-center gap-1 mb-4">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ))}
+        </div>
+
+        {/* Call to Action */}
+        <div className="text-center mt-12">
+          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+            These results are from real students using our system. Ready to start building your own rental income?
+          </p>
+          <Button 
+            size="lg"
+            onClick={handleBookDemo}
+            className="bg-gradient-to-r from-yellow-600 to-green-600 hover:from-yellow-500 hover:to-green-500 text-white px-12 py-6 text-xl font-semibold"
+          >
+            <DollarSign className="h-6 w-6 mr-3" />
+            Start Earning Today
           </Button>
         </div>
       </div>
