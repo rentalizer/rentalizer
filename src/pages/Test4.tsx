@@ -118,15 +118,6 @@ const Test4 = () => {
 
           {/* Animated Features Section */}
           <div className="max-w-7xl mx-auto mb-20">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-4">
-                4 Core Features
-              </h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Everything you need to succeed in rental arbitrage, powered by AI
-              </p>
-            </div>
-
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {/* Feature 1: Market Intelligence */}
               <div className="group relative">
