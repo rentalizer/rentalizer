@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -344,78 +345,84 @@ const Test4 = () => {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {testimonials.map((testimonial, index) => (
-                <div key={index} className="group relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                  
-                  {testimonial.earningsImage ? (
-                    <HoverCard openDelay={100} closeDelay={100}>
-                      <HoverCardTrigger asChild>
-                        <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
-                          <CardContent className="p-6">
-                            {/* Testimonial Text */}
-                            <p className="text-gray-300 text-sm leading-relaxed mb-6 text-center italic">
-                              "{testimonial.text}"
-                            </p>
+              {testimonials.map((testimonial, index) => {
+                console.log(`Testimonial ${index}: ${testimonial.name}, has image: ${!!testimonial.earningsImage}`);
+                
+                if (testimonial.earningsImage) {
+                  return (
+                    <div key={index} className="group relative">
+                      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                      
+                      <HoverCard openDelay={200} closeDelay={200}>
+                        <HoverCardTrigger asChild>
+                          <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
+                            <CardContent className="p-6">
+                              {/* Testimonial Text */}
+                              <p className="text-gray-300 text-sm leading-relaxed mb-6 text-center italic">
+                                "{testimonial.text}"
+                              </p>
 
-                            {/* Stars */}
-                            <div className="flex justify-center gap-1 mb-4">
-                              {[...Array(5)].map((_, i) => (
-                                <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                              ))}
-                            </div>
+                              {/* Stars */}
+                              <div className="flex justify-center gap-1 mb-4">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                ))}
+                              </div>
 
-                            {/* Author */}
-                            <div className="text-center">
-                              <h4 className="text-white font-semibold text-lg">{testimonial.name}</h4>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </HoverCardTrigger>
-                      <HoverCardContent 
-                        className="w-40 p-0 bg-transparent border-0 z-[100]" 
-                        side="top" 
-                        align="center"
-                        sideOffset={20}
-                        style={{ position: 'fixed' }}
-                      >
-                        <div className="rounded-lg overflow-hidden shadow-2xl relative">
-                          <img 
-                            src={testimonial.earningsImage} 
-                            alt={`${testimonial.name}'s earnings screenshot`}
-                            className="w-full h-auto object-cover"
-                            style={{ 
-                              clipPath: 'inset(0 0 15% 0)',
-                              objectPosition: 'top'
-                            }}
-                          />
-                        </div>
-                      </HoverCardContent>
-                    </HoverCard>
-                  ) : (
-                    <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105">
-                      <CardContent className="p-6">
-                        {/* Testimonial Text */}
-                        <p className="text-gray-300 text-sm leading-relaxed mb-6 text-center italic">
-                          "{testimonial.text}"
-                        </p>
+                              {/* Author */}
+                              <div className="text-center">
+                                <h4 className="text-white font-semibold text-lg">{testimonial.name}</h4>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </HoverCardTrigger>
+                        <HoverCardContent 
+                          className="w-64 p-0 bg-transparent border-0 shadow-2xl" 
+                          side="top" 
+                          align="center"
+                          sideOffset={10}
+                        >
+                          <div className="rounded-lg overflow-hidden shadow-2xl bg-white">
+                            <img 
+                              src={testimonial.earningsImage} 
+                              alt={`${testimonial.name}'s earnings screenshot`}
+                              className="w-full h-auto object-cover max-h-96"
+                              onLoad={() => console.log(`Image loaded for ${testimonial.name}`)}
+                              onError={() => console.log(`Image failed to load for ${testimonial.name}`)}
+                            />
+                          </div>
+                        </HoverCardContent>
+                      </HoverCard>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div key={index} className="group relative">
+                      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                      <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105">
+                        <CardContent className="p-6">
+                          {/* Testimonial Text */}
+                          <p className="text-gray-300 text-sm leading-relaxed mb-6 text-center italic">
+                            "{testimonial.text}"
+                          </p>
 
-                        {/* Stars */}
-                        <div className="flex justify-center gap-1 mb-4">
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          ))}
-                        </div>
+                          {/* Stars */}
+                          <div className="flex justify-center gap-1 mb-4">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            ))}
+                          </div>
 
-                        {/* Author */}
-                        <div className="text-center">
-                          <h4 className="text-white font-semibold text-lg">{testimonial.name}</h4>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-              ))}
+                          {/* Author */}
+                          <div className="text-center">
+                            <h4 className="text-white font-semibold text-lg">{testimonial.name}</h4>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  );
+                }
+              })}
             </div>
           </div>
         </div>
