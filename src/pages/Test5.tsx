@@ -1,6 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Search, 
   Building, 
@@ -20,29 +24,30 @@ import {
   BarChart3,
   Play,
   TrendingUp,
-  Star
+  Star,
+  Table2,
+  Map
 } from 'lucide-react';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { MapView } from '@/components/MapView';
 import { AcquisitionsCRMDemo } from '@/components/AcquisitionsCRMDemo';
 import { PMSDemo } from '@/components/PMSDemo';
+import { ResultsTable } from '@/components/ResultsTable';
 
 const Test5 = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [demoRunning, setDemoRunning] = useState(false);
   const [manualMode, setManualMode] = useState(false);
 
-  // Mock data for map demo
+  // Mock data for market analysis demos
   const mockMarketData = [
-    { submarket: "Downtown", strRevenue: 45000, medianRent: 2200, multiple: 3.41 },
-    { submarket: "Midtown", strRevenue: 38000, medianRent: 1900, multiple: 3.33 },
-    { submarket: "Riverside", strRevenue: 41000, medianRent: 2100, multiple: 3.25 },
-    { submarket: "Tech District", strRevenue: 52000, medianRent: 2400, multiple: 3.61 },
-    { submarket: "Arts Quarter", strRevenue: 35000, medianRent: 1700, multiple: 3.43 },
-    { submarket: "University Area", strRevenue: 33000, medianRent: 1600, multiple: 3.44 },
-    { submarket: "Historic Center", strRevenue: 39000, medianRent: 1850, multiple: 3.51 },
-    { submarket: "Business Park", strRevenue: 44000, medianRent: 2050, multiple: 3.58 }
+    { submarket: "Hillcrest", strRevenue: 7076, medianRent: 3800, multiple: 1.86 },
+    { submarket: "Little Italy", strRevenue: 7948, medianRent: 4500, multiple: 1.77 },
+    { submarket: "Gaslamp Quarter", strRevenue: 7415, medianRent: 4200, multiple: 1.77 },
+    { submarket: "Mission Valley", strRevenue: 0, medianRent: 3500, multiple: 0 },
+    { submarket: "La Jolla", strRevenue: 0, medianRent: 4800, multiple: 0 },
+    { submarket: "Pacific Beach", strRevenue: 0, medianRent: 4000, multiple: 0 }
   ];
 
   useEffect(() => {
@@ -248,16 +253,86 @@ const Test5 = () => {
         {/* Step-Specific Visual Demonstrations */}
         {(demoRunning || manualMode) && (
           <div className="mb-12 space-y-8">
-            {/* Market Analysis Steps (1-3) - Interactive Map */}
-            {currentStep >= 1 && currentStep <= 3 && (
-              <Card className="bg-slate-800/50 border-gray-700 animate-fade-in">
+            {/* Step 1: Market Research - Search Field */}
+            {currentStep === 1 && (
+              <Card className="bg-slate-800/50 border-cyan-500/20 animate-fade-in">
                 <CardHeader>
-                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                    Live Market Analysis - Austin, TX
+                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <Search className="h-6 w-6 text-cyan-400" />
+                    Market Research Input
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <MapView results={mockMarketData} city="Austin, TX" />
+                  <div className="max-w-md mx-auto space-y-4">
+                    <div>
+                      <Label htmlFor="target-city" className="text-sm font-medium text-gray-300">
+                        Enter Target City
+                      </Label>
+                      <Input
+                        id="target-city"
+                        value="San Diego"
+                        readOnly
+                        className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium text-gray-300">Bedrooms</Label>
+                        <Select value="2" disabled>
+                          <SelectTrigger className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100">
+                            <SelectValue placeholder="2 Bedrooms" />
+                          </SelectTrigger>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-sm font-medium text-gray-300">Bathrooms</Label>
+                        <Select value="2" disabled>
+                          <SelectTrigger className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100">
+                            <SelectValue placeholder="2 Bathrooms" />
+                          </SelectTrigger>
+                        </Select>
+                      </div>
+                    </div>
+                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500">
+                      <Search className="h-4 w-4 mr-2" />
+                      Analyze Market
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Step 2: Market Scoring - Table View */}
+            {currentStep === 2 && (
+              <Card className="bg-slate-800/50 border-cyan-500/20 animate-fade-in">
+                <CardHeader>
+                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <Table2 className="h-6 w-6 text-cyan-400" />
+                    Market Scoring Results
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[400px] overflow-hidden">
+                    <ResultsTable 
+                      results={mockMarketData} 
+                      city="San Diego" 
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Step 3: Location Analysis - Map View */}
+            {currentStep === 3 && (
+              <Card className="bg-slate-800/50 border-cyan-500/20 animate-fade-in">
+                <CardHeader>
+                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <Map className="h-6 w-6 text-cyan-400" />
+                    Location Analysis - San Diego, CA
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <MapView results={mockMarketData} city="San Diego, CA" />
                 </CardContent>
               </Card>
             )}

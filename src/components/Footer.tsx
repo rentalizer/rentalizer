@@ -39,8 +39,8 @@ export const Footer = ({ showLinks = true }: FooterProps) => {
           )}
         </div>
 
-        {/* Bottom Section */}
-        <div className="pt-8 border-t border-gray-700/50 flex flex-col md:flex-row justify-between items-center">
+        {/* Copyright and Powered by */}
+        <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="text-gray-400 text-sm mb-4 md:mb-0">
             © 2025 Rentalizer. All rights reserved.
           </div>
