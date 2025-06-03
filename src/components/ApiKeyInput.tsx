@@ -43,7 +43,6 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   };
 
   const handleSaveKeys = () => {
-    // Store in localStorage for session persistence
     if (airdnaKey) localStorage.setItem('airdna_api_key', airdnaKey);
     if (openaiKey) localStorage.setItem('openai_api_key', openaiKey);
     
@@ -80,7 +79,6 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     
     const allKeys: {[key: string]: string} = {};
     
-    // Search all localStorage keys
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key) {
@@ -120,7 +118,6 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     }
   };
 
-  // Load keys from localStorage on component mount
   React.useEffect(() => {
     const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
@@ -137,9 +134,9 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   }, []);
 
   return (
-    <Card className="shadow-xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg max-w-2xl mx-auto">
+    <Card className="shadow-xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg max-w-xl mx-auto">
       <CardHeader className="pb-2 border-b border-gray-700/50">
-        <CardTitle className="flex items-center justify-between text-cyan-300 text-lg">
+        <CardTitle className="flex items-center justify-between text-cyan-300 text-sm">
           <div className="flex items-center gap-2">
             <Key className="h-4 w-4 text-cyan-400" />
             API Configuration
@@ -201,7 +198,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                   type={showKeys ? "text" : "password"}
                   value={airdnaKey}
                   onChange={(e) => setAirdnaKey(e.target.value)}
-                  placeholder="AirDNA API key..."
+                  placeholder="STR Earnings API Key"
                   className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
                 />
               </div>
@@ -229,7 +226,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                   type={showKeys ? "text" : "password"}
                   value={openaiKey}
                   onChange={(e) => setOpenaiKey(e.target.value)}
-                  placeholder="OpenAI API key (sk-...)..."
+                  placeholder="Apartment Rental API Key"
                   className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
                 />
               </div>
