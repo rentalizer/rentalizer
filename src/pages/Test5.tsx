@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,7 +20,11 @@ import {
   Phone,
   User,
   Star,
-  Send
+  Send,
+  MessageCircle,
+  Calendar,
+  Home,
+  Settings
 } from 'lucide-react';
 
 const Test5 = () => {
@@ -103,6 +106,37 @@ const Test5 = () => {
       description: "Track responses and follow-ups",
       content: "Monitor email open rates, responses, and schedule automatic follow-ups to maximize your conversion rate.",
       category: "crm"
+    },
+    // PMS Steps
+    {
+      title: "PMS Overview",
+      description: "Complete property management system",
+      content: "Finally, let's see how our PMS helps you manage all your properties once you've secured deals.",
+      category: "pms"
+    },
+    {
+      title: "Unified Dashboard",
+      description: "All properties in one view",
+      content: "See all your properties across Airbnb, VRBO, Booking.com and other platforms in a single dashboard.",
+      category: "pms"
+    },
+    {
+      title: "Guest Messaging",
+      description: "Centralized communication hub",
+      content: "Handle all guest messages from every platform in one inbox with smart automation and canned responses.",
+      category: "pms"
+    },
+    {
+      title: "Automated Responses",
+      description: "AI-powered guest communication",
+      content: "Set up automatic check-in instructions, house rules, and follow-up messages to save hours of manual work.",
+      category: "pms"
+    },
+    {
+      title: "Unified Calendar",
+      description: "All bookings synchronized",
+      content: "See check-ins, check-outs, and maintenance across all platforms in one calendar view.",
+      category: "pms"
     }
   ];
 
@@ -120,6 +154,13 @@ const Test5 = () => {
     { address: "456 Ocean Ave, San Diego", rent: 3200, landlord: "Sarah Johnson", email: "sarah@realty.com", phone: "(555) 234-5678", status: "responded" },
     { address: "789 Harbor Dr, San Diego", rent: 2600, landlord: "Mike Chen", email: "mike@properties.com", phone: "(555) 345-6789", status: "interested" },
     { address: "321 Park Blvd, San Diego", rent: 2400, landlord: "Lisa Garcia", email: "lisa@mgmt.com", phone: "(555) 456-7890", status: "negotiating" }
+  ];
+
+  const mockPMSData = [
+    { property: "Downtown Loft", platform: "Airbnb", status: "occupied", guest: "John Smith", message: "Hi! What time is check-in?", unread: true },
+    { property: "Beach House", platform: "VRBO", status: "cleaning", guest: null, message: null, unread: false },
+    { property: "Mountain Cabin", platform: "Booking.com", status: "available", guest: null, message: null, unread: false },
+    { property: "City Apartment", platform: "Airbnb", status: "maintenance", guest: "Lisa Garcia", message: "Can I check in early?", unread: true }
   ];
 
   useEffect(() => {
@@ -162,6 +203,7 @@ const Test5 = () => {
   const currentCategory = steps[currentStep]?.category;
   const isMarketIntelligence = currentCategory === "market";
   const isAcquisitionCRM = currentCategory === "crm";
+  const isPMS = currentCategory === "pms";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
@@ -171,14 +213,18 @@ const Test5 = () => {
           <div className="flex items-center justify-center gap-3 mb-4">
             {isMarketIntelligence && <BarChart3 className="h-12 w-12 text-cyan-400" />}
             {isAcquisitionCRM && <Building className="h-12 w-12 text-purple-400" />}
+            {isPMS && <Home className="h-12 w-12 text-green-400" />}
             <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              {isMarketIntelligence ? "Market Intelligence Demo" : "Acquisition CRM Demo"}
+              {isMarketIntelligence ? "Market Intelligence Demo" : 
+               isAcquisitionCRM ? "Acquisition CRM Demo" : "PMS Demo"}
             </h1>
           </div>
           <p className="text-xl text-gray-300 mb-6">
             {isMarketIntelligence 
               ? "See how our AI finds the most profitable rental arbitrage opportunities"
-              : "Watch how our AI helps you contact landlords and close deals"
+              : isAcquisitionCRM
+              ? "Watch how our AI helps you contact landlords and close deals"
+              : "Experience our complete property management system"
             }
           </p>
           
@@ -213,7 +259,7 @@ const Test5 = () => {
         </div>
 
         {/* Step Navigation */}
-        <div className="grid grid-cols-12 gap-1 mb-8">
+        <div className="grid grid-cols-17 gap-1 mb-8">
           {steps.map((step, index) => (
             <Button
               key={index}
@@ -224,7 +270,9 @@ const Test5 = () => {
                 index === currentStep 
                   ? step.category === "market" 
                     ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white" 
-                    : "bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+                    : step.category === "crm"
+                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+                    : "bg-gradient-to-r from-green-600 to-emerald-600 text-white"
                   : "border-gray-600 text-gray-400 hover:text-white"
               }`}
             >
@@ -243,6 +291,10 @@ const Test5 = () => {
             <div className="w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
             <span className="text-gray-300 text-sm">Acquisition CRM (Steps 8-12)</span>
           </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full"></div>
+            <span className="text-gray-300 text-sm">PMS (Steps 13-17)</span>
+          </div>
         </div>
 
         {/* Main Demo Area */}
@@ -250,7 +302,10 @@ const Test5 = () => {
           {/* Left: Current Step */}
           <Card className="bg-gray-900/80 border-cyan-500/20 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className={`flex items-center gap-2 ${isMarketIntelligence ? 'text-cyan-300' : 'text-purple-300'}`}>
+              <CardTitle className={`flex items-center gap-2 ${
+                isMarketIntelligence ? 'text-cyan-300' : 
+                isAcquisitionCRM ? 'text-purple-300' : 'text-green-300'
+              }`}>
                 <Zap className="h-5 w-5" />
                 {steps[currentStep].title}
               </CardTitle>
@@ -333,15 +388,72 @@ const Test5 = () => {
                   </div>
                 </div>
               )}
+
+              {currentStep === 13 && (
+                <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
+                  <div className="flex items-center gap-2 text-green-300 mb-2">
+                    <Home className="h-4 w-4" />
+                    <span className="font-semibold">4 Properties Connected</span>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-gray-400 text-sm">• 2 Airbnb properties</div>
+                    <div className="text-gray-400 text-sm">• 1 VRBO property</div>
+                    <div className="text-gray-400 text-sm">• 1 Booking.com property</div>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 14 && (
+                <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
+                  <div className="text-green-300 mb-2 font-semibold">Unread Messages: 2</div>
+                  <div className="text-gray-300 text-sm">
+                    All guest communications from every platform appear in one unified inbox.
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 15 && (
+                <div className="mt-6 space-y-2">
+                  <div className="flex items-center gap-2 text-green-400">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Check-in instructions automated</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-green-400">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>House rules sent automatically</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-green-400">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Follow-up messages scheduled</span>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 16 && (
+                <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
+                  <div className="flex items-center gap-2 text-green-300 mb-2">
+                    <Calendar className="h-4 w-4" />
+                    <span className="font-semibold">Unified Calendar View</span>
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    See all check-ins, check-outs, and cleaning schedules in one calendar.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Right: Mock Results */}
           <Card className="bg-gray-900/80 border-purple-500/20 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-purple-300 flex items-center gap-2">
-                {isMarketIntelligence ? <BarChart3 className="h-5 w-5" /> : <Building className="h-5 w-5" />}
-                {isMarketIntelligence ? "Live Results Preview" : "CRM Dashboard"}
+              <CardTitle className={`${
+                isMarketIntelligence ? 'text-cyan-300' : 
+                isAcquisitionCRM ? 'text-purple-300' : 'text-green-300'
+              } flex items-center gap-2`}>
+                {isMarketIntelligence ? <BarChart3 className="h-5 w-5" /> : 
+                 isAcquisitionCRM ? <Building className="h-5 w-5" /> : <Home className="h-5 w-5" />}
+                {isMarketIntelligence ? "Live Results Preview" : 
+                 isAcquisitionCRM ? "CRM Dashboard" : "PMS Dashboard"}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -390,7 +502,7 @@ const Test5 = () => {
                     </div>
                   )}
                 </>
-              ) : (
+              ) : isAcquisitionCRM ? (
                 <>
                   {currentStep >= 8 ? (
                     <div className="space-y-4">
@@ -459,6 +571,80 @@ const Test5 = () => {
                     </div>
                   )}
                 </>
+              ) : (
+                <>
+                  {currentStep >= 12 ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-white font-semibold">Property Management Dashboard</h3>
+                        <Badge className="bg-green-600">4 Properties</Badge>
+                      </div>
+                      
+                      {mockPMSData.slice(0, Math.min(currentStep - 11, 4)).map((property, index) => (
+                        <div key={index} className="p-3 bg-slate-800/50 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="font-medium text-white">{property.property}</div>
+                            <div className="flex items-center gap-2">
+                              <Badge className={
+                                property.platform === 'Airbnb' ? 'bg-red-600' :
+                                property.platform === 'VRBO' ? 'bg-blue-600' :
+                                'bg-purple-600'
+                              }>
+                                {property.platform}
+                              </Badge>
+                              <Badge className={
+                                property.status === 'occupied' ? 'bg-green-600' :
+                                property.status === 'cleaning' ? 'bg-yellow-600' :
+                                property.status === 'available' ? 'bg-blue-600' :
+                                'bg-red-600'
+                              }>
+                                {property.status}
+                              </Badge>
+                            </div>
+                          </div>
+                          {property.guest && (
+                            <div className="text-sm text-gray-400 space-y-1">
+                              <div className="flex items-center gap-2">
+                                <User className="h-3 w-3" />
+                                <span>Guest: {property.guest}</span>
+                              </div>
+                              {property.message && property.unread && (
+                                <div className="flex items-center gap-2">
+                                  <MessageCircle className="h-3 w-3 text-cyan-400" />
+                                  <span className="text-cyan-300">New message: {property.message}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      
+                      {currentStep >= 15 && (
+                        <div className="mt-6 pt-4 border-t border-gray-700">
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-green-400">100%</div>
+                              <div className="text-xs text-gray-400">Automated</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-cyan-400">2</div>
+                              <div className="text-xs text-gray-400">Unread Messages</div>
+                            </div>
+                          </div>
+                          <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500">
+                            <Settings className="h-4 w-4 mr-2" />
+                            Configure Automation
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-gray-500">
+                      <Home className="h-16 w-16 mx-auto mb-4 opacity-30" />
+                      <p>PMS data will appear after starting management...</p>
+                    </div>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
@@ -499,7 +685,7 @@ const Test5 = () => {
         <Card className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-500/20">
           <CardContent className="p-8">
             <h3 className="text-2xl font-bold text-white mb-6 text-center">
-              Complete Rental Arbitrage Solution
+              Complete End-to-End Rental Arbitrage Solution
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
@@ -517,11 +703,11 @@ const Test5 = () => {
                 <p className="text-gray-300 text-sm">Contact landlords efficiently with AI-powered outreach</p>
               </div>
               <div className="text-center">
-                <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-12 h-12 mx-auto mb-4 flex items-center justify-center">
-                  <TrendingUp className="h-6 w-6 text-white" />
+                <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full w-12 h-12 mx-auto mb-4 flex items-center justify-center">
+                  <Home className="h-6 w-6 text-white" />
                 </div>
-                <h4 className="font-semibold text-white mb-2">End-to-End Solution</h4>
-                <p className="text-gray-300 text-sm">From market research to deal closing - everything you need</p>
+                <h4 className="font-semibold text-white mb-2">Property Management</h4>
+                <p className="text-gray-300 text-sm">Manage all properties with automated guest communication</p>
               </div>
             </div>
           </CardContent>
