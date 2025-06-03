@@ -343,7 +343,7 @@ const Test4 = () => {
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                   
                   {testimonial.earningsImage ? (
-                    <HoverCard>
+                    <HoverCard openDelay={100} closeDelay={100}>
                       <HoverCardTrigger asChild>
                         <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
                           <CardContent className="p-6">
@@ -366,8 +366,14 @@ const Test4 = () => {
                           </CardContent>
                         </Card>
                       </HoverCardTrigger>
-                      <HoverCardContent className="w-48 p-0 bg-slate-800/95 backdrop-blur-lg border border-green-500/30 z-50" side="top" align="center">
-                        <div className="rounded-lg overflow-hidden">
+                      <HoverCardContent 
+                        className="w-40 p-0 bg-transparent border-0 z-[100]" 
+                        side="top" 
+                        align="center"
+                        sideOffset={20}
+                        style={{ position: 'fixed' }}
+                      >
+                        <div className="rounded-lg overflow-hidden shadow-2xl">
                           <img 
                             src={testimonial.earningsImage} 
                             alt={`${testimonial.name}'s earnings screenshot`}
