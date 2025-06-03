@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -168,7 +166,7 @@ const Test4 = () => {
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-gray-300 text-sm leading-relaxed">
-                      Find The Best Rental Arbitrage Markets
+                      The First-Of-Its-Kind AI Tool To Find The Best Rental Arbitrage Markets
                     </p>
                     <div className="mt-4 flex justify-center space-x-2">
                       <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
@@ -286,4 +284,3 @@ const Test4 = () => {
 };
 
 export default Test4;
-
