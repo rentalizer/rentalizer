@@ -24,32 +24,32 @@ const Test4 = () => {
     {
       name: "Bishoi Mikhail",
       text: "Rentalizer has everything that you need in one program to get you set up and to be able to have a successful Airbnb business. Rentalizer helped me acquire 3 properties within 1 month of starting the program, each with only $200 deposits and 8 weeks free rent.",
-      avatar: "/lovable-uploads/5eeba32a-ec11-45dd-9658-aa22f387c552.png"
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
     },
     {
       name: "Bobby Han",
       text: "If you are thinking about getting into the short term rental business, Rentalizer's blueprint and all the templates available is definitely something that gives more confidence moving forward. If you have any question whether to join Rentalizer's program, I think you'll find it very beneficial.",
-      avatar: "/lovable-uploads/8d3cb97f-6ec1-444e-9e13-776f5fb850e5.png"
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
     },
     {
       name: "Shante Davis",
       text: "Rentalizer's program is amazing. Rentalizer helped us close the largest apartment company in our area. We now have 6 properties. I recommend the mentorship. You won't be disappointed.",
-      avatar: "/lovable-uploads/f475d8b4-915e-4c34-b435-fe9e431107e3.png"
+      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
     },
     {
       name: "Maria Sallie Forte-Charette",
       text: "Thank you so much Rentalizer for sharing your knowledge and always promptly answering any questions, which helped me to close three new properties! I learned so much from our training and coaching.",
-      avatar: "/lovable-uploads/9fc38f6b-2643-4f7f-baec-26d3527ffeae.png"
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
     },
     {
       name: "Elena Ashley",
       text: "Rentalizer's program has meant the difference in my business from just being a hobby to moving it into an actual business.",
-      avatar: "/lovable-uploads/8f8edc04-6698-4212-8d0d-49e6b8c81e58.png"
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face"
     },
     {
       name: "Liz Garcia",
       text: "I just closed my first deal, thanks to Rentalizer's program!",
-      avatar: "/lovable-uploads/551496ee-3322-4eef-bc59-fad0dc27bfb3.png"
+      avatar: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=150&h=150&fit=crop&crop=face"
     }
   ];
 
