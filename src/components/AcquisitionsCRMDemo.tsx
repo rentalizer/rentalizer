@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,11 @@ import {
   CheckCircle2,
   ArrowRight,
   Play,
-  Pause
+  Pause,
+  Users,
+  MessageSquare,
+  BookOpen,
+  Calendar
 } from 'lucide-react';
 
 interface AcquisitionsCRMDemoProps {
@@ -213,14 +218,14 @@ export const AcquisitionsCRMDemo = ({ currentStep, isRunning }: AcquisitionsCRMD
                 title: "Lead Conversion", 
                 icon: Target, 
                 description: "Track responses and convert leads into profitable deals",
-                color: "text-green-400"
+                color: "text-cyan-400"
               },
               { 
                 step: 4, 
                 title: "Deal Calculator", 
                 icon: Calculator, 
                 description: "Analyze profitability and ROI for each opportunity",
-                color: "text-cyan-400"
+                color: "text-blue-400"
               }
             ].map((item) => {
               const status = getStepStatus(item.step);
@@ -228,12 +233,12 @@ export const AcquisitionsCRMDemo = ({ currentStep, isRunning }: AcquisitionsCRMD
                 <div key={item.step} className="text-center space-y-3">
                   <div className={`
                     p-4 rounded-full w-16 h-16 mx-auto flex items-center justify-center transition-all duration-500
-                    ${status === 'completed' ? 'bg-green-500/20 border-2 border-green-400' : 
+                    ${status === 'completed' ? 'bg-cyan-500/20 border-2 border-cyan-400' : 
                       status === 'active' ? 'bg-gradient-to-r from-purple-500 to-cyan-500 animate-pulse' : 
                       'bg-slate-700/50 border border-slate-600'}
                   `}>
                     {status === 'completed' ? (
-                      <CheckCircle2 className="h-8 w-8 text-green-400" />
+                      <CheckCircle2 className="h-8 w-8 text-cyan-400" />
                     ) : (
                       <item.icon className={`h-8 w-8 ${status === 'active' ? 'text-white' : item.color}`} />
                     )}
@@ -479,9 +484,9 @@ export const AcquisitionsCRMDemo = ({ currentStep, isRunning }: AcquisitionsCRMD
 
           {/* Step 3: Lead Conversion (Steps 7-11) */}
           {(currentStep >= 7 && currentStep <= 11) && (
-            <Card className="bg-slate-800/50 border-green-500/20 animate-scale-in">
+            <Card className="bg-slate-800/50 border-cyan-500/20 animate-scale-in">
               <CardHeader>
-                <CardTitle className="text-xl text-green-300 flex items-center gap-2">
+                <CardTitle className="text-xl text-cyan-300 flex items-center gap-2">
                   <Target className="h-5 w-5" />
                   Step 3: Lead Conversion - CRM Pipeline
                 </CardTitle>
@@ -491,7 +496,7 @@ export const AcquisitionsCRMDemo = ({ currentStep, isRunning }: AcquisitionsCRMD
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-300">Converting leads to deals...</span>
-                      <span className="text-green-400">{leadProgress}%</span>
+                      <span className="text-cyan-400">{leadProgress}%</span>
                     </div>
                     <Progress value={leadProgress} className="h-2" />
                   </div>
@@ -505,22 +510,22 @@ export const AcquisitionsCRMDemo = ({ currentStep, isRunning }: AcquisitionsCRMD
                       <div className="text-2xl font-bold text-purple-400">{leadData.qualified}</div>
                       <div className="text-sm text-gray-300">Qualified</div>
                     </div>
-                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 text-center">
-                      <div className="text-2xl font-bold text-yellow-400">{leadData.viewingsScheduled}</div>
+                    <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-cyan-400">{leadData.viewingsScheduled}</div>
                       <div className="text-sm text-gray-300">Viewings</div>
                     </div>
-                    <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4 text-center">
-                      <div className="text-2xl font-bold text-orange-400">{leadData.dealsInProgress}</div>
+                    <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-blue-400">{leadData.dealsInProgress}</div>
                       <div className="text-sm text-gray-300">In Progress</div>
                     </div>
-                    <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4 text-center">
-                      <div className="text-2xl font-bold text-green-400">{leadData.closed}</div>
+                    <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-4 text-center">
+                      <div className="text-2xl font-bold text-cyan-400">{leadData.closed}</div>
                       <div className="text-sm text-gray-300">Closed</div>
                     </div>
                   </div>
 
                   <div className="bg-slate-700/30 rounded-lg p-4">
-                    <h4 className="font-semibold text-green-300 mb-3">Recent Activity</h4>
+                    <h4 className="font-semibold text-cyan-300 mb-3">Recent Activity</h4>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between items-center">
                         <span className="text-gray-300">📧 Response from 456 Ocean Ave landlord</span>
@@ -547,75 +552,101 @@ export const AcquisitionsCRMDemo = ({ currentStep, isRunning }: AcquisitionsCRMD
 
           {/* Step 4: Deal Calculator (Steps 7-8) */}
           {(currentStep === 7 || currentStep === 8) && (
-            <Card className="bg-slate-800/50 border-cyan-500/20 animate-fade-in">
+            <Card className="bg-slate-800/50 border-blue-500/20 animate-fade-in">
               <CardHeader>
-                <CardTitle className="text-xl text-cyan-300 flex items-center gap-2">
+                <CardTitle className="text-xl text-blue-300 flex items-center gap-2">
                   <Calculator className="h-5 w-5" />
-                  Step 4: Deal Calculator - ROI Analysis
+                  Step 4: Deal Calculator - Property Analysis
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  <div className="bg-slate-700/50 rounded-lg p-4 border border-cyan-500/20">
+                  {/* Property Header */}
+                  <div className="bg-slate-700/50 rounded-lg p-4 border border-blue-500/20">
                     <h4 className="font-semibold text-white mb-2">{calculatorData.property}</h4>
                     <div className="text-sm text-gray-300">2BR/2BA • 1400 sqft</div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-green-300">Revenue Analysis</h4>
-                      <div className="bg-slate-700/50 rounded-lg p-4 space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">Monthly Rent</span>
-                          <span className="text-red-300">${calculatorData.rent.toLocaleString()}</span>
+                  {/* Calculator Layout */}
+                  <div className="bg-slate-700/30 rounded-lg p-6 border border-blue-500/20">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      {/* Input Section */}
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-blue-300 text-center">Inputs</h4>
+                        <div className="space-y-3">
+                          <div className="bg-slate-800/50 rounded-lg p-3">
+                            <label className="text-sm text-gray-300 block mb-1">Monthly Rent</label>
+                            <div className="text-lg font-bold text-white">${calculatorData.rent.toLocaleString()}</div>
+                          </div>
+                          <div className="bg-slate-800/50 rounded-lg p-3">
+                            <label className="text-sm text-gray-300 block mb-1">STR Revenue</label>
+                            <div className="text-lg font-bold text-cyan-400">${calculatorData.strRevenue.toLocaleString()}</div>
+                          </div>
+                          <div className="bg-slate-800/50 rounded-lg p-3">
+                            <label className="text-sm text-gray-300 block mb-1">Total Expenses</label>
+                            <div className="text-lg font-bold text-purple-400">${calculatorData.expenses.toLocaleString()}</div>
+                          </div>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">STR Revenue</span>
-                          <span className="text-green-400 font-bold">${calculatorData.strRevenue.toLocaleString()}</span>
+                      </div>
+
+                      {/* Calculator Display */}
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-cyan-300 text-center">Calculator</h4>
+                        <div className="bg-slate-900/50 rounded-lg p-4 border-2 border-cyan-500/30">
+                          <div className="space-y-3">
+                            <div className="text-center">
+                              <div className="text-xs text-gray-400 mb-1">REVENUE - EXPENSES</div>
+                              <div className="text-2xl font-mono text-cyan-400">
+                                ${calculatorData.strRevenue.toLocaleString()} - ${calculatorData.expenses.toLocaleString()}
+                              </div>
+                            </div>
+                            <div className="border-t border-cyan-500/30 pt-3">
+                              <div className="text-center">
+                                <div className="text-xs text-gray-400 mb-1">NET PROFIT</div>
+                                <div className="text-3xl font-bold text-cyan-300">
+                                  ${calculatorData.netProfit.toLocaleString()}
+                                </div>
+                                <div className="text-sm text-gray-400">per month</div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex justify-between border-t border-slate-600 pt-2">
-                          <span className="text-gray-300">Revenue Multiple</span>
-                          <span className="text-cyan-400">1.5x</span>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                            Calculate
+                          </Button>
+                          <Button variant="outline" className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10">
+                            Clear
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Results Section */}
+                      <div className="space-y-4">
+                        <h4 className="font-semibold text-purple-300 text-center">Results</h4>
+                        <div className="space-y-3">
+                          <div className="bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-lg p-3 border border-cyan-500/30">
+                            <div className="text-sm text-gray-300 mb-1">Monthly Profit</div>
+                            <div className="text-xl font-bold text-cyan-400">${calculatorData.netProfit}</div>
+                          </div>
+                          <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-lg p-3 border border-purple-500/30">
+                            <div className="text-sm text-gray-300 mb-1">Annual ROI</div>
+                            <div className="text-xl font-bold text-purple-400">{calculatorData.roi}</div>
+                          </div>
+                          <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-lg p-3 border border-blue-500/30">
+                            <div className="text-sm text-gray-300 mb-1">Payback Period</div>
+                            <div className="text-xl font-bold text-blue-400">{calculatorData.payback}</div>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-red-300">Expense Breakdown</h4>
-                      <div className="bg-slate-700/50 rounded-lg p-4 space-y-3">
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">Total Expenses</span>
-                          <span className="text-red-300">${calculatorData.expenses.toLocaleString()}</span>
-                        </div>
-                        <div className="text-xs text-gray-400">
-                          Rent + Utilities + Cleaning + Platform Fees
-                        </div>
-                      </div>
+                    <div className="flex justify-center mt-6">
+                      <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 px-8">
+                        <CheckCircle2 className="h-5 w-5 mr-2" />
+                        Approve Deal
+                      </Button>
                     </div>
-                  </div>
-
-                  <div className="bg-gradient-to-r from-green-500/20 to-cyan-500/20 rounded-lg p-6 border border-green-500/30">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                      <div>
-                        <div className="text-3xl font-bold text-green-400">${calculatorData.netProfit}</div>
-                        <div className="text-gray-300">Monthly Net Profit</div>
-                      </div>
-                      <div>
-                        <div className="text-3xl font-bold text-cyan-400">{calculatorData.roi}</div>
-                        <div className="text-gray-300">Annual ROI</div>
-                      </div>
-                      <div>
-                        <div className="text-3xl font-bold text-purple-400">{calculatorData.payback}</div>
-                        <div className="text-gray-300">Payback Period</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-center">
-                    <Button className="bg-gradient-to-r from-green-600 to-cyan-600 hover:from-green-500 hover:to-cyan-500 px-8">
-                      <CheckCircle2 className="h-5 w-5 mr-2" />
-                      Approve Deal
-                    </Button>
                   </div>
                 </div>
               </CardContent>

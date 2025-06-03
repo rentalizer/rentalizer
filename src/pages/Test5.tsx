@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { 
   Search, 
   Building, 
@@ -26,7 +27,12 @@ import {
   TrendingUp,
   Star,
   Table2,
-  Map
+  Map,
+  BookOpen,
+  Video,
+  Heart,
+  Reply,
+  Pin
 } from 'lucide-react';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
@@ -353,44 +359,199 @@ const Test5 = () => {
                 <CardHeader>
                   <CardTitle className="text-center text-2xl bg-gradient-to-r from-orange-400 to-cyan-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
                     <Users className="h-6 w-6 text-orange-400" />
-                    Community Support & Networking
+                    Community Hub - Connect & Learn
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-slate-700/30 rounded-lg p-4">
-                      <h4 className="font-semibold text-orange-300 mb-3">Expert Network</h4>
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
-                          <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
-                            <Users className="h-5 w-5 text-white" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    {/* Discussion Threads */}
+                    <Card className="bg-slate-700/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center gap-2">
+                          <MessageSquare className="h-5 w-5 text-cyan-400" />
+                          <CardTitle className="text-lg text-cyan-300">Discussion Threads</CardTitle>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            RM
                           </div>
-                          <div>
-                            <div className="text-white font-medium">Sarah Chen</div>
-                            <div className="text-gray-400 text-sm">STR Expert • 47 properties</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Pin className="h-3 w-3 text-yellow-400" />
+                              <span className="text-sm font-medium text-white truncate">Welcome to the Community!</span>
+                            </div>
+                            <div className="text-xs text-gray-400">Richie Matthews • 2h ago</div>
+                            <div className="flex items-center gap-3 mt-1 text-xs">
+                              <span className="text-gray-400 flex items-center gap-1">
+                                <Reply className="h-3 w-3" />
+                                23
+                              </span>
+                              <span className="text-gray-400 flex items-center gap-1">
+                                <Heart className="h-3 w-3" />
+                                45
+                              </span>
+                            </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
-                          <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center">
-                            <Star className="h-5 w-5 text-white" />
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            SJ
                           </div>
-                          <div>
-                            <div className="text-white font-medium">Mike Rodriguez</div>
-                            <div className="text-gray-400 text-sm">Market Analyst • Austin specialist</div>
+                          <div className="flex-1 min-w-0">
+                            <span className="text-sm font-medium text-white truncate block">Best practices for market research?</span>
+                            <div className="text-xs text-gray-400">Sarah Johnson • 4h ago</div>
+                            <div className="flex items-center gap-3 mt-1 text-xs">
+                              <span className="text-gray-400 flex items-center gap-1">
+                                <Reply className="h-3 w-3" />
+                                12
+                              </span>
+                              <span className="text-gray-400 flex items-center gap-1">
+                                <Heart className="h-3 w-3" />
+                                18
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <Button size="sm" className="w-full bg-cyan-600 hover:bg-cyan-700 text-white">
+                          View All Threads
+                        </Button>
+                      </CardContent>
+                    </Card>
+
+                    {/* Video Library */}
+                    <Card className="bg-slate-700/50 border-purple-500/20 hover:border-purple-500/40 transition-colors">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center gap-2">
+                          <Video className="h-5 w-5 text-purple-400" />
+                          <CardTitle className="text-lg text-purple-300">Video Library</CardTitle>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="space-y-2">
+                          <div className="bg-slate-800/50 rounded p-2">
+                            <div className="text-sm font-medium text-white mb-1">Market Analysis Masterclass</div>
+                            <div className="text-xs text-gray-400">45 min • Beginner</div>
+                          </div>
+                          <div className="bg-slate-800/50 rounded p-2">
+                            <div className="text-sm font-medium text-white mb-1">Negotiation Strategies</div>
+                            <div className="text-xs text-gray-400">32 min • Intermediate</div>
+                          </div>
+                          <div className="bg-slate-800/50 rounded p-2">
+                            <div className="text-sm font-medium text-white mb-1">Setting Up Your First Property</div>
+                            <div className="text-xs text-gray-400">28 min • Beginner</div>
+                          </div>
+                        </div>
+                        <Button size="sm" className="w-full bg-purple-600 hover:bg-purple-700 text-white">
+                          Browse Videos
+                        </Button>
+                      </CardContent>
+                    </Card>
+
+                    {/* Documents Library */}
+                    <Card className="bg-slate-700/50 border-blue-500/20 hover:border-blue-500/40 transition-colors">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center gap-2">
+                          <BookOpen className="h-5 w-5 text-blue-400" />
+                          <CardTitle className="text-lg text-blue-300">Documents</CardTitle>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 p-2 bg-slate-800/50 rounded">
+                            <FileText className="h-4 w-4 text-blue-400" />
+                            <span className="text-sm text-white">Lease Agreement Template</span>
+                          </div>
+                          <div className="flex items-center gap-2 p-2 bg-slate-800/50 rounded">
+                            <FileText className="h-4 w-4 text-cyan-400" />
+                            <span className="text-sm text-white">Market Research Checklist</span>
+                          </div>
+                          <div className="flex items-center gap-2 p-2 bg-slate-800/50 rounded">
+                            <FileText className="h-4 w-4 text-purple-400" />
+                            <span className="text-sm text-white">Expense Tracking Sheet</span>
+                          </div>
+                        </div>
+                        <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                          View Library
+                        </Button>
+                      </CardContent>
+                    </Card>
+
+                    {/* Community Calendar */}
+                    <Card className="bg-slate-700/50 border-orange-500/20 hover:border-orange-500/40 transition-colors">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-5 w-5 text-orange-400" />
+                          <CardTitle className="text-lg text-orange-300">Events</CardTitle>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="space-y-2">
+                          <div className="bg-slate-800/50 rounded p-2">
+                            <div className="text-sm font-medium text-white mb-1">Weekly Q&A Session</div>
+                            <div className="text-xs text-orange-400">Today 7:00 PM EST</div>
+                          </div>
+                          <div className="bg-slate-800/50 rounded p-2">
+                            <div className="text-sm font-medium text-white mb-1">Market Analysis Workshop</div>
+                            <div className="text-xs text-gray-400">Dec 15 • 2:00 PM EST</div>
+                          </div>
+                          <div className="bg-slate-800/50 rounded p-2">
+                            <div className="text-sm font-medium text-white mb-1">Success Stories Meetup</div>
+                            <div className="text-xs text-gray-400">Dec 22 • 6:00 PM EST</div>
+                          </div>
+                        </div>
+                        <Button size="sm" className="w-full bg-orange-600 hover:bg-orange-700 text-white">
+                          View Calendar
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Expert Network Section */}
+                  <div className="bg-slate-700/30 rounded-lg p-6 border border-orange-500/20">
+                    <h4 className="font-semibold text-orange-300 mb-4 flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      Expert Network
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+                        <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold">
+                          SC
+                        </div>
+                        <div>
+                          <div className="text-white font-medium">Sarah Chen</div>
+                          <div className="text-gray-400 text-sm">STR Expert • 47 properties</div>
+                          <div className="flex items-center gap-1 mt-1">
+                            <Star className="h-3 w-3 text-yellow-400" />
+                            <span className="text-yellow-400 text-xs">4.9</span>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="bg-slate-700/30 rounded-lg p-4">
-                      <h4 className="font-semibold text-orange-300 mb-3">Recent Discussions</h4>
-                      <div className="space-y-3">
-                        <div className="p-3 bg-slate-800/50 rounded-lg">
-                          <div className="text-white font-medium text-sm mb-1">Best STR neighborhoods in Austin?</div>
-                          <div className="text-gray-400 text-xs">12 replies • 3 hours ago</div>
+                      <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+                        <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                          MR
                         </div>
-                        <div className="p-3 bg-slate-800/50 rounded-lg">
-                          <div className="text-white font-medium text-sm mb-1">Furniture sourcing tips</div>
-                          <div className="text-gray-400 text-xs">8 replies • 5 hours ago</div>
+                        <div>
+                          <div className="text-white font-medium">Mike Rodriguez</div>
+                          <div className="text-gray-400 text-sm">Market Analyst • Austin specialist</div>
+                          <div className="flex items-center gap-1 mt-1">
+                            <Star className="h-3 w-3 text-yellow-400" />
+                            <span className="text-yellow-400 text-xs">4.8</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                          LT
+                        </div>
+                        <div>
+                          <div className="text-white font-medium">Lisa Thompson</div>
+                          <div className="text-gray-400 text-sm">Legal Expert • Contract specialist</div>
+                          <div className="flex items-center gap-1 mt-1">
+                            <Star className="h-3 w-3 text-yellow-400" />
+                            <span className="text-yellow-400 text-xs">5.0</span>
+                          </div>
                         </div>
                       </div>
                     </div>
