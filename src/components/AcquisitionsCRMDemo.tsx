@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,7 +31,44 @@ export const AcquisitionsCRMDemo = ({ currentStep, isRunning }: AcquisitionsCRMD
   const [emailProgress, setEmailProgress] = useState(0);
   const [leadProgress, setLeadProgress] = useState(0);
 
-  // Mock property data
+  // Mock Tampa property data
+  const tampaProperties = [
+    { 
+      id: 1, 
+      address: "110 Main Street, Tampa, FL", 
+      rent: 1832, 
+      bedrooms: 1, 
+      bathrooms: 2, 
+      sqft: 936,
+      status: "Available Now",
+      profit: "+$800/mo",
+      rating: 4.2
+    },
+    { 
+      id: 2, 
+      address: "140 Main Street, Tampa, FL", 
+      rent: 1929, 
+      bedrooms: 3, 
+      bathrooms: 1, 
+      sqft: 1094,
+      status: "Available Now",
+      profit: "+$950/mo",
+      rating: 4.9
+    },
+    { 
+      id: 3, 
+      address: "300 Main Street, Tampa, FL", 
+      rent: 2017, 
+      bedrooms: 3, 
+      bathrooms: 2, 
+      sqft: 996,
+      status: "Available Now",
+      profit: "+$1,100/mo",
+      rating: 4.1
+    }
+  ];
+
+  // Mock San Diego property data for step 4
   const mockProperties = [
     { 
       id: 1, 
@@ -297,20 +333,95 @@ export const AcquisitionsCRMDemo = ({ currentStep, isRunning }: AcquisitionsCRMD
             </Card>
           )}
 
-          {/* Step 2: Smart Outreach (Steps 5-6) */}
-          {(currentStep === 5 || currentStep === 6) && (
+          {/* Step 2A: Property Listings - Tampa (Step 5) */}
+          {currentStep === 5 && (
+            <Card className="bg-slate-800/50 border-purple-500/20 animate-slide-in-right">
+              <CardHeader>
+                <CardTitle className="text-xl text-purple-300 flex items-center gap-2">
+                  <Building2 className="h-5 w-5" />
+                  Step 2A: Property Listings Found - Tampa, FL
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-semibold text-white">3 Properties Found</span>
+                      <MapPin className="h-4 w-4 text-purple-400" />
+                      <span className="text-purple-200">Tampa Area</span>
+                    </div>
+                    <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                      "tampa"
+                    </Badge>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {tampaProperties.map((property) => (
+                      <div key={property.id} className="bg-slate-700/50 rounded-lg p-4 border border-purple-500/20">
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-start">
+                            <div className="text-2xl font-bold text-white">
+                              ${property.rent.toLocaleString()}/mo
+                            </div>
+                            <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
+                              {property.status}
+                            </Badge>
+                          </div>
+                          
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
+                              <Star className="h-4 w-4 text-yellow-400" />
+                              <span className="text-yellow-400 text-sm">{property.rating}</span>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-4 text-sm text-gray-300">
+                            <span>{property.bedrooms} bed</span>
+                            <span>{property.bathrooms} bath</span>
+                            <span>{property.sqft} sqft</span>
+                          </div>
+
+                          <div className="text-sm font-medium text-white">
+                            {property.address.split(',')[0]}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            {property.address}
+                          </div>
+
+                          <div className="flex justify-between items-center pt-2 border-t border-slate-600">
+                            <div className="text-green-400 font-semibold">{property.profit}</div>
+                            <div className="flex gap-2">
+                              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-xs">
+                                Contact Owner
+                              </Button>
+                              <Button size="sm" variant="outline" className="text-xs border-purple-500/30 text-purple-300 hover:bg-purple-500/10">
+                                Save Property
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Step 2B: Smart Outreach - Email Campaign (Step 6) */}
+          {currentStep === 6 && (
             <Card className="bg-slate-800/50 border-purple-500/20 animate-slide-in-right">
               <CardHeader>
                 <CardTitle className="text-xl text-purple-300 flex items-center gap-2">
                   <Bot className="h-5 w-5" />
-                  Step 2: Smart Outreach - AI Email Campaign
+                  Step 2B: Smart Outreach - AI Email Campaign
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
                   <div className="bg-slate-700/50 rounded-lg p-4 border border-purple-500/20">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm text-gray-400">To: landlord@oceanave456.com</span>
+                      <span className="text-sm text-gray-400">To: landlord@tampaproperties.com</span>
                       <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
                         ✓ Sent
                       </Badge>
@@ -320,9 +431,9 @@ export const AcquisitionsCRMDemo = ({ currentStep, isRunning }: AcquisitionsCRMD
                         Subject: Partnership Opportunity - Premium Short-Term Rental Management
                       </p>
                       <div className="text-xs text-gray-300 bg-slate-800/50 p-3 rounded border-l-4 border-purple-500">
-                        <p className="mb-2">Hi Sarah,</p>
+                        <p className="mb-2">Hi Maria,</p>
                         <p className="mb-2">
-                          I hope this email finds you well. I'm reaching out regarding your beautiful property at 456 Ocean Ave. 
+                          I hope this email finds you well. I'm reaching out regarding your beautiful property at 110 Main Street in Tampa. 
                           I specialize in premium short-term rental management and would love to discuss a partnership opportunity 
                           that could increase your monthly income by 40-60% while providing you with guaranteed monthly payments.
                         </p>
