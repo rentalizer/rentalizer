@@ -23,33 +23,51 @@ const Test4 = () => {
   const testimonials = [
     {
       name: "Bishoi Mikhail",
-      text: "Rentalizer has everything that you need in one program to get you set up and to be able to have a successful Airbnb business. Rentalizer helped me acquire 3 properties within 1 month of starting the program, each with only $200 deposits and 8 weeks free rent.",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+      text: "Rentalizer has everything that you need in one program to get you set up and to be able to have a successful Airbnb business. Rentalizer helped me acquire 3 properties within 1 month of starting the program, each with only $200 deposits and 8 weeks free rent."
     },
     {
       name: "Bobby Han",
-      text: "If you are thinking about getting into the short term rental business, Rentalizer's blueprint and all the templates available is definitely something that gives more confidence moving forward. If you have any question whether to join Rentalizer's program, I think you'll find it very beneficial.",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+      text: "If you are thinking about getting into the short term rental business, Rentalizer's blueprint and all the templates available is definitely something that gives more confidence moving forward. If you have any question whether to join Rentalizer's program, I think you'll find it very beneficial."
     },
     {
       name: "Shante Davis",
-      text: "Rentalizer's program is amazing. Rentalizer helped us close the largest apartment company in our area. We now have 6 properties. I recommend the mentorship. You won't be disappointed.",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face"
+      text: "Rentalizer's program is amazing. Rentalizer helped us close the largest apartment company in our area. We now have 6 properties. I recommend the mentorship. You won't be disappointed."
     },
     {
       name: "Maria Sallie Forte-Charette",
-      text: "Thank you so much Rentalizer for sharing your knowledge and always promptly answering any questions, which helped me to close three new properties! I learned so much from our training and coaching.",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+      text: "Thank you so much Rentalizer for sharing your knowledge and always promptly answering any questions, which helped me to close three new properties! I learned so much from our training and coaching."
     },
     {
       name: "Elena Ashley",
-      text: "Rentalizer's program has meant the difference in my business from just being a hobby to moving it into an actual business.",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face"
+      text: "Rentalizer's program has meant the difference in my business from just being a hobby to moving it into an actual business."
     },
     {
       name: "Liz Garcia",
-      text: "I just closed my first deal, thanks to Rentalizer's program!",
-      avatar: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=150&h=150&fit=crop&crop=face"
+      text: "I just closed my first deal, thanks to Rentalizer's program!"
+    },
+    {
+      name: "Marcus Thompson",
+      text: "The AI market analysis tool is incredible. It helped me identify profitable markets I never would have considered before. I'm now managing 4 successful properties."
+    },
+    {
+      name: "Sarah Chen",
+      text: "Rentalizer's CRM made all the difference in my outreach. I went from getting ignored to closing deals within weeks. The templates and automation saved me hours every day."
+    },
+    {
+      name: "David Rodriguez",
+      text: "The community support is unmatched. Whenever I had questions, there was always someone ready to help. I've learned as much from other members as I have from the training materials."
+    },
+    {
+      name: "Jessica Williams",
+      text: "I was skeptical at first, but Rentalizer delivered on every promise. The profit calculator alone has saved me from making costly mistakes. Now I have 5 profitable properties."
+    },
+    {
+      name: "Michael Johnson",
+      text: "The mentorship and coaching calls were game-changers. Having access to experts who've been there before made the learning curve so much smoother. Highly recommend."
+    },
+    {
+      name: "Amanda Foster",
+      text: "Rentalizer turned my side hustle into a full-time income. The systematic approach and tools provided everything I needed to scale confidently. Best investment I've made."
     }
   ];
 
@@ -322,17 +340,6 @@ const Test4 = () => {
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                   <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105">
                     <CardContent className="p-6">
-                      {/* Avatar Image */}
-                      <div className="flex justify-center mb-4">
-                        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-cyan-400/50">
-                          <img 
-                            src={testimonial.avatar} 
-                            alt={testimonial.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      </div>
-
                       {/* Testimonial Text */}
                       <p className="text-gray-300 text-sm leading-relaxed mb-6 text-center italic">
                         "{testimonial.text}"
