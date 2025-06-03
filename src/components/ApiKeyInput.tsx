@@ -189,7 +189,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
           {/* API Key Inputs with Status - Compact */}
           <div className="grid grid-cols-1 gap-2">
-            {/* AirDNA API Key */}
+            {/* STR Revenue API Key */}
             <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
               {getStatusIcon(getKeyStatus(airdnaKey))}
               <div className="flex-1 min-w-0">
@@ -198,7 +198,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                   type={showKeys ? "text" : "password"}
                   value={airdnaKey}
                   onChange={(e) => setAirdnaKey(e.target.value)}
-                  placeholder="STR Earnings API Key"
+                  placeholder="STR Revenue API"
                   className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
                 />
               </div>
@@ -207,7 +207,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => copyToClipboard(airdnaKey, 'AirDNA')}
+                    onClick={() => copyToClipboard(airdnaKey, 'STR Revenue API')}
                     className="h-5 w-5 p-0 text-gray-400 hover:text-white"
                   >
                     <Copy className="h-3 w-3" />
@@ -217,7 +217,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               </div>
             </div>
 
-            {/* OpenAI API Key */}
+            {/* Rental Rates API Key */}
             <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
               {getStatusIcon(getKeyStatus(openaiKey))}
               <div className="flex-1 min-w-0">
@@ -226,7 +226,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                   type={showKeys ? "text" : "password"}
                   value={openaiKey}
                   onChange={(e) => setOpenaiKey(e.target.value)}
-                  placeholder="Apartment Rental API Key"
+                  placeholder="Rental Rates API"
                   className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
                 />
               </div>
@@ -235,7 +235,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => copyToClipboard(openaiKey, 'OpenAI')}
+                    onClick={() => copyToClipboard(openaiKey, 'Rental Rates API')}
                     className="h-5 w-5 p-0 text-gray-400 hover:text-white"
                   >
                     <Copy className="h-3 w-3" />
