@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import { 
   Building2, 
   Bot, 
@@ -17,11 +18,13 @@ import {
   Phone, 
   MapPin,
   Star,
-  Zap
+  Zap,
+  Calculator
 } from 'lucide-react';
 
 export default function AcquisitionsAgent() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('properties');
 
@@ -60,6 +63,18 @@ export default function AcquisitionsAgent() {
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             AI-Powered Apartment Sourcing And Automated Landlord Outreach System
           </p>
+          
+          {/* Calculator Button */}
+          <div className="mt-6">
+            <Button
+              onClick={() => navigate('/calculator')}
+              className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-500 hover:to-blue-500 text-white"
+              size="lg"
+            >
+              <Calculator className="h-5 w-5 mr-2" />
+              Open Calculator
+            </Button>
+          </div>
         </div>
 
         {/* How It Works Section */}

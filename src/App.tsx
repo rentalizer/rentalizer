@@ -20,6 +20,7 @@ import Test3 from "./pages/Test3";
 import Test4 from "./pages/Test4";
 import Pricing from "./pages/Pricing";
 import AcquisitionsAgent from "./pages/AcquisitionsAgent";
+import Community from "./pages/Community";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const AppRoutes = () => (
     <Route path="/markets" element={<MarketAnalysis />} />
     <Route path="/calculator" element={<Calculator />} />
     <Route path="/properties" element={<AcquisitionsAgent />} />
+    <Route path="/community" element={<Community />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
     <Route path="/terms-of-service" element={<TermsOfService />} />
