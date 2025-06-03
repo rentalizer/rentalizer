@@ -100,6 +100,9 @@ const fetchAirDNAData = async (city: string, apiKey: string, propertyType: strin
 
     const url = `https://api.airdna.co/v1/market/property_type_summary?${params.toString()}`;
 
+    console.log('🔍 AirDNA API URL:', url);
+    console.log('🔑 Using API key:', apiKey.substring(0, 8) + '...');
+
     // AirDNA API call for real market data
     const response = await fetch(url, {
       method: 'GET',
@@ -109,12 +112,16 @@ const fetchAirDNAData = async (city: string, apiKey: string, propertyType: strin
       }
     });
 
+    console.log('📡 AirDNA API Response status:', response.status);
+
     if (!response.ok) {
-      console.log(`⚠️ AirDNA API failed (${response.status}), using fallback data`);
+      const errorText = await response.text();
+      console.log(`⚠️ AirDNA API failed (${response.status}): ${errorText}`);
       return generateFallbackSTRData(city, propertyType, bathrooms);
     }
 
     const data = await response.json();
+    console.log('📊 AirDNA API Response data:', data);
     
     if (data.submarkets && data.submarkets.length > 0) {
       const strData: STRData[] = data.submarkets.map((submarket: any) => {
@@ -128,7 +135,7 @@ const fetchAirDNAData = async (city: string, apiKey: string, propertyType: strin
         };
       });
 
-      console.log('✅ Got real STR data from AirDNA with 25% buffer applied');
+      console.log('✅ Got real STR data from AirDNA with 25% buffer applied:', strData);
       return strData;
     }
 
