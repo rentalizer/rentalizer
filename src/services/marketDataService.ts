@@ -1,3 +1,4 @@
+
 import { CityMarketData, STRData, RentData } from '@/types';
 
 const getBedroomMultiplier = (propertyType: string): number => {
@@ -79,14 +80,14 @@ const getCityCoordinates = (city: string): { lat: number; lng: number } => {
   return cityCoords[city.toLowerCase()] || { lat: 40.7128, lng: -74.0060 };
 };
 
-const fetchAirDNAData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<STRData[]> => {
+const fetchAirDNAData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<STRData[] | null> => {
   try {
-    console.log(`🏠 Fetching real STR earnings from AirDNA for ${city} (${propertyType}BR/${bathrooms}BA)`);
+    console.log(`🏠 Attempting to fetch REAL STR earnings from AirDNA for ${city} (${propertyType}BR/${bathrooms}BA)`);
     console.log('🔑 API Key being used:', apiKey ? `${apiKey.substring(0, 8)}...` : 'No API key provided');
     
     if (!apiKey || apiKey.trim() === '') {
-      console.log('⚠️ No AirDNA API key, using fallback data');
-      return generateFallbackSTRData(city, propertyType, bathrooms);
+      console.log('❌ No AirDNA API key provided - RETURNING NULL (NO MOCK DATA)');
+      return null;
     }
 
     // Construct URL with query parameters
@@ -116,16 +117,16 @@ const fetchAirDNAData = async (city: string, apiKey: string, propertyType: strin
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.log(`⚠️ AirDNA API failed (${response.status}): ${errorText}`);
-      console.log('🔄 FALLING BACK TO MOCK DATA due to API failure');
-      return generateFallbackSTRData(city, propertyType, bathrooms);
+      console.log(`❌ AirDNA API FAILED (${response.status}): ${errorText}`);
+      console.log('🚫 RETURNING NULL - NO MOCK DATA WILL BE USED');
+      return null;
     }
 
     const data = await response.json();
     console.log('📊 RAW AirDNA API Response data (full object):', JSON.stringify(data, null, 2));
     
     if (data.submarkets && data.submarkets.length > 0) {
-      console.log('✅ REAL DATA DETECTED - Processing AirDNA submarkets...');
+      console.log('✅ REAL DATA CONFIRMED - Processing AirDNA submarkets...');
       
       const strData: STRData[] = data.submarkets.map((submarket: any, index: number) => {
         // Log each submarket's raw data
@@ -153,67 +154,28 @@ const fetchAirDNAData = async (city: string, apiKey: string, propertyType: strin
         };
       });
 
-      console.log('✅ FINAL STR DATA (with 25% buffer applied):', strData);
+      console.log('✅ FINAL REAL STR DATA (with 25% buffer applied):', strData);
       console.log('🔍 DATA SOURCE: Real AirDNA API response');
       return strData;
     }
 
-    console.log('⚠️ No submarkets in AirDNA response, using fallback');
-    console.log('🔄 FALLING BACK TO MOCK DATA due to no submarkets');
-    return generateFallbackSTRData(city, propertyType, bathrooms);
+    console.log('❌ No submarkets in AirDNA response - RETURNING NULL');
+    return null;
 
   } catch (error) {
     console.error('❌ AirDNA API error:', error);
-    console.log('🔄 FALLING BACK TO MOCK DATA due to API error');
-    return generateFallbackSTRData(city, propertyType, bathrooms);
+    console.log('🚫 RETURNING NULL - NO MOCK DATA WILL BE USED');
+    return null;
   }
 };
 
-const generateFallbackSTRData = (city: string, propertyType: string, bathrooms: string): STRData[] => {
-  console.log('📊 GENERATING FALLBACK/MOCK STR DATA with realistic monthly earnings + 25% buffer');
-  console.log('🔍 DATA SOURCE: Mock/Fallback data (not real API)');
-  
-  const cityKey = city.toLowerCase();
-  const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Downtown`, `${city} Midtown`];
-  
-  // Updated base monthly earnings to reflect current 2025 STR market rates
-  let baseMonthlyEarnings;
-  
-  // San Diego has premium STR rates
-  if (cityKey === 'san diego') {
-    baseMonthlyEarnings = propertyType === '1' ? 4200 : propertyType === '2' ? 5800 : 7200;
-  } 
-  // Other major markets
-  else if (['seattle', 'denver', 'austin', 'miami'].includes(cityKey)) {
-    baseMonthlyEarnings = propertyType === '1' ? 3600 : propertyType === '2' ? 4800 : 6000;
-  }
-  // Secondary markets
-  else {
-    baseMonthlyEarnings = propertyType === '1' ? 3200 : propertyType === '2' ? 4200 : 5400;
-  }
-  
-  return neighborhoods.slice(0, 12).map((neighborhood, index) => {
-    // Vary earnings by neighborhood quality (15-40% variation for realistic spread)
-    const variation = 0.80 + (index * 0.03) + (Math.random() * 0.35);
-    const actualMonthlyEarnings = Math.round(baseMonthlyEarnings * variation);
-    
-    // Apply 25% buffer as requested
-    const monthlyRevenueWith25Percent = Math.round(actualMonthlyEarnings * 1.25);
-    
-    return {
-      submarket: neighborhood,
-      revenue: monthlyRevenueWith25Percent
-    };
-  });
-};
-
-const fetchOpenAIRentData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<RentData[]> => {
+const fetchOpenAIRentData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<RentData[] | null> => {
   try {
-    console.log(`🤖 Using OpenAI for CURRENT rent research in ${city} (last 30 days)`);
+    console.log(`🤖 Attempting to use OpenAI for CURRENT rent research in ${city} (last 30 days)`);
     
     if (!apiKey || apiKey.trim() === '') {
-      console.log('⚠️ No OpenAI API key, using fallback data');
-      return generateFallbackRentData(city, propertyType, bathrooms);
+      console.log('❌ No OpenAI API key provided - RETURNING NULL (NO MOCK DATA)');
+      return null;
     }
     
     const cityKey = city.toLowerCase();
@@ -284,8 +246,8 @@ Verify your data against RentCafe.com, Zumper.com, and Rentometer.com as the pri
     });
 
     if (!response.ok) {
-      console.log('⚠️ OpenAI failed, using fallback data');
-      return generateFallbackRentData(city, propertyType, bathrooms);
+      console.log('❌ OpenAI API FAILED - RETURNING NULL (NO MOCK DATA)');
+      return null;
     }
 
     const data = await response.json();
@@ -299,7 +261,7 @@ Verify your data against RentCafe.com, Zumper.com, and Rentometer.com as the pri
       const rentData = parsedContent.rentData || [];
       
       if (rentData.length >= 8) {
-        console.log('✅ Got current rent data from OpenAI using RentCafe, Zumper, and Rentometer (last 30 days):', rentData);
+        console.log('✅ REAL rent data from OpenAI using RentCafe, Zumper, and Rentometer (last 30 days):', rentData);
         return rentData;
       }
     } catch (parseError) {
@@ -307,55 +269,14 @@ Verify your data against RentCafe.com, Zumper.com, and Rentometer.com as the pri
       console.log('Raw OpenAI content:', content);
     }
 
-    return generateFallbackRentData(city, propertyType, bathrooms);
+    console.log('❌ OpenAI parsing failed - RETURNING NULL');
+    return null;
 
   } catch (error) {
     console.error('❌ OpenAI rent research error:', error);
-    return generateFallbackRentData(city, propertyType, bathrooms);
+    console.log('🚫 RETURNING NULL - NO MOCK DATA WILL BE USED');
+    return null;
   }
-};
-
-const generateFallbackRentData = (city: string, propertyType: string, bathrooms: string): RentData[] => {
-  const cityKey = city.toLowerCase();
-  
-  // Updated with current 2025 San Diego market rates - significantly higher
-  const rentData: { [key: string]: Array<{ name: string; rent: number }> } = {
-    'san diego': [
-      { name: 'Gaslamp Quarter', rent: 5200 },  // Updated from 4200
-      { name: 'Pacific Beach', rent: 4800 },    // Updated from 3800
-      { name: 'Hillcrest', rent: 4200 },        // Updated from 3400
-      { name: 'Little Italy', rent: 5500 },     // Updated from 4500
-      { name: 'La Jolla', rent: 6200 },         // Updated from 5200
-      { name: 'Mission Beach', rent: 5100 },    // Updated from 4100
-      { name: 'Ocean Beach', rent: 4600 },      // Updated from 3600
-      { name: 'Balboa Park', rent: 4300 },      // Updated from 3300
-      { name: 'North Park', rent: 4000 },       // Updated from 3200
-      { name: 'Mission Valley', rent: 4700 },   // Updated from 3700
-      { name: 'University Heights', rent: 3900 }, // New
-      { name: 'Normal Heights', rent: 3800 }    // New
-    ]
-  };
-  
-  const cityRentData = rentData[cityKey];
-  
-  if (!cityRentData) {
-    const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Downtown`, `${city} Midtown`];
-    // Updated base rents to reflect current 2025 market
-    const baseRent = propertyType === '1' ? 2800 : propertyType === '2' ? 4200 : 5200;
-    
-    return neighborhoods.slice(0, 10).map((neighborhood, index) => {
-      const variation = 0.80 + (index * 0.05) + (Math.random() * 0.20);
-      return {
-        submarket: neighborhood,
-        rent: Math.round(baseRent * variation)
-      };
-    });
-  }
-  
-  return cityRentData.map(item => ({
-    submarket: item.name,
-    rent: item.rent
-  }));
 };
 
 export const fetchMarketData = async (
@@ -374,38 +295,43 @@ export const fetchMarketData = async (
     let strData: STRData[] = [];
     let rentData: RentData[] = [];
 
-    // Fetch real STR earnings data with AirDNA API
-    try {
-      if (apiConfig.airdnaApiKey && apiConfig.airdnaApiKey.trim() !== '') {
-        console.log('🚀 Using AirDNA API for STR data...');
-        strData = await fetchAirDNAData(city, apiConfig.airdnaApiKey, propertyType, bathrooms);
-      } else {
-        console.log('📊 No AirDNA key, using fallback STR data with 25% buffer');
-        strData = generateFallbackSTRData(city, propertyType, bathrooms);
-      }
-    } catch (error) {
-      console.warn('⚠️ AirDNA failed, using fallback:', error);
-      strData = generateFallbackSTRData(city, propertyType, bathrooms);
+    // Fetch STR data - only real data, no fallbacks
+    const strResult = await fetchAirDNAData(city, apiConfig.airdnaApiKey || '', propertyType, bathrooms);
+    if (strResult) {
+      strData = strResult;
+      console.log('✅ Using REAL STR data from AirDNA API');
+    } else {
+      console.log('❌ STR API failed - will show "NA" for STR revenue');
+      // Create placeholder data with "NA" indicators
+      const cityKey = city.toLowerCase();
+      const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Area`];
+      strData = neighborhoods.slice(0, 6).map(neighborhood => ({
+        submarket: neighborhood,
+        revenue: 0 // Will be displayed as "NA"
+      }));
     }
 
-    // Fetch rent data (existing OpenAI logic)
-    try {
-      if (apiConfig.openaiApiKey && apiConfig.openaiApiKey.trim() !== '') {
-        rentData = await fetchOpenAIRentData(city, apiConfig.openaiApiKey, propertyType, bathrooms);
-      } else {
-        rentData = generateFallbackRentData(city, propertyType, bathrooms);
-      }
-    } catch (error) {
-      console.warn('⚠️ OpenAI failed, using fallback:', error);
-      rentData = generateFallbackRentData(city, propertyType, bathrooms);
+    // Fetch rent data - only real data, no fallbacks
+    const rentResult = await fetchOpenAIRentData(city, apiConfig.openaiApiKey || '', propertyType, bathrooms);
+    if (rentResult) {
+      rentData = rentResult;
+      console.log('✅ Using REAL rent data from OpenAI API');
+    } else {
+      console.log('❌ Rent API failed - will show "NA" for rent data');
+      // Create placeholder data with "NA" indicators
+      const cityKey = city.toLowerCase();
+      const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Area`];
+      rentData = neighborhoods.slice(0, 6).map(neighborhood => ({
+        submarket: neighborhood,
+        rent: 0 // Will be displayed as "NA"
+      }));
     }
 
-    console.log(`✅ Market data compiled for ${city}:`, {
+    console.log(`📊 Market data compilation complete for ${city}:`, {
       strSubmarkets: strData.length,
       rentSubmarkets: rentData.length,
-      strRevenueNote: 'Monthly earnings with 25% buffer applied',
-      rentDataNote: 'Current rental rates from last 30 days',
-      finalStrData: strData
+      strDataSource: strResult ? 'Real AirDNA API' : 'API Failed - Showing NA',
+      rentDataSource: rentResult ? 'Real OpenAI API' : 'API Failed - Showing NA'
     });
 
     return {

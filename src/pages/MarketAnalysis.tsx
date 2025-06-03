@@ -121,8 +121,8 @@ const MarketAnalysis = () => {
       // Combine STR and rent data
       const combinedData: SubmarketData[] = marketData.strData.map(strItem => {
         const rentItem = marketData.rentData.find(r => r.submarket === strItem.submarket);
-        const medianRent = rentItem?.rent || 2000;
-        const multiple = strItem.revenue / medianRent;
+        const medianRent = rentItem?.rent || 0; // Use 0 for failed data instead of fallback
+        const multiple = (strItem.revenue > 0 && medianRent > 0) ? strItem.revenue / medianRent : 0;
         
         return {
           submarket: strItem.submarket,
@@ -132,15 +132,32 @@ const MarketAnalysis = () => {
         };
       });
 
-      combinedData.sort((a, b) => b.multiple - a.multiple);
+      // Sort by multiple, but put failed data (0) at the end
+      combinedData.sort((a, b) => {
+        if (a.multiple === 0 && b.multiple === 0) return 0;
+        if (a.multiple === 0) return 1;
+        if (b.multiple === 0) return -1;
+        return b.multiple - a.multiple;
+      });
 
       setSubmarketData(combinedData);
       setCityName(targetCity);
       
-      toast({
-        title: "Analysis Complete",
-        description: `Found ${combinedData.length} submarkets in ${targetCity}`,
-      });
+      const failedCount = combinedData.filter(d => d.strRevenue === 0 || d.medianRent === 0).length;
+      const successCount = combinedData.length - failedCount;
+      
+      if (failedCount > 0) {
+        toast({
+          title: "Analysis Complete with Warnings",
+          description: `${successCount} submarkets with real data, ${failedCount} showing "NA" due to API failures`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Analysis Complete",
+          description: `Found ${combinedData.length} submarkets with real data in ${targetCity}`,
+        });
+      }
 
     } catch (error) {
       console.error('💥 Market analysis error:', {

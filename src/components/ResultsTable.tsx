@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import { TrendingUp, DollarSign, CheckCircle } from 'lucide-react';
+import { TrendingUp, DollarSign, CheckCircle, AlertTriangle } from 'lucide-react';
 
 interface SubmarketData {
   submarket: string;
@@ -31,7 +31,10 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
     );
   }
 
-  const avgMultiple = results.reduce((sum, r) => sum + r.multiple, 0) / results.length;
+  const validResults = results.filter(r => r.strRevenue > 0 && r.medianRent > 0);
+  const avgMultiple = validResults.length > 0 
+    ? validResults.reduce((sum, r) => sum + r.multiple, 0) / validResults.length 
+    : 0;
 
   const handleSubmarketSelection = (submarket: string, checked: boolean) => {
     const updatedSelection = checked 
@@ -58,7 +61,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
   };
 
   const isAllSelected = selectedSubmarkets.length === results.length;
-  const isPartiallySelected = selectedSubmarkets.length > 0 && selectedSubmarkets.length < results.length;
+  const hasFailedData = results.some(r => r.strRevenue === 0 || r.medianRent === 0);
 
   return (
     <Card className="w-full bg-gray-900/95 border-gray-700 shadow-2xl">
@@ -69,8 +72,17 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
             {city} Market Analysis
           </CardTitle>
           <div className="flex items-center gap-2">
-            <CheckCircle className="h-4 w-4 text-green-400" />
-            <span className="text-green-400 text-sm font-medium">Analysis Complete</span>
+            {hasFailedData ? (
+              <>
+                <AlertTriangle className="h-4 w-4 text-yellow-400" />
+                <span className="text-yellow-400 text-sm font-medium">API Failures Detected</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle className="h-4 w-4 text-green-400" />
+                <span className="text-green-400 text-sm font-medium">Real Data</span>
+              </>
+            )}
           </div>
         </div>
         <p className="text-white">Revenue potential by submarket</p>
@@ -115,13 +127,25 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
                     {result.submarket}
                   </TableCell>
                   <TableCell className="text-white font-semibold">
-                    ${result.strRevenue.toLocaleString()}
+                    {result.strRevenue === 0 ? (
+                      <span className="text-yellow-400">NA</span>
+                    ) : (
+                      `$${result.strRevenue.toLocaleString()}`
+                    )}
                   </TableCell>
                   <TableCell className="text-white font-semibold">
-                    ${result.medianRent.toLocaleString()}
+                    {result.medianRent === 0 ? (
+                      <span className="text-yellow-400">NA</span>
+                    ) : (
+                      `$${result.medianRent.toLocaleString()}`
+                    )}
                   </TableCell>
                   <TableCell className="text-white font-semibold">
-                    {result.multiple.toFixed(2)}x
+                    {result.strRevenue === 0 || result.medianRent === 0 ? (
+                      <span className="text-yellow-400">NA</span>
+                    ) : (
+                      `${result.multiple.toFixed(2)}x`
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -138,7 +162,11 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
               )}
             </div>
             <div className="text-gray-400">
-              {results.length} submarkets analyzed • Avg Multiple: {avgMultiple.toFixed(2)}x
+              {results.length} submarkets analyzed 
+              {validResults.length > 0 && ` • Avg Multiple: ${avgMultiple.toFixed(2)}x`}
+              {hasFailedData && (
+                <span className="text-yellow-400 ml-2">• Some APIs failed</span>
+              )}
             </div>
           </div>
         </div>
