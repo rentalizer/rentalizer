@@ -35,6 +35,23 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     });
   };
 
+  const handleClearKeys = () => {
+    setAirdnaKey('');
+    setOpenaiKey('');
+    localStorage.removeItem('airdna_api_key');
+    localStorage.removeItem('openai_api_key');
+    
+    onApiKeysChange({
+      airdnaApiKey: undefined,
+      openaiApiKey: undefined
+    });
+
+    toast({
+      title: "🗑️ API Keys Cleared",
+      description: "Your API keys have been cleared.",
+    });
+  };
+
   const findAllStoredKeys = () => {
     console.log('🔍 SEARCHING FOR ALL API KEYS...');
     
@@ -89,7 +106,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     }
   };
 
-  // Load keys from localStorage on component mount
+  // Load keys from localStorage on component mount - FIXED to prevent infinite loop
   React.useEffect(() => {
     const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
@@ -97,13 +114,14 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     setAirdnaKey(savedAirDNAKey);
     setOpenaiKey(savedOpenaiKey);
     
+    // Only call onApiKeysChange if there are actually keys to load
     if (savedAirDNAKey || savedOpenaiKey) {
       onApiKeysChange({
         airdnaApiKey: savedAirDNAKey || undefined,
         openaiApiKey: savedOpenaiKey || undefined
       });
     }
-  }, [onApiKeysChange]);
+  }, []); // Removed onApiKeysChange from dependencies to prevent infinite loop
 
   return (
     <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
@@ -217,13 +235,24 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               {showKeys ? 'Hide' : 'Show'} Keys
             </Button>
 
-            <Button
-              onClick={handleSaveKeys}
-              size="sm"
-              className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300"
-            >
-              Save Configuration
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleClearKeys}
+                variant="outline"
+                size="sm"
+                className="border-red-500/30 text-red-300 hover:bg-red-500/10"
+              >
+                Clear All Keys
+              </Button>
+              
+              <Button
+                onClick={handleSaveKeys}
+                size="sm"
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white shadow-2xl hover:shadow-cyan-500/25 transition-all duration-300"
+              >
+                Save Configuration
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>
