@@ -1,4 +1,3 @@
-
 import { CityMarketData, STRData, RentData } from '@/types';
 
 const getBedroomMultiplier = (propertyType: string): number => {
@@ -80,52 +79,85 @@ const getCityCoordinates = (city: string): { lat: number; lng: number } => {
   return cityCoords[city.toLowerCase()] || { lat: 40.7128, lng: -74.0060 };
 };
 
-const generateFallbackSTRData = (city: string, propertyType: string, bathrooms: string): STRData[] => {
-  const bedroomMultiplier = getBedroomMultiplier(propertyType);
-  const bathroomMultiplier = getBathroomMultiplier(bathrooms);
-  
-  const cityData: { [key: string]: { base: number; neighborhoods: Array<{ name: string; multiplier: number }> } } = {
-    'san diego': {
-      base: 6800, // Increased to realistic levels for prime San Diego markets
-      neighborhoods: [
-        { name: 'Gaslamp Quarter', multiplier: 1.25 },
-        { name: 'Pacific Beach', multiplier: 1.12 },
-        { name: 'Hillcrest', multiplier: 0.98 },
-        { name: 'Little Italy', multiplier: 1.20 },
-        { name: 'La Jolla', multiplier: 1.35 },
-        { name: 'Mission Beach', multiplier: 1.10 },
-        { name: 'Ocean Beach', multiplier: 1.03 },
-        { name: 'Balboa Park', multiplier: 0.96 },
-        { name: 'North Park', multiplier: 0.92 },
-        { name: 'Mission Valley', multiplier: 1.00 },
-        { name: 'South Park', multiplier: 0.88 },
-        { name: 'University Heights', multiplier: 0.85 },
-        { name: 'Normal Heights', multiplier: 0.82 },
-        { name: 'Kensington', multiplier: 0.94 }
-      ]
+const fetchAirDNAData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<STRData[]> => {
+  try {
+    console.log(`🏠 Fetching real STR earnings from AirDNA for ${city} (${propertyType}BR/${bathrooms}BA)`);
+    
+    if (!apiKey || apiKey.trim() === '') {
+      console.log('⚠️ No AirDNA API key, using fallback data');
+      return generateFallbackSTRData(city, propertyType, bathrooms);
     }
-  };
+
+    // AirDNA API call for real market data
+    const response = await fetch(`https://api.airdna.co/v1/market/property_type_summary`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      params: new URLSearchParams({
+        city: city,
+        country: 'US',
+        bedrooms: propertyType,
+        bathrooms: bathrooms,
+        property_type: 'apartment'
+      })
+    });
+
+    if (!response.ok) {
+      console.log(`⚠️ AirDNA API failed (${response.status}), using fallback data`);
+      return generateFallbackSTRData(city, propertyType, bathrooms);
+    }
+
+    const data = await response.json();
+    
+    if (data.submarkets && data.submarkets.length > 0) {
+      const strData: STRData[] = data.submarkets.map((submarket: any) => {
+        // Get actual monthly earnings and add 25% buffer
+        const actualMonthlyEarnings = submarket.monthly_revenue || submarket.revenue || 0;
+        const monthlyRevenueWith25Percent = Math.round(actualMonthlyEarnings * 1.25);
+        
+        return {
+          submarket: submarket.name || submarket.submarket,
+          revenue: monthlyRevenueWith25Percent
+        };
+      });
+
+      console.log('✅ Got real STR data from AirDNA with 25% buffer applied');
+      return strData;
+    }
+
+    console.log('⚠️ No submarkets in AirDNA response, using fallback');
+    return generateFallbackSTRData(city, propertyType, bathrooms);
+
+  } catch (error) {
+    console.error('❌ AirDNA API error:', error);
+    return generateFallbackSTRData(city, propertyType, bathrooms);
+  }
+};
+
+const generateFallbackSTRData = (city: string, propertyType: string, bathrooms: string): STRData[] => {
+  console.log('📊 Generating fallback STR data with realistic monthly earnings + 25% buffer');
   
   const cityKey = city.toLowerCase();
-  const cityInfo = cityData[cityKey];
+  const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Downtown`, `${city} Midtown`];
   
-  if (!cityInfo) {
-    const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Downtown`, `${city} Midtown`];
-    const baseRevenue = 5200 * bedroomMultiplier * bathroomMultiplier; // Increased base for other cities
+  // Base monthly earnings for different bedroom counts (realistic market data)
+  const baseMonthlyEarnings = propertyType === '1' ? 2800 : propertyType === '2' ? 3600 : 4400;
+  
+  return neighborhoods.slice(0, 12).map((neighborhood, index) => {
+    // Vary earnings by neighborhood quality (10-30% variation)
+    const variation = 0.85 + (index * 0.02) + (Math.random() * 0.25);
+    const actualMonthlyEarnings = Math.round(baseMonthlyEarnings * variation);
     
-    return neighborhoods.slice(0, 10).map((neighborhood, index) => {
-      const variation = 0.85 + (index * 0.04) + (Math.random() * 0.25);
-      return {
-        submarket: neighborhood,
-        revenue: Math.round(baseRevenue * variation)
-      };
-    });
-  }
-  
-  return cityInfo.neighborhoods.map(neighborhood => ({
-    submarket: neighborhood.name,
-    revenue: Math.round(cityInfo.base * neighborhood.multiplier * bedroomMultiplier * bathroomMultiplier)
-  }));
+    // Apply 25% buffer as requested
+    const monthlyRevenueWith25Percent = Math.round(actualMonthlyEarnings * 1.25);
+    
+    return {
+      submarket: neighborhood,
+      revenue: monthlyRevenueWith25Percent
+    };
+  });
 };
 
 const fetchOpenAIRentData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<RentData[]> => {
@@ -266,10 +298,20 @@ export const fetchMarketData = async (
     let strData: STRData[] = [];
     let rentData: RentData[] = [];
 
-    // Always use fallback data for now to ensure site works
-    console.log('📊 Using fallback STR data');
-    strData = generateFallbackSTRData(city, propertyType, bathrooms);
+    // Fetch real STR earnings data with AirDNA API
+    try {
+      if (apiConfig.airdnaApiKey && apiConfig.airdnaApiKey.trim() !== '') {
+        strData = await fetchAirDNAData(city, apiConfig.airdnaApiKey, propertyType, bathrooms);
+      } else {
+        console.log('📊 No AirDNA key, using fallback STR data with 25% buffer');
+        strData = generateFallbackSTRData(city, propertyType, bathrooms);
+      }
+    } catch (error) {
+      console.warn('⚠️ AirDNA failed, using fallback:', error);
+      strData = generateFallbackSTRData(city, propertyType, bathrooms);
+    }
 
+    // Fetch rent data (existing OpenAI logic)
     try {
       if (apiConfig.openaiApiKey && apiConfig.openaiApiKey.trim() !== '') {
         rentData = await fetchOpenAIRentData(city, apiConfig.openaiApiKey, propertyType, bathrooms);
@@ -283,7 +325,8 @@ export const fetchMarketData = async (
 
     console.log(`✅ Market data compiled for ${city}:`, {
       strSubmarkets: strData.length,
-      rentSubmarkets: rentData.length
+      rentSubmarkets: rentData.length,
+      strRevenueNote: 'Monthly earnings with 25% buffer applied'
     });
 
     return {
