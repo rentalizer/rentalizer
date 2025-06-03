@@ -538,46 +538,30 @@ const PMS = () => {
           </TabsContent>
 
           {/* Calendar Tab */}
-          <TabsContent value="calendar" className="space-y-6">
-            <Card className="bg-gray-900/80 border-gray-700/50">
-              <CardHeader>
-                <CardTitle className="text-white">Unified Calendar</CardTitle>
-                <p className="text-gray-400">All bookings across platforms in one view</p>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-7 gap-2 mb-4">
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="p-2 text-center text-gray-400 font-medium">
-                      {day}
-                    </div>
-                  ))}
-                </div>
-                <div className="grid grid-cols-7 gap-2">
-                  {Array.from({ length: 35 }, (_, i) => {
-                    const date = new Date();
-                    date.setDate(date.getDate() - date.getDay() + i);
-                    const dateStr = date.toISOString().split('T')[0];
-                    const event = enhancedCalendarEvents.find(e => e.date === dateStr);
-                    
-                    return (
-                      <div key={i} className="h-24 p-1 border border-gray-700 rounded">
-                        <div className="text-gray-300 text-sm mb-1">{date.getDate()}</div>
-                        {event && (
-                          <div className={`text-xs p-1 rounded ${
-                            event.type === 'checkin' ? 'bg-green-600/20 text-green-300' :
-                            event.type === 'checkout' ? 'bg-red-600/20 text-red-300' :
-                            'bg-yellow-600/20 text-yellow-300'
-                          }`}>
-                            {event.type === 'checkin' ? 'Check-in' : 
-                             event.type === 'checkout' ? 'Check-out' : 'Maintenance'}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="calendar" className="space-y-4">
+            <div className="bg-slate-700/30 rounded-lg p-4">
+              <h4 className="font-semibold text-cyan-300 mb-3">Unified Calendar View</h4>
+              <div className="grid grid-cols-7 gap-2 mb-4">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  <div key={day} className="p-2 text-center text-gray-400 font-medium text-sm">
+                    {day}
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-2">
+                {Array.from({ length: 21 }, (_, i) => (
+                  <div key={i} className="h-16 p-1 border border-gray-600 rounded text-xs">
+                    <div className="text-gray-300 mb-1">{i + 1}</div>
+                    {i === 2 && <div className="bg-cyan-600/20 text-cyan-300 p-1 rounded text-xs">Check-in</div>}
+                    {i === 7 && <div className="bg-purple-600/20 text-purple-300 p-1 rounded text-xs">Check-out</div>}
+                    {i === 10 && <div className="bg-blue-600/20 text-blue-300 p-1 rounded text-xs">Cleaning</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="text-center text-gray-400 text-sm">
+              ✓ Airbnb, VRBO, and Booking.com calendars synchronized
+            </div>
           </TabsContent>
 
           {/* Properties Tab */}

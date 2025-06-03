@@ -1,7 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { 
   Search, 
   Building, 
@@ -31,8 +31,8 @@ import { PMSDemo } from '@/components/PMSDemo';
 
 const Test5 = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [progress, setProgress] = useState(0);
   const [demoRunning, setDemoRunning] = useState(false);
+  const [manualMode, setManualMode] = useState(false);
 
   // Mock data for map demo
   const mockMarketData = [
@@ -46,34 +46,14 @@ const Test5 = () => {
     { submarket: "Business Park", strRevenue: 44000, medianRent: 2050, multiple: 3.58 }
   ];
 
-  // Mock properties for property search demo
-  const mockProperties = [
-    { address: "123 Main St, Austin, TX", rent: 2200, bedrooms: 2, bathrooms: 2, sqft: 1100 },
-    { address: "456 Oak Ave, Austin, TX", rent: 1900, bedrooms: 2, bathrooms: 1, sqft: 950 },
-    { address: "789 Pine Dr, Austin, TX", rent: 2400, bedrooms: 3, bathrooms: 2, sqft: 1300 }
-  ];
-
   useEffect(() => {
-    if (demoRunning) {
-      const timer = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            return 0;
-          }
-          return prev + 2;
-        });
-      }, 100);
-
-      return () => clearInterval(timer);
-    }
-  }, [demoRunning]);
-
-  useEffect(() => {
-    if (demoRunning) {
+    if (demoRunning && !manualMode) {
       const stepTimer = setInterval(() => {
         setCurrentStep((prev) => {
           if (prev >= 17) {
-            return 1;
+            setDemoRunning(false);
+            setManualMode(true);
+            return 17;
           }
           return prev + 1;
         });
@@ -81,13 +61,26 @@ const Test5 = () => {
 
       return () => clearInterval(stepTimer);
     }
-  }, [demoRunning]);
+  }, [demoRunning, manualMode]);
 
   const handleRunDemo = () => {
-    setDemoRunning(!demoRunning);
-    if (!demoRunning) {
+    if (demoRunning) {
+      setDemoRunning(false);
+      setManualMode(false);
+    } else {
+      setDemoRunning(true);
+      setManualMode(false);
       setCurrentStep(1);
-      setProgress(0);
+    }
+  };
+
+  const handleStepClick = (stepId) => {
+    if (manualMode || !demoRunning) {
+      setCurrentStep(stepId);
+      if (!manualMode) {
+        setManualMode(true);
+        setDemoRunning(false);
+      }
     }
   };
 
@@ -130,7 +123,7 @@ const Test5 = () => {
   };
 
   const getStepBorder = (step, category) => {
-    if (step === currentStep && demoRunning) {
+    if (step === currentStep && (demoRunning || manualMode)) {
       switch (category) {
         case "market":
           return "ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900";
@@ -161,27 +154,44 @@ const Test5 = () => {
           </p>
           
           {/* Run Demo Button */}
-          <Button 
-            onClick={handleRunDemo}
-            size="lg"
-            className={`mb-8 px-8 py-4 text-lg font-semibold transition-all duration-300 ${
-              demoRunning 
-                ? 'bg-red-600 hover:bg-red-500 text-white' 
-                : 'bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white'
-            }`}
-          >
-            {demoRunning ? (
-              <>
-                Stop Demo
-                <CheckCircle2 className="ml-2 h-5 w-5" />
-              </>
-            ) : (
-              <>
-                Run Live Demo
-                <Play className="ml-2 h-5 w-5" />
-              </>
+          <div className="flex justify-center gap-4 mb-8">
+            <Button 
+              onClick={handleRunDemo}
+              size="lg"
+              className={`px-8 py-4 text-lg font-semibold transition-all duration-300 ${
+                demoRunning 
+                  ? 'bg-red-600 hover:bg-red-500 text-white' 
+                  : 'bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white'
+              }`}
+            >
+              {demoRunning ? (
+                <>
+                  Stop Demo
+                  <CheckCircle2 className="ml-2 h-5 w-5" />
+                </>
+              ) : (
+                <>
+                  Run Live Demo
+                  <Play className="ml-2 h-5 w-5" />
+                </>
+              )}
+            </Button>
+            
+            {(manualMode || !demoRunning) && (
+              <Button 
+                onClick={() => {
+                  setManualMode(true);
+                  setDemoRunning(false);
+                }}
+                size="lg"
+                variant="outline"
+                className="px-8 py-4 text-lg font-semibold border-cyan-500 text-cyan-400 hover:bg-cyan-500/10"
+              >
+                Manual Demo
+                <Settings className="ml-2 h-5 w-5" />
+              </Button>
             )}
-          </Button>
+          </div>
         </div>
 
         {/* Progress Flow with Numbered Steps (No Line) */}
@@ -190,22 +200,18 @@ const Test5 = () => {
             {steps.map((step) => (
               <div
                 key={step.id}
-                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 ${getStepColor(step.id, step.category)} ${getStepBorder(step.id, step.category)}`}
+                onClick={() => handleStepClick(step.id)}
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 cursor-pointer ${getStepColor(step.id, step.category)} ${getStepBorder(step.id, step.category)} ${
+                  manualMode || !demoRunning ? 'hover:scale-110' : ''
+                }`}
               >
                 <span className="text-white text-sm font-bold">{step.id}</span>
               </div>
             ))}
           </div>
 
-          {/* Progress Bar */}
-          {demoRunning && (
-            <div className="mb-8">
-              <Progress value={progress} className="w-full h-2" />
-            </div>
-          )}
-
           {/* Current Step Display */}
-          {demoRunning && (
+          {(demoRunning || manualMode) && (
             <div className="text-center mb-8">
               <div className="bg-slate-800/50 backdrop-blur-lg border border-gray-700 rounded-lg p-6 max-w-md mx-auto transform transition-all duration-500 scale-105">
                 <div className="flex items-center justify-center mb-4">
@@ -237,13 +243,18 @@ const Test5 = () => {
                      'Community'}
                   </div>
                 </div>
+                {manualMode && (
+                  <div className="mt-4 text-sm text-gray-400">
+                    Click any step number to explore manually
+                  </div>
+                )}
               </div>
             </div>
           )}
         </div>
 
         {/* Step-Specific Visual Demonstrations */}
-        {demoRunning && (
+        {(demoRunning || manualMode) && (
           <div className="mb-12 space-y-8">
             {/* Market Analysis Steps (1-3) - Interactive Map */}
             {currentStep >= 1 && currentStep <= 3 && (
@@ -261,25 +272,67 @@ const Test5 = () => {
 
             {/* Acquisitions CRM Demo (Steps 4-11) */}
             {currentStep >= 4 && currentStep <= 11 && (
-              <AcquisitionsCRMDemo currentStep={currentStep} isRunning={demoRunning} />
+              <AcquisitionsCRMDemo currentStep={currentStep} isRunning={demoRunning || manualMode} />
             )}
 
             {/* Property Management Steps (12-16) */}
             {currentStep >= 12 && currentStep <= 16 && (
-              <PMSDemo currentStep={currentStep} isRunning={demoRunning} />
+              <PMSDemo currentStep={currentStep} isRunning={demoRunning || manualMode} />
+            )}
+
+            {/* Community Step (17) */}
+            {currentStep === 17 && (
+              <Card className="bg-slate-800/50 border-orange-500/20 animate-fade-in">
+                <CardHeader>
+                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-orange-400 to-cyan-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <Users className="h-6 w-6 text-orange-400" />
+                    Community Support & Networking
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="bg-slate-700/30 rounded-lg p-4">
+                      <h4 className="font-semibold text-orange-300 mb-3">Expert Network</h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+                          <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                            <Users className="h-5 w-5 text-white" />
+                          </div>
+                          <div>
+                            <div className="text-white font-medium">Sarah Chen</div>
+                            <div className="text-gray-400 text-sm">STR Expert • 47 properties</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+                          <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center">
+                            <Star className="h-5 w-5 text-white" />
+                          </div>
+                          <div>
+                            <div className="text-white font-medium">Mike Rodriguez</div>
+                            <div className="text-gray-400 text-sm">Market Analyst • Austin specialist</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-slate-700/30 rounded-lg p-4">
+                      <h4 className="font-semibold text-orange-300 mb-3">Recent Discussions</h4>
+                      <div className="space-y-3">
+                        <div className="p-3 bg-slate-800/50 rounded-lg">
+                          <div className="text-white font-medium text-sm mb-1">Best STR neighborhoods in Austin?</div>
+                          <div className="text-gray-400 text-xs">12 replies • 3 hours ago</div>
+                        </div>
+                        <div className="p-3 bg-slate-800/50 rounded-lg">
+                          <div className="text-white font-medium text-sm mb-1">Furniture sourcing tips</div>
+                          <div className="text-gray-400 text-xs">8 replies • 5 hours ago</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </div>
         )}
-
-        <div className="text-center">
-          <Button 
-            size="lg"
-            className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-4"
-          >
-            Start Your Free Trial
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </div>
       </div>
 
       <Footer />
