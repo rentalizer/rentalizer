@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -27,6 +26,7 @@ import {
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { MapView } from '@/components/MapView';
+import { AcquisitionsCRMDemo } from '@/components/AcquisitionsCRMDemo';
 
 const Test5 = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -258,137 +258,9 @@ const Test5 = () => {
               </Card>
             )}
 
-            {/* Property Search (Step 4) */}
-            {currentStep === 4 && (
-              <Card className="bg-slate-800/50 border-gray-700 animate-scale-in">
-                <CardHeader>
-                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
-                    <Building className="h-6 w-6 text-purple-400" />
-                    Property Search Results
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4">
-                    {mockProperties.map((property, index) => (
-                      <div key={index} className="bg-slate-700/50 rounded-lg p-4 border border-purple-500/20">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-semibold text-white">{property.address}</h4>
-                          <div className="text-right">
-                            <div className="text-lg font-bold text-purple-400">${property.rent}/mo</div>
-                            <div className="text-sm text-gray-400">Market Rate</div>
-                          </div>
-                        </div>
-                        <div className="flex gap-4 text-sm text-gray-300">
-                          <span>{property.bedrooms} bed</span>
-                          <span>{property.bathrooms} bath</span>
-                          <span>{property.sqft} sqft</span>
-                        </div>
-                        <div className="mt-3 flex justify-between items-center">
-                          <div className="text-sm text-green-400">✓ Arbitrage Potential</div>
-                          <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
-                            Analyze Deal
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Email Campaign (Steps 5-6) */}
-            {(currentStep === 5 || currentStep === 6) && (
-              <Card className="bg-slate-800/50 border-gray-700 animate-slide-in-right">
-                <CardHeader>
-                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
-                    <Mail className="h-6 w-6 text-purple-400" />
-                    AI Email Campaign
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="bg-slate-700/50 rounded-lg p-4 mb-4 border border-purple-500/20">
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-sm text-gray-400">To: landlord@property.com</span>
-                      <span className="text-xs text-green-400">✓ Sent</span>
-                    </div>
-                    <p className="text-sm font-medium text-white mb-2">Subject: Partnership Opportunity - Short-Term Rental Management</p>
-                    <p className="text-xs text-gray-300 leading-relaxed">
-                      Hi [Landlord Name], I hope this email finds you well. I'm reaching out regarding your property at [Property Address]. I specialize in rental arbitrage and would love to discuss a partnership opportunity that could increase your monthly income by 40-60% while providing you with a guaranteed monthly payment...
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 text-center">
-                    <div className="bg-slate-700/30 rounded-lg p-3">
-                      <div className="text-xl font-bold text-green-400">127</div>
-                      <div className="text-xs text-gray-400">Emails Sent</div>
-                    </div>
-                    <div className="bg-slate-700/30 rounded-lg p-3">
-                      <div className="text-xl font-bold text-cyan-400">23%</div>
-                      <div className="text-xs text-gray-400">Open Rate</div>
-                    </div>
-                    <div className="bg-slate-700/30 rounded-lg p-3">
-                      <div className="text-xl font-bold text-purple-400">8</div>
-                      <div className="text-xs text-gray-400">Responses</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Deal Calculator (Steps 7-8) */}
-            {(currentStep === 7 || currentStep === 8) && (
-              <Card className="bg-slate-800/50 border-gray-700 animate-scale-in">
-                <CardHeader>
-                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-purple-400 to-green-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
-                    <Calculator className="h-6 w-6 text-purple-400" />
-                    Deal Analysis Calculator
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-cyan-300 mb-3">Revenue Projections</h4>
-                      <div className="bg-slate-700/50 rounded-lg p-4">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-300">Monthly STR Revenue</span>
-                          <span className="text-lg font-bold text-green-400">$3,200</span>
-                        </div>
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-300">Occupancy Rate</span>
-                          <span className="text-sm text-cyan-400">75%</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-300">Average Daily Rate</span>
-                          <span className="text-sm text-purple-400">$142</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-purple-300 mb-3">Expense Breakdown</h4>
-                      <div className="bg-slate-700/50 rounded-lg p-4">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-300">Rent to Landlord</span>
-                          <span className="text-lg font-bold text-red-300">$2,200</span>
-                        </div>
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-300">Utilities & Cleaning</span>
-                          <span className="text-sm text-red-300">$450</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-300">Platform Fees</span>
-                          <span className="text-sm text-red-300">$210</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-6 bg-gradient-to-r from-green-500/20 to-cyan-500/20 rounded-lg p-6 border border-green-500/30">
-                    <div className="text-center">
-                      <div className="text-3xl font-bold text-green-400 mb-2">$2,340</div>
-                      <div className="text-lg text-gray-300 mb-1">Monthly Net Profit</div>
-                      <div className="text-2xl font-bold text-cyan-400">420% ROI</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Acquisitions CRM Demo (Steps 4-11) */}
+            {currentStep >= 4 && currentStep <= 11 && (
+              <AcquisitionsCRMDemo currentStep={currentStep} isRunning={demoRunning} />
             )}
 
             {/* Property Management Steps (12-16) */}
