@@ -373,11 +373,15 @@ const Test4 = () => {
                         sideOffset={20}
                         style={{ position: 'fixed' }}
                       >
-                        <div className="rounded-lg overflow-hidden shadow-2xl">
+                        <div className="rounded-lg overflow-hidden shadow-2xl relative">
                           <img 
                             src={testimonial.earningsImage} 
                             alt={`${testimonial.name}'s earnings screenshot`}
                             className="w-full h-auto object-cover"
+                            style={{ 
+                              clipPath: 'inset(0 0 15% 0)',
+                              objectPosition: 'top'
+                            }}
                           />
                         </div>
                       </HoverCardContent>
