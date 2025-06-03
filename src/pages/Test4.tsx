@@ -231,7 +231,7 @@ const Test4 = () => {
                 </Card>
               </div>
 
-              {/* Feature 2: Acquisition CRM & Calculator */}
+              {/* Feature 2: Acquisition CRM */}
               <div className="group relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105">
@@ -242,7 +242,7 @@ const Test4 = () => {
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
-                    <CardTitle className="text-xl font-bold text-purple-300">Acquisition CRM & Calculator</CardTitle>
+                    <CardTitle className="text-xl font-bold text-purple-300">Acquisition CRM</CardTitle>
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-gray-300 text-sm leading-relaxed">
