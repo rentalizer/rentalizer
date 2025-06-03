@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar } from 'lucide-react';
+import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar, Star } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +19,39 @@ const Test4 = () => {
       });
     }
   };
+
+  const testimonials = [
+    {
+      name: "Bishoi Mikhail",
+      text: "Rentalizer has everything that you need in one program to get you set up and to be able to have a successful Airbnb business. Rentalizer helped me acquire 3 properties within 1 month of starting the program, each with only $200 deposits and 8 weeks free rent.",
+      avatar: "/lovable-uploads/5eeba32a-ec11-45dd-9658-aa22f387c552.png"
+    },
+    {
+      name: "Bobby Han",
+      text: "If you are thinking about getting into the short term rental business, Rentalizer's blueprint and all the templates available is definitely something that gives more confidence moving forward. If you have any question whether to join Rentalizer's program, I think you'll find it very beneficial.",
+      avatar: "/lovable-uploads/8d3cb97f-6ec1-444e-9e13-776f5fb850e5.png"
+    },
+    {
+      name: "Shante Davis",
+      text: "Rentalizer's program is amazing. Rentalizer helped us close the largest apartment company in our area. We now have 6 properties. I recommend the mentorship. You won't be disappointed.",
+      avatar: "/lovable-uploads/f475d8b4-915e-4c34-b435-fe9e431107e3.png"
+    },
+    {
+      name: "Maria Sallie Forte-Charette",
+      text: "Thank you so much Rentalizer for sharing your knowledge and always promptly answering any questions, which helped me to close three new properties! I learned so much from our training and coaching.",
+      avatar: "/lovable-uploads/9fc38f6b-2643-4f7f-baec-26d3527ffeae.png"
+    },
+    {
+      name: "Elena Ashley",
+      text: "Rentalizer's program has meant the difference in my business from just being a hobby to moving it into an actual business.",
+      avatar: "/lovable-uploads/8f8edc04-6698-4212-8d0d-49e6b8c81e58.png"
+    },
+    {
+      name: "Liz Garcia",
+      text: "I just closed my first deal, thanks to Rentalizer's program!",
+      avatar: "/lovable-uploads/551496ee-3322-4eef-bc59-fad0dc27bfb3.png"
+    }
+  ];
 
   useEffect(() => {
     // Load Calendly script
@@ -273,6 +306,53 @@ const Test4 = () => {
             <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
               RENTALIZER.AI Combines AI POWERED Market Analysis, Deal Sourcing, And Automation Tools With A Built-In CRM And A Thriving Community—Everything You Need To Launch And Scale Your Rental Arbitrage Business.
             </p>
+          </div>
+
+          {/* Testimonials Section */}
+          <div className="max-w-7xl mx-auto mb-20">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+                What Our Community Says
+              </h2>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                Real success stories from rental arbitrage entrepreneurs using Rentalizer
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {testimonials.map((testimonial, index) => (
+                <div key={index} className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                  <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105">
+                    <CardContent className="p-6">
+                      {/* Quote Icon */}
+                      <div className="flex justify-center mb-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center">
+                          <span className="text-white text-2xl font-bold">"</span>
+                        </div>
+                      </div>
+
+                      {/* Testimonial Text */}
+                      <p className="text-gray-300 text-sm leading-relaxed mb-6 text-center italic">
+                        "{testimonial.text}"
+                      </p>
+
+                      {/* Stars */}
+                      <div className="flex justify-center gap-1 mb-4">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="h-4 w-4 fill-red-500 text-red-500" />
+                        ))}
+                      </div>
+
+                      {/* Author */}
+                      <div className="text-center">
+                        <h4 className="text-white font-semibold text-lg">{testimonial.name}</h4>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
