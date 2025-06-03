@@ -45,8 +45,7 @@ const MarketAnalysis = () => {
     
     const possibleAirdnaKeys = [
       'airdna_api_key',
-      'professional_data_key',
-      'mashvisor_api_key'
+      'professional_data_key'
     ];
     
     const possibleOpenaiKeys = [

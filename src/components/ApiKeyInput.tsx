@@ -12,8 +12,6 @@ interface ApiKeyInputProps {
 }
 
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
-  const [airbnbKey, setAirbnbKey] = useState('');
-  const [mashvisorKey, setMashvisorKey] = useState('');
   const [airdnaKey, setAirdnaKey] = useState('');
   const [openaiKey, setOpenaiKey] = useState('');
   const [showKeys, setShowKeys] = useState(false);
@@ -23,8 +21,6 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
   const handleSaveKeys = () => {
     // Store in localStorage for session persistence
-    if (airbnbKey) localStorage.setItem('airbnb_api_key', airbnbKey);
-    if (mashvisorKey) localStorage.setItem('mashvisor_api_key', mashvisorKey);
     if (airdnaKey) localStorage.setItem('airdna_api_key', airdnaKey);
     if (openaiKey) localStorage.setItem('openai_api_key', openaiKey);
     
@@ -61,8 +57,6 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     const apiKeys = {
       'openai_api_key': localStorage.getItem('openai_api_key') || 'NOT FOUND',
       'airdna_api_key': localStorage.getItem('airdna_api_key') || 'NOT FOUND', 
-      'mashvisor_api_key': localStorage.getItem('mashvisor_api_key') || 'NOT FOUND',
-      'airbnb_api_key': localStorage.getItem('airbnb_api_key') || 'NOT FOUND',
       'professional_data_key': localStorage.getItem('professional_data_key') || 'NOT FOUND'
     };
     
@@ -97,13 +91,9 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
   // Load keys from localStorage on component mount
   React.useEffect(() => {
-    const savedAirbnbKey = localStorage.getItem('airbnb_api_key') || '';
-    const savedMashvisorKey = localStorage.getItem('mashvisor_api_key') || '';
     const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
     
-    setAirbnbKey(savedAirbnbKey);
-    setMashvisorKey(savedMashvisorKey);
     setAirdnaKey(savedAirDNAKey);
     setOpenaiKey(savedOpenaiKey);
     
@@ -172,41 +162,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           {/* Professional Data Keys Section */}
           <div>
             <h3 className="text-lg font-semibold text-gray-200 mb-4">Professional Data Keys</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="airbnb-key" className="text-sm font-medium text-gray-300">
-                  Airbnb API Key
-                </Label>
-                <Input
-                  id="airbnb-key"
-                  type={showKeys ? "text" : "password"}
-                  value={airbnbKey}
-                  onChange={(e) => setAirbnbKey(e.target.value)}
-                  placeholder="Enter Airbnb API key..."
-                  className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
-                />
-                <p className="text-xs text-gray-400 mt-1">
-                  Direct Airbnb listing data
-                </p>
-              </div>
-
-              <div>
-                <Label htmlFor="mashvisor-key" className="text-sm font-medium text-gray-300">
-                  Mashvisor API Key {mashvisorKey ? '✅' : '❌'}
-                </Label>
-                <Input
-                  id="mashvisor-key"
-                  type={showKeys ? "text" : "password"}
-                  value={mashvisorKey}
-                  onChange={(e) => setMashvisorKey(e.target.value)}
-                  placeholder="Enter Mashvisor API key..."
-                  className={`mt-1 ${mashvisorKey ? 'border-green-500/30' : 'border-red-500/30'} bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500`}
-                />
-                <p className={`text-xs mt-1 ${mashvisorKey ? 'text-green-400' : 'text-red-400'}`}>
-                  {mashvisorKey ? '✅ Investment analysis data' : '❌ Required for investment analysis'}
-                </p>
-              </div>
-
+            <div className="grid grid-cols-1 gap-4">
               <div>
                 <Label htmlFor="airdna-key" className="text-sm font-medium text-gray-300">
                   AirDNA API Key {airdnaKey ? '✅' : '❌'}
