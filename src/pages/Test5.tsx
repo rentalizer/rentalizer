@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { MapView } from '@/components/MapView';
 import { 
   Play, 
   Pause, 
@@ -13,7 +14,8 @@ import {
   TrendingUp,
   Search,
   CheckCircle,
-  Zap
+  Zap,
+  Map
 } from 'lucide-react';
 
 const Test5 = () => {
@@ -48,9 +50,9 @@ const Test5 = () => {
       content: "See detailed revenue-to-rent ratios for each submarket, identifying the most profitable opportunities."
     },
     {
-      title: "Interactive Map & Table",
-      description: "Visual analysis tools",
-      content: "Explore results through both detailed tables and interactive heat maps for comprehensive market understanding."
+      title: "Interactive Map View",
+      description: "Visual heat map analysis",
+      content: "Explore results through our interactive heat map showing revenue potential across all neighborhoods."
     },
     {
       title: "Export & Action",
@@ -60,10 +62,12 @@ const Test5 = () => {
   ];
 
   const mockResults = [
-    { submarket: "Little Italy", revenue: 4200, rent: 2800, multiple: 1.5 },
-    { submarket: "Gaslamp Quarter", revenue: 4800, rent: 3200, multiple: 1.5 },
-    { submarket: "Hillcrest", revenue: 3900, rent: 2600, multiple: 1.5 },
-    { submarket: "Mission Valley", revenue: 3600, rent: 2400, multiple: 1.5 }
+    { submarket: "Little Italy", strRevenue: 5200, medianRent: 2800, multiple: 1.86 },
+    { submarket: "Gaslamp Quarter", strRevenue: 5800, medianRent: 3200, multiple: 1.81 },
+    { submarket: "Hillcrest", strRevenue: 4900, medianRent: 2600, multiple: 1.88 },
+    { submarket: "Mission Valley", strRevenue: 4600, medianRent: 2400, multiple: 1.92 },
+    { submarket: "La Jolla", strRevenue: 7200, medianRent: 4200, multiple: 1.71 },
+    { submarket: "Pacific Beach", strRevenue: 5500, medianRent: 3000, multiple: 1.83 }
   ];
 
   useEffect(() => {
@@ -80,7 +84,7 @@ const Test5 = () => {
               return 100;
             }
           }
-          return prev + 2;
+          return prev + 1.5;
         });
       }, 100);
     }
@@ -105,7 +109,7 @@ const Test5 = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
-      <div className="container mx-auto max-w-6xl">
+      <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -168,7 +172,7 @@ const Test5 = () => {
         </div>
 
         {/* Main Demo Area */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Left: Current Step */}
           <Card className="bg-gray-900/80 border-cyan-500/20 backdrop-blur-sm">
             <CardHeader>
@@ -212,6 +216,18 @@ const Test5 = () => {
                   </div>
                 </div>
               )}
+
+              {currentStep === 5 && (
+                <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
+                  <div className="flex items-center gap-2 text-purple-300 mb-2">
+                    <Map className="h-4 w-4" />
+                    <span className="font-semibold">Interactive Heat Map</span>
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    Click on any neighborhood circle to see detailed revenue data and investment potential.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -231,7 +247,7 @@ const Test5 = () => {
                     <Badge className="bg-green-600">2BR/2BA</Badge>
                   </div>
                   
-                  {mockResults.map((result, index) => (
+                  {mockResults.slice(0, currentStep >= 5 ? 6 : 4).map((result, index) => (
                     <div key={index} className="p-3 bg-slate-800/50 rounded-lg">
                       <div className="flex items-center justify-between">
                         <div>
@@ -239,13 +255,13 @@ const Test5 = () => {
                           <div className="text-sm text-gray-400 flex items-center gap-4">
                             <span className="flex items-center gap-1">
                               <DollarSign className="h-3 w-3 text-green-400" />
-                              ${result.revenue.toLocaleString()} STR
+                              ${result.strRevenue.toLocaleString()} STR
                             </span>
-                            <span>${result.rent.toLocaleString()} rent</span>
+                            <span>${result.medianRent.toLocaleString()} rent</span>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-lg font-bold text-cyan-400">{result.multiple}x</div>
+                          <div className="text-lg font-bold text-cyan-400">{result.multiple.toFixed(2)}x</div>
                           <div className="text-xs text-gray-400">multiple</div>
                         </div>
                       </div>
@@ -270,8 +286,39 @@ const Test5 = () => {
           </Card>
         </div>
 
+        {/* Interactive Map View - Shows during step 5 and beyond */}
+        {currentStep >= 5 && (
+          <Card className="bg-gray-900/80 border-cyan-500/20 backdrop-blur-sm mb-8">
+            <CardHeader>
+              <CardTitle className="text-cyan-300 flex items-center gap-2">
+                <Map className="h-5 w-5" />
+                Interactive Market Heat Map
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4">
+                <p className="text-gray-400 text-sm mb-2">
+                  Click on any neighborhood marker to see detailed investment metrics
+                </p>
+                <div className="flex gap-2 mb-4">
+                  <Badge variant="outline" className="bg-gray-800/50 border-green-500/30 text-green-300">
+                    High Potential (1.8x+)
+                  </Badge>
+                  <Badge variant="outline" className="bg-gray-800/50 border-blue-500/30 text-blue-300">
+                    Good Potential (1.6x+)
+                  </Badge>
+                  <Badge variant="outline" className="bg-gray-800/50 border-yellow-500/30 text-yellow-300">
+                    Moderate Potential (1.4x+)
+                  </Badge>
+                </div>
+              </div>
+              <MapView results={mockResults} city="San Diego" />
+            </CardContent>
+          </Card>
+        )}
+
         {/* Benefits Section */}
-        <Card className="mt-8 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-500/20">
+        <Card className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-500/20">
           <CardContent className="p-8">
             <h3 className="text-2xl font-bold text-white mb-6 text-center">
               Why Market Intelligence Gives You The Edge
@@ -288,8 +335,8 @@ const Test5 = () => {
                 <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-12 h-12 mx-auto mb-4 flex items-center justify-center">
                   <TrendingUp className="h-6 w-6 text-white" />
                 </div>
-                <h4 className="font-semibold text-white mb-2">Profit Analysis</h4>
-                <p className="text-gray-300 text-sm">Instant revenue-to-rent ratios for every neighborhood</p>
+                <h4 className="font-semibold text-white mb-2">Visual Analysis</h4>
+                <p className="text-gray-300 text-sm">Interactive heat maps show profit potential at a glance</p>
               </div>
               <div className="text-center">
                 <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-12 h-12 mx-auto mb-4 flex items-center justify-center">
