@@ -24,18 +24,31 @@ import {
 } from 'lucide-react';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
+import { MapView } from '@/components/MapView';
 
 const Test5 = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [progress, setProgress] = useState(0);
   const [demoRunning, setDemoRunning] = useState(false);
 
+  // Mock data for map demo
+  const mockMarketData = [
+    { submarket: "Downtown", strRevenue: 45000, medianRent: 2200, multiple: 3.41 },
+    { submarket: "Midtown", strRevenue: 38000, medianRent: 1900, multiple: 3.33 },
+    { submarket: "Riverside", strRevenue: 41000, medianRent: 2100, multiple: 3.25 },
+    { submarket: "Tech District", strRevenue: 52000, medianRent: 2400, multiple: 3.61 },
+    { submarket: "Arts Quarter", strRevenue: 35000, medianRent: 1700, multiple: 3.43 },
+    { submarket: "University Area", strRevenue: 33000, medianRent: 1600, multiple: 3.44 },
+    { submarket: "Historic Center", strRevenue: 39000, medianRent: 1850, multiple: 3.51 },
+    { submarket: "Business Park", strRevenue: 44000, medianRent: 2050, multiple: 3.58 }
+  ];
+
   useEffect(() => {
     if (demoRunning) {
       const timer = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 100) {
-            return 0; // Reset progress
+            return 0;
           }
           return prev + 2;
         });
@@ -50,7 +63,7 @@ const Test5 = () => {
       const stepTimer = setInterval(() => {
         setCurrentStep((prev) => {
           if (prev >= 17) {
-            return 1; // Reset to beginning
+            return 1;
           }
           return prev + 1;
         });
@@ -222,6 +235,22 @@ const Test5 = () => {
             </div>
           )}
         </div>
+
+        {/* Interactive Map Demo - Show when demo is running and in market analysis steps */}
+        {demoRunning && currentStep >= 1 && currentStep <= 3 && (
+          <div className="mb-12">
+            <Card className="bg-slate-800/50 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-center text-2xl bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                  Live Market Analysis - Austin, TX
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <MapView results={mockMarketData} city="Austin, TX" />
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Feature Categories */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
