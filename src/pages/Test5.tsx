@@ -24,7 +24,8 @@ import {
   MessageCircle,
   Calendar,
   Home,
-  Settings
+  Settings,
+  Calculator
 } from 'lucide-react';
 
 const Test5 = () => {
@@ -107,6 +108,18 @@ const Test5 = () => {
       content: "Monitor email open rates, responses, and schedule automatic follow-ups to maximize your conversion rate.",
       category: "crm"
     },
+    {
+      title: "Deal Analysis",
+      description: "Calculator integration for deal evaluation",
+      content: "Use our integrated calculator to analyze each property's profitability before making an offer to landlords.",
+      category: "crm"
+    },
+    {
+      title: "Financial Projections",
+      description: "Complete ROI and cash flow analysis",
+      content: "Generate detailed financial projections including cash-to-launch, monthly profit, and cash-on-cash returns.",
+      category: "crm"
+    },
     // PMS Steps
     {
       title: "PMS Overview",
@@ -162,6 +175,18 @@ const Test5 = () => {
     { property: "Mountain Cabin", platform: "Booking.com", status: "available", guest: null, message: null, unread: false },
     { property: "City Apartment", platform: "Airbnb", status: "maintenance", guest: "Lisa Garcia", message: "Can I check in early?", unread: true }
   ];
+
+  const mockCalculatorData = {
+    address: "123 Main St, Little Italy",
+    rent: 2800,
+    strRevenue: 5200,
+    furnishingsCost: 8500,
+    securityDeposit: 2800,
+    cashToLaunch: 14100,
+    monthlyProfit: 1850,
+    cashOnCashReturn: 15.7,
+    paybackMonths: 7.6
+  };
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -259,7 +284,7 @@ const Test5 = () => {
         </div>
 
         {/* Step Navigation */}
-        <div className="grid grid-cols-17 gap-1 mb-8">
+        <div className="grid grid-cols-19 gap-1 mb-8">
           {steps.map((step, index) => (
             <Button
               key={index}
@@ -289,11 +314,11 @@ const Test5 = () => {
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
-            <span className="text-gray-300 text-sm">Acquisition CRM (Steps 8-12)</span>
+            <span className="text-gray-300 text-sm">Acquisition CRM (Steps 8-14)</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full"></div>
-            <span className="text-gray-300 text-sm">PMS (Steps 13-17)</span>
+            <span className="text-gray-300 text-sm">PMS (Steps 15-19)</span>
           </div>
         </div>
 
@@ -389,7 +414,36 @@ const Test5 = () => {
                 </div>
               )}
 
+              {currentStep === 12 && (
+                <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
+                  <div className="flex items-center gap-2 text-purple-300 mb-2">
+                    <Calculator className="h-4 w-4" />
+                    <span className="font-semibold">Calculator Integration</span>
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    Analyze each property's financial potential before reaching out to landlords.
+                  </p>
+                </div>
+              )}
+
               {currentStep === 13 && (
+                <div className="mt-6 space-y-2">
+                  <div className="flex items-center gap-2 text-green-400">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Revenue projections calculated</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-green-400">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>ROI analysis complete</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-green-400">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Cash flow projections ready</span>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 15 && (
                 <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
                   <div className="flex items-center gap-2 text-green-300 mb-2">
                     <Home className="h-4 w-4" />
@@ -403,7 +457,7 @@ const Test5 = () => {
                 </div>
               )}
 
-              {currentStep === 14 && (
+              {currentStep === 16 && (
                 <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
                   <div className="text-green-300 mb-2 font-semibold">Unread Messages: 2</div>
                   <div className="text-gray-300 text-sm">
@@ -412,7 +466,7 @@ const Test5 = () => {
                 </div>
               )}
 
-              {currentStep === 15 && (
+              {currentStep === 17 && (
                 <div className="mt-6 space-y-2">
                   <div className="flex items-center gap-2 text-green-400">
                     <CheckCircle className="h-4 w-4" />
@@ -429,7 +483,7 @@ const Test5 = () => {
                 </div>
               )}
 
-              {currentStep === 16 && (
+              {currentStep === 18 && (
                 <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
                   <div className="flex items-center gap-2 text-green-300 mb-2">
                     <Calendar className="h-4 w-4" />
@@ -459,14 +513,14 @@ const Test5 = () => {
             <CardContent>
               {isMarketIntelligence ? (
                 <>
-                  {currentStep >= 4 ? (
+                  {currentStep >= 3 ? (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-white font-semibold">San Diego Market Analysis</h3>
                         <Badge className="bg-green-600">2BR/2BA</Badge>
                       </div>
                       
-                      {mockResults.slice(0, currentStep >= 5 ? 6 : 4).map((result, index) => (
+                      {mockResults.slice(0, currentStep >= 4 ? 6 : 4).map((result, index) => (
                         <div key={index} className="p-3 bg-slate-800/50 rounded-lg">
                           <div className="flex items-center justify-between">
                             <div>
@@ -496,9 +550,36 @@ const Test5 = () => {
                       )}
                     </div>
                   ) : (
-                    <div className="text-center py-12 text-gray-500">
-                      <BarChart3 className="h-16 w-16 mx-auto mb-4 opacity-30" />
-                      <p>Results will appear after analysis starts...</p>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-white font-semibold">San Diego Market Analysis</h3>
+                        <Badge className="bg-blue-600">Analyzing...</Badge>
+                      </div>
+                      
+                      <div className="p-3 bg-slate-800/30 rounded-lg animate-pulse">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-2">
+                            <div className="h-4 bg-gray-600 rounded w-24"></div>
+                            <div className="h-3 bg-gray-700 rounded w-32"></div>
+                          </div>
+                          <div className="h-6 bg-gray-600 rounded w-12"></div>
+                        </div>
+                      </div>
+                      
+                      <div className="p-3 bg-slate-800/30 rounded-lg animate-pulse">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-2">
+                            <div className="h-4 bg-gray-600 rounded w-28"></div>
+                            <div className="h-3 bg-gray-700 rounded w-36"></div>
+                          </div>
+                          <div className="h-6 bg-gray-600 rounded w-12"></div>
+                        </div>
+                      </div>
+                      
+                      <div className="text-center py-4 text-gray-500">
+                        <BarChart3 className="h-8 w-8 mx-auto mb-2 opacity-30 animate-pulse" />
+                        <p className="text-sm">Analyzing market data...</p>
+                      </div>
                     </div>
                   )}
                 </>
@@ -506,62 +587,119 @@ const Test5 = () => {
                 <>
                   {currentStep >= 8 ? (
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-white font-semibold">Property Outreach Campaign</h3>
-                        <Badge className="bg-purple-600">Little Italy</Badge>
-                      </div>
-                      
-                      {mockProperties.slice(0, Math.min(currentStep - 7, 4)).map((property, index) => (
-                        <div key={index} className="p-3 bg-slate-800/50 rounded-lg">
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="font-medium text-white">{property.address}</div>
-                            <Badge className={
-                              property.status === 'contacted' ? 'bg-blue-600' :
-                              property.status === 'responded' ? 'bg-yellow-600' :
-                              property.status === 'interested' ? 'bg-green-600' :
-                              'bg-purple-600'
-                            }>
-                              {property.status}
-                            </Badge>
+                      {currentStep <= 11 ? (
+                        <>
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-white font-semibold">Property Outreach Campaign</h3>
+                            <Badge className="bg-purple-600">Little Italy</Badge>
                           </div>
-                          <div className="text-sm text-gray-400 space-y-1">
-                            <div className="flex items-center gap-2">
-                              <User className="h-3 w-3" />
-                              <span>{property.landlord}</span>
+                          
+                          {mockProperties.slice(0, Math.min(currentStep - 7, 4)).map((property, index) => (
+                            <div key={index} className="p-3 bg-slate-800/50 rounded-lg">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="font-medium text-white">{property.address}</div>
+                                <Badge className={
+                                  property.status === 'contacted' ? 'bg-blue-600' :
+                                  property.status === 'responded' ? 'bg-yellow-600' :
+                                  property.status === 'interested' ? 'bg-green-600' :
+                                  'bg-purple-600'
+                                }>
+                                  {property.status}
+                                </Badge>
+                              </div>
+                              <div className="text-sm text-gray-400 space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <User className="h-3 w-3" />
+                                  <span>{property.landlord}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Mail className="h-3 w-3" />
+                                  <span>{property.email}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <DollarSign className="h-3 w-3 text-green-400" />
+                                  <span>${property.rent.toLocaleString()}/month</span>
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Mail className="h-3 w-3" />
-                              <span>{property.email}</span>
+                          ))}
+                          
+                          {currentStep >= 11 && (
+                            <div className="mt-6 pt-4 border-t border-gray-700">
+                              <div className="grid grid-cols-3 gap-4 mb-4">
+                                <div className="text-center">
+                                  <div className="text-2xl font-bold text-green-400">75%</div>
+                                  <div className="text-xs text-gray-400">Open Rate</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-2xl font-bold text-blue-400">25%</div>
+                                  <div className="text-xs text-gray-400">Response Rate</div>
+                                </div>
+                                <div className="text-center">
+                                  <div className="text-2xl font-bold text-purple-400">3</div>
+                                  <div className="text-xs text-gray-400">Interested</div>
+                                </div>
+                              </div>
+                              <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500">
+                                <Send className="h-4 w-4 mr-2" />
+                                Send Follow-up Campaign
+                              </Button>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <DollarSign className="h-3 w-3 text-green-400" />
-                              <span>${property.rent.toLocaleString()}/month</span>
-                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {/* Deal Analysis View for steps 12-13 */}
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-white font-semibold">Deal Analysis</h3>
+                            <Badge className="bg-cyan-600">Calculator</Badge>
                           </div>
-                        </div>
-                      ))}
-                      
-                      {currentStep >= 11 && (
-                        <div className="mt-6 pt-4 border-t border-gray-700">
-                          <div className="grid grid-cols-3 gap-4 mb-4">
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-green-400">75%</div>
-                              <div className="text-xs text-gray-400">Open Rate</div>
+                          
+                          <div className="p-4 bg-slate-800/50 rounded-lg border border-cyan-500/20">
+                            <div className="flex items-center gap-2 mb-3">
+                              <Calculator className="h-4 w-4 text-cyan-400" />
+                              <span className="font-medium text-white">{mockCalculatorData.address}</span>
                             </div>
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-blue-400">25%</div>
-                              <div className="text-xs text-gray-400">Response Rate</div>
+                            
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <div className="text-gray-400">Monthly Rent</div>
+                                <div className="text-white font-semibold">${mockCalculatorData.rent.toLocaleString()}</div>
+                              </div>
+                              <div>
+                                <div className="text-gray-400">STR Revenue</div>
+                                <div className="text-green-400 font-semibold">${mockCalculatorData.strRevenue.toLocaleString()}</div>
+                              </div>
+                              <div>
+                                <div className="text-gray-400">Cash to Launch</div>
+                                <div className="text-yellow-400 font-semibold">${mockCalculatorData.cashToLaunch.toLocaleString()}</div>
+                              </div>
+                              <div>
+                                <div className="text-gray-400">Monthly Profit</div>
+                                <div className="text-green-400 font-semibold">${mockCalculatorData.monthlyProfit.toLocaleString()}</div>
+                              </div>
                             </div>
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-purple-400">3</div>
-                              <div className="text-xs text-gray-400">Interested</div>
-                            </div>
+                            
+                            {currentStep >= 13 && (
+                              <div className="mt-4 pt-4 border-t border-gray-700">
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                  <div>
+                                    <div className="text-gray-400">Cash-on-Cash ROI</div>
+                                    <div className="text-cyan-400 font-bold text-lg">{mockCalculatorData.cashOnCashReturn}%</div>
+                                  </div>
+                                  <div>
+                                    <div className="text-gray-400">Payback Period</div>
+                                    <div className="text-purple-400 font-bold text-lg">{mockCalculatorData.paybackMonths} months</div>
+                                  </div>
+                                </div>
+                                <Button className="w-full mt-4 bg-gradient-to-r from-green-600 to-cyan-600 hover:from-green-500 hover:to-cyan-500">
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Approve Deal & Contact Landlord
+                                </Button>
+                              </div>
+                            )}
                           </div>
-                          <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500">
-                            <Send className="h-4 w-4 mr-2" />
-                            Send Follow-up Campaign
-                          </Button>
-                        </div>
+                        </>
                       )}
                     </div>
                   ) : (
@@ -573,14 +711,14 @@ const Test5 = () => {
                 </>
               ) : (
                 <>
-                  {currentStep >= 12 ? (
+                  {currentStep >= 14 ? (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-white font-semibold">Property Management Dashboard</h3>
                         <Badge className="bg-green-600">4 Properties</Badge>
                       </div>
                       
-                      {mockPMSData.slice(0, Math.min(currentStep - 11, 4)).map((property, index) => (
+                      {mockPMSData.slice(0, Math.min(currentStep - 13, 4)).map((property, index) => (
                         <div key={index} className="p-3 bg-slate-800/50 rounded-lg">
                           <div className="flex items-center justify-between mb-2">
                             <div className="font-medium text-white">{property.property}</div>
@@ -619,7 +757,7 @@ const Test5 = () => {
                         </div>
                       ))}
                       
-                      {currentStep >= 15 && (
+                      {currentStep >= 17 && (
                         <div className="mt-6 pt-4 border-t border-gray-700">
                           <div className="grid grid-cols-2 gap-4 mb-4">
                             <div className="text-center">
