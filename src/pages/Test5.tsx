@@ -27,6 +27,7 @@ import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { MapView } from '@/components/MapView';
 import { AcquisitionsCRMDemo } from '@/components/AcquisitionsCRMDemo';
+import { PMSDemo } from '@/components/PMSDemo';
 
 const Test5 = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -118,7 +119,7 @@ const Test5 = () => {
         case "acquisition":
           return "bg-purple-500";
         case "pms":
-          return "bg-green-500";
+          return "bg-blue-500";
         case "community":
           return "bg-orange-500";
         default:
@@ -136,7 +137,7 @@ const Test5 = () => {
         case "acquisition":
           return "ring-2 ring-purple-400 ring-offset-2 ring-offset-slate-900";
         case "pms":
-          return "ring-2 ring-green-400 ring-offset-2 ring-offset-slate-900";
+          return "ring-2 ring-blue-400 ring-offset-2 ring-offset-slate-900";
         case "community":
           return "ring-2 ring-orange-400 ring-offset-2 ring-offset-slate-900";
         default:
@@ -152,7 +153,7 @@ const Test5 = () => {
       
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-green-400 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-4">
             Live Demo: Complete Rental Arbitrage Workflow
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
@@ -212,7 +213,7 @@ const Test5 = () => {
                     className: `h-12 w-12 ${
                       steps[currentStep - 1]?.category === 'market' ? 'text-cyan-400' :
                       steps[currentStep - 1]?.category === 'acquisition' ? 'text-purple-400' :
-                      steps[currentStep - 1]?.category === 'pms' ? 'text-green-400' :
+                      steps[currentStep - 1]?.category === 'pms' ? 'text-blue-400' :
                       'text-orange-400'
                     }`
                   })}
@@ -227,7 +228,7 @@ const Test5 = () => {
                   <div className={`inline-block px-4 py-2 rounded-full text-sm font-medium ${
                     steps[currentStep - 1]?.category === 'market' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' :
                     steps[currentStep - 1]?.category === 'acquisition' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
-                    steps[currentStep - 1]?.category === 'pms' ? 'bg-green-500/20 text-green-300 border border-green-500/30' :
+                    steps[currentStep - 1]?.category === 'pms' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
                     'bg-orange-500/20 text-orange-300 border border-orange-500/30'
                   }`}>
                     {steps[currentStep - 1]?.category === 'market' ? 'Market Intelligence' :
@@ -265,50 +266,7 @@ const Test5 = () => {
 
             {/* Property Management Steps (12-16) */}
             {currentStep >= 12 && currentStep <= 16 && (
-              <Card className="bg-slate-800/50 border-gray-700 animate-fade-in">
-                <CardHeader>
-                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
-                    <Home className="h-6 w-6 text-green-400" />
-                    Property Management Dashboard
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-3 gap-6 mb-6">
-                    <div className="bg-slate-700/50 rounded-lg p-4 border border-green-500/20 text-center">
-                      <Calendar className="h-8 w-8 text-green-400 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-white">85%</div>
-                      <div className="text-sm text-gray-400">Occupancy Rate</div>
-                    </div>
-                    <div className="bg-slate-700/50 rounded-lg p-4 border border-cyan-500/20 text-center">
-                      <DollarSign className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-white">$2,890</div>
-                      <div className="text-sm text-gray-400">Monthly Revenue</div>
-                    </div>
-                    <div className="bg-slate-700/50 rounded-lg p-4 border border-purple-500/20 text-center">
-                      <Star className="h-8 w-8 text-purple-400 mx-auto mb-2" />
-                      <div className="text-2xl font-bold text-white">4.8</div>
-                      <div className="text-sm text-gray-400">Guest Rating</div>
-                    </div>
-                  </div>
-                  <div className="bg-slate-700/30 rounded-lg p-4">
-                    <h4 className="font-semibold text-green-300 mb-3">Recent Activity</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-300">✓ New booking confirmed</span>
-                        <span className="text-gray-400">2 min ago</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-300">📧 Check-in instructions sent</span>
-                        <span className="text-gray-400">15 min ago</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-300">🧹 Cleaning scheduled</span>
-                        <span className="text-gray-400">1 hr ago</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <PMSDemo currentStep={currentStep} isRunning={demoRunning} />
             )}
           </div>
         )}

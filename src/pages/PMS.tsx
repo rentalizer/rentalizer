@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
 import { 
   Calendar,
   MessageCircle,
@@ -19,21 +19,149 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  Star
+  Star,
+  Filter,
+  Search,
+  BarChart3,
+  DollarSign,
+  TrendingUp,
+  Eye,
+  Download,
+  RefreshCw
 } from 'lucide-react';
 
 const PMS = () => {
   const [selectedProperty, setSelectedProperty] = useState('all');
   const [selectedMessage, setSelectedMessage] = useState(null);
 
-  // Mock data
+  // Enhanced mock data with more properties and details
   const properties = [
-    { id: 1, name: "Downtown Loft", platform: "Airbnb", status: "occupied", guests: 2, checkIn: "2024-06-01", checkOut: "2024-06-05" },
-    { id: 2, name: "Beach House", platform: "VRBO", status: "cleaning", guests: 0, checkIn: "2024-06-06", checkOut: "2024-06-10" },
-    { id: 3, name: "Mountain Cabin", platform: "Booking.com", status: "available", guests: 0, checkIn: null, checkOut: null },
-    { id: 4, name: "City Apartment", platform: "Airbnb", status: "maintenance", guests: 0, checkIn: "2024-06-08", checkOut: "2024-06-12" }
+    { 
+      id: 1, 
+      name: "Downtown Loft", 
+      platform: "Airbnb", 
+      status: "occupied", 
+      guests: 2, 
+      checkIn: "2024-06-01", 
+      checkOut: "2024-06-05",
+      revenue: 3200,
+      rating: 4.9,
+      bookings: 23,
+      occupancy: 85
+    },
+    { 
+      id: 2, 
+      name: "Beach House", 
+      platform: "VRBO", 
+      status: "cleaning", 
+      guests: 0, 
+      checkIn: "2024-06-06", 
+      checkOut: "2024-06-10",
+      revenue: 4100,
+      rating: 4.8,
+      bookings: 18,
+      occupancy: 78
+    },
+    { 
+      id: 3, 
+      name: "Mountain Cabin", 
+      platform: "Booking.com", 
+      status: "available", 
+      guests: 0, 
+      checkIn: null, 
+      checkOut: null,
+      revenue: 2800,
+      rating: 4.7,
+      bookings: 15,
+      occupancy: 72
+    },
+    { 
+      id: 4, 
+      name: "City Apartment", 
+      platform: "Airbnb", 
+      status: "maintenance", 
+      guests: 0, 
+      checkIn: "2024-06-08", 
+      checkOut: "2024-06-12",
+      revenue: 2900,
+      rating: 4.6,
+      bookings: 20,
+      occupancy: 82
+    },
+    { 
+      id: 5, 
+      name: "Luxury Suite", 
+      platform: "VRBO", 
+      status: "occupied", 
+      guests: 4, 
+      checkIn: "2024-06-03", 
+      checkOut: "2024-06-08",
+      revenue: 5200,
+      rating: 4.9,
+      bookings: 12,
+      occupancy: 90
+    }
   ];
 
+  const enhancedMessages = [
+    { 
+      id: 1, 
+      propertyId: 1, 
+      guest: "John Smith", 
+      platform: "Airbnb", 
+      message: "Hi! What time is check-in? Also, is there parking available?", 
+      time: "10:30 AM", 
+      unread: true,
+      type: "question",
+      priority: "medium"
+    },
+    { 
+      id: 2, 
+      propertyId: 2, 
+      guest: "Sarah Johnson", 
+      platform: "VRBO", 
+      message: "Thank you for the amazing stay! Everything was perfect.", 
+      time: "Yesterday", 
+      unread: false,
+      type: "review",
+      priority: "low"
+    },
+    { 
+      id: 3, 
+      propertyId: 1, 
+      guest: "Mike Chen", 
+      platform: "Airbnb", 
+      message: "The WiFi password isn't working. Can you help?", 
+      time: "2 hours ago", 
+      unread: true,
+      type: "issue",
+      priority: "high"
+    },
+    { 
+      id: 4, 
+      propertyId: 4, 
+      guest: "Lisa Garcia", 
+      platform: "Booking.com", 
+      message: "Can I check in early? My flight arrived ahead of schedule.", 
+      time: "1 hour ago", 
+      unread: true,
+      type: "request",
+      priority: "medium"
+    },
+    { 
+      id: 5, 
+      propertyId: 5, 
+      guest: "David Wilson", 
+      platform: "VRBO", 
+      message: "Is it possible to extend my stay by one more night?", 
+      time: "30 min ago", 
+      unread: true,
+      type: "request",
+      priority: "medium"
+    }
+  ];
+
+  // Mock data
   const messages = [
     { id: 1, propertyId: 1, guest: "John Smith", platform: "Airbnb", message: "Hi! What time is check-in?", time: "10:30 AM", unread: true },
     { id: 2, propertyId: 2, guest: "Sarah Johnson", platform: "VRBO", message: "Thank you for the stay!", time: "Yesterday", unread: false },
@@ -55,18 +183,29 @@ const PMS = () => {
     { id: 4, trigger: "Check-out Day", delay: "Morning of", message: "Check-out reminder and thank you message." }
   ];
 
-  const calendarEvents = [
-    { date: "2024-06-01", property: "Downtown Loft", type: "checkin", guest: "John Smith" },
-    { date: "2024-06-05", property: "Downtown Loft", type: "checkout", guest: "John Smith" },
-    { date: "2024-06-06", property: "Beach House", type: "checkin", guest: "Sarah Johnson" },
-    { date: "2024-06-08", property: "City Apartment", type: "maintenance", guest: "Cleaning Crew" }
+  const enhancedCalendarEvents = [
+    { date: "2024-06-01", property: "Downtown Loft", type: "checkin", guest: "John Smith", revenue: 280 },
+    { date: "2024-06-05", property: "Downtown Loft", type: "checkout", guest: "John Smith", revenue: 0 },
+    { date: "2024-06-06", property: "Beach House", type: "checkin", guest: "Sarah Johnson", revenue: 350 },
+    { date: "2024-06-08", property: "City Apartment", type: "maintenance", guest: "Cleaning Crew", revenue: -80 },
+    { date: "2024-06-10", property: "Beach House", type: "checkout", guest: "Sarah Johnson", revenue: 0 },
+    { date: "2024-06-12", property: "Mountain Cabin", type: "checkin", guest: "Family Group", revenue: 320 }
   ];
+
+  const analytics = {
+    totalRevenue: 18200,
+    monthlyGrowth: 12.5,
+    averageRating: 4.78,
+    totalBookings: 88,
+    occupancyRate: 81.4,
+    responseTime: "12 min"
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'occupied': return 'bg-green-600';
+      case 'occupied': return 'bg-blue-600';
       case 'cleaning': return 'bg-yellow-600';
-      case 'available': return 'bg-blue-600';
+      case 'available': return 'bg-cyan-600';
       case 'maintenance': return 'bg-red-600';
       default: return 'bg-gray-600';
     }
@@ -81,17 +220,40 @@ const PMS = () => {
     }
   };
 
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case 'high': return 'bg-red-500/20 text-red-300 border-red-500/30';
+      case 'medium': return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30';
+      case 'low': return 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30';
+      default: return 'bg-gray-500/20 text-gray-300 border-gray-500/30';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
       <div className="container mx-auto max-w-7xl">
-        {/* Header */}
+        {/* Enhanced Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-2">
-            Property Management System
-          </h1>
-          <p className="text-gray-300 text-lg">
-            Manage all your short-term rental properties from one unified dashboard
-          </p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-2">
+                Property Management System
+              </h1>
+              <p className="text-gray-300 text-lg">
+                Manage all your short-term rental properties from one unified dashboard
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button className="bg-gradient-to-r from-cyan-600 to-purple-600">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Property
+              </Button>
+              <Button variant="outline" className="border-gray-600">
+                <Download className="h-4 w-4 mr-2" />
+                Export Data
+              </Button>
+            </div>
+          </div>
         </div>
 
         <Tabs defaultValue="dashboard" className="space-y-6">
@@ -122,22 +284,36 @@ const PMS = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Dashboard Tab */}
+          {/* Enhanced Dashboard Tab */}
           <TabsContent value="dashboard" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {/* Analytics Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
               <Card className="bg-gray-900/80 border-cyan-500/20">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-cyan-300 text-sm">Total Properties</CardTitle>
+                  <CardTitle className="text-cyan-300 text-sm">Total Revenue</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-white">{properties.length}</div>
-                  <p className="text-gray-400 text-sm">Across 3 platforms</p>
+                  <div className="text-3xl font-bold text-white">${analytics.totalRevenue.toLocaleString()}</div>
+                  <p className="text-cyan-400 text-sm flex items-center">
+                    <TrendingUp className="h-3 w-3 mr-1" />
+                    +{analytics.monthlyGrowth}% this month
+                  </p>
                 </CardContent>
               </Card>
               
-              <Card className="bg-gray-900/80 border-green-500/20">
+              <Card className="bg-gray-900/80 border-purple-500/20">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-green-300 text-sm">Occupied</CardTitle>
+                  <CardTitle className="text-purple-300 text-sm">Properties</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-white">{properties.length}</div>
+                  <p className="text-gray-400 text-sm">Active listings</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-900/80 border-blue-500/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-blue-300 text-sm">Occupied</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-white">
@@ -149,79 +325,150 @@ const PMS = () => {
 
               <Card className="bg-gray-900/80 border-yellow-500/20">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-yellow-300 text-sm">Unread Messages</CardTitle>
+                  <CardTitle className="text-yellow-300 text-sm">Messages</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-white">
-                    {messages.filter(m => m.unread).length}
+                    {enhancedMessages.filter(m => m.unread).length}
                   </div>
-                  <p className="text-gray-400 text-sm">Requiring attention</p>
+                  <p className="text-gray-400 text-sm">Unread</p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-900/80 border-purple-500/20">
+              <Card className="bg-gray-900/80 border-orange-500/20">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-purple-300 text-sm">This Month</CardTitle>
+                  <CardTitle className="text-orange-300 text-sm">Avg Rating</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-white">$12,450</div>
-                  <p className="text-gray-400 text-sm">Revenue</p>
+                  <div className="text-3xl font-bold text-white flex items-center">
+                    {analytics.averageRating}
+                    <Star className="h-5 w-5 text-orange-400 ml-1" />
+                  </div>
+                  <p className="text-gray-400 text-sm">Across all properties</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-900/80 border-cyan-500/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-cyan-300 text-sm">Occupancy</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-white">{analytics.occupancyRate}%</div>
+                  <p className="text-gray-400 text-sm">This month</p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Recent Activity */}
-            <Card className="bg-gray-900/80 border-gray-700/50">
-              <CardHeader>
-                <CardTitle className="text-white">Recent Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 bg-green-600/20 rounded-full">
-                      <CheckCircle className="h-4 w-4 text-green-400" />
+            {/* Property Performance Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="bg-gray-900/80 border-gray-700/50">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center justify-between">
+                    Property Performance
+                    <Button variant="outline" size="sm" className="border-gray-600">
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {properties.map((property) => (
+                      <div key={property.id} className="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-3 h-3 rounded-full ${getStatusColor(property.status)}`} />
+                          <div>
+                            <h4 className="font-medium text-white">{property.name}</h4>
+                            <p className="text-gray-400 text-sm">{property.occupancy}% occupancy</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-white font-semibold">${property.revenue}</div>
+                          <div className="text-gray-400 text-sm">{property.rating} ⭐</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-900/80 border-gray-700/50">
+                <CardHeader>
+                  <CardTitle className="text-white">Recent Activity</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-blue-600/20 rounded-full">
+                        <CheckCircle className="h-4 w-4 text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-white">David Wilson checked into Luxury Suite</p>
+                        <p className="text-gray-400 text-sm">1 hour ago</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-white">John Smith checked into Downtown Loft</p>
-                      <p className="text-gray-400 text-sm">2 hours ago</p>
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-cyan-600/20 rounded-full">
+                        <MessageCircle className="h-4 w-4 text-cyan-400" />
+                      </div>
+                      <div>
+                        <p className="text-white">New high-priority message from Mike Chen</p>
+                        <p className="text-gray-400 text-sm">2 hours ago</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-yellow-600/20 rounded-full">
+                        <AlertCircle className="h-4 w-4 text-yellow-400" />
+                      </div>
+                      <div>
+                        <p className="text-white">Beach House cleaning scheduled</p>
+                        <p className="text-gray-400 text-sm">3 hours ago</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className="p-2 bg-purple-600/20 rounded-full">
+                        <Star className="h-4 w-4 text-purple-400" />
+                      </div>
+                      <div>
+                        <p className="text-white">5-star review received for Mountain Cabin</p>
+                        <p className="text-gray-400 text-sm">5 hours ago</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 bg-blue-600/20 rounded-full">
-                      <MessageCircle className="h-4 w-4 text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="text-white">New message from Mike Chen</p>
-                      <p className="text-gray-400 text-sm">3 hours ago</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 bg-yellow-600/20 rounded-full">
-                      <AlertCircle className="h-4 w-4 text-yellow-400" />
-                    </div>
-                    <div>
-                      <p className="text-white">Beach House cleaning scheduled</p>
-                      <p className="text-gray-400 text-sm">5 hours ago</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
-          {/* Messages Tab */}
+          {/* Enhanced Messages Tab */}
           <TabsContent value="messages" className="space-y-6">
+            <div className="flex gap-4 mb-6">
+              <div className="flex-1">
+                <Input 
+                  placeholder="Search messages..." 
+                  className="bg-gray-800/50 border-gray-600"
+                  prefix={<Search className="h-4 w-4 text-gray-400" />}
+                />
+              </div>
+              <Button variant="outline" className="border-gray-600">
+                <Filter className="h-4 w-4 mr-2" />
+                Filter
+              </Button>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="bg-gray-900/80 border-gray-700/50">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center justify-between">
                     Guest Messages
-                    <Badge className="bg-red-600">{messages.filter(m => m.unread).length} unread</Badge>
+                    <div className="flex gap-2">
+                      <Badge className="bg-red-600">{enhancedMessages.filter(m => m.unread && m.priority === 'high').length} urgent</Badge>
+                      <Badge className="bg-yellow-600">{enhancedMessages.filter(m => m.unread).length} total</Badge>
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {messages.map((message) => (
+                    {enhancedMessages.map((message) => (
                       <div 
                         key={message.id}
                         className={`p-3 rounded-lg cursor-pointer transition-colors ${
@@ -235,10 +482,23 @@ const PMS = () => {
                             <Badge className={getPlatformColor(message.platform)}>
                               {message.platform}
                             </Badge>
+                            <Badge className={getPriorityColor(message.priority)}>
+                              {message.priority}
+                            </Badge>
                           </div>
                           <span className="text-gray-400 text-sm">{message.time}</span>
                         </div>
-                        <p className="text-gray-300 text-sm">{message.message}</p>
+                        <p className="text-gray-300 text-sm mb-2">{message.message}</p>
+                        <div className="flex gap-2">
+                          <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700">
+                            <Send className="h-3 w-3 mr-1" />
+                            Reply
+                          </Button>
+                          <Button size="sm" variant="outline" className="border-gray-600">
+                            <Eye className="h-3 w-3 mr-1" />
+                            View Property
+                          </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -297,7 +557,7 @@ const PMS = () => {
                     const date = new Date();
                     date.setDate(date.getDate() - date.getDay() + i);
                     const dateStr = date.toISOString().split('T')[0];
-                    const event = calendarEvents.find(e => e.date === dateStr);
+                    const event = enhancedCalendarEvents.find(e => e.date === dateStr);
                     
                     return (
                       <div key={i} className="h-24 p-1 border border-gray-700 rounded">
