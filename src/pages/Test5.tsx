@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -124,7 +123,7 @@ const Test5 = () => {
         case "pms":
           return "bg-blue-500";
         case "community":
-          return "bg-orange-500";
+          return "bg-cyan-500";
         default:
           return "bg-gray-500";
       }
@@ -142,7 +141,7 @@ const Test5 = () => {
         case "pms":
           return "ring-2 ring-blue-400 ring-offset-2 ring-offset-slate-900";
         case "community":
-          return "ring-2 ring-orange-400 ring-offset-2 ring-offset-slate-900";
+          return "ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900";
         default:
           return "ring-2 ring-gray-400 ring-offset-2 ring-offset-slate-900";
       }
@@ -355,10 +354,10 @@ const Test5 = () => {
 
             {/* Community Step (17) */}
             {currentStep === 17 && (
-              <Card className="bg-slate-800/50 border-orange-500/20 animate-fade-in">
+              <Card className="bg-slate-800/50 border-cyan-500/20 animate-fade-in">
                 <CardHeader>
-                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-orange-400 to-cyan-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
-                    <Users className="h-6 w-6 text-orange-400" />
+                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <Users className="h-6 w-6 text-cyan-400" />
                     Community Hub - Connect & Learn
                   </CardTitle>
                 </CardHeader>
@@ -479,18 +478,18 @@ const Test5 = () => {
                     </Card>
 
                     {/* Community Calendar */}
-                    <Card className="bg-slate-700/50 border-orange-500/20 hover:border-orange-500/40 transition-colors">
+                    <Card className="bg-slate-700/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors">
                       <CardHeader className="pb-3">
                         <div className="flex items-center gap-2">
-                          <Calendar className="h-5 w-5 text-orange-400" />
-                          <CardTitle className="text-lg text-orange-300">Events</CardTitle>
+                          <Calendar className="h-5 w-5 text-cyan-400" />
+                          <CardTitle className="text-lg text-cyan-300">Events</CardTitle>
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <div className="space-y-2">
                           <div className="bg-slate-800/50 rounded p-2">
                             <div className="text-sm font-medium text-white mb-1">Weekly Q&A Session</div>
-                            <div className="text-xs text-orange-400">Today 7:00 PM EST</div>
+                            <div className="text-xs text-cyan-400">Today 7:00 PM EST</div>
                           </div>
                           <div className="bg-slate-800/50 rounded p-2">
                             <div className="text-sm font-medium text-white mb-1">Market Analysis Workshop</div>
@@ -501,7 +500,7 @@ const Test5 = () => {
                             <div className="text-xs text-gray-400">Dec 22 • 6:00 PM EST</div>
                           </div>
                         </div>
-                        <Button size="sm" className="w-full bg-orange-600 hover:bg-orange-700 text-white">
+                        <Button size="sm" className="w-full bg-cyan-600 hover:bg-cyan-700 text-white">
                           View Calendar
                         </Button>
                       </CardContent>
@@ -509,14 +508,14 @@ const Test5 = () => {
                   </div>
 
                   {/* Expert Network Section */}
-                  <div className="bg-slate-700/30 rounded-lg p-6 border border-orange-500/20">
-                    <h4 className="font-semibold text-orange-300 mb-4 flex items-center gap-2">
+                  <div className="bg-slate-700/30 rounded-lg p-6 border border-cyan-500/20">
+                    <h4 className="font-semibold text-cyan-300 mb-4 flex items-center gap-2">
                       <Users className="h-5 w-5" />
                       Expert Network
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
-                        <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold">
+                        <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
                           SC
                         </div>
                         <div>
@@ -529,7 +528,7 @@ const Test5 = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
-                        <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
                           MR
                         </div>
                         <div>
@@ -542,7 +541,7 @@ const Test5 = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
-                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold">
                           LT
                         </div>
                         <div>
