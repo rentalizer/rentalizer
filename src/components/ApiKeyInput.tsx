@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -188,60 +189,66 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           )}
 
           {/* API Key Inputs with Status - Compact */}
-          <div className="grid grid-cols-1 gap-2">
+          <div className="grid grid-cols-1 gap-3">
             {/* STR Revenue API Key */}
-            <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
-              {getStatusIcon(getKeyStatus(airdnaKey))}
-              <div className="flex-1 min-w-0">
-                <Input
-                  id="airdna-key"
-                  type={showKeys ? "text" : "password"}
-                  value={airdnaKey}
-                  onChange={(e) => setAirdnaKey(e.target.value)}
-                  placeholder="STR Revenue API"
-                  className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
-                />
-              </div>
-              <div className="flex items-center gap-1">
-                {airdnaKey && showKeys && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => copyToClipboard(airdnaKey, 'STR Revenue API')}
-                    className="h-5 w-5 p-0 text-gray-400 hover:text-white"
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                )}
-                {getStatusBadge(getKeyStatus(airdnaKey))}
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-cyan-300">STR Revenue API</label>
+              <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
+                {getStatusIcon(getKeyStatus(airdnaKey))}
+                <div className="flex-1 min-w-0">
+                  <Input
+                    id="airdna-key"
+                    type={showKeys ? "text" : "password"}
+                    value={airdnaKey}
+                    onChange={(e) => setAirdnaKey(e.target.value)}
+                    placeholder="Enter your STR Revenue API key"
+                    className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                  />
+                </div>
+                <div className="flex items-center gap-1">
+                  {airdnaKey && showKeys && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => copyToClipboard(airdnaKey, 'STR Revenue API')}
+                      className="h-5 w-5 p-0 text-gray-400 hover:text-white"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  )}
+                  {getStatusBadge(getKeyStatus(airdnaKey))}
+                </div>
               </div>
             </div>
 
             {/* Rental Rates API Key */}
-            <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
-              {getStatusIcon(getKeyStatus(openaiKey))}
-              <div className="flex-1 min-w-0">
-                <Input
-                  id="openai-key"
-                  type={showKeys ? "text" : "password"}
-                  value={openaiKey}
-                  onChange={(e) => setOpenaiKey(e.target.value)}
-                  placeholder="Rental Rates API"
-                  className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
-                />
-              </div>
-              <div className="flex items-center gap-1">
-                {openaiKey && showKeys && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => copyToClipboard(openaiKey, 'Rental Rates API')}
-                    className="h-5 w-5 p-0 text-gray-400 hover:text-white"
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                )}
-                {getStatusBadge(getKeyStatus(openaiKey))}
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-cyan-300">Rental Rates API</label>
+              <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
+                {getStatusIcon(getKeyStatus(openaiKey))}
+                <div className="flex-1 min-w-0">
+                  <Input
+                    id="openai-key"
+                    type={showKeys ? "text" : "password"}
+                    value={openaiKey}
+                    onChange={(e) => setOpenaiKey(e.target.value)}
+                    placeholder="Enter your Rental Rates API key"
+                    className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                  />
+                </div>
+                <div className="flex items-center gap-1">
+                  {openaiKey && showKeys && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => copyToClipboard(openaiKey, 'Rental Rates API')}
+                      className="h-5 w-5 p-0 text-gray-400 hover:text-white"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  )}
+                  {getStatusBadge(getKeyStatus(openaiKey))}
+                </div>
               </div>
             </div>
           </div>
