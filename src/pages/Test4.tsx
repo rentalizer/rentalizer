@@ -360,27 +360,6 @@ const Test4 = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Feature Flow Visualization */}
-              <div className="flex justify-center items-center gap-4 mb-8 opacity-70">
-                {slides.map((slide, index) => {
-                  const SlideIcon = slide.icon;
-                  return (
-                    <React.Fragment key={index}>
-                      <div className={`flex items-center gap-2 transition-all duration-500 ${
-                        currentSlide === index ? 'scale-110 opacity-100' : 'scale-90 opacity-50'
-                      }`}>
-                        <div className="w-8 h-8 rounded-full bg-slate-700/50 backdrop-blur-sm border border-gray-600 flex items-center justify-center">
-                          <SlideIcon className="h-4 w-4 text-gray-300" />
-                        </div>
-                      </div>
-                      {index < slides.length - 1 && (
-                        <ArrowRight className="h-4 w-4 text-gray-500 animate-pulse" style={{ animationDelay: `${index * 200}ms` }} />
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </div>
             </div>
           </div>
         </div>
