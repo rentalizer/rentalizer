@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -367,19 +366,13 @@ const Test4 = () => {
                           </CardContent>
                         </Card>
                       </HoverCardTrigger>
-                      <HoverCardContent className="w-64 p-0 bg-slate-800/95 backdrop-blur-lg border border-green-500/30 z-50" side="top" align="center">
-                        <div className="p-3">
-                          <div className="text-center mb-3">
-                            <h4 className="text-green-400 font-semibold text-base">{testimonial.name}'s Earnings</h4>
-                            <p className="text-green-300 text-xl font-bold">{testimonial.earnings}</p>
-                          </div>
-                          <div className="rounded-lg overflow-hidden">
-                            <img 
-                              src={testimonial.earningsImage} 
-                              alt={`${testimonial.name}'s earnings screenshot`}
-                              className="w-full h-auto object-cover max-h-48"
-                            />
-                          </div>
+                      <HoverCardContent className="w-48 p-0 bg-slate-800/95 backdrop-blur-lg border border-green-500/30 z-50" side="bottom" align="center">
+                        <div className="rounded-lg overflow-hidden">
+                          <img 
+                            src={testimonial.earningsImage} 
+                            alt={`${testimonial.name}'s earnings screenshot`}
+                            className="w-full h-auto object-cover"
+                          />
                         </div>
                       </HoverCardContent>
                     </HoverCard>
