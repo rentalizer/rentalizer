@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -97,10 +98,11 @@ const Test4 = () => {
             </div>
             <p className="text-lg text-white font-medium mb-8">By Richie Matthews</p>
             
-            {/* Updated Tagline - ensure full text is visible */}
+            {/* Updated Tagline - two lines on desktop with larger text */}
             <div className="mb-12 px-4">
-              <p className="text-xl md:text-2xl lg:text-3xl text-white max-w-6xl mx-auto leading-relaxed font-semibold">
-                AI-Powered Rental Arbitrage System, CRM, And Community—Everything You Need To Succeed
+              <p className="text-2xl md:text-3xl lg:text-4xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
+                AI-Powered Rental Arbitrage System, CRM, And Community<br className="hidden lg:block" />
+                <span className="lg:block">—Everything You Need To Succeed</span>
               </p>
             </div>
 
