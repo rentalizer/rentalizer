@@ -312,11 +312,8 @@ const Test4 = () => {
           <div className="max-w-7xl mx-auto mb-20">
             <div className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
-                What Our Community Says
+                Real Users Who've Unlocked Rental Income With Rentalizer
               </h2>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Real success stories from rental arbitrage entrepreneurs using Rentalizer
-              </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
