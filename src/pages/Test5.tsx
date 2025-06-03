@@ -20,7 +20,9 @@ import {
   FileText,
   Settings,
   BarChart3,
-  Play
+  Play,
+  TrendingUp,
+  Star
 } from 'lucide-react';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
@@ -41,6 +43,13 @@ const Test5 = () => {
     { submarket: "University Area", strRevenue: 33000, medianRent: 1600, multiple: 3.44 },
     { submarket: "Historic Center", strRevenue: 39000, medianRent: 1850, multiple: 3.51 },
     { submarket: "Business Park", strRevenue: 44000, medianRent: 2050, multiple: 3.58 }
+  ];
+
+  // Mock properties for property search demo
+  const mockProperties = [
+    { address: "123 Main St, Austin, TX", rent: 2200, bedrooms: 2, bathrooms: 2, sqft: 1100 },
+    { address: "456 Oak Ave, Austin, TX", rent: 1900, bedrooms: 2, bathrooms: 1, sqft: 950 },
+    { address: "789 Pine Dr, Austin, TX", rent: 2400, bedrooms: 3, bathrooms: 2, sqft: 1300 }
   ];
 
   useEffect(() => {
@@ -67,7 +76,7 @@ const Test5 = () => {
           }
           return prev + 1;
         });
-      }, 2000);
+      }, 3000);
 
       return () => clearInterval(stepTimer);
     }
@@ -174,19 +183,15 @@ const Test5 = () => {
           </Button>
         </div>
 
-        {/* Progress Flow with Small Dots */}
+        {/* Progress Flow with Numbered Steps (No Line) */}
         <div className="max-w-6xl mx-auto mb-12">
-          <div className="flex justify-center items-center gap-2 mb-8 flex-wrap">
-            {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center">
-                <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-500 ${getStepColor(step.id, step.category)} ${getStepBorder(step.id, step.category)}`}
-                >
-                  <span className="text-white text-xs font-bold">{step.id}</span>
-                </div>
-                {index < steps.length - 1 && (
-                  <div className="w-4 h-0.5 bg-gray-600 mx-1" />
-                )}
+          <div className="flex justify-center items-center gap-4 mb-8 flex-wrap">
+            {steps.map((step) => (
+              <div
+                key={step.id}
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 ${getStepColor(step.id, step.category)} ${getStepBorder(step.id, step.category)}`}
+              >
+                <span className="text-white text-sm font-bold">{step.id}</span>
               </div>
             ))}
           </div>
@@ -236,167 +241,204 @@ const Test5 = () => {
           )}
         </div>
 
-        {/* Interactive Map Demo - Show when demo is running and in market analysis steps */}
-        {demoRunning && currentStep >= 1 && currentStep <= 3 && (
-          <div className="mb-12">
-            <Card className="bg-slate-800/50 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-center text-2xl bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                  Live Market Analysis - Austin, TX
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <MapView results={mockMarketData} city="Austin, TX" />
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Feature Categories */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <Card className="bg-slate-800/50 border-cyan-500/30">
-            <CardHeader className="text-center">
-              <div className="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <Search className="h-6 w-6 text-cyan-400" />
-              </div>
-              <CardTitle className="text-cyan-300">Market Intelligence</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 text-sm text-center">
-                Steps 1-3: AI-powered market analysis and location scoring
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-slate-800/50 border-purple-500/30">
-            <CardHeader className="text-center">
-              <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <Building className="h-6 w-6 text-purple-400" />
-              </div>
-              <CardTitle className="text-purple-300">Acquisition CRM</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 text-sm text-center">
-                Steps 4-11: Property search, outreach, and deal closure
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-slate-800/50 border-green-500/30">
-            <CardHeader className="text-center">
-              <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <Home className="h-6 w-6 text-green-400" />
-              </div>
-              <CardTitle className="text-green-300">Property Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 text-sm text-center">
-                Steps 12-16: Listing management and guest operations
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-slate-800/50 border-orange-500/30">
-            <CardHeader className="text-center">
-              <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <Users className="h-6 w-6 text-orange-400" />
-              </div>
-              <CardTitle className="text-orange-300">Community</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 text-sm text-center">
-                Step 17: Connect with fellow rental arbitrage investors
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Live Results Preview - Only show when demo is running */}
+        {/* Step-Specific Visual Demonstrations */}
         {demoRunning && (
-          <Card className="bg-slate-800/50 border-gray-700 mb-8 transform transition-all duration-500 animate-fade-in">
-            <CardHeader>
-              <CardTitle className="text-center text-2xl bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                Live Results Preview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-3 gap-6 mb-6">
-                <div className="bg-slate-700/50 rounded-lg p-4 border border-cyan-500/20">
-                  <h4 className="font-semibold text-cyan-300 mb-2 flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4" />
-                    Market Score
-                  </h4>
-                  <div className="text-3xl font-bold text-white">8.7/10</div>
-                  <p className="text-sm text-gray-400">Austin, TX - Downtown</p>
-                </div>
-                
-                <div className="bg-slate-700/50 rounded-lg p-4 border border-purple-500/20">
-                  <h4 className="font-semibold text-purple-300 mb-2 flex items-center gap-2">
-                    <Building className="h-4 w-4" />
-                    Properties Found
-                  </h4>
-                  <div className="text-3xl font-bold text-white">47</div>
-                  <p className="text-sm text-gray-400">Available for arbitrage</p>
-                </div>
-                
-                <div className="bg-slate-700/50 rounded-lg p-4 border border-green-500/20">
-                  <h4 className="font-semibold text-green-300 mb-2 flex items-center gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    Projected Profit
-                  </h4>
-                  <div className="text-3xl font-bold text-white">$2,340</div>
-                  <p className="text-sm text-gray-400">Monthly net income</p>
-                </div>
-              </div>
+          <div className="mb-12 space-y-8">
+            {/* Market Analysis Steps (1-3) - Interactive Map */}
+            {currentStep >= 1 && currentStep <= 3 && (
+              <Card className="bg-slate-800/50 border-gray-700 animate-fade-in">
+                <CardHeader>
+                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                    Live Market Analysis - Austin, TX
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <MapView results={mockMarketData} city="Austin, TX" />
+                </CardContent>
+              </Card>
+            )}
 
-              {/* Mock Calculator Demo */}
-              {(currentStep >= 7 && currentStep <= 8) && (
-                <div className="mt-6 bg-slate-700/30 rounded-lg p-6 border border-purple-500/20 animate-scale-in">
-                  <h4 className="font-semibold text-purple-300 mb-4 text-center flex items-center justify-center gap-2">
-                    <Calculator className="h-5 w-5" />
-                    Deal Analysis Calculator
-                  </h4>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-400 mb-1">Monthly Rent Revenue</p>
-                      <div className="text-xl font-bold text-green-300">$3,200</div>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-400 mb-1">Monthly Expenses</p>
-                      <div className="text-xl font-bold text-red-300">$860</div>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-400 mb-1">Net Monthly Profit</p>
-                      <div className="text-2xl font-bold text-cyan-300">$2,340</div>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-400 mb-1">Annual ROI</p>
-                      <div className="text-2xl font-bold text-purple-300">420%</div>
-                    </div>
+            {/* Property Search (Step 4) */}
+            {currentStep === 4 && (
+              <Card className="bg-slate-800/50 border-gray-700 animate-scale-in">
+                <CardHeader>
+                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <Building className="h-6 w-6 text-purple-400" />
+                    Property Search Results
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4">
+                    {mockProperties.map((property, index) => (
+                      <div key={index} className="bg-slate-700/50 rounded-lg p-4 border border-purple-500/20">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-semibold text-white">{property.address}</h4>
+                          <div className="text-right">
+                            <div className="text-lg font-bold text-purple-400">${property.rent}/mo</div>
+                            <div className="text-sm text-gray-400">Market Rate</div>
+                          </div>
+                        </div>
+                        <div className="flex gap-4 text-sm text-gray-300">
+                          <span>{property.bedrooms} bed</span>
+                          <span>{property.bathrooms} bath</span>
+                          <span>{property.sqft} sqft</span>
+                        </div>
+                        <div className="mt-3 flex justify-between items-center">
+                          <div className="text-sm text-green-400">✓ Arbitrage Potential</div>
+                          <Button size="sm" className="bg-purple-600 hover:bg-purple-700">
+                            Analyze Deal
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </div>
-              )}
+                </CardContent>
+              </Card>
+            )}
 
-              {/* Mock Email Campaign Demo */}
-              {(currentStep >= 5 && currentStep <= 6) && (
-                <div className="mt-6 bg-slate-700/30 rounded-lg p-6 border border-purple-500/20 animate-slide-in-right">
-                  <h4 className="font-semibold text-purple-300 mb-4 text-center flex items-center justify-center gap-2">
-                    <Mail className="h-5 w-5" />
+            {/* Email Campaign (Steps 5-6) */}
+            {(currentStep === 5 || currentStep === 6) && (
+              <Card className="bg-slate-800/50 border-gray-700 animate-slide-in-right">
+                <CardHeader>
+                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <Mail className="h-6 w-6 text-purple-400" />
                     AI Email Campaign
-                  </h4>
-                  <div className="bg-slate-800/50 rounded-lg p-4 mb-4">
-                    <p className="text-sm text-gray-300 mb-2">Subject: Partnership Opportunity - Short-Term Rental Management</p>
-                    <p className="text-xs text-gray-400">Hi [Landlord Name], I hope this email finds you well. I'm reaching out regarding your property at [Property Address]...</p>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-slate-700/50 rounded-lg p-4 mb-4 border border-purple-500/20">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-sm text-gray-400">To: landlord@property.com</span>
+                      <span className="text-xs text-green-400">✓ Sent</span>
+                    </div>
+                    <p className="text-sm font-medium text-white mb-2">Subject: Partnership Opportunity - Short-Term Rental Management</p>
+                    <p className="text-xs text-gray-300 leading-relaxed">
+                      Hi [Landlord Name], I hope this email finds you well. I'm reaching out regarding your property at [Property Address]. I specialize in rental arbitrage and would love to discuss a partnership opportunity that could increase your monthly income by 40-60% while providing you with a guaranteed monthly payment...
+                    </p>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-green-300">✓ 127 emails sent</span>
-                    <span className="text-cyan-300">📈 23% open rate</span>
-                    <span className="text-purple-300">🎯 8 responses</span>
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="bg-slate-700/30 rounded-lg p-3">
+                      <div className="text-xl font-bold text-green-400">127</div>
+                      <div className="text-xs text-gray-400">Emails Sent</div>
+                    </div>
+                    <div className="bg-slate-700/30 rounded-lg p-3">
+                      <div className="text-xl font-bold text-cyan-400">23%</div>
+                      <div className="text-xs text-gray-400">Open Rate</div>
+                    </div>
+                    <div className="bg-slate-700/30 rounded-lg p-3">
+                      <div className="text-xl font-bold text-purple-400">8</div>
+                      <div className="text-xs text-gray-400">Responses</div>
+                    </div>
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Deal Calculator (Steps 7-8) */}
+            {(currentStep === 7 || currentStep === 8) && (
+              <Card className="bg-slate-800/50 border-gray-700 animate-scale-in">
+                <CardHeader>
+                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-purple-400 to-green-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <Calculator className="h-6 w-6 text-purple-400" />
+                    Deal Analysis Calculator
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-cyan-300 mb-3">Revenue Projections</h4>
+                      <div className="bg-slate-700/50 rounded-lg p-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-300">Monthly STR Revenue</span>
+                          <span className="text-lg font-bold text-green-400">$3,200</span>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-300">Occupancy Rate</span>
+                          <span className="text-sm text-cyan-400">75%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-300">Average Daily Rate</span>
+                          <span className="text-sm text-purple-400">$142</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <h4 className="font-semibold text-purple-300 mb-3">Expense Breakdown</h4>
+                      <div className="bg-slate-700/50 rounded-lg p-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-300">Rent to Landlord</span>
+                          <span className="text-lg font-bold text-red-300">$2,200</span>
+                        </div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-300">Utilities & Cleaning</span>
+                          <span className="text-sm text-red-300">$450</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-300">Platform Fees</span>
+                          <span className="text-sm text-red-300">$210</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-6 bg-gradient-to-r from-green-500/20 to-cyan-500/20 rounded-lg p-6 border border-green-500/30">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-green-400 mb-2">$2,340</div>
+                      <div className="text-lg text-gray-300 mb-1">Monthly Net Profit</div>
+                      <div className="text-2xl font-bold text-cyan-400">420% ROI</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Property Management Steps (12-16) */}
+            {currentStep >= 12 && currentStep <= 16 && (
+              <Card className="bg-slate-800/50 border-gray-700 animate-fade-in">
+                <CardHeader>
+                  <CardTitle className="text-center text-2xl bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <Home className="h-6 w-6 text-green-400" />
+                    Property Management Dashboard
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid md:grid-cols-3 gap-6 mb-6">
+                    <div className="bg-slate-700/50 rounded-lg p-4 border border-green-500/20 text-center">
+                      <Calendar className="h-8 w-8 text-green-400 mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">85%</div>
+                      <div className="text-sm text-gray-400">Occupancy Rate</div>
+                    </div>
+                    <div className="bg-slate-700/50 rounded-lg p-4 border border-cyan-500/20 text-center">
+                      <DollarSign className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">$2,890</div>
+                      <div className="text-sm text-gray-400">Monthly Revenue</div>
+                    </div>
+                    <div className="bg-slate-700/50 rounded-lg p-4 border border-purple-500/20 text-center">
+                      <Star className="h-8 w-8 text-purple-400 mx-auto mb-2" />
+                      <div className="text-2xl font-bold text-white">4.8</div>
+                      <div className="text-sm text-gray-400">Guest Rating</div>
+                    </div>
+                  </div>
+                  <div className="bg-slate-700/30 rounded-lg p-4">
+                    <h4 className="font-semibold text-green-300 mb-3">Recent Activity</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-300">✓ New booking confirmed</span>
+                        <span className="text-gray-400">2 min ago</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-300">📧 Check-in instructions sent</span>
+                        <span className="text-gray-400">15 min ago</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-300">🧹 Cleaning scheduled</span>
+                        <span className="text-gray-400">1 hr ago</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         )}
 
         <div className="text-center">
