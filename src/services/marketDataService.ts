@@ -82,6 +82,7 @@ const getCityCoordinates = (city: string): { lat: number; lng: number } => {
 const fetchAirDNAData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<STRData[]> => {
   try {
     console.log(`🏠 Fetching real STR earnings from AirDNA for ${city} (${propertyType}BR/${bathrooms}BA)`);
+    console.log('🔑 API Key being used:', apiKey ? `${apiKey.substring(0, 8)}...` : 'No API key provided');
     
     if (!apiKey || apiKey.trim() === '') {
       console.log('⚠️ No AirDNA API key, using fallback data');
@@ -100,7 +101,6 @@ const fetchAirDNAData = async (city: string, apiKey: string, propertyType: strin
     const url = `https://api.airdna.co/v1/market/property_type_summary?${params.toString()}`;
 
     console.log('🔍 AirDNA API URL:', url);
-    console.log('🔑 Using API key:', apiKey.substring(0, 8) + '...');
 
     // AirDNA API call for real market data
     const response = await fetch(url, {
@@ -112,21 +112,40 @@ const fetchAirDNAData = async (city: string, apiKey: string, propertyType: strin
     });
 
     console.log('📡 AirDNA API Response status:', response.status);
+    console.log('📡 AirDNA API Response headers:', Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       const errorText = await response.text();
       console.log(`⚠️ AirDNA API failed (${response.status}): ${errorText}`);
+      console.log('🔄 FALLING BACK TO MOCK DATA due to API failure');
       return generateFallbackSTRData(city, propertyType, bathrooms);
     }
 
     const data = await response.json();
-    console.log('📊 AirDNA API Response data:', data);
+    console.log('📊 RAW AirDNA API Response data (full object):', JSON.stringify(data, null, 2));
     
     if (data.submarkets && data.submarkets.length > 0) {
-      const strData: STRData[] = data.submarkets.map((submarket: any) => {
+      console.log('✅ REAL DATA DETECTED - Processing AirDNA submarkets...');
+      
+      const strData: STRData[] = data.submarkets.map((submarket: any, index: number) => {
+        // Log each submarket's raw data
+        console.log(`📍 Submarket ${index + 1} RAW data:`, {
+          name: submarket.name || submarket.submarket,
+          monthly_revenue: submarket.monthly_revenue,
+          revenue: submarket.revenue,
+          annual_revenue: submarket.annual_revenue,
+          all_fields: submarket
+        });
+        
         // Get actual monthly earnings and add 25% buffer
         const actualMonthlyEarnings = submarket.monthly_revenue || submarket.revenue || 0;
         const monthlyRevenueWith25Percent = Math.round(actualMonthlyEarnings * 1.25);
+        
+        console.log(`💰 Revenue calculation for ${submarket.name || submarket.submarket}:`, {
+          rawApiValue: actualMonthlyEarnings,
+          with25PercentBuffer: monthlyRevenueWith25Percent,
+          bufferAdded: monthlyRevenueWith25Percent - actualMonthlyEarnings
+        });
         
         return {
           submarket: submarket.name || submarket.submarket,
@@ -134,21 +153,25 @@ const fetchAirDNAData = async (city: string, apiKey: string, propertyType: strin
         };
       });
 
-      console.log('✅ Got real STR data from AirDNA with 25% buffer applied:', strData);
+      console.log('✅ FINAL STR DATA (with 25% buffer applied):', strData);
+      console.log('🔍 DATA SOURCE: Real AirDNA API response');
       return strData;
     }
 
     console.log('⚠️ No submarkets in AirDNA response, using fallback');
+    console.log('🔄 FALLING BACK TO MOCK DATA due to no submarkets');
     return generateFallbackSTRData(city, propertyType, bathrooms);
 
   } catch (error) {
     console.error('❌ AirDNA API error:', error);
+    console.log('🔄 FALLING BACK TO MOCK DATA due to API error');
     return generateFallbackSTRData(city, propertyType, bathrooms);
   }
 };
 
 const generateFallbackSTRData = (city: string, propertyType: string, bathrooms: string): STRData[] => {
-  console.log('📊 Generating fallback STR data with realistic monthly earnings + 25% buffer');
+  console.log('📊 GENERATING FALLBACK/MOCK STR DATA with realistic monthly earnings + 25% buffer');
+  console.log('🔍 DATA SOURCE: Mock/Fallback data (not real API)');
   
   const cityKey = city.toLowerCase();
   const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Downtown`, `${city} Midtown`];
@@ -342,6 +365,10 @@ export const fetchMarketData = async (
   bathrooms: string = '1'
 ): Promise<CityMarketData> => {
   console.log(`🔍 Fetching market data for ${city} (${propertyType}BR/${bathrooms}BA properties)`);
+  console.log('🔑 API Configuration:', {
+    hasAirDNAKey: !!(apiConfig.airdnaApiKey && apiConfig.airdnaApiKey.trim()),
+    hasOpenAIKey: !!(apiConfig.openaiApiKey && apiConfig.openaiApiKey.trim())
+  });
 
   try {
     let strData: STRData[] = [];
@@ -350,6 +377,7 @@ export const fetchMarketData = async (
     // Fetch real STR earnings data with AirDNA API
     try {
       if (apiConfig.airdnaApiKey && apiConfig.airdnaApiKey.trim() !== '') {
+        console.log('🚀 Using AirDNA API for STR data...');
         strData = await fetchAirDNAData(city, apiConfig.airdnaApiKey, propertyType, bathrooms);
       } else {
         console.log('📊 No AirDNA key, using fallback STR data with 25% buffer');
@@ -376,7 +404,8 @@ export const fetchMarketData = async (
       strSubmarkets: strData.length,
       rentSubmarkets: rentData.length,
       strRevenueNote: 'Monthly earnings with 25% buffer applied',
-      rentDataNote: 'Current rental rates from last 30 days'
+      rentDataNote: 'Current rental rates from last 30 days',
+      finalStrData: strData
     });
 
     return {
