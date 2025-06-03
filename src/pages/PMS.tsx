@@ -446,7 +446,6 @@ const PMS = () => {
                 <Input 
                   placeholder="Search messages..." 
                   className="bg-gray-800/50 border-gray-600"
-                  prefix={<Search className="h-4 w-4 text-gray-400" />}
                 />
               </div>
               <Button variant="outline" className="border-gray-600">

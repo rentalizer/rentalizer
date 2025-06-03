@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -194,9 +193,9 @@ const Test5 = () => {
           </div>
         </div>
 
-        {/* Progress Flow with Numbered Steps (No Line) */}
-        <div className="max-w-6xl mx-auto mb-12">
-          <div className="flex justify-center items-center gap-4 mb-8 flex-wrap">
+        {/* Streamlined Progress Flow */}
+        <div className="max-w-6xl mx-auto mb-8">
+          <div className="flex justify-center items-center gap-4 mb-6 flex-wrap">
             {steps.map((step) => (
               <div
                 key={step.id}
@@ -210,44 +209,37 @@ const Test5 = () => {
             ))}
           </div>
 
-          {/* Current Step Display */}
+          {/* Compact Current Step Display */}
           {(demoRunning || manualMode) && (
-            <div className="text-center mb-8">
-              <div className="bg-slate-800/50 backdrop-blur-lg border border-gray-700 rounded-lg p-6 max-w-md mx-auto transform transition-all duration-500 scale-105">
-                <div className="flex items-center justify-center mb-4">
+            <div className="text-center mb-6">
+              <div className="bg-slate-800/50 backdrop-blur-lg border border-gray-700 rounded-lg p-4 max-w-lg mx-auto">
+                <div className="flex items-center justify-center gap-3 mb-2">
                   {React.createElement(steps[currentStep - 1]?.icon || Search, {
-                    className: `h-12 w-12 ${
+                    className: `h-6 w-6 ${
                       steps[currentStep - 1]?.category === 'market' ? 'text-cyan-400' :
                       steps[currentStep - 1]?.category === 'acquisition' ? 'text-purple-400' :
                       steps[currentStep - 1]?.category === 'pms' ? 'text-blue-400' :
                       'text-orange-400'
                     }`
                   })}
+                  <h3 className="text-xl font-bold text-white">
+                    Step {currentStep}: {steps[currentStep - 1]?.title}
+                  </h3>
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">
-                  Step {currentStep}: {steps[currentStep - 1]?.title}
-                </h3>
-                <p className="text-gray-300 mb-4">
+                <p className="text-gray-300 text-sm mb-3">
                   {steps[currentStep - 1]?.description}
                 </p>
-                <div className="mt-4">
-                  <div className={`inline-block px-4 py-2 rounded-full text-sm font-medium ${
-                    steps[currentStep - 1]?.category === 'market' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' :
-                    steps[currentStep - 1]?.category === 'acquisition' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
-                    steps[currentStep - 1]?.category === 'pms' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
-                    'bg-orange-500/20 text-orange-300 border border-orange-500/30'
-                  }`}>
-                    {steps[currentStep - 1]?.category === 'market' ? 'Market Intelligence' :
-                     steps[currentStep - 1]?.category === 'acquisition' ? 'Acquisition CRM' :
-                     steps[currentStep - 1]?.category === 'pms' ? 'Property Management' :
-                     'Community'}
-                  </div>
+                <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                  steps[currentStep - 1]?.category === 'market' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' :
+                  steps[currentStep - 1]?.category === 'acquisition' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
+                  steps[currentStep - 1]?.category === 'pms' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
+                  'bg-orange-500/20 text-orange-300 border border-orange-500/30'
+                }`}>
+                  {steps[currentStep - 1]?.category === 'market' ? 'Market Intelligence' :
+                   steps[currentStep - 1]?.category === 'acquisition' ? 'Acquisition CRM' :
+                   steps[currentStep - 1]?.category === 'pms' ? 'Property Management' :
+                   'Community'}
                 </div>
-                {manualMode && (
-                  <div className="mt-4 text-sm text-gray-400">
-                    Click any step number to explore manually
-                  </div>
-                )}
               </div>
             </div>
           )}
