@@ -30,7 +30,8 @@ const Test4 = () => {
     },
     {
       name: "Bobby Han",
-      text: "If you are thinking about getting into the short term rental business, Rentalizer's blueprint and all the templates available is definitely something that gives more confidence moving forward. If you have any question whether to join Rentalizer's program, I think you'll find it very beneficial."
+      text: "If you are thinking about getting into the short term rental business, Rentalizer's blueprint and all the templates available is definitely something that gives more confidence moving forward. If you have any question whether to join Rentalizer's program, I think you'll find it very beneficial.",
+      earningsImage: "/lovable-uploads/8e300e4a-2470-4019-a82d-fae65ffdaa2b.png"
     },
     {
       name: "Shante Davis",
@@ -39,7 +40,8 @@ const Test4 = () => {
     },
     {
       name: "Maria Sallie Forte-Charette",
-      text: "Thank you so much Rentalizer for sharing your knowledge and always promptly answering any questions, which helped me to close three new properties! I learned so much from our training and coaching."
+      text: "Thank you so much Rentalizer for sharing your knowledge and always promptly answering any questions, which helped me to close three new properties! I learned so much from our training and coaching.",
+      earningsImage: "/lovable-uploads/d0f04aff-7c0b-4008-ac0c-7dd5c108ab09.png"
     },
     {
       name: "Elena Ashley",
@@ -48,11 +50,13 @@ const Test4 = () => {
     },
     {
       name: "Liz Garcia",
-      text: "I just closed my first deal, thanks to Rentalizer's program!"
+      text: "I just closed my first deal, thanks to Rentalizer's program!",
+      earningsImage: "/lovable-uploads/0b25ffb5-6d6c-4c9e-9588-382c6f623250.png"
     },
     {
       name: "Marcus Thompson",
-      text: "The AI market analysis tool is incredible. It helped me identify profitable markets I never would have considered before. I'm now managing 4 successful properties."
+      text: "The AI market analysis tool is incredible. It helped me identify profitable markets I never would have considered before. I'm now managing 4 successful properties.",
+      earningsImage: "/lovable-uploads/f5ff4f34-560a-42e3-92d3-aea5ceced3a5.png"
     },
     {
       name: "Sarah Chen",
