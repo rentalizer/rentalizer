@@ -143,7 +143,7 @@ const Test4 = () => {
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-gray-300 text-sm leading-relaxed">
-                      AI-powered market analysis to identify the most profitable rental opportunities in your area
+                      Find The Best Rental Arbitrage Markets
                     </p>
                     <div className="mt-4 flex justify-center space-x-2">
                       <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
@@ -154,7 +154,7 @@ const Test4 = () => {
                 </Card>
               </div>
 
-              {/* Feature 2: Deal Calculator */}
+              {/* Feature 2: Acquisition CRM & Calculator */}
               <div className="group relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105">
@@ -165,11 +165,11 @@ const Test4 = () => {
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
-                    <CardTitle className="text-xl font-bold text-purple-300">Deal Calculator</CardTitle>
+                    <CardTitle className="text-xl font-bold text-purple-300">Acquisition CRM & Calculator</CardTitle>
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-gray-300 text-sm leading-relaxed">
-                      Comprehensive ROI calculator that factors in all costs and revenue streams for accurate projections
+                      Property Outreach, Close Deals, Profit Calculator, Manage Relationships
                     </p>
                     <div className="mt-4 flex justify-center space-x-1">
                       <div className="w-8 h-1 bg-purple-400 rounded animate-pulse"></div>
@@ -180,7 +180,7 @@ const Test4 = () => {
                 </Card>
               </div>
 
-              {/* Feature 3: CRM & Automation */}
+              {/* Feature 3: PMS */}
               <div className="group relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105">
@@ -191,11 +191,11 @@ const Test4 = () => {
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
-                    <CardTitle className="text-xl font-bold text-cyan-300">CRM & Automation</CardTitle>
+                    <CardTitle className="text-xl font-bold text-cyan-300">PMS</CardTitle>
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-gray-300 text-sm leading-relaxed">
-                      Streamline your operations with automated lead management and landlord communication systems
+                      Property Management System Automates Operations
                     </p>
                     <div className="mt-4 grid grid-cols-3 gap-1">
                       {[...Array(6)].map((_, i) => (
@@ -206,7 +206,7 @@ const Test4 = () => {
                 </Card>
               </div>
 
-              {/* Feature 4: Community & Training */}
+              {/* Feature 4: Community */}
               <div className="group relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105">
@@ -217,11 +217,11 @@ const Test4 = () => {
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
-                    <CardTitle className="text-xl font-bold text-purple-300">Community & Training</CardTitle>
+                    <CardTitle className="text-xl font-bold text-purple-300">Community</CardTitle>
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-gray-300 text-sm leading-relaxed">
-                      Access expert training modules and connect with a community of successful rental arbitrage entrepreneurs
+                      Connect With Other Rental Arbitrage Investors
                     </p>
                     <div className="mt-4 flex justify-center">
                       <div className="flex -space-x-2">
