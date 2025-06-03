@@ -1,8 +1,9 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare } from 'lucide-react';
+import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
@@ -10,10 +11,40 @@ import { useNavigate } from 'react-router-dom';
 const Test4 = () => {
   const navigate = useNavigate();
 
-  const handleGetStarted = () => {
-    console.log('Get Started button clicked - navigating to demo page');
-    navigate('/demo');
+  const handleBookDemo = () => {
+    console.log('Book Demo button clicked - opening Calendly popup');
+    // @ts-ignore
+    if (window.Calendly) {
+      // @ts-ignore
+      window.Calendly.initPopupWidget({
+        url: 'https://calendly.com/richies-schedule/scale'
+      });
+    }
   };
+
+  useEffect(() => {
+    // Load Calendly script
+    const script = document.createElement('script');
+    script.src = 'https://assets.calendly.com/assets/external/widget.js';
+    script.async = true;
+    document.head.appendChild(script);
+
+    // Load Calendly CSS
+    const link = document.createElement('link');
+    link.href = 'https://assets.calendly.com/assets/external/widget.css';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
+    return () => {
+      // Cleanup
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
@@ -110,11 +141,11 @@ const Test4 = () => {
             <div className="flex justify-center items-center mb-16">
               <Button 
                 size="lg"
-                onClick={handleGetStarted}
+                onClick={handleBookDemo}
                 className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-6 text-xl font-semibold min-w-[200px]"
               >
-                <ArrowRight className="h-6 w-6 mr-3" />
-                Get Started
+                <Calendar className="h-6 w-6 mr-3" />
+                Book Demo
               </Button>
             </div>
           </div>
@@ -255,3 +286,4 @@ const Test4 = () => {
 };
 
 export default Test4;
+
