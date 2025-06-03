@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -98,10 +97,12 @@ const Test4 = () => {
             </div>
             <p className="text-lg text-white font-medium mb-8">By Richie Matthews</p>
             
-            {/* Updated Tagline - forced to stay on one line */}
-            <p className="text-xl md:text-2xl lg:text-3xl text-white mb-12 max-w-7xl mx-auto leading-relaxed font-semibold whitespace-nowrap overflow-hidden">
-              AI-Powered Rental Arbitrage System, CRM, And Community—Everything You Need To Succeed
-            </p>
+            {/* Updated Tagline - ensure full text is visible */}
+            <div className="mb-12 px-4">
+              <p className="text-xl md:text-2xl lg:text-3xl text-white max-w-6xl mx-auto leading-relaxed font-semibold">
+                AI-Powered Rental Arbitrage System, CRM, And Community—Everything You Need To Succeed
+              </p>
+            </div>
 
             {/* Single Button Layout */}
             <div className="flex justify-center items-center mb-16">
