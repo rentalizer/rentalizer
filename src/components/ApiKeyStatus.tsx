@@ -94,11 +94,20 @@ export const ApiKeyStatus: React.FC = () => {
     console.log('🔍 Searching for all stored API keys...');
     
     const allKeys = {};
+    const apiKeyMappings = {
+      'professional_data_key': 'AirDNA API Key (STR Revenue)',
+      'openai_api_key': 'OpenAI API Key (Rent Research)',
+      'mashvisor_api_key': 'Mashvisor API Key',
+      'airdna_api_key': 'AirDNA API Key',
+      'OPENAI_API_KEY': 'OpenAI API Key'
+    };
+    
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && (key.includes('api') || key.includes('key'))) {
         const value = localStorage.getItem(key);
-        allKeys[key] = value ? `${value.substring(0, 8)}... (${value.length} chars)` : 'Empty';
+        const label = apiKeyMappings[key] || key;
+        allKeys[label] = value ? `${value.substring(0, 8)}... (${value.length} chars)` : 'Empty';
       }
     }
     
@@ -107,7 +116,7 @@ export const ApiKeyStatus: React.FC = () => {
     const keyCount = Object.keys(allKeys).length;
     toast({
       title: `🔍 Found ${keyCount} API Keys`,
-      description: keyCount > 0 ? "Check browser console for full details" : "No API keys found in storage",
+      description: keyCount > 0 ? "Check browser console for labeled details" : "No API keys found in storage",
     });
     
     return allKeys;
@@ -176,38 +185,13 @@ export const ApiKeyStatus: React.FC = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-3">
-          {/* OpenAI API */}
-          <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-md">
-            <div className="flex items-center gap-3">
-              {getStatusIcon(getKeyStatus(apiKeys.openai || ''))}
-              <div className="flex-1">
-                <span className="text-white font-medium">OpenAI API</span>
-                <div className="text-xs text-gray-400 font-mono">
-                  {showKeys ? (apiKeys.openai || 'Not set') : maskKey(apiKeys.openai || '')}
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {apiKeys.openai && showKeys && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => copyToClipboard(apiKeys.openai!, 'OpenAI')}
-                  className="h-8 w-8 p-0 text-gray-400 hover:text-white"
-                >
-                  <Copy className="h-3 w-3" />
-                </Button>
-              )}
-              {getStatusBadge(getKeyStatus(apiKeys.openai || ''))}
-            </div>
-          </div>
-
-          {/* AirDNA API */}
+          {/* AirDNA API - for STR Revenue */}
           <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-md">
             <div className="flex items-center gap-3">
               {getStatusIcon(getKeyStatus(apiKeys.airdna || ''))}
               <div className="flex-1">
                 <span className="text-white font-medium">AirDNA API</span>
+                <div className="text-xs text-blue-400 mb-1">STR Revenue Data</div>
                 <div className="text-xs text-gray-400 font-mono">
                   {showKeys ? (apiKeys.airdna || 'Not set') : maskKey(apiKeys.airdna || '')}
                 </div>
@@ -228,12 +212,40 @@ export const ApiKeyStatus: React.FC = () => {
             </div>
           </div>
 
+          {/* OpenAI API - for Rent Research */}
+          <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-md">
+            <div className="flex items-center gap-3">
+              {getStatusIcon(getKeyStatus(apiKeys.openai || ''))}
+              <div className="flex-1">
+                <span className="text-white font-medium">OpenAI API</span>
+                <div className="text-xs text-green-400 mb-1">Rent Research</div>
+                <div className="text-xs text-gray-400 font-mono">
+                  {showKeys ? (apiKeys.openai || 'Not set') : maskKey(apiKeys.openai || '')}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {apiKeys.openai && showKeys && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => copyToClipboard(apiKeys.openai!, 'OpenAI')}
+                  className="h-8 w-8 p-0 text-gray-400 hover:text-white"
+                >
+                  <Copy className="h-3 w-3" />
+                </Button>
+              )}
+              {getStatusBadge(getKeyStatus(apiKeys.openai || ''))}
+            </div>
+          </div>
+
           {/* Mashvisor API */}
           <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-md">
             <div className="flex items-center gap-3">
               {getStatusIcon(getKeyStatus(apiKeys.mashvisor || ''))}
               <div className="flex-1">
                 <span className="text-white font-medium">Mashvisor API</span>
+                <div className="text-xs text-purple-400 mb-1">Property Analytics</div>
                 <div className="text-xs text-gray-400 font-mono">
                   {showKeys ? (apiKeys.mashvisor || 'Not set') : maskKey(apiKeys.mashvisor || '')}
                 </div>
@@ -260,7 +272,7 @@ export const ApiKeyStatus: React.FC = () => {
             <strong>Environment:</strong> {window.location.hostname === 'localhost' ? 'Preview/Development' : 'Production'}
           </div>
           <div className="text-xs text-blue-400 mt-1">
-            Click "Find All Keys" to search for all stored API keys in your browser
+            Click "Find All Keys" to search for all stored API keys with labels
           </div>
         </div>
       </CardContent>
