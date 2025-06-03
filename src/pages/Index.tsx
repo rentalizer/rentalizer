@@ -78,7 +78,7 @@ const Index = () => {
             
             {/* Updated Tagline */}
             <p className="text-2xl md:text-3xl text-white mb-12 max-w-5xl mx-auto leading-relaxed font-semibold">
-              AI-Powered Rental Arbitrage System, CRM & Community
+              All-in-One AI Platform to Launch and Scale a Rental Arbitrage Business
             </p>
           </div>
 
