@@ -189,12 +189,12 @@ CRITICAL: Use ONLY data from the last 30 days maximum - no older data allowed.
 
 Primary data sources to use (in order of preference):
 1. RentCafe.com (most reliable source)
-2. Zumper.com
-3. Apartment List
-4. RentSpree
-5. Zillow Rentals
-6. Apartments.com
-7. Rent.com
+2. Zumper.com (top rental platform)
+3. Rentometer.com (rental analytics)
+4. Apartment List
+5. RentSpree
+6. Zillow Rentals
+7. Apartments.com
 
 Search for actual active rental listings posted in the last 30 days on these platforms.`;
 
@@ -214,15 +214,15 @@ Search for actual active rental listings posted in the last 30 days on these pla
 
 CRITICAL Requirements:
 - Use real neighborhood names only
-- Cross-reference prices across multiple sources (especially RentCafe)
+- Cross-reference prices across RentCafe, Zumper, and Rentometer data
 - Research CURRENT median rent from active rental listings in the last 30 days
 - Include 10-12 neighborhoods
 - Focus on ${propertyType}BR/${bathrooms}BA apartments specifically
-- Use actual current market rental prices - verify against RentCafe data
+- Use actual current market rental prices - verify against RentCafe, Zumper, and Rentometer
 - Include rental-viable areas with good apartment inventory
 - Double-check prices are realistic for current ${city} market conditions (example: Little Italy in San Diego should be $4,000+ for 2BR/2BA)
 
-Verify your data against RentCafe.com as the primary source - this is the most reliable rental data platform.`;
+Verify your data against RentCafe.com, Zumper.com, and Rentometer.com as the primary sources - these are the most reliable rental data platforms.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -235,7 +235,7 @@ Verify your data against RentCafe.com as the primary source - this is the most r
         messages: [
           {
             role: 'system',
-            content: 'You are a real estate analyst with access to current rental market data from RentCafe, Zumper, Apartment List, and other reliable sources. Research actual rental listings from the last 30 days only. Cross-reference data across multiple sources with RentCafe as primary. Return valid JSON only. Focus on current market rates from reliable platforms.'
+            content: 'You are a real estate analyst with access to current rental market data from RentCafe, Zumper, Rentometer, and other reliable sources. Research actual rental listings from the last 30 days only. Cross-reference data across multiple sources with RentCafe, Zumper, and Rentometer as primary. Return valid JSON only. Focus on current market rates from reliable platforms.'
           },
           {
             role: 'user',
@@ -260,7 +260,7 @@ Verify your data against RentCafe.com as the primary source - this is the most r
       const rentData = parsedContent.rentData || [];
       
       if (rentData.length >= 8) {
-        console.log('✅ Got current rent data from OpenAI using RentCafe and other reliable sources (last 30 days):', rentData);
+        console.log('✅ Got current rent data from OpenAI using RentCafe, Zumper, and Rentometer (last 30 days):', rentData);
         return rentData;
       }
     } catch (parseError) {
