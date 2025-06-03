@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -270,8 +269,8 @@ const Test5 = () => {
                   
                   {currentStep >= 6 && (
                     <div className="mt-6 pt-4 border-t border-gray-700">
-                      <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600">
-                        Export to CSV & Open Calculator
+                      <Button className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
+                        Export to CSV
                       </Button>
                     </div>
                   )}
