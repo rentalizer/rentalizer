@@ -378,7 +378,7 @@ const MarketAnalysis = () => {
                     Market Analysis Results
                   </h2>
                   <p className="text-gray-400 mt-1">
-                    {propertyType}BR/{bathrooms}BA properties in {cityName}
+                    {propertyType}BR/{bathrooms}BA apartments in {cityName}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
