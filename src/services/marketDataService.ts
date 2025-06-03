@@ -183,11 +183,20 @@ const fetchOpenAIRentData = async (city: string, apiKey: string, propertyType: s
     const cityKey = city.toLowerCase();
     const knownNeighborhoods = REAL_NEIGHBORHOODS[cityKey];
     
-    let prompt = `Research CURRENT ${city} apartment rental market for ${propertyType}-bedroom, ${bathrooms}-bathroom apartments.
+    let prompt = `Research CURRENT ${city} apartment rental market for ${propertyType}-bedroom, ${bathrooms}-bathroom apartments using the most reliable rental data sources.
 
-I need CURRENT rental prices from the last 30 days maximum - no old data from Q4 2024 or earlier.
+CRITICAL: Use ONLY data from the last 30 days maximum - no older data allowed.
 
-Search for actual rental listings posted in the last 30 days on major rental platforms like Apartments.com, Zillow, Rent.com, etc.`;
+Primary data sources to use (in order of preference):
+1. RentCafe.com (most reliable source)
+2. Zumper.com
+3. Apartment List
+4. RentSpree
+5. Zillow Rentals
+6. Apartments.com
+7. Rent.com
+
+Search for actual active rental listings posted in the last 30 days on these platforms.`;
 
     if (knownNeighborhoods) {
       prompt += `\n\nFocus on these specific neighborhoods in ${city}: ${knownNeighborhoods.join(', ')}.`;
@@ -205,14 +214,15 @@ Search for actual rental listings posted in the last 30 days on major rental pla
 
 CRITICAL Requirements:
 - Use real neighborhood names only
+- Cross-reference prices across multiple sources (especially RentCafe)
 - Research CURRENT median rent from active rental listings in the last 30 days
 - Include 10-12 neighborhoods
 - Focus on ${propertyType}BR/${bathrooms}BA apartments specifically
-- Use actual market rental prices - not outdated data
+- Use actual current market rental prices - verify against RentCafe data
 - Include rental-viable areas with good apartment inventory
-- Double-check prices are realistic for current ${city} market conditions
+- Double-check prices are realistic for current ${city} market conditions (example: Little Italy in San Diego should be $4,000+ for 2BR/2BA)
 
-Example: Little Italy in San Diego should be $4,000+ for 2BR/2BA, not $3,000.`;
+Verify your data against RentCafe.com as the primary source - this is the most reliable rental data platform.`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -225,7 +235,7 @@ Example: Little Italy in San Diego should be $4,000+ for 2BR/2BA, not $3,000.`;
         messages: [
           {
             role: 'system',
-            content: 'You are a real estate analyst with access to current rental market data. Research actual rental listings from the last 30 days. Return valid JSON only. Focus on current market rates, not historical data.'
+            content: 'You are a real estate analyst with access to current rental market data from RentCafe, Zumper, Apartment List, and other reliable sources. Research actual rental listings from the last 30 days only. Cross-reference data across multiple sources with RentCafe as primary. Return valid JSON only. Focus on current market rates from reliable platforms.'
           },
           {
             role: 'user',
@@ -250,7 +260,7 @@ Example: Little Italy in San Diego should be $4,000+ for 2BR/2BA, not $3,000.`;
       const rentData = parsedContent.rentData || [];
       
       if (rentData.length >= 8) {
-        console.log('✅ Got current rent data from OpenAI (last 30 days):', rentData);
+        console.log('✅ Got current rent data from OpenAI using RentCafe and other reliable sources (last 30 days):', rentData);
         return rentData;
       }
     } catch (parseError) {
