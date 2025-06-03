@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -177,49 +176,34 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             </div>
           )}
 
-          {/* STR Earnings Data Key Section */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-200 mb-4">STR Earnings Data Key</h3>
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <Label htmlFor="airdna-key" className="text-sm font-medium text-gray-300">
-                  AirDNA API Key {airdnaKey ? '✅' : '❌'}
-                </Label>
-                <Input
-                  id="airdna-key"
-                  type={showKeys ? "text" : "password"}
-                  value={airdnaKey}
-                  onChange={(e) => setAirdnaKey(e.target.value)}
-                  placeholder="Enter AirDNA API key..."
-                  className={`mt-1 ${airdnaKey ? 'border-green-500/30' : 'border-red-500/30'} bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500`}
-                />
-                <p className={`text-xs mt-1 ${airdnaKey ? 'text-green-400' : 'text-red-400'}`}>
-                  {airdnaKey ? '✅ Market analytics data' : '❌ Required for market analytics'}
-                </p>
-              </div>
+          {/* API Key Inputs */}
+          <div className="grid grid-cols-1 gap-6">
+            <div>
+              <Input
+                id="airdna-key"
+                type={showKeys ? "text" : "password"}
+                value={airdnaKey}
+                onChange={(e) => setAirdnaKey(e.target.value)}
+                placeholder="Enter AirDNA API key..."
+                className={`${airdnaKey ? 'border-green-500/30' : 'border-red-500/30'} bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500`}
+              />
+              <p className={`text-xs mt-1 ${airdnaKey ? 'text-green-400' : 'text-red-400'}`}>
+                {airdnaKey ? '✅ Market analytics data' : '❌ Required for market analytics'}
+              </p>
             </div>
-          </div>
 
-          {/* Apartment Rental Data Key Section */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-200 mb-4">Apartment Rental Data Key</h3>
-            <div className="grid grid-cols-1 gap-4">
-              <div>
-                <Label htmlFor="openai-key" className="text-sm font-medium text-gray-300">
-                  OpenAI API Key {openaiKey ? '✅' : '❌'}
-                </Label>
-                <Input
-                  id="openai-key"
-                  type={showKeys ? "text" : "password"}
-                  value={openaiKey}
-                  onChange={(e) => setOpenaiKey(e.target.value)}
-                  placeholder="Enter OpenAI API key (sk-...)..."
-                  className={`mt-1 ${openaiKey ? 'border-green-500/30' : 'border-red-500/30'} bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500`}
-                />
-                <p className={`text-xs mt-1 ${openaiKey ? 'text-green-400' : 'text-red-400'}`}>
-                  {openaiKey ? '✅ OpenAI API key configured' : '❌ Required for AI research'}
-                </p>
-              </div>
+            <div>
+              <Input
+                id="openai-key"
+                type={showKeys ? "text" : "password"}
+                value={openaiKey}
+                onChange={(e) => setOpenaiKey(e.target.value)}
+                placeholder="Enter OpenAI API key (sk-...)..."
+                className={`${openaiKey ? 'border-green-500/30' : 'border-red-500/30'} bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500`}
+              />
+              <p className={`text-xs mt-1 ${openaiKey ? 'text-green-400' : 'text-red-400'}`}>
+                {openaiKey ? '✅ OpenAI API key configured' : '❌ Required for AI research'}
+              </p>
             </div>
           </div>
 
