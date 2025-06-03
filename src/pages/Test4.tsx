@@ -366,7 +366,7 @@ const Test4 = () => {
                           </CardContent>
                         </Card>
                       </HoverCardTrigger>
-                      <HoverCardContent className="w-48 p-0 bg-slate-800/95 backdrop-blur-lg border border-green-500/30 z-50" side="bottom" align="center">
+                      <HoverCardContent className="w-48 p-0 bg-slate-800/95 backdrop-blur-lg border border-green-500/30 z-50" side="top" align="center">
                         <div className="rounded-lg overflow-hidden">
                           <img 
                             src={testimonial.earningsImage} 
