@@ -1,3 +1,4 @@
+
 import { CityMarketData, STRData, RentData } from '@/types';
 
 const getBedroomMultiplier = (propertyType: string): number => {
@@ -88,20 +89,24 @@ const fetchAirDNAData = async (city: string, apiKey: string, propertyType: strin
       return generateFallbackSTRData(city, propertyType, bathrooms);
     }
 
+    // Construct URL with query parameters
+    const params = new URLSearchParams({
+      city: city,
+      country: 'US',
+      bedrooms: propertyType,
+      bathrooms: bathrooms,
+      property_type: 'apartment'
+    });
+
+    const url = `https://api.airdna.co/v1/market/property_type_summary?${params.toString()}`;
+
     // AirDNA API call for real market data
-    const response = await fetch(`https://api.airdna.co/v1/market/property_type_summary`, {
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-      },
-      params: new URLSearchParams({
-        city: city,
-        country: 'US',
-        bedrooms: propertyType,
-        bathrooms: bathrooms,
-        property_type: 'apartment'
-      })
+      }
     });
 
     if (!response.ok) {
