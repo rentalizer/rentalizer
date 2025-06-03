@@ -1,4 +1,3 @@
-
 import { CityMarketData, STRData, RentData } from '@/types';
 
 const getBedroomMultiplier = (propertyType: string): number => {
@@ -154,12 +153,25 @@ const generateFallbackSTRData = (city: string, propertyType: string, bathrooms: 
   const cityKey = city.toLowerCase();
   const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Downtown`, `${city} Midtown`];
   
-  // Base monthly earnings for different bedroom counts (realistic market data)
-  const baseMonthlyEarnings = propertyType === '1' ? 2800 : propertyType === '2' ? 3600 : 4400;
+  // Updated base monthly earnings to reflect current 2025 STR market rates
+  let baseMonthlyEarnings;
+  
+  // San Diego has premium STR rates
+  if (cityKey === 'san diego') {
+    baseMonthlyEarnings = propertyType === '1' ? 4200 : propertyType === '2' ? 5800 : 7200;
+  } 
+  // Other major markets
+  else if (['seattle', 'denver', 'austin', 'miami'].includes(cityKey)) {
+    baseMonthlyEarnings = propertyType === '1' ? 3600 : propertyType === '2' ? 4800 : 6000;
+  }
+  // Secondary markets
+  else {
+    baseMonthlyEarnings = propertyType === '1' ? 3200 : propertyType === '2' ? 4200 : 5400;
+  }
   
   return neighborhoods.slice(0, 12).map((neighborhood, index) => {
-    // Vary earnings by neighborhood quality (10-30% variation)
-    const variation = 0.85 + (index * 0.02) + (Math.random() * 0.25);
+    // Vary earnings by neighborhood quality (15-40% variation for realistic spread)
+    const variation = 0.80 + (index * 0.03) + (Math.random() * 0.35);
     const actualMonthlyEarnings = Math.round(baseMonthlyEarnings * variation);
     
     // Apply 25% buffer as requested
