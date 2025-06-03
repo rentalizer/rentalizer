@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,13 @@ import {
   Search,
   CheckCircle,
   Zap,
-  Map
+  Map,
+  Building,
+  Mail,
+  Phone,
+  User,
+  Star,
+  Send
 } from 'lucide-react';
 
 const Test5 = () => {
@@ -23,40 +30,79 @@ const Test5 = () => {
   const [progress, setProgress] = useState(0);
 
   const steps = [
+    // Market Intelligence Steps
     {
       title: "Market Intelligence Overview",
       description: "AI-powered rental arbitrage market analysis",
-      content: "Welcome to Market Intelligence - the most advanced rental arbitrage analysis tool available. Let's see how it works."
+      content: "Welcome to Market Intelligence - the most advanced rental arbitrage analysis tool available. Let's see how it works.",
+      category: "market"
     },
     {
       title: "Enter Target City",
       description: "Search any US city for opportunities",
-      content: "Simply enter any US city name. Our system works with hundreds of markets across the country."
+      content: "Simply enter any US city name. Our system works with hundreds of markets across the country.",
+      category: "market"
     },
     {
       title: "Select Property Type",
       description: "Choose bedroom and bathroom configuration",
-      content: "Customize your search by selecting 1-3 bedrooms and corresponding bathroom counts for precise market data."
+      content: "Customize your search by selecting 1-3 bedrooms and corresponding bathroom counts for precise market data.",
+      category: "market"
     },
     {
       title: "Real-Time Data Analysis",
       description: "Processing live market data",
-      content: "Our AI connects to multiple data sources including AirDNA for STR revenue and OpenAI for current rent prices."
+      content: "Our AI connects to multiple data sources including AirDNA for STR revenue and OpenAI for current rent prices.",
+      category: "market"
     },
     {
       title: "Market Results",
       description: "Revenue multiples by neighborhood",
-      content: "See detailed revenue-to-rent ratios for each submarket, identifying the most profitable opportunities."
+      content: "See detailed revenue-to-rent ratios for each submarket, identifying the most profitable opportunities.",
+      category: "market"
     },
     {
       title: "Interactive Map View",
       description: "Visual heat map analysis",
-      content: "Explore results through our interactive heat map showing revenue potential across all neighborhoods."
+      content: "Explore results through our interactive heat map showing revenue potential across all neighborhoods.",
+      category: "market"
     },
     {
       title: "Export & Action",
       description: "Download data and make decisions",
-      content: "Export selected markets to CSV and use our calculator to run detailed financial projections."
+      content: "Export selected markets to CSV and use our calculator to run detailed financial projections.",
+      category: "market"
+    },
+    // Acquisition CRM Steps
+    {
+      title: "Acquisition CRM Overview",
+      description: "AI-powered landlord outreach system",
+      content: "Now let's see how our Acquisition CRM helps you contact landlords and close deals in your target markets.",
+      category: "crm"
+    },
+    {
+      title: "Property Discovery",
+      description: "Find rental properties in target areas",
+      content: "Search for available rental properties in the neighborhoods you've identified as profitable.",
+      category: "crm"
+    },
+    {
+      title: "Landlord Contact Info",
+      description: "AI finds owner contact details",
+      content: "Our AI automatically researches and finds landlord contact information including emails and phone numbers.",
+      category: "crm"
+    },
+    {
+      title: "Personalized Outreach",
+      description: "AI-generated custom messages",
+      content: "Generate personalized email templates that explain the rental arbitrage opportunity to each landlord.",
+      category: "crm"
+    },
+    {
+      title: "Campaign Management",
+      description: "Track responses and follow-ups",
+      content: "Monitor email open rates, responses, and schedule automatic follow-ups to maximize your conversion rate.",
+      category: "crm"
     }
   ];
 
@@ -67,6 +113,13 @@ const Test5 = () => {
     { submarket: "Mission Valley", strRevenue: 4600, medianRent: 2400, multiple: 1.92 },
     { submarket: "La Jolla", strRevenue: 7200, medianRent: 4200, multiple: 1.71 },
     { submarket: "Pacific Beach", strRevenue: 5500, medianRent: 3000, multiple: 1.83 }
+  ];
+
+  const mockProperties = [
+    { address: "123 Main St, San Diego", rent: 2800, landlord: "John Smith", email: "john@example.com", phone: "(555) 123-4567", status: "contacted" },
+    { address: "456 Ocean Ave, San Diego", rent: 3200, landlord: "Sarah Johnson", email: "sarah@realty.com", phone: "(555) 234-5678", status: "responded" },
+    { address: "789 Harbor Dr, San Diego", rent: 2600, landlord: "Mike Chen", email: "mike@properties.com", phone: "(555) 345-6789", status: "interested" },
+    { address: "321 Park Blvd, San Diego", rent: 2400, landlord: "Lisa Garcia", email: "lisa@mgmt.com", phone: "(555) 456-7890", status: "negotiating" }
   ];
 
   useEffect(() => {
@@ -106,19 +159,27 @@ const Test5 = () => {
     setIsPlaying(false);
   };
 
+  const currentCategory = steps[currentStep]?.category;
+  const isMarketIntelligence = currentCategory === "market";
+  const isAcquisitionCRM = currentCategory === "crm";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <BarChart3 className="h-12 w-12 text-cyan-400" />
+            {isMarketIntelligence && <BarChart3 className="h-12 w-12 text-cyan-400" />}
+            {isAcquisitionCRM && <Building className="h-12 w-12 text-purple-400" />}
             <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              Market Intelligence Demo
+              {isMarketIntelligence ? "Market Intelligence Demo" : "Acquisition CRM Demo"}
             </h1>
           </div>
           <p className="text-xl text-gray-300 mb-6">
-            See how our AI finds the most profitable rental arbitrage opportunities
+            {isMarketIntelligence 
+              ? "See how our AI finds the most profitable rental arbitrage opportunities"
+              : "Watch how our AI helps you contact landlords and close deals"
+            }
           </p>
           
           {/* Controls */}
@@ -152,7 +213,7 @@ const Test5 = () => {
         </div>
 
         {/* Step Navigation */}
-        <div className="grid grid-cols-7 gap-2 mb-8">
+        <div className="grid grid-cols-12 gap-1 mb-8">
           {steps.map((step, index) => (
             <Button
               key={index}
@@ -161,7 +222,9 @@ const Test5 = () => {
               size="sm"
               className={`text-xs ${
                 index === currentStep 
-                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white" 
+                  ? step.category === "market" 
+                    ? "bg-gradient-to-r from-cyan-600 to-blue-600 text-white" 
+                    : "bg-gradient-to-r from-purple-600 to-pink-600 text-white"
                   : "border-gray-600 text-gray-400 hover:text-white"
               }`}
             >
@@ -170,12 +233,24 @@ const Test5 = () => {
           ))}
         </div>
 
+        {/* Category Labels */}
+        <div className="flex justify-center gap-8 mb-8">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full"></div>
+            <span className="text-gray-300 text-sm">Market Intelligence (Steps 1-7)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"></div>
+            <span className="text-gray-300 text-sm">Acquisition CRM (Steps 8-12)</span>
+          </div>
+        </div>
+
         {/* Main Demo Area */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Left: Current Step */}
           <Card className="bg-gray-900/80 border-cyan-500/20 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle className="text-cyan-300 flex items-center gap-2">
+              <CardTitle className={`flex items-center gap-2 ${isMarketIntelligence ? 'text-cyan-300' : 'text-purple-300'}`}>
                 <Zap className="h-5 w-5" />
                 {steps[currentStep].title}
               </CardTitle>
@@ -227,6 +302,37 @@ const Test5 = () => {
                   </p>
                 </div>
               )}
+
+              {currentStep === 8 && (
+                <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
+                  <div className="flex items-center gap-2 text-purple-300">
+                    <Search className="h-4 w-4" />
+                    <span className="font-mono">Little Italy, San Diego</span>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 9 && (
+                <div className="mt-6 space-y-2">
+                  <div className="flex items-center gap-2 text-green-400">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Email addresses found</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-green-400">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>Phone numbers verified</span>
+                  </div>
+                </div>
+              )}
+
+              {currentStep === 10 && (
+                <div className="mt-6 p-4 bg-slate-800/50 rounded-lg">
+                  <div className="text-purple-300 mb-2 font-semibold">Sample Email Template:</div>
+                  <div className="text-gray-300 text-sm italic">
+                    "Hi John, I'm interested in a long-term rental arrangement for your property at 123 Main St..."
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -234,59 +340,132 @@ const Test5 = () => {
           <Card className="bg-gray-900/80 border-purple-500/20 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="text-purple-300 flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Live Results Preview
+                {isMarketIntelligence ? <BarChart3 className="h-5 w-5" /> : <Building className="h-5 w-5" />}
+                {isMarketIntelligence ? "Live Results Preview" : "CRM Dashboard"}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {currentStep >= 4 ? (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-white font-semibold">San Diego Market Analysis</h3>
-                    <Badge className="bg-green-600">2BR/2BA</Badge>
-                  </div>
-                  
-                  {mockResults.slice(0, currentStep >= 5 ? 6 : 4).map((result, index) => (
-                    <div key={index} className="p-3 bg-slate-800/50 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-medium text-white">{result.submarket}</div>
-                          <div className="text-sm text-gray-400 flex items-center gap-4">
-                            <span className="flex items-center gap-1">
-                              <DollarSign className="h-3 w-3 text-green-400" />
-                              ${result.strRevenue.toLocaleString()} STR
-                            </span>
-                            <span>${result.medianRent.toLocaleString()} rent</span>
+              {isMarketIntelligence ? (
+                <>
+                  {currentStep >= 4 ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-white font-semibold">San Diego Market Analysis</h3>
+                        <Badge className="bg-green-600">2BR/2BA</Badge>
+                      </div>
+                      
+                      {mockResults.slice(0, currentStep >= 5 ? 6 : 4).map((result, index) => (
+                        <div key={index} className="p-3 bg-slate-800/50 rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium text-white">{result.submarket}</div>
+                              <div className="text-sm text-gray-400 flex items-center gap-4">
+                                <span className="flex items-center gap-1">
+                                  <DollarSign className="h-3 w-3 text-green-400" />
+                                  ${result.strRevenue.toLocaleString()} STR
+                                </span>
+                                <span>${result.medianRent.toLocaleString()} rent</span>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-lg font-bold text-cyan-400">{result.multiple.toFixed(2)}x</div>
+                              <div className="text-xs text-gray-400">multiple</div>
+                            </div>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="text-lg font-bold text-cyan-400">{result.multiple.toFixed(2)}x</div>
-                          <div className="text-xs text-gray-400">multiple</div>
+                      ))}
+                      
+                      {currentStep >= 6 && (
+                        <div className="mt-6 pt-4 border-t border-gray-700">
+                          <Button className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
+                            Export to CSV
+                          </Button>
                         </div>
-                      </div>
+                      )}
                     </div>
-                  ))}
-                  
-                  {currentStep >= 6 && (
-                    <div className="mt-6 pt-4 border-t border-gray-700">
-                      <Button className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-                        Export to CSV
-                      </Button>
+                  ) : (
+                    <div className="text-center py-12 text-gray-500">
+                      <BarChart3 className="h-16 w-16 mx-auto mb-4 opacity-30" />
+                      <p>Results will appear after analysis starts...</p>
                     </div>
                   )}
-                </div>
+                </>
               ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <BarChart3 className="h-16 w-16 mx-auto mb-4 opacity-30" />
-                  <p>Results will appear after analysis starts...</p>
-                </div>
+                <>
+                  {currentStep >= 8 ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-white font-semibold">Property Outreach Campaign</h3>
+                        <Badge className="bg-purple-600">Little Italy</Badge>
+                      </div>
+                      
+                      {mockProperties.slice(0, Math.min(currentStep - 7, 4)).map((property, index) => (
+                        <div key={index} className="p-3 bg-slate-800/50 rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="font-medium text-white">{property.address}</div>
+                            <Badge className={
+                              property.status === 'contacted' ? 'bg-blue-600' :
+                              property.status === 'responded' ? 'bg-yellow-600' :
+                              property.status === 'interested' ? 'bg-green-600' :
+                              'bg-purple-600'
+                            }>
+                              {property.status}
+                            </Badge>
+                          </div>
+                          <div className="text-sm text-gray-400 space-y-1">
+                            <div className="flex items-center gap-2">
+                              <User className="h-3 w-3" />
+                              <span>{property.landlord}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Mail className="h-3 w-3" />
+                              <span>{property.email}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <DollarSign className="h-3 w-3 text-green-400" />
+                              <span>${property.rent.toLocaleString()}/month</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {currentStep >= 11 && (
+                        <div className="mt-6 pt-4 border-t border-gray-700">
+                          <div className="grid grid-cols-3 gap-4 mb-4">
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-green-400">75%</div>
+                              <div className="text-xs text-gray-400">Open Rate</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-blue-400">25%</div>
+                              <div className="text-xs text-gray-400">Response Rate</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-purple-400">3</div>
+                              <div className="text-xs text-gray-400">Interested</div>
+                            </div>
+                          </div>
+                          <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500">
+                            <Send className="h-4 w-4 mr-2" />
+                            Send Follow-up Campaign
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-gray-500">
+                      <Building className="h-16 w-16 mx-auto mb-4 opacity-30" />
+                      <p>CRM data will appear after starting outreach...</p>
+                    </div>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Interactive Map View - Shows during step 5 and beyond */}
-        {currentStep >= 5 && (
+        {/* Interactive Map View - Shows during step 5 and beyond for Market Intelligence */}
+        {currentStep === 5 && (
           <Card className="bg-gray-900/80 border-cyan-500/20 backdrop-blur-sm mb-8">
             <CardHeader>
               <CardTitle className="text-cyan-300 flex items-center gap-2">
@@ -320,29 +499,29 @@ const Test5 = () => {
         <Card className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 border-blue-500/20">
           <CardContent className="p-8">
             <h3 className="text-2xl font-bold text-white mb-6 text-center">
-              Why Market Intelligence Gives You The Edge
+              Complete Rental Arbitrage Solution
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-12 h-12 mx-auto mb-4 flex items-center justify-center">
-                  <Zap className="h-6 w-6 text-white" />
+                <div className="p-3 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full w-12 h-12 mx-auto mb-4 flex items-center justify-center">
+                  <BarChart3 className="h-6 w-6 text-white" />
                 </div>
-                <h4 className="font-semibold text-white mb-2">Real-Time Data</h4>
-                <p className="text-gray-300 text-sm">Live API connections to AirDNA and current rental markets</p>
+                <h4 className="font-semibold text-white mb-2">Market Intelligence</h4>
+                <p className="text-gray-300 text-sm">Find the most profitable markets with real-time data analysis</p>
+              </div>
+              <div className="text-center">
+                <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full w-12 h-12 mx-auto mb-4 flex items-center justify-center">
+                  <Building className="h-6 w-6 text-white" />
+                </div>
+                <h4 className="font-semibold text-white mb-2">Acquisition CRM</h4>
+                <p className="text-gray-300 text-sm">Contact landlords efficiently with AI-powered outreach</p>
               </div>
               <div className="text-center">
                 <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-12 h-12 mx-auto mb-4 flex items-center justify-center">
                   <TrendingUp className="h-6 w-6 text-white" />
                 </div>
-                <h4 className="font-semibold text-white mb-2">Visual Analysis</h4>
-                <p className="text-gray-300 text-sm">Interactive heat maps show profit potential at a glance</p>
-              </div>
-              <div className="text-center">
-                <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-12 h-12 mx-auto mb-4 flex items-center justify-center">
-                  <MapPin className="h-6 w-6 text-white" />
-                </div>
-                <h4 className="font-semibold text-white mb-2">Market Coverage</h4>
-                <p className="text-gray-300 text-sm">Analyze any US city with neighborhood-level precision</p>
+                <h4 className="font-semibold text-white mb-2">End-to-End Solution</h4>
+                <p className="text-gray-300 text-sm">From market research to deal closing - everything you need</p>
               </div>
             </div>
           </CardContent>
