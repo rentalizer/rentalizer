@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,33 +17,38 @@ const Test4 = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-      {/* Custom CSS for sequential rotation animation */}
-      <style jsx>{`
-        @keyframes rotation-sequence {
-          0%, 12.5% { transform: rotate(0deg); }
-          25%, 37.5% { transform: rotate(360deg); }
-          50%, 62.5% { transform: rotate(360deg); }
-          75%, 87.5% { transform: rotate(360deg); }
-          100% { transform: rotate(360deg); }
+      {/* Custom CSS for sequential flash animation */}
+      <style>{`
+        @keyframes flash-sequence {
+          0%, 20% { 
+            opacity: 1; 
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.8), 0 0 40px rgba(168, 85, 247, 0.6);
+          }
+          25%, 100% { 
+            opacity: 0.7; 
+            transform: scale(1);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.3), 0 0 20px rgba(168, 85, 247, 0.2);
+          }
         }
         
-        .rotate-feature-1 {
-          animation: rotation-sequence 8s infinite;
+        .flash-feature-1 {
+          animation: flash-sequence 8s infinite;
           animation-delay: 0s;
         }
         
-        .rotate-feature-2 {
-          animation: rotation-sequence 8s infinite;
+        .flash-feature-2 {
+          animation: flash-sequence 8s infinite;
           animation-delay: 2s;
         }
         
-        .rotate-feature-3 {
-          animation: rotation-sequence 8s infinite;
+        .flash-feature-3 {
+          animation: flash-sequence 8s infinite;
           animation-delay: 4s;
         }
         
-        .rotate-feature-4 {
-          animation: rotation-sequence 8s infinite;
+        .flash-feature-4 {
+          animation: flash-sequence 8s infinite;
           animation-delay: 6s;
         }
       `}</style>
@@ -124,11 +130,11 @@ const Test4 = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {/* Feature 1: Market Intelligence */}
               <div className="group relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105">
                   <CardHeader className="text-center pb-4">
                     <div className="mx-auto mb-4 relative">
-                      <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center rotate-feature-1">
+                      <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center flash-feature-1 transition-all duration-300">
                         <Brain className="h-10 w-10 text-white" />
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -150,11 +156,11 @@ const Test4 = () => {
 
               {/* Feature 2: Deal Calculator */}
               <div className="group relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-cyan-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105">
                   <CardHeader className="text-center pb-4">
                     <div className="mx-auto mb-4 relative">
-                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center rotate-feature-2">
+                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center flash-feature-2 transition-all duration-300">
                         <Calculator className="h-10 w-10 text-white" />
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -176,11 +182,11 @@ const Test4 = () => {
 
               {/* Feature 3: CRM & Automation */}
               <div className="group relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105">
                   <CardHeader className="text-center pb-4">
                     <div className="mx-auto mb-4 relative">
-                      <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center rotate-feature-3">
+                      <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center flash-feature-3 transition-all duration-300">
                         <Target className="h-10 w-10 text-white" />
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -202,11 +208,11 @@ const Test4 = () => {
 
               {/* Feature 4: Community & Training */}
               <div className="group relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-cyan-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105">
                   <CardHeader className="text-center pb-4">
                     <div className="mx-auto mb-4 relative">
-                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center rotate-feature-4">
+                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center flash-feature-4 transition-all duration-300">
                         <MessageSquare className="h-10 w-10 text-white" />
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
