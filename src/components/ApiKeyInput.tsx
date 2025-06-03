@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -36,10 +35,10 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'active': return <Badge className="bg-green-600 text-white">Active</Badge>;
-      case 'invalid': return <Badge className="bg-yellow-600 text-white">Invalid</Badge>;
-      case 'missing': return <Badge className="bg-red-600 text-white">Missing</Badge>;
-      default: return <Badge className="bg-gray-600 text-white">Unknown</Badge>;
+      case 'active': return <Badge className="bg-green-600 text-white text-xs px-2 py-1">Active</Badge>;
+      case 'invalid': return <Badge className="bg-yellow-600 text-white text-xs px-2 py-1">Invalid</Badge>;
+      case 'missing': return <Badge className="bg-red-600 text-white text-xs px-2 py-1">Missing</Badge>;
+      default: return <Badge className="bg-gray-600 text-white text-xs px-2 py-1">Unknown</Badge>;
     }
   };
 
@@ -193,25 +192,19 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           )}
 
           {/* API Key Inputs with Status */}
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-4">
             {/* AirDNA API Key */}
-            <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-md">
-              <div className="flex items-center gap-3 flex-1">
-                {getStatusIcon(getKeyStatus(airdnaKey))}
-                <div className="flex-1">
-                  <span className="text-white font-medium">AirDNA API</span>
-                  <Input
-                    id="airdna-key"
-                    type={showKeys ? "text" : "password"}
-                    value={airdnaKey}
-                    onChange={(e) => setAirdnaKey(e.target.value)}
-                    placeholder="Enter AirDNA API key..."
-                    className="mt-2 bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
-                  />
-                  <p className={`text-xs mt-1 ${airdnaKey ? 'text-green-400' : 'text-red-400'}`}>
-                    {airdnaKey ? '✅ Market analytics data' : '❌ Required for market analytics'}
-                  </p>
-                </div>
+            <div className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-md">
+              {getStatusIcon(getKeyStatus(airdnaKey))}
+              <div className="flex-1 min-w-0">
+                <Input
+                  id="airdna-key"
+                  type={showKeys ? "text" : "password"}
+                  value={airdnaKey}
+                  onChange={(e) => setAirdnaKey(e.target.value)}
+                  placeholder="AirDNA API key..."
+                  className="h-8 text-sm bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                />
               </div>
               <div className="flex items-center gap-2">
                 {airdnaKey && showKeys && (
@@ -219,7 +212,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                     size="sm"
                     variant="ghost"
                     onClick={() => copyToClipboard(airdnaKey, 'AirDNA')}
-                    className="h-8 w-8 p-0 text-gray-400 hover:text-white"
+                    className="h-6 w-6 p-0 text-gray-400 hover:text-white"
                   >
                     <Copy className="h-3 w-3" />
                   </Button>
@@ -229,23 +222,17 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             </div>
 
             {/* OpenAI API Key */}
-            <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-md">
-              <div className="flex items-center gap-3 flex-1">
-                {getStatusIcon(getKeyStatus(openaiKey))}
-                <div className="flex-1">
-                  <span className="text-white font-medium">OpenAI API</span>
-                  <Input
-                    id="openai-key"
-                    type={showKeys ? "text" : "password"}
-                    value={openaiKey}
-                    onChange={(e) => setOpenaiKey(e.target.value)}
-                    placeholder="Enter OpenAI API key (sk-...)..."
-                    className="mt-2 bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
-                  />
-                  <p className={`text-xs mt-1 ${openaiKey ? 'text-green-400' : 'text-red-400'}`}>
-                    {openaiKey ? '✅ OpenAI API key configured' : '❌ Required for AI research'}
-                  </p>
-                </div>
+            <div className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-md">
+              {getStatusIcon(getKeyStatus(openaiKey))}
+              <div className="flex-1 min-w-0">
+                <Input
+                  id="openai-key"
+                  type={showKeys ? "text" : "password"}
+                  value={openaiKey}
+                  onChange={(e) => setOpenaiKey(e.target.value)}
+                  placeholder="OpenAI API key (sk-...)..."
+                  className="h-8 text-sm bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                />
               </div>
               <div className="flex items-center gap-2">
                 {openaiKey && showKeys && (
@@ -253,7 +240,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                     size="sm"
                     variant="ghost"
                     onClick={() => copyToClipboard(openaiKey, 'OpenAI')}
-                    className="h-8 w-8 p-0 text-gray-400 hover:text-white"
+                    className="h-6 w-6 p-0 text-gray-400 hover:text-white"
                   >
                     <Copy className="h-3 w-3" />
                   </Button>
