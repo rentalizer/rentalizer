@@ -139,19 +139,6 @@ const Test4 = () => {
 
           {/* Animated Presentation Section */}
           <div className="mb-16 relative">
-            {/* Geometric background pattern */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              <div className="absolute top-0 left-1/4 w-32 h-32 border border-cyan-400/10 rotate-45 animate-pulse"></div>
-              <div className="absolute bottom-0 right-1/4 w-48 h-48 border border-purple-400/10 rotate-12 animate-pulse delay-1000"></div>
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-blue-400/5 rounded-full animate-pulse delay-500"></div>
-              
-              {/* Floating particles */}
-              <div className="absolute top-16 left-16 w-2 h-2 bg-cyan-400/20 rounded-full animate-bounce"></div>
-              <div className="absolute top-32 right-24 w-3 h-3 bg-purple-400/20 rounded-full animate-bounce delay-300"></div>
-              <div className="absolute bottom-24 left-32 w-1 h-1 bg-blue-400/30 rounded-full animate-bounce delay-700"></div>
-              <div className="absolute bottom-16 right-16 w-2 h-2 bg-cyan-300/20 rounded-full animate-bounce delay-1000"></div>
-            </div>
-
             {/* Main Content Container */}
             <div className="relative max-w-6xl mx-auto">
               {/* Section Title */}
@@ -176,12 +163,6 @@ const Test4 = () => {
                     <div className="relative z-10 w-32 h-32 rounded-full bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-lg border border-cyan-400/30 flex items-center justify-center">
                       <IconComponent className={`h-16 w-16 ${currentSlideData.color} animate-pulse`} />
                     </div>
-                    
-                    {/* Corner accent dots */}
-                    <div className="absolute -top-2 -left-2 w-4 h-4 bg-cyan-400/40 rounded-full animate-pulse"></div>
-                    <div className="absolute -top-2 -right-2 w-3 h-3 bg-purple-400/40 rounded-full animate-pulse delay-500"></div>
-                    <div className="absolute -bottom-2 -left-2 w-3 h-3 bg-blue-400/40 rounded-full animate-pulse delay-700"></div>
-                    <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-cyan-300/40 rounded-full animate-pulse delay-1000"></div>
                   </div>
                 </div>
 
