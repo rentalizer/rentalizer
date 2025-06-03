@@ -110,22 +110,29 @@ const Calculator = () => {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
             <CalculatorIcon className="h-10 w-10 text-cyan-400" />
-            Calculator
+            STR Calculator
           </h1>
           <p className="text-xl text-gray-300">
-            Assess Property Profitability And ROI For Short-Term Rentals
+            Calculate Property Profitability And ROI For Short-Term Rentals
           </p>
         </div>
 
-        {/* Optimized 2x2 Grid Layout */}
-        <div className="grid lg:grid-cols-2 gap-6 max-w-7xl mx-auto">
-          {/* Top Left - Comps */}
-          <CompsSection data={data} updateData={updateData} />
-          
-          {/* Top Right - Build Out with Integrated Furnishings */}
+        {/* Calculator Display - Top Section */}
+        <div className="max-w-4xl mx-auto mb-8">
+          <NetProfitSection 
+            monthlyRevenue={monthlyRevenue}
+            netProfitMonthly={netProfitMonthly}
+            paybackMonths={paybackMonths}
+            cashOnCashReturn={cashOnCashReturn}
+          />
+        </div>
+
+        {/* Calculator Input Sections - 3x1 Grid Layout */}
+        <div className="grid lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+          {/* 1st - Build Out Costs */}
           <BuildOutSection data={data} updateData={updateData} cashToLaunch={cashToLaunch} />
           
-          {/* Bottom Left - Expenses */}
+          {/* 2nd - Expenses */}
           <ExpensesSection 
             data={data} 
             updateData={updateData} 
@@ -133,13 +140,8 @@ const Calculator = () => {
             monthlyExpenses={monthlyExpenses}
           />
           
-          {/* Bottom Right - Net Profit */}
-          <NetProfitSection 
-            monthlyRevenue={monthlyRevenue}
-            netProfitMonthly={netProfitMonthly}
-            paybackMonths={paybackMonths}
-            cashOnCashReturn={cashOnCashReturn}
-          />
+          {/* 3rd - Comps */}
+          <CompsSection data={data} updateData={updateData} />
         </div>
       </div>
     </div>
