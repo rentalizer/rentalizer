@@ -71,45 +71,6 @@ const Test4 = () => {
     }
   ];
 
-  const textMessages = [
-    {
-      id: 1,
-      sender: "Bishoi",
-      message: "Just signed 3 lease! Got them to give me 8 weeks concession on all 3 units :)\n1 bedrooms were $1280 each\n2 bedroom $2032\n\nParking is free and there is no car maximum per unit\n\nAll rooms are on the same floor and on the top floor of the building\n\nGot a 3X5 storage unit on the same floor as the rooms for $40 per month\n\nGarbage is a daily valet service included in the rent",
-      image: "/lovable-uploads/e5dcd8f4-2858-4789-9448-f876221dedec.png"
-    },
-    {
-      id: 2,
-      sender: "Bishoi Mikhail",
-      message: "Happy New Year to you too and your family! Rental Arbitrage is still going strong 💪. We have secured another 3 units in Nashville now that we are setting up this month :) Hopefully these ones do well as well! We will be at a total of 8 units :) How's it going on your end?",
-      image: "/lovable-uploads/3ff6b265-2add-4f8e-9f58-2ffe760dc9a6.png"
-    },
-    {
-      id: 3,
-      sender: "Charlie & Britt",
-      message: "@Britt Stewart was absolutely relentless. We have two leases officially signed, insured and now she is schedule furniture delivery and executing her shopping list\n\nUnits going live tonight using the generic photos. Will update after we have professional photos",
-      image: "/lovable-uploads/0d9f9b9f-0e87-44b9-9fcd-070f6385b0b3.png"
-    },
-    {
-      id: 4,
-      sender: "Erica Williams",
-      message: "Locked in My First Airbnb Deal 2 Units!\n\nI'm excited to share that I've officially secured my first corporate housing deal and it's TWO units! This journey has been full of learning, challenges, and breakthroughs, and I couldn't have done it without the mentorship and support of this community.\n\nA huge thank you to Richie for his guidance and for sharing the blueprint to make this possible. To anyone still working toward their first deal keep pushing! The right opportunity is out there, and when it comes, you'll be ready to take action. 🥳\n\nThis is just the beginning! Lets keep building and scaling together. #CorporateHousing #AirbnbJourney #FirstDeal #KeepGoing",
-      image: "/lovable-uploads/fcf74d36-487a-4dca-bb60-87c5b306b7e0.png"
-    },
-    {
-      id: 5,
-      sender: "Mahmoud",
-      message: "I signed the lease yesterday. I'm going today to pick up the keys",
-      image: "/lovable-uploads/858e220e-58b7-4df0-a31b-5672f102d711.png"
-    },
-    {
-      id: 6,
-      sender: "Ngozi Iroezi",
-      message: "Good news. I just talked to him again and got $1000 off first month's rent!\n\nI learned from you!",
-      image: "/lovable-uploads/96681e6c-5660-4a76-b92b-93925842d15d.png"
-    }
-  ];
-
   const earningsScreenshots = [
     {
       id: 1,
@@ -452,70 +413,6 @@ const Test4 = () => {
               ))}
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Text Messages Section */}
-      <div className="max-w-7xl mx-auto mb-20">
-        <div className="text-center mb-12">
-          <h2 className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
-            Real Messages From Our Successful Students
-          </h2>
-          <p className="text-gray-400 text-lg max-w-3xl mx-auto">
-            See the actual conversations and updates we receive from students who are building their rental arbitrage businesses
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {textMessages.map((msg) => (
-            <div key={msg.id} className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-blue-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-              <Card className="relative bg-slate-800/90 backdrop-blur-lg border border-green-500/30 hover:border-green-400/60 transition-all duration-500 h-full group-hover:scale-105">
-                <CardContent className="p-6">
-                  {/* Message Image */}
-                  <div className="mb-6 rounded-lg overflow-hidden bg-slate-700/50 border border-slate-600/50">
-                    <img 
-                      src={msg.image} 
-                      alt={`Message from ${msg.sender}`}
-                      className="w-full h-auto object-cover"
-                    />
-                  </div>
-
-                  {/* Sender Name */}
-                  <div className="text-center">
-                    <h4 className="text-green-300 font-semibold text-lg mb-2">{msg.sender}</h4>
-                    <div className="flex justify-center gap-1 mb-4">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 fill-green-400 text-green-400" />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Message Preview */}
-                  <div className="bg-slate-700/50 rounded-lg p-4 border border-slate-600/30">
-                    <p className="text-gray-300 text-sm leading-relaxed italic line-clamp-4">
-                      "{msg.message.substring(0, 150)}..."
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
-        </div>
-
-        {/* Call to Action */}
-        <div className="text-center mt-12">
-          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-            These are just a few of the many success stories from our community. Ready to start your own journey?
-          </p>
-          <Button 
-            size="lg"
-            onClick={handleBookDemo}
-            className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-500 hover:to-blue-500 text-white px-12 py-6 text-xl font-semibold"
-          >
-            <Calendar className="h-6 w-6 mr-3" />
-            Book Your Demo Now
-          </Button>
         </div>
       </div>
 
