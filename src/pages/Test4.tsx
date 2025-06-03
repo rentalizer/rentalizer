@@ -244,7 +244,7 @@ const Test4 = () => {
                   </CardHeader>
                   <CardContent className="text-center">
                     <p className="text-gray-300 text-sm leading-relaxed">
-                      Connect With Other Rental Arbitrage Investors
+                      Join A Network Of Successful Rental Arbitrage Entrepreneurs
                     </p>
                     <div className="mt-4 flex justify-center">
                       <div className="flex -space-x-2">
