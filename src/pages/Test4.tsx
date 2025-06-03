@@ -98,8 +98,8 @@ const Test4 = () => {
             </div>
             <p className="text-lg text-white font-medium mb-8">By Richie Matthews</p>
             
-            {/* Updated Tagline */}
-            <p className="text-2xl md:text-3xl text-white mb-12 max-w-5xl mx-auto leading-relaxed font-semibold">
+            {/* Updated Tagline - forced to stay on one line */}
+            <p className="text-xl md:text-2xl lg:text-3xl text-white mb-12 max-w-7xl mx-auto leading-relaxed font-semibold whitespace-nowrap overflow-hidden">
               AI-Powered Rental Arbitrage System, CRM, And Community—Everything You Need To Succeed
             </p>
 
