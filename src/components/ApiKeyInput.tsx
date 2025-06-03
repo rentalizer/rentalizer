@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Key, Eye, EyeOff, Search, Copy, AlertCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Key, Eye, EyeOff, Search, Copy, AlertCircle, Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ApiKeyInputProps {
@@ -17,6 +18,30 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   const [showStoredKeys, setShowStoredKeys] = useState(false);
   const [foundKeys, setFoundKeys] = useState<{[key: string]: string}>({});
   const { toast } = useToast();
+
+  const getKeyStatus = (key: string) => {
+    if (!key) return 'missing';
+    if (key.length < 10) return 'invalid';
+    return 'active';
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active': return <Check className="h-4 w-4 text-green-500" />;
+      case 'invalid': return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+      case 'missing': return <X className="h-4 w-4 text-red-500" />;
+      default: return <X className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active': return <Badge className="bg-green-600 text-white">Active</Badge>;
+      case 'invalid': return <Badge className="bg-yellow-600 text-white">Invalid</Badge>;
+      case 'missing': return <Badge className="bg-red-600 text-white">Missing</Badge>;
+      default: return <Badge className="bg-gray-600 text-white">Unknown</Badge>;
+    }
+  };
 
   const handleSaveKeys = () => {
     // Store in localStorage for session persistence
@@ -69,15 +94,6 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     
     console.log('🗂️ ALL STORED KEYS FOUND:', allKeys);
     
-    // Show specific API keys
-    const apiKeys = {
-      'openai_api_key': localStorage.getItem('openai_api_key') || 'NOT FOUND',
-      'airdna_api_key': localStorage.getItem('airdna_api_key') || 'NOT FOUND', 
-      'professional_data_key': localStorage.getItem('professional_data_key') || 'NOT FOUND'
-    };
-    
-    console.log('🔑 SPECIFIC API KEYS:', apiKeys);
-    
     setFoundKeys(allKeys);
     setShowStoredKeys(!showStoredKeys);
     
@@ -105,7 +121,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     }
   };
 
-  // Load keys from localStorage on component mount - FIXED to prevent infinite loop
+  // Load keys from localStorage on component mount
   React.useEffect(() => {
     const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
@@ -120,7 +136,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
         openaiApiKey: savedOpenaiKey || undefined
       });
     }
-  }, []); // Removed onApiKeysChange from dependencies to prevent infinite loop
+  }, []);
 
   return (
     <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
@@ -176,34 +192,74 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             </div>
           )}
 
-          {/* API Key Inputs */}
+          {/* API Key Inputs with Status */}
           <div className="grid grid-cols-1 gap-6">
-            <div>
-              <Input
-                id="airdna-key"
-                type={showKeys ? "text" : "password"}
-                value={airdnaKey}
-                onChange={(e) => setAirdnaKey(e.target.value)}
-                placeholder="Enter AirDNA API key..."
-                className={`${airdnaKey ? 'border-green-500/30' : 'border-red-500/30'} bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500`}
-              />
-              <p className={`text-xs mt-1 ${airdnaKey ? 'text-green-400' : 'text-red-400'}`}>
-                {airdnaKey ? '✅ Market analytics data' : '❌ Required for market analytics'}
-              </p>
+            {/* AirDNA API Key */}
+            <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-md">
+              <div className="flex items-center gap-3 flex-1">
+                {getStatusIcon(getKeyStatus(airdnaKey))}
+                <div className="flex-1">
+                  <span className="text-white font-medium">AirDNA API</span>
+                  <Input
+                    id="airdna-key"
+                    type={showKeys ? "text" : "password"}
+                    value={airdnaKey}
+                    onChange={(e) => setAirdnaKey(e.target.value)}
+                    placeholder="Enter AirDNA API key..."
+                    className="mt-2 bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                  />
+                  <p className={`text-xs mt-1 ${airdnaKey ? 'text-green-400' : 'text-red-400'}`}>
+                    {airdnaKey ? '✅ Market analytics data' : '❌ Required for market analytics'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {airdnaKey && showKeys && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => copyToClipboard(airdnaKey, 'AirDNA')}
+                    className="h-8 w-8 p-0 text-gray-400 hover:text-white"
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                )}
+                {getStatusBadge(getKeyStatus(airdnaKey))}
+              </div>
             </div>
 
-            <div>
-              <Input
-                id="openai-key"
-                type={showKeys ? "text" : "password"}
-                value={openaiKey}
-                onChange={(e) => setOpenaiKey(e.target.value)}
-                placeholder="Enter OpenAI API key (sk-...)..."
-                className={`${openaiKey ? 'border-green-500/30' : 'border-red-500/30'} bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500`}
-              />
-              <p className={`text-xs mt-1 ${openaiKey ? 'text-green-400' : 'text-red-400'}`}>
-                {openaiKey ? '✅ OpenAI API key configured' : '❌ Required for AI research'}
-              </p>
+            {/* OpenAI API Key */}
+            <div className="flex items-center justify-between p-3 bg-gray-800/30 rounded-md">
+              <div className="flex items-center gap-3 flex-1">
+                {getStatusIcon(getKeyStatus(openaiKey))}
+                <div className="flex-1">
+                  <span className="text-white font-medium">OpenAI API</span>
+                  <Input
+                    id="openai-key"
+                    type={showKeys ? "text" : "password"}
+                    value={openaiKey}
+                    onChange={(e) => setOpenaiKey(e.target.value)}
+                    placeholder="Enter OpenAI API key (sk-...)..."
+                    className="mt-2 bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                  />
+                  <p className={`text-xs mt-1 ${openaiKey ? 'text-green-400' : 'text-red-400'}`}>
+                    {openaiKey ? '✅ OpenAI API key configured' : '❌ Required for AI research'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {openaiKey && showKeys && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => copyToClipboard(openaiKey, 'OpenAI')}
+                    className="h-8 w-8 p-0 text-gray-400 hover:text-white"
+                  >
+                    <Copy className="h-3 w-3" />
+                  </Button>
+                )}
+                {getStatusBadge(getKeyStatus(openaiKey))}
+              </div>
             </div>
           </div>
 
@@ -236,6 +292,15 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               >
                 Save Configuration
               </Button>
+            </div>
+          </div>
+
+          <div className="mt-4 p-3 bg-blue-600/20 rounded-lg border border-blue-500/30">
+            <div className="text-sm text-blue-300">
+              <strong>Environment:</strong> {window.location.hostname === 'localhost' ? 'Preview/Development' : 'Production'}
+            </div>
+            <div className="text-xs text-blue-400 mt-1">
+              Click "Find All Keys" to search for all stored API keys in your browser
             </div>
           </div>
         </div>

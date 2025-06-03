@@ -436,17 +436,15 @@ const MarketAnalysis = () => {
                 </CardContent>
               </Card>
 
-              <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="mt-8">
                 <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
-                <ApiKeyStatus />
               </div>
             </div>
           )}
 
           {submarketData.length === 0 && (
-            <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="mt-8">
               <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
-              <ApiKeyStatus />
             </div>
           )}
         </div>
