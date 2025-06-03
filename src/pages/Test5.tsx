@@ -31,17 +31,19 @@ const Test5 = () => {
   const [demoRunning, setDemoRunning] = useState(false);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          return 100;
-        }
-        return prev + 1;
-      });
-    }, 100);
+    if (demoRunning) {
+      const timer = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 100) {
+            return 0; // Reset progress
+          }
+          return prev + 2;
+        });
+      }, 100);
 
-    return () => clearInterval(timer);
-  }, []);
+      return () => clearInterval(timer);
+    }
+  }, [demoRunning]);
 
   useEffect(() => {
     if (demoRunning) {
@@ -176,13 +178,20 @@ const Test5 = () => {
             ))}
           </div>
 
+          {/* Progress Bar */}
+          {demoRunning && (
+            <div className="mb-8">
+              <Progress value={progress} className="w-full h-2" />
+            </div>
+          )}
+
           {/* Current Step Display */}
           {demoRunning && (
             <div className="text-center mb-8">
-              <div className="bg-slate-800/50 backdrop-blur-lg border border-gray-700 rounded-lg p-6 max-w-md mx-auto">
+              <div className="bg-slate-800/50 backdrop-blur-lg border border-gray-700 rounded-lg p-6 max-w-md mx-auto transform transition-all duration-500 scale-105">
                 <div className="flex items-center justify-center mb-4">
                   {React.createElement(steps[currentStep - 1]?.icon || Search, {
-                    className: `h-8 w-8 ${
+                    className: `h-12 w-12 ${
                       steps[currentStep - 1]?.category === 'market' ? 'text-cyan-400' :
                       steps[currentStep - 1]?.category === 'acquisition' ? 'text-purple-400' :
                       steps[currentStep - 1]?.category === 'pms' ? 'text-green-400' :
@@ -190,18 +199,18 @@ const Test5 = () => {
                     }`
                   })}
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">
-                  {steps[currentStep - 1]?.title}
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  Step {currentStep}: {steps[currentStep - 1]?.title}
                 </h3>
-                <p className="text-gray-300 text-sm">
+                <p className="text-gray-300 mb-4">
                   {steps[currentStep - 1]?.description}
                 </p>
                 <div className="mt-4">
-                  <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                    steps[currentStep - 1]?.category === 'market' ? 'bg-cyan-500/20 text-cyan-300' :
-                    steps[currentStep - 1]?.category === 'acquisition' ? 'bg-purple-500/20 text-purple-300' :
-                    steps[currentStep - 1]?.category === 'pms' ? 'bg-green-500/20 text-green-300' :
-                    'bg-orange-500/20 text-orange-300'
+                  <div className={`inline-block px-4 py-2 rounded-full text-sm font-medium ${
+                    steps[currentStep - 1]?.category === 'market' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' :
+                    steps[currentStep - 1]?.category === 'acquisition' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
+                    steps[currentStep - 1]?.category === 'pms' ? 'bg-green-500/20 text-green-300 border border-green-500/30' :
+                    'bg-orange-500/20 text-orange-300 border border-orange-500/30'
                   }`}>
                     {steps[currentStep - 1]?.category === 'market' ? 'Market Intelligence' :
                      steps[currentStep - 1]?.category === 'acquisition' ? 'Acquisition CRM' :
@@ -275,28 +284,37 @@ const Test5 = () => {
 
         {/* Live Results Preview - Only show when demo is running */}
         {demoRunning && (
-          <Card className="bg-slate-800/50 border-gray-700 mb-8">
+          <Card className="bg-slate-800/50 border-gray-700 mb-8 transform transition-all duration-500 animate-fade-in">
             <CardHeader>
               <CardTitle className="text-center text-2xl bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
                 Live Results Preview
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="bg-slate-700/50 rounded-lg p-4">
-                  <h4 className="font-semibold text-cyan-300 mb-2">Market Score</h4>
+              <div className="grid md:grid-cols-3 gap-6 mb-6">
+                <div className="bg-slate-700/50 rounded-lg p-4 border border-cyan-500/20">
+                  <h4 className="font-semibold text-cyan-300 mb-2 flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    Market Score
+                  </h4>
                   <div className="text-3xl font-bold text-white">8.7/10</div>
                   <p className="text-sm text-gray-400">Austin, TX - Downtown</p>
                 </div>
                 
-                <div className="bg-slate-700/50 rounded-lg p-4">
-                  <h4 className="font-semibold text-purple-300 mb-2">Properties Found</h4>
+                <div className="bg-slate-700/50 rounded-lg p-4 border border-purple-500/20">
+                  <h4 className="font-semibold text-purple-300 mb-2 flex items-center gap-2">
+                    <Building className="h-4 w-4" />
+                    Properties Found
+                  </h4>
                   <div className="text-3xl font-bold text-white">47</div>
                   <p className="text-sm text-gray-400">Available for arbitrage</p>
                 </div>
                 
-                <div className="bg-slate-700/50 rounded-lg p-4">
-                  <h4 className="font-semibold text-green-300 mb-2">Projected Profit</h4>
+                <div className="bg-slate-700/50 rounded-lg p-4 border border-green-500/20">
+                  <h4 className="font-semibold text-green-300 mb-2 flex items-center gap-2">
+                    <DollarSign className="h-4 w-4" />
+                    Projected Profit
+                  </h4>
                   <div className="text-3xl font-bold text-white">$2,340</div>
                   <p className="text-sm text-gray-400">Monthly net income</p>
                 </div>
@@ -304,8 +322,11 @@ const Test5 = () => {
 
               {/* Mock Calculator Demo */}
               {(currentStep >= 7 && currentStep <= 8) && (
-                <div className="mt-6 bg-slate-700/30 rounded-lg p-4">
-                  <h4 className="font-semibold text-purple-300 mb-4 text-center">Deal Analysis Calculator</h4>
+                <div className="mt-6 bg-slate-700/30 rounded-lg p-6 border border-purple-500/20 animate-scale-in">
+                  <h4 className="font-semibold text-purple-300 mb-4 text-center flex items-center justify-center gap-2">
+                    <Calculator className="h-5 w-5" />
+                    Deal Analysis Calculator
+                  </h4>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <p className="text-sm text-gray-400 mb-1">Monthly Rent Revenue</p>
@@ -323,6 +344,25 @@ const Test5 = () => {
                       <p className="text-sm text-gray-400 mb-1">Annual ROI</p>
                       <div className="text-2xl font-bold text-purple-300">420%</div>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Mock Email Campaign Demo */}
+              {(currentStep >= 5 && currentStep <= 6) && (
+                <div className="mt-6 bg-slate-700/30 rounded-lg p-6 border border-purple-500/20 animate-slide-in-right">
+                  <h4 className="font-semibold text-purple-300 mb-4 text-center flex items-center justify-center gap-2">
+                    <Mail className="h-5 w-5" />
+                    AI Email Campaign
+                  </h4>
+                  <div className="bg-slate-800/50 rounded-lg p-4 mb-4">
+                    <p className="text-sm text-gray-300 mb-2">Subject: Partnership Opportunity - Short-Term Rental Management</p>
+                    <p className="text-xs text-gray-400">Hi [Landlord Name], I hope this email finds you well. I'm reaching out regarding your property at [Property Address]...</p>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-green-300">✓ 127 emails sent</span>
+                    <span className="text-cyan-300">📈 23% open rate</span>
+                    <span className="text-purple-300">🎯 8 responses</span>
                   </div>
                 </div>
               )}
