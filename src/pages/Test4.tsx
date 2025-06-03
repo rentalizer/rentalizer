@@ -35,7 +35,8 @@ const Test4 = () => {
     },
     {
       name: "Shante Davis",
-      text: "Rentalizer's program is amazing. Rentalizer helped us close the largest apartment company in our area. We now have 6 properties. I recommend the mentorship. You won't be disappointed."
+      text: "Rentalizer's program is amazing. Rentalizer helped us close the largest apartment company in our area. We now have 6 properties. I recommend the mentorship. You won't be disappointed.",
+      earningsImage: "/lovable-uploads/ef710610-2357-4b37-930f-9f6f689c6888.png"
     },
     {
       name: "Maria Sallie Forte-Charette",
