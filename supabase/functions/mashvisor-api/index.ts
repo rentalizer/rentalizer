@@ -43,7 +43,7 @@ async function callMashvisorAPI(url: string, apiKey: string, description: string
 
     if (response.ok) {
       const data = await response.json()
-      console.log(`✅ ${description} successful`)
+      console.log(`✅ ${description} successful with data:`, JSON.stringify(data, null, 2))
       return { success: true, data }
     } else {
       const errorText = await response.text()
@@ -109,87 +109,77 @@ serve(async (req) => {
     const { state, zipCodes } = locationData
     console.log(`📍 Found state ${state} for city ${city} with ${zipCodes.length} zip codes`)
 
-    // Try the export-comps endpoint for multiple zip codes
-    const neighborhoodData = []
-    const limitedZipCodes = zipCodes.slice(0, 5) // Limit to 5 zip codes to avoid rate limits
+    // First try city-level lookup for baseline data
+    const encodedCity = encodeURIComponent(city)
+    const cityLookupUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodedCity}&resource=airbnb&beds=${propertyType}`
     
-    for (const [index, zipCode] of limitedZipCodes.entries()) {
-      console.log(`🏘️ [${index + 1}/${limitedZipCodes.length}] Trying export-comps for zip code: ${zipCode}`)
+    const cityResult = await callMashvisorAPI(cityLookupUrl, mashvisorApiKey, `City-level lookup for ${city}`)
+    
+    const neighborhoodData = []
+    
+    // Process city baseline if available
+    if (cityResult.success && cityResult.data.content) {
+      const content = cityResult.data.content
+      const airbnbRevenue = (content.airbnb?.revenue || content.revenue || 0) * 12
+      const rentalIncome = (content.rental?.rent || content.rent || content.traditional_rental || 0) * 12
       
-      const exportCompsUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/export-comps?state=${state}&zip_code=${zipCode}&resource=airbnb`
-      
-      const exportCompsResult = await callMashvisorAPI(exportCompsUrl, mashvisorApiKey, `Export-comps for ${zipCode}`)
-      
-      if (exportCompsResult.success && exportCompsResult.data.content) {
-        const content = exportCompsResult.data.content
-        
-        // Handle array of properties or single property
-        const properties = Array.isArray(content) ? content : [content]
-        
-        properties.forEach((property: any, propIndex: number) => {
-          const airbnbRevenue = (property.airbnb_revenue || property.revenue || 0) * 12
-          const rentalIncome = (property.rental_income || property.rent || property.traditional_rental || 0) * 12
-          
-          if (airbnbRevenue > 0 || rentalIncome > 0) {
-            neighborhoodData.push({
-              neighborhood: `${zipCode} - Property ${propIndex + 1}`,
-              airbnb_revenue: Math.round(airbnbRevenue),
-              rental_income: Math.round(rentalIncome),
-              occupancy_rate: property.occupancy_rate || property.occupancy || 0,
-              median_night_rate: property.night_rate || property.avg_night_rate || 0,
-              api_neighborhood: zipCode,
-              api_city: city,
-              api_state: state,
-              data_source: 'export_comps'
-            })
-            
-            console.log(`✅ Found export-comps data for ${zipCode}: STR $${Math.round(airbnbRevenue)}, Rent $${Math.round(rentalIncome)}`)
-          }
+      if (airbnbRevenue > 0 || rentalIncome > 0) {
+        neighborhoodData.push({
+          neighborhood: `${city} - City Average`,
+          airbnb_revenue: Math.round(airbnbRevenue),
+          rental_income: Math.round(rentalIncome),
+          occupancy_rate: content.airbnb?.occupancy || content.occupancy || 0,
+          median_night_rate: content.airbnb?.night_rate || content.night_rate || 0,
+          api_neighborhood: city,
+          api_city: city,
+          api_state: state,
+          data_source: 'city_baseline'
         })
-      } else {
-        console.log(`❌ No export-comps data found for ${zipCode}`)
-      }
-      
-      // Delay between zip codes to respect rate limits
-      if (index < limitedZipCodes.length - 1) {
-        console.log(`⏳ Waiting 500ms before next zip code...`)
-        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        console.log(`✅ City baseline data: STR $${Math.round(airbnbRevenue)}, Rent $${Math.round(rentalIncome)}`)
       }
     }
 
-    console.log(`📊 Export-comps analysis complete: Found ${neighborhoodData.length} properties with revenue data`)
-
-    // If no data found, try fallback city-level lookup
-    if (neighborhoodData.length === 0) {
-      console.log(`🔄 No export-comps data found, trying city-level rento-calculator as fallback`)
+    // Try zip code level lookups for more specific data
+    const limitedZipCodes = zipCodes.slice(0, 3) // Limit to 3 zip codes to avoid rate limits
+    
+    for (const [index, zipCode] of limitedZipCodes.entries()) {
+      console.log(`🏘️ [${index + 1}/${limitedZipCodes.length}] Trying zip code lookup: ${zipCode}`)
       
-      const encodedCity = encodeURIComponent(city)
-      const cityRentoUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodedCity}&resource=airbnb&beds=${propertyType}`
+      const zipLookupUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&zip_code=${zipCode}&resource=airbnb&beds=${propertyType}`
       
-      const cityRentoResult = await callMashvisorAPI(cityRentoUrl, mashvisorApiKey, `City-level rento-calculator for ${city}`)
+      const zipResult = await callMashvisorAPI(zipLookupUrl, mashvisorApiKey, `Zip code lookup for ${zipCode}`)
       
-      if (cityRentoResult.success && cityRentoResult.data.content) {
-        const content = cityRentoResult.data.content
+      if (zipResult.success && zipResult.data.content) {
+        const content = zipResult.data.content
         const airbnbRevenue = (content.airbnb?.revenue || content.revenue || 0) * 12
         const rentalIncome = (content.rental?.rent || content.rent || content.traditional_rental || 0) * 12
         
         if (airbnbRevenue > 0 || rentalIncome > 0) {
           neighborhoodData.push({
-            neighborhood: `${city} - City Average`,
+            neighborhood: `${zipCode} - ${city}`,
             airbnb_revenue: Math.round(airbnbRevenue),
             rental_income: Math.round(rentalIncome),
             occupancy_rate: content.airbnb?.occupancy || content.occupancy || 0,
             median_night_rate: content.airbnb?.night_rate || content.night_rate || 0,
-            api_neighborhood: city,
+            api_neighborhood: zipCode,
             api_city: city,
             api_state: state,
-            data_source: 'city_fallback'
+            data_source: 'zip_code'
           })
           
-          console.log(`✅ City fallback data: STR $${Math.round(airbnbRevenue)}, Rent $${Math.round(rentalIncome)}`)
+          console.log(`✅ Zip code ${zipCode} data: STR $${Math.round(airbnbRevenue)}, Rent $${Math.round(rentalIncome)}`)
         }
       }
+      
+      // Delay between zip codes to respect rate limits
+      if (index < limitedZipCodes.length - 1) {
+        console.log(`⏳ Waiting 1000ms before next zip code...`)
+        await new Promise(resolve => setTimeout(resolve, 1000))
+      }
     }
+
+    console.log(`📊 Analysis complete: Found ${neighborhoodData.length} areas with revenue data`)
 
     return new Response(
       JSON.stringify({
@@ -199,7 +189,7 @@ serve(async (req) => {
           state: state,
           propertyType: propertyType,
           bathrooms: bathrooms,
-          source: 'export-comps',
+          source: 'rento-calculator-lookup',
           total_zip_codes: zipCodes.length,
           processed_zip_codes: limitedZipCodes.length,
           content: {
