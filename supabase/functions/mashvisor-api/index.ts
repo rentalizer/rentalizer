@@ -1,4 +1,3 @@
-
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
@@ -154,28 +153,8 @@ serve(async (req) => {
     const encodedCity = encodeURIComponent(city)
     let finalResult = null
 
-    // Strategy 1: Neighborhood Level - Try neighborhoods endpoint first
-    if (!zipCode && !address) {
-      const neighborhoodUrl = `https://api.mashvisor.com/v1.1/client/city/neighborhoods/${state}/${encodedCity}`
-      const neighborhoodResult = await callMashvisorAPI(neighborhoodUrl, mashvisorApiKey, 'Neighborhood endpoint')
-      
-      if (neighborhoodResult.success) {
-        finalResult = {
-          success: true,
-          data: {
-            city: city,
-            state: state,
-            propertyType: propertyType,
-            bathrooms: bathrooms,
-            source: 'neighborhoods',
-            ...neighborhoodResult.data
-          }
-        }
-      }
-    }
-
-    // Strategy 2: Address Level - If we have full address details
-    if (!finalResult && address && zipCode && lat && lng) {
+    // Strategy 1: Address Level - Try address endpoint first if we have full details
+    if (address && zipCode && lat && lng) {
       const addressUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&zip_code=${zipCode}&resource=airbnb&beds=${propertyType}&address=${encodeURIComponent(address)}&city=${encodedCity}&lat=${lat}&lng=${lng}`
       const addressResult = await callMashvisorAPI(addressUrl, mashvisorApiKey, 'Address level endpoint')
       
@@ -196,7 +175,7 @@ serve(async (req) => {
       }
     }
 
-    // Strategy 3: Zip Code Level - If we have zip code but no full address
+    // Strategy 2: Zip Code Level - If we have zip code but no full address
     if (!finalResult && zipCode) {
       const zipUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&zip_code=${zipCode}&resource=airbnb&beds=${propertyType}`
       const zipResult = await callMashvisorAPI(zipUrl, mashvisorApiKey, 'Zip code level endpoint')
@@ -217,7 +196,7 @@ serve(async (req) => {
       }
     }
 
-    // Strategy 4: City Level - Fallback to city level lookup
+    // Strategy 3: City Level - Try city level lookup for revenue data
     if (!finalResult) {
       const cityUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodedCity}&resource=airbnb&beds=${propertyType}`
       const cityResult = await callMashvisorAPI(cityUrl, mashvisorApiKey, 'City level endpoint')
@@ -232,6 +211,26 @@ serve(async (req) => {
             bathrooms: bathrooms,
             source: 'city',
             ...cityResult.data
+          }
+        }
+      }
+    }
+
+    // Strategy 4: Neighborhood Level - Fallback to neighborhoods endpoint
+    if (!finalResult) {
+      const neighborhoodUrl = `https://api.mashvisor.com/v1.1/client/city/neighborhoods/${state}/${encodedCity}`
+      const neighborhoodResult = await callMashvisorAPI(neighborhoodUrl, mashvisorApiKey, 'Neighborhood endpoint')
+      
+      if (neighborhoodResult.success) {
+        finalResult = {
+          success: true,
+          data: {
+            city: city,
+            state: state,
+            propertyType: propertyType,
+            bathrooms: bathrooms,
+            source: 'neighborhoods',
+            ...neighborhoodResult.data
           }
         }
       }
