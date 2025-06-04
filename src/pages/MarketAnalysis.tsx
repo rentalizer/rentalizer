@@ -7,9 +7,15 @@ import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
 import { SimulatedMarketIntelligence } from '@/components/SimulatedMarketIntelligence';
+import { ApiKeyInput } from '@/components/ApiKeyInput';
 
 const MarketAnalysis = () => {
   const navigate = useNavigate();
+
+  const handleApiKeysChange = (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => {
+    // API keys are automatically saved to localStorage by the ApiKeyInput component
+    console.log('API keys updated for market analysis:', keys);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
@@ -59,6 +65,11 @@ const MarketAnalysis = () => {
                 Export Data
               </Badge>
             </div>
+          </div>
+
+          {/* API Key Configuration Section */}
+          <div className="mb-8">
+            <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
           </div>
 
           {/* Simulated Market Intelligence Component */}
