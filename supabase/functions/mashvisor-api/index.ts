@@ -126,27 +126,44 @@ serve(async (req) => {
         
         // Process each property from the list-comps response
         zipResult.data.content.forEach((property: any, propIndex: number) => {
-          const monthlyRevenue = property.revenue || property.airbnb_revenue || property.monthly_revenue || 0
+          // Extract revenue data - try multiple possible field names
+          const monthlyRevenue = property.revenue || property.airbnb_revenue || property.monthly_revenue || property.str_revenue || 0
           const annualRevenue = monthlyRevenue * 12
-          const monthlyRent = property.rent || property.rental_income || property.traditional_rental || 0
+          
+          // Extract rent data - try multiple possible field names  
+          const monthlyRent = property.rent || property.rental_income || property.traditional_rental || property.monthly_rent || 0
           const annualRent = monthlyRent * 12
+          
+          console.log(`🏠 Property ${propIndex + 1} in ${zipCode}: Monthly Revenue: $${monthlyRevenue}, Monthly Rent: $${monthlyRent}`)
           
           if (annualRevenue > 0 || annualRent > 0) {
             propertiesWithRevenue.push({
               neighborhood: `${zipCode} - Property ${propIndex + 1}`,
               airbnb_revenue: Math.round(annualRevenue),
               rental_income: Math.round(annualRent),
-              occupancy_rate: property.occupancy || 0,
-              median_night_rate: property.night_rate || property.nightly_rate || 0,
+              occupancy_rate: property.occupancy || property.occupancy_rate || 0,
+              median_night_rate: property.night_rate || property.nightly_rate || property.rate || 0,
               api_neighborhood: zipCode,
               api_city: city,
               api_state: state,
               data_source: 'list_comps',
-              property_address: property.address || `Property in ${zipCode}`,
-              property_id: property.id || `${zipCode}-${propIndex}`
+              property_address: property.address || property.location || `Property in ${zipCode}`,
+              property_id: property.id || property.property_id || `${zipCode}-${propIndex}`,
+              raw_data: {
+                revenue: property.revenue,
+                airbnb_revenue: property.airbnb_revenue,
+                monthly_revenue: property.monthly_revenue,
+                str_revenue: property.str_revenue,
+                rent: property.rent,
+                rental_income: property.rental_income,
+                traditional_rental: property.traditional_rental,
+                monthly_rent: property.monthly_rent
+              }
             })
             
             console.log(`✅ Property ${propIndex + 1} in ${zipCode}: STR $${Math.round(annualRevenue)}, Rent $${Math.round(annualRent)}`)
+          } else {
+            console.log(`⚠️ Property ${propIndex + 1} in ${zipCode}: No revenue data found`)
           }
         })
       } else {

@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 interface SubmarketData {
@@ -53,6 +54,8 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
         const rentRevenue = property.rental_income || 0;
         const dataSource = property.data_source || 'unknown';
         
+        console.log(`📈 Processing property: ${propertyName}, STR: $${strRevenue}, Rent: $${rentRevenue}`);
+        
         if (strRevenue > 0 || rentRevenue > 0) {
           const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
           
@@ -91,7 +94,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       });
     }
     
-    // Handle export-comps data (keep existing handling)
+    // Handle export-comps data
     else if (responseData.source === 'export-comps' && responseData.content?.neighborhoods_with_revenue) {
       console.log('📊 Processing export-comps data from Mashvisor API');
       
