@@ -23,19 +23,21 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    const prompt = `Please provide the current median monthly rent for ${propertyType}-bedroom, ${bathrooms}-bathroom apartments in ${city}. 
+    const prompt = `Please provide the current median monthly rent for ${propertyType}-bedroom, ${bathrooms}-bathroom apartments in ${city} and its major neighborhoods/districts. 
 
-Return the data in JSON format with the following structure:
+Return ONLY a valid JSON object with this exact structure (no markdown, no code blocks, no additional text):
 {
-  "cityAverage": [median rent number],
+  "cityAverage": [number],
   "neighborhoods": {
-    "Neighborhood 1": [rent amount],
-    "Neighborhood 2": [rent amount],
-    "Neighborhood 3": [rent amount]
+    "Neighborhood 1": [number],
+    "Neighborhood 2": [number],
+    "Neighborhood 3": [number],
+    "Neighborhood 4": [number],
+    "Neighborhood 5": [number]
   }
 }
 
-Only return the JSON object, no additional text. Use current 2024 market data.`;
+Use current 2024 market data and provide realistic rent variations between neighborhoods. Include at least 5 different neighborhoods with varied rent prices (some higher-end, some mid-range, some affordable areas).`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -48,7 +50,7 @@ Only return the JSON object, no additional text. Use current 2024 market data.`;
         messages: [
           { 
             role: 'system', 
-            content: 'You are a real estate data expert. Provide accurate current market rental data in JSON format only.' 
+            content: 'You are a real estate data expert. Provide accurate current market rental data in valid JSON format only. Never use markdown code blocks or any additional formatting. Return only the raw JSON object.' 
           },
           { role: 'user', content: prompt }
         ],
@@ -62,13 +64,21 @@ Only return the JSON object, no additional text. Use current 2024 market data.`;
     }
 
     const data = await response.json();
-    const rentDataText = data.choices[0].message.content;
+    let rentDataText = data.choices[0].message.content.trim();
     
     console.log('📊 OpenAI rent response:', rentDataText);
+    
+    // Clean up markdown code blocks if they exist
+    rentDataText = rentDataText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
     
     try {
       const rentData = JSON.parse(rentDataText);
       console.log('✅ Parsed rent data:', rentData);
+      
+      // Validate the structure
+      if (!rentData.cityAverage || !rentData.neighborhoods || typeof rentData.neighborhoods !== 'object') {
+        throw new Error('Invalid data structure from OpenAI');
+      }
       
       return new Response(JSON.stringify({
         success: true,
@@ -78,9 +88,11 @@ Only return the JSON object, no additional text. Use current 2024 market data.`;
       });
     } catch (parseError) {
       console.error('❌ Failed to parse OpenAI response as JSON:', parseError);
+      console.error('❌ Raw response was:', rentDataText);
       
       // Fallback: try to extract numbers from the response
-      const cityAverage = parseInt(rentDataText.match(/\d{3,4}/)?.[0] || '0');
+      const numbers = rentDataText.match(/\d{3,4}/g);
+      const cityAverage = numbers && numbers.length > 0 ? parseInt(numbers[0]) : 0;
       
       return new Response(JSON.stringify({
         success: true,
