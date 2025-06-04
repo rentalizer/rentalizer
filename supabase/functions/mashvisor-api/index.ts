@@ -35,7 +35,7 @@ serve(async (req) => {
     // Call Mashvisor API with proper parameters
     const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client')
     
-    // Add query parameters if needed based on the API documentation
+    // Add query parameters based on the API documentation
     if (city) mashvisorUrl.searchParams.append('city', city)
     if (propertyType) mashvisorUrl.searchParams.append('bedrooms', propertyType)
     if (bathrooms) mashvisorUrl.searchParams.append('bathrooms', bathrooms)

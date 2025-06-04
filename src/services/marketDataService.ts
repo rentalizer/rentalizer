@@ -1,3 +1,4 @@
+
 import { CityMarketData, STRData, RentData } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -105,31 +106,40 @@ const fetchMashvisorDataViaEdgeFunction = async (city: string, propertyType: str
     console.log('✅ Edge Function Success - Processing data...');
     const apiData = data.data;
 
-    if (apiData.content && apiData.content.length > 0) {
+    // Check if we have actual data from Mashvisor API
+    if (apiData && (apiData.content || apiData.properties || apiData.listings)) {
       console.log('✅ REAL DATA CONFIRMED - Processing Mashvisor data...');
       
-      const strData: STRData[] = apiData.content.slice(0, 6).map((item: any, index: number) => {
-        const actualMonthlyEarnings = item.airbnb_revenue || item.monthly_revenue || 0;
-        const monthlyRevenueWith25Percent = Math.round(actualMonthlyEarnings * 1.25);
-        
-        return {
-          submarket: item.neighborhood || item.area || `${city} Area ${index + 1}`,
-          revenue: monthlyRevenueWith25Percent
-        };
-      });
+      // Handle different possible response structures
+      const dataArray = apiData.content || apiData.properties || apiData.listings || [];
+      
+      if (dataArray && dataArray.length > 0) {
+        const strData: STRData[] = dataArray.slice(0, 6).map((item: any, index: number) => {
+          // Try different property names that might contain revenue data
+          const revenue = item.airbnb_revenue || item.monthly_revenue || item.str_revenue || item.rental_income || 0;
+          const adjustedRevenue = Math.round(revenue * 1.25); // Add 25% markup
+          
+          return {
+            submarket: item.neighborhood || item.area || item.address || `${city} Area ${index + 1}`,
+            revenue: adjustedRevenue
+          };
+        });
 
-      const rentData: RentData[] = apiData.content.slice(0, 6).map((item: any, index: number) => {
-        return {
-          submarket: item.neighborhood || item.area || `${city} Area ${index + 1}`,
-          rent: item.monthly_rent || item.rent || 0
-        };
-      });
+        const rentData: RentData[] = dataArray.slice(0, 6).map((item: any, index: number) => {
+          const rent = item.monthly_rent || item.rent || item.traditional_rental || 0;
+          
+          return {
+            submarket: item.neighborhood || item.area || item.address || `${city} Area ${index + 1}`,
+            rent: rent
+          };
+        });
 
-      console.log('✅ FINAL REAL DATA:', { strData, rentData });
-      return { strData, rentData };
+        console.log('✅ FINAL REAL DATA:', { strData, rentData });
+        return { strData, rentData };
+      }
     }
 
-    console.log('❌ No content in Mashvisor response');
+    console.log('❌ No usable content in Mashvisor response, response structure:', Object.keys(apiData || {}));
     return { strData: null, rentData: null };
 
   } catch (error: any) {
@@ -155,12 +165,12 @@ export const fetchMarketData = async (
 
     const { strData: apiStrData, rentData: apiRentData } = await fetchMashvisorDataViaEdgeFunction(city, propertyType, bathrooms);
 
-    if (apiStrData && apiRentData) {
+    if (apiStrData && apiRentData && apiStrData.length > 0 && apiRentData.length > 0) {
       strData = apiStrData;
       rentData = apiRentData;
       console.log('✅ Using REAL data from Mashvisor API via Edge Function');
     } else {
-      console.log('❌ Edge Function failed - will show "NA" for all data');
+      console.log('❌ Edge Function failed or returned no data - will show "NA" for all data');
       // Create placeholder data with "NA" indicators
       const cityKey = city.toLowerCase();
       const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Area`];
@@ -179,7 +189,7 @@ export const fetchMarketData = async (
     console.log(`📊 ✅ FINAL Market data compilation complete for ${city}:`, {
       strSubmarkets: strData.length,
       rentSubmarkets: rentData.length,
-      dataSource: apiStrData && apiRentData ? 'Real Mashvisor API via Edge Function' : 'Edge Function Failed - Showing NA'
+      dataSource: apiStrData && apiRentData && apiStrData.length > 0 ? 'Real Mashvisor API via Edge Function' : 'Edge Function Failed - Showing NA'
     });
 
     return {
