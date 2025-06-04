@@ -36,19 +36,60 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
 export const processMarketData = (marketData: any): SubmarketData[] => {
   const processedData: SubmarketData[] = [];
   
-  // Handle the response data structure
-  if (marketData && marketData.data && marketData.data.content && Array.isArray(marketData.data.content)) {
-    marketData.data.content.forEach((item: any) => {
-      const multiple = item.rental_income > 0 && item.airbnb_revenue > 0 
-        ? item.airbnb_revenue / item.rental_income 
-        : 0;
+  // Handle the response data structure from property analytics endpoint
+  if (marketData && marketData.data && marketData.data.content) {
+    const content = marketData.data.content;
+    
+    // If content is an object with property analytics data
+    if (content.airbnb && content.traditional_rental) {
+      const airbnbRevenue = content.airbnb.revenue || 0;
+      const traditionalRent = content.traditional_rental.revenue || 0;
+      const multiple = traditionalRent > 0 ? airbnbRevenue / traditionalRent : 0;
       
       processedData.push({
-        submarket: item.neighborhood || item.area || 'Unknown Area',
-        strRevenue: item.airbnb_revenue || 0,
-        medianRent: item.rental_income || 0,
+        submarket: content.neighborhood || content.area || `${marketData.data.city || 'Unknown City'} Center`,
+        strRevenue: airbnbRevenue,
+        medianRent: traditionalRent,
         multiple: multiple
       });
+    }
+    // If content is an array of neighborhood data
+    else if (Array.isArray(content)) {
+      content.forEach((item: any) => {
+        const airbnbRevenue = item.airbnb?.revenue || item.airbnb_revenue || 0;
+        const traditionalRent = item.traditional_rental?.revenue || item.rental_income || 0;
+        const multiple = traditionalRent > 0 ? airbnbRevenue / traditionalRent : 0;
+        
+        processedData.push({
+          submarket: item.neighborhood || item.area || item.name || 'Unknown Area',
+          strRevenue: airbnbRevenue,
+          medianRent: traditionalRent,
+          multiple: multiple
+        });
+      });
+    }
+    // If it's a single property analysis
+    else if (typeof content === 'object') {
+      const airbnbRevenue = content.airbnb_revenue || content.str_revenue || 0;
+      const traditionalRent = content.rental_income || content.median_rent || 0;
+      const multiple = traditionalRent > 0 ? airbnbRevenue / traditionalRent : 0;
+      
+      processedData.push({
+        submarket: content.neighborhood || content.area || 'Market Analysis',
+        strRevenue: airbnbRevenue,
+        medianRent: traditionalRent,
+        multiple: multiple
+      });
+    }
+  }
+
+  // If no valid data found, create a sample entry to show structure
+  if (processedData.length === 0) {
+    processedData.push({
+      submarket: 'No Data Available',
+      strRevenue: 0,
+      medianRent: 0,
+      multiple: 0
     });
   }
 
