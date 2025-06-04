@@ -16,7 +16,8 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
       body: {
         city,
         propertyType,
-        bathrooms
+        bathrooms,
+        requestNeighborhoods: true // Always request neighborhood data
       }
     });
 
@@ -42,18 +43,48 @@ export const processMarketData = async (marketData: any, city: string, propertyT
   if (marketData && marketData.success && marketData.data) {
     const responseData = marketData.data;
     
+    // Handle neighborhood data from various Mashvisor endpoints
+    if (responseData.neighborhoods && Array.isArray(responseData.neighborhoods)) {
+      console.log('📊 Processing neighborhoods array from Mashvisor API');
+      
+      responseData.neighborhoods.forEach((neighborhood: any) => {
+        const locationName = neighborhood.name || neighborhood.neighborhood || neighborhood.area || 'Unknown Neighborhood';
+        
+        // Extract STR revenue data
+        const annualStrRevenue = neighborhood.airbnb_revenue || neighborhood.str_revenue || neighborhood.revenue || 0;
+        const monthlyStrRevenue = annualStrRevenue > 1000 ? Math.round(annualStrRevenue / 12) : annualStrRevenue;
+        
+        // Apply 25% markup to STR revenue
+        const strRevenueWith25Markup = Math.round(monthlyStrRevenue * 1.25);
+        
+        // Extract rental data
+        const monthlyRent = neighborhood.rental_income || neighborhood.traditional_rental || neighborhood.rent || neighborhood.median_rent || 0;
+        
+        console.log(`📈 Processing neighborhood: ${locationName}, Monthly STR: $${monthlyStrRevenue}, With 25% markup: $${strRevenueWith25Markup}, Rent: $${monthlyRent}`);
+        
+        const multiple = (strRevenueWith25Markup > 0 && monthlyRent > 0) ? strRevenueWith25Markup / monthlyRent : 0;
+        
+        processedData.push({
+          submarket: locationName,
+          strRevenue: strRevenueWith25Markup,
+          medianRent: monthlyRent,
+          multiple: multiple
+        });
+      });
+    }
+    
     // Handle rento-calculator-lookup data with neighborhoods_with_revenue
-    if (responseData.source === 'rento-calculator-lookup' && responseData.content?.neighborhoods_with_revenue) {
+    else if (responseData.source === 'rento-calculator-lookup' && responseData.content?.neighborhoods_with_revenue) {
       console.log('📊 Processing rento-calculator lookup data from Mashvisor API');
       
       const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
       
       neighborhoodsWithRevenue.forEach((location: any) => {
-        const locationName = location.neighborhood || location.property_address || 'Unknown Location';
+        const locationName = location.neighborhood || location.property_address || location.area || 'Unknown Location';
         const annualStrRevenue = location.airbnb_revenue || 0;
-        const monthlyStrRevenue = Math.round(annualStrRevenue / 12); // Convert annual to monthly
+        const monthlyStrRevenue = Math.round(annualStrRevenue / 12);
         
-        // Apply 25% markup to STR revenue as per your formula
+        // Apply 25% markup to STR revenue
         const strRevenueWith25Markup = Math.round(monthlyStrRevenue * 1.25);
         
         // Get rental data from the same Mashvisor location data
@@ -61,23 +92,52 @@ export const processMarketData = async (marketData: any, city: string, propertyT
         
         console.log(`📈 Processing neighborhood: ${locationName}, Monthly STR: $${monthlyStrRevenue}, With 25% markup: $${strRevenueWith25Markup}, Mashvisor Rent: $${monthlyRent}`);
         
-        // Include ALL neighborhoods with data, even if some values are 0
         const multiple = (strRevenueWith25Markup > 0 && monthlyRent > 0) ? strRevenueWith25Markup / monthlyRent : 0;
         
         processedData.push({
           submarket: locationName,
-          strRevenue: strRevenueWith25Markup, // STR revenue with 25% markup
-          medianRent: monthlyRent, // From same Mashvisor API call
+          strRevenue: strRevenueWith25Markup,
+          medianRent: monthlyRent,
           multiple: multiple
         });
       });
     }
     
-    // Handle fallback case with basic content structure - only if no neighborhoods found
+    // Handle zip code based data (for specific cities with zip mappings)
+    else if (responseData.content && responseData.content.zipCodeData && Array.isArray(responseData.content.zipCodeData)) {
+      console.log('📊 Processing zip code based neighborhood data from Mashvisor API');
+      
+      responseData.content.zipCodeData.forEach((zipData: any) => {
+        const locationName = zipData.neighborhood || zipData.area || `Zip ${zipData.zipCode}` || 'Unknown Area';
+        
+        // Extract STR revenue data
+        const annualStrRevenue = zipData.airbnb_revenue || zipData.str_revenue || zipData.revenue || 0;
+        const monthlyStrRevenue = annualStrRevenue > 1000 ? Math.round(annualStrRevenue / 12) : annualStrRevenue;
+        
+        // Apply 25% markup to STR revenue
+        const strRevenueWith25Markup = Math.round(monthlyStrRevenue * 1.25);
+        
+        // Extract rental data
+        const monthlyRent = zipData.rental_income || zipData.traditional_rental || zipData.rent || zipData.median_rent || 0;
+        
+        console.log(`📈 Processing zip area: ${locationName}, Monthly STR: $${monthlyStrRevenue}, With 25% markup: $${strRevenueWith25Markup}, Rent: $${monthlyRent}`);
+        
+        const multiple = (strRevenueWith25Markup > 0 && monthlyRent > 0) ? strRevenueWith25Markup / monthlyRent : 0;
+        
+        processedData.push({
+          submarket: locationName,
+          strRevenue: strRevenueWith25Markup,
+          medianRent: monthlyRent,
+          multiple: multiple
+        });
+      });
+    }
+    
+    // Handle city-level data as fallback
     else if (responseData.content && processedData.length === 0) {
       const content = responseData.content;
       
-      console.log('📊 Processing fallback city-level data:', content);
+      console.log('📊 Processing city-level data as fallback:', content);
       
       // Try to extract revenue data from various field names
       const monthlyStrRevenue = content.airbnb_revenue || content.revenue || content.revpar || content.revpan || 0;
@@ -100,15 +160,15 @@ export const processMarketData = async (marketData: any, city: string, propertyT
         console.log(`💡 Calculated monthly STR revenue: $${nightRate} x ${occupiedDaysPerMonth} days/month = $${calculatedMonthlyStr}/month`);
       }
       
-      // Apply 25% markup to STR revenue as per your formula
+      // Apply 25% markup to STR revenue
       const strRevenueWith25Markup = Math.round(calculatedMonthlyStr * 1.25);
       
       const multiple = (strRevenueWith25Markup > 0 && monthlyRent > 0) ? strRevenueWith25Markup / monthlyRent : 0;
       
       processedData.push({
         submarket: `${responseData.city || city} - City Average`,
-        strRevenue: strRevenueWith25Markup, // STR revenue with 25% markup
-        medianRent: monthlyRent, // From same Mashvisor API call
+        strRevenue: strRevenueWith25Markup,
+        medianRent: monthlyRent,
         multiple: multiple
       });
     }
@@ -119,7 +179,7 @@ export const processMarketData = async (marketData: any, city: string, propertyT
     console.log('❌ No valid data found from Mashvisor');
     
     const cityName = marketData?.data?.city || city || 'Unknown City';
-    const message = marketData?.data?.message || 'No data available from Mashvisor API';
+    const message = marketData?.data?.message || 'No neighborhood data available from Mashvisor API';
     
     processedData.push({
       submarket: `${cityName} - ${message}`,
