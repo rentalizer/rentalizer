@@ -62,7 +62,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     return processedData;
   }
 
-  // Handle the response data structure from rento-calculator/export-comps endpoint
+  // Handle the response data structure from rento-calculator/list-comps endpoint
   if (marketData && marketData.data) {
     const data = marketData.data;
     
@@ -81,14 +81,14 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       return processedData;
     }
     
-    // Handle rento-calculator response structure - might have comps or comparables array
+    // Handle list-comps response structure - look for comps array at different levels
     if (data.content && data.content.comps && Array.isArray(data.content.comps)) {
       const comps = data.content.comps;
       
       comps.forEach((comp: any, index: number) => {
-        const address = comp.address || comp.location || `Property ${index + 1}`;
-        const strRevenue = comp.airbnb_revenue || comp.str_revenue || comp.rental_revenue || 0;
-        const medianRent = comp.long_term_rent || comp.traditional_rent || comp.median_rent || 0;
+        const address = comp.address || comp.location || comp.property_address || `Property ${index + 1}`;
+        const strRevenue = comp.airbnb_revenue || comp.str_revenue || comp.rental_revenue || comp.monthly_revenue || 0;
+        const medianRent = comp.long_term_rent || comp.traditional_rent || comp.median_rent || comp.monthly_rent || 0;
         const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
         
         if (strRevenue > 0 && medianRent > 0) {
@@ -102,12 +102,12 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       });
     }
     
-    // Handle if comps is at root level
+    // Handle if comps is at root level of data
     if (data.comps && Array.isArray(data.comps)) {
       data.comps.forEach((comp: any, index: number) => {
-        const address = comp.address || comp.location || `Property ${index + 1}`;
-        const strRevenue = comp.airbnb_revenue || comp.str_revenue || comp.rental_revenue || 0;
-        const medianRent = comp.long_term_rent || comp.traditional_rent || comp.median_rent || 0;
+        const address = comp.address || comp.location || comp.property_address || `Property ${index + 1}`;
+        const strRevenue = comp.airbnb_revenue || comp.str_revenue || comp.rental_revenue || comp.monthly_revenue || 0;
+        const medianRent = comp.long_term_rent || comp.traditional_rent || comp.median_rent || comp.monthly_rent || 0;
         const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
         
         if (strRevenue > 0 && medianRent > 0) {
@@ -124,9 +124,28 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     // Handle if data is directly an array of comps
     if (Array.isArray(data)) {
       data.forEach((comp: any, index: number) => {
-        const address = comp.address || comp.location || `Property ${index + 1}`;
-        const strRevenue = comp.airbnb_revenue || comp.str_revenue || comp.rental_revenue || 0;
-        const medianRent = comp.long_term_rent || comp.traditional_rent || comp.median_rent || 0;
+        const address = comp.address || comp.location || comp.property_address || `Property ${index + 1}`;
+        const strRevenue = comp.airbnb_revenue || comp.str_revenue || comp.rental_revenue || comp.monthly_revenue || 0;
+        const medianRent = comp.long_term_rent || comp.traditional_rent || comp.median_rent || comp.monthly_rent || 0;
+        const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
+        
+        if (strRevenue > 0 && medianRent > 0) {
+          processedData.push({
+            submarket: address,
+            strRevenue: Math.round(strRevenue),
+            medianRent: Math.round(medianRent),
+            multiple: multiple
+          });
+        }
+      });
+    }
+
+    // Handle if the response has a different structure with a list of properties
+    if (data.content && data.content.list && Array.isArray(data.content.list)) {
+      data.content.list.forEach((comp: any, index: number) => {
+        const address = comp.address || comp.location || comp.property_address || `Property ${index + 1}`;
+        const strRevenue = comp.airbnb_revenue || comp.str_revenue || comp.rental_revenue || comp.monthly_revenue || 0;
+        const medianRent = comp.long_term_rent || comp.traditional_rent || comp.median_rent || comp.monthly_rent || 0;
         const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
         
         if (strRevenue > 0 && medianRent > 0) {
