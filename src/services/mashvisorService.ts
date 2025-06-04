@@ -63,6 +63,61 @@ const fetchRentDataFromOpenAI = async (city: string, propertyType: string, bathr
   }
 };
 
+// Helper function to find matching neighborhood rent
+const findNeighborhoodRent = (locationName: string, rentData: any, cityAverage: number) => {
+  if (!rentData || !rentData.neighborhoods) {
+    return cityAverage;
+  }
+
+  // Clean up location name for better matching
+  const cleanLocationName = locationName
+    .replace(/^.*,\s*/, '') // Remove city prefix like "Austin, "
+    .toLowerCase()
+    .trim();
+
+  console.log(`🔍 Looking for rent data for: "${cleanLocationName}"`);
+
+  // Try exact match first
+  for (const [neighborhood, rent] of Object.entries(rentData.neighborhoods)) {
+    if (neighborhood.toLowerCase() === cleanLocationName) {
+      console.log(`🎯 Exact match found: ${neighborhood} = $${rent}`);
+      return rent as number;
+    }
+  }
+
+  // Try partial matches for common neighborhood patterns
+  const neighborhoodMappings = {
+    'downtown': ['downtown', 'central', 'city center'],
+    'east': ['east austin', 'eastside'],
+    'south': ['south austin', 'south congress', 'south lamar'],
+    'west': ['west austin', 'westlake', 'west campus'],
+    'north': ['north austin', 'north loop'],
+    'mueller': ['mueller'],
+    'zilker': ['zilker', 'south lamar'],
+    'clarksville': ['clarksville'],
+    'hyde park': ['hyde park'],
+    'university': ['university', 'west campus'],
+    'domain': ['domain', 'north austin'],
+    'four points': ['four points', 'westlake']
+  };
+
+  for (const [key, variations] of Object.entries(neighborhoodMappings)) {
+    if (variations.some(variation => cleanLocationName.includes(variation))) {
+      // Find matching OpenAI neighborhood
+      for (const [neighborhood, rent] of Object.entries(rentData.neighborhoods)) {
+        const neighborhoodLower = neighborhood.toLowerCase();
+        if (variations.some(variation => neighborhoodLower.includes(variation))) {
+          console.log(`🎯 Pattern match found: ${cleanLocationName} → ${neighborhood} = $${rent}`);
+          return rent as number;
+        }
+      }
+    }
+  }
+
+  console.log(`⚠️ No match found for "${cleanLocationName}", using city average: $${cityAverage}`);
+  return cityAverage;
+};
+
 export const processMarketData = async (marketData: any, city: string, propertyType: string, bathrooms: string): Promise<SubmarketData[]> => {
   const processedData: SubmarketData[] = [];
   
@@ -92,17 +147,8 @@ export const processMarketData = async (marketData: any, city: string, propertyT
         
         console.log(`📈 Processing location: ${locationName}, Monthly STR: $${monthlyStrRevenue}, With 25% markup: $${strRevenueWith25Markup}`);
         
-        // Use rent from OpenAI - try to match neighborhood name first, then use city average
-        let medianRent = 0;
-        if (rentData) {
-          if (rentData.neighborhoods && rentData.neighborhoods[locationName]) {
-            medianRent = rentData.neighborhoods[locationName];
-            console.log(`🏠 Found neighborhood rent for ${locationName}: $${medianRent}`);
-          } else if (rentData.cityAverage) {
-            medianRent = rentData.cityAverage;
-            console.log(`🏠 Using city average rent for ${locationName}: $${medianRent}`);
-          }
-        }
+        // Use rent from OpenAI with improved neighborhood matching
+        const medianRent = findNeighborhoodRent(locationName, rentData, rentData?.cityAverage || 0);
         
         if (strRevenueWith25Markup > 0) {
           const multiple = medianRent > 0 ? strRevenueWith25Markup / medianRent : 0;
@@ -110,7 +156,7 @@ export const processMarketData = async (marketData: any, city: string, propertyT
           processedData.push({
             submarket: locationName,
             strRevenue: strRevenueWith25Markup, // STR revenue with 25% markup
-            medianRent: medianRent, // From OpenAI API
+            medianRent: medianRent, // From OpenAI API with improved matching
             multiple: multiple
           });
         }
@@ -183,7 +229,7 @@ export const processMarketData = async (marketData: any, city: string, propertyT
     processedData.sort((a, b) => b.strRevenue - a.strRevenue);
   }
 
-  console.log('✅ Final processed market data with 25% markup:', processedData.map(d => ({
+  console.log('✅ Final processed market data with improved rent matching:', processedData.map(d => ({
     submarket: d.submarket,
     monthlyRevenueWith25Markup: d.strRevenue,
     monthlyRentFromOpenAI: d.medianRent,
