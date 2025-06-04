@@ -38,63 +38,63 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   
   console.log('🔍 Processing market data structure:', marketData);
   
-  // Handle successful API response with city data
+  // Handle successful API response with neighborhood data
   if (marketData && marketData.success && marketData.data && marketData.data.content) {
-    const cityData = marketData.data.content;
-    console.log('📊 Processing city data:', cityData);
+    const responseData = marketData.data;
+    const neighborhoods = responseData.content.neighborhoods || responseData.content;
     
-    // For single city analysis, we'll create neighborhood-level data
-    if (cityData.median_rental_income && cityData.median_home_value) {
-      const monthlyStrRevenue = cityData.adjusted_rental_income || cityData.median_rental_income || 0;
-      const annualStrRevenue = monthlyStrRevenue * 12;
-      
-      // Calculate traditional rent estimate
-      const homeValue = cityData.median_home_value || 0;
-      const priceToRentRatio = cityData.price_to_rent_ratio || 200;
-      const estimatedMonthlyRent = homeValue > 0 ? homeValue / priceToRentRatio : 0;
-      const annualRent = estimatedMonthlyRent * 12;
-      
-      const cityName = marketData.data.city || 'City Center';
-      
-      console.log(`📈 ${cityName} - STR: $${annualStrRevenue}/year, Rent: $${annualRent}/year`);
-      
-      if (annualStrRevenue > 0) {
-        const multiple = annualRent > 0 ? annualStrRevenue / annualRent : 0;
+    console.log('📊 Processing neighborhood data:', neighborhoods);
+    
+    // Handle array of neighborhoods
+    if (Array.isArray(neighborhoods)) {
+      neighborhoods.forEach((neighborhood: any) => {
+        const neighborhoodName = neighborhood.name || neighborhood.neighborhood || 'Unknown Neighborhood';
+        const strRevenue = (neighborhood.airbnb_revenue || neighborhood.str_revenue || neighborhood.revenue || 0) * 12; // Annualize if monthly
+        const rentRevenue = (neighborhood.rental_income || neighborhood.rent || neighborhood.median_rent || 0) * 12; // Annualize if monthly
         
-        // Create multiple neighborhood entries with variations
-        const neighborhoods = [
-          'Downtown',
-          'City Center', 
-          'Historic District',
-          'Arts District',
-          'Waterfront',
-          'University Area'
-        ];
-        
-        neighborhoods.forEach((neighborhood, index) => {
-          // Add some realistic variation to the data
-          const variation = 0.8 + (index * 0.1); // 0.8 to 1.3 multiplier
-          const neighborhoodStrRevenue = Math.round(annualStrRevenue * variation);
-          const neighborhoodRent = Math.round(annualRent * (0.9 + index * 0.05));
-          const neighborhoodMultiple = neighborhoodRent > 0 ? neighborhoodStrRevenue / neighborhoodRent : 0;
+        if (strRevenue > 0 || rentRevenue > 0) {
+          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
           
           processedData.push({
-            submarket: `${neighborhood} - ${cityName}`,
-            strRevenue: neighborhoodStrRevenue,
-            medianRent: neighborhoodRent,
-            multiple: neighborhoodMultiple
+            submarket: `${neighborhoodName} - ${responseData.city}`,
+            strRevenue: Math.round(strRevenue),
+            medianRent: Math.round(rentRevenue),
+            multiple: multiple
           });
-        });
-      }
+        }
+      });
+    }
+    
+    // Handle object with neighborhood data
+    else if (typeof neighborhoods === 'object' && neighborhoods !== null) {
+      Object.keys(neighborhoods).forEach((key) => {
+        const neighborhood = neighborhoods[key];
+        if (typeof neighborhood === 'object') {
+          const neighborhoodName = neighborhood.name || key || 'Unknown Neighborhood';
+          const strRevenue = (neighborhood.airbnb_revenue || neighborhood.str_revenue || neighborhood.revenue || 0) * 12;
+          const rentRevenue = (neighborhood.rental_income || neighborhood.rent || neighborhood.median_rent || 0) * 12;
+          
+          if (strRevenue > 0 || rentRevenue > 0) {
+            const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
+            
+            processedData.push({
+              submarket: `${neighborhoodName} - ${responseData.city}`,
+              strRevenue: Math.round(strRevenue),
+              medianRent: Math.round(rentRevenue),
+              multiple: multiple
+            });
+          }
+        }
+      });
     }
   }
   
   // Handle API failure or no data
   if (processedData.length === 0) {
-    console.log('❌ No valid data found');
+    console.log('❌ No valid neighborhood data found');
     
     const city = marketData?.data?.city || 'Unknown City';
-    const message = marketData?.data?.message || 'No market data available';
+    const message = marketData?.data?.message || 'No neighborhood data available';
     
     processedData.push({
       submarket: `${city} - ${message}`,
@@ -107,7 +107,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   // Sort by STR revenue (highest first)
   processedData.sort((a, b) => b.strRevenue - a.strRevenue);
 
-  console.log('✅ Processed market data:', processedData.map(d => ({
+  console.log('✅ Processed neighborhood data:', processedData.map(d => ({
     submarket: d.submarket,
     revenue: d.strRevenue,
     rent: d.medianRent,

@@ -6,6 +6,68 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// City to state mapping for major US cities
+const cityToStateMap: { [key: string]: string } = {
+  'austin': 'TX',
+  'houston': 'TX',
+  'dallas': 'TX',
+  'san antonio': 'TX',
+  'fort worth': 'TX',
+  'los angeles': 'CA',
+  'san francisco': 'CA',
+  'san diego': 'CA',
+  'sacramento': 'CA',
+  'oakland': 'CA',
+  'fresno': 'CA',
+  'new york': 'NY',
+  'brooklyn': 'NY',
+  'queens': 'NY',
+  'manhattan': 'NY',
+  'bronx': 'NY',
+  'chicago': 'IL',
+  'philadelphia': 'PA',
+  'phoenix': 'AZ',
+  'tucson': 'AZ',
+  'san jose': 'CA',
+  'jacksonville': 'FL',
+  'miami': 'FL',
+  'tampa': 'FL',
+  'orlando': 'FL',
+  'fort lauderdale': 'FL',
+  'indianapolis': 'IN',
+  'columbus': 'OH',
+  'charlotte': 'NC',
+  'seattle': 'WA',
+  'denver': 'CO',
+  'washington': 'DC',
+  'boston': 'MA',
+  'el paso': 'TX',
+  'detroit': 'MI',
+  'nashville': 'TN',
+  'memphis': 'TN',
+  'portland': 'OR',
+  'oklahoma city': 'OK',
+  'las vegas': 'NV',
+  'louisville': 'KY',
+  'baltimore': 'MD',
+  'milwaukee': 'WI',
+  'albuquerque': 'NM',
+  'kansas city': 'MO',
+  'mesa': 'AZ',
+  'virginia beach': 'VA',
+  'atlanta': 'GA',
+  'colorado springs': 'CO',
+  'omaha': 'NE',
+  'raleigh': 'NC',
+  'long beach': 'CA',
+  'miami beach': 'FL',
+  'minneapolis': 'MN',
+  'tulsa': 'OK',
+  'cleveland': 'OH',
+  'wichita': 'KS',
+  'new orleans': 'LA'
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -32,19 +94,40 @@ serve(async (req) => {
     }
 
     console.log('🔑 Using Mashvisor API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
-    console.log(`📍 Analyzing specific city: ${city}`)
+    
+    // Get state from city mapping
+    const cityKey = city.toLowerCase().trim()
+    const state = cityToStateMap[cityKey]
+    
+    if (!state) {
+      console.log(`⚠️ State not found for city: ${city}`)
+      return new Response(
+        JSON.stringify({
+          success: false,
+          data: {
+            city: city,
+            propertyType: propertyType,
+            bathrooms: bathrooms,
+            message: `City '${city}' not found in our database. Please try a major US city.`,
+            content: {}
+          }
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    console.log(`📍 Found state ${state} for city ${city}`)
 
     try {
-      // Use the rento-calculator lookup endpoint with just city parameter
-      const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client/rento-calculator/lookup')
+      // Use the neighborhood endpoint to get granular data
+      const encodedCity = encodeURIComponent(city)
+      const mashvisorUrl = `https://api.mashvisor.com/v1.1/client/city/neighborhoods/${state}/${encodedCity}`
       
-      mashvisorUrl.searchParams.append('city', city)
-      mashvisorUrl.searchParams.append('resource', 'airbnb')
-      mashvisorUrl.searchParams.append('beds', propertyType)
+      console.log(`📡 Calling Mashvisor neighborhoods endpoint:`, mashvisorUrl)
       
-      console.log(`📡 Calling Mashvisor for ${city}:`, mashvisorUrl.toString())
-      
-      const mashvisorResponse = await fetch(mashvisorUrl.toString(), {
+      const mashvisorResponse = await fetch(mashvisorUrl, {
         method: 'GET',
         headers: {
           'x-api-key': mashvisorApiKey,
@@ -54,17 +137,18 @@ serve(async (req) => {
       })
 
       if (mashvisorResponse.ok) {
-        const cityData = await mashvisorResponse.json()
-        console.log(`✅ Successfully fetched data for ${city}`)
+        const neighborhoodData = await mashvisorResponse.json()
+        console.log(`✅ Successfully fetched neighborhood data for ${city}`)
         
-        // Return successful result for single city
+        // Return successful result with neighborhood data
         const successData = {
           success: true,
           data: {
             city: city,
+            state: state,
             propertyType: propertyType,
             bathrooms: bathrooms,
-            ...cityData
+            ...neighborhoodData
           }
         }
 
@@ -76,13 +160,14 @@ serve(async (req) => {
         )
       } else {
         const errorText = await mashvisorResponse.text()
-        console.log(`⚠️ Failed to fetch data for ${city}: ${mashvisorResponse.status} - ${errorText.substring(0, 100)}`)
+        console.log(`⚠️ Failed to fetch neighborhood data for ${city}: ${mashvisorResponse.status} - ${errorText.substring(0, 100)}`)
         
         // Return fallback data
         const fallbackData = {
           success: false,
           data: {
             city: city,
+            state: state,
             propertyType: propertyType,
             bathrooms: bathrooms,
             message: `Mashvisor API error: ${mashvisorResponse.status}`,
@@ -98,12 +183,13 @@ serve(async (req) => {
         )
       }
     } catch (error) {
-      console.log(`⚠️ Error fetching data for ${city}:`, error)
+      console.log(`⚠️ Error fetching neighborhood data for ${city}:`, error)
       
       const fallbackData = {
         success: false,
         data: {
           city: city,
+          state: state,
           propertyType: propertyType,
           bathrooms: bathrooms,
           message: 'API request failed',
