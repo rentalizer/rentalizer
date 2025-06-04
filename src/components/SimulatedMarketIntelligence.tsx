@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Eye } from 'lucide-react';
+import { Eye, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { MarketAnalysisForm } from '@/components/MarketAnalysisForm';
 import { MarketAnalysisResults } from '@/components/MarketAnalysisResults';
@@ -40,13 +40,22 @@ export const SimulatedMarketIntelligence = () => {
       setPropertyType(propType);
       setBathrooms(bathCount);
       
-      const successCount = processedData.filter(d => d.strRevenue > 0).length;
-      const failedCount = processedData.length - successCount;
+      const hasRealData = processedData.some(d => d.strRevenue > 0 && d.medianRent > 0);
+      const noDataAvailable = processedData.some(d => d.submarket.includes('No rental comparison data') || d.submarket.includes('No comparison data'));
       
-      if (successCount > 0) {
+      if (hasRealData) {
+        const successCount = processedData.filter(d => d.strRevenue > 0).length;
+        const failedCount = processedData.length - successCount;
+        
         toast({
           title: "Real Market Analysis Complete",
           description: `${successCount} submarkets analyzed with real Mashvisor data${failedCount > 0 ? `, ${failedCount} with limited data` : ''}`,
+        });
+      } else if (noDataAvailable) {
+        toast({
+          title: "No Data Available",
+          description: "Mashvisor API doesn't have rental comparison data for this market. Try a different city or check back later.",
+          variant: "destructive",
         });
       } else {
         toast({
@@ -83,6 +92,21 @@ export const SimulatedMarketIntelligence = () => {
               <h3 className="font-semibold text-green-300">Real Mashvisor Market Intelligence</h3>
               <p className="text-sm text-gray-300">
                 This tool uses real Mashvisor API data to analyze rental arbitrage opportunities in your target market.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* API Limitation Notice */}
+      <Card className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/30">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-5 w-5 text-yellow-400" />
+            <div>
+              <h3 className="font-semibold text-yellow-300">API Data Availability</h3>
+              <p className="text-sm text-gray-300">
+                Some markets may not have rental comparison data available in the Mashvisor database. If no data is found, try a different city or check back later.
               </p>
             </div>
           </div>

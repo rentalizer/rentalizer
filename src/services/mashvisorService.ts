@@ -36,6 +36,8 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
 export const processMarketData = (marketData: any): SubmarketData[] => {
   const processedData: SubmarketData[] = [];
   
+  console.log('🔍 Processing market data structure:', marketData);
+  
   // Handle fallback data structure
   if (marketData && marketData.data && marketData.data.fallback) {
     const comps = marketData.data.comps || [];
@@ -63,6 +65,21 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   // Handle the response data structure from rento-calculator/export-comps endpoint
   if (marketData && marketData.data) {
     const data = marketData.data;
+    
+    // Check if the API returned a status indicating no data available
+    if (data.content && data.content.status === 40 && !data.content.comps) {
+      console.log('⚠️ Mashvisor API returned status 40 - no comparison data available for this market');
+      
+      // Return a single entry indicating no data is available
+      processedData.push({
+        submarket: `No comparison data available for this market`,
+        strRevenue: 0,
+        medianRent: 0,
+        multiple: 0
+      });
+      
+      return processedData;
+    }
     
     // Handle rento-calculator response structure - might have comps or comparables array
     if (data.content && data.content.comps && Array.isArray(data.content.comps)) {
@@ -124,10 +141,10 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     }
   }
 
-  // If no valid data found, create a sample entry to show structure
+  // If no valid data found, create a more informative message
   if (processedData.length === 0) {
     processedData.push({
-      submarket: 'No Rental Comparison Data Available',
+      submarket: 'Mashvisor API - No rental comparison data available for this market',
       strRevenue: 0,
       medianRent: 0,
       multiple: 0
