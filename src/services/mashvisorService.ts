@@ -62,17 +62,16 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     return processedData;
   }
 
-  // Handle the response data structure from rento-calculator/list-comps endpoint
+  // Handle the response data structure from rento-calculator/revenue-stats endpoint
   if (marketData && marketData.data) {
     const data = marketData.data;
     
     // Check if the API returned a status indicating no data available
-    if (data.content && data.content.status === 40 && !data.content.comps) {
-      console.log('⚠️ Mashvisor API returned status 40 - no comparison data available for this market');
+    if (data.content && data.content.status === 40 && !data.content.stats) {
+      console.log('⚠️ Mashvisor API returned status 40 - no revenue stats available for this market');
       
-      // Return a single entry indicating no data is available
       processedData.push({
-        submarket: `No comparison data available for this market`,
+        submarket: `No revenue statistics available for this market`,
         strRevenue: 0,
         medianRent: 0,
         multiple: 0
@@ -81,76 +80,74 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       return processedData;
     }
     
-    // Handle list-comps response structure - look for comps array at different levels
-    if (data.content && data.content.comps && Array.isArray(data.content.comps)) {
-      const comps = data.content.comps;
+    // Handle revenue-stats response structure
+    if (data.content && data.content.stats) {
+      const stats = data.content.stats;
       
-      comps.forEach((comp: any, index: number) => {
-        const address = comp.address || comp.location || comp.property_address || `Property ${index + 1}`;
-        const strRevenue = comp.airbnb_revenue || comp.str_revenue || comp.rental_revenue || comp.monthly_revenue || 0;
-        const medianRent = comp.long_term_rent || comp.traditional_rent || comp.median_rent || comp.monthly_rent || 0;
+      // Process different submarkets or neighborhoods if available
+      if (stats.neighborhoods && Array.isArray(stats.neighborhoods)) {
+        stats.neighborhoods.forEach((neighborhood: any, index: number) => {
+          const name = neighborhood.name || neighborhood.neighborhood || `Neighborhood ${index + 1}`;
+          const strRevenue = neighborhood.airbnb_revenue || neighborhood.str_revenue || neighborhood.revenue || 0;
+          const medianRent = neighborhood.traditional_rent || neighborhood.long_term_rent || neighborhood.rent || 0;
+          const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
+          
+          if (strRevenue > 0 && medianRent > 0) {
+            processedData.push({
+              submarket: name,
+              strRevenue: Math.round(strRevenue),
+              medianRent: Math.round(medianRent),
+              multiple: multiple
+            });
+          }
+        });
+      }
+      
+      // If no neighborhoods, try to use overall stats
+      if (processedData.length === 0 && stats.average) {
+        const avgStats = stats.average;
+        const strRevenue = avgStats.airbnb_revenue || avgStats.str_revenue || avgStats.revenue || 0;
+        const medianRent = avgStats.traditional_rent || avgStats.long_term_rent || avgStats.rent || 0;
         const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
         
         if (strRevenue > 0 && medianRent > 0) {
           processedData.push({
-            submarket: address,
+            submarket: `${marketData.data.city || 'City'} Average`,
             strRevenue: Math.round(strRevenue),
             medianRent: Math.round(medianRent),
             multiple: multiple
           });
         }
-      });
-    }
-    
-    // Handle if comps is at root level of data
-    if (data.comps && Array.isArray(data.comps)) {
-      data.comps.forEach((comp: any, index: number) => {
-        const address = comp.address || comp.location || comp.property_address || `Property ${index + 1}`;
-        const strRevenue = comp.airbnb_revenue || comp.str_revenue || comp.rental_revenue || comp.monthly_revenue || 0;
-        const medianRent = comp.long_term_rent || comp.traditional_rent || comp.median_rent || comp.monthly_rent || 0;
+      }
+      
+      // If still no data, try direct stats properties
+      if (processedData.length === 0) {
+        const strRevenue = stats.airbnb_revenue || stats.str_revenue || stats.revenue || 0;
+        const medianRent = stats.traditional_rent || stats.long_term_rent || stats.rent || 0;
         const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
         
         if (strRevenue > 0 && medianRent > 0) {
           processedData.push({
-            submarket: address,
+            submarket: `${marketData.data.city || 'Market'} Statistics`,
             strRevenue: Math.round(strRevenue),
             medianRent: Math.round(medianRent),
             multiple: multiple
           });
         }
-      });
+      }
     }
     
-    // Handle if data is directly an array of comps
+    // Handle if data is directly an array of stats
     if (Array.isArray(data)) {
-      data.forEach((comp: any, index: number) => {
-        const address = comp.address || comp.location || comp.property_address || `Property ${index + 1}`;
-        const strRevenue = comp.airbnb_revenue || comp.str_revenue || comp.rental_revenue || comp.monthly_revenue || 0;
-        const medianRent = comp.long_term_rent || comp.traditional_rent || comp.median_rent || comp.monthly_rent || 0;
+      data.forEach((stat: any, index: number) => {
+        const name = stat.name || stat.neighborhood || stat.submarket || `Area ${index + 1}`;
+        const strRevenue = stat.airbnb_revenue || stat.str_revenue || stat.revenue || 0;
+        const medianRent = stat.traditional_rent || stat.long_term_rent || stat.rent || 0;
         const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
         
         if (strRevenue > 0 && medianRent > 0) {
           processedData.push({
-            submarket: address,
-            strRevenue: Math.round(strRevenue),
-            medianRent: Math.round(medianRent),
-            multiple: multiple
-          });
-        }
-      });
-    }
-
-    // Handle if the response has a different structure with a list of properties
-    if (data.content && data.content.list && Array.isArray(data.content.list)) {
-      data.content.list.forEach((comp: any, index: number) => {
-        const address = comp.address || comp.location || comp.property_address || `Property ${index + 1}`;
-        const strRevenue = comp.airbnb_revenue || comp.str_revenue || comp.rental_revenue || comp.monthly_revenue || 0;
-        const medianRent = comp.long_term_rent || comp.traditional_rent || comp.median_rent || comp.monthly_rent || 0;
-        const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
-        
-        if (strRevenue > 0 && medianRent > 0) {
-          processedData.push({
-            submarket: address,
+            submarket: name,
             strRevenue: Math.round(strRevenue),
             medianRent: Math.round(medianRent),
             multiple: multiple
@@ -163,7 +160,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   // If no valid data found, create a more informative message
   if (processedData.length === 0) {
     processedData.push({
-      submarket: 'Mashvisor API - No rental comparison data available for this market',
+      submarket: 'Mashvisor API - No revenue statistics available for this market',
       strRevenue: 0,
       medianRent: 0,
       multiple: 0

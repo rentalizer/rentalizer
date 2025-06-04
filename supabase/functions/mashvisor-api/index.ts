@@ -33,8 +33,8 @@ serve(async (req) => {
 
     console.log('🔑 Using Mashvisor API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
 
-    // Use the rento-calculator list-comps endpoint
-    const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client/rento-calculator/list-comps')
+    // Use the rento-calculator revenue-stats endpoint
+    const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client/rento-calculator/revenue-stats')
     
     // Add filters for property type and location
     mashvisorUrl.searchParams.append('bedrooms', propertyType)
@@ -42,7 +42,7 @@ serve(async (req) => {
     mashvisorUrl.searchParams.append('state', 'CA') // Default to CA, can be made dynamic later
     mashvisorUrl.searchParams.append('city', city.toLowerCase())
     
-    console.log('📡 Calling Mashvisor rento-calculator/list-comps API:', mashvisorUrl.toString())
+    console.log('📡 Calling Mashvisor rento-calculator/revenue-stats API:', mashvisorUrl.toString())
     
     const mashvisorResponse = await fetch(mashvisorUrl.toString(), {
       method: 'GET',
@@ -109,7 +109,7 @@ serve(async (req) => {
     }
 
     const data = await mashvisorResponse.json()
-    console.log('✅ Mashvisor rento-calculator/list-comps API Success - Data keys:', Object.keys(data))
+    console.log('✅ Mashvisor rento-calculator/revenue-stats API Success - Data keys:', Object.keys(data))
 
     return new Response(
       JSON.stringify({ success: true, data }),
