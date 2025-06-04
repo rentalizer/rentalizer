@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Eye, AlertTriangle, Info } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { MarketAnalysisForm } from '@/components/MarketAnalysisForm';
 import { MarketAnalysisResults } from '@/components/MarketAnalysisResults';
@@ -89,36 +89,6 @@ export const SimulatedMarketIntelligence = () => {
               <h3 className="font-semibold text-green-300">Real Mashvisor State Market Intelligence</h3>
               <p className="text-sm text-gray-300">
                 This tool uses real Mashvisor API data to analyze STR revenue opportunities at the state level.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Data Limitations Notice */}
-      <Card className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/30">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <Info className="h-5 w-5 text-blue-400" />
-            <div>
-              <h3 className="font-semibold text-blue-300">State-Level Revenue Statistics</h3>
-              <p className="text-sm text-gray-300">
-                The API provides STR revenue data aggregated by state and performance percentiles. Traditional rent data may be estimated using market averages when not available.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* API Limitation Notice */}
-      <Card className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/30">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <AlertTriangle className="h-5 w-5 text-yellow-400" />
-            <div>
-              <h3 className="font-semibold text-yellow-300">State Market Data Availability</h3>
-              <p className="text-sm text-gray-300">
-                Some states may not have comprehensive rental comparison data. Results show revenue statistics by performance tiers when available.
               </p>
             </div>
           </div>
