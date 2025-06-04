@@ -6,23 +6,23 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// City to state and zip code mapping for major US cities
-const cityToLocationMap: { [key: string]: { state: string; zipCodes: string[] } } = {
-  'austin': { state: 'TX', zipCodes: ['78701', '78702', '78703', '78704', '78705', '78721', '78722', '78723', '78724', '78725'] },
-  'houston': { state: 'TX', zipCodes: ['77002', '77003', '77004', '77005', '77006', '77007', '77008', '77009', '77010'] },
-  'dallas': { state: 'TX', zipCodes: ['75201', '75202', '75203', '75204', '75205', '75206', '75207', '75208', '75209', '75210'] },
-  'san antonio': { state: 'TX', zipCodes: ['78201', '78202', '78203', '78204', '78205', '78206', '78207', '78208', '78209', '78210'] },
-  'los angeles': { state: 'CA', zipCodes: ['90001', '90002', '90003', '90004', '90005', '90006', '90007', '90008', '90009', '90010'] },
-  'san francisco': { state: 'CA', zipCodes: ['94102', '94103', '94104', '94105', '94107', '94108', '94109', '94110', '94111', '94112'] },
-  'san diego': { state: 'CA', zipCodes: ['92101', '92102', '92103', '92104', '92105', '92106', '92107', '92108', '92109', '92110'] },
-  'new york': { state: 'NY', zipCodes: ['10001', '10002', '10003', '10004', '10005', '10006', '10007', '10008', '10009', '10010'] },
-  'chicago': { state: 'IL', zipCodes: ['60601', '60602', '60603', '60604', '60605', '60606', '60607', '60608', '60609', '60610'] },
-  'philadelphia': { state: 'PA', zipCodes: ['19101', '19102', '19103', '19104', '19105', '19106', '19107', '19108', '19109', '19110'] },
-  'phoenix': { state: 'AZ', zipCodes: ['85001', '85002', '85003', '85004', '85005', '85006', '85007', '85008', '85009', '85010'] },
-  'miami': { state: 'FL', zipCodes: ['33101', '33102', '33109', '33111', '33116', '33121', '33125', '33126', '33127', '33128'] },
-  'seattle': { state: 'WA', zipCodes: ['98101', '98102', '98103', '98104', '98105', '98106', '98107', '98108', '98109', '98110'] },
-  'denver': { state: 'CO', zipCodes: ['80201', '80202', '80203', '80204', '80205', '80206', '80207', '80208', '80209', '80210'] },
-  'atlanta': { state: 'GA', zipCodes: ['30301', '30302', '30303', '30304', '30305', '30306', '30307', '30308', '30309', '30310'] }
+// City to state mapping for major US cities
+const cityToStateMap: { [key: string]: string } = {
+  'austin': 'TX',
+  'houston': 'TX',
+  'dallas': 'TX',
+  'san antonio': 'TX',
+  'los angeles': 'CA',
+  'san francisco': 'CA',
+  'san diego': 'CA',
+  'new york': 'NY',
+  'chicago': 'IL',
+  'philadelphia': 'PA',
+  'phoenix': 'AZ',
+  'miami': 'FL',
+  'seattle': 'WA',
+  'denver': 'CO',
+  'atlanta': 'GA'
 };
 
 // Helper function to make API calls with proper error handling
@@ -83,12 +83,12 @@ serve(async (req) => {
 
     console.log('🔑 Using Mashvisor API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
     
-    // Get state and zip codes from city mapping
+    // Get state from city mapping
     const cityKey = city.toLowerCase().trim()
-    const locationData = cityToLocationMap[cityKey]
+    const state = cityToStateMap[cityKey]
     
-    if (!locationData) {
-      console.log(`⚠️ Location data not found for city: ${city}`)
+    if (!state) {
+      console.log(`⚠️ State not found for city: ${city}`)
       return new Response(
         JSON.stringify({
           success: false,
@@ -106,78 +106,140 @@ serve(async (req) => {
       )
     }
 
-    const { state, zipCodes } = locationData
-    console.log(`📍 Found state ${state} for city ${city} with ${zipCodes.length} zip codes`)
+    console.log(`📍 Found state ${state} for city ${city}`)
 
-    const propertiesWithRevenue = []
+    const neighborhoodsWithRevenue = []
     
-    // Try list-comps endpoint for multiple zip codes to get property revenue data
-    const limitedZipCodes = zipCodes.slice(0, 5) // Limit to 5 zip codes to avoid rate limits
+    // Try city-level lookup first for comprehensive neighborhood data
+    console.log(`🏙️ Trying city-level lookup for: ${city}, ${state}`)
     
-    for (const [index, zipCode] of limitedZipCodes.entries()) {
-      console.log(`🏘️ [${index + 1}/${limitedZipCodes.length}] Trying list-comps for zip code: ${zipCode}`)
+    const cityLookupUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodeURIComponent(city)}&resource=airbnb&beds=${propertyType}`
+    
+    const cityResult = await callMashvisorAPI(cityLookupUrl, mashvisorApiKey, `City lookup for ${city}`)
+    
+    if (cityResult.success && cityResult.data.content) {
+      console.log(`✅ City lookup successful for ${city}`)
       
-      const listCompsUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/list-comps?state=${state}&zip_code=${zipCode}&resource=airbnb&beds=${propertyType}`
+      const content = cityResult.data.content
       
-      const zipResult = await callMashvisorAPI(listCompsUrl, mashvisorApiKey, `List-comps for ${zipCode}`)
-      
-      if (zipResult.success && zipResult.data.content && zipResult.data.content.length > 0) {
-        console.log(`✅ Found ${zipResult.data.content.length} properties in zip ${zipCode}`)
+      // Extract city-level data
+      if (content.airbnb_revenue || content.rental_income || content.revenue || content.rent) {
+        const monthlyStrRevenue = content.airbnb_revenue || content.revenue || 0
+        const monthlyRentRevenue = content.rental_income || content.rent || 0
+        const annualStrRevenue = monthlyStrRevenue * 12
+        const annualRentRevenue = monthlyRentRevenue * 12
         
-        // Process each property from the list-comps response
-        zipResult.data.content.forEach((property: any, propIndex: number) => {
-          // Extract revenue data - try multiple possible field names
-          const monthlyRevenue = property.revenue || property.airbnb_revenue || property.monthly_revenue || property.str_revenue || 0
-          const annualRevenue = monthlyRevenue * 12
+        console.log(`📈 City ${city}: Monthly STR: $${monthlyStrRevenue}, Monthly Rent: $${monthlyRentRevenue}`)
+        
+        if (annualStrRevenue > 0 || annualRentRevenue > 0) {
+          neighborhoodsWithRevenue.push({
+            neighborhood: `${city} - City Average`,
+            airbnb_revenue: Math.round(annualStrRevenue),
+            rental_income: Math.round(annualRentRevenue),
+            occupancy_rate: content.occupancy || content.occupancy_rate || 0,
+            median_night_rate: content.night_rate || content.nightly_rate || content.rate || 0,
+            api_neighborhood: city,
+            api_city: city,
+            api_state: state,
+            data_source: 'city_lookup',
+            property_address: `${city}, ${state}`,
+            property_id: `city-${city.toLowerCase().replace(/\s+/g, '-')}`,
+            raw_data: {
+              airbnb_revenue: content.airbnb_revenue,
+              rental_income: content.rental_income,
+              revenue: content.revenue,
+              rent: content.rent,
+              occupancy: content.occupancy,
+              night_rate: content.night_rate
+            }
+          })
+        }
+      }
+      
+      // Extract neighborhood data if available
+      if (content.neighborhoods && Array.isArray(content.neighborhoods)) {
+        console.log(`🏘️ Found ${content.neighborhoods.length} neighborhoods in ${city}`)
+        
+        content.neighborhoods.forEach((neighborhood: any, index: number) => {
+          const neighborhoodName = neighborhood.name || neighborhood.neighborhood || `Neighborhood ${index + 1}`
+          const monthlyStrRevenue = neighborhood.airbnb_revenue || neighborhood.revenue || 0
+          const monthlyRentRevenue = neighborhood.rental_income || neighborhood.rent || 0
+          const annualStrRevenue = monthlyStrRevenue * 12
+          const annualRentRevenue = monthlyRentRevenue * 12
           
-          // Extract rent data - try multiple possible field names  
-          const monthlyRent = property.rent || property.rental_income || property.traditional_rental || property.monthly_rent || 0
-          const annualRent = monthlyRent * 12
+          console.log(`🏠 Neighborhood ${neighborhoodName}: Monthly STR: $${monthlyStrRevenue}, Monthly Rent: $${monthlyRentRevenue}`)
           
-          console.log(`🏠 Property ${propIndex + 1} in ${zipCode}: Monthly Revenue: $${monthlyRevenue}, Monthly Rent: $${monthlyRent}`)
-          
-          if (annualRevenue > 0 || annualRent > 0) {
-            propertiesWithRevenue.push({
-              neighborhood: `${zipCode} - Property ${propIndex + 1}`,
-              airbnb_revenue: Math.round(annualRevenue),
-              rental_income: Math.round(annualRent),
-              occupancy_rate: property.occupancy || property.occupancy_rate || 0,
-              median_night_rate: property.night_rate || property.nightly_rate || property.rate || 0,
-              api_neighborhood: zipCode,
+          if (annualStrRevenue > 0 || annualRentRevenue > 0) {
+            neighborhoodsWithRevenue.push({
+              neighborhood: `${neighborhoodName} - ${city}`,
+              airbnb_revenue: Math.round(annualStrRevenue),
+              rental_income: Math.round(annualRentRevenue),
+              occupancy_rate: neighborhood.occupancy || neighborhood.occupancy_rate || 0,
+              median_night_rate: neighborhood.night_rate || neighborhood.nightly_rate || neighborhood.rate || 0,
+              api_neighborhood: neighborhoodName,
               api_city: city,
               api_state: state,
-              data_source: 'list_comps',
-              property_address: property.address || property.location || `Property in ${zipCode}`,
-              property_id: property.id || property.property_id || `${zipCode}-${propIndex}`,
+              data_source: 'neighborhood_lookup',
+              property_address: `${neighborhoodName}, ${city}, ${state}`,
+              property_id: `neighborhood-${neighborhoodName.toLowerCase().replace(/\s+/g, '-')}-${index}`,
               raw_data: {
-                revenue: property.revenue,
-                airbnb_revenue: property.airbnb_revenue,
-                monthly_revenue: property.monthly_revenue,
-                str_revenue: property.str_revenue,
-                rent: property.rent,
-                rental_income: property.rental_income,
-                traditional_rental: property.traditional_rental,
-                monthly_rent: property.monthly_rent
+                airbnb_revenue: neighborhood.airbnb_revenue,
+                rental_income: neighborhood.rental_income,
+                revenue: neighborhood.revenue,
+                rent: neighborhood.rent,
+                occupancy: neighborhood.occupancy,
+                night_rate: neighborhood.night_rate
               }
             })
-            
-            console.log(`✅ Property ${propIndex + 1} in ${zipCode}: STR $${Math.round(annualRevenue)}, Rent $${Math.round(annualRent)}`)
-          } else {
-            console.log(`⚠️ Property ${propIndex + 1} in ${zipCode}: No revenue data found`)
           }
         })
-      } else {
-        console.log(`⚠️ No properties found in zip code ${zipCode}`)
       }
       
-      // Delay between zip codes to respect rate limits
-      if (index < limitedZipCodes.length - 1) {
-        console.log(`⏳ Waiting 1000ms before next zip code...`)
-        await new Promise(resolve => setTimeout(resolve, 1000))
+      // Extract address-level data if available
+      if (content.addresses && Array.isArray(content.addresses)) {
+        console.log(`🏠 Found ${content.addresses.length} addresses in ${city}`)
+        
+        content.addresses.forEach((address: any, index: number) => {
+          const addressName = address.address || address.property_address || `Address ${index + 1}`
+          const monthlyStrRevenue = address.airbnb_revenue || address.revenue || 0
+          const monthlyRentRevenue = address.rental_income || address.rent || 0
+          const annualStrRevenue = monthlyStrRevenue * 12
+          const annualRentRevenue = monthlyRentRevenue * 12
+          
+          console.log(`🏠 Address ${addressName}: Monthly STR: $${monthlyStrRevenue}, Monthly Rent: $${monthlyRentRevenue}`)
+          
+          if (annualStrRevenue > 0 || annualRentRevenue > 0) {
+            neighborhoodsWithRevenue.push({
+              neighborhood: `${addressName}`,
+              airbnb_revenue: Math.round(annualStrRevenue),
+              rental_income: Math.round(annualRentRevenue),
+              occupancy_rate: address.occupancy || address.occupancy_rate || 0,
+              median_night_rate: address.night_rate || address.nightly_rate || address.rate || 0,
+              api_neighborhood: address.neighborhood || city,
+              api_city: city,
+              api_state: state,
+              data_source: 'address_lookup',
+              property_address: addressName,
+              property_id: `address-${index}`,
+              raw_data: {
+                airbnb_revenue: address.airbnb_revenue,
+                rental_income: address.rental_income,
+                revenue: address.revenue,
+                rent: address.rent,
+                occupancy: address.occupancy,
+                night_rate: address.night_rate,
+                lat: address.lat,
+                lng: address.lng
+              }
+            })
+          }
+        })
       }
+    } else {
+      console.log(`⚠️ City lookup failed for ${city}`)
     }
 
-    console.log(`📊 Analysis complete: Found ${propertiesWithRevenue.length} properties with revenue data`)
+    console.log(`📊 Analysis complete: Found ${neighborhoodsWithRevenue.length} locations with revenue data`)
 
     return new Response(
       JSON.stringify({
@@ -187,12 +249,9 @@ serve(async (req) => {
           state: state,
           propertyType: propertyType,
           bathrooms: bathrooms,
-          source: 'list-comps',
-          total_zip_codes: zipCodes.length,
-          processed_zip_codes: limitedZipCodes.length,
+          source: 'rento-calculator-lookup',
           content: {
-            neighborhoods_with_revenue: propertiesWithRevenue,
-            zip_codes_analyzed: limitedZipCodes
+            neighborhoods_with_revenue: neighborhoodsWithRevenue
           }
         }
       }),

@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 interface SubmarketData {
@@ -42,8 +41,35 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   if (marketData && marketData.success && marketData.data) {
     const responseData = marketData.data;
     
-    // Handle list-comps data (new endpoint)
-    if (responseData.source === 'list-comps' && responseData.content?.neighborhoods_with_revenue) {
+    // Handle rento-calculator-lookup data (new lookup endpoint)
+    if (responseData.source === 'rento-calculator-lookup' && responseData.content?.neighborhoods_with_revenue) {
+      console.log('📊 Processing rento-calculator lookup data from Mashvisor API');
+      
+      const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
+      
+      neighborhoodsWithRevenue.forEach((location: any) => {
+        const locationName = location.neighborhood || location.property_address || 'Unknown Location';
+        const strRevenue = location.airbnb_revenue || 0;
+        const rentRevenue = location.rental_income || 0;
+        const dataSource = location.data_source || 'unknown';
+        
+        console.log(`📈 Processing location: ${locationName}, STR: $${strRevenue}, Rent: $${rentRevenue}`);
+        
+        if (strRevenue > 0 || rentRevenue > 0) {
+          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
+          
+          processedData.push({
+            submarket: `${locationName} (${dataSource})`,
+            strRevenue: strRevenue,
+            medianRent: rentRevenue,
+            multiple: multiple
+          });
+        }
+      });
+    }
+    
+    // Handle list-comps data (existing endpoint)
+    else if (responseData.source === 'list-comps' && responseData.content?.neighborhoods_with_revenue) {
       console.log('📊 Processing list-comps property data from Mashvisor API');
       
       const propertiesWithRevenue = responseData.content.neighborhoods_with_revenue;
@@ -61,31 +87,6 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
           
           processedData.push({
             submarket: `${propertyName} (${dataSource})`,
-            strRevenue: strRevenue,
-            medianRent: rentRevenue,
-            multiple: multiple
-          });
-        }
-      });
-    }
-    
-    // Handle rento-calculator-lookup data
-    else if (responseData.source === 'rento-calculator-lookup' && responseData.content?.neighborhoods_with_revenue) {
-      console.log('📊 Processing rento-calculator lookup data from Mashvisor API');
-      
-      const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
-      
-      neighborhoodsWithRevenue.forEach((area: any) => {
-        const areaName = area.neighborhood || 'Unknown Area';
-        const strRevenue = area.airbnb_revenue || 0;
-        const rentRevenue = area.rental_income || 0;
-        const dataSource = area.data_source || 'unknown';
-        
-        if (strRevenue > 0 || rentRevenue > 0) {
-          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
-          
-          processedData.push({
-            submarket: `${areaName} (${dataSource})`,
             strRevenue: strRevenue,
             medianRent: rentRevenue,
             multiple: multiple
