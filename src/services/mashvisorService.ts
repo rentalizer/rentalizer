@@ -33,10 +33,37 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
   }
 };
 
-export const processMarketData = (marketData: any): SubmarketData[] => {
+const fetchRentDataFromOpenAI = async (city: string, propertyType: string, bathrooms: string) => {
+  try {
+    console.log(`🤖 Calling OpenAI API for rent data in ${city}`);
+    
+    const { data, error } = await supabase.functions.invoke('openai-rent-lookup', {
+      body: {
+        city,
+        propertyType,
+        bathrooms
+      }
+    });
+
+    if (error) {
+      throw new Error(`OpenAI API call failed: ${error.message}`);
+    }
+
+    console.log('✅ OpenAI rent data response:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ OpenAI rent lookup error:', error);
+    return null;
+  }
+};
+
+export const processMarketData = async (marketData: any, city: string, propertyType: string, bathrooms: string): Promise<SubmarketData[]> => {
   const processedData: SubmarketData[] = [];
   
   console.log('🔍 Processing market data structure:', marketData);
+  
+  // Get rent data from OpenAI
+  const rentData = await fetchRentDataFromOpenAI(city, propertyType, bathrooms);
   
   // Handle successful API response
   if (marketData && marketData.success && marketData.data) {
@@ -52,18 +79,24 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
         const locationName = location.neighborhood || location.property_address || 'Unknown Location';
         const annualStrRevenue = location.airbnb_revenue || 0;
         const monthlyStrRevenue = Math.round(annualStrRevenue / 12); // Convert annual to monthly
-        const rentRevenue = location.rental_income || 0;
+        
+        // Apply 25% markup to STR revenue as per your formula
+        const strRevenueWith25Markup = Math.round(monthlyStrRevenue * 1.25);
+        
         const dataSource = location.data_source || 'unknown';
         
-        console.log(`📈 Processing location: ${locationName}, Monthly STR: $${monthlyStrRevenue}, Rent: $${rentRevenue}, Source: ${dataSource}`);
+        console.log(`📈 Processing location: ${locationName}, Monthly STR: $${monthlyStrRevenue}, With 25% markup: $${strRevenueWith25Markup}, Source: ${dataSource}`);
         
-        if (monthlyStrRevenue > 0 || rentRevenue > 0) {
-          const multiple = rentRevenue > 0 ? monthlyStrRevenue / rentRevenue : 0;
+        // Use rent from OpenAI instead of Mashvisor
+        const medianRent = rentData?.neighborhoods?.[locationName] || rentData?.cityAverage || 0;
+        
+        if (strRevenueWith25Markup > 0 || medianRent > 0) {
+          const multiple = medianRent > 0 ? strRevenueWith25Markup / medianRent : 0;
           
           processedData.push({
             submarket: `${locationName}`,
-            strRevenue: monthlyStrRevenue, // Now showing monthly revenue
-            medianRent: rentRevenue,
+            strRevenue: strRevenueWith25Markup, // STR revenue with 25% markup
+            medianRent: medianRent, // From OpenAI API
             multiple: multiple
           });
         }
@@ -78,11 +111,10 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       
       // Try to extract revenue data from various field names
       const monthlyStrRevenue = content.airbnb_revenue || content.revenue || content.revpar || content.revpan || 0;
-      const monthlyRentRevenue = content.median_rental_income || content.adjusted_rental_income || content.rental_income || content.rent || 0;
       const nightRate = content.median_night_rate || content.night_rate || content.nightly_rate || 0;
       const occupancyRate = content.median_occupancy_rate || content.occupancy || content.occupancy_rate || 0;
       
-      console.log(`📊 Extracted data - Monthly STR: $${monthlyStrRevenue}, Monthly Rent: $${monthlyRentRevenue}, Night Rate: $${nightRate}, Occupancy: ${occupancyRate}%`);
+      console.log(`📊 Extracted data - Monthly STR: $${monthlyStrRevenue}, Night Rate: $${nightRate}, Occupancy: ${occupancyRate}%`);
       
       let calculatedMonthlyStr = monthlyStrRevenue;
       
@@ -95,13 +127,19 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
         console.log(`💡 Calculated monthly STR revenue: $${nightRate} x ${occupiedDaysPerMonth} days/month = $${calculatedMonthlyStr}/month`);
       }
       
-      if (calculatedMonthlyStr > 0 || monthlyRentRevenue > 0) {
-        const multiple = monthlyRentRevenue > 0 ? calculatedMonthlyStr / monthlyRentRevenue : 0;
+      // Apply 25% markup to STR revenue as per your formula
+      const strRevenueWith25Markup = Math.round(calculatedMonthlyStr * 1.25);
+      
+      // Use rent from OpenAI instead of Mashvisor
+      const medianRent = rentData?.cityAverage || 0;
+      
+      if (strRevenueWith25Markup > 0 || medianRent > 0) {
+        const multiple = medianRent > 0 ? strRevenueWith25Markup / medianRent : 0;
         
         processedData.push({
           submarket: `${responseData.city} - City Data`,
-          strRevenue: Math.round(calculatedMonthlyStr), // Monthly revenue
-          medianRent: Math.round(monthlyRentRevenue), // Monthly rent
+          strRevenue: strRevenueWith25Markup, // STR revenue with 25% markup
+          medianRent: medianRent, // From OpenAI API
           multiple: multiple
         });
       }
@@ -128,10 +166,10 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     processedData.sort((a, b) => b.strRevenue - a.strRevenue);
   }
 
-  console.log('✅ Processed market data:', processedData.map(d => ({
+  console.log('✅ Processed market data with 25% markup:', processedData.map(d => ({
     submarket: d.submarket,
-    monthlyRevenue: d.strRevenue,
-    monthlyRent: d.medianRent,
+    monthlyRevenueWith25Markup: d.strRevenue,
+    monthlyRentFromOpenAI: d.medianRent,
     multiple: d.multiple > 0 ? d.multiple.toFixed(2) : 'N/A'
   })));
   

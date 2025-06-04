@@ -85,7 +85,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
             )}
           </div>
         </div>
-        <p className="text-white">Monthly revenue potential by submarket</p>
+        <p className="text-white">STR revenue (with 25% markup) vs OpenAI rent data</p>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
@@ -103,10 +103,10 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
                 <TableHead className="text-white font-semibold">
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-green-400" />
-                    Monthly STR Revenue
+                    STR Revenue (+25%)
                   </div>
                 </TableHead>
-                <TableHead className="text-white font-semibold">Monthly Rent</TableHead>
+                <TableHead className="text-white font-semibold">Median Rent (OpenAI)</TableHead>
                 <TableHead className="text-white font-semibold">Revenue Multiple</TableHead>
               </TableRow>
             </TableHeader>
