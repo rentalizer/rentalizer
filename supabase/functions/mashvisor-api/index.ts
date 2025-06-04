@@ -136,6 +136,8 @@ serve(async (req) => {
         },
       })
 
+      console.log(`📊 Mashvisor API response status: ${mashvisorResponse.status}`)
+
       if (mashvisorResponse.ok) {
         const neighborhoodData = await mashvisorResponse.json()
         console.log(`✅ Successfully fetched neighborhood data for ${city}`)
@@ -160,30 +162,72 @@ serve(async (req) => {
         )
       } else {
         const errorText = await mashvisorResponse.text()
-        console.log(`⚠️ Failed to fetch neighborhood data for ${city}: ${mashvisorResponse.status} - ${errorText.substring(0, 100)}`)
+        console.log(`⚠️ Failed to fetch neighborhood data for ${city}: ${mashvisorResponse.status} - ${errorText.substring(0, 200)}`)
         
-        // Return fallback data
-        const fallbackData = {
-          success: false,
-          data: {
-            city: city,
-            state: state,
-            propertyType: propertyType,
-            bathrooms: bathrooms,
-            message: `Mashvisor API error: ${mashvisorResponse.status}`,
-            content: {}
-          }
-        }
+        // If neighborhood endpoint fails, try the rento-calculator endpoint as fallback
+        console.log(`🔄 Trying fallback rento-calculator endpoint for ${city}`)
+        
+        const fallbackUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodedCity}&resource=airbnb&beds=${propertyType}`
+        
+        console.log(`📡 Calling fallback endpoint:`, fallbackUrl)
+        
+        const fallbackResponse = await fetch(fallbackUrl, {
+          method: 'GET',
+          headers: {
+            'x-api-key': mashvisorApiKey,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        })
 
-        return new Response(
-          JSON.stringify(fallbackData),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json()
+          console.log(`✅ Fallback endpoint successful for ${city}`)
+          
+          const successData = {
+            success: true,
+            data: {
+              city: city,
+              state: state,
+              propertyType: propertyType,
+              bathrooms: bathrooms,
+              ...fallbackData
+            }
           }
-        )
+
+          return new Response(
+            JSON.stringify(successData),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            }
+          )
+        } else {
+          const fallbackErrorText = await fallbackResponse.text()
+          console.log(`❌ Both endpoints failed for ${city}`)
+          
+          // Return error data
+          const errorData = {
+            success: false,
+            data: {
+              city: city,
+              state: state,
+              propertyType: propertyType,
+              bathrooms: bathrooms,
+              message: `Mashvisor API error: ${mashvisorResponse.status}. Fallback also failed: ${fallbackResponse.status}`,
+              content: {}
+            }
+          }
+
+          return new Response(
+            JSON.stringify(errorData),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            }
+          )
+        }
       }
     } catch (error) {
-      console.log(`⚠️ Error fetching neighborhood data for ${city}:`, error)
+      console.log(`⚠️ Error fetching data for ${city}:`, error)
       
       const fallbackData = {
         success: false,
