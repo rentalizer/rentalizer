@@ -1,3 +1,4 @@
+
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
@@ -105,7 +106,7 @@ serve(async (req) => {
   }
 
   try {
-    const { city, propertyType, bathrooms, zipCode, address, lat, lng } = await req.json()
+    const { city, propertyType, bathrooms } = await req.json()
     
     console.log(`🔍 Mashvisor Edge Function called for ${city} (${propertyType}BR/${bathrooms}BA)`)
     
@@ -151,118 +152,96 @@ serve(async (req) => {
     console.log(`📍 Found state ${state} for city ${city}`)
 
     const encodedCity = encodeURIComponent(city)
-    let finalResult = null
 
-    // Strategy 1: Address Level - Try address endpoint first if we have full details
-    if (address && zipCode && lat && lng) {
-      const addressUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&zip_code=${zipCode}&resource=airbnb&beds=${propertyType}&address=${encodeURIComponent(address)}&city=${encodedCity}&lat=${lat}&lng=${lng}`
-      const addressResult = await callMashvisorAPI(addressUrl, mashvisorApiKey, 'Address level endpoint')
-      
-      if (addressResult.success) {
-        finalResult = {
-          success: true,
-          data: {
-            city: city,
-            state: state,
-            propertyType: propertyType,
-            bathrooms: bathrooms,
-            zipCode: zipCode,
-            address: address,
-            source: 'address',
-            ...addressResult.data
-          }
-        }
-      }
-    }
-
-    // Strategy 2: Zip Code Level - If we have zip code but no full address
-    if (!finalResult && zipCode) {
-      const zipUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&zip_code=${zipCode}&resource=airbnb&beds=${propertyType}`
-      const zipResult = await callMashvisorAPI(zipUrl, mashvisorApiKey, 'Zip code level endpoint')
-      
-      if (zipResult.success) {
-        finalResult = {
-          success: true,
-          data: {
-            city: city,
-            state: state,
-            propertyType: propertyType,
-            bathrooms: bathrooms,
-            zipCode: zipCode,
-            source: 'zipcode',
-            ...zipResult.data
-          }
-        }
-      }
-    }
-
-    // Strategy 3: City Level - Try city level lookup for revenue data
-    if (!finalResult) {
-      const cityUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodedCity}&resource=airbnb&beds=${propertyType}`
-      const cityResult = await callMashvisorAPI(cityUrl, mashvisorApiKey, 'City level endpoint')
-      
-      if (cityResult.success) {
-        finalResult = {
-          success: true,
-          data: {
-            city: city,
-            state: state,
-            propertyType: propertyType,
-            bathrooms: bathrooms,
-            source: 'city',
-            ...cityResult.data
-          }
-        }
-      }
-    }
-
-    // Strategy 4: Neighborhood Level - Fallback to neighborhoods endpoint
-    if (!finalResult) {
-      const neighborhoodUrl = `https://api.mashvisor.com/v1.1/client/city/neighborhoods/${state}/${encodedCity}`
-      const neighborhoodResult = await callMashvisorAPI(neighborhoodUrl, mashvisorApiKey, 'Neighborhood endpoint')
-      
-      if (neighborhoodResult.success) {
-        finalResult = {
-          success: true,
-          data: {
-            city: city,
-            state: state,
-            propertyType: propertyType,
-            bathrooms: bathrooms,
-            source: 'neighborhoods',
-            ...neighborhoodResult.data
-          }
-        }
-      }
-    }
-
-    // If we got successful data from any endpoint, return it
-    if (finalResult) {
+    // Step 1: Get neighborhoods list
+    const neighborhoodUrl = `https://api.mashvisor.com/v1.1/client/city/neighborhoods/${state}/${encodedCity}`
+    const neighborhoodResult = await callMashvisorAPI(neighborhoodUrl, mashvisorApiKey, 'Neighborhood list endpoint')
+    
+    if (!neighborhoodResult.success) {
+      console.log(`❌ Failed to get neighborhoods for ${city}`)
       return new Response(
-        JSON.stringify(finalResult),
+        JSON.stringify({
+          success: false,
+          data: {
+            city: city,
+            state: state,
+            propertyType: propertyType,
+            bathrooms: bathrooms,
+            message: `Failed to fetch neighborhoods for ${city}`,
+            content: {}
+          }
+        }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
     }
 
-    // If all endpoints failed, return error
-    console.log(`❌ All Mashvisor endpoints failed for ${city}`)
+    // Step 2: Get revenue data for each neighborhood
+    const neighborhoods = neighborhoodResult.data.content?.results || []
+    console.log(`📋 Found ${neighborhoods.length} neighborhoods in ${city}`)
+
+    const neighborhoodData = []
     
-    const errorData = {
-      success: false,
-      data: {
-        city: city,
-        state: state,
-        propertyType: propertyType,
-        bathrooms: bathrooms,
-        message: `All Mashvisor API endpoints failed for ${city}. Please try a different city or check your API key.`,
-        content: {}
+    // Limit to first 10 neighborhoods to avoid timeout
+    const limitedNeighborhoods = neighborhoods.slice(0, 10)
+    
+    for (const neighborhood of limitedNeighborhoods) {
+      const neighborhoodName = neighborhood.name || 'Unknown'
+      console.log(`🏘️ Fetching data for neighborhood: ${neighborhoodName}`)
+      
+      // Try to get revenue data for this specific neighborhood
+      const rentoUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodedCity}&neighborhood=${encodeURIComponent(neighborhoodName)}&resource=airbnb&beds=${propertyType}`
+      const rentoResult = await callMashvisorAPI(rentoUrl, mashvisorApiKey, `Rento-calculator for ${neighborhoodName}`)
+      
+      if (rentoResult.success && rentoResult.data.content) {
+        const content = rentoResult.data.content
+        
+        // Extract revenue data
+        const airbnbRevenue = content.median_night_rate ? (content.median_night_rate * content.median_occupancy_rate * 365 / 100) || 0 : 0
+        const adjustedRevenue = content.adjusted_rental_income ? content.adjusted_rental_income * 12 : airbnbRevenue
+        const rentalIncome = content.median_rental_income ? content.median_rental_income * 12 : 0
+        
+        if (adjustedRevenue > 0 || rentalIncome > 0) {
+          neighborhoodData.push({
+            neighborhood: neighborhoodName,
+            airbnb_revenue: Math.round(adjustedRevenue),
+            rental_income: Math.round(rentalIncome),
+            median_night_rate: content.median_night_rate || 0,
+            occupancy_rate: content.median_occupancy_rate || 0,
+            sample_size: content.sample_size || 0
+          })
+          console.log(`✅ Revenue data found for ${neighborhoodName}: STR $${Math.round(adjustedRevenue)}, Rent $${Math.round(rentalIncome)}`)
+        } else {
+          console.log(`⚠️ No revenue data for ${neighborhoodName}`)
+        }
+      } else {
+        console.log(`❌ Failed to get revenue data for ${neighborhoodName}`)
       }
+      
+      // Add small delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 100))
     }
 
+    console.log(`📊 Successfully processed ${neighborhoodData.length} neighborhoods with revenue data`)
+
     return new Response(
-      JSON.stringify(errorData),
+      JSON.stringify({
+        success: true,
+        data: {
+          city: city,
+          state: state,
+          propertyType: propertyType,
+          bathrooms: bathrooms,
+          source: 'neighborhood-revenue',
+          total_neighborhoods: neighborhoods.length,
+          processed_neighborhoods: limitedNeighborhoods.length,
+          content: {
+            neighborhoods_with_revenue: neighborhoodData,
+            all_neighborhoods: neighborhoods
+          }
+        }
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }

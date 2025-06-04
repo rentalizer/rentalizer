@@ -42,36 +42,66 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   if (marketData && marketData.success && marketData.data) {
     const responseData = marketData.data;
     
-    // Handle neighborhoods endpoint response
-    if (responseData.source === 'neighborhoods' && responseData.content && responseData.content.results) {
-      console.log('📊 Processing neighborhoods data from Mashvisor API');
+    // Handle neighborhood revenue data (new implementation)
+    if (responseData.source === 'neighborhood-revenue' && responseData.content?.neighborhoods_with_revenue) {
+      console.log('📊 Processing neighborhood revenue data from Mashvisor API');
+      
+      const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
+      
+      neighborhoodsWithRevenue.forEach((neighborhood: any) => {
+        const neighborhoodName = neighborhood.neighborhood || 'Unknown Neighborhood';
+        const strRevenue = neighborhood.airbnb_revenue || 0;
+        const rentRevenue = neighborhood.rental_income || 0;
+        
+        if (strRevenue > 0 || rentRevenue > 0) {
+          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
+          
+          processedData.push({
+            submarket: `${neighborhoodName} - ${responseData.city}`,
+            strRevenue: strRevenue,
+            medianRent: rentRevenue,
+            multiple: multiple
+          });
+        }
+      });
+      
+      // Add summary info
+      const totalNeighborhoods = responseData.total_neighborhoods || 0;
+      const processedNeighborhoods = responseData.processed_neighborhoods || 0;
+      
+      if (processedData.length === 0) {
+        processedData.push({
+          submarket: `${responseData.city} - ${processedNeighborhoods} of ${totalNeighborhoods} neighborhoods processed, no revenue data found`,
+          strRevenue: 0,
+          medianRent: 0,
+          multiple: 0
+        });
+      }
+    }
+    
+    // Handle fallback neighborhood list (if revenue data not available)
+    else if (responseData.source === 'neighborhoods' && responseData.content && responseData.content.results) {
+      console.log('📊 Processing neighborhoods list from Mashvisor API (no revenue data)');
       
       const neighborhoods = responseData.content.results;
       
-      // For neighborhoods endpoint, we need to make additional calls to get revenue data
-      // For now, we'll show the neighborhoods as available submarkets
-      neighborhoods.forEach((neighborhood: any) => {
-        const neighborhoodName = neighborhood.name || 'Unknown Neighborhood';
-        
-        processedData.push({
-          submarket: `${neighborhoodName} - ${responseData.city}`,
-          strRevenue: 0, // Neighborhoods endpoint doesn't include revenue data
-          medianRent: 0, // Neighborhoods endpoint doesn't include rent data
-          multiple: 0
-        });
+      processedData.push({
+        submarket: `${responseData.city} - ${neighborhoods.length} neighborhoods found (no revenue data available)`,
+        strRevenue: 0,
+        medianRent: 0,
+        multiple: 0
       });
     }
     
-    // Handle rento-calculator endpoint response (city/zip/address level)
+    // Handle other endpoint responses as fallback
     else if (responseData.content) {
       const content = responseData.content;
       
-      console.log('📊 Processing rento-calculator data:', content);
+      console.log('📊 Processing fallback rento-calculator data:', content);
       
-      // Check for rental calculator response structure
       if (content.airbnb || content.rental || content.revenue || content.rent) {
-        const strRevenue = (content.airbnb?.revenue || content.revenue || 0) * 12; // Annualize if monthly
-        const rentRevenue = (content.rental?.rent || content.rent || content.median_rent || 0) * 12; // Annualize if monthly
+        const strRevenue = (content.airbnb?.revenue || content.revenue || content.adjusted_rental_income || 0) * 12;
+        const rentRevenue = (content.rental?.rent || content.rent || content.median_rental_income || 0) * 12;
         
         if (strRevenue > 0 || rentRevenue > 0) {
           const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
@@ -84,42 +114,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
           });
         }
       }
-      
-      // Handle array of neighborhoods from other endpoints
-      else if (Array.isArray(content)) {
-        content.forEach((item: any) => {
-          const itemName = item.name || item.neighborhood || item.submarket || 'Unknown Area';
-          const strRevenue = (item.airbnb_revenue || item.str_revenue || item.revenue || 0) * 12;
-          const rentRevenue = (item.rental_income || item.rent || item.median_rent || 0) * 12;
-          
-          if (strRevenue > 0 || rentRevenue > 0) {
-            const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
-            
-            processedData.push({
-              submarket: `${itemName} - ${responseData.city}`,
-              strRevenue: Math.round(strRevenue),
-              medianRent: Math.round(rentRevenue),
-              multiple: multiple
-            });
-          }
-        });
-      }
     }
-  }
-  
-  // If we only have neighborhood names without revenue data, show informational message
-  if (processedData.length > 0 && processedData.every(d => d.strRevenue === 0 && d.medianRent === 0)) {
-    console.log('ℹ️ Neighborhoods found but no revenue data available from this endpoint');
-    
-    const city = marketData?.data?.city || 'Unknown City';
-    
-    // Return a single informational row instead of all empty neighborhoods
-    return [{
-      submarket: `${city} - ${processedData.length} neighborhoods found`,
-      strRevenue: 0,
-      medianRent: 0,
-      multiple: 0
-    }];
   }
   
   // Handle API failure or no data
