@@ -27,7 +27,7 @@ export const SimulatedMarketIntelligence = () => {
     setIsLoading(true);
     
     try {
-      console.log(`🚀 Starting real market analysis for ${state} state`);
+      console.log(`🚀 Starting real market analysis for ${state} city`);
       
       // Call the real Mashvisor API
       const marketData = await fetchRealMarketData(state, propType, bathCount);
@@ -45,7 +45,7 @@ export const SimulatedMarketIntelligence = () => {
       
       if (hasRevenueData && hasRentData) {
         toast({
-          title: "State Market Analysis Complete",
+          title: "City Market Analysis Complete",
           description: `STR revenue data found for ${state}. Rent estimates provided using market averages.`,
         });
       } else if (hasRevenueData && !hasRentData) {
@@ -57,7 +57,7 @@ export const SimulatedMarketIntelligence = () => {
       } else {
         toast({
           title: "Limited Data Available",
-          description: "Mashvisor API returned limited market data for this state.",
+          description: "Mashvisor API returned limited market data for this city.",
           variant: "destructive",
         });
       }
@@ -86,9 +86,9 @@ export const SimulatedMarketIntelligence = () => {
           <div className="flex items-center gap-3">
             <Eye className="h-5 w-5 text-green-400" />
             <div>
-              <h3 className="font-semibold text-green-300">Real Mashvisor State Market Intelligence</h3>
+              <h3 className="font-semibold text-green-300">Real Mashvisor City Market Intelligence</h3>
               <p className="text-sm text-gray-300">
-                This tool uses real Mashvisor API data to analyze STR revenue opportunities at the state level.
+                This tool uses real Mashvisor API data to analyze STR revenue opportunities at the city level.
               </p>
             </div>
           </div>
