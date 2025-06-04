@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 interface SubmarketData {
@@ -41,7 +42,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   if (marketData && marketData.success && marketData.data) {
     const responseData = marketData.data;
     
-    // Handle rento-calculator-lookup data (new lookup endpoint)
+    // Handle rento-calculator-lookup data with neighborhoods_with_revenue
     if (responseData.source === 'rento-calculator-lookup' && responseData.content?.neighborhoods_with_revenue) {
       console.log('📊 Processing rento-calculator lookup data from Mashvisor API');
       
@@ -53,13 +54,13 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
         const rentRevenue = location.rental_income || 0;
         const dataSource = location.data_source || 'unknown';
         
-        console.log(`📈 Processing location: ${locationName}, STR: $${strRevenue}, Rent: $${rentRevenue}`);
+        console.log(`📈 Processing location: ${locationName}, STR: $${strRevenue}, Rent: $${rentRevenue}, Source: ${dataSource}`);
         
         if (strRevenue > 0 || rentRevenue > 0) {
           const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
           
           processedData.push({
-            submarket: `${locationName} (${dataSource})`,
+            submarket: `${locationName}`,
             strRevenue: strRevenue,
             medianRent: rentRevenue,
             multiple: multiple
@@ -68,118 +69,42 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       });
     }
     
-    // Handle list-comps data (existing endpoint)
-    else if (responseData.source === 'list-comps' && responseData.content?.neighborhoods_with_revenue) {
-      console.log('📊 Processing list-comps property data from Mashvisor API');
-      
-      const propertiesWithRevenue = responseData.content.neighborhoods_with_revenue;
-      
-      propertiesWithRevenue.forEach((property: any) => {
-        const propertyName = property.property_address || property.neighborhood || 'Unknown Property';
-        const strRevenue = property.airbnb_revenue || 0;
-        const rentRevenue = property.rental_income || 0;
-        const dataSource = property.data_source || 'unknown';
-        
-        console.log(`📈 Processing property: ${propertyName}, STR: $${strRevenue}, Rent: $${rentRevenue}`);
-        
-        if (strRevenue > 0 || rentRevenue > 0) {
-          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
-          
-          processedData.push({
-            submarket: `${propertyName} (${dataSource})`,
-            strRevenue: strRevenue,
-            medianRent: rentRevenue,
-            multiple: multiple
-          });
-        }
-      });
-    }
-    
-    // Handle export-comps data
-    else if (responseData.source === 'export-comps' && responseData.content?.neighborhoods_with_revenue) {
-      console.log('📊 Processing export-comps data from Mashvisor API');
-      
-      const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
-      
-      neighborhoodsWithRevenue.forEach((property: any) => {
-        const propertyName = property.neighborhood || 'Unknown Property';
-        const strRevenue = property.airbnb_revenue || 0;
-        const rentRevenue = property.rental_income || 0;
-        const dataSource = property.data_source || 'unknown';
-        
-        if (strRevenue > 0 || rentRevenue > 0) {
-          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
-          
-          processedData.push({
-            submarket: `${propertyName} - ${responseData.city} (${dataSource})`,
-            strRevenue: strRevenue,
-            medianRent: rentRevenue,
-            multiple: multiple
-          });
-        }
-      });
-    }
-    
-    // Handle legacy rento-calculator neighborhood data
-    else if (responseData.source === 'rento-calculator-neighborhood' && responseData.content?.neighborhoods_with_revenue) {
-      console.log('📊 Processing legacy rento-calculator neighborhood data from Mashvisor API');
-      
-      const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
-      
-      neighborhoodsWithRevenue.forEach((neighborhood: any) => {
-        const neighborhoodName = neighborhood.neighborhood || 'Unknown Neighborhood';
-        const strRevenue = neighborhood.airbnb_revenue || 0;
-        const rentRevenue = neighborhood.rental_income || 0;
-        const dataSource = neighborhood.data_source || 'unknown';
-        
-        if (strRevenue > 0 || rentRevenue > 0) {
-          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
-          
-          processedData.push({
-            submarket: `${neighborhoodName} - ${responseData.city} (${dataSource})`,
-            strRevenue: strRevenue,
-            medianRent: rentRevenue,
-            multiple: multiple
-          });
-        }
-      });
-      
-      // Add city baseline info if available
-      if (responseData.city_baseline) {
-        const cityBaseline = responseData.city_baseline;
-        if (cityBaseline.airbnb_revenue > 0 || cityBaseline.rental_income > 0) {
-          const multiple = cityBaseline.rental_income > 0 ? cityBaseline.airbnb_revenue / cityBaseline.rental_income : 0;
-          
-          processedData.push({
-            submarket: `${responseData.city} - City Baseline`,
-            strRevenue: cityBaseline.airbnb_revenue,
-            medianRent: cityBaseline.rental_income,
-            multiple: multiple
-          });
-        }
-      }
-    }
-    
-    // Handle fallback content (if revenue data not available)
+    // Handle fallback case with basic content structure
     else if (responseData.content) {
       const content = responseData.content;
       
       console.log('📊 Processing fallback rento-calculator data:', content);
       
-      if (content.airbnb || content.rental || content.revenue || content.rent) {
-        const strRevenue = (content.airbnb?.revenue || content.revenue || content.adjusted_rental_income || 0) * 12;
-        const rentRevenue = (content.rental?.rent || content.rent || content.median_rental_income || 0) * 12;
+      // Try to extract revenue data from various field names
+      const monthlyStrRevenue = content.airbnb_revenue || content.revenue || content.revpar || content.revpan || 0;
+      const monthlyRentRevenue = content.median_rental_income || content.adjusted_rental_income || content.rental_income || content.rent || 0;
+      const nightRate = content.median_night_rate || content.night_rate || content.nightly_rate || 0;
+      const occupancyRate = content.median_occupancy_rate || content.occupancy || content.occupancy_rate || 0;
+      
+      console.log(`📊 Extracted data - Monthly STR: $${monthlyStrRevenue}, Monthly Rent: $${monthlyRentRevenue}, Night Rate: $${nightRate}, Occupancy: ${occupancyRate}%`);
+      
+      let annualStrRevenue = monthlyStrRevenue * 12;
+      let annualRentRevenue = monthlyRentRevenue * 12;
+      
+      // Calculate STR revenue from night rate and occupancy if needed
+      if (nightRate > 0 && occupancyRate > 0 && annualStrRevenue === 0) {
+        const daysPerMonth = 30;
+        const occupiedDaysPerMonth = (occupancyRate / 100) * daysPerMonth;
+        const monthlyCalculatedStr = nightRate * occupiedDaysPerMonth;
+        annualStrRevenue = monthlyCalculatedStr * 12;
         
-        if (strRevenue > 0 || rentRevenue > 0) {
-          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
-          
-          processedData.push({
-            submarket: `${responseData.city} - ${responseData.source} data`,
-            strRevenue: Math.round(strRevenue),
-            medianRent: Math.round(rentRevenue),
-            multiple: multiple
-          });
-        }
+        console.log(`💡 Calculated STR revenue: $${nightRate} x ${occupiedDaysPerMonth} days/month x 12 = $${annualStrRevenue}/year`);
+      }
+      
+      if (annualStrRevenue > 0 || annualRentRevenue > 0) {
+        const multiple = annualRentRevenue > 0 ? annualStrRevenue / annualRentRevenue : 0;
+        
+        processedData.push({
+          submarket: `${responseData.city} - City Data`,
+          strRevenue: Math.round(annualStrRevenue),
+          medianRent: Math.round(annualRentRevenue),
+          multiple: multiple
+        });
       }
     }
   }

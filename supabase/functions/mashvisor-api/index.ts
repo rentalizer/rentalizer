@@ -110,7 +110,7 @@ serve(async (req) => {
 
     const neighborhoodsWithRevenue = []
     
-    // Try city-level lookup first for comprehensive neighborhood data
+    // Try city-level lookup first for comprehensive data
     console.log(`🏙️ Trying city-level lookup for: ${city}, ${state}`)
     
     const cityLookupUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodeURIComponent(city)}&resource=airbnb&beds=${propertyType}`
@@ -122,118 +122,131 @@ serve(async (req) => {
       
       const content = cityResult.data.content
       
-      // Extract city-level data
-      if (content.airbnb_revenue || content.rental_income || content.revenue || content.rent) {
-        const monthlyStrRevenue = content.airbnb_revenue || content.revenue || 0
-        const monthlyRentRevenue = content.rental_income || content.rent || 0
-        const annualStrRevenue = monthlyStrRevenue * 12
-        const annualRentRevenue = monthlyRentRevenue * 12
+      // Extract city-level revenue data - trying multiple field names
+      const monthlyStrRevenue = content.airbnb_revenue || content.revenue || content.revpar || content.revpan || 0
+      const monthlyRentRevenue = content.median_rental_income || content.adjusted_rental_income || content.rental_income || content.rent || 0
+      const nightRate = content.median_night_rate || content.night_rate || content.nightly_rate || 0
+      const occupancyRate = content.median_occupancy_rate || content.occupancy || content.occupancy_rate || 0
+      
+      console.log(`📈 City ${city} data - STR: $${monthlyStrRevenue}, Rent: $${monthlyRentRevenue}, Night Rate: $${nightRate}, Occupancy: ${occupancyRate}%`)
+      
+      // Calculate annual revenues and estimated STR if needed
+      let annualStrRevenue = monthlyStrRevenue * 12
+      let annualRentRevenue = monthlyRentRevenue * 12
+      
+      // If we have night rate and occupancy, calculate STR revenue
+      if (nightRate > 0 && occupancyRate > 0 && annualStrRevenue === 0) {
+        const daysPerMonth = 30
+        const occupiedDaysPerMonth = (occupancyRate / 100) * daysPerMonth
+        const monthlyCalculatedStr = nightRate * occupiedDaysPerMonth
+        annualStrRevenue = monthlyCalculatedStr * 12
         
-        console.log(`📈 City ${city}: Monthly STR: $${monthlyStrRevenue}, Monthly Rent: $${monthlyRentRevenue}`)
+        console.log(`💡 Calculated STR revenue from night rate ($${nightRate}) x occupancy (${occupancyRate}%) = $${monthlyCalculatedStr}/month`)
+      }
+      
+      if (annualStrRevenue > 0 || annualRentRevenue > 0) {
+        neighborhoodsWithRevenue.push({
+          neighborhood: `${city} - City Average`,
+          airbnb_revenue: Math.round(annualStrRevenue),
+          rental_income: Math.round(annualRentRevenue),
+          occupancy_rate: occupancyRate,
+          median_night_rate: nightRate,
+          api_neighborhood: city,
+          api_city: city,
+          api_state: state,
+          data_source: 'city_lookup',
+          property_address: `${city}, ${state}`,
+          property_id: `city-${city.toLowerCase().replace(/\s+/g, '-')}`,
+          raw_data: {
+            airbnb_revenue: content.airbnb_revenue,
+            revenue: content.revenue,
+            revpar: content.revpar,
+            revpan: content.revpan,
+            median_rental_income: content.median_rental_income,
+            adjusted_rental_income: content.adjusted_rental_income,
+            rental_income: content.rental_income,
+            median_night_rate: content.median_night_rate,
+            median_occupancy_rate: content.median_occupancy_rate
+          }
+        })
+      }
+      
+      // Try to get neighborhood-level data by checking different zip codes in the city
+      const majorZipCodes: { [key: string]: string[] } = {
+        'austin': ['78701', '78702', '78703', '78704', '78705', '78712', '78717', '78721', '78722', '78723'],
+        'houston': ['77002', '77003', '77004', '77005', '77006', '77007', '77008', '77019', '77024', '77025'],
+        'dallas': ['75201', '75202', '75204', '75205', '75206', '75214', '75218', '75219', '75225', '75230'],
+        'miami': ['33101', '33109', '33114', '33125', '33129', '33130', '33131', '33132', '33134', '33139'],
+        'denver': ['80202', '80203', '80204', '80205', '80206', '80209', '80210', '80211', '80218', '80220']
+      }
+      
+      const zipCodes = majorZipCodes[cityKey] || []
+      
+      if (zipCodes.length > 0) {
+        console.log(`🏘️ Trying ${zipCodes.length} zip codes for neighborhood data in ${city}`)
         
-        if (annualStrRevenue > 0 || annualRentRevenue > 0) {
-          neighborhoodsWithRevenue.push({
-            neighborhood: `${city} - City Average`,
-            airbnb_revenue: Math.round(annualStrRevenue),
-            rental_income: Math.round(annualRentRevenue),
-            occupancy_rate: content.occupancy || content.occupancy_rate || 0,
-            median_night_rate: content.night_rate || content.nightly_rate || content.rate || 0,
-            api_neighborhood: city,
-            api_city: city,
-            api_state: state,
-            data_source: 'city_lookup',
-            property_address: `${city}, ${state}`,
-            property_id: `city-${city.toLowerCase().replace(/\s+/g, '-')}`,
-            raw_data: {
-              airbnb_revenue: content.airbnb_revenue,
-              rental_income: content.rental_income,
-              revenue: content.revenue,
-              rent: content.rent,
-              occupancy: content.occupancy,
-              night_rate: content.night_rate
+        // Try a few zip codes to get neighborhood variety
+        const samplesToTry = zipCodes.slice(0, 5) // Try first 5 zip codes
+        
+        for (const zipCode of samplesToTry) {
+          try {
+            const zipLookupUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&zip_code=${zipCode}&resource=airbnb&beds=${propertyType}`
+            
+            const zipResult = await callMashvisorAPI(zipLookupUrl, mashvisorApiKey, `Zip ${zipCode} lookup`)
+            
+            if (zipResult.success && zipResult.data.content) {
+              const zipContent = zipResult.data.content
+              
+              const zipMonthlyStr = zipContent.airbnb_revenue || zipContent.revenue || zipContent.revpar || zipContent.revpan || 0
+              const zipMonthlyRent = zipContent.median_rental_income || zipContent.adjusted_rental_income || zipContent.rental_income || zipContent.rent || 0
+              const zipNightRate = zipContent.median_night_rate || zipContent.night_rate || zipContent.nightly_rate || 0
+              const zipOccupancy = zipContent.median_occupancy_rate || zipContent.occupancy || zipContent.occupancy_rate || 0
+              
+              let zipAnnualStr = zipMonthlyStr * 12
+              let zipAnnualRent = zipMonthlyRent * 12
+              
+              // Calculate STR if needed
+              if (zipNightRate > 0 && zipOccupancy > 0 && zipAnnualStr === 0) {
+                const daysPerMonth = 30
+                const occupiedDaysPerMonth = (zipOccupancy / 100) * daysPerMonth
+                const monthlyCalculatedStr = zipNightRate * occupiedDaysPerMonth
+                zipAnnualStr = monthlyCalculatedStr * 12
+              }
+              
+              if (zipAnnualStr > 0 || zipAnnualRent > 0) {
+                neighborhoodsWithRevenue.push({
+                  neighborhood: `${city} - Zip ${zipCode}`,
+                  airbnb_revenue: Math.round(zipAnnualStr),
+                  rental_income: Math.round(zipAnnualRent),
+                  occupancy_rate: zipOccupancy,
+                  median_night_rate: zipNightRate,
+                  api_neighborhood: `Zip ${zipCode}`,
+                  api_city: city,
+                  api_state: state,
+                  data_source: 'zip_lookup',
+                  property_address: `${zipCode}, ${city}, ${state}`,
+                  property_id: `zip-${zipCode}`,
+                  raw_data: {
+                    zip_code: zipCode,
+                    airbnb_revenue: zipContent.airbnb_revenue,
+                    revenue: zipContent.revenue,
+                    median_rental_income: zipContent.median_rental_income,
+                    adjusted_rental_income: zipContent.adjusted_rental_income,
+                    median_night_rate: zipContent.median_night_rate,
+                    median_occupancy_rate: zipContent.median_occupancy_rate
+                  }
+                })
+              }
             }
-          })
+            
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 100))
+            
+          } catch (error) {
+            console.log(`⚠️ Error fetching zip ${zipCode}:`, error)
+            continue
+          }
         }
-      }
-      
-      // Extract neighborhood data if available
-      if (content.neighborhoods && Array.isArray(content.neighborhoods)) {
-        console.log(`🏘️ Found ${content.neighborhoods.length} neighborhoods in ${city}`)
-        
-        content.neighborhoods.forEach((neighborhood: any, index: number) => {
-          const neighborhoodName = neighborhood.name || neighborhood.neighborhood || `Neighborhood ${index + 1}`
-          const monthlyStrRevenue = neighborhood.airbnb_revenue || neighborhood.revenue || 0
-          const monthlyRentRevenue = neighborhood.rental_income || neighborhood.rent || 0
-          const annualStrRevenue = monthlyStrRevenue * 12
-          const annualRentRevenue = monthlyRentRevenue * 12
-          
-          console.log(`🏠 Neighborhood ${neighborhoodName}: Monthly STR: $${monthlyStrRevenue}, Monthly Rent: $${monthlyRentRevenue}`)
-          
-          if (annualStrRevenue > 0 || annualRentRevenue > 0) {
-            neighborhoodsWithRevenue.push({
-              neighborhood: `${neighborhoodName} - ${city}`,
-              airbnb_revenue: Math.round(annualStrRevenue),
-              rental_income: Math.round(annualRentRevenue),
-              occupancy_rate: neighborhood.occupancy || neighborhood.occupancy_rate || 0,
-              median_night_rate: neighborhood.night_rate || neighborhood.nightly_rate || neighborhood.rate || 0,
-              api_neighborhood: neighborhoodName,
-              api_city: city,
-              api_state: state,
-              data_source: 'neighborhood_lookup',
-              property_address: `${neighborhoodName}, ${city}, ${state}`,
-              property_id: `neighborhood-${neighborhoodName.toLowerCase().replace(/\s+/g, '-')}-${index}`,
-              raw_data: {
-                airbnb_revenue: neighborhood.airbnb_revenue,
-                rental_income: neighborhood.rental_income,
-                revenue: neighborhood.revenue,
-                rent: neighborhood.rent,
-                occupancy: neighborhood.occupancy,
-                night_rate: neighborhood.night_rate
-              }
-            })
-          }
-        })
-      }
-      
-      // Extract address-level data if available
-      if (content.addresses && Array.isArray(content.addresses)) {
-        console.log(`🏠 Found ${content.addresses.length} addresses in ${city}`)
-        
-        content.addresses.forEach((address: any, index: number) => {
-          const addressName = address.address || address.property_address || `Address ${index + 1}`
-          const monthlyStrRevenue = address.airbnb_revenue || address.revenue || 0
-          const monthlyRentRevenue = address.rental_income || address.rent || 0
-          const annualStrRevenue = monthlyStrRevenue * 12
-          const annualRentRevenue = monthlyRentRevenue * 12
-          
-          console.log(`🏠 Address ${addressName}: Monthly STR: $${monthlyStrRevenue}, Monthly Rent: $${monthlyRentRevenue}`)
-          
-          if (annualStrRevenue > 0 || annualRentRevenue > 0) {
-            neighborhoodsWithRevenue.push({
-              neighborhood: `${addressName}`,
-              airbnb_revenue: Math.round(annualStrRevenue),
-              rental_income: Math.round(annualRentRevenue),
-              occupancy_rate: address.occupancy || address.occupancy_rate || 0,
-              median_night_rate: address.night_rate || address.nightly_rate || address.rate || 0,
-              api_neighborhood: address.neighborhood || city,
-              api_city: city,
-              api_state: state,
-              data_source: 'address_lookup',
-              property_address: addressName,
-              property_id: `address-${index}`,
-              raw_data: {
-                airbnb_revenue: address.airbnb_revenue,
-                rental_income: address.rental_income,
-                revenue: address.revenue,
-                rent: address.rent,
-                occupancy: address.occupancy,
-                night_rate: address.night_rate,
-                lat: address.lat,
-                lng: address.lng
-              }
-            })
-          }
-        })
       }
     } else {
       console.log(`⚠️ City lookup failed for ${city}`)
