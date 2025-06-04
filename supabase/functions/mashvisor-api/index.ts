@@ -20,10 +20,6 @@ serve(async (req) => {
     // Check for Mashvisor API key
     const mashvisorApiKey = Deno.env.get('MASHVISOR_API_KEY')
     
-    console.log('🔍 Available environment variables:', Object.keys(Deno.env.toObject()).filter(key => 
-      key.toLowerCase().includes('api') || key.toLowerCase().includes('key')
-    ))
-    
     if (!mashvisorApiKey) {
       console.error('❌ MASHVISOR_API_KEY not found in environment')
       return new Response(
@@ -37,7 +33,7 @@ serve(async (req) => {
 
     console.log('🔑 Using Mashvisor API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
 
-    // Call Mashvisor API - using the base endpoint from your example
+    // Call Mashvisor API using the base endpoint from your example
     const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client')
     
     // Add query parameters for property search
@@ -79,7 +75,7 @@ serve(async (req) => {
 
     const data = await mashvisorResponse.json()
     console.log('✅ Mashvisor API Success - Data keys:', Object.keys(data))
-    console.log('✅ Raw response structure:', JSON.stringify(data, null, 2).substring(0, 1000))
+    console.log('✅ Raw response preview:', JSON.stringify(data, null, 2).substring(0, 500))
 
     return new Response(
       JSON.stringify({ success: true, data }),
