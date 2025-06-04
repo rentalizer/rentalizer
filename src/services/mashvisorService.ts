@@ -47,36 +47,44 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       const cityName = cityResult.city;
       const cityData = cityResult.data;
       
-      if (cityData && cityData.content && cityData.content.airbnb && cityData.content.traditional_rental) {
-        const airbnbData = cityData.content.airbnb;
-        const rentalData = cityData.content.traditional_rental;
+      console.log(`🏙️ Processing ${cityName}:`, cityData);
+      
+      if (cityData && cityData.status === 'success' && cityData.content) {
+        const content = cityData.content;
         
-        // Extract revenue data (try different possible fields)
-        const airbnbRevenue = airbnbData.revenue || airbnbData.annual_revenue || (airbnbData.monthly_revenue * 12) || 0;
-        const traditionalRent = (rentalData.monthly_rent * 12) || rentalData.annual_rent || 0;
+        // Extract STR revenue data
+        const strRevenue = content.adjusted_rental_income || content.median_rental_income || 0;
         
-        if (airbnbRevenue > 0 && traditionalRent > 0) {
-          const multiple = airbnbRevenue / traditionalRent;
+        // Calculate traditional rent estimate based on property value and market ratios
+        const homeValue = content.median_home_value || 0;
+        const priceToRentRatio = content.price_to_rent_ratio || 12; // Default market ratio
+        const estimatedMonthlyRent = homeValue > 0 ? homeValue / priceToRentRatio : 0;
+        const annualRent = estimatedMonthlyRent * 12;
+        
+        console.log(`📈 ${cityName} - STR: $${strRevenue}, Rent: $${annualRent}`);
+        
+        if (strRevenue > 0) {
+          const multiple = annualRent > 0 ? strRevenue / annualRent : 0;
           
           processedData.push({
             submarket: `${cityName}, ${cityResult.state}`,
-            strRevenue: Math.round(airbnbRevenue),
-            medianRent: Math.round(traditionalRent),
+            strRevenue: Math.round(strRevenue),
+            medianRent: Math.round(annualRent),
             multiple: multiple
           });
-        } else if (airbnbRevenue > 0) {
-          // If we have revenue but no rental data, still show the city
+        } else {
+          // Add city with no STR data
           processedData.push({
-            submarket: `${cityName}, ${cityResult.state}`,
-            strRevenue: Math.round(airbnbRevenue),
-            medianRent: 0,
+            submarket: `${cityName}, ${cityResult.state} - No STR Data`,
+            strRevenue: 0,
+            medianRent: Math.round(annualRent),
             multiple: 0
           });
         }
       } else {
-        // Add city even if no data, to show we tried
+        // Add city with no data
         processedData.push({
-          submarket: `${cityName}, ${cityResult.state} - No Data`,
+          submarket: `${cityName}, ${cityResult.state} - API Error`,
           strRevenue: 0,
           medianRent: 0,
           multiple: 0
@@ -106,6 +114,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   console.log('✅ Processed market data:', processedData.map(d => ({
     submarket: d.submarket,
     revenue: d.strRevenue,
+    rent: d.medianRent,
     multiple: d.multiple > 0 ? d.multiple.toFixed(2) : 'N/A'
   })));
   
