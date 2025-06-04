@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,6 @@ import { BarChart3, MapPin, Search, Loader2, Map, Table2, Download, Satellite, E
 import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
 import { useToast } from '@/hooks/use-toast';
-import { fetchMarketData } from '@/services/marketDataService';
 
 interface SubmarketData {
   submarket: string;
@@ -19,6 +17,37 @@ interface SubmarketData {
   medianRent: number;
   multiple: number;
 }
+
+// Real Mashvisor API service function
+const fetchRealMarketData = async (city: string, propertyType: string, bathrooms: string) => {
+  try {
+    console.log(`🚀 Calling real Mashvisor API for ${city}`);
+    
+    const response = await fetch('/functions/v1/mashvisor-api', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        city,
+        propertyType,
+        bathrooms
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API call failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('✅ Real Mashvisor API response:', data);
+    
+    return data;
+  } catch (error) {
+    console.error('❌ Mashvisor API error:', error);
+    throw error;
+  }
+};
 
 export const SimulatedMarketIntelligence = () => {
   const { toast } = useToast();
@@ -45,29 +74,23 @@ export const SimulatedMarketIntelligence = () => {
     try {
       console.log(`🚀 Starting real market analysis for ${targetCity}`);
       
-      // Call the real market data service which uses Mashvisor API
-      const marketData = await fetchMarketData(
-        targetCity,
-        { mashvisorApiKey: 'configured' }, // The API key is stored in Supabase secrets
-        propertyType,
-        bathrooms
-      );
+      // Call the real Mashvisor API
+      const marketData = await fetchRealMarketData(targetCity, propertyType, bathrooms);
 
       // Process the real data from Mashvisor
       const processedData: SubmarketData[] = [];
       
-      // Combine STR and rent data to create submarket analysis
-      if (marketData.strData && marketData.rentData) {
-        const strMap = new Map(marketData.strData.map(item => [item.submarket.toLowerCase(), item.revenue]));
-        
-        marketData.rentData.forEach(rentItem => {
-          const strRevenue = strMap.get(rentItem.submarket.toLowerCase()) || 0;
-          const multiple = strRevenue > 0 && rentItem.rent > 0 ? strRevenue / rentItem.rent : 0;
+      // Handle the response data structure
+      if (marketData && marketData.content && Array.isArray(marketData.content)) {
+        marketData.content.forEach((item: any) => {
+          const multiple = item.rental_income > 0 && item.airbnb_revenue > 0 
+            ? item.airbnb_revenue / item.rental_income 
+            : 0;
           
           processedData.push({
-            submarket: rentItem.submarket,
-            strRevenue: strRevenue,
-            medianRent: rentItem.rent,
+            submarket: item.neighborhood || item.area || 'Unknown Area',
+            strRevenue: item.airbnb_revenue || 0,
+            medianRent: item.rental_income || 0,
             multiple: multiple
           });
         });
