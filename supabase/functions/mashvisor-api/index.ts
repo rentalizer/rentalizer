@@ -1,3 +1,4 @@
+
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
@@ -451,33 +452,41 @@ serve(async (req) => {
       
       const content = cityResult.data.content
       
-      // Extract city-level revenue data - trying multiple field names
-      const monthlyStrRevenue = content.airbnb_revenue || content.revenue || content.revpar || content.revpan || 0
-      const monthlyRentRevenue = content.median_rental_income || content.adjusted_rental_income || content.rental_income || content.rent || 0
+      // Calculate proper STR revenue using the right methodology
       const nightRate = content.median_night_rate || content.night_rate || content.nightly_rate || 0
       const occupancyRate = content.median_occupancy_rate || content.occupancy || content.occupancy_rate || 0
+      const monthlyRentRevenue = content.median_rental_income || content.adjusted_rental_income || content.rental_income || content.rent || 0
       
-      console.log(`📈 City ${city} data - STR: $${monthlyStrRevenue}, Rent: $${monthlyRentRevenue}, Night Rate: $${nightRate}, Occupancy: ${occupancyRate}%`)
-      
-      // Calculate annual STR revenue and keep monthly rent revenue
-      let annualStrRevenue = monthlyStrRevenue * 12
-      let monthlyRent = monthlyRentRevenue
-      
-      // If we have night rate and occupancy, calculate STR revenue
-      if (nightRate > 0 && occupancyRate > 0 && annualStrRevenue === 0) {
+      // Calculate monthly STR revenue: (nightly rate × occupancy rate × 30 days)
+      let monthlyStrRevenue = 0
+      if (nightRate > 0 && occupancyRate > 0) {
         const daysPerMonth = 30
         const occupiedDaysPerMonth = (occupancyRate / 100) * daysPerMonth
-        const monthlyCalculatedStr = nightRate * occupiedDaysPerMonth
-        annualStrRevenue = monthlyCalculatedStr * 12
+        monthlyStrRevenue = nightRate * occupiedDaysPerMonth
         
-        console.log(`💡 Calculated STR revenue from night rate ($${nightRate}) x occupancy (${occupancyRate}%) = $${monthlyCalculatedStr}/month`)
+        console.log(`💰 Calculated STR revenue: $${nightRate}/night × ${occupancyRate}% occupancy × ${daysPerMonth} days = $${monthlyStrRevenue}/month`)
       }
       
-      if (annualStrRevenue > 0 || monthlyRent > 0) {
+      // Fallback: try using revpar if it seems like monthly data
+      if (monthlyStrRevenue === 0) {
+        const revpar = content.revpar || content.revpan || 0
+        if (revpar > 1000) { // If revpar is > $1000, it's likely monthly
+          monthlyStrRevenue = revpar
+          console.log(`💰 Using revpar as monthly STR revenue: $${monthlyStrRevenue}`)
+        } else if (revpar > 0) {
+          // If revpar is small, it might be daily - multiply by days and occupancy
+          monthlyStrRevenue = revpar * 30
+          console.log(`💰 Using revpar as daily STR revenue: $${revpar} × 30 days = $${monthlyStrRevenue}`)
+        }
+      }
+      
+      console.log(`📈 City ${city} data - STR: $${monthlyStrRevenue}/month, Rent: $${monthlyRentRevenue}/month, Night Rate: $${nightRate}, Occupancy: ${occupancyRate}%`)
+      
+      if (monthlyStrRevenue > 0 || monthlyRentRevenue > 0) {
         neighborhoodsWithRevenue.push({
           neighborhood: `${city}, City Average`,
-          airbnb_revenue: Math.round(annualStrRevenue),
-          rental_income: Math.round(monthlyRent), // Keep as monthly
+          airbnb_revenue: Math.round(monthlyStrRevenue * 12), // Convert to annual for display
+          rental_income: Math.round(monthlyRentRevenue), // Keep monthly
           occupancy_rate: occupancyRate,
           median_night_rate: nightRate,
           api_neighborhood: city,
@@ -487,15 +496,12 @@ serve(async (req) => {
           property_address: `${city}, ${state}`,
           property_id: `city-${city.toLowerCase().replace(/\s+/g, '-')}`,
           raw_data: {
-            airbnb_revenue: content.airbnb_revenue,
-            revenue: content.revenue,
+            calculated_monthly_str: monthlyStrRevenue,
+            median_night_rate: nightRate,
+            median_occupancy_rate: occupancyRate,
+            median_rental_income: monthlyRentRevenue,
             revpar: content.revpar,
-            revpan: content.revpan,
-            median_rental_income: content.median_rental_income,
-            adjusted_rental_income: content.adjusted_rental_income,
-            rental_income: content.rental_income,
-            median_night_rate: content.median_night_rate,
-            median_occupancy_rate: content.median_occupancy_rate
+            revpan: content.revpan
           }
         })
       }
@@ -526,30 +532,36 @@ serve(async (req) => {
             if (zipResult.success && zipResult.data.content) {
               const zipContent = zipResult.data.content
               
-              const zipMonthlyStr = zipContent.airbnb_revenue || zipContent.revenue || zipContent.revpar || zipContent.revpan || 0
-              const zipMonthlyRent = zipContent.median_rental_income || zipContent.adjusted_rental_income || zipContent.rental_income || zipContent.rent || 0
               const zipNightRate = zipContent.median_night_rate || zipContent.night_rate || zipContent.nightly_rate || 0
               const zipOccupancy = zipContent.median_occupancy_rate || zipContent.occupancy || zipContent.occupancy_rate || 0
+              const zipMonthlyRent = zipContent.median_rental_income || zipContent.adjusted_rental_income || zipContent.rental_income || zipContent.rent || 0
               
-              let zipAnnualStr = zipMonthlyStr * 12
-              let zipMonthlyRentFinal = zipMonthlyRent // Keep as monthly
-              
-              // Calculate STR if needed
-              if (zipNightRate > 0 && zipOccupancy > 0 && zipAnnualStr === 0) {
+              // Calculate monthly STR revenue properly
+              let zipMonthlyStr = 0
+              if (zipNightRate > 0 && zipOccupancy > 0) {
                 const daysPerMonth = 30
                 const occupiedDaysPerMonth = (zipOccupancy / 100) * daysPerMonth
-                const monthlyCalculatedStr = zipNightRate * occupiedDaysPerMonth
-                zipAnnualStr = monthlyCalculatedStr * 12
+                zipMonthlyStr = zipNightRate * occupiedDaysPerMonth
               }
               
-              if (zipAnnualStr > 0 || zipMonthlyRentFinal > 0) {
+              // Fallback to revpar if calculation didn't work
+              if (zipMonthlyStr === 0) {
+                const revpar = zipContent.revpar || zipContent.revpan || 0
+                if (revpar > 1000) {
+                  zipMonthlyStr = revpar
+                } else if (revpar > 0) {
+                  zipMonthlyStr = revpar * 30
+                }
+              }
+              
+              if (zipMonthlyStr > 0 || zipMonthlyRent > 0) {
                 // Get neighborhood name from mapping or use a cleaner default
                 const neighborhoodName = zipToNeighborhoodMap[cityKey]?.[zipCode] || `District ${zipCode.slice(-2)}`
                 
                 neighborhoodsWithRevenue.push({
                   neighborhood: `${city}, ${neighborhoodName}`,
-                  airbnb_revenue: Math.round(zipAnnualStr),
-                  rental_income: Math.round(zipMonthlyRentFinal), // Keep as monthly
+                  airbnb_revenue: Math.round(zipMonthlyStr * 12), // Convert to annual for display
+                  rental_income: Math.round(zipMonthlyRent), // Keep monthly
                   occupancy_rate: zipOccupancy,
                   median_night_rate: zipNightRate,
                   api_neighborhood: neighborhoodName,
@@ -560,12 +572,12 @@ serve(async (req) => {
                   property_id: `neighborhood-${neighborhoodName.toLowerCase().replace(/\s+/g, '-')}`,
                   raw_data: {
                     zip_code: zipCode,
-                    airbnb_revenue: zipContent.airbnb_revenue,
-                    revenue: zipContent.revenue,
-                    median_rental_income: zipContent.median_rental_income,
-                    adjusted_rental_income: zipContent.adjusted_rental_income,
-                    median_night_rate: zipContent.median_night_rate,
-                    median_occupancy_rate: zipContent.median_occupancy_rate
+                    calculated_monthly_str: zipMonthlyStr,
+                    median_night_rate: zipNightRate,
+                    median_occupancy_rate: zipOccupancy,
+                    median_rental_income: zipMonthlyRent,
+                    revpar: zipContent.revpar,
+                    revpan: zipContent.revpan
                   }
                 })
               }
