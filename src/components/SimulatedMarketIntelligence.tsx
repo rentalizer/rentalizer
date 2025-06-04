@@ -32,7 +32,7 @@ export const SimulatedMarketIntelligence = () => {
       // Call the real Mashvisor API with just the city name
       const marketData = await fetchRealMarketData(city, propType, bathCount);
 
-      // Process the real data from Mashvisor with OpenAI rent lookup
+      // Process the real data from Mashvisor (both STR and rent data)
       const processedData = await processMarketData(marketData, city, propType, bathCount);
 
       setSubmarketData(processedData);
@@ -46,18 +46,18 @@ export const SimulatedMarketIntelligence = () => {
       if (hasRevenueData && hasRentData) {
         toast({
           title: "Market Analysis Complete",
-          description: `STR revenue data (with 25% markup) from Mashvisor and rent data from OpenAI for ${city}.`,
+          description: `Both STR revenue and rental data from Mashvisor API for ${city}.`,
         });
       } else if (hasRevenueData && !hasRentData) {
         toast({
           title: "Partial Data Available",
-          description: `STR revenue found but OpenAI rent lookup failed for ${city}.`,
+          description: `STR revenue found but rental data unavailable for ${city}.`,
           variant: "destructive",
         });
       } else {
         toast({
           title: "Limited Data Available",
-          description: `Both Mashvisor and OpenAI APIs returned limited data for ${city}.`,
+          description: `Mashvisor API returned limited data for ${city}.`,
           variant: "destructive",
         });
       }
@@ -86,9 +86,9 @@ export const SimulatedMarketIntelligence = () => {
           <div className="flex items-center gap-3">
             <Eye className="h-5 w-5 text-green-400" />
             <div>
-              <h3 className="font-semibold text-green-300">Real Market Intelligence with 25% STR Markup</h3>
+              <h3 className="font-semibold text-green-300">Real Market Intelligence from Mashvisor</h3>
               <p className="text-sm text-gray-300">
-                STR revenue from Mashvisor API (with 25% markup) compared to median rent from OpenAI API.
+                Both STR revenue (with 25% markup) and rental data from the same Mashvisor API source.
               </p>
             </div>
           </div>

@@ -85,7 +85,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
             )}
           </div>
         </div>
-        <p className="text-white">STR revenue (with 25% markup) vs OpenAI rent data</p>
+        <p className="text-white">STR revenue (with 25% markup) vs rental data from Mashvisor API</p>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
@@ -106,7 +106,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
                     STR Revenue (+25%)
                   </div>
                 </TableHead>
-                <TableHead className="text-white font-semibold">Median Rent (OpenAI)</TableHead>
+                <TableHead className="text-white font-semibold">Median Rent (Mashvisor)</TableHead>
                 <TableHead className="text-white font-semibold">Revenue Multiple</TableHead>
               </TableRow>
             </TableHeader>

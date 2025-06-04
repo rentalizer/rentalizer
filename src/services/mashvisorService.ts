@@ -33,99 +33,10 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
   }
 };
 
-const fetchRentDataFromOpenAI = async (city: string, propertyType: string, bathrooms: string) => {
-  try {
-    console.log(`🤖 Calling OpenAI API for rent data in ${city}`);
-    
-    const { data, error } = await supabase.functions.invoke('openai-rent-lookup', {
-      body: {
-        city,
-        propertyType,
-        bathrooms
-      }
-    });
-
-    if (error) {
-      console.error('❌ OpenAI API call failed:', error.message);
-      return null;
-    }
-
-    if (!data || !data.success) {
-      console.error('❌ OpenAI API returned error:', data);
-      return null;
-    }
-
-    console.log('✅ OpenAI rent data response:', data.data);
-    return data.data;
-  } catch (error) {
-    console.error('❌ OpenAI rent lookup error:', error);
-    return null;
-  }
-};
-
-// Helper function to find matching neighborhood rent
-const findNeighborhoodRent = (locationName: string, rentData: any, cityAverage: number) => {
-  if (!rentData || !rentData.neighborhoods) {
-    return cityAverage;
-  }
-
-  // Clean up location name for better matching
-  const cleanLocationName = locationName
-    .replace(/^.*,\s*/, '') // Remove city prefix like "Austin, "
-    .toLowerCase()
-    .trim();
-
-  console.log(`🔍 Looking for rent data for: "${cleanLocationName}"`);
-
-  // Try exact match first
-  for (const [neighborhood, rent] of Object.entries(rentData.neighborhoods)) {
-    if (neighborhood.toLowerCase() === cleanLocationName) {
-      console.log(`🎯 Exact match found: ${neighborhood} = $${rent}`);
-      return rent as number;
-    }
-  }
-
-  // Try partial matches for common neighborhood patterns
-  const neighborhoodMappings = {
-    'downtown': ['downtown', 'central', 'city center'],
-    'east': ['east austin', 'eastside'],
-    'south': ['south austin', 'south congress', 'south lamar'],
-    'west': ['west austin', 'westlake', 'west campus'],
-    'north': ['north austin', 'north loop'],
-    'mueller': ['mueller'],
-    'zilker': ['zilker', 'south lamar'],
-    'clarksville': ['clarksville'],
-    'hyde park': ['hyde park'],
-    'university': ['university', 'west campus'],
-    'domain': ['domain', 'north austin'],
-    'four points': ['four points', 'westlake']
-  };
-
-  for (const [key, variations] of Object.entries(neighborhoodMappings)) {
-    if (variations.some(variation => cleanLocationName.includes(variation))) {
-      // Find matching OpenAI neighborhood
-      for (const [neighborhood, rent] of Object.entries(rentData.neighborhoods)) {
-        const neighborhoodLower = neighborhood.toLowerCase();
-        if (variations.some(variation => neighborhoodLower.includes(variation))) {
-          console.log(`🎯 Pattern match found: ${cleanLocationName} → ${neighborhood} = $${rent}`);
-          return rent as number;
-        }
-      }
-    }
-  }
-
-  console.log(`⚠️ No match found for "${cleanLocationName}", using city average: $${cityAverage}`);
-  return cityAverage;
-};
-
 export const processMarketData = async (marketData: any, city: string, propertyType: string, bathrooms: string): Promise<SubmarketData[]> => {
   const processedData: SubmarketData[] = [];
   
   console.log('🔍 Processing market data structure:', marketData);
-  
-  // Get rent data from OpenAI
-  const rentData = await fetchRentDataFromOpenAI(city, propertyType, bathrooms);
-  console.log('🏠 OpenAI rent data received:', rentData);
   
   // Handle successful API response
   if (marketData && marketData.success && marketData.data) {
@@ -145,18 +56,18 @@ export const processMarketData = async (marketData: any, city: string, propertyT
         // Apply 25% markup to STR revenue as per your formula
         const strRevenueWith25Markup = Math.round(monthlyStrRevenue * 1.25);
         
-        console.log(`📈 Processing location: ${locationName}, Monthly STR: $${monthlyStrRevenue}, With 25% markup: $${strRevenueWith25Markup}`);
+        // Get rental data from the same Mashvisor location data
+        const monthlyRent = location.traditional_rental || location.rental_income || location.rent || 0;
         
-        // Use rent from OpenAI with improved neighborhood matching
-        const medianRent = findNeighborhoodRent(locationName, rentData, rentData?.cityAverage || 0);
+        console.log(`📈 Processing location: ${locationName}, Monthly STR: $${monthlyStrRevenue}, With 25% markup: $${strRevenueWith25Markup}, Mashvisor Rent: $${monthlyRent}`);
         
         if (strRevenueWith25Markup > 0) {
-          const multiple = medianRent > 0 ? strRevenueWith25Markup / medianRent : 0;
+          const multiple = monthlyRent > 0 ? strRevenueWith25Markup / monthlyRent : 0;
           
           processedData.push({
             submarket: locationName,
             strRevenue: strRevenueWith25Markup, // STR revenue with 25% markup
-            medianRent: medianRent, // From OpenAI API with improved matching
+            medianRent: monthlyRent, // From same Mashvisor API call
             multiple: multiple
           });
         }
@@ -174,7 +85,10 @@ export const processMarketData = async (marketData: any, city: string, propertyT
       const nightRate = content.median_night_rate || content.night_rate || content.nightly_rate || 0;
       const occupancyRate = content.median_occupancy_rate || content.occupancy || content.occupancy_rate || 0;
       
-      console.log(`📊 Extracted data - Monthly STR: $${monthlyStrRevenue}, Night Rate: $${nightRate}, Occupancy: ${occupancyRate}%`);
+      // Get rental data from Mashvisor
+      const monthlyRent = content.median_rental_income || content.rental_income || content.rent || 0;
+      
+      console.log(`📊 Extracted data - Monthly STR: $${monthlyStrRevenue}, Night Rate: $${nightRate}, Occupancy: ${occupancyRate}%, Mashvisor Rent: $${monthlyRent}`);
       
       let calculatedMonthlyStr = monthlyStrRevenue;
       
@@ -190,16 +104,13 @@ export const processMarketData = async (marketData: any, city: string, propertyT
       // Apply 25% markup to STR revenue as per your formula
       const strRevenueWith25Markup = Math.round(calculatedMonthlyStr * 1.25);
       
-      // Use rent from OpenAI
-      const medianRent = rentData?.cityAverage || 0;
-      
       if (strRevenueWith25Markup > 0) {
-        const multiple = medianRent > 0 ? strRevenueWith25Markup / medianRent : 0;
+        const multiple = monthlyRent > 0 ? strRevenueWith25Markup / monthlyRent : 0;
         
         processedData.push({
           submarket: `${responseData.city} - City Data`,
           strRevenue: strRevenueWith25Markup, // STR revenue with 25% markup
-          medianRent: medianRent, // From OpenAI API
+          medianRent: monthlyRent, // From same Mashvisor API call
           multiple: multiple
         });
       }
@@ -211,15 +122,12 @@ export const processMarketData = async (marketData: any, city: string, propertyT
     console.log('❌ No valid data found from Mashvisor');
     
     const cityName = marketData?.data?.city || city || 'Unknown City';
-    const message = marketData?.data?.message || 'No revenue data available from Mashvisor API';
-    
-    // Still try to get rent data from OpenAI even if Mashvisor failed
-    const medianRent = rentData?.cityAverage || 0;
+    const message = marketData?.data?.message || 'No data available from Mashvisor API';
     
     processedData.push({
       submarket: `${cityName} - ${message}`,
       strRevenue: 0,
-      medianRent: medianRent,
+      medianRent: 0,
       multiple: 0
     });
   }
@@ -229,10 +137,10 @@ export const processMarketData = async (marketData: any, city: string, propertyT
     processedData.sort((a, b) => b.strRevenue - a.strRevenue);
   }
 
-  console.log('✅ Final processed market data with improved rent matching:', processedData.map(d => ({
+  console.log('✅ Final processed market data using Mashvisor rent data:', processedData.map(d => ({
     submarket: d.submarket,
     monthlyRevenueWith25Markup: d.strRevenue,
-    monthlyRentFromOpenAI: d.medianRent,
+    monthlyRentFromMashvisor: d.medianRent,
     multiple: d.multiple > 0 ? d.multiple.toFixed(2) : 'N/A'
   })));
   
