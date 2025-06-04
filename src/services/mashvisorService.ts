@@ -46,11 +46,17 @@ const fetchRentDataFromOpenAI = async (city: string, propertyType: string, bathr
     });
 
     if (error) {
-      throw new Error(`OpenAI API call failed: ${error.message}`);
+      console.error('❌ OpenAI API call failed:', error.message);
+      return null;
     }
 
-    console.log('✅ OpenAI rent data response:', data);
-    return data;
+    if (!data || !data.success) {
+      console.error('❌ OpenAI API returned error:', data);
+      return null;
+    }
+
+    console.log('✅ OpenAI rent data response:', data.data);
+    return data.data;
   } catch (error) {
     console.error('❌ OpenAI rent lookup error:', error);
     return null;
@@ -64,6 +70,7 @@ export const processMarketData = async (marketData: any, city: string, propertyT
   
   // Get rent data from OpenAI
   const rentData = await fetchRentDataFromOpenAI(city, propertyType, bathrooms);
+  console.log('🏠 OpenAI rent data received:', rentData);
   
   // Handle successful API response
   if (marketData && marketData.success && marketData.data) {
@@ -83,18 +90,25 @@ export const processMarketData = async (marketData: any, city: string, propertyT
         // Apply 25% markup to STR revenue as per your formula
         const strRevenueWith25Markup = Math.round(monthlyStrRevenue * 1.25);
         
-        const dataSource = location.data_source || 'unknown';
+        console.log(`📈 Processing location: ${locationName}, Monthly STR: $${monthlyStrRevenue}, With 25% markup: $${strRevenueWith25Markup}`);
         
-        console.log(`📈 Processing location: ${locationName}, Monthly STR: $${monthlyStrRevenue}, With 25% markup: $${strRevenueWith25Markup}, Source: ${dataSource}`);
+        // Use rent from OpenAI - try to match neighborhood name first, then use city average
+        let medianRent = 0;
+        if (rentData) {
+          if (rentData.neighborhoods && rentData.neighborhoods[locationName]) {
+            medianRent = rentData.neighborhoods[locationName];
+            console.log(`🏠 Found neighborhood rent for ${locationName}: $${medianRent}`);
+          } else if (rentData.cityAverage) {
+            medianRent = rentData.cityAverage;
+            console.log(`🏠 Using city average rent for ${locationName}: $${medianRent}`);
+          }
+        }
         
-        // Use rent from OpenAI instead of Mashvisor
-        const medianRent = rentData?.neighborhoods?.[locationName] || rentData?.cityAverage || 0;
-        
-        if (strRevenueWith25Markup > 0 || medianRent > 0) {
+        if (strRevenueWith25Markup > 0) {
           const multiple = medianRent > 0 ? strRevenueWith25Markup / medianRent : 0;
           
           processedData.push({
-            submarket: `${locationName}`,
+            submarket: locationName,
             strRevenue: strRevenueWith25Markup, // STR revenue with 25% markup
             medianRent: medianRent, // From OpenAI API
             multiple: multiple
@@ -130,10 +144,10 @@ export const processMarketData = async (marketData: any, city: string, propertyT
       // Apply 25% markup to STR revenue as per your formula
       const strRevenueWith25Markup = Math.round(calculatedMonthlyStr * 1.25);
       
-      // Use rent from OpenAI instead of Mashvisor
+      // Use rent from OpenAI
       const medianRent = rentData?.cityAverage || 0;
       
-      if (strRevenueWith25Markup > 0 || medianRent > 0) {
+      if (strRevenueWith25Markup > 0) {
         const multiple = medianRent > 0 ? strRevenueWith25Markup / medianRent : 0;
         
         processedData.push({
@@ -148,15 +162,18 @@ export const processMarketData = async (marketData: any, city: string, propertyT
   
   // Handle API failure or no data
   if (processedData.length === 0) {
-    console.log('❌ No valid data found');
+    console.log('❌ No valid data found from Mashvisor');
     
-    const city = marketData?.data?.city || 'Unknown City';
+    const cityName = marketData?.data?.city || city || 'Unknown City';
     const message = marketData?.data?.message || 'No revenue data available from Mashvisor API';
     
+    // Still try to get rent data from OpenAI even if Mashvisor failed
+    const medianRent = rentData?.cityAverage || 0;
+    
     processedData.push({
-      submarket: `${city} - ${message}`,
+      submarket: `${cityName} - ${message}`,
       strRevenue: 0,
-      medianRent: 0,
+      medianRent: medianRent,
       multiple: 0
     });
   }
@@ -166,7 +183,7 @@ export const processMarketData = async (marketData: any, city: string, propertyT
     processedData.sort((a, b) => b.strRevenue - a.strRevenue);
   }
 
-  console.log('✅ Processed market data with 25% markup:', processedData.map(d => ({
+  console.log('✅ Final processed market data with 25% markup:', processedData.map(d => ({
     submarket: d.submarket,
     monthlyRevenueWith25Markup: d.strRevenue,
     monthlyRentFromOpenAI: d.medianRent,
