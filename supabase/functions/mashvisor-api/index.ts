@@ -109,7 +109,18 @@ serve(async (req) => {
     }
 
     const data = await mashvisorResponse.json()
-    console.log('✅ Mashvisor rento-calculator/lookup API Success - Data keys:', Object.keys(data))
+    console.log('✅ Mashvisor rento-calculator/lookup API Success')
+    console.log('📋 Response Data Structure:', {
+      status: data.status,
+      hasContent: !!data.content,
+      contentKeys: data.content ? Object.keys(data.content) : [],
+      medianRentalIncome: data.content?.median_rental_income,
+      adjustedRentalIncome: data.content?.adjusted_rental_income,
+      medianNightRate: data.content?.median_night_rate,
+      occupancyRate: data.content?.median_occupancy_rate,
+      sampleSize: data.content?.sample_size,
+      city: data.content?.market?.city || data.content?.city
+    })
 
     return new Response(
       JSON.stringify({ success: true, data }),
