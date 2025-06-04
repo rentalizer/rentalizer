@@ -41,8 +41,33 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   if (marketData && marketData.success && marketData.data) {
     const responseData = marketData.data;
     
+    // Handle list-comps data (new endpoint)
+    if (responseData.source === 'list-comps' && responseData.content?.neighborhoods_with_revenue) {
+      console.log('📊 Processing list-comps property data from Mashvisor API');
+      
+      const propertiesWithRevenue = responseData.content.neighborhoods_with_revenue;
+      
+      propertiesWithRevenue.forEach((property: any) => {
+        const propertyName = property.property_address || property.neighborhood || 'Unknown Property';
+        const strRevenue = property.airbnb_revenue || 0;
+        const rentRevenue = property.rental_income || 0;
+        const dataSource = property.data_source || 'unknown';
+        
+        if (strRevenue > 0 || rentRevenue > 0) {
+          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
+          
+          processedData.push({
+            submarket: `${propertyName} (${dataSource})`,
+            strRevenue: strRevenue,
+            medianRent: rentRevenue,
+            multiple: multiple
+          });
+        }
+      });
+    }
+    
     // Handle rento-calculator-lookup data
-    if (responseData.source === 'rento-calculator-lookup' && responseData.content?.neighborhoods_with_revenue) {
+    else if (responseData.source === 'rento-calculator-lookup' && responseData.content?.neighborhoods_with_revenue) {
       console.log('📊 Processing rento-calculator lookup data from Mashvisor API');
       
       const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
