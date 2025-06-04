@@ -1,4 +1,3 @@
-
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
@@ -197,13 +196,12 @@ serve(async (req) => {
       }
     }
 
-    // Strategy 3: City Level - Try city level lookup for revenue data (PRIORITY FOR REVENUE DATA)
+    // Strategy 3: City Level - Try city level lookup for revenue data
     if (!finalResult) {
       const cityUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodedCity}&resource=airbnb&beds=${propertyType}`
-      const cityResult = await callMashvisorAPI(cityUrl, mashvisorApiKey, 'City level rento-calculator endpoint')
+      const cityResult = await callMashvisorAPI(cityUrl, mashvisorApiKey, 'City level endpoint')
       
       if (cityResult.success) {
-        console.log('🎯 City-level rento-calculator returned data:', cityResult.data)
         finalResult = {
           success: true,
           data: {
@@ -211,38 +209,17 @@ serve(async (req) => {
             state: state,
             propertyType: propertyType,
             bathrooms: bathrooms,
-            source: 'city-revenue',
+            source: 'city',
             ...cityResult.data
           }
         }
       }
     }
 
-    // Strategy 4: Metro Areas - Try metro area lookup for some cities
-    if (!finalResult) {
-      // For major cities, try metro area endpoint
-      const metroUrl = `https://api.mashvisor.com/v1.1/client/metro/${state}/${encodedCity}?resource=airbnb&beds=${propertyType}`
-      const metroResult = await callMashvisorAPI(metroUrl, mashvisorApiKey, 'Metro area endpoint')
-      
-      if (metroResult.success) {
-        finalResult = {
-          success: true,
-          data: {
-            city: city,
-            state: state,
-            propertyType: propertyType,
-            bathrooms: bathrooms,
-            source: 'metro',
-            ...metroResult.data
-          }
-        }
-      }
-    }
-
-    // Strategy 5: Neighborhood Level - Fallback to neighborhoods endpoint (for directory only)
+    // Strategy 4: Neighborhood Level - Fallback to neighborhoods endpoint
     if (!finalResult) {
       const neighborhoodUrl = `https://api.mashvisor.com/v1.1/client/city/neighborhoods/${state}/${encodedCity}`
-      const neighborhoodResult = await callMashvisorAPI(neighborhoodUrl, mashvisorApiKey, 'Neighborhood directory endpoint')
+      const neighborhoodResult = await callMashvisorAPI(neighborhoodUrl, mashvisorApiKey, 'Neighborhood endpoint')
       
       if (neighborhoodResult.success) {
         finalResult = {
