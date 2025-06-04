@@ -10,6 +10,7 @@ import { BarChart3, MapPin, Search, Loader2, Map, Table2, Download, Satellite, E
 import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SubmarketData {
   submarket: string;
@@ -23,23 +24,18 @@ const fetchRealMarketData = async (city: string, propertyType: string, bathrooms
   try {
     console.log(`🚀 Calling real Mashvisor API for ${city}`);
     
-    const response = await fetch('/functions/v1/mashvisor-api', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    const { data, error } = await supabase.functions.invoke('mashvisor-api', {
+      body: {
         city,
         propertyType,
         bathrooms
-      }),
+      }
     });
 
-    if (!response.ok) {
-      throw new Error(`API call failed: ${response.status}`);
+    if (error) {
+      throw new Error(`API call failed: ${error.message}`);
     }
 
-    const data = await response.json();
     console.log('✅ Real Mashvisor API response:', data);
     
     return data;
@@ -81,8 +77,8 @@ export const SimulatedMarketIntelligence = () => {
       const processedData: SubmarketData[] = [];
       
       // Handle the response data structure
-      if (marketData && marketData.content && Array.isArray(marketData.content)) {
-        marketData.content.forEach((item: any) => {
+      if (marketData && marketData.data && marketData.data.content && Array.isArray(marketData.data.content)) {
+        marketData.data.content.forEach((item: any) => {
           const multiple = item.rental_income > 0 && item.airbnb_revenue > 0 
             ? item.airbnb_revenue / item.rental_income 
             : 0;
