@@ -1,5 +1,4 @@
 
-
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
@@ -34,10 +33,10 @@ serve(async (req) => {
 
     console.log('🔑 Using Mashvisor API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
 
-    // Use the city neighborhoods endpoint
-    const mashvisorUrl = new URL(`https://api.mashvisor.com/v1.1/client/city/neighborhoods/CA/${encodeURIComponent(city)}`)
+    // Use the city investment endpoint
+    const mashvisorUrl = new URL(`https://api.mashvisor.com/v1.1/client/city/investment/CA/${encodeURIComponent(city)}`)
     
-    console.log('📡 Calling Mashvisor neighborhoods API:', mashvisorUrl.toString())
+    console.log('📡 Calling Mashvisor investment API:', mashvisorUrl.toString())
     
     const mashvisorResponse = await fetch(mashvisorUrl.toString(), {
       method: 'GET',
@@ -69,7 +68,7 @@ serve(async (req) => {
     }
 
     const data = await mashvisorResponse.json()
-    console.log('✅ Mashvisor neighborhoods API Success - Data keys:', Object.keys(data))
+    console.log('✅ Mashvisor investment API Success - Data keys:', Object.keys(data))
     console.log('✅ Raw response preview:', JSON.stringify(data, null, 2).substring(0, 500))
 
     return new Response(
@@ -90,4 +89,3 @@ serve(async (req) => {
     )
   }
 })
-
