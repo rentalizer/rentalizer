@@ -2,16 +2,18 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MapPin, Search, Loader2 } from 'lucide-react';
 
 interface MarketAnalysisFormProps {
-  onAnalyze: (state: string, propertyType: string, bathrooms: string) => void;
+  onAnalyze: (city: string, state: string, propertyType: string, bathrooms: string) => void;
   isLoading: boolean;
 }
 
 export const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ onAnalyze, isLoading }) => {
-  const [targetState, setTargetState] = useState<string>('CA');
+  const [targetCity, setTargetCity] = useState<string>('Austin');
+  const [targetState, setTargetState] = useState<string>('TX');
   const [propertyType, setPropertyType] = useState<string>('2');
   const [bathrooms, setBathrooms] = useState<string>('2');
 
@@ -65,7 +67,7 @@ export const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ onAnalyz
   }, [propertyType]);
 
   const handleAnalyze = () => {
-    onAnalyze(targetState, propertyType, bathrooms);
+    onAnalyze(targetCity, targetState, propertyType, bathrooms);
   };
 
   return (
@@ -79,26 +81,42 @@ export const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ onAnalyz
       <CardContent className="pt-6">
         <div className="space-y-4">
           <div className="flex flex-col items-center space-y-4">
-            <div className="w-full max-w-md">
-              <label htmlFor="target-city" className="text-sm font-medium text-gray-300 block mb-2">
-                Select Target City
-              </label>
-              <Select value={targetState} onValueChange={setTargetState}>
-                <SelectTrigger className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400">
-                  <SelectValue placeholder="Choose a city" />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-700 z-50 max-h-60">
-                  {stateOptions.map((state) => (
-                    <SelectItem 
-                      key={state.value} 
-                      value={state.value} 
-                      className="text-gray-100 focus:bg-gray-700"
-                    >
-                      {state.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="w-full max-w-md grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="target-city" className="text-sm font-medium text-gray-300 block mb-2">
+                  City Name
+                </label>
+                <Input
+                  id="target-city"
+                  type="text"
+                  value={targetCity}
+                  onChange={(e) => setTargetCity(e.target.value)}
+                  placeholder="Enter city name"
+                  className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="target-state" className="text-sm font-medium text-gray-300 block mb-2">
+                  State
+                </label>
+                <Select value={targetState} onValueChange={setTargetState}>
+                  <SelectTrigger className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400">
+                    <SelectValue placeholder="Choose state" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 border-gray-700 z-50 max-h-60">
+                    {stateOptions.map((state) => (
+                      <SelectItem 
+                        key={state.value} 
+                        value={state.value} 
+                        className="text-gray-100 focus:bg-gray-700"
+                      >
+                        {state.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="w-full max-w-md grid grid-cols-2 gap-4">
@@ -143,7 +161,7 @@ export const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ onAnalyz
             
             <Button
               onClick={handleAnalyze}
-              disabled={isLoading}
+              disabled={isLoading || !targetCity.trim()}
               size="sm"
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 px-6"
             >
