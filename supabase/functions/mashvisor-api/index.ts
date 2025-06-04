@@ -33,14 +33,12 @@ serve(async (req) => {
 
     console.log('🔑 Using Mashvisor API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
 
-    // Call Mashvisor API using the base endpoint from your example
-    const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client')
+    // Use the correct Mashvisor API endpoint for city list
+    const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client/city/list')
     
-    // Add query parameters for property search
+    // Add query parameters
+    mashvisorUrl.searchParams.append('state', 'CA') // Default to CA, could be made dynamic later
     if (city) mashvisorUrl.searchParams.append('city', city)
-    if (propertyType) mashvisorUrl.searchParams.append('bedrooms', propertyType)
-    if (bathrooms) mashvisorUrl.searchParams.append('bathrooms', bathrooms)
-    mashvisorUrl.searchParams.append('state', 'CA') // Default to CA
     
     console.log('📡 Calling Mashvisor API:', mashvisorUrl.toString())
     
