@@ -50,18 +50,19 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       
       neighborhoodsWithRevenue.forEach((location: any) => {
         const locationName = location.neighborhood || location.property_address || 'Unknown Location';
-        const strRevenue = location.airbnb_revenue || 0;
+        const annualStrRevenue = location.airbnb_revenue || 0;
+        const monthlyStrRevenue = Math.round(annualStrRevenue / 12); // Convert annual to monthly
         const rentRevenue = location.rental_income || 0;
         const dataSource = location.data_source || 'unknown';
         
-        console.log(`📈 Processing location: ${locationName}, STR: $${strRevenue}, Rent: $${rentRevenue}, Source: ${dataSource}`);
+        console.log(`📈 Processing location: ${locationName}, Monthly STR: $${monthlyStrRevenue}, Rent: $${rentRevenue}, Source: ${dataSource}`);
         
-        if (strRevenue > 0 || rentRevenue > 0) {
-          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
+        if (monthlyStrRevenue > 0 || rentRevenue > 0) {
+          const multiple = rentRevenue > 0 ? monthlyStrRevenue / rentRevenue : 0;
           
           processedData.push({
             submarket: `${locationName}`,
-            strRevenue: strRevenue,
+            strRevenue: monthlyStrRevenue, // Now showing monthly revenue
             medianRent: rentRevenue,
             multiple: multiple
           });
@@ -83,26 +84,24 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       
       console.log(`📊 Extracted data - Monthly STR: $${monthlyStrRevenue}, Monthly Rent: $${monthlyRentRevenue}, Night Rate: $${nightRate}, Occupancy: ${occupancyRate}%`);
       
-      let annualStrRevenue = monthlyStrRevenue * 12;
-      let annualRentRevenue = monthlyRentRevenue * 12;
+      let calculatedMonthlyStr = monthlyStrRevenue;
       
       // Calculate STR revenue from night rate and occupancy if needed
-      if (nightRate > 0 && occupancyRate > 0 && annualStrRevenue === 0) {
+      if (nightRate > 0 && occupancyRate > 0 && calculatedMonthlyStr === 0) {
         const daysPerMonth = 30;
         const occupiedDaysPerMonth = (occupancyRate / 100) * daysPerMonth;
-        const monthlyCalculatedStr = nightRate * occupiedDaysPerMonth;
-        annualStrRevenue = monthlyCalculatedStr * 12;
+        calculatedMonthlyStr = nightRate * occupiedDaysPerMonth;
         
-        console.log(`💡 Calculated STR revenue: $${nightRate} x ${occupiedDaysPerMonth} days/month x 12 = $${annualStrRevenue}/year`);
+        console.log(`💡 Calculated monthly STR revenue: $${nightRate} x ${occupiedDaysPerMonth} days/month = $${calculatedMonthlyStr}/month`);
       }
       
-      if (annualStrRevenue > 0 || annualRentRevenue > 0) {
-        const multiple = annualRentRevenue > 0 ? annualStrRevenue / annualRentRevenue : 0;
+      if (calculatedMonthlyStr > 0 || monthlyRentRevenue > 0) {
+        const multiple = monthlyRentRevenue > 0 ? calculatedMonthlyStr / monthlyRentRevenue : 0;
         
         processedData.push({
           submarket: `${responseData.city} - City Data`,
-          strRevenue: Math.round(annualStrRevenue),
-          medianRent: Math.round(annualRentRevenue),
+          strRevenue: Math.round(calculatedMonthlyStr), // Monthly revenue
+          medianRent: Math.round(monthlyRentRevenue), // Monthly rent
           multiple: multiple
         });
       }
@@ -131,8 +130,8 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
 
   console.log('✅ Processed market data:', processedData.map(d => ({
     submarket: d.submarket,
-    revenue: d.strRevenue,
-    rent: d.medianRent,
+    monthlyRevenue: d.strRevenue,
+    monthlyRent: d.medianRent,
     multiple: d.multiple > 0 ? d.multiple.toFixed(2) : 'N/A'
   })));
   
