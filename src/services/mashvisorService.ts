@@ -36,46 +36,51 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
 export const processMarketData = (marketData: any): SubmarketData[] => {
   const processedData: SubmarketData[] = [];
   
-  // Handle the response data structure from property analytics endpoint
-  if (marketData && marketData.data && marketData.data.content) {
-    const content = marketData.data.content;
+  // Handle the response data structure from rento-calculator lookup endpoint
+  if (marketData && marketData.data) {
+    const data = marketData.data;
     
-    // If content is an object with property analytics data
-    if (content.airbnb && content.traditional_rental) {
-      const airbnbRevenue = content.airbnb.revenue || 0;
-      const traditionalRent = content.traditional_rental.revenue || 0;
-      const multiple = traditionalRent > 0 ? airbnbRevenue / traditionalRent : 0;
+    // Handle rento-calculator response structure
+    if (data.content || data.result) {
+      const content = data.content || data.result;
       
-      processedData.push({
-        submarket: content.neighborhood || content.area || `${marketData.data.city || 'Unknown City'} Center`,
-        strRevenue: airbnbRevenue,
-        medianRent: traditionalRent,
-        multiple: multiple
-      });
-    }
-    // If content is an array of neighborhood data
-    else if (Array.isArray(content)) {
-      content.forEach((item: any) => {
-        const airbnbRevenue = item.airbnb?.revenue || item.airbnb_revenue || 0;
-        const traditionalRent = item.traditional_rental?.revenue || item.rental_income || 0;
+      // If it's an array of results (multiple properties/areas)
+      if (Array.isArray(content)) {
+        content.forEach((item: any, index: number) => {
+          const airbnbRevenue = item.airbnb_revenue || item.str_revenue || item.rental_income_airbnb || 0;
+          const traditionalRent = item.rental_income || item.long_term_rental || item.traditional_rental || 0;
+          const multiple = traditionalRent > 0 ? airbnbRevenue / traditionalRent : 0;
+          
+          processedData.push({
+            submarket: item.neighborhood || item.area || item.address || `Area ${index + 1}`,
+            strRevenue: airbnbRevenue,
+            medianRent: traditionalRent,
+            multiple: multiple
+          });
+        });
+      }
+      // If it's a single result object
+      else if (typeof content === 'object') {
+        const airbnbRevenue = content.airbnb_revenue || content.str_revenue || content.rental_income_airbnb || 0;
+        const traditionalRent = content.rental_income || content.long_term_rental || content.traditional_rental || 0;
         const multiple = traditionalRent > 0 ? airbnbRevenue / traditionalRent : 0;
         
         processedData.push({
-          submarket: item.neighborhood || item.area || item.name || 'Unknown Area',
+          submarket: content.neighborhood || content.area || content.address || data.city || 'Market Analysis',
           strRevenue: airbnbRevenue,
           medianRent: traditionalRent,
           multiple: multiple
         });
-      });
+      }
     }
-    // If it's a single property analysis
-    else if (typeof content === 'object') {
-      const airbnbRevenue = content.airbnb_revenue || content.str_revenue || 0;
-      const traditionalRent = content.rental_income || content.median_rent || 0;
+    // Handle direct data structure
+    else if (data.airbnb_revenue || data.rental_income) {
+      const airbnbRevenue = data.airbnb_revenue || data.str_revenue || 0;
+      const traditionalRent = data.rental_income || data.long_term_rental || 0;
       const multiple = traditionalRent > 0 ? airbnbRevenue / traditionalRent : 0;
       
       processedData.push({
-        submarket: content.neighborhood || content.area || 'Market Analysis',
+        submarket: data.neighborhood || data.area || data.city || 'Market Analysis',
         strRevenue: airbnbRevenue,
         medianRent: traditionalRent,
         multiple: multiple
