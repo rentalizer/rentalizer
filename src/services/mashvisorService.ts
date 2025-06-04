@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 interface SubmarketData {
@@ -41,9 +42,46 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   if (marketData && marketData.success && marketData.data) {
     const responseData = marketData.data;
     
-    // Handle rento-calculator neighborhood data (new implementation)
-    if (responseData.source === 'rento-calculator-neighborhood' && responseData.content?.neighborhoods_with_revenue) {
-      console.log('📊 Processing rento-calculator neighborhood data from Mashvisor API');
+    // Handle export-comps data (new implementation)
+    if (responseData.source === 'export-comps' && responseData.content?.neighborhoods_with_revenue) {
+      console.log('📊 Processing export-comps data from Mashvisor API');
+      
+      const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
+      
+      neighborhoodsWithRevenue.forEach((property: any) => {
+        const propertyName = property.neighborhood || 'Unknown Property';
+        const strRevenue = property.airbnb_revenue || 0;
+        const rentRevenue = property.rental_income || 0;
+        const dataSource = property.data_source || 'unknown';
+        
+        if (strRevenue > 0 || rentRevenue > 0) {
+          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
+          
+          processedData.push({
+            submarket: `${propertyName} - ${responseData.city} (${dataSource})`,
+            strRevenue: strRevenue,
+            medianRent: rentRevenue,
+            multiple: multiple
+          });
+        }
+      });
+      
+      if (processedData.length === 0) {
+        const totalZipCodes = responseData.total_zip_codes || 0;
+        const processedZipCodes = responseData.processed_zip_codes || 0;
+        
+        processedData.push({
+          submarket: `${responseData.city} - ${processedZipCodes} of ${totalZipCodes} zip codes processed, no revenue data found`,
+          strRevenue: 0,
+          medianRent: 0,
+          multiple: 0
+        });
+      }
+    }
+    
+    // Handle legacy rento-calculator neighborhood data
+    else if (responseData.source === 'rento-calculator-neighborhood' && responseData.content?.neighborhoods_with_revenue) {
+      console.log('📊 Processing legacy rento-calculator neighborhood data from Mashvisor API');
       
       const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
       
@@ -79,59 +117,9 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
           });
         }
       }
-      
-      if (processedData.length === 0) {
-        const totalNeighborhoods = responseData.total_neighborhoods || 0;
-        const processedNeighborhoods = responseData.processed_neighborhoods || 0;
-        
-        processedData.push({
-          submarket: `${responseData.city} - ${processedNeighborhoods} of ${totalNeighborhoods} neighborhoods processed, no revenue data found`,
-          strRevenue: 0,
-          medianRent: 0,
-          multiple: 0
-        });
-      }
-    }
-    
-    // Handle legacy neighborhood revenue data
-    else if (responseData.source === 'neighborhood-revenue' && responseData.content?.neighborhoods_with_revenue) {
-      console.log('📊 Processing legacy neighborhood revenue data from Mashvisor API');
-      
-      const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
-      
-      neighborhoodsWithRevenue.forEach((neighborhood: any) => {
-        const neighborhoodName = neighborhood.neighborhood || 'Unknown Neighborhood';
-        const strRevenue = neighborhood.airbnb_revenue || 0;
-        const rentRevenue = neighborhood.rental_income || 0;
-        
-        if (strRevenue > 0 || rentRevenue > 0) {
-          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
-          
-          processedData.push({
-            submarket: `${neighborhoodName} - ${responseData.city}`,
-            strRevenue: strRevenue,
-            medianRent: rentRevenue,
-            multiple: multiple
-          });
-        }
-      });
     }
     
     // Handle fallback neighborhood list (if revenue data not available)
-    else if (responseData.source === 'neighborhoods' && responseData.content && responseData.content.results) {
-      console.log('📊 Processing neighborhoods list from Mashvisor API (no revenue data)');
-      
-      const neighborhoods = responseData.content.results;
-      
-      processedData.push({
-        submarket: `${responseData.city} - ${neighborhoods.length} neighborhoods found (no revenue data available)`,
-        strRevenue: 0,
-        medianRent: 0,
-        multiple: 0
-      });
-    }
-    
-    // Handle other endpoint responses as fallback
     else if (responseData.content) {
       const content = responseData.content;
       
