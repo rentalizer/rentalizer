@@ -221,18 +221,18 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               </div>
             </div>
 
-            {/* Backup API Key */}
+            {/* OpenAI API Key */}
             <div className="space-y-1">
-              <label className="text-xs font-medium text-cyan-300">Backup API Key (Optional)</label>
+              <label className="text-xs font-medium text-cyan-300">OpenAI Key</label>
               <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
                 {getStatusIcon(getKeyStatus(openaiKey))}
                 <div className="flex-1 min-w-0">
                   <Input
-                    id="backup-key"
+                    id="openai-key"
                     type={showKeys ? "text" : "password"}
                     value={openaiKey}
                     onChange={(e) => setOpenaiKey(e.target.value)}
-                    placeholder="Enter backup API key (optional)"
+                    placeholder="Enter OpenAI API key"
                     className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
                   />
                 </div>
@@ -241,7 +241,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => copyToClipboard(openaiKey, 'Backup API')}
+                      onClick={() => copyToClipboard(openaiKey, 'OpenAI API')}
                       className="h-5 w-5 p-0 text-gray-400 hover:text-white"
                     >
                       <Copy className="h-3 w-3" />
