@@ -52,23 +52,24 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       if (cityData && cityData.status === 'success' && cityData.content) {
         const content = cityData.content;
         
-        // Extract STR revenue data
-        const strRevenue = content.adjusted_rental_income || content.median_rental_income || 0;
+        // Extract STR revenue data (monthly, so multiply by 12 for annual)
+        const monthlyStrRevenue = content.adjusted_rental_income || content.median_rental_income || 0;
+        const annualStrRevenue = monthlyStrRevenue * 12;
         
         // Calculate traditional rent estimate based on property value and market ratios
         const homeValue = content.median_home_value || 0;
-        const priceToRentRatio = content.price_to_rent_ratio || 12; // Default market ratio
+        const priceToRentRatio = content.price_to_rent_ratio || 200; // Default market ratio (monthly)
         const estimatedMonthlyRent = homeValue > 0 ? homeValue / priceToRentRatio : 0;
         const annualRent = estimatedMonthlyRent * 12;
         
-        console.log(`📈 ${cityName} - STR: $${strRevenue}, Rent: $${annualRent}`);
+        console.log(`📈 ${cityName} - STR: $${annualStrRevenue}/year, Rent: $${annualRent}/year`);
         
-        if (strRevenue > 0) {
-          const multiple = annualRent > 0 ? strRevenue / annualRent : 0;
+        if (annualStrRevenue > 0) {
+          const multiple = annualRent > 0 ? annualStrRevenue / annualRent : 0;
           
           processedData.push({
             submarket: `${cityName}, ${cityResult.state}`,
-            strRevenue: Math.round(strRevenue),
+            strRevenue: Math.round(annualStrRevenue),
             medianRent: Math.round(annualRent),
             multiple: multiple
           });
