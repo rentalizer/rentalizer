@@ -25,7 +25,7 @@ const cityToStateMap: { [key: string]: string } = {
   'atlanta': 'GA'
 };
 
-// Zip code to neighborhood mapping for cleaner display
+// Expanded zip code to neighborhood mapping for cleaner display
 const zipToNeighborhoodMap: { [key: string]: { [key: string]: string } } = {
   'miami': {
     '33101': 'Downtown Miami',
@@ -37,7 +37,12 @@ const zipToNeighborhoodMap: { [key: string]: { [key: string]: string } } = {
     '33131': 'Downtown Core',
     '33132': 'Arts District',
     '33134': 'Coral Gables',
-    '33139': 'Miami Beach'
+    '33139': 'Miami Beach',
+    '33140': 'North Beach',
+    '33141': 'North Miami Beach',
+    '33142': 'Liberty City',
+    '33143': 'Coral Terrace',
+    '33144': 'Flagami'
   },
   'austin': {
     '78701': 'Downtown Austin',
@@ -49,7 +54,17 @@ const zipToNeighborhoodMap: { [key: string]: { [key: string]: string } } = {
     '78717': 'The Domain',
     '78721': 'Mueller',
     '78722': 'Clarksville',
-    '78723': 'Hyde Park'
+    '78723': 'Hyde Park',
+    '78724': 'Del Valle',
+    '78725': 'Montopolis',
+    '78726': 'Four Points',
+    '78727': 'Allandale',
+    '78728': 'Oak Hill',
+    '78729': 'Northwest Hills',
+    '78730': 'West Lake Hills',
+    '78731': 'Tarrytown',
+    '78732': 'Bee Cave',
+    '78733': 'Steiner Ranch'
   },
   'houston': {
     '77002': 'Downtown Houston',
@@ -61,7 +76,16 @@ const zipToNeighborhoodMap: { [key: string]: { [key: string]: string } } = {
     '77008': 'Garden Oaks',
     '77019': 'Galleria',
     '77024': 'Memorial',
-    '77025': 'Bellaire'
+    '77025': 'Bellaire',
+    '77027': 'River Oaks',
+    '77030': 'Texas Medical Center',
+    '77035': 'Meyerland',
+    '77056': 'Uptown',
+    '77057': 'Westchase',
+    '77063': 'Southwest Houston',
+    '77077': 'Energy Corridor',
+    '77079': 'Memorial Villages',
+    '77098': 'Montrose'
   },
   'dallas': {
     '75201': 'Downtown Dallas',
@@ -73,7 +97,15 @@ const zipToNeighborhoodMap: { [key: string]: { [key: string]: string } } = {
     '75218': 'Casa Linda',
     '75219': 'Turtle Creek',
     '75225': 'Preston Center',
-    '75230': 'North Dallas'
+    '75230': 'North Dallas',
+    '75240': 'Richardson',
+    '75201': 'Deep Ellum',
+    '75207': 'Oak Cliff',
+    '75208': 'Kessler Park',
+    '75209': 'Bluffview',
+    '75220': 'Love Field',
+    '75231': 'Lake Highlands',
+    '75235': 'Redbird'
   },
   'denver': {
     '80202': 'Downtown Denver',
@@ -85,7 +117,14 @@ const zipToNeighborhoodMap: { [key: string]: { [key: string]: string } } = {
     '80210': 'Washington Park',
     '80211': 'Berkeley',
     '80218': 'Mayfair',
-    '80220': 'Lowry'
+    '80220': 'Lowry',
+    '80222': 'Glendale',
+    '80224': 'Goldsmith',
+    '80230': 'Stapleton',
+    '80238': 'Montbello',
+    '80239': 'Gateway',
+    '80246': 'Virginia Village',
+    '80247': 'Westwood'
   }
 };
 
@@ -210,7 +249,7 @@ serve(async (req) => {
       
       if (annualStrRevenue > 0 || annualRentRevenue > 0) {
         neighborhoodsWithRevenue.push({
-          neighborhood: `${city} - City Average`,
+          neighborhood: `${city}, City Average`,
           airbnb_revenue: Math.round(annualStrRevenue),
           rental_income: Math.round(annualRentRevenue),
           occupancy_rate: occupancyRate,
@@ -237,11 +276,11 @@ serve(async (req) => {
       
       // Try to get neighborhood-level data by checking different zip codes in the city
       const majorZipCodes: { [key: string]: string[] } = {
-        'austin': ['78701', '78702', '78703', '78704', '78705', '78712', '78717', '78721', '78722', '78723'],
-        'houston': ['77002', '77003', '77004', '77005', '77006', '77007', '77008', '77019', '77024', '77025'],
-        'dallas': ['75201', '75202', '75204', '75205', '75206', '75214', '75218', '75219', '75225', '75230'],
-        'miami': ['33101', '33109', '33114', '33125', '33129', '33130', '33131', '33132', '33134', '33139'],
-        'denver': ['80202', '80203', '80204', '80205', '80206', '80209', '80210', '80211', '80218', '80220']
+        'austin': ['78701', '78702', '78703', '78704', '78705', '78712', '78717', '78721', '78722', '78723', '78724', '78725', '78726', '78727', '78728', '78729', '78730', '78731', '78732', '78733'],
+        'houston': ['77002', '77003', '77004', '77005', '77006', '77007', '77008', '77019', '77024', '77025', '77027', '77030', '77035', '77056', '77057', '77063', '77077', '77079', '77098'],
+        'dallas': ['75201', '75202', '75204', '75205', '75206', '75214', '75218', '75219', '75225', '75230', '75240', '75207', '75208', '75209', '75220', '75231', '75235'],
+        'miami': ['33101', '33109', '33114', '33125', '33129', '33130', '33131', '33132', '33134', '33139', '33140', '33141', '33142', '33143', '33144'],
+        'denver': ['80202', '80203', '80204', '80205', '80206', '80209', '80210', '80211', '80218', '80220', '80222', '80224', '80230', '80238', '80239', '80246', '80247']
       }
       
       const zipCodes = majorZipCodes[cityKey] || []
@@ -249,8 +288,8 @@ serve(async (req) => {
       if (zipCodes.length > 0) {
         console.log(`🏘️ Trying ${zipCodes.length} zip codes for neighborhood data in ${city}`)
         
-        // Try a few zip codes to get neighborhood variety
-        const samplesToTry = zipCodes.slice(0, 5) // Try first 5 zip codes
+        // Try more zip codes to get better neighborhood variety (up to 10)
+        const samplesToTry = zipCodes.slice(0, 10)
         
         for (const zipCode of samplesToTry) {
           try {
@@ -279,10 +318,10 @@ serve(async (req) => {
               
               if (zipAnnualStr > 0 || zipAnnualRent > 0) {
                 // Get neighborhood name from mapping or use a cleaner default
-                const neighborhoodName = zipToNeighborhoodMap[cityKey]?.[zipCode] || `${city} District ${zipCode.slice(-2)}`
+                const neighborhoodName = zipToNeighborhoodMap[cityKey]?.[zipCode] || `District ${zipCode.slice(-2)}`
                 
                 neighborhoodsWithRevenue.push({
-                  neighborhood: neighborhoodName,
+                  neighborhood: `${city}, ${neighborhoodName}`,
                   airbnb_revenue: Math.round(zipAnnualStr),
                   rental_income: Math.round(zipAnnualRent),
                   occupancy_rate: zipOccupancy,
