@@ -1,4 +1,5 @@
 
+
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
@@ -33,17 +34,10 @@ serve(async (req) => {
 
     console.log('🔑 Using Mashvisor API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
 
-    // Use the rento-calculator lookup endpoint
-    const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client/rento-calculator/lookup')
+    // Use the city neighborhoods endpoint
+    const mashvisorUrl = new URL(`https://api.mashvisor.com/v1.1/client/city/neighborhoods/CA/${encodeURIComponent(city)}`)
     
-    // Add query parameters for the lookup
-    mashvisorUrl.searchParams.append('state', 'CA')
-    mashvisorUrl.searchParams.append('city', city)
-    mashvisorUrl.searchParams.append('bedrooms', propertyType)
-    mashvisorUrl.searchParams.append('bathrooms', bathrooms)
-    mashvisorUrl.searchParams.append('property_type', 'Apartment')
-    
-    console.log('📡 Calling Mashvisor rento-calculator API:', mashvisorUrl.toString())
+    console.log('📡 Calling Mashvisor neighborhoods API:', mashvisorUrl.toString())
     
     const mashvisorResponse = await fetch(mashvisorUrl.toString(), {
       method: 'GET',
@@ -75,7 +69,7 @@ serve(async (req) => {
     }
 
     const data = await mashvisorResponse.json()
-    console.log('✅ Mashvisor rento-calculator API Success - Data keys:', Object.keys(data))
+    console.log('✅ Mashvisor neighborhoods API Success - Data keys:', Object.keys(data))
     console.log('✅ Raw response preview:', JSON.stringify(data, null, 2).substring(0, 500))
 
     return new Response(
@@ -96,3 +90,4 @@ serve(async (req) => {
     )
   }
 })
+
