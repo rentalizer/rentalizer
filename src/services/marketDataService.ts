@@ -1,5 +1,5 @@
-
 import { CityMarketData, STRData, RentData } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
 
 const getBedroomMultiplier = (propertyType: string): number => {
   switch (propertyType) {
@@ -80,75 +80,35 @@ const getCityCoordinates = (city: string): { lat: number; lng: number } => {
   return cityCoords[city.toLowerCase()] || { lat: 40.7128, lng: -74.0060 };
 };
 
-const fetchMashvisorSTRData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<STRData[] | null> => {
+const fetchMashvisorDataViaEdgeFunction = async (city: string, propertyType: string, bathrooms: string): Promise<{ strData: STRData[] | null; rentData: RentData[] | null }> => {
   try {
-    console.log(`🏠 Attempting to fetch REAL STR earnings from Mashvisor for ${city} (${propertyType}BR/${bathrooms}BA)`);
-    console.log('🔑 API Key being used:', apiKey ? `${apiKey.substring(0, 8)}...${apiKey.substring(apiKey.length - 4)}` : 'No API key provided');
+    console.log(`🏠 Calling Mashvisor Edge Function for ${city} (${propertyType}BR/${bathrooms}BA)`);
     
-    if (!apiKey || apiKey.trim() === '') {
-      console.log('❌ No Mashvisor API key provided - RETURNING NULL (NO MOCK DATA)');
-      return null;
-    }
-
-    // Clean the API key of any whitespace or newlines
-    const cleanApiKey = apiKey.trim().replace(/\s/g, '');
-    console.log('🧹 Cleaned API Key length:', cleanApiKey.length);
-
-    // Use the correct Mashvisor API base URL
-    const url = `https://api.mashvisor.com/v1.1/client`;
-
-    console.log('🔍 Mashvisor API URL:', url);
-    console.log('🔍 Request Headers:', {
-      'x-api-key': `${cleanApiKey.substring(0, 8)}...${cleanApiKey.substring(cleanApiKey.length - 4)}`,
-      'Content-Type': 'application/json'
-    });
-
-    // Create AbortController for timeout - reduced to 3 seconds for faster failure
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      console.log('⏰ API call timeout triggered (3 seconds)');
-      controller.abort();
-    }, 3000);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'x-api-key': cleanApiKey,
-        'Content-Type': 'application/json',
-      },
-      signal: controller.signal
-    });
-
-    clearTimeout(timeoutId);
-
-    console.log('📡 Mashvisor API Response status:', response.status);
-    console.log('📡 Mashvisor API Response headers:', Object.fromEntries(response.headers.entries()));
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.log(`❌ Mashvisor API FAILED (${response.status}): ${errorText}`);
-      
-      // Log specific error cases
-      if (response.status === 401) {
-        console.log('🚫 Authentication failed - check API key');
-      } else if (response.status === 403) {
-        console.log('🚫 Forbidden - API key may not have required permissions');
-      } else if (response.status === 429) {
-        console.log('🚫 Rate limit exceeded');
-      } else if (response.status >= 500) {
-        console.log('🚫 Server error on Mashvisor side');
+    const { data, error } = await supabase.functions.invoke('mashvisor-api', {
+      body: {
+        city,
+        propertyType,
+        bathrooms
       }
-      
-      return null;
+    });
+
+    if (error) {
+      console.error('❌ Edge Function Error:', error);
+      return { strData: null, rentData: null };
     }
 
-    const data = await response.json();
-    console.log('📊 RAW Mashvisor API Response data (first 500 chars):', JSON.stringify(data, null, 2).substring(0, 500));
-    
-    if (data.content && data.content.length > 0) {
+    if (!data || !data.success) {
+      console.error('❌ Edge Function returned error:', data);
+      return { strData: null, rentData: null };
+    }
+
+    console.log('✅ Edge Function Success - Processing data...');
+    const apiData = data.data;
+
+    if (apiData.content && apiData.content.length > 0) {
       console.log('✅ REAL DATA CONFIRMED - Processing Mashvisor data...');
       
-      const strData: STRData[] = data.content.slice(0, 6).map((item: any, index: number) => {
+      const strData: STRData[] = apiData.content.slice(0, 6).map((item: any, index: number) => {
         const actualMonthlyEarnings = item.airbnb_revenue || item.monthly_revenue || 0;
         const monthlyRevenueWith25Percent = Math.round(actualMonthlyEarnings * 1.25);
         
@@ -158,101 +118,23 @@ const fetchMashvisorSTRData = async (city: string, apiKey: string, propertyType:
         };
       });
 
-      console.log('✅ FINAL REAL STR DATA (with 25% buffer applied):', strData);
-      return strData;
-    }
-
-    console.log('❌ No content in Mashvisor response - RETURNING NULL');
-    return null;
-
-  } catch (error: any) {
-    if (error.name === 'AbortError') {
-      console.error('❌ Mashvisor API timeout (3 seconds)');
-    } else {
-      console.error('❌ Mashvisor API error details:', {
-        name: error.name,
-        message: error.message,
-        stack: error.stack?.substring(0, 200)
-      });
-    }
-    return null;
-  }
-};
-
-const fetchMashvisorRentData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<RentData[] | null> => {
-  try {
-    console.log(`🤖 Attempting to fetch REAL rent data from Mashvisor for ${city} (${propertyType}BR/${bathrooms}BA)`);
-    
-    if (!apiKey || apiKey.trim() === '') {
-      console.log('❌ No Mashvisor API key provided - RETURNING NULL (NO MOCK DATA)');
-      return null;
-    }
-
-    // Clean the API key
-    const cleanApiKey = apiKey.trim().replace(/\s/g, '');
-
-    // Use the same base URL for rental data
-    const url = `https://api.mashvisor.com/v1.1/client`;
-
-    console.log('🔍 Mashvisor Rental API URL:', url);
-
-    // Create AbortController for timeout - reduced to 3 seconds
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      console.log('⏰ Rental API call timeout triggered (3 seconds)');
-      controller.abort();
-    }, 3000);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'x-api-key': cleanApiKey,
-        'Content-Type': 'application/json',
-      },
-      signal: controller.signal
-    });
-
-    clearTimeout(timeoutId);
-
-    console.log('📡 Mashvisor Rental API Response status:', response.status);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.log(`❌ Mashvisor Rental API FAILED (${response.status}): ${errorText}`);
-      return null;
-    }
-
-    const data = await response.json();
-    console.log('📊 RAW Mashvisor Rental API Response (first 500 chars):', JSON.stringify(data, null, 2).substring(0, 500));
-    
-    if (data.content && data.content.length > 0) {
-      console.log('✅ REAL RENTAL DATA CONFIRMED - Processing Mashvisor rental data...');
-      
-      const rentData: RentData[] = data.content.slice(0, 6).map((item: any, index: number) => {
+      const rentData: RentData[] = apiData.content.slice(0, 6).map((item: any, index: number) => {
         return {
           submarket: item.neighborhood || item.area || `${city} Area ${index + 1}`,
           rent: item.monthly_rent || item.rent || 0
         };
       });
 
-      console.log('✅ FINAL REAL RENT DATA:', rentData);
-      return rentData;
+      console.log('✅ FINAL REAL DATA:', { strData, rentData });
+      return { strData, rentData };
     }
 
-    console.log('❌ No rental content in Mashvisor response - RETURNING NULL');
-    return null;
+    console.log('❌ No content in Mashvisor response');
+    return { strData: null, rentData: null };
 
   } catch (error: any) {
-    if (error.name === 'AbortError') {
-      console.error('❌ Mashvisor Rental API timeout (3 seconds)');
-    } else {
-      console.error('❌ Mashvisor Rental API error details:', {
-        name: error.name,
-        message: error.message,
-        stack: error.stack?.substring(0, 200)
-      });
-    }
-    return null;
+    console.error('❌ Edge Function call error:', error);
+    return { strData: null, rentData: null };
   }
 };
 
@@ -263,59 +145,31 @@ export const fetchMarketData = async (
   bathrooms: string = '1'
 ): Promise<CityMarketData> => {
   console.log(`🔍 STARTING fetchMarketData for ${city} (${propertyType}BR/${bathrooms}BA properties)`);
-  console.log('🔑 API Configuration:', {
-    hasMashvisorKey: !!(apiConfig.airdnaApiKey && apiConfig.airdnaApiKey.trim()),
-    mashvisorKeyLength: apiConfig.airdnaApiKey?.length || 0,
-    hasBackupKey: !!(apiConfig.openaiApiKey && apiConfig.openaiApiKey.trim())
-  });
+  console.log('🔑 Using Supabase Edge Function for Mashvisor API');
 
   try {
     let strData: STRData[] = [];
     let rentData: RentData[] = [];
 
-    console.log('🚀 Starting parallel API calls...');
+    console.log('🚀 Calling Mashvisor Edge Function...');
 
-    // Use Promise.allSettled to run both API calls in parallel with faster timeouts
-    const [strResult, rentResult] = await Promise.allSettled([
-      fetchMashvisorSTRData(city, apiConfig.airdnaApiKey || '', propertyType, bathrooms),
-      fetchMashvisorRentData(city, apiConfig.airdnaApiKey || '', propertyType, bathrooms)
-    ]);
+    const { strData: apiStrData, rentData: apiRentData } = await fetchMashvisorDataViaEdgeFunction(city, propertyType, bathrooms);
 
-    console.log('📊 API calls completed:', {
-      strStatus: strResult.status,
-      rentStatus: rentResult.status
-    });
-
-    // Handle STR data result
-    if (strResult.status === 'fulfilled' && strResult.value) {
-      strData = strResult.value;
-      console.log('✅ Using REAL STR data from Mashvisor API');
+    if (apiStrData && apiRentData) {
+      strData = apiStrData;
+      rentData = apiRentData;
+      console.log('✅ Using REAL data from Mashvisor API via Edge Function');
     } else {
-      console.log('❌ STR API failed - will show "NA" for STR revenue');
-      if (strResult.status === 'rejected') {
-        console.log('STR rejection reason:', strResult.reason);
-      }
+      console.log('❌ Edge Function failed - will show "NA" for all data');
       // Create placeholder data with "NA" indicators
       const cityKey = city.toLowerCase();
       const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Area`];
+      
       strData = neighborhoods.slice(0, 6).map(neighborhood => ({
         submarket: neighborhood,
         revenue: 0 // Will be displayed as "NA"
       }));
-    }
-
-    // Handle rent data result
-    if (rentResult.status === 'fulfilled' && rentResult.value) {
-      rentData = rentResult.value;
-      console.log('✅ Using REAL rent data from Mashvisor API');
-    } else {
-      console.log('❌ Rent API failed - will show "NA" for rent data');
-      if (rentResult.status === 'rejected') {
-        console.log('Rent rejection reason:', rentResult.reason);
-      }
-      // Create placeholder data with "NA" indicators
-      const cityKey = city.toLowerCase();
-      const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Area`];
+      
       rentData = neighborhoods.slice(0, 6).map(neighborhood => ({
         submarket: neighborhood,
         rent: 0 // Will be displayed as "NA"
@@ -325,8 +179,7 @@ export const fetchMarketData = async (
     console.log(`📊 ✅ FINAL Market data compilation complete for ${city}:`, {
       strSubmarkets: strData.length,
       rentSubmarkets: rentData.length,
-      strDataSource: strResult.status === 'fulfilled' && strResult.value ? 'Real Mashvisor API' : 'API Failed - Showing NA',
-      rentDataSource: rentResult.status === 'fulfilled' && rentResult.value ? 'Real Mashvisor API' : 'API Failed - Showing NA'
+      dataSource: apiStrData && apiRentData ? 'Real Mashvisor API via Edge Function' : 'Edge Function Failed - Showing NA'
     });
 
     return {

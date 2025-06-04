@@ -1,0 +1,87 @@
+
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  try {
+    const { city, propertyType, bathrooms } = await req.json()
+    
+    console.log(`🔍 Mashvisor Edge Function called for ${city} (${propertyType}BR/${bathrooms}BA)`)
+    
+    const mashvisorApiKey = Deno.env.get('MASHVISOR_API_KEY')
+    
+    if (!mashvisorApiKey) {
+      console.error('❌ MASHVISOR_API_KEY not found in environment')
+      return new Response(
+        JSON.stringify({ error: 'API key not configured' }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    console.log('🔑 Using API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
+
+    // Call Mashvisor API
+    const mashvisorUrl = 'https://api.mashvisor.com/v1.1/client'
+    
+    console.log('📡 Calling Mashvisor API:', mashvisorUrl)
+    
+    const mashvisorResponse = await fetch(mashvisorUrl, {
+      method: 'GET',
+      headers: {
+        'x-api-key': mashvisorApiKey,
+        'Content-Type': 'application/json',
+      },
+    })
+
+    console.log('📊 Mashvisor API Response status:', mashvisorResponse.status)
+    console.log('📊 Mashvisor API Response headers:', Object.fromEntries(mashvisorResponse.headers.entries()))
+
+    if (!mashvisorResponse.ok) {
+      const errorText = await mashvisorResponse.text()
+      console.error(`❌ Mashvisor API failed (${mashvisorResponse.status}):`, errorText)
+      
+      return new Response(
+        JSON.stringify({ 
+          error: `Mashvisor API error: ${mashvisorResponse.status}`,
+          details: errorText 
+        }),
+        { 
+          status: mashvisorResponse.status, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    const data = await mashvisorResponse.json()
+    console.log('✅ Mashvisor API Success - Data received:', JSON.stringify(data, null, 2).substring(0, 500))
+
+    return new Response(
+      JSON.stringify({ success: true, data }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    )
+
+  } catch (error) {
+    console.error('❌ Edge Function Error:', error)
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { 
+        status: 500, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    )
+  }
+})
