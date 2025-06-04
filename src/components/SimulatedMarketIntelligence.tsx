@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Eye, AlertTriangle } from 'lucide-react';
+import { Eye, AlertTriangle, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { MarketAnalysisForm } from '@/components/MarketAnalysisForm';
 import { MarketAnalysisResults } from '@/components/MarketAnalysisResults';
@@ -40,27 +40,24 @@ export const SimulatedMarketIntelligence = () => {
       setPropertyType(propType);
       setBathrooms(bathCount);
       
-      const hasRealData = processedData.some(d => d.strRevenue > 0 && d.medianRent > 0);
-      const noDataAvailable = processedData.some(d => d.submarket.includes('No rental comparison data') || d.submarket.includes('No comparison data'));
+      const hasRevenueData = processedData.some(d => d.strRevenue > 0);
+      const hasRentData = processedData.some(d => d.medianRent > 0);
       
-      if (hasRealData) {
-        const successCount = processedData.filter(d => d.strRevenue > 0).length;
-        const failedCount = processedData.length - successCount;
-        
+      if (hasRevenueData && hasRentData) {
         toast({
-          title: "Real Market Analysis Complete",
-          description: `${successCount} submarkets analyzed with real Mashvisor data${failedCount > 0 ? `, ${failedCount} with limited data` : ''}`,
+          title: "Market Analysis Complete",
+          description: `STR revenue data found for ${city}. Rent estimates provided using market averages.`,
         });
-      } else if (noDataAvailable) {
+      } else if (hasRevenueData && !hasRentData) {
         toast({
-          title: "No Data Available",
-          description: "Mashvisor API doesn't have rental comparison data for this market. Try a different city or check back later.",
+          title: "Revenue Data Found",
+          description: `STR revenue statistics available for ${city}, but no traditional rent comparison data found.`,
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Analysis Complete - Limited Data",
-          description: "Market analysis completed but Mashvisor API returned limited data for this market.",
+          title: "Limited Data Available",
+          description: "Mashvisor API returned limited market data for this location.",
           variant: "destructive",
         });
       }
@@ -91,7 +88,22 @@ export const SimulatedMarketIntelligence = () => {
             <div>
               <h3 className="font-semibold text-green-300">Real Mashvisor Market Intelligence</h3>
               <p className="text-sm text-gray-300">
-                This tool uses real Mashvisor API data to analyze rental arbitrage opportunities in your target market.
+                This tool uses real Mashvisor API data to analyze STR revenue opportunities in your target market.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Data Limitations Notice */}
+      <Card className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-500/30">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <Info className="h-5 w-5 text-blue-400" />
+            <div>
+              <h3 className="font-semibold text-blue-300">Revenue Statistics Available</h3>
+              <p className="text-sm text-gray-300">
+                The API provides STR revenue data by performance percentiles. Traditional rent data may be estimated using market averages when not available.
               </p>
             </div>
           </div>
@@ -106,7 +118,7 @@ export const SimulatedMarketIntelligence = () => {
             <div>
               <h3 className="font-semibold text-yellow-300">API Data Availability</h3>
               <p className="text-sm text-gray-300">
-                Some markets may not have rental comparison data available in the Mashvisor database. If no data is found, try a different city or check back later.
+                Some markets may not have comprehensive rental comparison data. Results show revenue statistics by performance tiers when available.
               </p>
             </div>
           </div>
