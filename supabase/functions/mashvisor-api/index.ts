@@ -68,6 +68,37 @@ const cityToStateMap: { [key: string]: string } = {
   'new orleans': 'LA'
 };
 
+// Helper function to make API calls with proper error handling
+async function callMashvisorAPI(url: string, apiKey: string, description: string) {
+  console.log(`📡 Calling ${description}:`, url)
+  
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'x-api-key': apiKey,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    })
+
+    console.log(`📊 ${description} response status: ${response.status}`)
+
+    if (response.ok) {
+      const data = await response.json()
+      console.log(`✅ ${description} successful`)
+      return { success: true, data }
+    } else {
+      const errorText = await response.text()
+      console.log(`⚠️ ${description} failed: ${response.status} - ${errorText.substring(0, 200)}`)
+      return { success: false, status: response.status, error: errorText }
+    }
+  } catch (error) {
+    console.log(`❌ ${description} error:`, error)
+    return { success: false, error: error.message }
+  }
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -75,7 +106,7 @@ serve(async (req) => {
   }
 
   try {
-    const { city, propertyType, bathrooms } = await req.json()
+    const { city, propertyType, bathrooms, zipCode, address, lat, lng } = await req.json()
     
     console.log(`🔍 Mashvisor Edge Function called for ${city} (${propertyType}BR/${bathrooms}BA)`)
     
@@ -120,134 +151,123 @@ serve(async (req) => {
 
     console.log(`📍 Found state ${state} for city ${city}`)
 
-    try {
-      // Use the neighborhood endpoint to get granular data
-      const encodedCity = encodeURIComponent(city)
-      const mashvisorUrl = `https://api.mashvisor.com/v1.1/client/city/neighborhoods/${state}/${encodedCity}`
-      
-      console.log(`📡 Calling Mashvisor neighborhoods endpoint:`, mashvisorUrl)
-      
-      const mashvisorResponse = await fetch(mashvisorUrl, {
-        method: 'GET',
-        headers: {
-          'x-api-key': mashvisorApiKey,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      })
+    const encodedCity = encodeURIComponent(city)
+    let finalResult = null
 
-      console.log(`📊 Mashvisor API response status: ${mashvisorResponse.status}`)
-
-      if (mashvisorResponse.ok) {
-        const neighborhoodData = await mashvisorResponse.json()
-        console.log(`✅ Successfully fetched neighborhood data for ${city}`)
-        
-        // Return successful result with neighborhood data
-        const successData = {
+    // Strategy 1: Neighborhood Level - Try neighborhoods endpoint first
+    if (!zipCode && !address) {
+      const neighborhoodUrl = `https://api.mashvisor.com/v1.1/client/city/neighborhoods/${state}/${encodedCity}`
+      const neighborhoodResult = await callMashvisorAPI(neighborhoodUrl, mashvisorApiKey, 'Neighborhood endpoint')
+      
+      if (neighborhoodResult.success) {
+        finalResult = {
           success: true,
           data: {
             city: city,
             state: state,
             propertyType: propertyType,
             bathrooms: bathrooms,
-            ...neighborhoodData
+            source: 'neighborhoods',
+            ...neighborhoodResult.data
           }
-        }
-
-        return new Response(
-          JSON.stringify(successData),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        )
-      } else {
-        const errorText = await mashvisorResponse.text()
-        console.log(`⚠️ Failed to fetch neighborhood data for ${city}: ${mashvisorResponse.status} - ${errorText.substring(0, 200)}`)
-        
-        // If neighborhood endpoint fails, try the rento-calculator endpoint as fallback
-        console.log(`🔄 Trying fallback rento-calculator endpoint for ${city}`)
-        
-        const fallbackUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodedCity}&resource=airbnb&beds=${propertyType}`
-        
-        console.log(`📡 Calling fallback endpoint:`, fallbackUrl)
-        
-        const fallbackResponse = await fetch(fallbackUrl, {
-          method: 'GET',
-          headers: {
-            'x-api-key': mashvisorApiKey,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-        })
-
-        if (fallbackResponse.ok) {
-          const fallbackData = await fallbackResponse.json()
-          console.log(`✅ Fallback endpoint successful for ${city}`)
-          
-          const successData = {
-            success: true,
-            data: {
-              city: city,
-              state: state,
-              propertyType: propertyType,
-              bathrooms: bathrooms,
-              ...fallbackData
-            }
-          }
-
-          return new Response(
-            JSON.stringify(successData),
-            { 
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-            }
-          )
-        } else {
-          const fallbackErrorText = await fallbackResponse.text()
-          console.log(`❌ Both endpoints failed for ${city}`)
-          
-          // Return error data
-          const errorData = {
-            success: false,
-            data: {
-              city: city,
-              state: state,
-              propertyType: propertyType,
-              bathrooms: bathrooms,
-              message: `Mashvisor API error: ${mashvisorResponse.status}. Fallback also failed: ${fallbackResponse.status}`,
-              content: {}
-            }
-          }
-
-          return new Response(
-            JSON.stringify(errorData),
-            { 
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-            }
-          )
         }
       }
-    } catch (error) {
-      console.log(`⚠️ Error fetching data for ${city}:`, error)
+    }
+
+    // Strategy 2: Address Level - If we have full address details
+    if (!finalResult && address && zipCode && lat && lng) {
+      const addressUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&zip_code=${zipCode}&resource=airbnb&beds=${propertyType}&address=${encodeURIComponent(address)}&city=${encodedCity}&lat=${lat}&lng=${lng}`
+      const addressResult = await callMashvisorAPI(addressUrl, mashvisorApiKey, 'Address level endpoint')
       
-      const fallbackData = {
-        success: false,
-        data: {
-          city: city,
-          state: state,
-          propertyType: propertyType,
-          bathrooms: bathrooms,
-          message: 'API request failed',
-          content: {}
+      if (addressResult.success) {
+        finalResult = {
+          success: true,
+          data: {
+            city: city,
+            state: state,
+            propertyType: propertyType,
+            bathrooms: bathrooms,
+            zipCode: zipCode,
+            address: address,
+            source: 'address',
+            ...addressResult.data
+          }
         }
       }
+    }
 
+    // Strategy 3: Zip Code Level - If we have zip code but no full address
+    if (!finalResult && zipCode) {
+      const zipUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&zip_code=${zipCode}&resource=airbnb&beds=${propertyType}`
+      const zipResult = await callMashvisorAPI(zipUrl, mashvisorApiKey, 'Zip code level endpoint')
+      
+      if (zipResult.success) {
+        finalResult = {
+          success: true,
+          data: {
+            city: city,
+            state: state,
+            propertyType: propertyType,
+            bathrooms: bathrooms,
+            zipCode: zipCode,
+            source: 'zipcode',
+            ...zipResult.data
+          }
+        }
+      }
+    }
+
+    // Strategy 4: City Level - Fallback to city level lookup
+    if (!finalResult) {
+      const cityUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodedCity}&resource=airbnb&beds=${propertyType}`
+      const cityResult = await callMashvisorAPI(cityUrl, mashvisorApiKey, 'City level endpoint')
+      
+      if (cityResult.success) {
+        finalResult = {
+          success: true,
+          data: {
+            city: city,
+            state: state,
+            propertyType: propertyType,
+            bathrooms: bathrooms,
+            source: 'city',
+            ...cityResult.data
+          }
+        }
+      }
+    }
+
+    // If we got successful data from any endpoint, return it
+    if (finalResult) {
       return new Response(
-        JSON.stringify(fallbackData),
+        JSON.stringify(finalResult),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
     }
+
+    // If all endpoints failed, return error
+    console.log(`❌ All Mashvisor endpoints failed for ${city}`)
+    
+    const errorData = {
+      success: false,
+      data: {
+        city: city,
+        state: state,
+        propertyType: propertyType,
+        bathrooms: bathrooms,
+        message: `All Mashvisor API endpoints failed for ${city}. Please try a different city or check your API key.`,
+        content: {}
+      }
+    }
+
+    return new Response(
+      JSON.stringify(errorData),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
+    )
 
   } catch (error) {
     console.error('❌ Edge Function Error:', error)
