@@ -1,4 +1,3 @@
-
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
@@ -6,23 +5,250 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// City to state mapping for major US cities
+// Expanded city to state mapping for major US cities
 const cityToStateMap: { [key: string]: string } = {
+  // Texas
   'austin': 'TX',
   'houston': 'TX',
   'dallas': 'TX',
   'san antonio': 'TX',
+  'fort worth': 'TX',
+  'el paso': 'TX',
+  'arlington': 'TX',
+  'corpus christi': 'TX',
+  'plano': 'TX',
+  'irving': 'TX',
+  
+  // California
   'los angeles': 'CA',
   'san francisco': 'CA',
   'san diego': 'CA',
-  'new york': 'NY',
-  'chicago': 'IL',
-  'philadelphia': 'PA',
-  'phoenix': 'AZ',
+  'san jose': 'CA',
+  'fresno': 'CA',
+  'sacramento': 'CA',
+  'long beach': 'CA',
+  'oakland': 'CA',
+  'bakersfield': 'CA',
+  'anaheim': 'CA',
+  'santa ana': 'CA',
+  'riverside': 'CA',
+  'stockton': 'CA',
+  'irvine': 'CA',
+  'fremont': 'CA',
+  
+  // Florida
   'miami': 'FL',
+  'tampa': 'FL',
+  'orlando': 'FL',
+  'jacksonville': 'FL',
+  'st. petersburg': 'FL',
+  'hialeah': 'FL',
+  'tallahassee': 'FL',
+  'fort lauderdale': 'FL',
+  'port st. lucie': 'FL',
+  'cape coral': 'FL',
+  'pembroke pines': 'FL',
+  'hollywood': 'FL',
+  'gainesville': 'FL',
+  'coral springs': 'FL',
+  'clearwater': 'FL',
+  
+  // New York
+  'new york': 'NY',
+  'buffalo': 'NY',
+  'rochester': 'NY',
+  'yonkers': 'NY',
+  'syracuse': 'NY',
+  'albany': 'NY',
+  'new rochelle': 'NY',
+  'mount vernon': 'NY',
+  'schenectady': 'NY',
+  'utica': 'NY',
+  
+  // Illinois
+  'chicago': 'IL',
+  'aurora': 'IL',
+  'peoria': 'IL',
+  'rockford': 'IL',
+  'elgin': 'IL',
+  'naperville': 'IL',
+  'sterling heights': 'IL',
+  'joliet': 'IL',
+  'waukegan': 'IL',
+  'cicero': 'IL',
+  
+  // Pennsylvania
+  'philadelphia': 'PA',
+  'pittsburgh': 'PA',
+  'allentown': 'PA',
+  'erie': 'PA',
+  'reading': 'PA',
+  'scranton': 'PA',
+  'bethlehem': 'PA',
+  'lancaster': 'PA',
+  'harrisburg': 'PA',
+  'altoona': 'PA',
+  
+  // Ohio
+  'columbus': 'OH',
+  'cleveland': 'OH',
+  'cincinnati': 'OH',
+  'toledo': 'OH',
+  'akron': 'OH',
+  'dayton': 'OH',
+  'parma': 'OH',
+  'canton': 'OH',
+  'youngstown': 'OH',
+  'lorain': 'OH',
+  
+  // Other major cities
+  'phoenix': 'AZ',
+  'tucson': 'AZ',
+  'mesa': 'AZ',
+  'chandler': 'AZ',
+  'scottsdale': 'AZ',
+  'glendale': 'AZ',
+  'tempe': 'AZ',
+  
+  'atlanta': 'GA',
+  'augusta': 'GA',
+  'columbus': 'GA',
+  'savannah': 'GA',
+  'athens': 'GA',
+  'sandy springs': 'GA',
+  
+  'charlotte': 'NC',
+  'raleigh': 'NC',
+  'greensboro': 'NC',
+  'durham': 'NC',
+  'winston-salem': 'NC',
+  'fayetteville': 'NC',
+  'cary': 'NC',
+  
   'seattle': 'WA',
+  'spokane': 'WA',
+  'tacoma': 'WA',
+  'vancouver': 'WA',
+  'bellevue': 'WA',
+  'kent': 'WA',
+  'everett': 'WA',
+  
   'denver': 'CO',
-  'atlanta': 'GA'
+  'colorado springs': 'CO',
+  'aurora': 'CO',
+  'fort collins': 'CO',
+  'lakewood': 'CO',
+  'thornton': 'CO',
+  'arvada': 'CO',
+  
+  'las vegas': 'NV',
+  'henderson': 'NV',
+  'reno': 'NV',
+  'north las vegas': 'NV',
+  'sparks': 'NV',
+  
+  'nashville': 'TN',
+  'memphis': 'TN',
+  'knoxville': 'TN',
+  'chattanooga': 'TN',
+  'clarksville': 'TN',
+  'murfreesboro': 'TN',
+  
+  'boston': 'MA',
+  'worcester': 'MA',
+  'springfield': 'MA',
+  'lowell': 'MA',
+  'cambridge': 'MA',
+  'brockton': 'MA',
+  'new bedford': 'MA',
+  
+  'detroit': 'MI',
+  'grand rapids': 'MI',
+  'warren': 'MI',
+  'sterling heights': 'MI',
+  'lansing': 'MI',
+  'ann arbor': 'MI',
+  'flint': 'MI',
+  
+  'baltimore': 'MD',
+  'frederick': 'MD',
+  'rockville': 'MD',
+  'gaithersburg': 'MD',
+  'bowie': 'MD',
+  'hagerstown': 'MD',
+  
+  'louisville': 'KY',
+  'lexington': 'KY',
+  'bowling green': 'KY',
+  'owensboro': 'KY',
+  'covington': 'KY',
+  
+  'portland': 'OR',
+  'salem': 'OR',
+  'eugene': 'OR',
+  'gresham': 'OR',
+  'hillsboro': 'OR',
+  'bend': 'OR',
+  
+  'oklahoma city': 'OK',
+  'tulsa': 'OK',
+  'norman': 'OK',
+  'broken arrow': 'OK',
+  'lawton': 'OK',
+  
+  'milwaukee': 'WI',
+  'madison': 'WI',
+  'green bay': 'WI',
+  'kenosha': 'WI',
+  'racine': 'WI',
+  
+  'minneapolis': 'MN',
+  'saint paul': 'MN',
+  'rochester': 'MN',
+  'duluth': 'MN',
+  'bloomington': 'MN',
+  
+  'kansas city': 'MO',
+  'st. louis': 'MO',
+  'springfield': 'MO',
+  'independence': 'MO',
+  'columbia': 'MO',
+  
+  'virginia beach': 'VA',
+  'norfolk': 'VA',
+  'chesapeake': 'VA',
+  'richmond': 'VA',
+  'newport news': 'VA',
+  'alexandria': 'VA',
+  'hampton': 'VA',
+  
+  'indianapolis': 'IN',
+  'fort wayne': 'IN',
+  'evansville': 'IN',
+  'south bend': 'IN',
+  'carmel': 'IN',
+  
+  'jacksonville': 'FL',
+  'albuquerque': 'NM',
+  'omaha': 'NE',
+  'lincoln': 'NE',
+  'wichita': 'KS',
+  'overland park': 'KS',
+  'little rock': 'AR',
+  'baton rouge': 'LA',
+  'new orleans': 'LA',
+  'shreveport': 'LA',
+  'des moines': 'IA',
+  'salt lake city': 'UT',
+  'west valley city': 'UT',
+  'provo': 'UT',
+  'birmingham': 'AL',
+  'huntsville': 'AL',
+  'mobile': 'AL',
+  'jackson': 'MS',
+  'charleston': 'SC',
+  'columbia': 'SC',
+  'north charleston': 'SC'
 };
 
 // Expanded zip code to neighborhood mapping for cleaner display
@@ -233,9 +459,9 @@ serve(async (req) => {
       
       console.log(`📈 City ${city} data - STR: $${monthlyStrRevenue}, Rent: $${monthlyRentRevenue}, Night Rate: $${nightRate}, Occupancy: ${occupancyRate}%`)
       
-      // Calculate annual revenues and estimated STR if needed
+      // Calculate annual STR revenue and keep monthly rent revenue
       let annualStrRevenue = monthlyStrRevenue * 12
-      let annualRentRevenue = monthlyRentRevenue * 12
+      let monthlyRent = monthlyRentRevenue
       
       // If we have night rate and occupancy, calculate STR revenue
       if (nightRate > 0 && occupancyRate > 0 && annualStrRevenue === 0) {
@@ -247,11 +473,11 @@ serve(async (req) => {
         console.log(`💡 Calculated STR revenue from night rate ($${nightRate}) x occupancy (${occupancyRate}%) = $${monthlyCalculatedStr}/month`)
       }
       
-      if (annualStrRevenue > 0 || annualRentRevenue > 0) {
+      if (annualStrRevenue > 0 || monthlyRent > 0) {
         neighborhoodsWithRevenue.push({
           neighborhood: `${city}, City Average`,
           airbnb_revenue: Math.round(annualStrRevenue),
-          rental_income: Math.round(annualRentRevenue),
+          rental_income: Math.round(monthlyRent), // Keep as monthly
           occupancy_rate: occupancyRate,
           median_night_rate: nightRate,
           api_neighborhood: city,
@@ -288,8 +514,8 @@ serve(async (req) => {
       if (zipCodes.length > 0) {
         console.log(`🏘️ Trying ${zipCodes.length} zip codes for neighborhood data in ${city}`)
         
-        // Try more zip codes to get better neighborhood variety (up to 10)
-        const samplesToTry = zipCodes.slice(0, 10)
+        // Try more zip codes to get better neighborhood variety (up to 15)
+        const samplesToTry = zipCodes.slice(0, 15)
         
         for (const zipCode of samplesToTry) {
           try {
@@ -306,7 +532,7 @@ serve(async (req) => {
               const zipOccupancy = zipContent.median_occupancy_rate || zipContent.occupancy || zipContent.occupancy_rate || 0
               
               let zipAnnualStr = zipMonthlyStr * 12
-              let zipAnnualRent = zipMonthlyRent * 12
+              let zipMonthlyRentFinal = zipMonthlyRent // Keep as monthly
               
               // Calculate STR if needed
               if (zipNightRate > 0 && zipOccupancy > 0 && zipAnnualStr === 0) {
@@ -316,14 +542,14 @@ serve(async (req) => {
                 zipAnnualStr = monthlyCalculatedStr * 12
               }
               
-              if (zipAnnualStr > 0 || zipAnnualRent > 0) {
+              if (zipAnnualStr > 0 || zipMonthlyRentFinal > 0) {
                 // Get neighborhood name from mapping or use a cleaner default
                 const neighborhoodName = zipToNeighborhoodMap[cityKey]?.[zipCode] || `District ${zipCode.slice(-2)}`
                 
                 neighborhoodsWithRevenue.push({
                   neighborhood: `${city}, ${neighborhoodName}`,
                   airbnb_revenue: Math.round(zipAnnualStr),
-                  rental_income: Math.round(zipAnnualRent),
+                  rental_income: Math.round(zipMonthlyRentFinal), // Keep as monthly
                   occupancy_rate: zipOccupancy,
                   median_night_rate: zipNightRate,
                   api_neighborhood: neighborhoodName,
