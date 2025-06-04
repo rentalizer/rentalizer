@@ -17,10 +17,8 @@ serve(async (req) => {
     
     console.log(`🔍 Mashvisor Edge Function called for ${city} (${propertyType}BR/${bathrooms}BA)`)
     
-    // Check multiple possible environment variable names for the API key
-    const mashvisorApiKey = Deno.env.get('MASHVISOR_API_KEY') || 
-                           Deno.env.get('MASHVISOR_API') || 
-                           Deno.env.get('AIRDNA_API_KEY')
+    // Check for Mashvisor API key
+    const mashvisorApiKey = Deno.env.get('MASHVISOR_API_KEY')
     
     console.log('🔍 Available environment variables:', Object.keys(Deno.env.toObject()).filter(key => 
       key.toLowerCase().includes('api') || key.toLowerCase().includes('key')
@@ -29,7 +27,7 @@ serve(async (req) => {
     if (!mashvisorApiKey) {
       console.error('❌ MASHVISOR_API_KEY not found in environment')
       return new Response(
-        JSON.stringify({ error: 'API key not configured. Please set MASHVISOR_API_KEY in Supabase secrets.' }),
+        JSON.stringify({ error: 'Mashvisor API key not configured. Please set MASHVISOR_API_KEY in Supabase secrets.' }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -37,16 +35,16 @@ serve(async (req) => {
       )
     }
 
-    console.log('🔑 Using API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
+    console.log('🔑 Using Mashvisor API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
 
-    // Call Mashvisor API with proper parameters
-    const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client/airbnb-property/active-listings')
+    // Call Mashvisor API - using the base endpoint from your example
+    const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client')
     
-    // Add query parameters based on the API documentation
+    // Add query parameters for property search
     if (city) mashvisorUrl.searchParams.append('city', city)
     if (propertyType) mashvisorUrl.searchParams.append('bedrooms', propertyType)
     if (bathrooms) mashvisorUrl.searchParams.append('bathrooms', bathrooms)
-    mashvisorUrl.searchParams.append('state', 'CA') // Default to CA, you might want to make this dynamic
+    mashvisorUrl.searchParams.append('state', 'CA') // Default to CA
     
     console.log('📡 Calling Mashvisor API:', mashvisorUrl.toString())
     

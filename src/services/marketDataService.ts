@@ -103,19 +103,19 @@ const fetchMashvisorDataViaEdgeFunction = async (city: string, propertyType: str
       return { strData: null, rentData: null };
     }
 
-    console.log('✅ Edge Function Success - Processing data...');
+    console.log('✅ Edge Function Success - Processing Mashvisor data...');
     const apiData = data.data;
 
     // Check if we have actual data from Mashvisor API
     if (apiData && (apiData.content || apiData.properties || apiData.listings)) {
-      console.log('✅ REAL DATA CONFIRMED - Processing Mashvisor data...');
+      console.log('✅ REAL MASHVISOR DATA - Processing...');
       
-      // Handle different possible response structures
+      // Handle different possible response structures from Mashvisor
       const dataArray = apiData.content || apiData.properties || apiData.listings || [];
       
       if (dataArray && dataArray.length > 0) {
         const strData: STRData[] = dataArray.slice(0, 6).map((item: any, index: number) => {
-          // Try different property names that might contain revenue data
+          // Try different property names that Mashvisor might use for revenue data
           const revenue = item.airbnb_revenue || item.monthly_revenue || item.str_revenue || item.rental_income || 0;
           const adjustedRevenue = Math.round(revenue * 1.25); // Add 25% markup
           
@@ -134,7 +134,7 @@ const fetchMashvisorDataViaEdgeFunction = async (city: string, propertyType: str
           };
         });
 
-        console.log('✅ FINAL REAL DATA:', { strData, rentData });
+        console.log('✅ FINAL MASHVISOR DATA:', { strData, rentData });
         return { strData, rentData };
       }
     }
@@ -143,14 +143,14 @@ const fetchMashvisorDataViaEdgeFunction = async (city: string, propertyType: str
     return { strData: null, rentData: null };
 
   } catch (error: any) {
-    console.error('❌ Edge Function call error:', error);
+    console.error('❌ Mashvisor Edge Function call error:', error);
     return { strData: null, rentData: null };
   }
 };
 
 export const fetchMarketData = async (
   city: string,
-  apiConfig: { airdnaApiKey?: string; openaiApiKey?: string },
+  apiConfig: { mashvisorApiKey?: string; openaiApiKey?: string },
   propertyType: string = '2',
   bathrooms: string = '1'
 ): Promise<CityMarketData> => {
@@ -170,7 +170,7 @@ export const fetchMarketData = async (
       rentData = apiRentData;
       console.log('✅ Using REAL data from Mashvisor API via Edge Function');
     } else {
-      console.log('❌ Edge Function failed or returned no data - will show "NA" for all data');
+      console.log('❌ Mashvisor Edge Function failed or returned no data - will show "NA" for all data');
       // Create placeholder data with "NA" indicators
       const cityKey = city.toLowerCase();
       const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Area`];
@@ -189,7 +189,7 @@ export const fetchMarketData = async (
     console.log(`📊 ✅ FINAL Market data compilation complete for ${city}:`, {
       strSubmarkets: strData.length,
       rentSubmarkets: rentData.length,
-      dataSource: apiStrData && apiRentData && apiStrData.length > 0 ? 'Real Mashvisor API via Edge Function' : 'Edge Function Failed - Showing NA'
+      dataSource: apiStrData && apiRentData && apiStrData.length > 0 ? 'Real Mashvisor API via Edge Function' : 'Mashvisor Edge Function Failed - Showing NA'
     });
 
     return {
