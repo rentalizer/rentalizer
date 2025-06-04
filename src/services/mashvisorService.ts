@@ -36,66 +36,63 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
 export const processMarketData = (marketData: any): SubmarketData[] => {
   const processedData: SubmarketData[] = [];
   
-  // Handle the response data structure from properties endpoint
+  // Handle the response data structure from top-markets endpoint
   if (marketData && marketData.data) {
     const data = marketData.data;
     
-    // Handle properties response structure
-    if (data.content && data.content.properties && Array.isArray(data.content.properties)) {
-      const properties = data.content.properties;
+    // Handle top markets response structure
+    if (data.content && data.content.markets && Array.isArray(data.content.markets)) {
+      const markets = data.content.markets;
       
-      // Group properties by neighborhood/submarket
-      const submarketMap = new Map<string, { airbnbRevenues: number[], rentPrices: number[] }>();
-      
-      properties.forEach((property: any) => {
-        const neighborhood = property.neighborhood || property.address?.neighborhood || property.submarket || 'Unknown Area';
-        const airbnbRevenue = property.rental_income_airbnb || property.str_revenue || property.airbnb_revenue || 0;
-        const rentPrice = property.rental_income || property.long_term_rental || property.traditional_rental || 0;
+      markets.forEach((market: any, index: number) => {
+        const cityName = market.city || market.name || `Market ${index + 1}`;
+        const strRevenue = market.airbnb_revenue || market.str_revenue || market.short_term_rental_revenue || 0;
+        const medianRent = market.traditional_revenue || market.long_term_rental || market.median_rent || 0;
+        const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
         
-        if (airbnbRevenue > 0 || rentPrice > 0) {
-          if (!submarketMap.has(neighborhood)) {
-            submarketMap.set(neighborhood, { airbnbRevenues: [], rentPrices: [] });
-          }
-          
-          const submarketData = submarketMap.get(neighborhood)!;
-          if (airbnbRevenue > 0) submarketData.airbnbRevenues.push(airbnbRevenue);
-          if (rentPrice > 0) submarketData.rentPrices.push(rentPrice);
-        }
-      });
-      
-      // Calculate averages for each submarket
-      submarketMap.forEach((data, neighborhood) => {
-        const avgAirbnb = data.airbnbRevenues.length > 0 
-          ? data.airbnbRevenues.reduce((a, b) => a + b, 0) / data.airbnbRevenues.length 
-          : 0;
-        const avgRent = data.rentPrices.length > 0 
-          ? data.rentPrices.reduce((a, b) => a + b, 0) / data.rentPrices.length 
-          : 0;
-        const multiple = avgRent > 0 ? avgAirbnb / avgRent : 0;
-        
-        if (avgAirbnb > 0 && avgRent > 0) {
+        if (strRevenue > 0 && medianRent > 0) {
           processedData.push({
-            submarket: neighborhood,
-            strRevenue: Math.round(avgAirbnb),
-            medianRent: Math.round(avgRent),
+            submarket: cityName,
+            strRevenue: Math.round(strRevenue),
+            medianRent: Math.round(medianRent),
             multiple: multiple
           });
         }
       });
     }
     
-    // Handle direct properties array (alternative structure)
-    if (data.properties && Array.isArray(data.properties)) {
-      data.properties.forEach((property: any, index: number) => {
-        const airbnbRevenue = property.rental_income_airbnb || property.str_revenue || property.airbnb_revenue || 0;
-        const rentPrice = property.rental_income || property.long_term_rental || property.traditional_rental || 0;
-        const multiple = rentPrice > 0 ? airbnbRevenue / rentPrice : 0;
+    // Handle alternative structure if markets is at root level
+    if (data.markets && Array.isArray(data.markets)) {
+      data.markets.forEach((market: any, index: number) => {
+        const cityName = market.city || market.name || `Market ${index + 1}`;
+        const strRevenue = market.airbnb_revenue || market.str_revenue || market.short_term_rental_revenue || 0;
+        const medianRent = market.traditional_revenue || market.long_term_rental || market.median_rent || 0;
+        const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
         
-        if (airbnbRevenue > 0 && rentPrice > 0) {
+        if (strRevenue > 0 && medianRent > 0) {
           processedData.push({
-            submarket: property.neighborhood || property.address || `Property ${index + 1}`,
-            strRevenue: Math.round(airbnbRevenue),
-            medianRent: Math.round(rentPrice),
+            submarket: cityName,
+            strRevenue: Math.round(strRevenue),
+            medianRent: Math.round(medianRent),
+            multiple: multiple
+          });
+        }
+      });
+    }
+    
+    // Handle if data is directly an array of markets
+    if (Array.isArray(data)) {
+      data.forEach((market: any, index: number) => {
+        const cityName = market.city || market.name || `Market ${index + 1}`;
+        const strRevenue = market.airbnb_revenue || market.str_revenue || market.short_term_rental_revenue || 0;
+        const medianRent = market.traditional_revenue || market.long_term_rental || market.median_rent || 0;
+        const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
+        
+        if (strRevenue > 0 && medianRent > 0) {
+          processedData.push({
+            submarket: cityName,
+            strRevenue: Math.round(strRevenue),
+            medianRent: Math.round(medianRent),
             multiple: multiple
           });
         }
@@ -106,7 +103,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   // If no valid data found, create a sample entry to show structure
   if (processedData.length === 0) {
     processedData.push({
-      submarket: 'No Property Data Available',
+      submarket: 'No Market Data Available',
       strRevenue: 0,
       medianRent: 0,
       multiple: 0

@@ -33,15 +33,15 @@ serve(async (req) => {
 
     console.log('🔑 Using Mashvisor API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
 
-    // Use the city properties endpoint which should have rental revenue data
-    const mashvisorUrl = new URL(`https://api.mashvisor.com/v1.1/client/city/properties/CA/${encodeURIComponent(city)}`)
+    // Use the top-markets endpoint which should have comprehensive market data
+    const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client/city/top-markets')
     
-    // Add property type filters
+    // Add filters for property type and location
     mashvisorUrl.searchParams.append('bedrooms', propertyType)
     mashvisorUrl.searchParams.append('bathrooms', bathrooms)
-    mashvisorUrl.searchParams.append('limit', '50') // Get more properties for better analysis
+    mashvisorUrl.searchParams.append('state', 'CA') // Default to CA, can be made dynamic later
     
-    console.log('📡 Calling Mashvisor properties API:', mashvisorUrl.toString())
+    console.log('📡 Calling Mashvisor top-markets API:', mashvisorUrl.toString())
     
     const mashvisorResponse = await fetch(mashvisorUrl.toString(), {
       method: 'GET',
@@ -73,7 +73,7 @@ serve(async (req) => {
     }
 
     const data = await mashvisorResponse.json()
-    console.log('✅ Mashvisor properties API Success - Data keys:', Object.keys(data))
+    console.log('✅ Mashvisor top-markets API Success - Data keys:', Object.keys(data))
     console.log('✅ Raw response preview:', JSON.stringify(data, null, 2).substring(0, 500))
 
     return new Response(
