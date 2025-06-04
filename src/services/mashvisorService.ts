@@ -42,9 +42,61 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   if (marketData && marketData.success && marketData.data) {
     const responseData = marketData.data;
     
-    // Handle neighborhood revenue data (new implementation)
-    if (responseData.source === 'neighborhood-revenue' && responseData.content?.neighborhoods_with_revenue) {
-      console.log('📊 Processing neighborhood revenue data from Mashvisor API');
+    // Handle rento-calculator neighborhood data (new implementation)
+    if (responseData.source === 'rento-calculator-neighborhood' && responseData.content?.neighborhoods_with_revenue) {
+      console.log('📊 Processing rento-calculator neighborhood data from Mashvisor API');
+      
+      const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
+      
+      neighborhoodsWithRevenue.forEach((neighborhood: any) => {
+        const neighborhoodName = neighborhood.neighborhood || 'Unknown Neighborhood';
+        const strRevenue = neighborhood.airbnb_revenue || 0;
+        const rentRevenue = neighborhood.rental_income || 0;
+        const dataSource = neighborhood.data_source || 'unknown';
+        
+        if (strRevenue > 0 || rentRevenue > 0) {
+          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
+          
+          processedData.push({
+            submarket: `${neighborhoodName} - ${responseData.city} (${dataSource})`,
+            strRevenue: strRevenue,
+            medianRent: rentRevenue,
+            multiple: multiple
+          });
+        }
+      });
+      
+      // Add city baseline info if available
+      if (responseData.city_baseline) {
+        const cityBaseline = responseData.city_baseline;
+        if (cityBaseline.airbnb_revenue > 0 || cityBaseline.rental_income > 0) {
+          const multiple = cityBaseline.rental_income > 0 ? cityBaseline.airbnb_revenue / cityBaseline.rental_income : 0;
+          
+          processedData.push({
+            submarket: `${responseData.city} - City Baseline`,
+            strRevenue: cityBaseline.airbnb_revenue,
+            medianRent: cityBaseline.rental_income,
+            multiple: multiple
+          });
+        }
+      }
+      
+      if (processedData.length === 0) {
+        const totalNeighborhoods = responseData.total_neighborhoods || 0;
+        const processedNeighborhoods = responseData.processed_neighborhoods || 0;
+        
+        processedData.push({
+          submarket: `${responseData.city} - ${processedNeighborhoods} of ${totalNeighborhoods} neighborhoods processed, no revenue data found`,
+          strRevenue: 0,
+          medianRent: 0,
+          multiple: 0
+        });
+      }
+    }
+    
+    // Handle legacy neighborhood revenue data
+    else if (responseData.source === 'neighborhood-revenue' && responseData.content?.neighborhoods_with_revenue) {
+      console.log('📊 Processing legacy neighborhood revenue data from Mashvisor API');
       
       const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
       
@@ -64,19 +116,6 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
           });
         }
       });
-      
-      // Add summary info
-      const totalNeighborhoods = responseData.total_neighborhoods || 0;
-      const processedNeighborhoods = responseData.processed_neighborhoods || 0;
-      
-      if (processedData.length === 0) {
-        processedData.push({
-          submarket: `${responseData.city} - ${processedNeighborhoods} of ${totalNeighborhoods} neighborhoods processed, no revenue data found`,
-          strRevenue: 0,
-          medianRent: 0,
-          multiple: 0
-        });
-      }
     }
     
     // Handle fallback neighborhood list (if revenue data not available)
