@@ -1,3 +1,4 @@
+
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
 const corsHeaders = {
@@ -90,8 +91,15 @@ async function callMashvisorAPI(url: string, apiKey: string, description: string
       // Add detailed logging of the response structure
       console.log(`🔍 ${description} response keys:`, Object.keys(data))
       if (data.content) {
-        console.log(`🔍 ${description} content keys:`, Object.keys(data.content))
-        console.log(`🔍 ${description} full content:`, JSON.stringify(data.content, null, 2))
+        console.log(`🔍 ${description} content type:`, typeof data.content)
+        if (Array.isArray(data.content)) {
+          console.log(`🔍 ${description} content array length:`, data.content.length)
+          if (data.content.length > 0) {
+            console.log(`🔍 ${description} first item keys:`, Object.keys(data.content[0]))
+          }
+        } else {
+          console.log(`🔍 ${description} content keys:`, Object.keys(data.content))
+        }
       }
       
       return { success: true, data }
@@ -184,93 +192,120 @@ serve(async (req) => {
       )
     }
 
-    // Step 2: Get revenue data for each neighborhood
+    // Step 2: Try property listings endpoint for more granular data
     const neighborhoods = neighborhoodResult.data.content?.results || []
     console.log(`📋 Found ${neighborhoods.length} neighborhoods in ${city}`)
 
     const neighborhoodData = []
     
-    // Limit to first 5 neighborhoods to avoid timeout and add detailed logging
-    const limitedNeighborhoods = neighborhoods.slice(0, 5)
+    // Limit to first 3 neighborhoods to avoid timeout and test different approach
+    const limitedNeighborhoods = neighborhoods.slice(0, 3)
     
     for (const [index, neighborhood] of limitedNeighborhoods.entries()) {
       const neighborhoodName = neighborhood.name || 'Unknown'
       console.log(`🏘️ [${index + 1}/${limitedNeighborhoods.length}] Processing neighborhood: ${neighborhoodName}`)
       
-      // Try to get revenue data for this specific neighborhood
-      const rentoUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodedCity}&neighborhood=${encodeURIComponent(neighborhoodName)}&resource=airbnb&beds=${propertyType}`
-      console.log(`🔗 Full rento-calculator URL for ${neighborhoodName}:`, rentoUrl)
+      // Try property listings endpoint for this neighborhood
+      const listingsUrl = `https://api.mashvisor.com/v1.1/client/property/search?state=${state}&city=${encodedCity}&neighborhood=${encodeURIComponent(neighborhoodName)}&beds=${propertyType}&source=Airbnb&page=1&items=10`
+      console.log(`🔗 Property listings URL for ${neighborhoodName}:`, listingsUrl)
       
-      const rentoResult = await callMashvisorAPI(rentoUrl, mashvisorApiKey, `Rento-calculator for ${neighborhoodName}`)
+      const listingsResult = await callMashvisorAPI(listingsUrl, mashvisorApiKey, `Property listings for ${neighborhoodName}`)
       
-      if (rentoResult.success && rentoResult.data.content) {
-        const content = rentoResult.data.content
-        
-        console.log(`📊 Raw response for ${neighborhoodName}:`, {
-          median_night_rate: content.median_night_rate,
-          median_occupancy_rate: content.median_occupancy_rate,
-          adjusted_rental_income: content.adjusted_rental_income,
-          median_rental_income: content.median_rental_income,
-          sample_size: content.sample_size,
-          neighborhood: content.neighborhood,
-          city: content.city,
-          state: content.state
+      if (listingsResult.success && listingsResult.data.content) {
+        const content = listingsResult.data.content
+        console.log(`📊 Listings response structure for ${neighborhoodName}:`, {
+          hasResults: !!content.results,
+          resultsLength: content.results?.length || 0,
+          hasProperties: !!content.properties,
+          propertiesLength: content.properties?.length || 0
         })
         
-        // Extract revenue data
-        const airbnbRevenue = content.median_night_rate ? (content.median_night_rate * content.median_occupancy_rate * 365 / 100) || 0 : 0
-        const adjustedRevenue = content.adjusted_rental_income ? content.adjusted_rental_income * 12 : airbnbRevenue
-        const rentalIncome = content.median_rental_income ? content.median_rental_income * 12 : 0
+        // Try to extract revenue data from property listings
+        const properties = content.results || content.properties || []
         
-        console.log(`💰 Calculated values for ${neighborhoodName}:`, {
-          airbnbRevenue: Math.round(airbnbRevenue),
-          adjustedRevenue: Math.round(adjustedRevenue),
-          rentalIncome: Math.round(rentalIncome),
-          source: 'calculated from API response'
-        })
-        
-        if (adjustedRevenue > 0 || rentalIncome > 0) {
-          neighborhoodData.push({
-            neighborhood: neighborhoodName,
-            airbnb_revenue: Math.round(adjustedRevenue),
-            rental_income: Math.round(rentalIncome),
-            median_night_rate: content.median_night_rate || 0,
-            occupancy_rate: content.median_occupancy_rate || 0,
-            sample_size: content.sample_size || 0,
-            api_neighborhood: content.neighborhood || 'N/A',
-            api_city: content.city || 'N/A',
-            api_state: content.state || 'N/A'
+        if (properties.length > 0) {
+          console.log(`📊 Found ${properties.length} properties in ${neighborhoodName}`)
+          console.log(`🔍 First property keys:`, Object.keys(properties[0]))
+          console.log(`🔍 First property sample:`, {
+            address: properties[0].address,
+            rental_income: properties[0].rental_income,
+            airbnb_income: properties[0].airbnb_income,
+            monthly_revenue: properties[0].monthly_revenue,
+            revenue: properties[0].revenue,
+            price: properties[0].price
           })
-          console.log(`✅ Added revenue data for ${neighborhoodName}: STR $${Math.round(adjustedRevenue)}, Rent $${Math.round(rentalIncome)}`)
+          
+          // Calculate averages from property data
+          let totalAirbnbRevenue = 0
+          let totalRentalIncome = 0
+          let validProperties = 0
+          
+          properties.forEach(property => {
+            const airbnbRevenue = property.airbnb_income || property.monthly_revenue || property.revenue || 0
+            const rentalIncome = property.rental_income || property.rent || 0
+            
+            if (airbnbRevenue > 0 || rentalIncome > 0) {
+              totalAirbnbRevenue += airbnbRevenue * 12 // Convert monthly to annual
+              totalRentalIncome += rentalIncome * 12 // Convert monthly to annual
+              validProperties++
+            }
+          })
+          
+          if (validProperties > 0) {
+            const avgAirbnbRevenue = Math.round(totalAirbnbRevenue / validProperties)
+            const avgRentalIncome = Math.round(totalRentalIncome / validProperties)
+            
+            console.log(`💰 Calculated averages for ${neighborhoodName}:`, {
+              avgAirbnbRevenue,
+              avgRentalIncome,
+              validProperties,
+              source: 'property listings aggregation'
+            })
+            
+            neighborhoodData.push({
+              neighborhood: neighborhoodName,
+              airbnb_revenue: avgAirbnbRevenue,
+              rental_income: avgRentalIncome,
+              median_night_rate: 0,
+              occupancy_rate: 0,
+              sample_size: validProperties,
+              api_neighborhood: neighborhoodName,
+              api_city: city,
+              api_state: state
+            })
+            console.log(`✅ Added property-based data for ${neighborhoodName}: STR $${avgAirbnbRevenue}, Rent $${avgRentalIncome}`)
+          } else {
+            console.log(`⚠️ No valid property data for ${neighborhoodName}`)
+          }
         } else {
-          console.log(`⚠️ No revenue data for ${neighborhoodName} - both values are 0`)
+          console.log(`❌ No properties found for ${neighborhoodName}`)
         }
       } else {
-        console.log(`❌ Failed to get revenue data for ${neighborhoodName}:`, rentoResult.error || 'Unknown error')
+        console.log(`❌ Failed to get property listings for ${neighborhoodName}:`, listingsResult.error || 'Unknown error')
       }
       
       // Add delay to avoid rate limiting
       if (index < limitedNeighborhoods.length - 1) {
-        console.log(`⏳ Waiting 200ms before next API call...`)
-        await new Promise(resolve => setTimeout(resolve, 200))
+        console.log(`⏳ Waiting 500ms before next API call...`)
+        await new Promise(resolve => setTimeout(resolve, 500))
       }
     }
 
-    console.log(`📊 Final summary: Successfully processed ${neighborhoodData.length} neighborhoods with revenue data out of ${limitedNeighborhoods.length} attempted`)
+    console.log(`📊 Final summary: Successfully processed ${neighborhoodData.length} neighborhoods with property data out of ${limitedNeighborhoods.length} attempted`)
     
-    // Log if all neighborhoods have the same values (which would indicate an issue)
+    // Check for data variation
     if (neighborhoodData.length > 1) {
-      const firstRevenue = neighborhoodData[0]?.airbnb_revenue
-      const firstRent = neighborhoodData[0]?.rental_income
-      const allSameRevenue = neighborhoodData.every(n => n.airbnb_revenue === firstRevenue)
-      const allSameRent = neighborhoodData.every(n => n.rental_income === firstRent)
+      const revenues = neighborhoodData.map(n => n.airbnb_revenue)
+      const rents = neighborhoodData.map(n => n.rental_income)
+      const uniqueRevenues = new Set(revenues).size
+      const uniqueRents = new Set(rents).size
       
-      if (allSameRevenue && allSameRent) {
-        console.log(`🚨 WARNING: All neighborhoods have identical values! This suggests the API is returning city-level data for all neighborhoods.`)
-        console.log(`🚨 Revenue: $${firstRevenue}, Rent: $${firstRent}`)
-      } else {
-        console.log(`✅ Good: Neighborhoods have different values, indicating granular data`)
-      }
+      console.log(`📈 Data variation check:`, {
+        uniqueRevenues,
+        uniqueRents,
+        totalNeighborhoods: neighborhoodData.length,
+        hasVariation: uniqueRevenues > 1 || uniqueRents > 1
+      })
     }
 
     return new Response(
@@ -281,7 +316,7 @@ serve(async (req) => {
           state: state,
           propertyType: propertyType,
           bathrooms: bathrooms,
-          source: 'neighborhood-revenue',
+          source: 'property-listings',
           total_neighborhoods: neighborhoods.length,
           processed_neighborhoods: limitedNeighborhoods.length,
           content: {
