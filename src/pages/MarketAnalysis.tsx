@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -67,13 +66,13 @@ const MarketAnalysis = () => {
             </div>
           </div>
 
-          {/* API Key Configuration Section */}
-          <div className="mb-8">
-            <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
-          </div>
-
           {/* Simulated Market Intelligence Component */}
           <SimulatedMarketIntelligence />
+
+          {/* API Key Configuration Section */}
+          <div className="mt-8">
+            <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
+          </div>
         </div>
       </div>
 
