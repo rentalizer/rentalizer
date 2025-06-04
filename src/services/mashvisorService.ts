@@ -57,28 +57,27 @@ export const processMarketData = async (marketData: any, city: string, propertyT
         const strRevenueWith25Markup = Math.round(monthlyStrRevenue * 1.25);
         
         // Get rental data from the same Mashvisor location data
-        const monthlyRent = location.traditional_rental || location.rental_income || location.rent || 0;
+        const monthlyRent = location.rental_income || location.traditional_rental || location.rent || 0;
         
-        console.log(`📈 Processing location: ${locationName}, Monthly STR: $${monthlyStrRevenue}, With 25% markup: $${strRevenueWith25Markup}, Mashvisor Rent: $${monthlyRent}`);
+        console.log(`📈 Processing neighborhood: ${locationName}, Monthly STR: $${monthlyStrRevenue}, With 25% markup: $${strRevenueWith25Markup}, Mashvisor Rent: $${monthlyRent}`);
         
-        if (strRevenueWith25Markup > 0) {
-          const multiple = monthlyRent > 0 ? strRevenueWith25Markup / monthlyRent : 0;
-          
-          processedData.push({
-            submarket: locationName,
-            strRevenue: strRevenueWith25Markup, // STR revenue with 25% markup
-            medianRent: monthlyRent, // From same Mashvisor API call
-            multiple: multiple
-          });
-        }
+        // Include ALL neighborhoods with data, even if some values are 0
+        const multiple = (strRevenueWith25Markup > 0 && monthlyRent > 0) ? strRevenueWith25Markup / monthlyRent : 0;
+        
+        processedData.push({
+          submarket: locationName,
+          strRevenue: strRevenueWith25Markup, // STR revenue with 25% markup
+          medianRent: monthlyRent, // From same Mashvisor API call
+          multiple: multiple
+        });
       });
     }
     
-    // Handle fallback case with basic content structure
-    else if (responseData.content) {
+    // Handle fallback case with basic content structure - only if no neighborhoods found
+    else if (responseData.content && processedData.length === 0) {
       const content = responseData.content;
       
-      console.log('📊 Processing fallback rento-calculator data:', content);
+      console.log('📊 Processing fallback city-level data:', content);
       
       // Try to extract revenue data from various field names
       const monthlyStrRevenue = content.airbnb_revenue || content.revenue || content.revpar || content.revpan || 0;
@@ -88,7 +87,7 @@ export const processMarketData = async (marketData: any, city: string, propertyT
       // Get rental data from Mashvisor
       const monthlyRent = content.median_rental_income || content.rental_income || content.rent || 0;
       
-      console.log(`📊 Extracted data - Monthly STR: $${monthlyStrRevenue}, Night Rate: $${nightRate}, Occupancy: ${occupancyRate}%, Mashvisor Rent: $${monthlyRent}`);
+      console.log(`📊 Extracted city data - Monthly STR: $${monthlyStrRevenue}, Night Rate: $${nightRate}, Occupancy: ${occupancyRate}%, Mashvisor Rent: $${monthlyRent}`);
       
       let calculatedMonthlyStr = monthlyStrRevenue;
       
@@ -104,16 +103,14 @@ export const processMarketData = async (marketData: any, city: string, propertyT
       // Apply 25% markup to STR revenue as per your formula
       const strRevenueWith25Markup = Math.round(calculatedMonthlyStr * 1.25);
       
-      if (strRevenueWith25Markup > 0) {
-        const multiple = monthlyRent > 0 ? strRevenueWith25Markup / monthlyRent : 0;
-        
-        processedData.push({
-          submarket: `${responseData.city} - City Data`,
-          strRevenue: strRevenueWith25Markup, // STR revenue with 25% markup
-          medianRent: monthlyRent, // From same Mashvisor API call
-          multiple: multiple
-        });
-      }
+      const multiple = (strRevenueWith25Markup > 0 && monthlyRent > 0) ? strRevenueWith25Markup / monthlyRent : 0;
+      
+      processedData.push({
+        submarket: `${responseData.city || city} - City Average`,
+        strRevenue: strRevenueWith25Markup, // STR revenue with 25% markup
+        medianRent: monthlyRent, // From same Mashvisor API call
+        multiple: multiple
+      });
     }
   }
   
@@ -137,8 +134,8 @@ export const processMarketData = async (marketData: any, city: string, propertyT
     processedData.sort((a, b) => b.strRevenue - a.strRevenue);
   }
 
-  console.log('✅ Final processed market data using Mashvisor rent data:', processedData.map(d => ({
-    submarket: d.submarket,
+  console.log(`✅ Final processed neighborhoods (${processedData.length} total):`, processedData.map(d => ({
+    neighborhood: d.submarket,
     monthlyRevenueWith25Markup: d.strRevenue,
     monthlyRentFromMashvisor: d.medianRent,
     multiple: d.multiple > 0 ? d.multiple.toFixed(2) : 'N/A'
