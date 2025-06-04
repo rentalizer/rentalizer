@@ -152,7 +152,7 @@ serve(async (req) => {
     console.log(`📍 Found state ${state} for city ${city}`)
     const encodedCity = encodeURIComponent(city)
 
-    // Step 1: Get neighborhoods list
+    // Step 1: Get neighborhoods list first
     const neighborhoodUrl = `https://api.mashvisor.com/v1.1/client/city/neighborhoods/${state}/${encodedCity}`
     const neighborhoodResult = await callMashvisorAPI(neighborhoodUrl, mashvisorApiKey, 'Neighborhood list endpoint')
     
@@ -176,126 +176,87 @@ serve(async (req) => {
       )
     }
 
-    // Step 2: Use property search + property estimates approach
     const neighborhoods = neighborhoodResult.data.content?.results || []
     console.log(`📋 Found ${neighborhoods.length} neighborhoods in ${city}`)
 
-    const neighborhoodData = []
+    // Step 2: Get city-level rento-calculator data as baseline
+    const cityRentoUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodedCity}&resource=airbnb&beds=${propertyType}`
+    console.log(`🏙️ Getting city-level rento-calculator data:`, cityRentoUrl)
     
-    // Limit to first 5 neighborhoods to avoid timeout
-    const limitedNeighborhoods = neighborhoods.slice(0, 5)
+    const cityRentoResult = await callMashvisorAPI(cityRentoUrl, mashvisorApiKey, `City-level rento-calculator for ${city}`)
+    
+    let cityBaseline = null
+    if (cityRentoResult.success && cityRentoResult.data.content) {
+      const content = cityRentoResult.data.content
+      cityBaseline = {
+        airbnb_revenue: (content.airbnb?.revenue || content.revenue || 0) * 12, // Convert to annual
+        rental_income: (content.rental?.rent || content.rent || content.traditional_rental || 0) * 12, // Convert to annual
+        occupancy_rate: content.airbnb?.occupancy || content.occupancy || 0,
+        night_rate: content.airbnb?.night_rate || content.night_rate || 0
+      }
+      console.log(`✅ City baseline data:`, cityBaseline)
+    }
+
+    // Step 3: Try to get neighborhood-specific data using rento-calculator lookup
+    const neighborhoodData = []
+    const limitedNeighborhoods = neighborhoods.slice(0, 8) // Test more neighborhoods since this should be faster
     
     for (const [index, neighborhood] of limitedNeighborhoods.entries()) {
       const neighborhoodName = neighborhood.name || 'Unknown'
       console.log(`🏘️ [${index + 1}/${limitedNeighborhoods.length}] Processing neighborhood: ${neighborhoodName}`)
       
-      // First, search for properties in this neighborhood
-      const propertySearchUrl = `https://api.mashvisor.com/v1.1/client/property?state=${state}&city=${encodedCity}&neighborhood=${encodeURIComponent(neighborhoodName)}&beds=${propertyType}&source=Airbnb&items=5`
-      console.log(`🔗 Property search URL for ${neighborhoodName}:`, propertySearchUrl)
+      // Try rento-calculator lookup with neighborhood name as part of city parameter
+      const neighborhoodCityParam = `${city} ${neighborhoodName}`
+      const neighborhoodRentoUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodeURIComponent(neighborhoodCityParam)}&resource=airbnb&beds=${propertyType}`
       
-      const propertySearchResult = await callMashvisorAPI(propertySearchUrl, mashvisorApiKey, `Property search for ${neighborhoodName}`)
+      console.log(`🔗 Neighborhood rento-calculator URL:`, neighborhoodRentoUrl)
       
-      if (propertySearchResult.success && propertySearchResult.data.content) {
-        const properties = propertySearchResult.data.content.results || propertySearchResult.data.content || []
+      const neighborhoodRentoResult = await callMashvisorAPI(neighborhoodRentoUrl, mashvisorApiKey, `Neighborhood rento-calculator for ${neighborhoodName}`)
+      
+      if (neighborhoodRentoResult.success && neighborhoodRentoResult.data.content) {
+        const content = neighborhoodRentoResult.data.content
         
-        console.log(`📊 Found ${properties.length} properties in ${neighborhoodName}`)
+        const airbnbRevenue = (content.airbnb?.revenue || content.revenue || 0) * 12 // Convert to annual
+        const rentalIncome = (content.rental?.rent || content.rent || content.traditional_rental || 0) * 12 // Convert to annual
+        const occupancyRate = content.airbnb?.occupancy || content.occupancy || 0
+        const nightRate = content.airbnb?.night_rate || content.night_rate || 0
         
-        if (properties.length > 0) {
-          // Get estimates for each property
-          const propertyEstimates = []
+        console.log(`💰 ${neighborhoodName} rento-calculator data:`, {
+          airbnb_revenue: airbnbRevenue,
+          rental_income: rentalIncome,
+          occupancy_rate: occupancyRate,
+          night_rate: nightRate
+        })
+        
+        if (airbnbRevenue > 0 || rentalIncome > 0) {
+          neighborhoodData.push({
+            neighborhood: neighborhoodName,
+            airbnb_revenue: Math.round(airbnbRevenue),
+            rental_income: Math.round(rentalIncome),
+            occupancy_rate: occupancyRate,
+            median_night_rate: nightRate,
+            api_neighborhood: neighborhoodName,
+            api_city: city,
+            api_state: state,
+            data_source: 'rento_calculator'
+          })
           
-          for (const property of properties.slice(0, 3)) { // Limit to 3 properties per neighborhood
-            const propertyId = property.id || property.pid || property.property_id
-            
-            if (propertyId) {
-              console.log(`🏠 Getting estimates for property ID: ${propertyId}`)
-              
-              const estimatesUrl = `https://api.mashvisor.com/v1.1/client/property/estimates/${propertyId}?state=${state}`
-              const estimatesResult = await callMashvisorAPI(estimatesUrl, mashvisorApiKey, `Property estimates for ${propertyId}`)
-              
-              if (estimatesResult.success && estimatesResult.data.content) {
-                const estimates = estimatesResult.data.content
-                
-                // Extract revenue data from estimates
-                const airbnbRevenue = estimates.airbnb?.revenue || estimates.airbnb_revenue || 0
-                const rentalRevenue = estimates.rental?.revenue || estimates.traditional_rental || estimates.rental_revenue || 0
-                
-                console.log(`💰 Property ${propertyId} estimates:`, {
-                  airbnb_revenue: airbnbRevenue,
-                  rental_revenue: rentalRevenue,
-                  address: property.address || 'Unknown'
-                })
-                
-                if (airbnbRevenue > 0 || rentalRevenue > 0) {
-                  propertyEstimates.push({
-                    property_id: propertyId,
-                    airbnb_revenue: airbnbRevenue,
-                    rental_revenue: rentalRevenue,
-                    address: property.address || 'Unknown Address'
-                  })
-                }
-              } else {
-                console.log(`❌ Failed to get estimates for property ${propertyId}`)
-              }
-              
-              // Add delay to avoid rate limiting
-              await new Promise(resolve => setTimeout(resolve, 500))
-            }
-          }
-          
-          // Calculate averages from property estimates
-          if (propertyEstimates.length > 0) {
-            let totalAirbnbRevenue = 0
-            let totalRentalRevenue = 0
-            
-            propertyEstimates.forEach(estimate => {
-              totalAirbnbRevenue += estimate.airbnb_revenue
-              totalRentalRevenue += estimate.rental_revenue
-            })
-            
-            const avgAirbnbRevenue = Math.round((totalAirbnbRevenue / propertyEstimates.length) * 12) // Convert to annual
-            const avgRentalRevenue = Math.round((totalRentalRevenue / propertyEstimates.length) * 12) // Convert to annual
-            
-            console.log(`💰 Calculated averages for ${neighborhoodName}:`, {
-              avgAirbnbRevenue,
-              avgRentalRevenue,
-              sampleSize: propertyEstimates.length
-            })
-            
-            if (avgAirbnbRevenue > 0 || avgRentalRevenue > 0) {
-              neighborhoodData.push({
-                neighborhood: neighborhoodName,
-                airbnb_revenue: avgAirbnbRevenue,
-                rental_income: avgRentalRevenue,
-                median_night_rate: 0,
-                occupancy_rate: 0,
-                sample_size: propertyEstimates.length,
-                api_neighborhood: neighborhoodName,
-                api_city: city,
-                api_state: state,
-                data_source: 'property_estimates'
-              })
-              
-              console.log(`✅ Added property estimates data for ${neighborhoodName}: STR $${avgAirbnbRevenue}, Rent $${avgRentalRevenue}`)
-            }
-          } else {
-            console.log(`⚠️ No valid property estimates for ${neighborhoodName}`)
-          }
+          console.log(`✅ Added rento-calculator data for ${neighborhoodName}: STR $${Math.round(airbnbRevenue)}, Rent $${Math.round(rentalIncome)}`)
         } else {
-          console.log(`❌ No properties found for ${neighborhoodName}`)
+          console.log(`⚠️ No revenue data for ${neighborhoodName} in rento-calculator`)
         }
       } else {
-        console.log(`❌ Failed to search properties for ${neighborhoodName}`)
+        console.log(`❌ Failed to get rento-calculator data for ${neighborhoodName}`)
       }
       
       // Add delay between neighborhoods to avoid rate limiting
       if (index < limitedNeighborhoods.length - 1) {
-        console.log(`⏳ Waiting 1000ms before next neighborhood...`)
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        console.log(`⏳ Waiting 500ms before next neighborhood...`)
+        await new Promise(resolve => setTimeout(resolve, 500))
       }
     }
 
-    console.log(`📊 Final summary: Successfully processed ${neighborhoodData.length} neighborhoods with property estimates out of ${limitedNeighborhoods.length} attempted`)
+    console.log(`📊 Final summary: Successfully processed ${neighborhoodData.length} neighborhoods with rento-calculator data out of ${limitedNeighborhoods.length} attempted`)
 
     return new Response(
       JSON.stringify({
@@ -305,9 +266,10 @@ serve(async (req) => {
           state: state,
           propertyType: propertyType,
           bathrooms: bathrooms,
-          source: 'property-estimates',
+          source: 'rento-calculator-neighborhood',
           total_neighborhoods: neighborhoods.length,
           processed_neighborhoods: limitedNeighborhoods.length,
+          city_baseline: cityBaseline,
           content: {
             neighborhoods_with_revenue: neighborhoodData,
             all_neighborhoods: neighborhoods

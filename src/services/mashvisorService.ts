@@ -41,46 +41,8 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   if (marketData && marketData.success && marketData.data) {
     const responseData = marketData.data;
     
-    // Handle property estimates data (new implementation)
-    if (responseData.source === 'property-estimates' && responseData.content?.neighborhoods_with_revenue) {
-      console.log('📊 Processing property estimates data from Mashvisor API');
-      
-      const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
-      
-      neighborhoodsWithRevenue.forEach((neighborhood: any) => {
-        const neighborhoodName = neighborhood.neighborhood || 'Unknown Neighborhood';
-        const strRevenue = neighborhood.airbnb_revenue || 0;
-        const rentRevenue = neighborhood.rental_income || 0;
-        const dataSource = neighborhood.data_source || 'property_estimates';
-        const sampleSize = neighborhood.sample_size || 0;
-        
-        if (strRevenue > 0 || rentRevenue > 0) {
-          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
-          
-          processedData.push({
-            submarket: `${neighborhoodName} - ${responseData.city} (${sampleSize} properties)`,
-            strRevenue: strRevenue,
-            medianRent: rentRevenue,
-            multiple: multiple
-          });
-        }
-      });
-      
-      if (processedData.length === 0) {
-        const totalNeighborhoods = responseData.total_neighborhoods || 0;
-        const processedNeighborhoods = responseData.processed_neighborhoods || 0;
-        
-        processedData.push({
-          submarket: `${responseData.city} - ${processedNeighborhoods} of ${totalNeighborhoods} neighborhoods processed, no property data found`,
-          strRevenue: 0,
-          medianRent: 0,
-          multiple: 0
-        });
-      }
-    }
-    
     // Handle rento-calculator neighborhood data (new implementation)
-    else if (responseData.source === 'rento-calculator-neighborhood' && responseData.content?.neighborhoods_with_revenue) {
+    if (responseData.source === 'rento-calculator-neighborhood' && responseData.content?.neighborhoods_with_revenue) {
       console.log('📊 Processing rento-calculator neighborhood data from Mashvisor API');
       
       const neighborhoodsWithRevenue = responseData.content.neighborhoods_with_revenue;
