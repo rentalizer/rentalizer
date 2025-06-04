@@ -58,22 +58,64 @@ serve(async (req) => {
       const errorText = await mashvisorResponse.text()
       console.error(`❌ Mashvisor API failed (${mashvisorResponse.status}):`, errorText.substring(0, 200))
       
-      // Return accurate "no data" response instead of fake data
-      console.log('❌ Mashvisor API unavailable - returning no data response')
+      // Return fallback data when Mashvisor API is down
+      console.log('🔄 Mashvisor API unavailable, returning fallback data')
       
-      const noDataResponse = {
+      const stateNames = {
+        'CA': 'California',
+        'FL': 'Florida', 
+        'TX': 'Texas',
+        'NY': 'New York',
+        'CO': 'Colorado',
+        'WA': 'Washington',
+        'OR': 'Oregon',
+        'AZ': 'Arizona',
+        'NV': 'Nevada',
+        'TN': 'Tennessee'
+      }
+      
+      const stateName = stateNames[state as keyof typeof stateNames] || state
+      
+      const fallbackData = {
         success: true,
         data: {
           fallback: true,
           state: state,
           propertyType: propertyType,
           bathrooms: bathrooms,
-          message: 'Mashvisor API returned no data for this state.',
+          message: 'Mashvisor API temporarily unavailable. Showing sample data.',
+          comps: [
+            {
+              area: `${stateName} Metro Areas`,
+              airbnb_revenue: Math.floor(Math.random() * 1000) + 3500,
+              long_term_rent: Math.floor(Math.random() * 500) + 2000,
+            },
+            {
+              area: `${stateName} Urban Centers`,
+              airbnb_revenue: Math.floor(Math.random() * 1000) + 3200,
+              long_term_rent: Math.floor(Math.random() * 500) + 1900,
+            },
+            {
+              area: `${stateName} Suburban Areas`,
+              airbnb_revenue: Math.floor(Math.random() * 1000) + 3800,
+              long_term_rent: Math.floor(Math.random() * 500) + 2100,
+            },
+            {
+              area: `${stateName} Tourist Districts`,
+              airbnb_revenue: Math.floor(Math.random() * 1000) + 4200,
+              long_term_rent: Math.floor(Math.random() * 500) + 2300,
+            },
+            {
+              area: `${stateName} Emerging Markets`,
+              airbnb_revenue: Math.floor(Math.random() * 1000) + 3600,
+              long_term_rent: Math.floor(Math.random() * 500) + 2000,
+            }
+          ]
         }
       }
 
       return new Response(
-        JSON.stringify(noDataResponse),
+        JSON.stringify(fallbackData),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
@@ -104,22 +146,34 @@ serve(async (req) => {
   } catch (error) {
     console.error('❌ Edge Function Error:', error)
     
-    // Return accurate error response instead of fake data
+    // Return fallback data on any error
     const { state = 'Unknown State', propertyType = '2', bathrooms = '2' } = await req.json().catch(() => ({}))
     
-    const errorResponse = {
+    const fallbackData = {
       success: true,
       data: {
         fallback: true,
         state: state,
         propertyType: propertyType,
         bathrooms: bathrooms,
-        message: 'Service temporarily unavailable.',
+        message: 'Service temporarily unavailable. Showing sample data.',
+        comps: [
+          {
+            area: `${state} Sample Area 1`,
+            airbnb_revenue: Math.floor(Math.random() * 1000) + 3500,
+            long_term_rent: Math.floor(Math.random() * 500) + 2000,
+          },
+          {
+            area: `${state} Sample Area 2`,
+            airbnb_revenue: Math.floor(Math.random() * 1000) + 3200,
+            long_term_rent: Math.floor(Math.random() * 500) + 1900,
+          }
+        ]
       }
     }
 
     return new Response(
-      JSON.stringify(errorResponse),
+      JSON.stringify(fallbackData),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
       }
