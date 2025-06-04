@@ -7,38 +7,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MapPin, Search, Loader2 } from 'lucide-react';
 
 interface MarketAnalysisFormProps {
-  onAnalyze: (city: string, state: string, propertyType: string, bathrooms: string) => void;
+  onAnalyze: (city: string, propertyType: string, bathrooms: string) => void;
   isLoading: boolean;
 }
 
 export const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ onAnalyze, isLoading }) => {
   const [targetCity, setTargetCity] = useState<string>('Austin');
-  const [targetState, setTargetState] = useState<string>('TX');
   const [propertyType, setPropertyType] = useState<string>('2');
   const [bathrooms, setBathrooms] = useState<string>('2');
-
-  const stateOptions = [
-    { value: 'CA', label: 'California' },
-    { value: 'FL', label: 'Florida' },
-    { value: 'TX', label: 'Texas' },
-    { value: 'NY', label: 'New York' },
-    { value: 'CO', label: 'Colorado' },
-    { value: 'WA', label: 'Washington' },
-    { value: 'OR', label: 'Oregon' },
-    { value: 'AZ', label: 'Arizona' },
-    { value: 'NV', label: 'Nevada' },
-    { value: 'TN', label: 'Tennessee' },
-    { value: 'NC', label: 'North Carolina' },
-    { value: 'GA', label: 'Georgia' },
-    { value: 'SC', label: 'South Carolina' },
-    { value: 'VA', label: 'Virginia' },
-    { value: 'IL', label: 'Illinois' },
-    { value: 'OH', label: 'Ohio' },
-    { value: 'MI', label: 'Michigan' },
-    { value: 'PA', label: 'Pennsylvania' },
-    { value: 'MA', label: 'Massachusetts' },
-    { value: 'MD', label: 'Maryland' }
-  ];
 
   const getBathroomOptions = () => {
     const options = propertyType === '1' ? [{ value: '1', label: '1 Bathroom' }] :
@@ -67,7 +43,7 @@ export const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ onAnalyz
   }, [propertyType]);
 
   const handleAnalyze = () => {
-    onAnalyze(targetCity, targetState, propertyType, bathrooms);
+    onAnalyze(targetCity, propertyType, bathrooms);
   };
 
   return (
@@ -81,7 +57,7 @@ export const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ onAnalyz
       <CardContent className="pt-6">
         <div className="space-y-4">
           <div className="flex flex-col items-center space-y-4">
-            <div className="w-full max-w-md grid grid-cols-2 gap-4">
+            <div className="w-full max-w-md">
               <div>
                 <label htmlFor="target-city" className="text-sm font-medium text-gray-300 block mb-2">
                   City Name
@@ -91,31 +67,9 @@ export const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ onAnalyz
                   type="text"
                   value={targetCity}
                   onChange={(e) => setTargetCity(e.target.value)}
-                  placeholder="Enter city name"
+                  placeholder="Enter city name (e.g., Austin, Miami, Denver)"
                   className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400"
                 />
-              </div>
-
-              <div>
-                <label htmlFor="target-state" className="text-sm font-medium text-gray-300 block mb-2">
-                  State
-                </label>
-                <Select value={targetState} onValueChange={setTargetState}>
-                  <SelectTrigger className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400">
-                    <SelectValue placeholder="Choose state" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700 z-50 max-h-60">
-                    {stateOptions.map((state) => (
-                      <SelectItem 
-                        key={state.value} 
-                        value={state.value} 
-                        className="text-gray-100 focus:bg-gray-700"
-                      >
-                        {state.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
             </div>
 

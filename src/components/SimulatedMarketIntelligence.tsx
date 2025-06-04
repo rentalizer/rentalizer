@@ -23,20 +23,20 @@ export const SimulatedMarketIntelligence = () => {
   const [bathrooms, setBathrooms] = useState<string>('2');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleMarketAnalysis = async (city: string, state: string, propType: string, bathCount: string) => {
+  const handleMarketAnalysis = async (city: string, propType: string, bathCount: string) => {
     setIsLoading(true);
     
     try {
-      console.log(`🚀 Starting real market analysis for ${city}, ${state}`);
+      console.log(`🚀 Starting real market analysis for ${city}`);
       
-      // Call the real Mashvisor API with specific city
-      const marketData = await fetchRealMarketData(city, state, propType, bathCount);
+      // Call the real Mashvisor API with just the city name
+      const marketData = await fetchRealMarketData(city, propType, bathCount);
 
       // Process the real data from Mashvisor
       const processedData = processMarketData(marketData);
 
       setSubmarketData(processedData);
-      setCityName(`${city}, ${state}`);
+      setCityName(city);
       setPropertyType(propType);
       setBathrooms(bathCount);
       
@@ -46,18 +46,18 @@ export const SimulatedMarketIntelligence = () => {
       if (hasRevenueData && hasRentData) {
         toast({
           title: "City Market Analysis Complete",
-          description: `STR revenue data found for ${city}, ${state}. Rent estimates provided using market averages.`,
+          description: `STR revenue data found for ${city}. Rent estimates provided using market averages.`,
         });
       } else if (hasRevenueData && !hasRentData) {
         toast({
           title: "Revenue Data Found",
-          description: `STR revenue statistics available for ${city}, ${state}, but no traditional rent comparison data found.`,
+          description: `STR revenue statistics available for ${city}, but no traditional rent comparison data found.`,
           variant: "destructive",
         });
       } else {
         toast({
           title: "Limited Data Available",
-          description: `Mashvisor API returned limited market data for ${city}, ${state}.`,
+          description: `Mashvisor API returned limited market data for ${city}.`,
           variant: "destructive",
         });
       }

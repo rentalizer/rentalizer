@@ -13,9 +13,9 @@ serve(async (req) => {
   }
 
   try {
-    const { city, state, propertyType, bathrooms } = await req.json()
+    const { city, propertyType, bathrooms } = await req.json()
     
-    console.log(`🔍 Mashvisor Edge Function called for ${city}, ${state} (${propertyType}BR/${bathrooms}BA)`)
+    console.log(`🔍 Mashvisor Edge Function called for ${city} (${propertyType}BR/${bathrooms}BA)`)
     
     // Check for Mashvisor API key
     const mashvisorApiKey = Deno.env.get('MASHVISOR_API_KEY')
@@ -32,18 +32,17 @@ serve(async (req) => {
     }
 
     console.log('🔑 Using Mashvisor API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
-    console.log(`📍 Analyzing specific city: ${city}, ${state}`)
+    console.log(`📍 Analyzing specific city: ${city}`)
 
     try {
-      // Use the rento-calculator lookup endpoint with specific city parameter
+      // Use the rento-calculator lookup endpoint with just city parameter
       const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client/rento-calculator/lookup')
       
-      mashvisorUrl.searchParams.append('state', state)
       mashvisorUrl.searchParams.append('city', city)
       mashvisorUrl.searchParams.append('resource', 'airbnb')
       mashvisorUrl.searchParams.append('beds', propertyType)
       
-      console.log(`📡 Calling Mashvisor for ${city}, ${state}:`, mashvisorUrl.toString())
+      console.log(`📡 Calling Mashvisor for ${city}:`, mashvisorUrl.toString())
       
       const mashvisorResponse = await fetch(mashvisorUrl.toString(), {
         method: 'GET',
@@ -56,14 +55,13 @@ serve(async (req) => {
 
       if (mashvisorResponse.ok) {
         const cityData = await mashvisorResponse.json()
-        console.log(`✅ Successfully fetched data for ${city}, ${state}`)
+        console.log(`✅ Successfully fetched data for ${city}`)
         
         // Return successful result for single city
         const successData = {
           success: true,
           data: {
             city: city,
-            state: state,
             propertyType: propertyType,
             bathrooms: bathrooms,
             ...cityData
@@ -78,14 +76,13 @@ serve(async (req) => {
         )
       } else {
         const errorText = await mashvisorResponse.text()
-        console.log(`⚠️ Failed to fetch data for ${city}, ${state}: ${mashvisorResponse.status} - ${errorText.substring(0, 100)}`)
+        console.log(`⚠️ Failed to fetch data for ${city}: ${mashvisorResponse.status} - ${errorText.substring(0, 100)}`)
         
         // Return fallback data
         const fallbackData = {
           success: false,
           data: {
             city: city,
-            state: state,
             propertyType: propertyType,
             bathrooms: bathrooms,
             message: `Mashvisor API error: ${mashvisorResponse.status}`,
@@ -101,13 +98,12 @@ serve(async (req) => {
         )
       }
     } catch (error) {
-      console.log(`⚠️ Error fetching data for ${city}, ${state}:`, error)
+      console.log(`⚠️ Error fetching data for ${city}:`, error)
       
       const fallbackData = {
         success: false,
         data: {
           city: city,
-          state: state,
           propertyType: propertyType,
           bathrooms: bathrooms,
           message: 'API request failed',

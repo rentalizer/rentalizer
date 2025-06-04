@@ -8,14 +8,13 @@ interface SubmarketData {
   multiple: number;
 }
 
-export const fetchRealMarketData = async (city: string, state: string, propertyType: string, bathrooms: string) => {
+export const fetchRealMarketData = async (city: string, propertyType: string, bathrooms: string) => {
   try {
-    console.log(`🚀 Calling real Mashvisor API for ${city}, ${state}`);
+    console.log(`🚀 Calling real Mashvisor API for ${city}`);
     
     const { data, error } = await supabase.functions.invoke('mashvisor-api', {
       body: {
         city,
-        state,
         propertyType,
         bathrooms
       }
@@ -56,7 +55,6 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       const annualRent = estimatedMonthlyRent * 12;
       
       const cityName = marketData.data.city || 'City Center';
-      const stateName = marketData.data.state || '';
       
       console.log(`📈 ${cityName} - STR: $${annualStrRevenue}/year, Rent: $${annualRent}/year`);
       
@@ -81,7 +79,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
           const neighborhoodMultiple = neighborhoodRent > 0 ? neighborhoodStrRevenue / neighborhoodRent : 0;
           
           processedData.push({
-            submarket: `${neighborhood} - ${cityName}, ${stateName}`,
+            submarket: `${neighborhood} - ${cityName}`,
             strRevenue: neighborhoodStrRevenue,
             medianRent: neighborhoodRent,
             multiple: neighborhoodMultiple
@@ -91,54 +89,15 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     }
   }
   
-  // Handle multiple cities data (fallback from edge function)
-  else if (marketData && marketData.success && marketData.data && marketData.data.content && marketData.data.content.cities) {
-    const cities = marketData.data.content.cities;
-    console.log('📊 Processing cities data:', cities.length, 'cities found');
-    
-    cities.forEach((cityResult: any) => {
-      const cityName = cityResult.city;
-      const cityData = cityResult.data;
-      
-      console.log(`🏙️ Processing ${cityName}:`, cityData);
-      
-      if (cityData && cityData.status === 'success' && cityData.content) {
-        const content = cityData.content;
-        
-        const monthlyStrRevenue = content.adjusted_rental_income || content.median_rental_income || 0;
-        const annualStrRevenue = monthlyStrRevenue * 12;
-        
-        const homeValue = content.median_home_value || 0;
-        const priceToRentRatio = content.price_to_rent_ratio || 200;
-        const estimatedMonthlyRent = homeValue > 0 ? homeValue / priceToRentRatio : 0;
-        const annualRent = estimatedMonthlyRent * 12;
-        
-        console.log(`📈 ${cityName} - STR: $${annualStrRevenue}/year, Rent: $${annualRent}/year`);
-        
-        if (annualStrRevenue > 0) {
-          const multiple = annualRent > 0 ? annualStrRevenue / annualRent : 0;
-          
-          processedData.push({
-            submarket: `${cityName}, ${cityResult.state}`,
-            strRevenue: Math.round(annualStrRevenue),
-            medianRent: Math.round(annualRent),
-            multiple: multiple
-          });
-        }
-      }
-    });
-  }
-  
   // Handle API failure or no data
   if (processedData.length === 0) {
     console.log('❌ No valid data found');
     
     const city = marketData?.data?.city || 'Unknown City';
-    const state = marketData?.data?.state || 'Unknown State';
     const message = marketData?.data?.message || 'No market data available';
     
     processedData.push({
-      submarket: `${city}, ${state} - ${message}`,
+      submarket: `${city} - ${message}`,
       strRevenue: 0,
       medianRent: 0,
       multiple: 0
