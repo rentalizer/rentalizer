@@ -62,80 +62,70 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     return processedData;
   }
 
-  // Handle the revenue-stats endpoint response
+  // Handle the lookup endpoint response
   if (marketData && marketData.data && marketData.data.content) {
     const content = marketData.data.content;
     
-    // Check if we have rental income data
-    if (content.rental_income) {
-      const rentalIncome = content.rental_income;
+    // Check for rental comps data
+    if (content.rental_comps && Array.isArray(content.rental_comps)) {
+      content.rental_comps.forEach((comp: any, index: number) => {
+        const address = comp.address || comp.neighborhood || `Area ${index + 1}`;
+        const strRevenue = comp.airbnb_revenue || comp.str_revenue || 0;
+        const medianRent = comp.long_term_rent || comp.rental_income || 0;
+        const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
+        
+        processedData.push({
+          submarket: address,
+          strRevenue: Math.round(strRevenue),
+          medianRent: Math.round(medianRent),
+          multiple: multiple
+        });
+      });
+    }
+    
+    // Check for airbnb data
+    if (content.airbnb && content.airbnb.revenue) {
+      const airbnbRevenue = content.airbnb.revenue;
+      const longTermRent = content.rental?.income || content.rental?.rent || 0;
+      const multiple = longTermRent > 0 ? airbnbRevenue / longTermRent : 0;
       
-      // Create revenue statistics breakdown
-      const revenueStats = [
-        {
-          name: 'Top 5% Properties',
-          revenue: rentalIncome.percentile_95 || 0,
-          percentile: '95th percentile'
-        },
-        {
-          name: 'Top 10% Properties', 
-          revenue: rentalIncome.percentile_90 || 0,
-          percentile: '90th percentile'
-        },
-        {
-          name: 'Top 20% Properties',
-          revenue: rentalIncome.percentile_80 || 0,
-          percentile: '80th percentile'
-        },
-        {
-          name: 'Median Performance',
-          revenue: rentalIncome.median || 0,
-          percentile: '50th percentile'
-        },
-        {
-          name: 'Bottom 20% Properties',
-          revenue: rentalIncome.percentile_20 || 0,
-          percentile: '20th percentile'
-        }
-      ];
+      processedData.push({
+        submarket: `${content.city || 'City'} Average`,
+        strRevenue: Math.round(airbnbRevenue),
+        medianRent: Math.round(longTermRent),
+        multiple: multiple
+      });
+    }
 
-      // Estimate rent based on common STR multiple (typically 2-4x rent)
-      // Using conservative 2.5x multiple for estimation
-      const estimatedMultiple = 2.5;
-      
-      revenueStats.forEach((stat) => {
-        if (stat.revenue > 0) {
-          const estimatedRent = Math.round(stat.revenue / estimatedMultiple);
-          
+    // Check for neighborhood-level data
+    if (content.neighborhoods && Array.isArray(content.neighborhoods)) {
+      content.neighborhoods.forEach((neighborhood: any) => {
+        const name = neighborhood.name || neighborhood.neighborhood || 'Unknown Neighborhood';
+        const strRevenue = neighborhood.airbnb_revenue || neighborhood.str_revenue || 0;
+        const medianRent = neighborhood.rental_income || neighborhood.long_term_rent || 0;
+        const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
+        
+        if (strRevenue > 0 || medianRent > 0) {
           processedData.push({
-            submarket: `${stat.name} (${stat.percentile})`,
-            strRevenue: Math.round(stat.revenue),
-            medianRent: estimatedRent,
-            multiple: estimatedMultiple
+            submarket: name,
+            strRevenue: Math.round(strRevenue),
+            medianRent: Math.round(medianRent),
+            multiple: multiple
           });
         }
       });
+    }
 
-      // Add market overview with actual data
-      if (rentalIncome.avg > 0) {
-        const avgRent = Math.round(rentalIncome.avg / estimatedMultiple);
-        processedData.unshift({
-          submarket: `Market Average (${content.count || 0} properties analyzed)`,
-          strRevenue: Math.round(rentalIncome.avg),
-          medianRent: avgRent,
-          multiple: estimatedMultiple
+    // If we still have no data, try to extract any revenue information
+    if (processedData.length === 0) {
+      if (content.revenue || content.income) {
+        processedData.push({
+          submarket: 'Market Data Available',
+          strRevenue: Math.round(content.revenue || content.income || 0),
+          medianRent: Math.round(content.rent || content.rental_income || 0),
+          multiple: content.rent > 0 ? (content.revenue || 0) / content.rent : 0
         });
       }
-    }
-    
-    // If we still have no data, show informative message
-    if (processedData.length === 0) {
-      processedData.push({
-        submarket: 'Revenue data available but no rent comparisons found',
-        strRevenue: content.rental_income?.median || 0,
-        medianRent: 0,
-        multiple: 0
-      });
     }
   }
 
@@ -149,12 +139,14 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     });
   }
 
-  // Sort by STR revenue (highest first) since we have that data
+  // Sort by multiple (highest first), then by STR revenue
   processedData.sort((a, b) => {
-    if (a.strRevenue === 0 && b.strRevenue === 0) return 0;
-    if (a.strRevenue === 0) return 1;
-    if (b.strRevenue === 0) return -1;
-    return b.strRevenue - a.strRevenue;
+    if (a.multiple === 0 && b.multiple === 0) {
+      return b.strRevenue - a.strRevenue;
+    }
+    if (a.multiple === 0) return 1;
+    if (b.multiple === 0) return -1;
+    return b.multiple - a.multiple;
   });
 
   return processedData;
