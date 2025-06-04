@@ -8,13 +8,13 @@ interface SubmarketData {
   multiple: number;
 }
 
-export const fetchRealMarketData = async (city: string, propertyType: string, bathrooms: string) => {
+export const fetchRealMarketData = async (state: string, propertyType: string, bathrooms: string) => {
   try {
-    console.log(`🚀 Calling real Mashvisor API for ${city}`);
+    console.log(`🚀 Calling real Mashvisor API for ${state} state`);
     
     const { data, error } = await supabase.functions.invoke('mashvisor-api', {
       body: {
-        city,
+        state,
         propertyType,
         bathrooms
       }
@@ -46,10 +46,10 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       adjusted_rental_income: content.adjusted_rental_income,
       median_night_rate: content.median_night_rate,
       median_occupancy_rate: content.median_occupancy_rate,
-      city: content.market?.city || content.city
+      state: content.market?.state || content.state
     });
     
-    const cityName = content.market?.city || content.city || 'Unknown City';
+    const stateName = content.market?.state || content.state || 'Unknown State';
     
     // Extract actual revenue data from the lookup response
     if (content.median_rental_income || content.adjusted_rental_income) {
@@ -63,29 +63,29 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       // Generate performance scenarios based on occupancy variations
       const performanceScenarios = [
         {
-          name: 'High Performance (80% occupancy)',
-          revenue: Math.round(annualRevenue * 1.2), // 20% above median
-          occupancy: 80
+          name: 'Top 10% Performance (85% occupancy)',
+          revenue: Math.round(annualRevenue * 1.3), // 30% above median
+          occupancy: 85
         },
         {
-          name: 'Above Average (70% occupancy)', 
-          revenue: Math.round(annualRevenue * 1.1), // 10% above median
-          occupancy: 70
+          name: 'Top 25% Performance (75% occupancy)', 
+          revenue: Math.round(annualRevenue * 1.15), // 15% above median
+          occupancy: 75
         },
         {
-          name: 'Market Average',
+          name: 'State Average',
           revenue: annualRevenue,
-          occupancy: occupancyRate || 55
+          occupancy: occupancyRate || 60
         },
         {
-          name: 'Below Average (45% occupancy)',
+          name: 'Below Average (50% occupancy)',
           revenue: Math.round(annualRevenue * 0.85), // 15% below median
-          occupancy: 45
+          occupancy: 50
         },
         {
-          name: 'Low Performance (35% occupancy)',
+          name: 'Bottom 25% (40% occupancy)',
           revenue: Math.round(annualRevenue * 0.7), // 30% below median
-          occupancy: 35
+          occupancy: 40
         }
       ];
 
@@ -97,7 +97,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
           const multiple = estimatedMonthlyRent > 0 ? scenario.revenue / (estimatedMonthlyRent * 12) : 0;
           
           processedData.push({
-            submarket: `${cityName} - ${scenario.name}`,
+            submarket: `${stateName} - ${scenario.name}`,
             strRevenue: scenario.revenue,
             medianRent: estimatedMonthlyRent * 12, // Annual rent for comparison
             multiple: multiple
@@ -112,7 +112,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
         const multipleFromNightRate = rentFromNightRate > 0 ? estimatedAnnualFromNightRate / (rentFromNightRate * 12) : 0;
         
         processedData.push({
-          submarket: `${cityName} - Night Rate Analysis ($${nightRate}/night)`,
+          submarket: `${stateName} - Night Rate Analysis ($${nightRate}/night)`,
           strRevenue: estimatedAnnualFromNightRate,
           medianRent: rentFromNightRate * 12,
           multiple: multipleFromNightRate
@@ -127,7 +127,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     const comps = marketData.data.comps || [];
     
     comps.forEach((comp: any) => {
-      const address = comp.address || 'Unknown Area';
+      const area = comp.area || 'Unknown Area';
       const monthlyStrRevenue = comp.airbnb_revenue || 0;
       const monthlyRent = comp.long_term_rent || 0;
       
@@ -137,7 +137,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
       const multiple = annualRent > 0 ? annualStrRevenue / annualRent : 0;
       
       processedData.push({
-        submarket: address,
+        submarket: area,
         strRevenue: annualStrRevenue,
         medianRent: annualRent,
         multiple: multiple

@@ -18,25 +18,25 @@ export const SimulatedMarketIntelligence = () => {
   const { toast } = useToast();
   const [submarketData, setSubmarketData] = useState<SubmarketData[]>([]);
   const [selectedSubmarkets, setSelectedSubmarkets] = useState<SubmarketData[]>([]);
-  const [cityName, setCityName] = useState<string>('');
+  const [stateName, setStateName] = useState<string>('');
   const [propertyType, setPropertyType] = useState<string>('2');
   const [bathrooms, setBathrooms] = useState<string>('2');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleMarketAnalysis = async (city: string, propType: string, bathCount: string) => {
+  const handleMarketAnalysis = async (state: string, propType: string, bathCount: string) => {
     setIsLoading(true);
     
     try {
-      console.log(`🚀 Starting real market analysis for ${city}`);
+      console.log(`🚀 Starting real market analysis for ${state} state`);
       
       // Call the real Mashvisor API
-      const marketData = await fetchRealMarketData(city, propType, bathCount);
+      const marketData = await fetchRealMarketData(state, propType, bathCount);
 
       // Process the real data from Mashvisor
       const processedData = processMarketData(marketData);
 
       setSubmarketData(processedData);
-      setCityName(city);
+      setStateName(state);
       setPropertyType(propType);
       setBathrooms(bathCount);
       
@@ -45,19 +45,19 @@ export const SimulatedMarketIntelligence = () => {
       
       if (hasRevenueData && hasRentData) {
         toast({
-          title: "Market Analysis Complete",
-          description: `STR revenue data found for ${city}. Rent estimates provided using market averages.`,
+          title: "State Market Analysis Complete",
+          description: `STR revenue data found for ${state}. Rent estimates provided using market averages.`,
         });
       } else if (hasRevenueData && !hasRentData) {
         toast({
           title: "Revenue Data Found",
-          description: `STR revenue statistics available for ${city}, but no traditional rent comparison data found.`,
+          description: `STR revenue statistics available for ${state}, but no traditional rent comparison data found.`,
           variant: "destructive",
         });
       } else {
         toast({
           title: "Limited Data Available",
-          description: "Mashvisor API returned limited market data for this location.",
+          description: "Mashvisor API returned limited market data for this state.",
           variant: "destructive",
         });
       }
@@ -86,9 +86,9 @@ export const SimulatedMarketIntelligence = () => {
           <div className="flex items-center gap-3">
             <Eye className="h-5 w-5 text-green-400" />
             <div>
-              <h3 className="font-semibold text-green-300">Real Mashvisor Market Intelligence</h3>
+              <h3 className="font-semibold text-green-300">Real Mashvisor State Market Intelligence</h3>
               <p className="text-sm text-gray-300">
-                This tool uses real Mashvisor API data to analyze STR revenue opportunities in your target market.
+                This tool uses real Mashvisor API data to analyze STR revenue opportunities at the state level.
               </p>
             </div>
           </div>
@@ -101,9 +101,9 @@ export const SimulatedMarketIntelligence = () => {
           <div className="flex items-center gap-3">
             <Info className="h-5 w-5 text-blue-400" />
             <div>
-              <h3 className="font-semibold text-blue-300">Revenue Statistics Available</h3>
+              <h3 className="font-semibold text-blue-300">State-Level Revenue Statistics</h3>
               <p className="text-sm text-gray-300">
-                The API provides STR revenue data by performance percentiles. Traditional rent data may be estimated using market averages when not available.
+                The API provides STR revenue data aggregated by state and performance percentiles. Traditional rent data may be estimated using market averages when not available.
               </p>
             </div>
           </div>
@@ -116,9 +116,9 @@ export const SimulatedMarketIntelligence = () => {
           <div className="flex items-center gap-3">
             <AlertTriangle className="h-5 w-5 text-yellow-400" />
             <div>
-              <h3 className="font-semibold text-yellow-300">API Data Availability</h3>
+              <h3 className="font-semibold text-yellow-300">State Market Data Availability</h3>
               <p className="text-sm text-gray-300">
-                Some markets may not have comprehensive rental comparison data. Results show revenue statistics by performance tiers when available.
+                Some states may not have comprehensive rental comparison data. Results show revenue statistics by performance tiers when available.
               </p>
             </div>
           </div>
@@ -132,7 +132,7 @@ export const SimulatedMarketIntelligence = () => {
       <MarketAnalysisResults
         submarketData={submarketData}
         selectedSubmarkets={selectedSubmarkets}
-        cityName={cityName}
+        cityName={stateName}
         propertyType={propertyType}
         bathrooms={bathrooms}
         onSelectionChange={handleSelectionChange}

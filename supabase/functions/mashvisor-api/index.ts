@@ -13,9 +13,9 @@ serve(async (req) => {
   }
 
   try {
-    const { city, propertyType, bathrooms } = await req.json()
+    const { state, propertyType, bathrooms } = await req.json()
     
-    console.log(`🔍 Mashvisor Edge Function called for ${city} (${propertyType}BR/${bathrooms}BA)`)
+    console.log(`🔍 Mashvisor Edge Function called for ${state} state (${propertyType}BR/${bathrooms}BA)`)
     
     // Check for Mashvisor API key
     const mashvisorApiKey = Deno.env.get('MASHVISOR_API_KEY')
@@ -33,12 +33,11 @@ serve(async (req) => {
 
     console.log('🔑 Using Mashvisor API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
 
-    // Use the rento-calculator lookup endpoint for better data
+    // Use the rento-calculator lookup endpoint for state-level data
     const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client/rento-calculator/lookup')
     
-    // Add parameters for city-level lookup
-    mashvisorUrl.searchParams.append('state', 'CA') // Default to CA, can be made dynamic later
-    mashvisorUrl.searchParams.append('city', city.toLowerCase())
+    // Add parameters for state-level lookup
+    mashvisorUrl.searchParams.append('state', state)
     mashvisorUrl.searchParams.append('resource', 'airbnb')
     mashvisorUrl.searchParams.append('beds', propertyType)
     
@@ -62,37 +61,52 @@ serve(async (req) => {
       // Return fallback data when Mashvisor API is down
       console.log('🔄 Mashvisor API unavailable, returning fallback data')
       
+      const stateNames = {
+        'CA': 'California',
+        'FL': 'Florida', 
+        'TX': 'Texas',
+        'NY': 'New York',
+        'CO': 'Colorado',
+        'WA': 'Washington',
+        'OR': 'Oregon',
+        'AZ': 'Arizona',
+        'NV': 'Nevada',
+        'TN': 'Tennessee'
+      }
+      
+      const stateName = stateNames[state as keyof typeof stateNames] || state
+      
       const fallbackData = {
         success: true,
         data: {
           fallback: true,
-          city: city,
+          state: state,
           propertyType: propertyType,
           bathrooms: bathrooms,
           message: 'Mashvisor API temporarily unavailable. Showing sample data.',
           comps: [
             {
-              address: `${city} Downtown`,
+              area: `${stateName} Metro Areas`,
               airbnb_revenue: Math.floor(Math.random() * 1000) + 3500,
               long_term_rent: Math.floor(Math.random() * 500) + 2000,
             },
             {
-              address: `${city} Midtown`,
+              area: `${stateName} Urban Centers`,
               airbnb_revenue: Math.floor(Math.random() * 1000) + 3200,
               long_term_rent: Math.floor(Math.random() * 500) + 1900,
             },
             {
-              address: `${city} Uptown`,
+              area: `${stateName} Suburban Areas`,
               airbnb_revenue: Math.floor(Math.random() * 1000) + 3800,
               long_term_rent: Math.floor(Math.random() * 500) + 2100,
             },
             {
-              address: `${city} Waterfront`,
+              area: `${stateName} Tourist Districts`,
               airbnb_revenue: Math.floor(Math.random() * 1000) + 4200,
               long_term_rent: Math.floor(Math.random() * 500) + 2300,
             },
             {
-              address: `${city} Historic District`,
+              area: `${stateName} Emerging Markets`,
               airbnb_revenue: Math.floor(Math.random() * 1000) + 3600,
               long_term_rent: Math.floor(Math.random() * 500) + 2000,
             }
@@ -119,7 +133,7 @@ serve(async (req) => {
       medianNightRate: data.content?.median_night_rate,
       occupancyRate: data.content?.median_occupancy_rate,
       sampleSize: data.content?.sample_size,
-      city: data.content?.market?.city || data.content?.city
+      state: data.content?.market?.state || data.content?.state
     })
 
     return new Response(
@@ -133,24 +147,24 @@ serve(async (req) => {
     console.error('❌ Edge Function Error:', error)
     
     // Return fallback data on any error
-    const { city = 'Unknown City', propertyType = '2', bathrooms = '2' } = await req.json().catch(() => ({}))
+    const { state = 'Unknown State', propertyType = '2', bathrooms = '2' } = await req.json().catch(() => ({}))
     
     const fallbackData = {
       success: true,
       data: {
         fallback: true,
-        city: city,
+        state: state,
         propertyType: propertyType,
         bathrooms: bathrooms,
         message: 'Service temporarily unavailable. Showing sample data.',
         comps: [
           {
-            address: `${city} Sample Area 1`,
+            area: `${state} Sample Area 1`,
             airbnb_revenue: Math.floor(Math.random() * 1000) + 3500,
             long_term_rent: Math.floor(Math.random() * 500) + 2000,
           },
           {
-            address: `${city} Sample Area 2`,
+            area: `${state} Sample Area 2`,
             airbnb_revenue: Math.floor(Math.random() * 1000) + 3200,
             long_term_rent: Math.floor(Math.random() * 500) + 1900,
           }
