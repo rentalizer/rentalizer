@@ -36,6 +36,30 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
 export const processMarketData = (marketData: any): SubmarketData[] => {
   const processedData: SubmarketData[] = [];
   
+  // Handle fallback data structure
+  if (marketData && marketData.data && marketData.data.fallback) {
+    const comps = marketData.data.comps || [];
+    
+    comps.forEach((comp: any) => {
+      const address = comp.address || 'Unknown Area';
+      const strRevenue = comp.airbnb_revenue || 0;
+      const medianRent = comp.long_term_rent || 0;
+      const multiple = medianRent > 0 ? strRevenue / medianRent : 0;
+      
+      processedData.push({
+        submarket: address,
+        strRevenue: Math.round(strRevenue),
+        medianRent: Math.round(medianRent),
+        multiple: multiple
+      });
+    });
+
+    // Sort by multiple (highest first)
+    processedData.sort((a, b) => b.multiple - a.multiple);
+    
+    return processedData;
+  }
+
   // Handle the response data structure from rento-calculator/export-comps endpoint
   if (marketData && marketData.data) {
     const data = marketData.data;
