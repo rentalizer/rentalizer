@@ -90,25 +90,16 @@ const fetchMashvisorSTRData = async (city: string, apiKey: string, propertyType:
       return null;
     }
 
-    // Mashvisor API endpoint for market data
-    const params = new URLSearchParams({
-      state: 'CA', // Default to California, can be made dynamic
-      city: city,
-      property_type: 'Apartment',
-      bedrooms: propertyType,
-      bathrooms: bathrooms
-    });
-
-    const url = `https://api.mashvisor.com/v1.1/client/market-trends?${params.toString()}`;
+    // Use the correct Mashvisor API base URL from your example
+    const url = `https://api.mashvisor.com/v1.1/client`;
 
     console.log('🔍 Mashvisor API URL:', url);
 
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'x-api-key': apiKey,
         'Content-Type': 'application/json',
-        'X-RapidAPI-Key': apiKey, // Some Mashvisor integrations use this header
       }
     });
 
@@ -176,25 +167,16 @@ const fetchMashvisorRentData = async (city: string, apiKey: string, propertyType
       return null;
     }
 
-    // Mashvisor rental comps endpoint
-    const params = new URLSearchParams({
-      state: 'CA', // Default to California, can be made dynamic
-      city: city,
-      property_type: 'Apartment',
-      bedrooms: propertyType,
-      bathrooms: bathrooms
-    });
-
-    const url = `https://api.mashvisor.com/v1.1/client/rental-comps?${params.toString()}`;
+    // Use the same base URL for rental data
+    const url = `https://api.mashvisor.com/v1.1/client`;
 
     console.log('🔍 Mashvisor Rental API URL:', url);
 
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'x-api-key': apiKey,
         'Content-Type': 'application/json',
-        'X-RapidAPI-Key': apiKey,
       }
     });
 
