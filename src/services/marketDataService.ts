@@ -95,13 +95,20 @@ const fetchMashvisorSTRData = async (city: string, apiKey: string, propertyType:
 
     console.log('🔍 Mashvisor API URL:', url);
 
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'x-api-key': apiKey,
         'Content-Type': 'application/json',
-      }
+      },
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     console.log('📡 Mashvisor API Response status:', response.status);
     console.log('📡 Mashvisor API Response headers:', Object.fromEntries(response.headers.entries()));
@@ -152,7 +159,11 @@ const fetchMashvisorSTRData = async (city: string, apiKey: string, propertyType:
     return null;
 
   } catch (error) {
-    console.error('❌ Mashvisor API error:', error);
+    if (error.name === 'AbortError') {
+      console.error('❌ Mashvisor API timeout (5 seconds)');
+    } else {
+      console.error('❌ Mashvisor API error:', error);
+    }
     console.log('🚫 RETURNING NULL - NO MOCK DATA WILL BE USED');
     return null;
   }
@@ -172,13 +183,20 @@ const fetchMashvisorRentData = async (city: string, apiKey: string, propertyType
 
     console.log('🔍 Mashvisor Rental API URL:', url);
 
+    // Create AbortController for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'x-api-key': apiKey,
         'Content-Type': 'application/json',
-      }
+      },
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     console.log('📡 Mashvisor Rental API Response status:', response.status);
 
@@ -210,7 +228,11 @@ const fetchMashvisorRentData = async (city: string, apiKey: string, propertyType
     return null;
 
   } catch (error) {
-    console.error('❌ Mashvisor Rental API error:', error);
+    if (error.name === 'AbortError') {
+      console.error('❌ Mashvisor Rental API timeout (5 seconds)');
+    } else {
+      console.error('❌ Mashvisor Rental API error:', error);
+    }
     console.log('🚫 RETURNING NULL - NO MOCK DATA WILL BE USED');
     return null;
   }
@@ -232,10 +254,15 @@ export const fetchMarketData = async (
     let strData: STRData[] = [];
     let rentData: RentData[] = [];
 
-    // Fetch STR data from Mashvisor - only real data, no fallbacks
-    const strResult = await fetchMashvisorSTRData(city, apiConfig.airdnaApiKey || '', propertyType, bathrooms);
-    if (strResult) {
-      strData = strResult;
+    // Use Promise.allSettled to run both API calls in parallel and prevent one from blocking the other
+    const [strResult, rentResult] = await Promise.allSettled([
+      fetchMashvisorSTRData(city, apiConfig.airdnaApiKey || '', propertyType, bathrooms),
+      fetchMashvisorRentData(city, apiConfig.airdnaApiKey || '', propertyType, bathrooms)
+    ]);
+
+    // Handle STR data result
+    if (strResult.status === 'fulfilled' && strResult.value) {
+      strData = strResult.value;
       console.log('✅ Using REAL STR data from Mashvisor API');
     } else {
       console.log('❌ STR API failed - will show "NA" for STR revenue');
@@ -248,10 +275,9 @@ export const fetchMarketData = async (
       }));
     }
 
-    // Fetch rent data from Mashvisor - only real data, no fallbacks
-    const rentResult = await fetchMashvisorRentData(city, apiConfig.airdnaApiKey || '', propertyType, bathrooms);
-    if (rentResult) {
-      rentData = rentResult;
+    // Handle rent data result
+    if (rentResult.status === 'fulfilled' && rentResult.value) {
+      rentData = rentResult.value;
       console.log('✅ Using REAL rent data from Mashvisor API');
     } else {
       console.log('❌ Rent API failed - will show "NA" for rent data');
@@ -267,8 +293,8 @@ export const fetchMarketData = async (
     console.log(`📊 Market data compilation complete for ${city}:`, {
       strSubmarkets: strData.length,
       rentSubmarkets: rentData.length,
-      strDataSource: strResult ? 'Real Mashvisor API' : 'API Failed - Showing NA',
-      rentDataSource: rentResult ? 'Real Mashvisor API' : 'API Failed - Showing NA'
+      strDataSource: strResult.status === 'fulfilled' && strResult.value ? 'Real Mashvisor API' : 'API Failed - Showing NA',
+      rentDataSource: rentResult.status === 'fulfilled' && rentResult.value ? 'Real Mashvisor API' : 'API Failed - Showing NA'
     });
 
     return {
