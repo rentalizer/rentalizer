@@ -25,6 +25,70 @@ const cityToStateMap: { [key: string]: string } = {
   'atlanta': 'GA'
 };
 
+// Zip code to neighborhood mapping for cleaner display
+const zipToNeighborhoodMap: { [key: string]: { [key: string]: string } } = {
+  'miami': {
+    '33101': 'Downtown Miami',
+    '33109': 'South Beach',
+    '33114': 'Doral',
+    '33125': 'Little Havana',
+    '33129': 'Brickell',
+    '33130': 'Midtown Miami',
+    '33131': 'Downtown Core',
+    '33132': 'Arts District',
+    '33134': 'Coral Gables',
+    '33139': 'Miami Beach'
+  },
+  'austin': {
+    '78701': 'Downtown Austin',
+    '78702': 'East Austin',
+    '78703': 'Zilker',
+    '78704': 'South Lamar',
+    '78705': 'West Campus',
+    '78712': 'University Area',
+    '78717': 'The Domain',
+    '78721': 'Mueller',
+    '78722': 'Clarksville',
+    '78723': 'Hyde Park'
+  },
+  'houston': {
+    '77002': 'Downtown Houston',
+    '77003': 'Third Ward',
+    '77004': 'Museum District',
+    '77005': 'Rice Village',
+    '77006': 'River Oaks',
+    '77007': 'Heights',
+    '77008': 'Garden Oaks',
+    '77019': 'Galleria',
+    '77024': 'Memorial',
+    '77025': 'Bellaire'
+  },
+  'dallas': {
+    '75201': 'Downtown Dallas',
+    '75202': 'Arts District',
+    '75204': 'Fair Park',
+    '75205': 'Highland Park',
+    '75206': 'Lakewood',
+    '75214': 'White Rock',
+    '75218': 'Casa Linda',
+    '75219': 'Turtle Creek',
+    '75225': 'Preston Center',
+    '75230': 'North Dallas'
+  },
+  'denver': {
+    '80202': 'Downtown Denver',
+    '80203': 'Capitol Hill',
+    '80204': 'Highlands',
+    '80205': 'Park Hill',
+    '80206': 'Cherry Creek',
+    '80209': 'Glendale',
+    '80210': 'Washington Park',
+    '80211': 'Berkeley',
+    '80218': 'Mayfair',
+    '80220': 'Lowry'
+  }
+};
+
 // Helper function to make API calls with proper error handling
 async function callMashvisorAPI(url: string, apiKey: string, description: string) {
   console.log(`📡 Calling ${description}:`, url)
@@ -214,18 +278,21 @@ serve(async (req) => {
               }
               
               if (zipAnnualStr > 0 || zipAnnualRent > 0) {
+                // Get neighborhood name from mapping or use a cleaner default
+                const neighborhoodName = zipToNeighborhoodMap[cityKey]?.[zipCode] || `${city} District ${zipCode.slice(-2)}`
+                
                 neighborhoodsWithRevenue.push({
-                  neighborhood: `${city} - Zip ${zipCode}`,
+                  neighborhood: neighborhoodName,
                   airbnb_revenue: Math.round(zipAnnualStr),
                   rental_income: Math.round(zipAnnualRent),
                   occupancy_rate: zipOccupancy,
                   median_night_rate: zipNightRate,
-                  api_neighborhood: `Zip ${zipCode}`,
+                  api_neighborhood: neighborhoodName,
                   api_city: city,
                   api_state: state,
                   data_source: 'zip_lookup',
-                  property_address: `${zipCode}, ${city}, ${state}`,
-                  property_id: `zip-${zipCode}`,
+                  property_address: `${neighborhoodName}, ${city}, ${state}`,
+                  property_id: `neighborhood-${neighborhoodName.toLowerCase().replace(/\s+/g, '-')}`,
                   raw_data: {
                     zip_code: zipCode,
                     airbnb_revenue: zipContent.airbnb_revenue,
