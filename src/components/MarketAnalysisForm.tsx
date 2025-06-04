@@ -80,7 +80,7 @@ export const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ onAnalyz
         <div className="space-y-4">
           <div className="flex flex-col items-center space-y-4">
             <div className="w-full max-w-md">
-              <label htmlFor="target-state" className="text-sm font-medium text-gray-300 block mb-2">
+              <label htmlFor="target-city" className="text-sm font-medium text-gray-300 block mb-2">
                 Select Target City
               </label>
               <Select value={targetState} onValueChange={setTargetState}>
