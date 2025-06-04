@@ -120,16 +120,16 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   };
 
   React.useEffect(() => {
-    const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '';
-    const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
+    const savedMashvisorKey = localStorage.getItem('airdna_api_key') || '';
+    const savedBackupKey = localStorage.getItem('openai_api_key') || '';
     
-    setAirdnaKey(savedAirDNAKey);
-    setOpenaiKey(savedOpenaiKey);
+    setAirdnaKey(savedMashvisorKey);
+    setOpenaiKey(savedBackupKey);
     
-    if (savedAirDNAKey || savedOpenaiKey) {
+    if (savedMashvisorKey || savedBackupKey) {
       onApiKeysChange({
-        airdnaApiKey: savedAirDNAKey || undefined,
-        openaiApiKey: savedOpenaiKey || undefined
+        airdnaApiKey: savedMashvisorKey || undefined,
+        openaiApiKey: savedBackupKey || undefined
       });
     }
   }, []);
@@ -140,7 +140,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
         <CardTitle className="flex items-center justify-between text-cyan-300 text-sm">
           <div className="flex items-center gap-2">
             <Key className="h-4 w-4 text-cyan-400" />
-            API Configuration
+            Mashvisor API Configuration
           </div>
           <Button
             onClick={findAllStoredKeys}
@@ -190,18 +190,18 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
           {/* API Key Inputs with Status - Compact */}
           <div className="grid grid-cols-1 gap-3">
-            {/* STR Revenue API Key */}
+            {/* Mashvisor API Key */}
             <div className="space-y-1">
-              <label className="text-xs font-medium text-cyan-300">STR Revenue API</label>
+              <label className="text-xs font-medium text-cyan-300">Mashvisor API Key</label>
               <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
                 {getStatusIcon(getKeyStatus(airdnaKey))}
                 <div className="flex-1 min-w-0">
                   <Input
-                    id="airdna-key"
+                    id="mashvisor-key"
                     type={showKeys ? "text" : "password"}
                     value={airdnaKey}
                     onChange={(e) => setAirdnaKey(e.target.value)}
-                    placeholder="Enter your STR Revenue API key"
+                    placeholder="Enter your Mashvisor API key"
                     className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
                   />
                 </div>
@@ -210,7 +210,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => copyToClipboard(airdnaKey, 'STR Revenue API')}
+                      onClick={() => copyToClipboard(airdnaKey, 'Mashvisor API')}
                       className="h-5 w-5 p-0 text-gray-400 hover:text-white"
                     >
                       <Copy className="h-3 w-3" />
@@ -221,18 +221,18 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               </div>
             </div>
 
-            {/* Rental Rates API Key */}
+            {/* Backup API Key */}
             <div className="space-y-1">
-              <label className="text-xs font-medium text-cyan-300">Rental Rates API</label>
+              <label className="text-xs font-medium text-cyan-300">Backup API Key (Optional)</label>
               <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
                 {getStatusIcon(getKeyStatus(openaiKey))}
                 <div className="flex-1 min-w-0">
                   <Input
-                    id="openai-key"
+                    id="backup-key"
                     type={showKeys ? "text" : "password"}
                     value={openaiKey}
                     onChange={(e) => setOpenaiKey(e.target.value)}
-                    placeholder="Enter your Rental Rates API key"
+                    placeholder="Enter backup API key (optional)"
                     className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
                   />
                 </div>
@@ -241,7 +241,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => copyToClipboard(openaiKey, 'Rental Rates API')}
+                      onClick={() => copyToClipboard(openaiKey, 'Backup API')}
                       className="h-5 w-5 p-0 text-gray-400 hover:text-white"
                     >
                       <Copy className="h-3 w-3" />
@@ -290,7 +290,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               <strong>Environment:</strong> {window.location.hostname === 'localhost' ? 'Preview/Development' : 'Production'}
             </div>
             <div className="text-xs text-blue-400 mt-1">
-              Click "Find All Keys" to search for all stored API keys in your browser
+              Using Mashvisor API for both STR revenue and rental market data
             </div>
           </div>
         </div>

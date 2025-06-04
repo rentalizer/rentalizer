@@ -80,200 +80,155 @@ const getCityCoordinates = (city: string): { lat: number; lng: number } => {
   return cityCoords[city.toLowerCase()] || { lat: 40.7128, lng: -74.0060 };
 };
 
-const fetchAirDNAData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<STRData[] | null> => {
+const fetchMashvisorSTRData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<STRData[] | null> => {
   try {
-    console.log(`🏠 Attempting to fetch REAL STR earnings from AirDNA for ${city} (${propertyType}BR/${bathrooms}BA)`);
+    console.log(`🏠 Attempting to fetch REAL STR earnings from Mashvisor for ${city} (${propertyType}BR/${bathrooms}BA)`);
     console.log('🔑 API Key being used:', apiKey ? `${apiKey.substring(0, 8)}...` : 'No API key provided');
     
     if (!apiKey || apiKey.trim() === '') {
-      console.log('❌ No AirDNA API key provided - RETURNING NULL (NO MOCK DATA)');
+      console.log('❌ No Mashvisor API key provided - RETURNING NULL (NO MOCK DATA)');
       return null;
     }
 
-    // Construct URL with query parameters
+    // Mashvisor API endpoint for market data
     const params = new URLSearchParams({
+      state: 'CA', // Default to California, can be made dynamic
       city: city,
-      country: 'US',
+      property_type: 'Apartment',
       bedrooms: propertyType,
-      bathrooms: bathrooms,
-      property_type: 'apartment'
+      bathrooms: bathrooms
     });
 
-    const url = `https://api.airdna.co/v1/market/property_type_summary?${params.toString()}`;
+    const url = `https://api.mashvisor.com/v1.1/client/market-trends?${params.toString()}`;
 
-    console.log('🔍 AirDNA API URL:', url);
+    console.log('🔍 Mashvisor API URL:', url);
 
-    // AirDNA API call for real market data
     const response = await fetch(url, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
+        'X-RapidAPI-Key': apiKey, // Some Mashvisor integrations use this header
       }
     });
 
-    console.log('📡 AirDNA API Response status:', response.status);
-    console.log('📡 AirDNA API Response headers:', Object.fromEntries(response.headers.entries()));
+    console.log('📡 Mashvisor API Response status:', response.status);
+    console.log('📡 Mashvisor API Response headers:', Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.log(`❌ AirDNA API FAILED (${response.status}): ${errorText}`);
+      console.log(`❌ Mashvisor API FAILED (${response.status}): ${errorText}`);
       console.log('🚫 RETURNING NULL - NO MOCK DATA WILL BE USED');
       return null;
     }
 
     const data = await response.json();
-    console.log('📊 RAW AirDNA API Response data (full object):', JSON.stringify(data, null, 2));
+    console.log('📊 RAW Mashvisor API Response data (full object):', JSON.stringify(data, null, 2));
     
-    if (data.submarkets && data.submarkets.length > 0) {
-      console.log('✅ REAL DATA CONFIRMED - Processing AirDNA submarkets...');
+    if (data.content && data.content.length > 0) {
+      console.log('✅ REAL DATA CONFIRMED - Processing Mashvisor data...');
       
-      const strData: STRData[] = data.submarkets.map((submarket: any, index: number) => {
-        // Log each submarket's raw data
-        console.log(`📍 Submarket ${index + 1} RAW data:`, {
-          name: submarket.name || submarket.submarket,
-          monthly_revenue: submarket.monthly_revenue,
-          revenue: submarket.revenue,
-          annual_revenue: submarket.annual_revenue,
-          all_fields: submarket
+      const strData: STRData[] = data.content.map((item: any, index: number) => {
+        console.log(`📍 Item ${index + 1} RAW data:`, {
+          neighborhood: item.neighborhood || item.area,
+          airbnb_revenue: item.airbnb_revenue,
+          monthly_revenue: item.monthly_revenue,
+          all_fields: item
         });
         
         // Get actual monthly earnings and add 25% buffer
-        const actualMonthlyEarnings = submarket.monthly_revenue || submarket.revenue || 0;
+        const actualMonthlyEarnings = item.airbnb_revenue || item.monthly_revenue || 0;
         const monthlyRevenueWith25Percent = Math.round(actualMonthlyEarnings * 1.25);
         
-        console.log(`💰 Revenue calculation for ${submarket.name || submarket.submarket}:`, {
+        console.log(`💰 Revenue calculation for ${item.neighborhood || item.area}:`, {
           rawApiValue: actualMonthlyEarnings,
           with25PercentBuffer: monthlyRevenueWith25Percent,
           bufferAdded: monthlyRevenueWith25Percent - actualMonthlyEarnings
         });
         
         return {
-          submarket: submarket.name || submarket.submarket,
+          submarket: item.neighborhood || item.area || `${city} Area ${index + 1}`,
           revenue: monthlyRevenueWith25Percent
         };
       });
 
       console.log('✅ FINAL REAL STR DATA (with 25% buffer applied):', strData);
-      console.log('🔍 DATA SOURCE: Real AirDNA API response');
+      console.log('🔍 DATA SOURCE: Real Mashvisor API response');
       return strData;
     }
 
-    console.log('❌ No submarkets in AirDNA response - RETURNING NULL');
+    console.log('❌ No content in Mashvisor response - RETURNING NULL');
     return null;
 
   } catch (error) {
-    console.error('❌ AirDNA API error:', error);
+    console.error('❌ Mashvisor API error:', error);
     console.log('🚫 RETURNING NULL - NO MOCK DATA WILL BE USED');
     return null;
   }
 };
 
-const fetchOpenAIRentData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<RentData[] | null> => {
+const fetchMashvisorRentData = async (city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<RentData[] | null> => {
   try {
-    console.log(`🤖 Attempting to use OpenAI for CURRENT rent research in ${city} (last 30 days)`);
+    console.log(`🤖 Attempting to fetch REAL rent data from Mashvisor for ${city} (${propertyType}BR/${bathrooms}BA)`);
     
     if (!apiKey || apiKey.trim() === '') {
-      console.log('❌ No OpenAI API key provided - RETURNING NULL (NO MOCK DATA)');
+      console.log('❌ No Mashvisor API key provided - RETURNING NULL (NO MOCK DATA)');
       return null;
     }
-    
-    const cityKey = city.toLowerCase();
-    const knownNeighborhoods = REAL_NEIGHBORHOODS[cityKey];
-    
-    let prompt = `Research CURRENT ${city} apartment rental market for ${propertyType}-bedroom, ${bathrooms}-bathroom apartments using the most reliable rental data sources.
 
-CRITICAL: Use ONLY data from the last 30 days maximum - no older data allowed.
+    // Mashvisor rental comps endpoint
+    const params = new URLSearchParams({
+      state: 'CA', // Default to California, can be made dynamic
+      city: city,
+      property_type: 'Apartment',
+      bedrooms: propertyType,
+      bathrooms: bathrooms
+    });
 
-Primary data sources to use (in order of preference):
-1. RentCafe.com (most reliable source)
-2. Zumper.com (top rental platform)
-3. Rentometer.com (rental analytics)
-4. Apartment List
-5. RentSpree
-6. Zillow Rentals
-7. Apartments.com
+    const url = `https://api.mashvisor.com/v1.1/client/rental-comps?${params.toString()}`;
 
-Search for actual active rental listings posted in the last 30 days on these platforms.`;
+    console.log('🔍 Mashvisor Rental API URL:', url);
 
-    if (knownNeighborhoods) {
-      prompt += `\n\nFocus on these specific neighborhoods in ${city}: ${knownNeighborhoods.join(', ')}.`;
-    }
-
-    prompt += `\n\nReturn a JSON object with this structure:
-{
-  "rentData": [
-    {
-      "submarket": "Neighborhood Name",
-      "rent": 4200
-    }
-  ]
-}
-
-CRITICAL Requirements:
-- Use real neighborhood names only
-- Cross-reference prices across RentCafe, Zumper, and Rentometer data
-- Research CURRENT median rent from active rental listings in the last 30 days
-- Include 10-12 neighborhoods
-- Focus on ${propertyType}BR/${bathrooms}BA apartments specifically
-- Use actual current market rental prices - verify against RentCafe, Zumper, and Rentometer
-- Include rental-viable areas with good apartment inventory
-- Double-check prices are realistic for current ${city} market conditions (example: Little Italy in San Diego should be $4,000+ for 2BR/2BA)
-
-Verify your data against RentCafe.com, Zumper.com, and Rentometer.com as the primary sources - these are the most reliable rental data platforms.`;
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
+    const response = await fetch(url, {
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a real estate analyst with access to current rental market data from RentCafe, Zumper, Rentometer, and other reliable sources. Research actual rental listings from the last 30 days only. Cross-reference data across multiple sources with RentCafe, Zumper, and Rentometer as primary. Return valid JSON only - no markdown formatting, no code blocks, just pure JSON. Focus on current market rates from reliable platforms.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.1,
-        max_tokens: 2000
-      })
+        'X-RapidAPI-Key': apiKey,
+      }
     });
 
+    console.log('📡 Mashvisor Rental API Response status:', response.status);
+
     if (!response.ok) {
-      console.log('❌ OpenAI API FAILED - RETURNING NULL (NO MOCK DATA)');
+      const errorText = await response.text();
+      console.log(`❌ Mashvisor Rental API FAILED (${response.status}): ${errorText}`);
+      console.log('🚫 RETURNING NULL - NO MOCK DATA WILL BE USED');
       return null;
     }
 
     const data = await response.json();
-    let content = data.choices[0].message.content;
+    console.log('📊 RAW Mashvisor Rental API Response:', JSON.stringify(data, null, 2));
     
-    // Clean up markdown formatting if present
-    content = content.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
-    
-    try {
-      const parsedContent = JSON.parse(content);
-      const rentData = parsedContent.rentData || [];
+    if (data.content && data.content.length > 0) {
+      console.log('✅ REAL RENTAL DATA CONFIRMED - Processing Mashvisor rental data...');
       
-      if (rentData.length >= 8) {
-        console.log('✅ REAL rent data from OpenAI using RentCafe, Zumper, and Rentometer (last 30 days):', rentData);
-        return rentData;
-      }
-    } catch (parseError) {
-      console.error('Failed to parse OpenAI response:', parseError);
-      console.log('Raw OpenAI content:', content);
+      const rentData: RentData[] = data.content.map((item: any, index: number) => {
+        return {
+          submarket: item.neighborhood || item.area || `${city} Area ${index + 1}`,
+          rent: item.monthly_rent || item.rent || 0
+        };
+      });
+
+      console.log('✅ FINAL REAL RENT DATA:', rentData);
+      return rentData;
     }
 
-    console.log('❌ OpenAI parsing failed - RETURNING NULL');
+    console.log('❌ No rental content in Mashvisor response - RETURNING NULL');
     return null;
 
   } catch (error) {
-    console.error('❌ OpenAI rent research error:', error);
+    console.error('❌ Mashvisor Rental API error:', error);
     console.log('🚫 RETURNING NULL - NO MOCK DATA WILL BE USED');
     return null;
   }
@@ -287,19 +242,19 @@ export const fetchMarketData = async (
 ): Promise<CityMarketData> => {
   console.log(`🔍 Fetching market data for ${city} (${propertyType}BR/${bathrooms}BA properties)`);
   console.log('🔑 API Configuration:', {
-    hasAirDNAKey: !!(apiConfig.airdnaApiKey && apiConfig.airdnaApiKey.trim()),
-    hasOpenAIKey: !!(apiConfig.openaiApiKey && apiConfig.openaiApiKey.trim())
+    hasMashvisorKey: !!(apiConfig.airdnaApiKey && apiConfig.airdnaApiKey.trim()),
+    hasBackupKey: !!(apiConfig.openaiApiKey && apiConfig.openaiApiKey.trim())
   });
 
   try {
     let strData: STRData[] = [];
     let rentData: RentData[] = [];
 
-    // Fetch STR data - only real data, no fallbacks
-    const strResult = await fetchAirDNAData(city, apiConfig.airdnaApiKey || '', propertyType, bathrooms);
+    // Fetch STR data from Mashvisor - only real data, no fallbacks
+    const strResult = await fetchMashvisorSTRData(city, apiConfig.airdnaApiKey || '', propertyType, bathrooms);
     if (strResult) {
       strData = strResult;
-      console.log('✅ Using REAL STR data from AirDNA API');
+      console.log('✅ Using REAL STR data from Mashvisor API');
     } else {
       console.log('❌ STR API failed - will show "NA" for STR revenue');
       // Create placeholder data with "NA" indicators
@@ -311,11 +266,11 @@ export const fetchMarketData = async (
       }));
     }
 
-    // Fetch rent data - only real data, no fallbacks
-    const rentResult = await fetchOpenAIRentData(city, apiConfig.openaiApiKey || '', propertyType, bathrooms);
+    // Fetch rent data from Mashvisor - only real data, no fallbacks
+    const rentResult = await fetchMashvisorRentData(city, apiConfig.airdnaApiKey || '', propertyType, bathrooms);
     if (rentResult) {
       rentData = rentResult;
-      console.log('✅ Using REAL rent data from OpenAI API');
+      console.log('✅ Using REAL rent data from Mashvisor API');
     } else {
       console.log('❌ Rent API failed - will show "NA" for rent data');
       // Create placeholder data with "NA" indicators
@@ -330,8 +285,8 @@ export const fetchMarketData = async (
     console.log(`📊 Market data compilation complete for ${city}:`, {
       strSubmarkets: strData.length,
       rentSubmarkets: rentData.length,
-      strDataSource: strResult ? 'Real AirDNA API' : 'API Failed - Showing NA',
-      rentDataSource: rentResult ? 'Real OpenAI API' : 'API Failed - Showing NA'
+      strDataSource: strResult ? 'Real Mashvisor API' : 'API Failed - Showing NA',
+      rentDataSource: rentResult ? 'Real Mashvisor API' : 'API Failed - Showing NA'
     });
 
     return {
