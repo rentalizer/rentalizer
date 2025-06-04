@@ -11,6 +11,7 @@ import { BarChart3, MapPin, Search, Loader2, Map, Table2, Download, Satellite, E
 import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
 import { useToast } from '@/hooks/use-toast';
+import { fetchMarketData } from '@/services/marketDataService';
 
 interface SubmarketData {
   submarket: string;
@@ -29,34 +30,6 @@ export const SimulatedMarketIntelligence = () => {
   const [bathrooms, setBathrooms] = useState<string>('2');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Simulated market data for different cities
-  const simulatedData: { [key: string]: SubmarketData[] } = {
-    'san diego': [
-      { submarket: "Gaslamp Quarter", strRevenue: 0, medianRent: 4200, multiple: 0 },
-      { submarket: "Little Italy", strRevenue: 0, medianRent: 4500, multiple: 0 },
-      { submarket: "Hillcrest", strRevenue: 0, medianRent: 3800, multiple: 0 },
-      { submarket: "Mission Valley", strRevenue: 0, medianRent: 3500, multiple: 0 },
-      { submarket: "La Jolla", strRevenue: 0, medianRent: 4800, multiple: 0 },
-      { submarket: "Pacific Beach", strRevenue: 0, medianRent: 4000, multiple: 0 }
-    ],
-    'denver': [
-      { submarket: "LoDo", strRevenue: 0, medianRent: 2800, multiple: 0 },
-      { submarket: "Capitol Hill", strRevenue: 0, medianRent: 2400, multiple: 0 },
-      { submarket: "Highland", strRevenue: 0, medianRent: 2600, multiple: 0 },
-      { submarket: "RiNo", strRevenue: 0, medianRent: 2700, multiple: 0 },
-      { submarket: "Cherry Creek", strRevenue: 0, medianRent: 3200, multiple: 0 },
-      { submarket: "Washington Park", strRevenue: 0, medianRent: 2900, multiple: 0 }
-    ],
-    'austin': [
-      { submarket: "Downtown", strRevenue: 0, medianRent: 2600, multiple: 0 },
-      { submarket: "South Lamar", strRevenue: 0, medianRent: 2300, multiple: 0 },
-      { submarket: "East Austin", strRevenue: 0, medianRent: 2100, multiple: 0 },
-      { submarket: "Zilker", strRevenue: 0, medianRent: 2800, multiple: 0 },
-      { submarket: "The Domain", strRevenue: 0, medianRent: 2400, multiple: 0 },
-      { submarket: "Mueller", strRevenue: 0, medianRent: 2200, multiple: 0 }
-    ]
-  };
-
   const handleMarketAnalysis = async () => {
     if (!targetCity.trim()) {
       toast({
@@ -69,43 +42,38 @@ export const SimulatedMarketIntelligence = () => {
 
     setIsLoading(true);
     
-    // Simulate API loading time
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
     try {
-      const cityKey = targetCity.toLowerCase().trim();
-      let baseData = simulatedData[cityKey] || simulatedData['san diego'];
+      console.log(`🚀 Starting real market analysis for ${targetCity}`);
       
-      // Apply property type and bathroom multipliers
-      const bedroomMultiplier = propertyType === '1' ? 0.8 : propertyType === '3' ? 1.2 : 1;
-      const bathroomMultiplier = bathrooms === '1' ? 0.9 : bathrooms === '3' ? 1.1 : 1;
-      
-      // Generate simulated STR revenue data showing "API failures"
-      const processedData = baseData.map((item, index) => {
-        // Simulate some API failures (showing "NA")
-        const hasApiFailure = index >= 3; // First 3 succeed, rest fail
-        
-        if (hasApiFailure) {
-          return {
-            ...item,
-            strRevenue: 0, // Will show as "NA"
-            multiple: 0
-          };
-        } else {
-          // Calculate realistic STR revenue
-          const baseRevenue = item.medianRent * 1.8 * bedroomMultiplier * bathroomMultiplier;
-          const strRevenue = Math.round(baseRevenue + (Math.random() * 500 - 250));
-          const multiple = strRevenue / item.medianRent;
-          
-          return {
-            ...item,
-            strRevenue,
-            multiple
-          };
-        }
-      });
+      // Call the real market data service which uses Mashvisor API
+      const marketData = await fetchMarketData(
+        targetCity,
+        { mashvisorApiKey: 'configured' }, // The API key is stored in Supabase secrets
+        propertyType,
+        bathrooms
+      );
 
-      // Sort by multiple (failed data at end)
+      // Process the real data from Mashvisor
+      const processedData: SubmarketData[] = [];
+      
+      // Combine STR and rent data to create submarket analysis
+      if (marketData.strData && marketData.rentData) {
+        const strMap = new Map(marketData.strData.map(item => [item.submarket.toLowerCase(), item.revenue]));
+        
+        marketData.rentData.forEach(rentItem => {
+          const strRevenue = strMap.get(rentItem.submarket.toLowerCase()) || 0;
+          const multiple = strRevenue > 0 && rentItem.rent > 0 ? strRevenue / rentItem.rent : 0;
+          
+          processedData.push({
+            submarket: rentItem.submarket,
+            strRevenue: strRevenue,
+            medianRent: rentItem.rent,
+            multiple: multiple
+          });
+        });
+      }
+
+      // Sort by multiple (highest first), with failed data at the end
       processedData.sort((a, b) => {
         if (a.multiple === 0 && b.multiple === 0) return 0;
         if (a.multiple === 0) return 1;
@@ -116,19 +84,27 @@ export const SimulatedMarketIntelligence = () => {
       setSubmarketData(processedData);
       setCityName(targetCity);
       
-      const failedCount = processedData.filter(d => d.strRevenue === 0).length;
-      const successCount = processedData.length - failedCount;
+      const successCount = processedData.filter(d => d.strRevenue > 0).length;
+      const failedCount = processedData.length - successCount;
       
-      toast({
-        title: "Simulated Analysis Complete",
-        description: `${successCount} submarkets with simulated data, ${failedCount} showing "NA" (simulated API failures)`,
-        variant: failedCount > 0 ? "destructive" : "default",
-      });
+      if (successCount > 0) {
+        toast({
+          title: "Real Market Analysis Complete",
+          description: `${successCount} submarkets analyzed with real Mashvisor data${failedCount > 0 ? `, ${failedCount} with limited data` : ''}`,
+        });
+      } else {
+        toast({
+          title: "Analysis Complete - Limited Data",
+          description: "Market analysis completed but Mashvisor API returned limited data for this market.",
+          variant: "destructive",
+        });
+      }
 
     } catch (error) {
+      console.error('❌ Market analysis error:', error);
       toast({
         title: "Analysis Failed",
-        description: "Unable to complete market analysis.",
+        description: "Unable to complete market analysis. Please check the console for details.",
         variant: "destructive",
       });
     } finally {
@@ -163,7 +139,7 @@ export const SimulatedMarketIntelligence = () => {
     const url = URL.createObjectURL(blob);
     
     link.setAttribute('href', url);
-    link.setAttribute('download', `${cityName.toLowerCase().replace(/\s+/g, '-')}-market-analysis-simulated.csv`);
+    link.setAttribute('download', `${cityName.toLowerCase().replace(/\s+/g, '-')}-market-analysis-mashvisor.csv`);
     link.style.visibility = 'hidden';
     
     document.body.appendChild(link);
@@ -173,7 +149,7 @@ export const SimulatedMarketIntelligence = () => {
     
     toast({
       title: "Data Exported",
-      description: `Simulated market data for ${cityName} downloaded.`,
+      description: `Real market data for ${cityName} downloaded.`,
     });
   };
 
@@ -209,15 +185,15 @@ export const SimulatedMarketIntelligence = () => {
 
   return (
     <div className="space-y-8">
-      {/* Demo Notice */}
-      <Card className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-cyan-500/30">
+      {/* Real Data Notice */}
+      <Card className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/30">
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
-            <Eye className="h-5 w-5 text-cyan-400" />
+            <Eye className="h-5 w-5 text-green-400" />
             <div>
-              <h3 className="font-semibold text-cyan-300">Simulated Market Intelligence Demo</h3>
+              <h3 className="font-semibold text-green-300">Real Mashvisor Market Intelligence</h3>
               <p className="text-sm text-gray-300">
-                This is a demonstration showing how our market intelligence works. Some data points show "API Failures" to demonstrate real-world scenarios.
+                This tool uses real Mashvisor API data to analyze rental arbitrage opportunities in your target market.
               </p>
             </div>
           </div>
