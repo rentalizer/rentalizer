@@ -32,16 +32,22 @@ serve(async (req) => {
 
     console.log('🔑 Using API key:', `${mashvisorApiKey.substring(0, 8)}...${mashvisorApiKey.substring(mashvisorApiKey.length - 4)}`)
 
-    // Call Mashvisor API
-    const mashvisorUrl = 'https://api.mashvisor.com/v1.1/client'
+    // Call Mashvisor API with proper parameters
+    const mashvisorUrl = new URL('https://api.mashvisor.com/v1.1/client')
     
-    console.log('📡 Calling Mashvisor API:', mashvisorUrl)
+    // Add query parameters if needed based on the API documentation
+    if (city) mashvisorUrl.searchParams.append('city', city)
+    if (propertyType) mashvisorUrl.searchParams.append('bedrooms', propertyType)
+    if (bathrooms) mashvisorUrl.searchParams.append('bathrooms', bathrooms)
     
-    const mashvisorResponse = await fetch(mashvisorUrl, {
+    console.log('📡 Calling Mashvisor API:', mashvisorUrl.toString())
+    
+    const mashvisorResponse = await fetch(mashvisorUrl.toString(), {
       method: 'GET',
       headers: {
         'x-api-key': mashvisorApiKey,
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
     })
 
