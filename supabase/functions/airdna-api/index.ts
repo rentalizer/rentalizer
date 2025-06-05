@@ -17,8 +17,8 @@ serve(async (req) => {
     
     console.log(`🔍 AirDNA API call for ${city} (${propertyType}BR/${bathrooms}BA)`)
     
-    // Check for RapidAPI key
-    const rapidApiKey = Deno.env.get('RAPIDAPI_KEY')
+    // Check for RapidAPI key - now using the correct key
+    const rapidApiKey = Deno.env.get('RAPIDAPI_KEY') || '563ec2cceemshee4eb6d8e03f721p10e5cjsn566618f8f3c3'
     
     if (!rapidApiKey) {
       console.error('❌ RAPIDAPI_KEY not found in environment')
