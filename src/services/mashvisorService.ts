@@ -133,7 +133,7 @@ const zipToNeighborhoodMap: { [key: string]: string } = {
 
 const getNeighborhoodName = (zipCode: string, city: string): string => {
   const neighborhoodName = zipToNeighborhoodMap[zipCode];
-  return neighborhoodName || `${city} - ${zipCode}`;
+  return neighborhoodName ? `${city}, ${neighborhoodName}` : `${city}, ${zipCode}`;
 };
 
 export const fetchRealMarketData = async (city: string, propertyType: string, bathrooms: string) => {
@@ -214,7 +214,7 @@ export const processMarketData = async (marketData: any, city: string, propertyT
         const zipCodeMatch = originalName.match(/Zip (\d{5})/);
         const zipCode = zipCodeMatch ? zipCodeMatch[1] : null;
         
-        const displayName = zipCode ? getNeighborhoodName(zipCode, city) : originalName;
+        const displayName = zipCode ? getNeighborhoodName(zipCode, city) : `${city}, ${originalName}`;
         
         // Calculate accurate STR revenue
         const monthlyStrRevenue = calculateAccurateSTRRevenue(neighborhood);
@@ -265,7 +265,7 @@ export const processMarketData = async (marketData: any, city: string, propertyT
           const multiple = (strRevenueWith25Markup > 0 && monthlyRent > 0) ? strRevenueWith25Markup / monthlyRent : 0;
           
           processedData.push({
-            submarket: locationName,
+            submarket: `${city}, ${locationName}`,
             strRevenue: strRevenueWith25Markup,
             medianRent: monthlyRent,
             multiple: multiple
@@ -293,7 +293,7 @@ export const processMarketData = async (marketData: any, city: string, propertyT
         const multiple = (strRevenueWith25Markup > 0 && monthlyRent > 0) ? strRevenueWith25Markup / monthlyRent : 0;
         
         processedData.push({
-          submarket: `${responseData.city || city} - City Average`,
+          submarket: `${responseData.city || city}, City Average`,
           strRevenue: strRevenueWith25Markup,
           medianRent: monthlyRent,
           multiple: multiple
@@ -310,7 +310,7 @@ export const processMarketData = async (marketData: any, city: string, propertyT
     const message = marketData?.data?.message || 'No neighborhood data available from Mashvisor API';
     
     processedData.push({
-      submarket: `${cityName} - ${message}`,
+      submarket: `${cityName}, ${message}`,
       strRevenue: 0,
       medianRent: 0,
       multiple: 0
