@@ -32,8 +32,8 @@ export const SimulatedMarketIntelligence = () => {
       // Call the real Mashvisor API with just the city name
       const marketData = await fetchRealMarketData(city, propType, bathCount);
 
-      // Process the real data from Mashvisor (both STR and rent data)
-      const processedData = await processMarketData(marketData, city, propType, bathCount);
+      // Process the real data from Mashvisor
+      const processedData = processMarketData(marketData);
 
       setSubmarketData(processedData);
       setCityName(city);
@@ -45,19 +45,19 @@ export const SimulatedMarketIntelligence = () => {
       
       if (hasRevenueData && hasRentData) {
         toast({
-          title: "Market Analysis Complete",
-          description: `Both STR revenue and rental data from Mashvisor API for ${city}.`,
+          title: "City Market Analysis Complete",
+          description: `STR revenue data found for ${city}. Rent estimates provided using market averages.`,
         });
       } else if (hasRevenueData && !hasRentData) {
         toast({
-          title: "Partial Data Available",
-          description: `STR revenue found but rental data unavailable for ${city}.`,
+          title: "Revenue Data Found",
+          description: `STR revenue statistics available for ${city}, but no traditional rent comparison data found.`,
           variant: "destructive",
         });
       } else {
         toast({
           title: "Limited Data Available",
-          description: `Mashvisor API returned limited data for ${city}.`,
+          description: `Mashvisor API returned limited market data for ${city}.`,
           variant: "destructive",
         });
       }
@@ -86,9 +86,9 @@ export const SimulatedMarketIntelligence = () => {
           <div className="flex items-center gap-3">
             <Eye className="h-5 w-5 text-green-400" />
             <div>
-              <h3 className="font-semibold text-green-300">Real Market Intelligence from Mashvisor</h3>
+              <h3 className="font-semibold text-green-300">Real Mashvisor City Market Intelligence</h3>
               <p className="text-sm text-gray-300">
-                Both STR revenue (with 25% markup) and rental data from the same Mashvisor API source.
+                This tool uses real Mashvisor API data to analyze STR revenue opportunities for specific cities and neighborhoods.
               </p>
             </div>
           </div>
