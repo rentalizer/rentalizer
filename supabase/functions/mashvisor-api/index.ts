@@ -117,67 +117,45 @@ serve(async (req) => {
     if (comprehensiveNeighborhoods) {
       console.log(`🏘️ Starting comprehensive neighborhood search for ${city}, ${state}`)
       
-      // Enhanced neighborhood data for major cities
-      const cityNeighborhoods: { [key: string]: string[] } = {
+      // Enhanced zip code data for major cities
+      const cityZipCodes: { [key: string]: string[] } = {
         'austin': [
-          'Downtown', 'South Congress', 'East Austin', 'West Lake Hills', 'Zilker', 'Barton Hills',
-          'Travis Heights', 'Bouldin Creek', 'Mueller', 'North Loop', 'Crestview', 'Hyde Park',
-          'Clarksville', 'Tarrytown', 'Westlake', 'Rollingwood', 'Allandale', 'Rosedale',
-          'University of Texas', 'Hancock', 'Cherrywood', 'French Place', 'Riverside',
-          'St. Elmo', 'Montopolis', 'Dove Springs', 'Windsor Park', 'Georgian Acres',
-          'Coronado Hills', 'Govalle', 'Holly', 'MLK', 'Pecan Springs', 'Pleasant Valley',
-          'Rosewood', 'Springdale', 'Upper Boggy Creek', 'Blackland', 'Chestnut',
-          'Del Valle', 'Johnston Terrace', 'Parker Lane', 'Sweetbriar'
+          '78701', '78702', '78703', '78704', '78705', '78712', '78717', '78721', '78722', '78723',
+          '78724', '78725', '78726', '78727', '78728', '78729', '78730', '78731', '78732', '78733',
+          '78734', '78735', '78736', '78737', '78738', '78739', '78741', '78742', '78744', '78745',
+          '78746', '78747', '78748', '78749', '78750', '78751', '78752', '78753', '78754', '78756',
+          '78757', '78758', '78759'
         ],
         'houston': [
-          'Downtown', 'River Oaks', 'Highland Village', 'Montrose', 'Heights', 'Memorial',
-          'Galleria', 'Uptown', 'Midtown', 'Museum District', 'Medical Center', 'Bellaire',
-          'West University', 'Rice Village', 'Tanglewood', 'Katy', 'Sugar Land', 'Pearland',
-          'Spring Branch', 'Cypress', 'Tomball', 'The Woodlands', 'Kingwood', 'Clear Lake',
-          'Pasadena', 'Friendswood', 'League City', 'Webster', 'Humble', 'Atascocita'
+          '77002', '77003', '77004', '77005', '77006', '77007', '77008', '77019', '77024', '77025',
+          '77027', '77030', '77035', '77056', '77057', '77063', '77077', '77079', '77098', '77054',
+          '77081', '77092', '77096', '77401', '77429', '77433', '77449', '77459', '77478', '77494'
         ],
         'dallas': [
-          'Downtown', 'Uptown', 'Deep Ellum', 'Bishop Arts', 'Lower Greenville', 'Knox Henderson',
-          'Preston Center', 'Park Cities', 'Highland Park', 'University Park', 'Lakewood',
-          'White Rock', 'East Dallas', 'Oak Cliff', 'Design District', 'Trinity Groves',
-          'Victory Park', 'Arts District', 'West Village', 'McKinney Avenue'
+          '75201', '75202', '75204', '75205', '75206', '75214', '75218', '75219', '75225', '75230',
+          '75240', '75207', '75208', '75209', '75220', '75231', '75235', '75390', '75243', '75248'
         ],
         'miami': [
-          'South Beach', 'Wynwood', 'Brickell', 'Downtown Miami', 'Design District', 'Midtown',
-          'Little Havana', 'Coral Gables', 'Coconut Grove', 'Key Biscayne', 'Aventura',
-          'Bal Harbour', 'Bay Harbor Islands', 'Sunny Isles Beach', 'North Miami Beach',
-          'Miami Beach', 'Doral', 'Kendall', 'Homestead', 'Pinecrest'
-        ],
-        'los angeles': [
-          'Hollywood', 'West Hollywood', 'Beverly Hills', 'Santa Monica', 'Venice', 'Manhattan Beach',
-          'Hermosa Beach', 'Redondo Beach', 'Marina del Rey', 'Culver City', 'Westwood',
-          'Brentwood', 'Pacific Palisades', 'Malibu', 'Downtown LA', 'Arts District',
-          'Silver Lake', 'Los Feliz', 'Echo Park', 'Highland Park', 'Pasadena', 'Glendale',
-          'Burbank', 'Studio City', 'Sherman Oaks', 'Encino', 'Tarzana', 'Woodland Hills'
-        ],
-        'san francisco': [
-          'SOMA', 'Mission', 'Castro', 'Noe Valley', 'Hayes Valley', 'Pacific Heights',
-          'Marina District', 'Russian Hill', 'North Beach', 'Chinatown', 'Financial District',
-          'Tenderloin', 'Civic Center', 'Potrero Hill', 'Dogpatch', 'Mission Bay',
-          'Richmond', 'Sunset', 'Haight-Ashbury', 'Cole Valley', 'Inner Sunset'
+          '33101', '33109', '33114', '33125', '33129', '33130', '33131', '33132', '33134', '33139',
+          '33140', '33141', '33142', '33143', '33144', '33145', '33146', '33147', '33149', '33150'
         ]
       };
 
-      const neighborhoods = cityNeighborhoods[cityKey] || []
+      const zipCodes = cityZipCodes[cityKey] || []
       
-      if (neighborhoods.length > 0) {
-        console.log(`🏘️ Processing ${neighborhoods.length} neighborhoods for ${city}`)
+      if (zipCodes.length > 0) {
+        console.log(`🏘️ Processing ${zipCodes.length} zip codes for ${city}`)
         
-        for (const neighborhood of neighborhoods) {
+        for (const zipCode of zipCodes) {
           try {
-            const neighborhoodLookupUrl = `https://api.mashvisor.com/v1.1/client/neighborhood-lookup?state=${state}&city=${encodeURIComponent(city)}&neighborhood=${encodeURIComponent(neighborhood)}&resource=airbnb&beds=${propertyType}`
+            const zipLookupUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&zip_code=${zipCode}&resource=airbnb&beds=${propertyType}`
             
-            const neighborhoodResult = await callMashvisorAPI(neighborhoodLookupUrl, mashvisorApiKey, `${neighborhood} neighborhood lookup`)
+            const zipResult = await callMashvisorAPI(zipLookupUrl, mashvisorApiKey, `Zip ${zipCode} lookup`)
             
-            if (neighborhoodResult.success && neighborhoodResult.data?.content) {
-              console.log(`✅ ${neighborhood} neighborhood lookup successful`)
+            if (zipResult.success && zipResult.data?.content) {
+              console.log(`✅ Zip ${zipCode} lookup successful`)
               
-              const content = neighborhoodResult.data.content
+              const content = zipResult.data.content
               
               // Only include areas with meaningful data
               const hasValidData = (
@@ -188,11 +166,12 @@ serve(async (req) => {
               
               if (hasValidData) {
                 allNeighborhoods.push({
-                  name: neighborhood,
-                  neighborhood: neighborhood,
-                  area: neighborhood,
+                  name: `${city} - Zip ${zipCode}`,
+                  neighborhood: `${city} - Zip ${zipCode}`,
+                  area: `Zip ${zipCode}`,
                   city: city,
                   state: state,
+                  zipCode: zipCode,
                   median_night_rate: content.median_night_rate || 0,
                   median_occupancy_rate: content.median_occupancy_rate || 0,
                   revpar: content.revpar || content.revpan || 0,
@@ -200,16 +179,13 @@ serve(async (req) => {
                   sample_size: content.sample_size || 0
                 })
               }
-            } else {
-              // Fallback to zip code lookup for this neighborhood
-              console.log(`⚠️ Neighborhood lookup failed for ${neighborhood}, trying alternative method`)
             }
             
             // Rate limiting delay
             await new Promise(resolve => setTimeout(resolve, 100))
             
           } catch (error) {
-            console.log(`⚠️ Error processing neighborhood ${neighborhood}:`, error)
+            console.log(`⚠️ Error processing zip ${zipCode}:`, error)
             continue
           }
         }
