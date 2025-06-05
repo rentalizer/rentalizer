@@ -10,7 +10,7 @@ interface SubmarketData {
 
 export const fetchRealMarketData = async (city: string, propertyType: string, bathrooms: string) => {
   try {
-    console.log(`🚀 Calling real AirDNA API for ${city}`);
+    console.log(`🚀 Calling AirDNA API for ${city}`);
     
     const { data, error } = await supabase.functions.invoke('airdna-api', {
       body: {
@@ -24,7 +24,7 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
       throw new Error(`API call failed: ${error.message}`);
     }
 
-    console.log('✅ Real AirDNA API response:', data);
+    console.log('✅ AirDNA API response:', data);
     
     return data;
   } catch (error) {
@@ -36,56 +36,63 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
 export const processMarketData = (marketData: any): SubmarketData[] => {
   const processedData: SubmarketData[] = [];
   
-  console.log('🔍 Processing AirDNA market data structure:', marketData);
+  console.log('🔍 Processing AirDNA market data:', marketData);
   
   // Handle successful API response with market data
   if (marketData && marketData.success && marketData.data) {
     const responseData = marketData.data;
     
-    // Handle AirDNA data structure - typically has markets or properties array
-    const markets = responseData.markets || responseData.properties || responseData.data || [];
+    // Handle AirDNA properties data structure
+    const properties = responseData.properties || [];
     
-    console.log('📊 Processing AirDNA market data:', markets);
+    console.log('📊 Processing AirDNA properties:', properties);
     
-    // Handle array of markets/properties
-    if (Array.isArray(markets)) {
-      markets.forEach((market: any) => {
-        const marketName = market.market_name || market.name || market.location || 'Unknown Market';
-        const strRevenue = (market.revenue || market.adr || market.annual_revenue || 0) * 12; // Annualize if needed
-        const rentRevenue = (market.long_term_rental || market.rental_income || market.rent || 0) * 12; // Annualize if needed
+    // Process properties data from AirDNA
+    if (Array.isArray(properties) && properties.length > 0) {
+      // Group properties by neighborhood/area and calculate averages
+      const neighborhoodData = new Map();
+      
+      properties.forEach((property: any) => {
+        const neighborhood = property.neighborhood || property.district || property.area || 'Unknown Area';
+        const revenue = property.revenue || property.annual_revenue || property.monthly_revenue * 12 || 0;
+        const occupancy = property.occupancy_rate || property.occupancy || 0.75; // default 75%
+        const adr = property.adr || property.average_daily_rate || 0;
         
-        if (strRevenue > 0 || rentRevenue > 0) {
-          const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
-          
-          processedData.push({
-            submarket: `${marketName} - ${responseData.city}`,
-            strRevenue: Math.round(strRevenue),
-            medianRent: Math.round(rentRevenue),
-            multiple: multiple
+        // Calculate annualized revenue if needed
+        let annualRevenue = revenue;
+        if (adr > 0 && occupancy > 0) {
+          annualRevenue = adr * 365 * (occupancy / 100);
+        }
+        
+        if (!neighborhoodData.has(neighborhood)) {
+          neighborhoodData.set(neighborhood, {
+            revenues: [],
+            count: 0
           });
         }
+        
+        const data = neighborhoodData.get(neighborhood);
+        if (annualRevenue > 0) {
+          data.revenues.push(annualRevenue);
+          data.count++;
+        }
       });
-    }
-    
-    // Handle object with market data
-    else if (typeof markets === 'object' && markets !== null) {
-      Object.keys(markets).forEach((key) => {
-        const market = markets[key];
-        if (typeof market === 'object') {
-          const marketName = market.market_name || market.name || key || 'Unknown Market';
-          const strRevenue = (market.revenue || market.adr || market.annual_revenue || 0) * 12;
-          const rentRevenue = (market.long_term_rental || market.rental_income || market.rent || 0) * 12;
+      
+      // Calculate averages for each neighborhood
+      neighborhoodData.forEach((data, neighborhood) => {
+        if (data.revenues.length > 0) {
+          const avgRevenue = data.revenues.reduce((sum: number, rev: number) => sum + rev, 0) / data.revenues.length;
           
-          if (strRevenue > 0 || rentRevenue > 0) {
-            const multiple = rentRevenue > 0 ? strRevenue / rentRevenue : 0;
-            
-            processedData.push({
-              submarket: `${marketName} - ${responseData.city}`,
-              strRevenue: Math.round(strRevenue),
-              medianRent: Math.round(rentRevenue),
-              multiple: multiple
-            });
-          }
+          // Estimate rent (typically 60-80% of STR revenue for similar properties)
+          const estimatedRent = avgRevenue * 0.7;
+          const multiple = estimatedRent > 0 ? avgRevenue / estimatedRent : 0;
+          
+          processedData.push({
+            submarket: `${neighborhood}, ${responseData.city}`,
+            strRevenue: Math.round(avgRevenue),
+            medianRent: Math.round(estimatedRent),
+            multiple: multiple
+          });
         }
       });
     }
@@ -96,7 +103,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     console.log('❌ No valid market data found from AirDNA');
     
     const city = marketData?.data?.city || 'Unknown City';
-    const message = marketData?.data?.message || 'No market data available';
+    const message = marketData?.data?.message || marketData?.data?.error || 'No market data available';
     
     processedData.push({
       submarket: `${city} - ${message}`,
