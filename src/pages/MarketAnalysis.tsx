@@ -8,6 +8,7 @@ import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
 import { SimulatedMarketIntelligence } from '@/components/SimulatedMarketIntelligence';
 import { ApiKeyInput } from '@/components/ApiKeyInput';
+import { SwaggerUpload } from '@/components/SwaggerUpload';
 
 const MarketAnalysis = () => {
   const navigate = useNavigate();
@@ -65,6 +66,11 @@ const MarketAnalysis = () => {
                 Export Data
               </Badge>
             </div>
+          </div>
+
+          {/* Swagger Upload Section */}
+          <div className="mb-8">
+            <SwaggerUpload />
           </div>
 
           {/* Simulated Market Intelligence Component */}
