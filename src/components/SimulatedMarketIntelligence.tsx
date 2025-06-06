@@ -5,7 +5,7 @@ import { Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { MarketAnalysisForm } from '@/components/MarketAnalysisForm';
 import { MarketAnalysisResults } from '@/components/MarketAnalysisResults';
-import { fetchRealMarketData, processMarketData } from '@/services/airdnaService';
+import { fetchRealMarketData, processMarketData } from '@/services/mashvisorService';
 
 interface SubmarketData {
   submarket: string;
@@ -27,12 +27,12 @@ export const SimulatedMarketIntelligence = () => {
     setIsLoading(true);
     
     try {
-      console.log(`🚀 Starting real AirDNA market analysis for ${city}`);
+      console.log(`🚀 Starting real Mashvisor market analysis for ${city}`);
       
-      // Call the real AirDNA API with just the city name
+      // Call the real Mashvisor API with just the city name
       const marketData = await fetchRealMarketData(city, propType, bathCount);
 
-      // Process the real data from AirDNA
+      // Process the real data from Mashvisor
       const processedData = processMarketData(marketData);
 
       setSubmarketData(processedData);
@@ -57,7 +57,7 @@ export const SimulatedMarketIntelligence = () => {
       } else {
         toast({
           title: "Limited Data Available",
-          description: `AirDNA API returned limited market data for ${city}.`,
+          description: `Mashvisor API returned limited market data for ${city}.`,
           variant: "destructive",
         });
       }
@@ -86,9 +86,9 @@ export const SimulatedMarketIntelligence = () => {
           <div className="flex items-center gap-3">
             <Eye className="h-5 w-5 text-green-400" />
             <div>
-              <h3 className="font-semibold text-green-300">Real AirDNA City Market Intelligence</h3>
+              <h3 className="font-semibold text-green-300">Real Mashvisor City Market Intelligence</h3>
               <p className="text-sm text-gray-300">
-                This tool uses real AirDNA API data to analyze STR revenue opportunities for specific cities and neighborhoods.
+                This tool uses real Mashvisor API data to analyze STR revenue opportunities for specific cities and neighborhoods.
               </p>
             </div>
           </div>
