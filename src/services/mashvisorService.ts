@@ -44,16 +44,17 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     console.log('📊 Processing real Mashvisor lookup rental data');
     
     const rentalData = marketData.data.rentalData;
-    const neighborhoods = marketData.data.neighborhoods || [];
     
     // Group rental data by neighborhood
     const neighborhoodDataMap = new Map();
     
     rentalData.forEach((item: any) => {
-      if (!item || !item.data || !item.neighborhood) return;
+      if (!item || !item.data) return;
       
-      const neighborhood = item.neighborhood;
-      const isAirbnb = item.type.includes('airbnb');
+      const neighborhood = item.neighborhood || 'Unknown Area';
+      const isAirbnb = item.type && item.type.includes('airbnb');
+      
+      console.log(`🔍 Processing ${neighborhood} - Type: ${item.type}`, item.data);
       
       if (!neighborhoodDataMap.has(neighborhood)) {
         neighborhoodDataMap.set(neighborhood, {
@@ -78,26 +79,71 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     neighborhoodDataMap.forEach((entry, neighborhood) => {
       const { airbnbData, traditionalData } = entry;
       
-      // Extract STR revenue from Airbnb data
+      console.log(`🔍 Detailed data for ${neighborhood}:`, {
+        airbnbData: airbnbData,
+        traditionalData: traditionalData
+      });
+      
+      // Extract STR revenue from Airbnb data - check multiple possible locations
       let monthlyStrRevenue = 0;
-      if (airbnbData && airbnbData.content) {
-        monthlyStrRevenue = airbnbData.content.monthly_revenue || 
-                           airbnbData.content.revenue || 
-                           airbnbData.content.airbnb_revenue || 
-                           0;
+      if (airbnbData) {
+        // Check different possible paths in the response
+        monthlyStrRevenue = 
+          airbnbData.monthly_revenue || 
+          airbnbData.revenue || 
+          airbnbData.airbnb_revenue ||
+          airbnbData.monthly_rental_income ||
+          airbnbData.rental_income ||
+          (airbnbData.content && airbnbData.content.monthly_revenue) ||
+          (airbnbData.content && airbnbData.content.revenue) ||
+          (airbnbData.content && airbnbData.content.airbnb_revenue) ||
+          (airbnbData.results && airbnbData.results.monthly_revenue) ||
+          (airbnbData.results && airbnbData.results.revenue) ||
+          0;
+          
+        console.log(`💰 STR Revenue extraction for ${neighborhood}:`, {
+          monthly_revenue: airbnbData.monthly_revenue,
+          revenue: airbnbData.revenue,
+          airbnb_revenue: airbnbData.airbnb_revenue,
+          content: airbnbData.content,
+          results: airbnbData.results,
+          extracted: monthlyStrRevenue
+        });
       }
       
-      // Extract traditional rent from traditional data
+      // Extract traditional rent from traditional data - check multiple possible locations
       let monthlyRent = 0;
-      if (traditionalData && traditionalData.content) {
-        monthlyRent = traditionalData.content.monthly_rent || 
-                     traditionalData.content.rent || 
-                     traditionalData.content.traditional_rent || 
-                     0;
+      if (traditionalData) {
+        monthlyRent = 
+          traditionalData.monthly_rent || 
+          traditionalData.rent || 
+          traditionalData.traditional_rent ||
+          traditionalData.monthly_rental_income ||
+          traditionalData.rental_income ||
+          (traditionalData.content && traditionalData.content.monthly_rent) ||
+          (traditionalData.content && traditionalData.content.rent) ||
+          (traditionalData.content && traditionalData.content.traditional_rent) ||
+          (traditionalData.results && traditionalData.results.monthly_rent) ||
+          (traditionalData.results && traditionalData.results.rent) ||
+          0;
+          
+        console.log(`🏠 Rent extraction for ${neighborhood}:`, {
+          monthly_rent: traditionalData.monthly_rent,
+          rent: traditionalData.rent,
+          traditional_rent: traditionalData.traditional_rent,
+          content: traditionalData.content,
+          results: traditionalData.results,
+          extracted: monthlyRent
+        });
       }
       
       // Get address info if available
-      const address = airbnbData?.content?.address || traditionalData?.content?.address || '';
+      const address = 
+        (airbnbData && airbnbData.address) ||
+        (traditionalData && traditionalData.address) ||
+        (airbnbData && airbnbData.content && airbnbData.content.address) ||
+        (traditionalData && traditionalData.content && traditionalData.content.address) ||
+        '';
       
       console.log(`📍 ${neighborhood}: STR: $${monthlyStrRevenue}, Rent: $${monthlyRent}, Address: ${address}`);
       
@@ -128,7 +174,10 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
         
         console.log(`⚠️ PARTIAL DATA: ${neighborhood} - STR: $${monthlyStrRevenue}, No rent data`);
       } else {
-        console.log(`❌ NO FINANCIAL DATA: ${neighborhood}`);
+        console.log(`❌ NO FINANCIAL DATA: ${neighborhood} - Available keys:`, {
+          airbnbKeys: airbnbData ? Object.keys(airbnbData) : [],
+          traditionalKeys: traditionalData ? Object.keys(traditionalData) : []
+        });
       }
     });
   }

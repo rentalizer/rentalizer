@@ -155,10 +155,15 @@ serve(async (req) => {
         }).then(async (res) => {
           if (res.ok) {
             const data = await res.json()
+            console.log(`📊 City Airbnb response for ${city}:`, JSON.stringify(data, null, 2))
             return { type: 'city_airbnb', data, neighborhood: 'City Average' }
           }
+          console.log(`❌ City Airbnb request failed: ${res.status}`)
           return null
-        }).catch(() => null)
+        }).catch((err) => {
+          console.log(`❌ City Airbnb request error:`, err)
+          return null
+        })
       )
 
       // City-level lookup for Traditional
@@ -169,10 +174,15 @@ serve(async (req) => {
         }).then(async (res) => {
           if (res.ok) {
             const data = await res.json()
+            console.log(`📊 City Traditional response for ${city}:`, JSON.stringify(data, null, 2))
             return { type: 'city_traditional', data, neighborhood: 'City Average' }
           }
+          console.log(`❌ City Traditional request failed: ${res.status}`)
           return null
-        }).catch(() => null)
+        }).catch((err) => {
+          console.log(`❌ City Traditional request error:`, err)
+          return null
+        })
       )
 
       // Get data for top neighborhoods if available
@@ -190,10 +200,15 @@ serve(async (req) => {
             }).then(async (res) => {
               if (res.ok) {
                 const data = await res.json()
+                console.log(`📊 Neighborhood ${neighborhoodName} Airbnb response:`, JSON.stringify(data, null, 2))
                 return { type: 'neighborhood_airbnb', data, neighborhood: neighborhoodName }
               }
+              console.log(`❌ Neighborhood ${neighborhoodName} Airbnb request failed: ${res.status}`)
               return null
-            }).catch(() => null)
+            }).catch((err) => {
+              console.log(`❌ Neighborhood ${neighborhoodName} Airbnb request error:`, err)
+              return null
+            })
           )
 
           // Traditional data for neighborhood
@@ -204,10 +219,15 @@ serve(async (req) => {
             }).then(async (res) => {
               if (res.ok) {
                 const data = await res.json()
+                console.log(`📊 Neighborhood ${neighborhoodName} Traditional response:`, JSON.stringify(data, null, 2))
                 return { type: 'neighborhood_traditional', data, neighborhood: neighborhoodName }
               }
+              console.log(`❌ Neighborhood ${neighborhoodName} Traditional request failed: ${res.status}`)
               return null
-            }).catch(() => null)
+            }).catch((err) => {
+              console.log(`❌ Neighborhood ${neighborhoodName} Traditional request error:`, err)
+              return null
+            })
           )
         }
       }
