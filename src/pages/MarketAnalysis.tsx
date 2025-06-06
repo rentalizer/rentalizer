@@ -68,17 +68,17 @@ const MarketAnalysis = () => {
             </div>
           </div>
 
-          {/* Swagger Upload Section */}
-          <div className="mb-8">
-            <SwaggerUpload />
-          </div>
-
           {/* Simulated Market Intelligence Component */}
           <SimulatedMarketIntelligence />
 
           {/* API Key Configuration Section */}
           <div className="mt-8">
             <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
+          </div>
+
+          {/* Swagger Upload Section - Moved to bottom */}
+          <div className="mt-8">
+            <SwaggerUpload />
           </div>
         </div>
       </div>
