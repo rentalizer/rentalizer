@@ -8,11 +8,11 @@ import { Key, Eye, EyeOff, Search, Copy, AlertCircle, Check, X } from 'lucide-re
 import { useToast } from '@/hooks/use-toast';
 
 interface ApiKeyInputProps {
-  onApiKeysChange: (keys: { mashvisorApiKey?: string; openaiApiKey?: string }) => void;
+  onApiKeysChange: (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => void;
 }
 
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
-  const [mashvisorKey, setMashvisorKey] = useState('');
+  const [airdnaKey, setAirdnaKey] = useState('');
   const [openaiKey, setOpenaiKey] = useState('');
   const [showKeys, setShowKeys] = useState(false);
   const [showStoredKeys, setShowStoredKeys] = useState(false);
@@ -44,11 +44,11 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   };
 
   const handleSaveKeys = () => {
-    if (mashvisorKey) localStorage.setItem('mashvisor_api_key', mashvisorKey);
+    if (airdnaKey) localStorage.setItem('professional_data_key', airdnaKey);
     if (openaiKey) localStorage.setItem('openai_api_key', openaiKey);
     
     onApiKeysChange({
-      mashvisorApiKey: mashvisorKey || undefined,
+      airdnaApiKey: airdnaKey || undefined,
       openaiApiKey: openaiKey || undefined
     });
 
@@ -59,13 +59,13 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   };
 
   const handleClearKeys = () => {
-    setMashvisorKey('');
+    setAirdnaKey('');
     setOpenaiKey('');
-    localStorage.removeItem('mashvisor_api_key');
+    localStorage.removeItem('professional_data_key');
     localStorage.removeItem('openai_api_key');
     
     onApiKeysChange({
-      mashvisorApiKey: undefined,
+      airdnaApiKey: undefined,
       openaiApiKey: undefined
     });
 
@@ -120,15 +120,15 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   };
 
   React.useEffect(() => {
-    const savedMashvisorKey = localStorage.getItem('mashvisor_api_key') || '';
+    const savedAirdnaKey = localStorage.getItem('professional_data_key') || '';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
     
-    setMashvisorKey(savedMashvisorKey);
+    setAirdnaKey(savedAirdnaKey);
     setOpenaiKey(savedOpenaiKey);
     
-    if (savedMashvisorKey || savedOpenaiKey) {
+    if (savedAirdnaKey || savedOpenaiKey) {
       onApiKeysChange({
-        mashvisorApiKey: savedMashvisorKey || undefined,
+        airdnaApiKey: savedAirdnaKey || undefined,
         openaiApiKey: savedOpenaiKey || undefined
       });
     }
@@ -190,33 +190,33 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
           {/* API Key Inputs with Status - Compact */}
           <div className="grid grid-cols-1 gap-3">
-            {/* Mashvisor API Key */}
+            {/* AirDNA API Key */}
             <div className="space-y-1">
-              <label className="text-xs font-medium text-cyan-300">Mashvisor API Key</label>
+              <label className="text-xs font-medium text-cyan-300">AirDNA API Key</label>
               <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
-                {getStatusIcon(getKeyStatus(mashvisorKey))}
+                {getStatusIcon(getKeyStatus(airdnaKey))}
                 <div className="flex-1 min-w-0">
                   <Input
-                    id="mashvisor-key"
+                    id="airdna-key"
                     type={showKeys ? "text" : "password"}
-                    value={mashvisorKey}
-                    onChange={(e) => setMashvisorKey(e.target.value)}
-                    placeholder="Enter your Mashvisor API key"
+                    value={airdnaKey}
+                    onChange={(e) => setAirdnaKey(e.target.value)}
+                    placeholder="Enter your AirDNA API key"
                     className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
                   />
                 </div>
                 <div className="flex items-center gap-1">
-                  {mashvisorKey && showKeys && (
+                  {airdnaKey && showKeys && (
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => copyToClipboard(mashvisorKey, 'Mashvisor API')}
+                      onClick={() => copyToClipboard(airdnaKey, 'AirDNA API')}
                       className="h-5 w-5 p-0 text-gray-400 hover:text-white"
                     >
                       <Copy className="h-3 w-3" />
                     </Button>
                   )}
-                  {getStatusBadge(getKeyStatus(mashvisorKey))}
+                  {getStatusBadge(getKeyStatus(airdnaKey))}
                 </div>
               </div>
             </div>
@@ -290,7 +290,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               <strong>Environment:</strong> {window.location.hostname === 'localhost' ? 'Preview/Development' : 'Production'}
             </div>
             <div className="text-xs text-blue-400 mt-1">
-              Mashvisor API provides monthly STR revenue and rent data. OpenAI API enables AI-powered market insights.
+              AirDNA API provides monthly STR revenue and property data. OpenAI API enables AI-powered market insights.
             </div>
           </div>
         </div>
