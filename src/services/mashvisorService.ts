@@ -84,63 +84,22 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
         traditionalData: traditionalData
       });
       
-      // Extract STR revenue from Airbnb data - check multiple possible locations
+      // Extract STR revenue from Airbnb data - focus on median_rental_income from content
       let monthlyStrRevenue = 0;
-      if (airbnbData) {
-        // Check different possible paths in the response
-        monthlyStrRevenue = 
-          airbnbData.monthly_revenue || 
-          airbnbData.revenue || 
-          airbnbData.airbnb_revenue ||
-          airbnbData.monthly_rental_income ||
-          airbnbData.rental_income ||
-          (airbnbData.content && airbnbData.content.monthly_revenue) ||
-          (airbnbData.content && airbnbData.content.revenue) ||
-          (airbnbData.content && airbnbData.content.airbnb_revenue) ||
-          (airbnbData.results && airbnbData.results.monthly_revenue) ||
-          (airbnbData.results && airbnbData.results.revenue) ||
-          0;
-          
-        console.log(`💰 STR Revenue extraction for ${neighborhood}:`, {
-          monthly_revenue: airbnbData.monthly_revenue,
-          revenue: airbnbData.revenue,
-          airbnb_revenue: airbnbData.airbnb_revenue,
-          content: airbnbData.content,
-          results: airbnbData.results,
-          extracted: monthlyStrRevenue
-        });
+      if (airbnbData && airbnbData.status === 'success' && airbnbData.content) {
+        monthlyStrRevenue = airbnbData.content.median_rental_income || 0;
+        console.log(`💰 STR Revenue for ${neighborhood}: $${monthlyStrRevenue} from median_rental_income`);
       }
       
-      // Extract traditional rent from traditional data - check multiple possible locations
+      // Extract traditional rent from traditional data - focus on median_rental_income from content
       let monthlyRent = 0;
-      if (traditionalData) {
-        monthlyRent = 
-          traditionalData.monthly_rent || 
-          traditionalData.rent || 
-          traditionalData.traditional_rent ||
-          traditionalData.monthly_rental_income ||
-          traditionalData.rental_income ||
-          (traditionalData.content && traditionalData.content.monthly_rent) ||
-          (traditionalData.content && traditionalData.content.rent) ||
-          (traditionalData.content && traditionalData.content.traditional_rent) ||
-          (traditionalData.results && traditionalData.results.monthly_rent) ||
-          (traditionalData.results && traditionalData.results.rent) ||
-          0;
-          
-        console.log(`🏠 Rent extraction for ${neighborhood}:`, {
-          monthly_rent: traditionalData.monthly_rent,
-          rent: traditionalData.rent,
-          traditional_rent: traditionalData.traditional_rent,
-          content: traditionalData.content,
-          results: traditionalData.results,
-          extracted: monthlyRent
-        });
+      if (traditionalData && traditionalData.status === 'success' && traditionalData.content) {
+        monthlyRent = traditionalData.content.median_rental_income || 0;
+        console.log(`🏠 Traditional Rent for ${neighborhood}: $${monthlyRent} from median_rental_income`);
       }
       
       // Get address info if available
       const address = 
-        (airbnbData && airbnbData.address) ||
-        (traditionalData && traditionalData.address) ||
         (airbnbData && airbnbData.content && airbnbData.content.address) ||
         (traditionalData && traditionalData.content && traditionalData.content.address) ||
         '';
@@ -174,9 +133,9 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
         
         console.log(`⚠️ PARTIAL DATA: ${neighborhood} - STR: $${monthlyStrRevenue}, No rent data`);
       } else {
-        console.log(`❌ NO FINANCIAL DATA: ${neighborhood} - Available keys:`, {
-          airbnbKeys: airbnbData ? Object.keys(airbnbData) : [],
-          traditionalKeys: traditionalData ? Object.keys(traditionalData) : []
+        console.log(`❌ NO FINANCIAL DATA: ${neighborhood} - Check content structure:`, {
+          airbnbContent: airbnbData?.content,
+          traditionalContent: traditionalData?.content
         });
       }
     });
