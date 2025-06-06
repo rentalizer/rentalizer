@@ -77,7 +77,7 @@ serve(async (req) => {
   try {
     const { city, propertyType, bathrooms } = await req.json()
     
-    console.log(`🔍 Mashvisor Edge Function called for ${city} (${propertyType}BR/${bathrooms}BA)`)
+    console.log(`🔍 Mashvisor Lookup API called for ${city} (${propertyType}BR/${bathrooms}BA)`)
     
     // Check for Mashvisor API key
     const mashvisorApiKey = Deno.env.get('MASHVISOR_API_KEY')
@@ -121,13 +121,12 @@ serve(async (req) => {
     console.log(`📍 Found state ${state} for city ${city}`)
 
     try {
-      // Use the neighborhood endpoint to get granular data
-      const encodedCity = encodeURIComponent(city)
-      const mashvisorUrl = `https://api.mashvisor.com/v1.1/client/city/neighborhoods/${state}/${encodedCity}`
+      // First get neighborhoods for the city
+      const neighborhoodsUrl = `https://api.mashvisor.com/v1.1/client/city/neighborhoods/${state}/${encodeURIComponent(city)}`
       
-      console.log(`📡 Calling Mashvisor neighborhoods endpoint:`, mashvisorUrl)
+      console.log(`📡 Fetching neighborhoods from:`, neighborhoodsUrl)
       
-      const mashvisorResponse = await fetch(mashvisorUrl, {
+      const neighborhoodsResponse = await fetch(neighborhoodsUrl, {
         method: 'GET',
         headers: {
           'x-api-key': mashvisorApiKey,
@@ -136,54 +135,114 @@ serve(async (req) => {
         },
       })
 
-      if (mashvisorResponse.ok) {
-        const neighborhoodData = await mashvisorResponse.json()
-        console.log(`✅ Successfully fetched neighborhood data for ${city}`)
-        
-        // Return successful result with neighborhood data
-        const successData = {
-          success: true,
-          data: {
-            city: city,
-            state: state,
-            propertyType: propertyType,
-            bathrooms: bathrooms,
-            ...neighborhoodData
-          }
-        }
-
-        return new Response(
-          JSON.stringify(successData),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        )
+      let neighborhoods = []
+      if (neighborhoodsResponse.ok) {
+        const neighborhoodData = await neighborhoodsResponse.json()
+        neighborhoods = neighborhoodData.content?.results || []
+        console.log(`✅ Found ${neighborhoods.length} neighborhoods`)
       } else {
-        const errorText = await mashvisorResponse.text()
-        console.log(`⚠️ Failed to fetch neighborhood data for ${city}: ${mashvisorResponse.status} - ${errorText.substring(0, 100)}`)
-        
-        // Return fallback data
-        const fallbackData = {
-          success: false,
-          data: {
-            city: city,
-            state: state,
-            propertyType: propertyType,
-            bathrooms: bathrooms,
-            message: `Mashvisor API error: ${mashvisorResponse.status}`,
-            content: {}
-          }
-        }
-
-        return new Response(
-          JSON.stringify(fallbackData),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        )
+        console.log(`⚠️ Could not fetch neighborhoods: ${neighborhoodsResponse.status}`)
       }
+
+      // Now get rental data using the lookup endpoint for each neighborhood
+      const rentalDataPromises = []
+      
+      // City-level lookup for Airbnb
+      const cityAirbnbUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodeURIComponent(city)}&resource=airbnb&beds=${propertyType}`
+      rentalDataPromises.push(
+        fetch(cityAirbnbUrl, {
+          headers: { 'x-api-key': mashvisorApiKey }
+        }).then(async (res) => {
+          if (res.ok) {
+            const data = await res.json()
+            return { type: 'city_airbnb', data, neighborhood: 'City Average' }
+          }
+          return null
+        }).catch(() => null)
+      )
+
+      // City-level lookup for Traditional
+      const cityTraditionalUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodeURIComponent(city)}&resource=traditional&beds=${propertyType}`
+      rentalDataPromises.push(
+        fetch(cityTraditionalUrl, {
+          headers: { 'x-api-key': mashvisorApiKey }
+        }).then(async (res) => {
+          if (res.ok) {
+            const data = await res.json()
+            return { type: 'city_traditional', data, neighborhood: 'City Average' }
+          }
+          return null
+        }).catch(() => null)
+      )
+
+      // Get data for top neighborhoods if available
+      if (neighborhoods.length > 0) {
+        const topNeighborhoods = neighborhoods.slice(0, 10) // Limit to prevent too many API calls
+        
+        for (const neighborhood of topNeighborhoods) {
+          const neighborhoodName = neighborhood.name || neighborhood.neighborhood
+          
+          // Airbnb data for neighborhood
+          const neighborhoodAirbnbUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodeURIComponent(city)}&neighborhood=${encodeURIComponent(neighborhoodName)}&resource=airbnb&beds=${propertyType}`
+          rentalDataPromises.push(
+            fetch(neighborhoodAirbnbUrl, {
+              headers: { 'x-api-key': mashvisorApiKey }
+            }).then(async (res) => {
+              if (res.ok) {
+                const data = await res.json()
+                return { type: 'neighborhood_airbnb', data, neighborhood: neighborhoodName }
+              }
+              return null
+            }).catch(() => null)
+          )
+
+          // Traditional data for neighborhood
+          const neighborhoodTraditionalUrl = `https://api.mashvisor.com/v1.1/client/rento-calculator/lookup?state=${state}&city=${encodeURIComponent(city)}&neighborhood=${encodeURIComponent(neighborhoodName)}&resource=traditional&beds=${propertyType}`
+          rentalDataPromises.push(
+            fetch(neighborhoodTraditionalUrl, {
+              headers: { 'x-api-key': mashvisorApiKey }
+            }).then(async (res) => {
+              if (res.ok) {
+                const data = await res.json()
+                return { type: 'neighborhood_traditional', data, neighborhood: neighborhoodName }
+              }
+              return null
+            }).catch(() => null)
+          )
+        }
+      }
+
+      console.log(`📊 Making ${rentalDataPromises.length} API calls for rental data`)
+      
+      // Execute all API calls
+      const rentalResults = await Promise.all(rentalDataPromises)
+      const validResults = rentalResults.filter(result => result !== null)
+
+      console.log(`✅ Got ${validResults.length} valid rental data responses`)
+
+      // Combine the data
+      const combinedData = {
+        success: true,
+        data: {
+          city: city,
+          state: state,
+          propertyType: propertyType,
+          bathrooms: bathrooms,
+          neighborhoods: neighborhoods,
+          rentalData: validResults,
+          message: 'Real rental data from Mashvisor lookup API'
+        }
+      }
+
+      return new Response(
+        JSON.stringify(combinedData),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+
     } catch (error) {
-      console.log(`⚠️ Error fetching neighborhood data for ${city}:`, error)
+      console.log(`⚠️ Error fetching data for ${city}:`, error)
       
       const fallbackData = {
         success: false,

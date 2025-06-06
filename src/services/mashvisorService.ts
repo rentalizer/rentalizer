@@ -6,11 +6,13 @@ interface SubmarketData {
   strRevenue: number;
   medianRent: number;
   multiple: number;
+  address?: string;
+  neighborhood: string;
 }
 
 export const fetchRealMarketData = async (city: string, propertyType: string, bathrooms: string) => {
   try {
-    console.log(`🚀 Calling real Mashvisor API for ${city}`);
+    console.log(`🚀 Calling Mashvisor Lookup API for ${city}`);
     
     const { data, error } = await supabase.functions.invoke('mashvisor-api', {
       body: {
@@ -24,7 +26,7 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
       throw new Error(`API call failed: ${error.message}`);
     }
 
-    console.log('✅ Real Mashvisor API response:', data);
+    console.log('✅ Mashvisor Lookup API response:', data);
     
     return data;
   } catch (error) {
@@ -36,80 +38,124 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
 export const processMarketData = (marketData: any): SubmarketData[] => {
   const processedData: SubmarketData[] = [];
   
-  console.log('🔍 Processing market data structure:', marketData);
+  console.log('🔍 Processing Mashvisor lookup data:', marketData);
   
-  // Handle successful API response with real financial data
-  if (marketData && marketData.success && marketData.data && marketData.data.content) {
-    console.log('📊 Processing real Mashvisor financial data');
+  if (marketData && marketData.success && marketData.data && marketData.data.rentalData) {
+    console.log('📊 Processing real Mashvisor lookup rental data');
     
-    // Check for different possible data structures from Mashvisor
-    const results = marketData.data.content.results || 
-                   marketData.data.content.properties || 
-                   marketData.data.content.neighborhoods || 
-                   marketData.data.content;
+    const rentalData = marketData.data.rentalData;
+    const neighborhoods = marketData.data.neighborhoods || [];
     
-    if (results && Array.isArray(results)) {
-      console.log(`✅ Found ${results.length} real data points from Mashvisor`);
+    // Group rental data by neighborhood
+    const neighborhoodDataMap = new Map();
+    
+    rentalData.forEach((item: any) => {
+      if (!item || !item.data || !item.neighborhood) return;
       
-      results.forEach((item: any, index: number) => {
-        // Extract REAL financial data from Mashvisor API
-        const monthlyStrRevenue = item.airbnb?.monthly_revenue || 
-                                 item.str_revenue || 
-                                 item.rental_income?.str || 
-                                 item.monthly_revenue || 
-                                 0;
-        
-        const monthlyRent = item.traditional?.monthly_rent || 
-                           item.monthly_rent || 
-                           item.rental_income?.traditional || 
-                           item.rent || 
+      const neighborhood = item.neighborhood;
+      const isAirbnb = item.type.includes('airbnb');
+      
+      if (!neighborhoodDataMap.has(neighborhood)) {
+        neighborhoodDataMap.set(neighborhood, {
+          neighborhood: neighborhood,
+          airbnbData: null,
+          traditionalData: null
+        });
+      }
+      
+      const neighborhoodEntry = neighborhoodDataMap.get(neighborhood);
+      
+      if (isAirbnb) {
+        neighborhoodEntry.airbnbData = item.data;
+      } else {
+        neighborhoodEntry.traditionalData = item.data;
+      }
+    });
+    
+    console.log(`✅ Found data for ${neighborhoodDataMap.size} areas`);
+    
+    // Process each neighborhood's data
+    neighborhoodDataMap.forEach((entry, neighborhood) => {
+      const { airbnbData, traditionalData } = entry;
+      
+      // Extract STR revenue from Airbnb data
+      let monthlyStrRevenue = 0;
+      if (airbnbData && airbnbData.content) {
+        monthlyStrRevenue = airbnbData.content.monthly_revenue || 
+                           airbnbData.content.revenue || 
+                           airbnbData.content.airbnb_revenue || 
                            0;
+      }
+      
+      // Extract traditional rent from traditional data
+      let monthlyRent = 0;
+      if (traditionalData && traditionalData.content) {
+        monthlyRent = traditionalData.content.monthly_rent || 
+                     traditionalData.content.rent || 
+                     traditionalData.content.traditional_rent || 
+                     0;
+      }
+      
+      // Get address info if available
+      const address = airbnbData?.content?.address || traditionalData?.content?.address || '';
+      
+      console.log(`📍 ${neighborhood}: STR: $${monthlyStrRevenue}, Rent: $${monthlyRent}, Address: ${address}`);
+      
+      // Only include data points with real financial data
+      if (monthlyStrRevenue > 0 && monthlyRent > 0) {
+        const multiple = monthlyStrRevenue / monthlyRent;
         
-        const neighborhoodName = item.neighborhood || 
-                                item.name || 
-                                item.area || 
-                                item.address || 
-                                `Area ${index + 1}`;
+        processedData.push({
+          submarket: `${neighborhood} - ${marketData.data.city || 'Unknown City'}`,
+          strRevenue: Math.round(monthlyStrRevenue),
+          medianRent: Math.round(monthlyRent),
+          multiple: multiple,
+          neighborhood: neighborhood,
+          address: address
+        });
         
-        // Only include data points with REAL financial data from Mashvisor
-        if (monthlyStrRevenue > 0 && monthlyRent > 0) {
-          const multiple = monthlyStrRevenue / monthlyRent;
-          
-          processedData.push({
-            submarket: `${neighborhoodName} - ${marketData.data.city || 'Unknown City'}`,
-            strRevenue: Math.round(monthlyStrRevenue),
-            medianRent: Math.round(monthlyRent),
-            multiple: multiple
-          });
-          
-          console.log(`✅ REAL DATA: ${neighborhoodName} - STR: $${monthlyStrRevenue}, Rent: $${monthlyRent}, Multiple: ${multiple.toFixed(2)}x`);
-        } else {
-          console.log(`❌ INCOMPLETE DATA: ${neighborhoodName} - STR: $${monthlyStrRevenue}, Rent: $${monthlyRent}`);
-        }
-      });
-    }
+        console.log(`✅ REAL DATA: ${neighborhood} - STR: $${monthlyStrRevenue}, Rent: $${monthlyRent}, Multiple: ${multiple.toFixed(2)}x`);
+      } else if (monthlyStrRevenue > 0) {
+        // If we have STR data but no rent data, still include it
+        processedData.push({
+          submarket: `${neighborhood} - ${marketData.data.city || 'Unknown City'}`,
+          strRevenue: Math.round(monthlyStrRevenue),
+          medianRent: 0,
+          multiple: 0,
+          neighborhood: neighborhood,
+          address: address
+        });
+        
+        console.log(`⚠️ PARTIAL DATA: ${neighborhood} - STR: $${monthlyStrRevenue}, No rent data`);
+      } else {
+        console.log(`❌ NO FINANCIAL DATA: ${neighborhood}`);
+      }
+    });
   }
   
-  // Only show error message if API failed or returned no usable data
+  // If no data available, show message
   if (processedData.length === 0) {
-    console.log('❌ No real financial data available from Mashvisor API');
+    console.log('❌ No real financial data available from Mashvisor Lookup API');
     
     const city = marketData?.data?.city || 'Unknown City';
-    const message = 'No real financial data available from Mashvisor API';
+    const message = 'No real financial data available from Mashvisor Lookup API';
     
     processedData.push({
       submarket: `${city} - ${message}`,
       strRevenue: 0,
       medianRent: 0,
-      multiple: 0
+      multiple: 0,
+      neighborhood: city,
+      address: ''
     });
   }
 
   // Sort by monthly STR revenue (highest first)
   processedData.sort((a, b) => b.strRevenue - a.strRevenue);
 
-  console.log('✅ Final processed REAL data:', processedData.map(d => ({
-    submarket: d.submarket,
+  console.log('✅ Final processed REAL lookup data:', processedData.map(d => ({
+    neighborhood: d.neighborhood,
+    address: d.address,
     monthlyStrRevenue: d.strRevenue,
     monthlyRent: d.medianRent,
     multiple: d.multiple > 0 ? d.multiple.toFixed(2) : 'No Data'
