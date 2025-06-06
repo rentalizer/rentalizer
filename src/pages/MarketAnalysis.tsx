@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,7 +12,7 @@ import { ApiKeyInput } from '@/components/ApiKeyInput';
 const MarketAnalysis = () => {
   const navigate = useNavigate();
 
-  const handleApiKeysChange = (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => {
+  const handleApiKeysChange = (keys: { mashvisorApiKey?: string; openaiApiKey?: string }) => {
     // API keys are automatically saved to localStorage by the ApiKeyInput component
     console.log('API keys updated for market analysis:', keys);
   };
