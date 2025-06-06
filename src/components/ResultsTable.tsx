@@ -85,7 +85,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
             )}
           </div>
         </div>
-        <p className="text-white">Revenue potential by submarket</p>
+        <p className="text-white">Monthly revenue potential by submarket</p>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
@@ -103,10 +103,10 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
                 <TableHead className="text-white font-semibold">
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-green-400" />
-                    STR Revenue
+                    Monthly STR Revenue
                   </div>
                 </TableHead>
-                <TableHead className="text-white font-semibold">Median Rent</TableHead>
+                <TableHead className="text-white font-semibold">Monthly Median Rent</TableHead>
                 <TableHead className="text-white font-semibold">Revenue Multiple</TableHead>
               </TableRow>
             </TableHeader>
@@ -156,7 +156,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
         <div className="p-4 bg-gray-800/20 border-t border-gray-700">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2 text-cyan-300">
-              <span>Market Analysis Results</span>
+              <span>Monthly Market Analysis Results</span>
               {selectedSubmarkets.length > 0 && (
                 <span className="text-purple-300">• {selectedSubmarkets.length} selected</span>
               )}

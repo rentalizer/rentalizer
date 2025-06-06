@@ -290,7 +290,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               <strong>Environment:</strong> {window.location.hostname === 'localhost' ? 'Preview/Development' : 'Production'}
             </div>
             <div className="text-xs text-blue-400 mt-1">
-              Mashvisor API provides real estate market data including STR revenue and rental income statistics
+              Mashvisor API provides monthly STR revenue and rent data. OpenAI API enables AI-powered market insights.
             </div>
           </div>
         </div>

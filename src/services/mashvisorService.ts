@@ -49,20 +49,20 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     neighborhoods.forEach((neighborhood: any, index: number) => {
       const neighborhoodName = neighborhood.name || `Neighborhood ${index + 1}`;
       
-      // Generate simulated revenue data based on neighborhood characteristics
+      // Generate simulated monthly revenue data based on neighborhood characteristics
       // Since Mashvisor neighborhood endpoint doesn't include revenue data directly,
-      // we'll create realistic estimates based on location and city
-      const baseRevenue = getBaseRevenueForCity(city);
-      const strRevenue = Math.round(baseRevenue * (0.8 + Math.random() * 0.4)); // 80%-120% of base
-      const rentRevenue = Math.round(strRevenue * (0.4 + Math.random() * 0.3)); // 40%-70% of STR revenue
+      // we'll create realistic monthly estimates based on location and city
+      const baseMonthlyRevenue = getBaseMonthlyRevenueForCity(city);
+      const monthlyStrRevenue = Math.round(baseMonthlyRevenue * (0.8 + Math.random() * 0.4)); // 80%-120% of base
+      const monthlyRent = Math.round(monthlyStrRevenue * (0.4 + Math.random() * 0.3)); // 40%-70% of STR revenue
       
-      if (strRevenue > 0 && rentRevenue > 0) {
-        const multiple = strRevenue / rentRevenue;
+      if (monthlyStrRevenue > 0 && monthlyRent > 0) {
+        const multiple = monthlyStrRevenue / monthlyRent;
         
         processedData.push({
           submarket: `${neighborhoodName} - ${city}`,
-          strRevenue: strRevenue,
-          medianRent: rentRevenue,
+          strRevenue: monthlyStrRevenue,
+          medianRent: monthlyRent,
           multiple: multiple
         });
       }
@@ -84,45 +84,45 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     });
   }
 
-  // Sort by STR revenue (highest first)
+  // Sort by monthly STR revenue (highest first)
   processedData.sort((a, b) => b.strRevenue - a.strRevenue);
 
   console.log('✅ Processed neighborhood data:', processedData.map(d => ({
     submarket: d.submarket,
-    revenue: d.strRevenue,
-    rent: d.medianRent,
+    monthlyStrRevenue: d.strRevenue,
+    monthlyRent: d.medianRent,
     multiple: d.multiple > 0 ? d.multiple.toFixed(2) : 'N/A'
   })));
   
   return processedData;
 };
 
-// Helper function to get base revenue estimates by city
-const getBaseRevenueForCity = (city: string): number => {
+// Helper function to get base monthly revenue estimates by city
+const getBaseMonthlyRevenueForCity = (city: string): number => {
   const cityLower = city.toLowerCase();
   
-  const cityRevenueMap: { [key: string]: number } = {
-    'austin': 45000,
-    'houston': 38000,
-    'dallas': 42000,
-    'san antonio': 35000,
-    'los angeles': 65000,
-    'san francisco': 85000,
-    'san diego': 55000,
-    'new york': 75000,
-    'chicago': 48000,
-    'miami': 52000,
-    'denver': 46000,
-    'seattle': 58000,
-    'atlanta': 41000,
-    'phoenix': 39000,
-    'tampa': 44000,
-    'orlando': 47000,
-    'las vegas': 43000,
-    'boston': 62000,
-    'washington': 59000,
-    'philadelphia': 51000
+  const cityMonthlyRevenueMap: { [key: string]: number } = {
+    'austin': 3750,
+    'houston': 3170,
+    'dallas': 3500,
+    'san antonio': 2920,
+    'los angeles': 5420,
+    'san francisco': 7080,
+    'san diego': 4580,
+    'new york': 6250,
+    'chicago': 4000,
+    'miami': 4330,
+    'denver': 3830,
+    'seattle': 4830,
+    'atlanta': 3420,
+    'phoenix': 3250,
+    'tampa': 3670,
+    'orlando': 3920,
+    'las vegas': 3580,
+    'boston': 5170,
+    'washington': 4920,
+    'philadelphia': 4250
   };
   
-  return cityRevenueMap[cityLower] || 40000; // Default fallback
+  return cityMonthlyRevenueMap[cityLower] || 3330; // Default monthly fallback
 };
