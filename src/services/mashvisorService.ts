@@ -38,43 +38,64 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   
   console.log('🔍 Processing market data structure:', marketData);
   
-  // Handle successful API response with neighborhood data
-  if (marketData && marketData.success && marketData.data && marketData.data.content && marketData.data.content.results) {
-    const neighborhoods = marketData.data.content.results;
-    const city = marketData.data.city || 'Unknown City';
+  // Handle successful API response with real financial data
+  if (marketData && marketData.success && marketData.data && marketData.data.content) {
+    console.log('📊 Processing real Mashvisor financial data');
     
-    console.log('📊 Processing neighborhood results:', neighborhoods);
+    // Check for different possible data structures from Mashvisor
+    const results = marketData.data.content.results || 
+                   marketData.data.content.properties || 
+                   marketData.data.content.neighborhoods || 
+                   marketData.data.content;
     
-    // Process each neighborhood from the results array
-    neighborhoods.forEach((neighborhood: any, index: number) => {
-      const neighborhoodName = neighborhood.name || `Neighborhood ${index + 1}`;
+    if (results && Array.isArray(results)) {
+      console.log(`✅ Found ${results.length} real data points from Mashvisor`);
       
-      // Generate simulated monthly revenue data based on neighborhood characteristics
-      // Since Mashvisor neighborhood endpoint doesn't include revenue data directly,
-      // we'll create realistic monthly estimates based on location and city
-      const baseMonthlyRevenue = getBaseMonthlyRevenueForCity(city);
-      const monthlyStrRevenue = Math.round(baseMonthlyRevenue * (0.8 + Math.random() * 0.4)); // 80%-120% of base
-      const monthlyRent = Math.round(monthlyStrRevenue * (0.4 + Math.random() * 0.3)); // 40%-70% of STR revenue
-      
-      if (monthlyStrRevenue > 0 && monthlyRent > 0) {
-        const multiple = monthlyStrRevenue / monthlyRent;
+      results.forEach((item: any, index: number) => {
+        // Extract REAL financial data from Mashvisor API
+        const monthlyStrRevenue = item.airbnb?.monthly_revenue || 
+                                 item.str_revenue || 
+                                 item.rental_income?.str || 
+                                 item.monthly_revenue || 
+                                 0;
         
-        processedData.push({
-          submarket: `${neighborhoodName} - ${city}`,
-          strRevenue: monthlyStrRevenue,
-          medianRent: monthlyRent,
-          multiple: multiple
-        });
-      }
-    });
+        const monthlyRent = item.traditional?.monthly_rent || 
+                           item.monthly_rent || 
+                           item.rental_income?.traditional || 
+                           item.rent || 
+                           0;
+        
+        const neighborhoodName = item.neighborhood || 
+                                item.name || 
+                                item.area || 
+                                item.address || 
+                                `Area ${index + 1}`;
+        
+        // Only include data points with REAL financial data from Mashvisor
+        if (monthlyStrRevenue > 0 && monthlyRent > 0) {
+          const multiple = monthlyStrRevenue / monthlyRent;
+          
+          processedData.push({
+            submarket: `${neighborhoodName} - ${marketData.data.city || 'Unknown City'}`,
+            strRevenue: Math.round(monthlyStrRevenue),
+            medianRent: Math.round(monthlyRent),
+            multiple: multiple
+          });
+          
+          console.log(`✅ REAL DATA: ${neighborhoodName} - STR: $${monthlyStrRevenue}, Rent: $${monthlyRent}, Multiple: ${multiple.toFixed(2)}x`);
+        } else {
+          console.log(`❌ INCOMPLETE DATA: ${neighborhoodName} - STR: $${monthlyStrRevenue}, Rent: $${monthlyRent}`);
+        }
+      });
+    }
   }
   
-  // Handle API failure or no data
+  // Only show error message if API failed or returned no usable data
   if (processedData.length === 0) {
-    console.log('❌ No valid neighborhood data found');
+    console.log('❌ No real financial data available from Mashvisor API');
     
     const city = marketData?.data?.city || 'Unknown City';
-    const message = marketData?.data?.message || marketData?.message || 'No neighborhood data available';
+    const message = 'No real financial data available from Mashvisor API';
     
     processedData.push({
       submarket: `${city} - ${message}`,
@@ -87,42 +108,12 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
   // Sort by monthly STR revenue (highest first)
   processedData.sort((a, b) => b.strRevenue - a.strRevenue);
 
-  console.log('✅ Processed neighborhood data:', processedData.map(d => ({
+  console.log('✅ Final processed REAL data:', processedData.map(d => ({
     submarket: d.submarket,
     monthlyStrRevenue: d.strRevenue,
     monthlyRent: d.medianRent,
-    multiple: d.multiple > 0 ? d.multiple.toFixed(2) : 'N/A'
+    multiple: d.multiple > 0 ? d.multiple.toFixed(2) : 'No Data'
   })));
   
   return processedData;
-};
-
-// Helper function to get base monthly revenue estimates by city
-const getBaseMonthlyRevenueForCity = (city: string): number => {
-  const cityLower = city.toLowerCase();
-  
-  const cityMonthlyRevenueMap: { [key: string]: number } = {
-    'austin': 3750,
-    'houston': 3170,
-    'dallas': 3500,
-    'san antonio': 2920,
-    'los angeles': 5420,
-    'san francisco': 7080,
-    'san diego': 4580,
-    'new york': 6250,
-    'chicago': 4000,
-    'miami': 4330,
-    'denver': 3830,
-    'seattle': 4830,
-    'atlanta': 3420,
-    'phoenix': 3250,
-    'tampa': 3670,
-    'orlando': 3920,
-    'las vegas': 3580,
-    'boston': 5170,
-    'washington': 4920,
-    'philadelphia': 4250
-  };
-  
-  return cityMonthlyRevenueMap[cityLower] || 3330; // Default monthly fallback
 };
