@@ -13,41 +13,103 @@ serve(async (req) => {
   }
 
   try {
-    const { city, propertyType, bathrooms } = await req.json()
+    const { city, propertyType, bathrooms, listingId, action = 'market_search' } = await req.json()
     
-    console.log(`🔍 AirDNA API call for ${city} (${propertyType}BR/${bathrooms}BA)`)
+    console.log(`🔍 AirDNA API call - Action: ${action}`)
     
     // Use your provided AirDNA API key
     const airdnaApiKey = '563ec2eceemshee4a0b6d8e03f721b10e5cien566818f3fc3'
     
-    console.log('🔑 Using AirDNA API key for market data...')
+    console.log('🔑 Using AirDNA API key for data...')
 
     try {
-      // Call AirDNA market data endpoint
-      const airdnaUrl = `https://api.airdna.co/v1/market/property_type_performance`
-      
-      const requestBody = {
-        location: city,
-        property_types: [`${propertyType}br`],
-        start_date: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 year ago
-        end_date: new Date().toISOString().split('T')[0]
+      // Handle comps request for specific listing
+      if (action === 'get_comps' && listingId) {
+        console.log(`🏠 Fetching comps for listing: ${listingId}`)
+        
+        const compsUrl = `https://api.airdna.co/api/enterprise/v2/listing/${listingId}/comps`
+        
+        const compsResponse = await fetch(compsUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${airdnaApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            pagination: { page_size: 10, offset: 0 },
+            currency: 'usd'
+          })
+        })
+
+        if (compsResponse.ok) {
+          const compsData = await compsResponse.json()
+          console.log(`✅ AirDNA Comps API response received for listing ${listingId}`)
+          
+          return new Response(
+            JSON.stringify({
+              success: true,
+              data: {
+                listingId: listingId,
+                comps: compsData,
+                source: 'airdna_comps_api'
+              }
+            }),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            }
+          )
+        } else {
+          const errorText = await compsResponse.text()
+          console.error(`❌ AirDNA Comps API error: ${compsResponse.status} - ${errorText}`)
+          
+          return new Response(
+            JSON.stringify({
+              success: false,
+              data: {
+                listingId: listingId,
+                message: `AirDNA Comps API error: ${compsResponse.status}`,
+                error: errorText
+              }
+            }),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            }
+          )
+        }
       }
 
-      console.log(`📡 Calling AirDNA Market API: ${airdnaUrl}`)
-      console.log(`📝 Request body:`, requestBody)
+      // Original market data search logic
+      console.log(`🔍 AirDNA market search for ${city} (${propertyType}BR/${bathrooms}BA)`)
       
-      const airdnaResponse = await fetch(airdnaUrl, {
+      // Try property search to get listing IDs first
+      const searchUrl = `https://api.airdna.co/v1/market/property_search`
+      const searchBody = {
+        location: city,
+        bedrooms: parseInt(propertyType),
+        bathrooms: parseInt(bathrooms),
+        limit: 50
+      }
+      
+      console.log(`🔄 Trying property search: ${searchUrl}`)
+      
+      const searchResponse = await fetch(searchUrl, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${airdnaApiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(searchBody)
       })
-
-      if (airdnaResponse.ok) {
-        const airdnaData = await airdnaResponse.json()
-        console.log(`✅ AirDNA Market API response received for ${city}`)
+      
+      if (searchResponse.ok) {
+        const searchData = await searchResponse.json()
+        console.log(`✅ AirDNA Property Search response received for ${city}`)
+        
+        // Extract listing IDs for potential comps lookup
+        const listings = searchData.results || searchData.data || searchData
+        const listingIds = Array.isArray(listings) 
+          ? listings.slice(0, 5).map((listing: any) => listing.listing_id || listing.id).filter(Boolean)
+          : []
         
         return new Response(
           JSON.stringify({
@@ -56,8 +118,9 @@ serve(async (req) => {
               city: city,
               propertyType: propertyType,
               bathrooms: bathrooms,
-              marketData: airdnaData,
-              source: 'airdna_market_api'
+              properties: listings,
+              listingIds: listingIds, // Include listing IDs for comps lookup
+              source: 'airdna_property_search'
             }
           }),
           { 
@@ -65,70 +128,26 @@ serve(async (req) => {
           }
         )
       } else {
-        const errorText = await airdnaResponse.text()
-        console.error(`⚠️ AirDNA Market API error: ${airdnaResponse.status} - ${errorText}`)
+        const searchErrorText = await searchResponse.text()
+        console.error(`❌ AirDNA Property Search error: ${searchResponse.status} - ${searchErrorText}`)
         
-        // Fallback to property search if market API fails
-        const searchUrl = `https://api.airdna.co/v1/market/property_search`
-        const searchBody = {
-          location: city,
-          bedrooms: parseInt(propertyType),
-          bathrooms: parseInt(bathrooms),
-          limit: 100
-        }
-        
-        console.log(`🔄 Trying property search fallback: ${searchUrl}`)
-        
-        const searchResponse = await fetch(searchUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${airdnaApiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(searchBody)
-        })
-        
-        if (searchResponse.ok) {
-          const searchData = await searchResponse.json()
-          console.log(`✅ AirDNA Property Search response received for ${city}`)
-          
-          return new Response(
-            JSON.stringify({
-              success: true,
-              data: {
-                city: city,
-                propertyType: propertyType,
-                bathrooms: bathrooms,
-                properties: searchData.results || searchData.data || searchData,
-                source: 'airdna_property_search'
-              }
-            }),
-            { 
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        return new Response(
+          JSON.stringify({
+            success: false,
+            data: {
+              city: city,
+              propertyType: propertyType,
+              bathrooms: bathrooms,
+              message: `AirDNA API error: ${searchResponse.status}`,
+              error: searchErrorText
             }
-          )
-        } else {
-          const searchErrorText = await searchResponse.text()
-          console.error(`❌ AirDNA Property Search error: ${searchResponse.status} - ${searchErrorText}`)
-          
-          return new Response(
-            JSON.stringify({
-              success: false,
-              data: {
-                city: city,
-                propertyType: propertyType,
-                bathrooms: bathrooms,
-                message: `AirDNA API error: ${airdnaResponse.status}`,
-                error: errorText,
-                searchError: searchErrorText
-              }
-            }),
-            { 
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-            }
-          )
-        }
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        )
       }
+
     } catch (apiError) {
       console.error(`❌ Error calling AirDNA API:`, apiError)
       

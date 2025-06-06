@@ -8,6 +8,7 @@ interface SubmarketData {
   multiple: number;
   neighborhood: string;
   address?: string;
+  listingId?: string;
 }
 
 export const fetchRealMarketData = async (city: string, propertyType: string, bathrooms: string) => {
@@ -18,7 +19,8 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
       body: {
         city,
         propertyType,
-        bathrooms
+        bathrooms,
+        action: 'market_search'
       }
     });
 
@@ -35,6 +37,30 @@ export const fetchRealMarketData = async (city: string, propertyType: string, ba
   }
 };
 
+export const fetchCompsData = async (listingId: string) => {
+  try {
+    console.log(`🏠 Calling AirDNA Comps API for listing: ${listingId}`);
+    
+    const { data, error } = await supabase.functions.invoke('airdna-api', {
+      body: {
+        listingId,
+        action: 'get_comps'
+      }
+    });
+
+    if (error) {
+      throw new Error(`Comps API call failed: ${error.message}`);
+    }
+
+    console.log('✅ AirDNA Comps API response:', data);
+    
+    return data;
+  } catch (error) {
+    console.error('❌ AirDNA Comps API error:', error);
+    throw error;
+  }
+};
+
 export const processMarketData = (marketData: any): SubmarketData[] => {
   const processedData: SubmarketData[] = [];
   
@@ -46,34 +72,8 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     
     console.log(`📊 Processing AirDNA data from source: ${responseData.source}`);
     
-    // Handle market performance data
-    if (responseData.source === 'airdna_market_api' && responseData.marketData) {
-      console.log('📈 Processing market performance data');
-      const marketData = responseData.marketData;
-      
-      // Process market data by location/neighborhood if available
-      if (marketData.results && Array.isArray(marketData.results)) {
-        marketData.results.forEach((result: any) => {
-          const neighborhood = result.neighborhood || result.location || result.area || 'City Average';
-          const monthlyRevenue = result.revenue || result.monthly_revenue || (result.adr * result.occupancy_rate * 30) || 0;
-          const estimatedRent = monthlyRevenue * 0.7; // Estimate traditional rent as 70% of STR revenue
-          const multiple = estimatedRent > 0 ? monthlyRevenue / estimatedRent : 0;
-          
-          if (monthlyRevenue > 0) {
-            processedData.push({
-              submarket: `${neighborhood}, ${responseData.city}`,
-              strRevenue: Math.round(monthlyRevenue),
-              medianRent: Math.round(estimatedRent),
-              multiple: multiple,
-              neighborhood: neighborhood
-            });
-          }
-        });
-      }
-    }
-    
     // Handle property search data
-    else if (responseData.source === 'airdna_property_search' && responseData.properties) {
+    if (responseData.source === 'airdna_property_search' && responseData.properties) {
       console.log('🏠 Processing property search data');
       const properties = responseData.properties;
       
@@ -86,6 +86,7 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
           const revenue = property.revenue || property.monthly_revenue || 0;
           const adr = property.adr || property.average_daily_rate || 0;
           const occupancy = property.occupancy_rate || property.occupancy || 0;
+          const listingId = property.listing_id || property.id;
           
           // Calculate monthly revenue if we have ADR and occupancy
           let monthlyRevenue = revenue;
@@ -96,7 +97,8 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
           if (!neighborhoodData.has(neighborhood)) {
             neighborhoodData.set(neighborhood, {
               revenues: [],
-              count: 0
+              count: 0,
+              listingIds: []
             });
           }
           
@@ -104,6 +106,9 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
           if (monthlyRevenue > 0) {
             data.revenues.push(monthlyRevenue);
             data.count++;
+            if (listingId) {
+              data.listingIds.push(listingId);
+            }
           }
         });
         
@@ -119,7 +124,8 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
               strRevenue: Math.round(avgRevenue),
               medianRent: Math.round(estimatedRent),
               multiple: multiple,
-              neighborhood: neighborhood
+              neighborhood: neighborhood,
+              listingId: data.listingIds[0] // Include first listing ID for comps lookup
             });
           }
         });
@@ -150,7 +156,8 @@ export const processMarketData = (marketData: any): SubmarketData[] => {
     neighborhood: d.neighborhood,
     monthlyRevenue: d.strRevenue,
     estimatedRent: d.medianRent,
-    multiple: d.multiple > 0 ? d.multiple.toFixed(2) : 'N/A'
+    multiple: d.multiple > 0 ? d.multiple.toFixed(2) : 'N/A',
+    listingId: d.listingId || 'N/A'
   })));
   
   return processedData;
