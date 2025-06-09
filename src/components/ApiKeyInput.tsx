@@ -19,9 +19,17 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   const [showKeys, setShowKeys] = useState(false);
 
   useEffect(() => {
-    // Load saved API keys from localStorage
-    const savedRapidApiKey = localStorage.getItem('rapidapi_key') || '';
-    const savedOpenaiApiKey = localStorage.getItem('openai_api_key') || '';
+    // Load saved API keys from localStorage - check multiple possible keys
+    const savedRapidApiKey = localStorage.getItem('rapidapi_key') || 
+                            localStorage.getItem('professional_data_key') || 
+                            localStorage.getItem('airdna_api_key') || '';
+    const savedOpenaiApiKey = localStorage.getItem('openai_api_key') || 
+                             localStorage.getItem('OPENAI_API_KEY') || '';
+    
+    console.log('🔍 Loading API Keys from localStorage:', {
+      rapidApiKey: savedRapidApiKey ? `${savedRapidApiKey.substring(0, 8)}... (${savedRapidApiKey.length} chars)` : 'Not found',
+      openaiApiKey: savedOpenaiApiKey ? `${savedOpenaiApiKey.substring(0, 8)}... (${savedOpenaiApiKey.length} chars)` : 'Not found'
+    });
     
     setRapidApiKey(savedRapidApiKey);
     setOpenaiApiKey(savedOpenaiApiKey);
@@ -37,12 +45,15 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     setIsSaving(true);
     
     try {
-      // Save to localStorage
+      // Save to localStorage with multiple keys for compatibility
       if (rapidApiKey) {
         localStorage.setItem('rapidapi_key', rapidApiKey);
+        localStorage.setItem('professional_data_key', rapidApiKey);
+        localStorage.setItem('airdna_api_key', rapidApiKey);
       }
       if (openaiApiKey) {
         localStorage.setItem('openai_api_key', openaiApiKey);
+        localStorage.setItem('OPENAI_API_KEY', openaiApiKey);
       }
       
       // Notify parent component
