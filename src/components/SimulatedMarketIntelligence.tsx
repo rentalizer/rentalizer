@@ -34,17 +34,24 @@ export const SimulatedMarketIntelligence = () => {
       const rentalApiData = await fetchRealRentalData(city, propType);
       const rentals = processRentalData(rentalApiData);
       
-      console.log(`📊 OpenAI rental data:`, rentals);
+      console.log(`📊 Processed OpenAI rental data:`, rentals);
 
-      // Step 2: Create submarkets with rental data
-      const submarkets: SubmarketData[] = rentals.map((rental: any) => ({
-        submarket: `${rental.neighborhood}, ${city}`,
-        strRevenue: 0, // Will be filled with STR data if available
-        medianRent: rental.rent || 0,
-        multiple: 0
-      }));
+      // Step 2: Create submarkets DIRECTLY from OpenAI rental data
+      const submarkets: SubmarketData[] = rentals.map((rental: any, index: number) => {
+        console.log(`📍 Processing rental ${index}:`, rental);
+        
+        const submarket: SubmarketData = {
+          submarket: rental.neighborhood || `Area ${index + 1}`,
+          strRevenue: 0, // Will be filled with STR data if available
+          medianRent: rental.rent || 0,
+          multiple: 0
+        };
+        
+        console.log(`✅ Created submarket:`, submarket);
+        return submarket;
+      });
 
-      console.log(`📋 Created ${submarkets.length} submarkets with rental data:`, submarkets);
+      console.log(`📋 Final submarkets with rental data:`, submarkets);
 
       // Step 3: Try to get STR data (optional)
       try {
@@ -76,6 +83,8 @@ export const SimulatedMarketIntelligence = () => {
       setBathrooms(bathCount);
       
       const rentalCount = submarkets.filter(d => d.medianRent > 0).length;
+      
+      console.log(`🎉 Analysis complete! ${submarkets.length} submarkets, ${rentalCount} with rental data`);
       
       toast({
         title: "Market Analysis Complete",
