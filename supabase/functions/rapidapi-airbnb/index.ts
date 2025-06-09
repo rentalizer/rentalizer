@@ -17,9 +17,9 @@ serve(async (req) => {
     
     console.log(`Processing RapidAPI Airbnb request for ${city}`);
     
-    // You'll need to replace this with your actual RapidAPI endpoint and key
-    const rapidApiKey = 'YOUR_RAPIDAPI_KEY'; // Replace with your actual key
-    const rapidApiHost = 'airbnb-scraper.p.rapidapi.com'; // Replace with actual host
+    // Your actual RapidAPI credentials
+    const rapidApiKey = '563ec2eceemshee4eb6d8e03f721p1oe15cjsn5666181f3c3';
+    const rapidApiHost = 'airbnb-scraper.p.rapidapi.com';
     
     try {
       // Make actual call to RapidAPI Airbnb Scraper
@@ -31,9 +31,13 @@ serve(async (req) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          location: city,
-          property_type: propertyType,
-          // Add other parameters as needed based on the API documentation
+          locationQuery: `${city}, California`,
+          maxListings: 18,
+          includeReviews: true,
+          maxReviews: 100,
+          currency: "USD",
+          checkin: "YYYY-MM-DD",
+          checkout: "YYYY-MM-DD"
         })
       });
 
@@ -49,12 +53,14 @@ serve(async (req) => {
           }
         };
         
-        console.log('✅ RapidAPI Airbnb Scraper response processed');
+        console.log('✅ RapidAPI Airbnb Scraper response processed:', processedData);
         
         return new Response(JSON.stringify(processedData), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       } else {
+        const errorText = await response.text();
+        console.error(`RapidAPI error: ${response.status} - ${errorText}`);
         throw new Error(`RapidAPI error: ${response.status}`);
       }
     } catch (apiError) {
