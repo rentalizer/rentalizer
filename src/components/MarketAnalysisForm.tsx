@@ -60,7 +60,7 @@ export const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ onAnalyz
                 id="neighborhood"
                 value={neighborhood}
                 onChange={(e) => setNeighborhood(e.target.value)}
-                placeholder="e.g., North Park, Downtown, etc."
+                placeholder="e.g., North Park, East Village, etc."
                 className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
               />
             </div>
