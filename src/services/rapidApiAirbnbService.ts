@@ -80,42 +80,41 @@ export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
   };
 };
 
-// Enhanced function to fetch real rental data only
+// NEW: Fetch real rental data using OpenAI ChatGPT
 export const fetchRealRentalData = async (city: string, propertyType: string = '2') => {
   try {
-    console.log(`🏠 Fetching REAL rental data for ${city} - ${propertyType}BR/2BA`);
+    console.log(`🤖 Fetching OpenAI ChatGPT rental data for ${city} - ${propertyType}BR/2BA (Last 30 days only)`);
     
-    const { data, error } = await supabase.functions.invoke('rental-data-api', {
+    const { data, error } = await supabase.functions.invoke('openai-rental-data', {
       body: {
         city,
         bedrooms: propertyType,
-        bathrooms: '2',
-        action: 'get_rental_rates'
+        bathrooms: '2'
       }
     });
 
     if (error) {
-      console.error('Rental API call failed:', error);
-      return { success: false, data: { rentals: [] } };
+      console.error('OpenAI rental data call failed:', error);
+      throw new Error('Failed to fetch real rental data from OpenAI');
     }
 
-    console.log('✅ Real rental data response:', data);
+    console.log('✅ OpenAI ChatGPT rental data response:', data);
     return data;
   } catch (error) {
-    console.error('❌ Rental data error:', error);
-    return { success: false, data: { rentals: [] } };
+    console.error('❌ OpenAI rental data error:', error);
+    throw error;
   }
 };
 
-// Process rental data to standardize format
+// Process rental data from OpenAI ChatGPT
 export const processRentalData = (rentalData: any) => {
   if (!rentalData || !rentalData.data || !rentalData.data.rentals) {
     return [];
   }
 
   return rentalData.data.rentals.map((rental: any) => ({
-    neighborhood: rental.neighborhood || rental.address || 'Unknown',
-    rent: rental.rent || rental.price || 0,
+    neighborhood: rental.neighborhood || 'Unknown',
+    rent: rental.rent || 0,
     address: rental.address || rental.neighborhood || 'Unknown'
   }));
 };

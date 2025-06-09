@@ -29,17 +29,17 @@ export const SimulatedMarketIntelligence = () => {
     try {
       console.log(`🚀 Starting complete market analysis for ${city} - ${propType}BR/${bathCount}BA`);
       
-      // Fetch BOTH STR earnings AND rental data
+      // Fetch BOTH STR earnings AND rental data from OpenAI
       console.log(`🏠 Fetching STR earnings for ${city}`);
       const strApiData = await fetchAirbnbEarningsData(city, propType);
       const processedSTR = processAirbnbEarningsData(strApiData);
       
-      console.log(`🏠 Fetching rental rates for ${city}`);
+      console.log(`🤖 Fetching OpenAI ChatGPT rental rates for ${city} (Last 30 days only)`);
       const rentalApiData = await fetchRealRentalData(city, propType);
       const processedRentals = processRentalData(rentalApiData);
       
       console.log(`📊 STR data:`, processedSTR);
-      console.log(`📊 Rental data:`, processedRentals);
+      console.log(`📊 OpenAI ChatGPT rental data:`, processedRentals);
 
       // Combine STR and rental data by neighborhood
       const combinedData: SubmarketData[] = [];
@@ -97,15 +97,15 @@ export const SimulatedMarketIntelligence = () => {
       const validDataCount = combinedData.filter(d => d.strRevenue > 0 && d.medianRent > 0).length;
       
       toast({
-        title: "Complete Market Analysis Done",
-        description: `Found ${combinedData.length} submarkets with ${validDataCount} having both STR and rental data.`,
+        title: "OpenAI ChatGPT Market Analysis Complete",
+        description: `Found ${combinedData.length} submarkets using real ChatGPT rental data (last 30 days) with ${validDataCount} having both STR and rental data.`,
       });
 
     } catch (error) {
       console.error('❌ Market analysis error:', error);
       toast({
         title: "Analysis Failed",
-        description: "Unable to fetch market data. Please try another city.",
+        description: "Unable to fetch real market data from OpenAI ChatGPT. Please check your API key.",
         variant: "destructive",
       });
       setSubmarketData([]);
@@ -126,9 +126,9 @@ export const SimulatedMarketIntelligence = () => {
           <div className="flex items-center gap-3">
             <Eye className="h-5 w-5 text-green-400" />
             <div>
-              <h3 className="font-semibold text-green-300">REAL STR & RENTAL DATA</h3>
+              <h3 className="font-semibold text-green-300">REAL CHATGPT RENTAL DATA (LAST 30 DAYS)</h3>
               <p className="text-sm text-gray-300">
-                This tool fetches real STR earnings AND real rental rates to calculate accurate revenue multiples.
+                This tool uses OpenAI ChatGPT for rental rates (last 30 days only) and real STR earnings to calculate accurate revenue multiples. NO ESTIMATES.
               </p>
             </div>
           </div>
