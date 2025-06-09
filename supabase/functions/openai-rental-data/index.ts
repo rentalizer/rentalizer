@@ -13,9 +13,10 @@ serve(async (req) => {
   }
 
   try {
-    const { city, bedrooms, bathrooms } = await req.json();
+    const { city, bedrooms, bathrooms, neighborhood } = await req.json();
     
-    console.log(`🤖 Fetching OpenAI rental data for ${city} - ${bedrooms}BR apartments`);
+    const searchLocation = neighborhood ? `${neighborhood}, ${city}` : city;
+    console.log(`🤖 Fetching OpenAI rental data for ${searchLocation} - ${bedrooms}BR apartments`);
     
     const openAIApiKey = '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';
     
@@ -25,15 +26,38 @@ serve(async (req) => {
 
     console.log('🔑 OpenAI API key configured, making request...');
 
-    // Enhanced prompt specifically targeting public rental platforms for median apartment rents
-    const prompt = `You are a real estate data analyst with access to current rental market data from public platforms like Zumper, Rentometer, and Rentcafe.com.
+    // Enhanced prompt for specific neighborhood or city-wide search
+    const prompt = neighborhood 
+      ? `You are a real estate data analyst with access to current rental market data from public platforms like Zumper, Rentometer, and Rentcafe.com.
+
+Task: Find the current MEDIAN monthly rent for ${bedrooms}-bedroom APARTMENTS ONLY in the ${neighborhood} neighborhood of ${city}.
+
+Data Requirements:
+- Pull the most recent data from public rental platforms (Zumper, Rentometer, Rentcafe.com)
+- Return MEDIAN rent values only (not averages or ranges)
+- Focus on APARTMENTS only (exclude houses, condos, townhomes)
+- Based on user choice of ${bedrooms} bedrooms
+- Use current market data (2024-2025)
+
+Return exactly this JSON format for ${neighborhood}:
+[
+  {"neighborhood": "${neighborhood}", "rent": [median_rent_number], "address": "${neighborhood}, ${city}"}
+]
+
+Requirements:
+- Return ONLY the JSON array, no explanations
+- All rent values must be numbers (not strings)
+- Use realistic MEDIAN apartment rents for ${bedrooms}BR units in ${neighborhood}, ${city}
+- Base data on current market rates from public rental platforms`
+      : `You are a real estate data analyst with access to current rental market data from public platforms like Zumper, Rentometer, and Rentcafe.com.
 
 Task: Find the current MEDIAN monthly rent for ${bedrooms}-bedroom APARTMENTS ONLY in ${city}.
 
 Data Requirements:
-- Pull data from public rental platforms (Zumper, Rentometer, Rentcafe.com, etc.)
+- Pull the most recent data from public rental platforms (Zumper, Rentometer, Rentcafe.com)
 - Return MEDIAN rent values only (not averages or ranges)
 - Focus on APARTMENTS only (exclude houses, condos, townhomes)
+- Based on user choice of ${bedrooms} bedrooms
 - Provide data for exactly 8 different neighborhoods in ${city}
 - Use current market data (2024-2025)
 
@@ -129,6 +153,7 @@ Requirements:
       success: true,
       data: {
         city: city,
+        neighborhood: neighborhood || null,
         rentals: rentals,
         source: 'OpenAI ChatGPT - Public Rental Platforms',
         dataDate: new Date().toISOString(),

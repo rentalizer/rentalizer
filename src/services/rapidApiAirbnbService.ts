@@ -81,15 +81,16 @@ export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
 };
 
 // Fetch real rental data using OpenAI ChatGPT - ONLY SOURCE FOR RENTAL DATA
-export const fetchRealRentalData = async (city: string, propertyType: string = '2') => {
+export const fetchRealRentalData = async (city: string, propertyType: string = '2', neighborhood?: string) => {
   try {
-    console.log(`🤖 Fetching OpenAI ChatGPT rental data for ${city} - ${propertyType}BR/2BA`);
+    console.log(`🤖 Fetching OpenAI ChatGPT rental data for ${neighborhood ? neighborhood + ', ' + city : city} - ${propertyType}BR/2BA`);
     
     const { data, error } = await supabase.functions.invoke('openai-rental-data', {
       body: {
         city,
         bedrooms: propertyType,
-        bathrooms: '2'
+        bathrooms: '2',
+        neighborhood: neighborhood || null
       }
     });
 

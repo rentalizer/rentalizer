@@ -23,15 +23,15 @@ export const SimulatedMarketIntelligence = () => {
   const [bathrooms, setBathrooms] = useState<string>('2');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleMarketAnalysis = async (city: string, propType: string, bathCount: string) => {
+  const handleMarketAnalysis = async (city: string, propType: string, bathCount: string, neighborhood?: string) => {
     setIsLoading(true);
     
     try {
-      console.log(`🚀 Starting market analysis for ${city} - ${propType}BR/${bathCount}BA`);
+      console.log(`🚀 Starting market analysis for ${neighborhood ? neighborhood + ', ' + city : city} - ${propType}BR/${bathCount}BA`);
       
-      // Step 1: Get rental data from OpenAI
-      console.log(`🤖 Fetching OpenAI rental data for ${city}`);
-      const rentalApiData = await fetchRealRentalData(city, propType);
+      // Step 1: Get rental data from OpenAI for specific neighborhood or city
+      console.log(`🤖 Fetching OpenAI rental data for ${neighborhood ? neighborhood + ', ' + city : city}`);
+      const rentalApiData = await fetchRealRentalData(city, propType, neighborhood);
       const rentals = processRentalData(rentalApiData);
       
       console.log(`📊 Processed OpenAI rental data:`, rentals);

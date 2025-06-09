@@ -1,138 +1,119 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Search, Loader2 } from 'lucide-react';
+import { Search, Home, MapPin } from 'lucide-react';
 
 interface MarketAnalysisFormProps {
-  onAnalyze: (city: string, propertyType: string, bathrooms: string) => void;
+  onAnalyze: (city: string, propertyType: string, bathrooms: string, neighborhood?: string) => void;
   isLoading: boolean;
 }
 
 export const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ onAnalyze, isLoading }) => {
-  const [targetCity, setTargetCity] = useState<string>('Austin');
-  const [propertyType, setPropertyType] = useState<string>('2');
-  const [bathrooms, setBathrooms] = useState<string>('2');
+  const [city, setCity] = useState('');
+  const [neighborhood, setNeighborhood] = useState('');
+  const [propertyType, setPropertyType] = useState('2');
+  const [bathrooms, setBathrooms] = useState('2');
 
-  const getBathroomOptions = () => {
-    const options = propertyType === '1' ? [{ value: '1', label: '1 Bathroom' }] :
-                   propertyType === '2' ? [
-                     { value: '1', label: '1 Bathroom' },
-                     { value: '2', label: '2 Bathrooms' }
-                   ] :
-                   propertyType === '3' ? [
-                     { value: '1', label: '1 Bathroom' },
-                     { value: '2', label: '2 Bathrooms' },
-                     { value: '3', label: '3 Bathrooms' }
-                   ] : [{ value: '1', label: '1 Bathroom' }];
-    
-    return options;
-  };
-
-  useEffect(() => {
-    const options = getBathroomOptions();
-    if (!options.find(opt => opt.value === bathrooms)) {
-      if (propertyType === '2') {
-        setBathrooms('2');
-      } else {
-        setBathrooms(options[0].value);
-      }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (city.trim()) {
+      onAnalyze(city.trim(), propertyType, bathrooms, neighborhood.trim() || undefined);
     }
-  }, [propertyType]);
-
-  const handleAnalyze = () => {
-    onAnalyze(targetCity, propertyType, bathrooms);
   };
 
   return (
-    <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
-      <CardHeader className="pb-4 border-b border-gray-700/50">
-        <CardTitle className="flex items-center gap-2 text-cyan-300">
-          <MapPin className="h-5 w-5 text-cyan-400" />
-          City Market Analysis
+    <Card className="bg-gray-900/95 border-gray-700 shadow-2xl">
+      <CardHeader className="border-b border-gray-700">
+        <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
+          <Search className="h-6 w-6 text-cyan-400" />
+          Market Analysis
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-6">
-        <div className="space-y-4">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="w-full max-w-md">
-              <div>
-                <label htmlFor="target-city" className="text-sm font-medium text-gray-300 block mb-2">
-                  City Name
-                </label>
-                <Input
-                  id="target-city"
-                  type="text"
-                  value={targetCity}
-                  onChange={(e) => setTargetCity(e.target.value)}
-                  placeholder="Enter city name (e.g., Austin, Miami, Denver)"
-                  className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400"
-                />
-              </div>
-            </div>
-
-            <div className="w-full max-w-md grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="property-type" className="text-sm font-medium text-gray-300 block mb-2">
-                  Bedrooms
-                </label>
-                <Select value={propertyType} onValueChange={setPropertyType}>
-                  <SelectTrigger className="border-cyan-500/30 bg-gray-800/50 text-gray-100">
-                    <SelectValue placeholder="Select bedrooms" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700 z-50">
-                    <SelectItem value="1" className="text-gray-100 focus:bg-gray-700">1 Bedroom</SelectItem>
-                    <SelectItem value="2" className="text-gray-100 focus:bg-gray-700">2 Bedrooms</SelectItem>
-                    <SelectItem value="3" className="text-gray-100 focus:bg-gray-700">3 Bedrooms</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label htmlFor="bathrooms" className="text-sm font-medium text-gray-300 block mb-2">
-                  Bathrooms
-                </label>
-                <Select value={bathrooms} onValueChange={setBathrooms}>
-                  <SelectTrigger className="border-cyan-500/30 bg-gray-800/50 text-gray-100">
-                    <SelectValue placeholder="Select bathrooms" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700 z-50">
-                    {getBathroomOptions().map((option) => (
-                      <SelectItem 
-                        key={option.value} 
-                        value={option.value} 
-                        className="text-gray-100 focus:bg-gray-700"
-                      >
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+      <CardContent className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="city" className="text-white font-medium">
+                <MapPin className="h-4 w-4 inline mr-1" />
+                City *
+              </Label>
+              <Input
+                id="city"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="e.g., San Diego, Austin, Miami"
+                className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
+                required
+              />
             </div>
             
-            <Button
-              onClick={handleAnalyze}
-              disabled={isLoading || !targetCity.trim()}
-              size="sm"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 px-6"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Analyzing City Market...
-                </>
-              ) : (
-                <>
-                  <Search className="h-4 w-4 mr-2" />
-                  Analyze City Market
-                </>
-              )}
-            </Button>
+            <div className="space-y-2">
+              <Label htmlFor="neighborhood" className="text-white font-medium">
+                <Home className="h-4 w-4 inline mr-1" />
+                Neighborhood (Optional)
+              </Label>
+              <Input
+                id="neighborhood"
+                value={neighborhood}
+                onChange={(e) => setNeighborhood(e.target.value)}
+                placeholder="e.g., North Park, Downtown, etc."
+                className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-400"
+              />
+            </div>
           </div>
-        </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="bedrooms" className="text-white font-medium">Bedrooms</Label>
+              <Select value={propertyType} onValueChange={setPropertyType}>
+                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-600">
+                  <SelectItem value="1">1 Bedroom</SelectItem>
+                  <SelectItem value="2">2 Bedrooms</SelectItem>
+                  <SelectItem value="3">3 Bedrooms</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bathrooms" className="text-white font-medium">Bathrooms</Label>
+              <Select value={bathrooms} onValueChange={setBathrooms}>
+                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-600">
+                  <SelectItem value="1">1 Bathroom</SelectItem>
+                  <SelectItem value="2">2 Bathrooms</SelectItem>
+                  <SelectItem value="3">3 Bathrooms</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            disabled={isLoading || !city.trim()}
+            className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold py-3"
+          >
+            {isLoading ? (
+              <>
+                <Search className="h-4 w-4 mr-2 animate-spin" />
+                Analyzing Market...
+              </>
+            ) : (
+              <>
+                <Search className="h-4 w-4 mr-2" />
+                Analyze Market
+              </>
+            )}
+          </Button>
+        </form>
       </CardContent>
     </Card>
   );
