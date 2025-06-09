@@ -71,7 +71,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   const isOpenaiKeyValid = openaiApiKey.length > 10;
 
   return (
-    <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
+    <Card className="max-w-2xl mx-auto shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
       <CardHeader className="pb-4 border-b border-gray-700/50">
         <CardTitle className="flex items-center gap-2 text-cyan-300">
           <Key className="h-5 w-5 text-cyan-400" />
