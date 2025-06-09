@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Eye } from 'lucide-react';
+import { Eye, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { MarketAnalysisForm } from '@/components/MarketAnalysisForm';
 import { MarketAnalysisResults } from '@/components/MarketAnalysisResults';
@@ -36,32 +36,49 @@ export const SimulatedMarketIntelligence = () => {
         const rapidApiProcessed = processAirbnbEarningsData(rapidApiData);
         
         if (rapidApiProcessed.properties && rapidApiProcessed.properties.length > 0) {
-          // Convert RapidAPI data to SubmarketData format
-          const processedData: SubmarketData[] = rapidApiProcessed.properties.map(property => ({
-            submarket: `${property.neighborhood}, ${city}`,
-            strRevenue: property.monthlyRevenue,
-            medianRent: Math.round(property.monthlyRevenue * 0.7), // Estimate traditional rent
-            multiple: property.monthlyRevenue > 0 ? property.monthlyRevenue / (property.monthlyRevenue * 0.7) : 0
-          }));
+          // Check if we got real data or NA data
+          const hasRealData = rapidApiProcessed.properties.some(prop => prop.monthlyRevenue > 0);
+          
+          if (hasRealData) {
+            // Convert RapidAPI data to SubmarketData format
+            const processedData: SubmarketData[] = rapidApiProcessed.properties.map(property => ({
+              submarket: `${property.neighborhood}, ${city}`,
+              strRevenue: property.monthlyRevenue,
+              medianRent: 0, // Set to 0 - will show as NA in table
+              multiple: 0 // Set to 0 - will show as NA in table
+            }));
 
-          setSubmarketData(processedData);
-          setCityName(city);
-          setPropertyType(propType);
-          setBathrooms(bathCount);
-          
-          toast({
-            title: "RapidAPI Market Analysis Complete",
-            description: `Found ${rapidApiProcessed.totalProperties} STR properties in ${city} using RapidAPI Airbnb Scraper.`,
-          });
-          
-          setIsLoading(false);
-          return;
+            setSubmarketData(processedData);
+            setCityName(city);
+            setPropertyType(propType);
+            setBathrooms(bathCount);
+            
+            toast({
+              title: "RapidAPI Market Analysis Complete",
+              description: `Found ${rapidApiProcessed.totalProperties} STR properties in ${city} using RapidAPI Airbnb Scraper.`,
+            });
+            
+            setIsLoading(false);
+            return;
+          } else {
+            // API returned but with no real data
+            toast({
+              title: "No Real Data Available",
+              description: `RapidAPI returned no valid data for ${city}. Trying fallback sources.`,
+              variant: "destructive",
+            });
+          }
         }
       } catch (rapidApiError) {
         console.warn('RapidAPI failed, falling back to AirDNA:', rapidApiError);
+        toast({
+          title: "API Failed",
+          description: "RapidAPI failed. Falling back to AirDNA.",
+          variant: "destructive",
+        });
       }
 
-      // Fallback to AirDNA if RapidAPI fails
+      // Fallback to AirDNA if RapidAPI fails or returns no data
       console.log(`🔄 Falling back to AirDNA market analysis for ${city}`);
       const marketData = await fetchRealMarketData(city, propType, bathCount);
       const processedData = processMarketData(marketData);
@@ -119,7 +136,7 @@ export const SimulatedMarketIntelligence = () => {
             <div>
               <h3 className="font-semibold text-green-300">RapidAPI Airbnb Scraper + AirDNA Market Intelligence</h3>
               <p className="text-sm text-gray-300">
-                This tool now uses RapidAPI Airbnb Scraper as the primary data source with AirDNA as fallback for comprehensive STR market analysis.
+                This tool uses RapidAPI Airbnb Scraper as the primary data source with AirDNA as fallback. No placeholder data will be shown - only real market data or "NA" when unavailable.
               </p>
             </div>
           </div>

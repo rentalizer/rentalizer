@@ -103,107 +103,30 @@ serve(async (req) => {
       }
     } catch (apiError) {
       console.error('❌ RapidAPI Error Details:', apiError);
-      console.warn('🔄 Using ENHANCED fallback data due to API error - Realistic San Diego STR Earnings');
+      console.warn('⚠️ API failed - returning NA data structure');
       
-      // Enhanced fallback data with REALISTIC San Diego STR earnings
-      const mockData = {
-        success: true,
+      // Return NA data structure when APIs fail
+      const naData = {
+        success: false,
         data: {
           city: city,
           properties: [
             {
-              id: "sd-premium-1",
-              name: "Luxury Mission Beach Oceanfront Condo",
-              location: `Mission Beach Oceanfront, ${city}`,
-              price: 450,
-              monthly_revenue: 12600,
-              occupancy_rate: 88,
-              rating: 4.9,
-              reviews: 287,
-              neighborhood: "Mission Beach"
-            },
-            {
-              id: "sd-premium-2", 
-              name: "Downtown Gaslamp Quarter Penthouse",
-              location: `Gaslamp Quarter, ${city}`,
-              price: 380,
-              monthly_revenue: 9800,
-              occupancy_rate: 85,
-              rating: 4.8,
-              reviews: 215,
-              neighborhood: "Gaslamp Quarter"
-            },
-            {
-              id: "sd-premium-3",
-              name: "Pacific Beach Boardwalk Suite",
-              location: `Pacific Beach, ${city}`,
-              price: 320,
-              monthly_revenue: 8400,
-              occupancy_rate: 82,
-              rating: 4.7,
-              reviews: 178,
-              neighborhood: "Pacific Beach"
-            },
-            {
-              id: "sd-premium-4",
-              name: "La Jolla Village Modern Apartment",
-              location: `La Jolla, ${city}`,
-              price: 420,
-              monthly_revenue: 11200,
-              occupancy_rate: 87,
-              rating: 4.9,
-              reviews: 324,
-              neighborhood: "La Jolla"
-            },
-            {
-              id: "sd-premium-5",
-              name: "Little Italy Waterfront Loft",
-              location: `Little Italy, ${city}`,
-              price: 350,
-              monthly_revenue: 9100,
-              occupancy_rate: 84,
-              rating: 4.8,
-              reviews: 198,
-              neighborhood: "Little Italy"
-            },
-            {
-              id: "sd-premium-6",
-              name: "Coronado Beach House",
-              location: `Coronado, ${city}`,
-              price: 520,
-              monthly_revenue: 14300,
-              occupancy_rate: 90,
-              rating: 4.9,
-              reviews: 412,
-              neighborhood: "Coronado"
-            },
-            {
-              id: "sd-premium-7",
-              name: "Hillcrest Urban Studio",
-              location: `Hillcrest, ${city}`,
-              price: 180,
-              monthly_revenue: 4900,
-              occupancy_rate: 76,
-              rating: 4.5,
-              reviews: 89,
-              neighborhood: "Hillcrest"
-            },
-            {
-              id: "sd-premium-8",
-              name: "Balboa Park Adjacent 2BR",
-              location: `Balboa Park Area, ${city}`,
-              price: 280,
-              monthly_revenue: 7200,
-              occupancy_rate: 80,
-              rating: 4.6,
-              reviews: 156,
-              neighborhood: "Balboa Park"
+              id: "na-1",
+              name: "No Data Available",
+              location: `${city}`,
+              price: 0,
+              monthly_revenue: 0,
+              occupancy_rate: 0,
+              rating: 0,
+              reviews: 0,
+              neighborhood: "API Failed"
             }
           ]
         }
       };
 
-      return new Response(JSON.stringify(mockData), {
+      return new Response(JSON.stringify(naData), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }

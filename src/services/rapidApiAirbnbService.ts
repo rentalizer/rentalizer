@@ -50,24 +50,26 @@ export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
   
   let processedProperties: AirbnbProperty[] = [];
   
-  if (apiData && apiData.success && apiData.data) {
+  if (apiData && apiData.data) {
     const properties = apiData.data.properties || [];
     
     processedProperties = properties.map((property: any) => ({
       id: property.id || property.listing_id || Math.random().toString(),
-      name: property.name || property.title || 'Unknown Property',
-      location: property.location || property.address || 'Unknown Location',
+      name: property.name || property.title || 'No Data Available',
+      location: property.location || property.address || 'No Data Available',
       price: property.price || property.nightly_rate || 0,
-      monthlyRevenue: property.monthly_revenue || (property.price * 20) || 0, // Estimate if not available
-      occupancyRate: property.occupancy_rate || property.occupancy || 75, // Default estimate
-      rating: property.rating || property.review_score || 4.5,
+      monthlyRevenue: property.monthly_revenue || (property.price * 20) || 0,
+      occupancyRate: property.occupancy_rate || property.occupancy || 0,
+      rating: property.rating || property.review_score || 0,
       reviews: property.reviews || property.review_count || 0,
-      neighborhood: property.neighborhood || property.district || 'Unknown Area'
+      neighborhood: property.neighborhood || property.district || 'No Data Available'
     }));
   }
   
-  const averageRevenue = processedProperties.length > 0 
-    ? processedProperties.reduce((sum, prop) => sum + prop.monthlyRevenue, 0) / processedProperties.length
+  // If API failed, don't calculate averages from zero values
+  const validProperties = processedProperties.filter(prop => prop.monthlyRevenue > 0);
+  const averageRevenue = validProperties.length > 0 
+    ? validProperties.reduce((sum, prop) => sum + prop.monthlyRevenue, 0) / validProperties.length
     : 0;
   
   return {
