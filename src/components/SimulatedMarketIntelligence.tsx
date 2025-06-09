@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { MarketAnalysisForm } from '@/components/MarketAnalysisForm';
 import { MarketAnalysisResults } from '@/components/MarketAnalysisResults';
 import { fetchRealMarketData, processMarketData } from '@/services/airdnaService';
+import { fetchAirbnbEarningsData, processAirbnbEarningsData } from '@/services/rapidApiAirbnbService';
 
 interface SubmarketData {
   submarket: string;
@@ -27,12 +28,42 @@ export const SimulatedMarketIntelligence = () => {
     setIsLoading(true);
     
     try {
-      console.log(`🚀 Starting real AirDNA market analysis for ${city}`);
+      console.log(`🚀 Starting market analysis for ${city} using RapidAPI Airbnb Scraper`);
       
-      // Call the real AirDNA API with just the city name
-      const marketData = await fetchRealMarketData(city, propType, bathCount);
+      // First try RapidAPI Airbnb Scraper
+      try {
+        const rapidApiData = await fetchAirbnbEarningsData(city, propType);
+        const rapidApiProcessed = processAirbnbEarningsData(rapidApiData);
+        
+        if (rapidApiProcessed.properties && rapidApiProcessed.properties.length > 0) {
+          // Convert RapidAPI data to SubmarketData format
+          const processedData: SubmarketData[] = rapidApiProcessed.properties.map(property => ({
+            submarket: `${property.neighborhood}, ${city}`,
+            strRevenue: property.monthlyRevenue,
+            medianRent: Math.round(property.monthlyRevenue * 0.7), // Estimate traditional rent
+            multiple: property.monthlyRevenue > 0 ? property.monthlyRevenue / (property.monthlyRevenue * 0.7) : 0
+          }));
 
-      // Process the real data from AirDNA
+          setSubmarketData(processedData);
+          setCityName(city);
+          setPropertyType(propType);
+          setBathrooms(bathCount);
+          
+          toast({
+            title: "RapidAPI Market Analysis Complete",
+            description: `Found ${rapidApiProcessed.totalProperties} STR properties in ${city} using RapidAPI Airbnb Scraper.`,
+          });
+          
+          setIsLoading(false);
+          return;
+        }
+      } catch (rapidApiError) {
+        console.warn('RapidAPI failed, falling back to AirDNA:', rapidApiError);
+      }
+
+      // Fallback to AirDNA if RapidAPI fails
+      console.log(`🔄 Falling back to AirDNA market analysis for ${city}`);
+      const marketData = await fetchRealMarketData(city, propType, bathCount);
       const processedData = processMarketData(marketData);
 
       setSubmarketData(processedData);
@@ -45,7 +76,7 @@ export const SimulatedMarketIntelligence = () => {
       
       if (hasRevenueData && hasRentData) {
         toast({
-          title: "City Market Analysis Complete",
+          title: "AirDNA Market Analysis Complete",
           description: `STR revenue data found for ${city}. Rent estimates provided using market averages.`,
         });
       } else if (hasRevenueData && !hasRentData) {
@@ -57,7 +88,7 @@ export const SimulatedMarketIntelligence = () => {
       } else {
         toast({
           title: "Limited Data Available",
-          description: `AirDNA API returned limited market data for ${city}.`,
+          description: `Market data services returned limited data for ${city}.`,
           variant: "destructive",
         });
       }
@@ -80,15 +111,15 @@ export const SimulatedMarketIntelligence = () => {
 
   return (
     <div className="space-y-8">
-      {/* Real Data Notice */}
+      {/* Updated Data Notice */}
       <Card className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/30">
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
             <Eye className="h-5 w-5 text-green-400" />
             <div>
-              <h3 className="font-semibold text-green-300">Real AirDNA City Market Intelligence</h3>
+              <h3 className="font-semibold text-green-300">RapidAPI + AirDNA Market Intelligence</h3>
               <p className="text-sm text-gray-300">
-                This tool uses real AirDNA API data to analyze STR revenue opportunities for specific cities and neighborhoods.
+                This tool now uses RapidAPI Airbnb Scraper as the primary data source with AirDNA as fallback for comprehensive STR market analysis.
               </p>
             </div>
           </div>
