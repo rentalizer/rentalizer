@@ -61,7 +61,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
   };
 
   const isAllSelected = selectedSubmarkets.length === results.length;
-  const hasFailedData = results.some(r => r.strRevenue === 0 || r.medianRent === 0);
+  const hasFailedData = results.some(r => r.strRevenue === 0 || r.medianRent <= 0);
 
   return (
     <Card className="w-full bg-gray-900/95 border-gray-700 shadow-2xl">
@@ -134,14 +134,14 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
                     )}
                   </TableCell>
                   <TableCell className="text-white font-semibold">
-                    {result.medianRent === 0 ? (
+                    {!result.medianRent || result.medianRent <= 0 ? (
                       <span className="text-yellow-400">NA</span>
                     ) : (
                       `$${result.medianRent.toLocaleString()}`
                     )}
                   </TableCell>
                   <TableCell className="text-white font-semibold">
-                    {result.strRevenue === 0 || result.medianRent === 0 ? (
+                    {result.strRevenue === 0 || result.medianRent <= 0 ? (
                       <span className="text-yellow-400">NA</span>
                     ) : (
                       `${result.multiple.toFixed(2)}x`
