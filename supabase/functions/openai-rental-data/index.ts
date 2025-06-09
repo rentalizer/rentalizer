@@ -26,7 +26,7 @@ serve(async (req) => {
 
     console.log('🔑 OpenAI API key configured, making request...');
 
-    // Enhanced prompt for specific neighborhood or city-wide search
+    // Enhanced prompt for specific neighborhood or city-wide search with REAL neighborhoods
     const prompt = neighborhood 
       ? `You are a real estate data analyst with access to current rental market data from public platforms like Zumper, Rentometer, and Rentcafe.com.
 
@@ -49,35 +49,7 @@ Requirements:
 - All rent values must be numbers (not strings)
 - Use realistic MEDIAN apartment rents for ${bedrooms}BR units in ${neighborhood}, ${city}
 - Base data on current market rates from public rental platforms`
-      : `You are a real estate data analyst with access to current rental market data from public platforms like Zumper, Rentometer, and Rentcafe.com.
-
-Task: Find the current MEDIAN monthly rent for ${bedrooms}-bedroom APARTMENTS ONLY in ${city}.
-
-Data Requirements:
-- Pull the most recent data from public rental platforms (Zumper, Rentometer, Rentcafe.com)
-- Return MEDIAN rent values only (not averages or ranges)
-- Focus on APARTMENTS only (exclude houses, condos, townhomes)
-- Based on user choice of ${bedrooms} bedrooms
-- Provide data for exactly 8 different neighborhoods in ${city}
-- Use current market data (2024-2025)
-
-Return exactly this JSON format with 8 neighborhoods:
-[
-  {"neighborhood": "Downtown ${city}", "rent": [median_rent_number], "address": "Downtown ${city}, ${city}"},
-  {"neighborhood": "Midtown", "rent": [median_rent_number], "address": "Midtown, ${city}"},
-  {"neighborhood": "East Side", "rent": [median_rent_number], "address": "East Side, ${city}"},
-  {"neighborhood": "West End", "rent": [median_rent_number], "address": "West End, ${city}"},
-  {"neighborhood": "Uptown", "rent": [median_rent_number], "address": "Uptown, ${city}"},
-  {"neighborhood": "South ${city}", "rent": [median_rent_number], "address": "South ${city}, ${city}"},
-  {"neighborhood": "North ${city}", "rent": [median_rent_number], "address": "North ${city}, ${city}"},
-  {"neighborhood": "Central ${city}", "rent": [median_rent_number], "address": "Central ${city}, ${city}"}
-]
-
-Requirements:
-- Return ONLY the JSON array, no explanations
-- All rent values must be numbers (not strings)
-- Use realistic MEDIAN apartment rents for ${bedrooms}BR units in ${city}
-- Base data on current market rates from public rental platforms`;
+      : getSpecificCityPrompt(city, bedrooms);
 
     console.log('📝 Sending enhanced request to OpenAI...');
 
@@ -181,3 +153,117 @@ Requirements:
     });
   }
 });
+
+function getSpecificCityPrompt(city: string, bedrooms: string): string {
+  const cityLower = city.toLowerCase();
+  
+  // Use actual neighborhood names for specific cities
+  if (cityLower.includes('san diego')) {
+    return `You are a real estate data analyst with access to current rental market data from public platforms like Zumper, Rentometer, and Rentcafe.com.
+
+Task: Find the current MEDIAN monthly rent for ${bedrooms}-bedroom APARTMENTS ONLY in San Diego using REAL neighborhood names.
+
+Data Requirements:
+- Pull the most recent data from public rental platforms (Zumper, Rentometer, Rentcafe.com)
+- Return MEDIAN rent values only (not averages or ranges)
+- Focus on APARTMENTS only (exclude houses, condos, townhomes)
+- Based on user choice of ${bedrooms} bedrooms
+- Use current market data (2024-2025)
+- Use REAL San Diego neighborhoods only
+
+Return exactly this JSON format with 8 REAL San Diego neighborhoods:
+[
+  {"neighborhood": "Gaslamp Quarter", "rent": [median_rent_number], "address": "Gaslamp Quarter, San Diego"},
+  {"neighborhood": "Mission Beach", "rent": [median_rent_number], "address": "Mission Beach, San Diego"},
+  {"neighborhood": "Pacific Beach", "rent": [median_rent_number], "address": "Pacific Beach, San Diego"},
+  {"neighborhood": "La Jolla", "rent": [median_rent_number], "address": "La Jolla, San Diego"},
+  {"neighborhood": "Hillcrest", "rent": [median_rent_number], "address": "Hillcrest, San Diego"},
+  {"neighborhood": "Mission Valley", "rent": [median_rent_number], "address": "Mission Valley, San Diego"},
+  {"neighborhood": "Little Italy", "rent": [median_rent_number], "address": "Little Italy, San Diego"},
+  {"neighborhood": "Balboa Park", "rent": [median_rent_number], "address": "Balboa Park, San Diego"}
+]
+
+Requirements:
+- Return ONLY the JSON array, no explanations
+- All rent values must be numbers (not strings)
+- Use realistic MEDIAN apartment rents for ${bedrooms}BR units in San Diego
+- Base data on current market rates from public rental platforms`;
+  }
+  
+  if (cityLower.includes('austin')) {
+    return `You are a real estate data analyst with access to current rental market data from public platforms like Zumper, Rentometer, and Rentcafe.com.
+
+Task: Find the current MEDIAN monthly rent for ${bedrooms}-bedroom APARTMENTS ONLY in Austin using REAL neighborhood names.
+
+Return exactly this JSON format with 8 REAL Austin neighborhoods:
+[
+  {"neighborhood": "Downtown Austin", "rent": [median_rent_number], "address": "Downtown Austin, Austin"},
+  {"neighborhood": "South Lamar", "rent": [median_rent_number], "address": "South Lamar, Austin"},
+  {"neighborhood": "East Austin", "rent": [median_rent_number], "address": "East Austin, Austin"},
+  {"neighborhood": "West Campus", "rent": [median_rent_number], "address": "West Campus, Austin"},
+  {"neighborhood": "Mueller", "rent": [median_rent_number], "address": "Mueller, Austin"},
+  {"neighborhood": "Rainey Street", "rent": [median_rent_number], "address": "Rainey Street, Austin"},
+  {"neighborhood": "Zilker", "rent": [median_rent_number], "address": "Zilker, Austin"},
+  {"neighborhood": "The Domain", "rent": [median_rent_number], "address": "The Domain, Austin"}
+]
+
+Requirements:
+- Return ONLY the JSON array, no explanations
+- All rent values must be numbers (not strings)
+- Use realistic MEDIAN apartment rents for ${bedrooms}BR units in Austin`;
+  }
+  
+  if (cityLower.includes('miami')) {
+    return `You are a real estate data analyst with access to current rental market data from public platforms like Zumper, Rentometer, and Rentcafe.com.
+
+Task: Find the current MEDIAN monthly rent for ${bedrooms}-bedroom APARTMENTS ONLY in Miami using REAL neighborhood names.
+
+Return exactly this JSON format with 8 REAL Miami neighborhoods:
+[
+  {"neighborhood": "South Beach", "rent": [median_rent_number], "address": "South Beach, Miami"},
+  {"neighborhood": "Brickell", "rent": [median_rent_number], "address": "Brickell, Miami"},
+  {"neighborhood": "Wynwood", "rent": [median_rent_number], "address": "Wynwood, Miami"},
+  {"neighborhood": "Design District", "rent": [median_rent_number], "address": "Design District, Miami"},
+  {"neighborhood": "Coconut Grove", "rent": [median_rent_number], "address": "Coconut Grove, Miami"},
+  {"neighborhood": "Coral Gables", "rent": [median_rent_number], "address": "Coral Gables, Miami"},
+  {"neighborhood": "Midtown", "rent": [median_rent_number], "address": "Midtown, Miami"},
+  {"neighborhood": "Aventura", "rent": [median_rent_number], "address": "Aventura, Miami"}
+]
+
+Requirements:
+- Return ONLY the JSON array, no explanations
+- All rent values must be numbers (not strings)
+- Use realistic MEDIAN apartment rents for ${bedrooms}BR units in Miami`;
+  }
+  
+  // Generic prompt for other cities
+  return `You are a real estate data analyst with access to current rental market data from public platforms like Zumper, Rentometer, and Rentcafe.com.
+
+Task: Find the current MEDIAN monthly rent for ${bedrooms}-bedroom APARTMENTS ONLY in ${city}.
+
+Data Requirements:
+- Pull the most recent data from public rental platforms (Zumper, Rentometer, Rentcafe.com)
+- Return MEDIAN rent values only (not averages or ranges)
+- Focus on APARTMENTS only (exclude houses, condos, townhomes)
+- Based on user choice of ${bedrooms} bedrooms
+- Provide data for exactly 8 different REAL neighborhoods in ${city}
+- Use current market data (2024-2025)
+
+Return exactly this JSON format with 8 neighborhoods:
+[
+  {"neighborhood": "[Real neighborhood 1]", "rent": [median_rent_number], "address": "[Real neighborhood 1], ${city}"},
+  {"neighborhood": "[Real neighborhood 2]", "rent": [median_rent_number], "address": "[Real neighborhood 2], ${city}"},
+  {"neighborhood": "[Real neighborhood 3]", "rent": [median_rent_number], "address": "[Real neighborhood 3], ${city}"},
+  {"neighborhood": "[Real neighborhood 4]", "rent": [median_rent_number], "address": "[Real neighborhood 4], ${city}"},
+  {"neighborhood": "[Real neighborhood 5]", "rent": [median_rent_number], "address": "[Real neighborhood 5], ${city}"},
+  {"neighborhood": "[Real neighborhood 6]", "rent": [median_rent_number], "address": "[Real neighborhood 6], ${city}"},
+  {"neighborhood": "[Real neighborhood 7]", "rent": [median_rent_number], "address": "[Real neighborhood 7], ${city}"},
+  {"neighborhood": "[Real neighborhood 8]", "rent": [median_rent_number], "address": "[Real neighborhood 8], ${city}"}
+]
+
+Requirements:
+- Return ONLY the JSON array, no explanations
+- All rent values must be numbers (not strings)
+- Use realistic MEDIAN apartment rents for ${bedrooms}BR units in ${city}
+- Base data on current market rates from public rental platforms`;
+}
