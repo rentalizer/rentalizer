@@ -124,7 +124,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
                     />
                   </TableCell>
                   <TableCell className="font-medium text-white">
-                    {(result as any).neighborhood || result.submarket}
+                    {result.submarket}
                   </TableCell>
                   <TableCell className="text-white font-semibold">
                     {result.strRevenue === 0 ? (
