@@ -31,6 +31,9 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
     );
   }
 
+  // Log the results to debug the data flow
+  console.log('📊 ResultsTable received data:', results);
+
   const validResults = results.filter(r => r.strRevenue > 0 && r.medianRent > 0);
   const avgMultiple = validResults.length > 0 
     ? validResults.reduce((sum, r) => sum + r.multiple, 0) / validResults.length 
@@ -111,44 +114,54 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
               </TableRow>
             </TableHeader>
             <TableBody>
-              {results.map((result, index) => (
-                <TableRow 
-                  key={index} 
-                  className="border-gray-700 hover:bg-gray-800/50 transition-colors"
-                >
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedSubmarkets.includes(result.submarket)}
-                      onCheckedChange={(checked) => handleSubmarketSelection(result.submarket, checked as boolean)}
-                      className="border-cyan-500/50 data-[state=checked]:bg-cyan-600 data-[state=checked]:border-cyan-600"
-                    />
-                  </TableCell>
-                  <TableCell className="font-medium text-white">
-                    {result.submarket}
-                  </TableCell>
-                  <TableCell className="text-white font-semibold">
-                    {result.strRevenue === 0 ? (
-                      <span className="text-yellow-400">NA</span>
-                    ) : (
-                      `$${result.strRevenue.toLocaleString()}`
-                    )}
-                  </TableCell>
-                  <TableCell className="text-white font-semibold">
-                    {!result.medianRent || result.medianRent <= 0 ? (
-                      <span className="text-yellow-400">NA</span>
-                    ) : (
-                      `$${result.medianRent.toLocaleString()}`
-                    )}
-                  </TableCell>
-                  <TableCell className="text-white font-semibold">
-                    {result.strRevenue === 0 || result.medianRent <= 0 ? (
-                      <span className="text-yellow-400">NA</span>
-                    ) : (
-                      `${result.multiple.toFixed(2)}x`
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
+              {results.map((result, index) => {
+                // Debug log each row to see the actual values
+                console.log(`📍 Displaying row ${index}:`, {
+                  submarket: result.submarket,
+                  medianRent: result.medianRent,
+                  strRevenue: result.strRevenue,
+                  multiple: result.multiple
+                });
+                
+                return (
+                  <TableRow 
+                    key={index} 
+                    className="border-gray-700 hover:bg-gray-800/50 transition-colors"
+                  >
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedSubmarkets.includes(result.submarket)}
+                        onCheckedChange={(checked) => handleSubmarketSelection(result.submarket, checked as boolean)}
+                        className="border-cyan-500/50 data-[state=checked]:bg-cyan-600 data-[state=checked]:border-cyan-600"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium text-white">
+                      {result.submarket}
+                    </TableCell>
+                    <TableCell className="text-white font-semibold">
+                      {result.strRevenue === 0 ? (
+                        <span className="text-yellow-400">NA</span>
+                      ) : (
+                        `$${result.strRevenue.toLocaleString()}`
+                      )}
+                    </TableCell>
+                    <TableCell className="text-white font-semibold">
+                      {!result.medianRent || result.medianRent <= 0 ? (
+                        <span className="text-yellow-400">NA</span>
+                      ) : (
+                        `$${result.medianRent.toLocaleString()}`
+                      )}
+                    </TableCell>
+                    <TableCell className="text-white font-semibold">
+                      {result.strRevenue === 0 || result.medianRent <= 0 ? (
+                        <span className="text-yellow-400">NA</span>
+                      ) : (
+                        `${result.multiple.toFixed(2)}x`
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
