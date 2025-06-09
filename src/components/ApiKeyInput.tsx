@@ -16,7 +16,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   const [rapidApiKey, setRapidApiKey] = useState<string>('');
   const [openaiApiKey, setOpenaiApiKey] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
-  const [showStoredKeys, setShowStoredKeys] = useState(false);
+  const [showKeys, setShowKeys] = useState(false);
 
   useEffect(() => {
     // Load saved API keys from localStorage
@@ -68,21 +68,21 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     }
   };
 
-  const handleViewStoredKeys = () => {
-    const storedRapidApi = localStorage.getItem('rapidapi_key') || 'Not set';
-    const storedOpenai = localStorage.getItem('openai_api_key') || 'Not set';
+  const handleToggleShowKeys = () => {
+    setShowKeys(!showKeys);
     
-    console.log('🔑 Stored API Keys:', {
-      'STR Earnings API': storedRapidApi.length > 0 ? `${storedRapidApi.substring(0, 8)}... (${storedRapidApi.length} chars)` : 'Not set',
-      'Rental Rates API': storedOpenai.length > 0 ? `${storedOpenai.substring(0, 8)}... (${storedOpenai.length} chars)` : 'Not set'
-    });
-    
-    toast({
-      title: "API Keys Status",
-      description: `STR Earnings: ${storedRapidApi !== 'Not set' ? 'Loaded' : 'Not set'} | Rental Rates: ${storedOpenai !== 'Not set' ? 'Loaded' : 'Not set'}. Check console for details.`,
-    });
-    
-    setShowStoredKeys(!showStoredKeys);
+    if (!showKeys) {
+      // Log the keys when showing them
+      console.log('🔑 Current API Keys:', {
+        'STR Earnings API': rapidApiKey || 'Not set',
+        'Rental Rates API': openaiApiKey || 'Not set'
+      });
+      
+      toast({
+        title: "API Keys Revealed",
+        description: "API keys are now visible in the input fields. Check console for full details.",
+      });
+    }
   };
 
   const isRapidApiKeyValid = rapidApiKey.length > 10;
@@ -116,7 +116,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             </div>
             <Input
               id="rapidapi-key"
-              type="password"
+              type={showKeys ? "text" : "password"}
               value={rapidApiKey}
               onChange={(e) => setRapidApiKey(e.target.value)}
               placeholder="Enter your STR Earnings API key"
@@ -142,7 +142,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
             </div>
             <Input
               id="openai-key"
-              type="password"
+              type={showKeys ? "text" : "password"}
               value={openaiApiKey}
               onChange={(e) => setOpenaiApiKey(e.target.value)}
               placeholder="Enter your Rental Rates API key for AI features"
@@ -174,14 +174,20 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           </Button>
           
           <Button
-            onClick={handleViewStoredKeys}
+            onClick={handleToggleShowKeys}
             variant="outline"
             className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
           >
-            {showStoredKeys ? (
-              <EyeOff className="h-4 w-4" />
+            {showKeys ? (
+              <>
+                <EyeOff className="h-4 w-4 mr-2" />
+                Hide Keys
+              </>
             ) : (
-              <Eye className="h-4 w-4" />
+              <>
+                <Eye className="h-4 w-4 mr-2" />
+                Show Keys
+              </>
             )}
           </Button>
         </div>
