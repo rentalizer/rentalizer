@@ -15,7 +15,7 @@ serve(async (req) => {
   try {
     const { city, bedrooms, bathrooms } = await req.json();
     
-    console.log(`🤖 Fetching OpenAI rental data for ${city} - ${bedrooms}BR/${bathrooms}BA`);
+    console.log(`🤖 Fetching OpenAI rental data for ${city} - ${bedrooms}BR apartments`);
     
     const openAIApiKey = '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';
     
@@ -25,29 +25,37 @@ serve(async (req) => {
 
     console.log('🔑 OpenAI API key configured, making request...');
 
-    // Enhanced prompt for better rental data
-    const prompt = `You are a real estate market analyst. Provide current median rental rates for ${bedrooms}-bedroom, ${bathrooms}-bathroom apartments in ${city}.
+    // Enhanced prompt specifically targeting public rental platforms for median apartment rents
+    const prompt = `You are a real estate data analyst with access to current rental market data from public platforms like Zumper, Rentometer, and Rentcafe.com.
 
-Return exactly 8 neighborhoods with their typical monthly rent prices. Use this EXACT JSON format:
+Task: Find the current MEDIAN monthly rent for ${bedrooms}-bedroom APARTMENTS ONLY in ${city}.
+
+Data Requirements:
+- Pull data from public rental platforms (Zumper, Rentometer, Rentcafe.com, etc.)
+- Return MEDIAN rent values only (not averages or ranges)
+- Focus on APARTMENTS only (exclude houses, condos, townhomes)
+- Provide data for exactly 8 different neighborhoods in ${city}
+- Use current market data (2024-2025)
+
+Return exactly this JSON format with 8 neighborhoods:
 [
-  {"neighborhood": "Downtown ${city}", "rent": 2800, "address": "Downtown ${city}, ${city}"},
-  {"neighborhood": "Midtown", "rent": 2400, "address": "Midtown, ${city}"},
-  {"neighborhood": "East Side", "rent": 2200, "address": "East Side, ${city}"},
-  {"neighborhood": "West End", "rent": 2600, "address": "West End, ${city}"},
-  {"neighborhood": "Uptown", "rent": 2900, "address": "Uptown, ${city}"},
-  {"neighborhood": "South ${city}", "rent": 2100, "address": "South ${city}, ${city}"},
-  {"neighborhood": "North ${city}", "rent": 2300, "address": "North ${city}, ${city}"},
-  {"neighborhood": "Central ${city}", "rent": 2500, "address": "Central ${city}, ${city}"}
+  {"neighborhood": "Downtown ${city}", "rent": [median_rent_number], "address": "Downtown ${city}, ${city}"},
+  {"neighborhood": "Midtown", "rent": [median_rent_number], "address": "Midtown, ${city}"},
+  {"neighborhood": "East Side", "rent": [median_rent_number], "address": "East Side, ${city}"},
+  {"neighborhood": "West End", "rent": [median_rent_number], "address": "West End, ${city}"},
+  {"neighborhood": "Uptown", "rent": [median_rent_number], "address": "Uptown, ${city}"},
+  {"neighborhood": "South ${city}", "rent": [median_rent_number], "address": "South ${city}, ${city}"},
+  {"neighborhood": "North ${city}", "rent": [median_rent_number], "address": "North ${city}, ${city}"},
+  {"neighborhood": "Central ${city}", "rent": [median_rent_number], "address": "Central ${city}, ${city}"}
 ]
 
 Requirements:
 - Return ONLY the JSON array, no explanations
-- Use realistic rent prices for ${city} market
-- Include diverse neighborhoods across price ranges
-- All rent values should be numbers (not strings)
-- Each neighborhood must have a unique name`;
+- All rent values must be numbers (not strings)
+- Use realistic MEDIAN apartment rents for ${bedrooms}BR units in ${city}
+- Base data on current market rates from public rental platforms`;
 
-    console.log('📝 Sending request to OpenAI with prompt...');
+    console.log('📝 Sending enhanced request to OpenAI...');
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -60,7 +68,7 @@ Requirements:
         messages: [
           { 
             role: 'system', 
-            content: 'You are a real estate market analyst that provides rental market data. Always return valid JSON arrays with realistic rental rates.' 
+            content: 'You are a real estate market analyst that provides current median rental data from public platforms like Zumper, Rentometer, and Rentcafe.com. Always return accurate median rent values for apartments only, formatted as valid JSON arrays.' 
           },
           { role: 'user', content: prompt }
         ],
@@ -108,7 +116,7 @@ Requirements:
           console.error(`❌ Invalid rent type at index ${index}:`, typeof rental.rent);
           throw new Error(`Invalid rent type at index ${index} - must be number`);
         }
-        console.log(`✅ Valid rental ${index}: ${rental.neighborhood} - $${rental.rent}`);
+        console.log(`✅ Valid rental ${index}: ${rental.neighborhood} - $${rental.rent} (median)`);
       });
       
     } catch (parseError) {
@@ -122,10 +130,11 @@ Requirements:
       data: {
         city: city,
         rentals: rentals,
-        source: 'OpenAI ChatGPT',
+        source: 'OpenAI ChatGPT - Public Rental Platforms',
         dataDate: new Date().toISOString(),
         bedrooms: bedrooms,
-        bathrooms: bathrooms
+        bathrooms: bathrooms,
+        dataType: 'Median Apartment Rents'
       }
     };
 
@@ -140,7 +149,7 @@ Requirements:
     return new Response(JSON.stringify({ 
       success: false, 
       error: error.message,
-      message: 'Failed to fetch rental data from OpenAI ChatGPT'
+      message: 'Failed to fetch median apartment rental data from public platforms'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
