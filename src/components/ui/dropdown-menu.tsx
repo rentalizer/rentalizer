@@ -1,17 +1,16 @@
-
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { Check, ChevronRight, Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-// Create a wrapper that supports hover
+// Create a wrapper that supports hover by default
 const DropdownMenuRoot = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Root> & {
     openOnHover?: boolean
   }
->(({ openOnHover = false, children, ...props }, ref) => {
+>(({ openOnHover = true, children, ...props }, ref) => {
   const [open, setOpen] = React.useState(false)
   const timeoutRef = React.useRef<NodeJS.Timeout>()
 
