@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Key, Save, CheckCircle, AlertCircle } from 'lucide-react';
+import { Key, Save, CheckCircle, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ApiKeyInputProps {
@@ -16,6 +16,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
   const [rapidApiKey, setRapidApiKey] = useState<string>('');
   const [openaiApiKey, setOpenaiApiKey] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
+  const [showStoredKeys, setShowStoredKeys] = useState(false);
 
   useEffect(() => {
     // Load saved API keys from localStorage
@@ -65,6 +66,23 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleViewStoredKeys = () => {
+    const storedRapidApi = localStorage.getItem('rapidapi_key') || 'Not set';
+    const storedOpenai = localStorage.getItem('openai_api_key') || 'Not set';
+    
+    console.log('🔑 Stored API Keys:', {
+      'STR Earnings API': storedRapidApi.length > 0 ? `${storedRapidApi.substring(0, 8)}... (${storedRapidApi.length} chars)` : 'Not set',
+      'Rental Rates API': storedOpenai.length > 0 ? `${storedOpenai.substring(0, 8)}... (${storedOpenai.length} chars)` : 'Not set'
+    });
+    
+    toast({
+      title: "API Keys Status",
+      description: `STR Earnings: ${storedRapidApi !== 'Not set' ? 'Loaded' : 'Not set'} | Rental Rates: ${storedOpenai !== 'Not set' ? 'Loaded' : 'Not set'}. Check console for details.`,
+    });
+    
+    setShowStoredKeys(!showStoredKeys);
   };
 
   const isRapidApiKeyValid = rapidApiKey.length > 10;
@@ -136,23 +154,37 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           </div>
         </div>
 
-        <Button
-          onClick={handleSaveKeys}
-          disabled={isSaving}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500"
-        >
-          {isSaving ? (
-            <>
-              <Save className="h-4 w-4 mr-2 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4 mr-2" />
-              Save API Keys
-            </>
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleSaveKeys}
+            disabled={isSaving}
+            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500"
+          >
+            {isSaving ? (
+              <>
+                <Save className="h-4 w-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Save API Keys
+              </>
+            )}
+          </Button>
+          
+          <Button
+            onClick={handleViewStoredKeys}
+            variant="outline"
+            className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+          >
+            {showStoredKeys ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
