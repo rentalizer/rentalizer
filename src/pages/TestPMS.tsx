@@ -1,19 +1,11 @@
 
 import React from 'react';
-import { HospitableNavbar } from '@/components/hospitable/HospitableNavbar';
-import { HospitableHero } from '@/components/hospitable/HospitableHero';
-import { HospitableFeatures } from '@/components/hospitable/HospitableFeatures';
-import { HospitablePricing } from '@/components/hospitable/HospitablePricing';
-import { HospitableFooter } from '@/components/hospitable/HospitableFooter';
+import { PMSDashboard } from '@/components/pms/PMSDashboard';
 
 const TestPMS = () => {
   return (
-    <div className="min-h-screen bg-white">
-      <HospitableNavbar />
-      <HospitableHero />
-      <HospitableFeatures />
-      <HospitablePricing />
-      <HospitableFooter />
+    <div className="min-h-screen bg-gray-50">
+      <PMSDashboard />
     </div>
   );
 };
