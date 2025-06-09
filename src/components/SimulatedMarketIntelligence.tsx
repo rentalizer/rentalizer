@@ -5,8 +5,7 @@ import { Eye, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { MarketAnalysisForm } from '@/components/MarketAnalysisForm';
 import { MarketAnalysisResults } from '@/components/MarketAnalysisResults';
-import { fetchRealMarketData, processMarketData } from '@/services/airdnaService';
-import { fetchAirbnbEarningsData, processAirbnbEarningsData, fetchRealRentalData } from '@/services/rapidApiAirbnbService';
+import { fetchAirbnbEarningsData, processAirbnbEarningsData, fetchRealRentalData, processRentalData } from '@/services/rapidApiAirbnbService';
 
 interface SubmarketData {
   submarket: string;
@@ -28,98 +27,53 @@ export const SimulatedMarketIntelligence = () => {
     setIsLoading(true);
     
     try {
-      console.log(`🚀 Starting market analysis for ${city} - STR + REAL RENTAL DATA ONLY`);
+      console.log(`🚀 Starting market analysis for ${city} - ${propType}BR/${bathCount}BA RENTALS ONLY`);
       
-      // Get STR data
-      let strData: any[] = [];
-      try {
-        const rapidApiData = await fetchAirbnbEarningsData(city, propType);
-        const rapidApiProcessed = processAirbnbEarningsData(rapidApiData);
-        
-        if (rapidApiProcessed.properties && rapidApiProcessed.properties.length > 0) {
-          const hasRealData = rapidApiProcessed.properties.some(prop => prop.monthlyRevenue > 0);
-          if (hasRealData) {
-            strData = rapidApiProcessed.properties;
-          }
-        }
-      } catch (strError) {
-        console.warn('STR API failed:', strError);
-      }
+      // Fetch REAL rental data first
+      console.log(`🏠 Fetching REAL rental rates for ${city}`);
+      const rentalApiData = await fetchRealRentalData(city, propType);
+      const processedRentals = processRentalData(rentalApiData);
+      
+      console.log(`📊 Processed rental data:`, processedRentals);
 
-      // Get REAL rental data only
-      let realRentalData: any[] = [];
-      try {
-        console.log(`🏠 Fetching REAL rental rates for ${city}`);
-        const rentalApiData = await fetchRealRentalData(city, propType);
-        
-        if (rentalApiData && rentalApiData.data && rentalApiData.data.rentals) {
-          realRentalData = rentalApiData.data.rentals;
-          console.log(`✅ Found ${realRentalData.length} real rental listings`);
-        }
-      } catch (rentalError) {
-        console.warn('Real rental API failed:', rentalError);
-      }
-
-      // Combine data - ONLY show real rental rates, no fake calculations
-      const processedData: SubmarketData[] = [];
-
-      // Add STR data with real rental matches
-      if (strData.length > 0) {
-        strData.forEach(strProperty => {
-          // Find matching real rental data by neighborhood
-          const matchingRental = realRentalData.find(rental => 
-            rental.neighborhood?.toLowerCase().includes(strProperty.neighborhood?.toLowerCase()) ||
-            rental.address?.toLowerCase().includes(strProperty.neighborhood?.toLowerCase())
-          );
-
-          processedData.push({
-            submarket: `${strProperty.neighborhood}, ${city}`,
-            strRevenue: strProperty.monthlyRevenue,
-            medianRent: matchingRental ? (matchingRental.rent || matchingRental.price || 0) : 0,
-            multiple: matchingRental && matchingRental.rent > 0 ? 
-              strProperty.monthlyRevenue / (matchingRental.rent || matchingRental.price) : 0
-          });
+      if (processedRentals.length === 0) {
+        toast({
+          title: "No Rental Data Found",
+          description: `No real rental data available for ${propType}BR/${bathCount}BA apartments in ${city}. Try a different city or property type.`,
+          variant: "destructive",
         });
+        setSubmarketData([]);
+        return;
       }
 
-      // Add pure rental data for areas without STR matches
-      if (realRentalData.length > 0) {
-        realRentalData.forEach(rental => {
-          const existingMatch = processedData.find(item => 
-            item.submarket.toLowerCase().includes(rental.neighborhood?.toLowerCase() || rental.address?.toLowerCase())
-          );
-          
-          if (!existingMatch) {
-            processedData.push({
-              submarket: `${rental.neighborhood || rental.address || 'Unknown'}, ${city}`,
-              strRevenue: 0, // No STR data for this area
-              medianRent: rental.rent || rental.price || 0,
-              multiple: 0 // Can't calculate without STR data
-            });
-          }
-        });
-      }
+      // Convert rental data to submarket format
+      const processedData: SubmarketData[] = processedRentals.map(rental => ({
+        submarket: `${rental.neighborhood}, ${city}`,
+        strRevenue: 0, // Not fetching STR data for rental-only analysis
+        medianRent: rental.rent,
+        multiple: 0 // Can't calculate without STR data
+      }));
 
       setSubmarketData(processedData);
       setCityName(city);
       setPropertyType(propType);
       setBathrooms(bathCount);
       
-      const realRentCount = processedData.filter(d => d.medianRent > 0).length;
-      const strCount = processedData.filter(d => d.strRevenue > 0).length;
+      const validRentCount = processedData.filter(d => d.medianRent > 0).length;
       
       toast({
-        title: "Real Market Data Analysis Complete",
-        description: `Found ${realRentCount} real rental rates and ${strCount} STR properties in ${city}. No fake data included.`,
+        title: "Real Rental Data Analysis Complete",
+        description: `Found ${validRentCount} real rental rates for ${propType}BR/${bathCount}BA apartments in ${city}.`,
       });
 
     } catch (error) {
       console.error('❌ Market analysis error:', error);
       toast({
         title: "Analysis Failed",
-        description: "Unable to fetch real market data. Please try another city.",
+        description: "Unable to fetch real rental data. Please try another city.",
         variant: "destructive",
       });
+      setSubmarketData([]);
     } finally {
       setIsLoading(false);
     }
@@ -139,7 +93,7 @@ export const SimulatedMarketIntelligence = () => {
             <div>
               <h3 className="font-semibold text-green-300">REAL RENTAL DATA ONLY</h3>
               <p className="text-sm text-gray-300">
-                This tool now fetches ONLY real rental rates from actual rental markets. No calculated or fake rental data will be shown - only "NA" when real data is unavailable.
+                This tool fetches ONLY real rental rates from actual rental markets. No fake calculations or STR-derived rental estimates.
               </p>
             </div>
           </div>

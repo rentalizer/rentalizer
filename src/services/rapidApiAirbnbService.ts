@@ -80,10 +80,10 @@ export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
   };
 };
 
-// New function to fetch real rental data only
+// Enhanced function to fetch real rental data only
 export const fetchRealRentalData = async (city: string, propertyType: string = '2') => {
   try {
-    console.log(`🏠 Fetching real rental data for ${city}`);
+    console.log(`🏠 Fetching REAL rental data for ${city} - ${propertyType}BR/2BA`);
     
     const { data, error } = await supabase.functions.invoke('rental-data-api', {
       body: {
@@ -95,13 +95,27 @@ export const fetchRealRentalData = async (city: string, propertyType: string = '
     });
 
     if (error) {
-      throw new Error(`Rental API call failed: ${error.message}`);
+      console.error('Rental API call failed:', error);
+      return { success: false, data: { rentals: [] } };
     }
 
     console.log('✅ Real rental data response:', data);
     return data;
   } catch (error) {
     console.error('❌ Rental data error:', error);
-    throw error;
+    return { success: false, data: { rentals: [] } };
   }
+};
+
+// Process rental data to standardize format
+export const processRentalData = (rentalData: any) => {
+  if (!rentalData || !rentalData.data || !rentalData.data.rentals) {
+    return [];
+  }
+
+  return rentalData.data.rentals.map((rental: any) => ({
+    neighborhood: rental.neighborhood || rental.address || 'Unknown',
+    rent: rental.rent || rental.price || 0,
+    address: rental.address || rental.neighborhood || 'Unknown'
+  }));
 };
