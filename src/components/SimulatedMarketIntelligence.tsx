@@ -34,56 +34,44 @@ export const SimulatedMarketIntelligence = () => {
       const strApiData = await fetchAirbnbEarningsData(city, propType);
       const processedSTR = processAirbnbEarningsData(strApiData);
       
-      console.log(`🤖 Fetching OpenAI ChatGPT rental rates for ${city} (Last 30 days only)`);
+      console.log(`🤖 Fetching OpenAI ChatGPT rental rates for ${city}`);
       const rentalApiData = await fetchRealRentalData(city, propType);
       const processedRentals = processRentalData(rentalApiData);
       
       console.log(`📊 STR data:`, processedSTR);
       console.log(`📊 OpenAI ChatGPT rental data:`, processedRentals);
 
-      // Combine STR and rental data by neighborhood
+      // Create combined data starting with rental data as the base
       const combinedData: SubmarketData[] = [];
       
-      // Create a map of rental data by neighborhood
-      const rentalMap = new Map();
+      // Start with all rental neighborhoods
       processedRentals.forEach(rental => {
-        const neighborhood = rental.neighborhood.toLowerCase();
-        if (!rentalMap.has(neighborhood)) {
-          rentalMap.set(neighborhood, []);
-        }
-        rentalMap.get(neighborhood).push(rental.rent);
-      });
-      
-      // Process STR properties and match with rental data
-      processedSTR.properties.forEach(strProperty => {
-        const neighborhood = strProperty.neighborhood.toLowerCase();
-        const rentals = rentalMap.get(neighborhood) || [];
-        const medianRent = rentals.length > 0 
-          ? rentals.sort((a, b) => a - b)[Math.floor(rentals.length / 2)]
-          : 0;
-        
-        const multiple = medianRent > 0 ? strProperty.monthlyRevenue / medianRent : 0;
-        
         combinedData.push({
-          submarket: `${strProperty.neighborhood}, ${city}`,
-          strRevenue: strProperty.monthlyRevenue,
-          medianRent: medianRent,
-          multiple: multiple
+          submarket: `${rental.neighborhood}, ${city}`,
+          strRevenue: 0, // Will be filled if STR data exists
+          medianRent: rental.rent,
+          multiple: 0
         });
       });
       
-      // Add rental-only data for neighborhoods without STR matches
-      processedRentals.forEach(rental => {
-        const neighborhood = rental.neighborhood.toLowerCase();
-        const exists = combinedData.some(item => 
-          item.submarket.toLowerCase().includes(neighborhood)
+      // Add STR data to existing neighborhoods or create new entries
+      processedSTR.properties.forEach(strProperty => {
+        // Find matching rental entry by looking for neighborhood name in submarket
+        let existingEntry = combinedData.find(item => 
+          item.submarket.toLowerCase().includes(strProperty.neighborhood.toLowerCase()) ||
+          strProperty.neighborhood.toLowerCase().includes(item.submarket.toLowerCase().split(',')[0].trim())
         );
         
-        if (!exists) {
+        if (existingEntry) {
+          // Update existing entry with STR data
+          existingEntry.strRevenue = strProperty.monthlyRevenue;
+          existingEntry.multiple = existingEntry.medianRent > 0 ? strProperty.monthlyRevenue / existingEntry.medianRent : 0;
+        } else {
+          // Create new entry for STR-only neighborhood
           combinedData.push({
-            submarket: `${rental.neighborhood}, ${city}`,
-            strRevenue: 0,
-            medianRent: rental.rent,
+            submarket: `${strProperty.neighborhood}, ${city}`,
+            strRevenue: strProperty.monthlyRevenue,
+            medianRent: 0,
             multiple: 0
           });
         }
@@ -95,10 +83,11 @@ export const SimulatedMarketIntelligence = () => {
       setBathrooms(bathCount);
       
       const validDataCount = combinedData.filter(d => d.strRevenue > 0 && d.medianRent > 0).length;
+      const rentalDataCount = combinedData.filter(d => d.medianRent > 0).length;
       
       toast({
         title: "OpenAI ChatGPT Market Analysis Complete",
-        description: `Found ${combinedData.length} submarkets using real ChatGPT rental data (last 30 days) with ${validDataCount} having both STR and rental data.`,
+        description: `Found ${combinedData.length} submarkets with ${rentalDataCount} having rental data and ${validDataCount} having both STR and rental data.`,
       });
 
     } catch (error) {
@@ -126,9 +115,9 @@ export const SimulatedMarketIntelligence = () => {
           <div className="flex items-center gap-3">
             <Eye className="h-5 w-5 text-green-400" />
             <div>
-              <h3 className="font-semibold text-green-300">REAL CHATGPT RENTAL DATA (LAST 30 DAYS)</h3>
+              <h3 className="font-semibold text-green-300">REAL CHATGPT RENTAL DATA</h3>
               <p className="text-sm text-gray-300">
-                This tool uses OpenAI ChatGPT for rental rates (last 30 days only) and real STR earnings to calculate accurate revenue multiples. NO ESTIMATES.
+                This tool uses OpenAI ChatGPT for rental rates and real STR earnings to calculate accurate revenue multiples.
               </p>
             </div>
           </div>
