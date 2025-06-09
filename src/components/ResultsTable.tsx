@@ -85,7 +85,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
             )}
           </div>
         </div>
-        <p className="text-white">Monthly revenue potential by neighborhood and address</p>
+        <p className="text-white">Monthly revenue potential by neighborhood</p>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
@@ -100,7 +100,6 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
                   />
                 </TableHead>
                 <TableHead className="text-white font-semibold">Neighborhood</TableHead>
-                <TableHead className="text-white font-semibold">Address</TableHead>
                 <TableHead className="text-white font-semibold">
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-green-400" />
@@ -126,9 +125,6 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ results, city, onSel
                   </TableCell>
                   <TableCell className="font-medium text-white">
                     {(result as any).neighborhood || result.submarket}
-                  </TableCell>
-                  <TableCell className="text-white text-sm">
-                    {(result as any).address || 'N/A'}
                   </TableCell>
                   <TableCell className="text-white font-semibold">
                     {result.strRevenue === 0 ? (
