@@ -78,7 +78,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           API Configuration
         </CardTitle>
         <p className="text-sm text-gray-400">
-          Configure your RapidAPI key for Airbnb data scraping and OpenAI for AI features
+          Configure your STR Earnings API key for Airbnb data scraping and Rental Rates API for AI features
         </p>
       </CardHeader>
       <CardContent className="pt-6 space-y-4">
@@ -87,7 +87,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label htmlFor="rapidapi-key" className="text-sm font-medium text-gray-300">
-                RapidAPI Key (Airbnb Scraper)
+                STR Earnings API
               </label>
               {isRapidApiKeyValid ? (
                 <Badge variant="outline" className="border-green-500/30 text-green-300">
@@ -106,7 +106,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               type="password"
               value={rapidApiKey}
               onChange={(e) => setRapidApiKey(e.target.value)}
-              placeholder="Enter your RapidAPI key for Airbnb Scraper"
+              placeholder="Enter your STR Earnings API key"
               className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400"
             />
             <p className="text-xs text-gray-500">
@@ -118,7 +118,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label htmlFor="openai-key" className="text-sm font-medium text-gray-300">
-                OpenAI API Key (Optional)
+                Rental Rates API (Optional)
               </label>
               {isOpenaiKeyValid ? (
                 <Badge variant="outline" className="border-green-500/30 text-green-300">
@@ -136,7 +136,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               type="password"
               value={openaiApiKey}
               onChange={(e) => setOpenaiApiKey(e.target.value)}
-              placeholder="Enter your OpenAI API key for AI features"
+              placeholder="Enter your Rental Rates API key for AI features"
               className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400"
             />
             <p className="text-xs text-gray-500">
