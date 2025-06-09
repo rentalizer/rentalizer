@@ -83,7 +83,7 @@ export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
 // Fetch real rental data using OpenAI ChatGPT - ONLY SOURCE FOR RENTAL DATA
 export const fetchRealRentalData = async (city: string, propertyType: string = '2') => {
   try {
-    console.log(`🤖 Fetching OpenAI ChatGPT rental data for ${city} - ${propertyType}BR/2BA (Last 30 days ONLY)`);
+    console.log(`🤖 Fetching OpenAI ChatGPT rental data for ${city} - ${propertyType}BR/2BA`);
     
     const { data, error } = await supabase.functions.invoke('openai-rental-data', {
       body: {
@@ -111,7 +111,7 @@ export const fetchRealRentalData = async (city: string, propertyType: string = '
   }
 };
 
-// Process rental data from OpenAI ChatGPT
+// Process rental data from OpenAI ChatGPT - SIMPLIFIED TO JUST RETURN THE RENTALS
 export const processRentalData = (rentalData: any) => {
   console.log('🔍 Processing OpenAI rental data:', rentalData);
   
@@ -120,12 +120,9 @@ export const processRentalData = (rentalData: any) => {
     return [];
   }
 
-  const processedRentals = rentalData.data.rentals.map((rental: any) => ({
-    neighborhood: rental.neighborhood || 'Unknown',
-    rent: rental.rent || 0,
-    address: rental.address || rental.neighborhood || 'Unknown'
-  }));
-
-  console.log('✅ Processed rental data:', processedRentals);
-  return processedRentals;
+  const rentals = rentalData.data.rentals;
+  console.log('✅ Raw rentals from OpenAI:', rentals);
+  
+  // Return the rentals exactly as they come from OpenAI
+  return rentals;
 };

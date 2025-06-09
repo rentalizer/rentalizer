@@ -27,74 +27,66 @@ export const SimulatedMarketIntelligence = () => {
     setIsLoading(true);
     
     try {
-      console.log(`🚀 Starting complete market analysis for ${city} - ${propType}BR/${bathCount}BA`);
+      console.log(`🚀 Starting market analysis for ${city} - ${propType}BR/${bathCount}BA`);
       
-      // Fetch BOTH STR earnings AND rental data from OpenAI
-      console.log(`🏠 Fetching STR earnings for ${city}`);
-      const strApiData = await fetchAirbnbEarningsData(city, propType);
-      const processedSTR = processAirbnbEarningsData(strApiData);
-      
-      console.log(`🤖 Fetching OpenAI ChatGPT rental rates for ${city}`);
+      // Step 1: Get rental data from OpenAI
+      console.log(`🤖 Fetching OpenAI rental data for ${city}`);
       const rentalApiData = await fetchRealRentalData(city, propType);
-      const processedRentals = processRentalData(rentalApiData);
+      const rentals = processRentalData(rentalApiData);
       
-      console.log(`📊 STR data:`, processedSTR);
-      console.log(`📊 OpenAI ChatGPT rental data:`, processedRentals);
+      console.log(`📊 OpenAI rental data:`, rentals);
 
-      // Create combined data starting with rental data as the base
-      const combinedData: SubmarketData[] = [];
-      
-      // Start with all rental neighborhoods
-      processedRentals.forEach(rental => {
-        combinedData.push({
-          submarket: `${rental.neighborhood}, ${city}`,
-          strRevenue: 0, // Will be filled if STR data exists
-          medianRent: rental.rent,
-          multiple: 0
-        });
-      });
-      
-      // Add STR data to existing neighborhoods or create new entries
-      processedSTR.properties.forEach(strProperty => {
-        // Find matching rental entry by looking for neighborhood name in submarket
-        let existingEntry = combinedData.find(item => 
-          item.submarket.toLowerCase().includes(strProperty.neighborhood.toLowerCase()) ||
-          strProperty.neighborhood.toLowerCase().includes(item.submarket.toLowerCase().split(',')[0].trim())
-        );
+      // Step 2: Create submarkets with rental data
+      const submarkets: SubmarketData[] = rentals.map((rental: any) => ({
+        submarket: `${rental.neighborhood}, ${city}`,
+        strRevenue: 0, // Will be filled with STR data if available
+        medianRent: rental.rent || 0,
+        multiple: 0
+      }));
+
+      console.log(`📋 Created ${submarkets.length} submarkets with rental data:`, submarkets);
+
+      // Step 3: Try to get STR data (optional)
+      try {
+        console.log(`🏠 Fetching STR earnings for ${city}`);
+        const strApiData = await fetchAirbnbEarningsData(city, propType);
+        const processedSTR = processAirbnbEarningsData(strApiData);
         
-        if (existingEntry) {
-          // Update existing entry with STR data
-          existingEntry.strRevenue = strProperty.monthlyRevenue;
-          existingEntry.multiple = existingEntry.medianRent > 0 ? strProperty.monthlyRevenue / existingEntry.medianRent : 0;
-        } else {
-          // Create new entry for STR-only neighborhood
-          combinedData.push({
-            submarket: `${strProperty.neighborhood}, ${city}`,
-            strRevenue: strProperty.monthlyRevenue,
-            medianRent: 0,
-            multiple: 0
-          });
-        }
-      });
+        console.log(`📊 STR data:`, processedSTR);
 
-      setSubmarketData(combinedData);
+        // Add STR data to existing submarkets where possible
+        processedSTR.properties.forEach(strProperty => {
+          const matchingSubmarket = submarkets.find(submarket => 
+            submarket.submarket.toLowerCase().includes(strProperty.neighborhood.toLowerCase())
+          );
+          
+          if (matchingSubmarket) {
+            matchingSubmarket.strRevenue = strProperty.monthlyRevenue;
+            matchingSubmarket.multiple = matchingSubmarket.medianRent > 0 ? 
+              strProperty.monthlyRevenue / matchingSubmarket.medianRent : 0;
+          }
+        });
+      } catch (strError) {
+        console.warn('⚠️ STR data fetch failed, continuing with rental data only:', strError);
+      }
+
+      setSubmarketData(submarkets);
       setCityName(city);
       setPropertyType(propType);
       setBathrooms(bathCount);
       
-      const validDataCount = combinedData.filter(d => d.strRevenue > 0 && d.medianRent > 0).length;
-      const rentalDataCount = combinedData.filter(d => d.medianRent > 0).length;
+      const rentalCount = submarkets.filter(d => d.medianRent > 0).length;
       
       toast({
-        title: "OpenAI ChatGPT Market Analysis Complete",
-        description: `Found ${combinedData.length} submarkets with ${rentalDataCount} having rental data and ${validDataCount} having both STR and rental data.`,
+        title: "Market Analysis Complete",
+        description: `Found ${submarkets.length} submarkets with ${rentalCount} having rental data from OpenAI.`,
       });
 
     } catch (error) {
       console.error('❌ Market analysis error:', error);
       toast({
         title: "Analysis Failed",
-        description: "Unable to fetch real market data from OpenAI ChatGPT. Please check your API key.",
+        description: "Unable to fetch rental data from OpenAI. Please check your API key.",
         variant: "destructive",
       });
       setSubmarketData([]);
