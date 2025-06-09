@@ -76,7 +76,7 @@ export const SimulatedMarketIntelligence = () => {
       
       if (hasRevenueData && hasRentData) {
         toast({
-          title: "AirDNA Market Analysis Complete",
+          title: "AirDNA Fallback Analysis Complete",
           description: `STR revenue data found for ${city}. Rent estimates provided using market averages.`,
         });
       } else if (hasRevenueData && !hasRentData) {
@@ -117,7 +117,7 @@ export const SimulatedMarketIntelligence = () => {
           <div className="flex items-center gap-3">
             <Eye className="h-5 w-5 text-green-400" />
             <div>
-              <h3 className="font-semibold text-green-300">RapidAPI + AirDNA Market Intelligence</h3>
+              <h3 className="font-semibold text-green-300">RapidAPI Airbnb Scraper + AirDNA Market Intelligence</h3>
               <p className="text-sm text-gray-300">
                 This tool now uses RapidAPI Airbnb Scraper as the primary data source with AirDNA as fallback for comprehensive STR market analysis.
               </p>
