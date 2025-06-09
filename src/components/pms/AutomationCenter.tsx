@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Settings, Zap, Clock, MessageSquare } from 'lucide-react';
+import { Plus, Settings, Zap, Clock, MessageSquare, DollarSign } from 'lucide-react';
 
 export const AutomationCenter = () => {
   const automations = [
