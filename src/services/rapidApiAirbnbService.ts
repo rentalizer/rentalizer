@@ -79,3 +79,29 @@ export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
     city: apiData?.data?.city || 'Unknown City'
   };
 };
+
+// New function to fetch real rental data only
+export const fetchRealRentalData = async (city: string, propertyType: string = '2') => {
+  try {
+    console.log(`🏠 Fetching real rental data for ${city}`);
+    
+    const { data, error } = await supabase.functions.invoke('rental-data-api', {
+      body: {
+        city,
+        bedrooms: propertyType,
+        bathrooms: '2',
+        action: 'get_rental_rates'
+      }
+    });
+
+    if (error) {
+      throw new Error(`Rental API call failed: ${error.message}`);
+    }
+
+    console.log('✅ Real rental data response:', data);
+    return data;
+  } catch (error) {
+    console.error('❌ Rental data error:', error);
+    throw error;
+  }
+};
