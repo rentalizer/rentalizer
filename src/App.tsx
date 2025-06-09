@@ -23,6 +23,7 @@ import Pricing from "./pages/Pricing";
 import AcquisitionsAgent from "./pages/AcquisitionsAgent";
 import Community from "./pages/Community";
 import PMS from "./pages/PMS";
+import TestPMS from "./pages/TestPMS";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const AppRoutes = () => (
     <Route path="/properties" element={<AcquisitionsAgent />} />
     <Route path="/community" element={<Community />} />
     <Route path="/pms" element={<PMS />} />
+    <Route path="/testpms" element={<TestPMS />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
     <Route path="/terms-of-service" element={<TermsOfService />} />
