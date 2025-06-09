@@ -8,6 +8,7 @@ import { CalendarView } from './CalendarView';
 import { MessagingCenter } from './MessagingCenter';
 import { AutomationCenter } from './AutomationCenter';
 import { PlatformIntegrations } from './PlatformIntegrations';
+import { STREarningsAnalysis } from './STREarningsAnalysis';
 
 export const PMSDashboard = () => {
   const [activeView, setActiveView] = useState('dashboard');
@@ -26,6 +27,8 @@ export const PMSDashboard = () => {
         return <AutomationCenter />;
       case 'platforms':
         return <PlatformIntegrations />;
+      case 'earnings':
+        return <STREarningsAnalysis />;
       default:
         return <DashboardOverview />;
     }

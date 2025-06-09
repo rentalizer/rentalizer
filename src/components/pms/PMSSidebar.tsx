@@ -9,7 +9,8 @@ import {
   Settings, 
   BarChart3,
   Zap,
-  Link
+  Link,
+  DollarSign
 } from 'lucide-react';
 
 interface PMSSidebarProps {
@@ -25,6 +26,7 @@ export const PMSSidebar = ({ activeView, setActiveView }: PMSSidebarProps) => {
     { id: 'messages', label: 'Messages', icon: MessageSquare },
     { id: 'automation', label: 'Automation', icon: Zap },
     { id: 'platforms', label: 'Platforms', icon: Link },
+    { id: 'earnings', label: 'STR Earnings', icon: DollarSign },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
