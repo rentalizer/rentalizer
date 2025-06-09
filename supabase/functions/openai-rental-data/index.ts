@@ -23,21 +23,20 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    // Create a prompt that matches ChatGPT's approach for rental data
-    const prompt = `You are a real estate data analyst. Provide ONLY accurate rental rates for ${bedrooms}-bedroom, ${bathrooms}-bathroom apartments in ${city} as of the LAST 30 DAYS ONLY.
+    // Updated prompt that works within OpenAI's knowledge cutoff
+    const prompt = `You are a real estate market analyst. Based on your knowledge of rental markets, provide typical rental rates for ${bedrooms}-bedroom, ${bathrooms}-bathroom apartments in ${city}.
 
-List 8-10 different neighborhoods with their current median rent prices. Format as JSON array with this exact structure:
+List 8-10 different neighborhoods with their typical median rent prices. Format as JSON array with this exact structure:
 [
   {"neighborhood": "Neighborhood Name", "rent": 3600, "address": "Neighborhood Name, ${city}"}
 ]
 
-CRITICAL REQUIREMENTS:
-- Use ONLY real market data from the LAST 30 DAYS
-- NO estimates, approximations, or old data
-- Include diverse neighborhoods across different price ranges
-- Rent prices must be accurate current market rates for ${bedrooms}BR/${bathrooms}BA units
+Requirements:
+- Use your knowledge of ${city} rental market patterns
+- Include diverse neighborhoods across different price ranges  
+- Rent prices should reflect typical market rates for ${bedrooms}BR/${bathrooms}BA units
 - Return ONLY the JSON array, no other text or explanations
-- Data must be from December 2024 to January 2025 timeframe`;
+- Base estimates on known market patterns and neighborhood characteristics`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -50,11 +49,11 @@ CRITICAL REQUIREMENTS:
         messages: [
           { 
             role: 'system', 
-            content: 'You are a real estate data analyst that provides only accurate, current rental market data from the last 30 days. Never provide estimates or approximations. Only use real data from December 2024 to January 2025.' 
+            content: 'You are a real estate market analyst that provides rental market data based on your training knowledge. Provide realistic rental rates based on known market patterns.' 
           },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.1, // Low temperature for consistent data
+        temperature: 0.3,
         max_tokens: 1000,
       }),
     });
@@ -101,7 +100,7 @@ CRITICAL REQUIREMENTS:
         city: city,
         rentals: rentals,
         source: 'OpenAI ChatGPT',
-        dataDate: 'Last 30 days (Dec 2024 - Jan 2025)',
+        dataDate: 'Based on training data patterns',
         bedrooms: bedrooms,
         bathrooms: bathrooms
       }
@@ -118,7 +117,7 @@ CRITICAL REQUIREMENTS:
     return new Response(JSON.stringify({ 
       success: false, 
       error: error.message,
-      message: 'Failed to fetch real rental data from OpenAI ChatGPT'
+      message: 'Failed to fetch rental data from OpenAI ChatGPT'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
