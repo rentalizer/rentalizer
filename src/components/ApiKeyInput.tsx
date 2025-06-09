@@ -52,7 +52,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
       
       toast({
         title: "API Keys Saved",
-        description: "Your RapidAPI and OpenAI keys have been saved locally.",
+        description: "Your STR Earnings and Rental Rates API keys have been saved locally.",
       });
       
     } catch (error) {
@@ -89,15 +89,10 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               <label htmlFor="rapidapi-key" className="text-sm font-medium text-gray-300">
                 STR Earnings API
               </label>
-              {isRapidApiKeyValid ? (
+              {isRapidApiKeyValid && (
                 <Badge variant="outline" className="border-green-500/30 text-green-300">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   Valid
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="border-yellow-500/30 text-yellow-300">
-                  <AlertCircle className="h-3 w-3 mr-1" />
-                  Required
                 </Badge>
               )}
             </div>
@@ -118,16 +113,12 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label htmlFor="openai-key" className="text-sm font-medium text-gray-300">
-                Rental Rates API (Optional)
+                Rental Rates API
               </label>
-              {isOpenaiKeyValid ? (
+              {isOpenaiKeyValid && (
                 <Badge variant="outline" className="border-green-500/30 text-green-300">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   Valid
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="border-gray-500/30 text-gray-400">
-                  Optional
                 </Badge>
               )}
             </div>
@@ -147,7 +138,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
 
         <Button
           onClick={handleSaveKeys}
-          disabled={isSaving || !rapidApiKey}
+          disabled={isSaving}
           className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500"
         >
           {isSaving ? (
