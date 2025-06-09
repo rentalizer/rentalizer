@@ -1,10 +1,60 @@
+
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { Check, ChevronRight, Circle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-const DropdownMenu = DropdownMenuPrimitive.Root
+// Create a wrapper that supports hover
+const DropdownMenuRoot = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Root> & {
+    openOnHover?: boolean
+  }
+>(({ openOnHover = false, children, ...props }, ref) => {
+  const [open, setOpen] = React.useState(false)
+  const timeoutRef = React.useRef<NodeJS.Timeout>()
+
+  const handleMouseEnter = React.useCallback(() => {
+    if (openOnHover) {
+      clearTimeout(timeoutRef.current)
+      setOpen(true)
+    }
+  }, [openOnHover])
+
+  const handleMouseLeave = React.useCallback(() => {
+    if (openOnHover) {
+      timeoutRef.current = setTimeout(() => setOpen(false), 150)
+    }
+  }, [openOnHover])
+
+  React.useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
+
+  if (openOnHover) {
+    return (
+      <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <DropdownMenuPrimitive.Root open={open} onOpenChange={setOpen} {...props}>
+          {children}
+        </DropdownMenuPrimitive.Root>
+      </div>
+    )
+  }
+
+  return (
+    <DropdownMenuPrimitive.Root {...props}>
+      {children}
+    </DropdownMenuPrimitive.Root>
+  )
+})
+DropdownMenuRoot.displayName = "DropdownMenuRoot"
+
+const DropdownMenu = DropdownMenuRoot
 
 const DropdownMenuTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Trigger>,
@@ -55,7 +105,7 @@ const DropdownMenuSubContent = React.forwardRef<
   <DropdownMenuPrimitive.SubContent
     ref={ref}
     className={cn(
-      "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-slate-800 p-1 text-gray-100 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 group-hover:block",
+      "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-slate-800 p-1 text-gray-100 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
       className
     )}
     {...props}
@@ -73,7 +123,7 @@ const DropdownMenuContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        "z-50 min-w-[8rem] overflow-hidden rounded-md border border-gray-600 bg-slate-800 p-1 text-gray-100 shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 group-hover:block",
+        "z-50 min-w-[8rem] overflow-hidden rounded-md border border-gray-600 bg-slate-800 p-1 text-gray-100 shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         className
       )}
       {...props}
