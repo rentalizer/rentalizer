@@ -25,14 +25,14 @@ export const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ onAnalyz
   };
 
   return (
-    <Card className="bg-gray-900/95 border-gray-700 shadow-2xl">
+    <Card className="bg-gray-900/95 border-gray-700 shadow-2xl max-w-md mx-auto">
       <CardHeader className="border-b border-gray-700">
         <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
           <Search className="h-6 w-6 text-cyan-400" />
           Market Analysis
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-6 space-y-6">
+      <CardContent className="p-6 space-y-4">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="city" className="text-white font-medium">
@@ -49,34 +49,32 @@ export const MarketAnalysisForm: React.FC<MarketAnalysisFormProps> = ({ onAnalyz
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="bedrooms" className="text-white font-medium">Bedrooms</Label>
-              <Select value={propertyType} onValueChange={setPropertyType}>
-                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-600">
-                  <SelectItem value="1">1 Bedroom</SelectItem>
-                  <SelectItem value="2">2 Bedrooms</SelectItem>
-                  <SelectItem value="3">3 Bedrooms</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="bedrooms" className="text-white font-medium">Bedrooms</Label>
+            <Select value={propertyType} onValueChange={setPropertyType}>
+              <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800 border-gray-600">
+                <SelectItem value="1">1 Bedroom</SelectItem>
+                <SelectItem value="2">2 Bedrooms</SelectItem>
+                <SelectItem value="3">3 Bedrooms</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="bathrooms" className="text-white font-medium">Bathrooms</Label>
-              <Select value={bathrooms} onValueChange={setBathrooms}>
-                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-600">
-                  <SelectItem value="1">1 Bathroom</SelectItem>
-                  <SelectItem value="2">2 Bathrooms</SelectItem>
-                  <SelectItem value="3">3 Bathrooms</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="bathrooms" className="text-white font-medium">Bathrooms</Label>
+            <Select value={bathrooms} onValueChange={setBathrooms}>
+              <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-gray-800 border-gray-600">
+                <SelectItem value="1">1 Bathroom</SelectItem>
+                <SelectItem value="2">2 Bathrooms</SelectItem>
+                <SelectItem value="3">3 Bathrooms</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <Button
