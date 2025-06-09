@@ -24,19 +24,20 @@ serve(async (req) => {
     }
 
     // Create a prompt that matches ChatGPT's approach for rental data
-    const prompt = `Provide ONLY real rental rates for ${bedrooms}-bedroom, ${bathrooms}-bathroom apartments in ${city} as of the last 30 days. 
+    const prompt = `You are a real estate data analyst. Provide ONLY accurate rental rates for ${bedrooms}-bedroom, ${bathrooms}-bathroom apartments in ${city} as of the LAST 30 DAYS ONLY.
 
-List 5-8 different neighborhoods with their current median rent prices. Format as JSON array with this exact structure:
+List 8-10 different neighborhoods with their current median rent prices. Format as JSON array with this exact structure:
 [
-  {"neighborhood": "Neighborhood Name", "rent": 3500, "address": "Neighborhood Name, ${city}"}
+  {"neighborhood": "Neighborhood Name", "rent": 3600, "address": "Neighborhood Name, ${city}"}
 ]
 
-Requirements:
-- Use ONLY real market data from the last 30 days
-- NO estimates or approximations
-- Include diverse price ranges across different neighborhoods
-- Rent prices must be accurate current market rates
-- Return ONLY the JSON array, no other text`;
+CRITICAL REQUIREMENTS:
+- Use ONLY real market data from the LAST 30 DAYS
+- NO estimates, approximations, or old data
+- Include diverse neighborhoods across different price ranges
+- Rent prices must be accurate current market rates for ${bedrooms}BR/${bathrooms}BA units
+- Return ONLY the JSON array, no other text or explanations
+- Data must be from December 2024 to January 2025 timeframe`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -49,15 +50,18 @@ Requirements:
         messages: [
           { 
             role: 'system', 
-            content: 'You are a real estate data analyst that provides only accurate, current rental market data. Never provide estimates or approximations. Only use real data from the last 30 days.' 
+            content: 'You are a real estate data analyst that provides only accurate, current rental market data from the last 30 days. Never provide estimates or approximations. Only use real data from December 2024 to January 2025.' 
           },
           { role: 'user', content: prompt }
         ],
         temperature: 0.1, // Low temperature for consistent data
+        max_tokens: 1000,
       }),
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`OpenAI API error: ${response.status} - ${errorText}`);
       throw new Error(`OpenAI API error: ${response.status}`);
     }
 
@@ -72,8 +76,22 @@ Requirements:
       // Clean the response in case there are markdown code blocks
       const cleanedResponse = aiResponse.replace(/```json\n?|\n?```/g, '').trim();
       rentals = JSON.parse(cleanedResponse);
+      
+      // Validate that we have an array with the expected structure
+      if (!Array.isArray(rentals) || rentals.length === 0) {
+        throw new Error('Invalid data structure returned');
+      }
+      
+      // Validate each rental object
+      rentals.forEach((rental, index) => {
+        if (!rental.neighborhood || !rental.rent || !rental.address) {
+          throw new Error(`Invalid rental data at index ${index}`);
+        }
+      });
+      
     } catch (parseError) {
       console.error('Failed to parse OpenAI response:', parseError);
+      console.error('Raw response:', aiResponse);
       throw new Error('Invalid response format from OpenAI');
     }
 
@@ -83,9 +101,13 @@ Requirements:
         city: city,
         rentals: rentals,
         source: 'OpenAI ChatGPT',
-        dataDate: 'Last 30 days'
+        dataDate: 'Last 30 days (Dec 2024 - Jan 2025)',
+        bedrooms: bedrooms,
+        bathrooms: bathrooms
       }
     };
+
+    console.log('✅ Processed rental data:', processedData);
 
     return new Response(JSON.stringify(processedData), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -96,7 +118,7 @@ Requirements:
     return new Response(JSON.stringify({ 
       success: false, 
       error: error.message,
-      message: 'Failed to fetch real rental data from OpenAI'
+      message: 'Failed to fetch real rental data from OpenAI ChatGPT'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -80,10 +80,10 @@ export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
   };
 };
 
-// NEW: Fetch real rental data using OpenAI ChatGPT
+// Fetch real rental data using OpenAI ChatGPT - ONLY SOURCE FOR RENTAL DATA
 export const fetchRealRentalData = async (city: string, propertyType: string = '2') => {
   try {
-    console.log(`🤖 Fetching OpenAI ChatGPT rental data for ${city} - ${propertyType}BR/2BA (Last 30 days only)`);
+    console.log(`🤖 Fetching OpenAI ChatGPT rental data for ${city} - ${propertyType}BR/2BA (Last 30 days ONLY)`);
     
     const { data, error } = await supabase.functions.invoke('openai-rental-data', {
       body: {
@@ -94,8 +94,13 @@ export const fetchRealRentalData = async (city: string, propertyType: string = '
     });
 
     if (error) {
-      console.error('OpenAI rental data call failed:', error);
-      throw new Error('Failed to fetch real rental data from OpenAI');
+      console.error('❌ OpenAI rental data call failed:', error);
+      throw new Error(`Failed to fetch real rental data from OpenAI: ${error.message}`);
+    }
+
+    if (!data || !data.success) {
+      console.error('❌ OpenAI rental data failed:', data);
+      throw new Error('OpenAI rental data request was not successful');
     }
 
     console.log('✅ OpenAI ChatGPT rental data response:', data);
@@ -108,13 +113,19 @@ export const fetchRealRentalData = async (city: string, propertyType: string = '
 
 // Process rental data from OpenAI ChatGPT
 export const processRentalData = (rentalData: any) => {
+  console.log('🔍 Processing OpenAI rental data:', rentalData);
+  
   if (!rentalData || !rentalData.data || !rentalData.data.rentals) {
+    console.error('❌ Invalid rental data structure:', rentalData);
     return [];
   }
 
-  return rentalData.data.rentals.map((rental: any) => ({
+  const processedRentals = rentalData.data.rentals.map((rental: any) => ({
     neighborhood: rental.neighborhood || 'Unknown',
     rent: rental.rent || 0,
     address: rental.address || rental.neighborhood || 'Unknown'
   }));
+
+  console.log('✅ Processed rental data:', processedRentals);
+  return processedRentals;
 };
