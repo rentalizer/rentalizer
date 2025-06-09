@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,7 +14,7 @@ interface ApiKeyInputProps {
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
   const { toast } = useToast();
   const [rapidApiKey, setRapidApiKey] = useState<string>('563ec2eceemshee4eb6d8e03f721p1oe15cjsn5666181f3c3');
-  const [openaiApiKey, setOpenaiApiKey] = useState<string>('');
+  const [openaiApiKey, setOpenaiApiKey] = useState<string>('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');
   const [isSaving, setIsSaving] = useState(false);
   const [showKeys, setShowKeys] = useState(false);
 
@@ -24,7 +25,8 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
                             localStorage.getItem('airdna_api_key') || 
                             '563ec2eceemshee4eb6d8e03f721p1oe15cjsn5666181f3c3'; // Default API key
     const savedOpenaiApiKey = localStorage.getItem('openai_api_key') || 
-                             localStorage.getItem('OPENAI_API_KEY') || '';
+                             localStorage.getItem('OPENAI_API_KEY') || 
+                             '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'; // Default OpenAI API key
     
     console.log('🔍 Loading API Keys from localStorage:', {
       rapidApiKey: savedRapidApiKey ? `${savedRapidApiKey.substring(0, 8)}... (${savedRapidApiKey.length} chars)` : 'Not found',
