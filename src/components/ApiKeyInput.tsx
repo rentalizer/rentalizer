@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,7 +12,7 @@ interface ApiKeyInputProps {
 
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
   const { toast } = useToast();
-  const [rapidApiKey, setRapidApiKey] = useState<string>('');
+  const [rapidApiKey, setRapidApiKey] = useState<string>('563ec2eceemshee4eb6d8e03f721p1oe15cjsn5666181f3c3');
   const [openaiApiKey, setOpenaiApiKey] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const [showKeys, setShowKeys] = useState(false);
@@ -22,7 +21,8 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     // Load saved API keys from localStorage - check multiple possible keys
     const savedRapidApiKey = localStorage.getItem('rapidapi_key') || 
                             localStorage.getItem('professional_data_key') || 
-                            localStorage.getItem('airdna_api_key') || '';
+                            localStorage.getItem('airdna_api_key') || 
+                            '563ec2eceemshee4eb6d8e03f721p1oe15cjsn5666181f3c3'; // Default API key
     const savedOpenaiApiKey = localStorage.getItem('openai_api_key') || 
                              localStorage.getItem('OPENAI_API_KEY') || '';
     
