@@ -22,11 +22,11 @@ serve(async (req) => {
     try {
       console.log(`📡 Trying Airbnb API for ${city}`);
       
-      // Try multiple Airbnb APIs for better data coverage
+      // Updated to use the correct working endpoint
       const apis = [
         {
-          url: `https://airbnb-listings.p.rapidapi.com/v2/listingsByGeoLocation`,
-          host: 'airbnb-listings.p.rapidapi.com',
+          url: `https://airbnb-listings-data.p.rapidapi.com/v2/listingsByGeoLocation`,
+          host: 'airbnb-listings-data.p.rapidapi.com',
           method: 'GET',
           params: `?location=${encodeURIComponent(city)}&limit=20`
         },
