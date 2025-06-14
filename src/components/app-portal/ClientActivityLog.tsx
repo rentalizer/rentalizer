@@ -318,14 +318,14 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
     },
     {
       id: 15,
-      timestamp: '2025-02-01 18:30:45',
+      timestamp: '2025-02-14 20:15:00',
       activity: 'First Login',
       details: 'Initial account setup and first login',
       type: 'login',
       icon: LogIn,
       color: 'purple',
       duration: '-',
-      link: '/auth/sessions/20250201183045'
+      link: '/auth/sessions/20250214201500'
     }
   ];
 

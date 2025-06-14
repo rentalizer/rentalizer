@@ -32,8 +32,8 @@ const clients = [
     email: 'ifeanyionline92@yahoo.com',
     plan: 'Monthly Subscription',
     monthlyRevenue: 9,
-    joinedDate: '2025-02-01',
-    daysSinceSignup: 133, // Feb 1 to June 14, 2025
+    joinedDate: '2025-02-14',
+    daysSinceSignup: 120, // Feb 14 to June 14, 2025
     status: 'Active'
   }
 ];
