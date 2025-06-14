@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -157,7 +156,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
     }
   ];
 
-  // Client 2 (Sarah Chen) - New client data
+  // Client 2 (Sara Ifeanyi) - Updated client data
   const client2Activities = [
     // May 2025
     {

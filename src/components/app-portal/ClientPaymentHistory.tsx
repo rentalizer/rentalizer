@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -66,7 +65,7 @@ const getPaymentHistory = (clientId: string, timeRange: string, client?: Client)
     }
   ];
 
-  // Client 2 (Sarah Chen) - New client data
+  // Client 2 (Sara Ifeanyi) - Updated client data
   const client2Payments = [
     {
       id: 'pi_3RDKLMGjV9r2LUGn2f9cYl',

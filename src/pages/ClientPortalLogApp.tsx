@@ -28,8 +28,8 @@ const clients = [
   },
   { 
     id: '2', 
-    name: 'Sarah Chen', 
-    email: 'sarah.chen@example.com',
+    name: 'Sara Ifeanyi', 
+    email: 'ifeanyionline92@yahoo.com',
     plan: 'Monthly Subscription',
     monthlyRevenue: 9,
     joinedDate: '2025-02-01',
