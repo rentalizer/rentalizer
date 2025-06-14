@@ -29,26 +29,14 @@ serve(async (req) => {
     try {
       console.log(`📡 Trying Airbnb Listings Data API for ${city} with coordinates:`, coordinates);
       
-      const apiUrl = 'https://airbnb-listings-data.p.rapidapi.com/getListingsData';
-      
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': rapidApiKey,
-          'x-rapidapi-host': 'airbnb-listings-data.p.rapidapi.com',
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
-        }
-      });
-
       // Build URL with query parameters
-      const urlWithParams = new URL(apiUrl);
-      urlWithParams.searchParams.append('nwLat', coordinates.nwLat.toString());
-      urlWithParams.searchParams.append('nwLng', coordinates.nwLng.toString());
-      urlWithParams.searchParams.append('seLat', coordinates.seLat.toString());
-      urlWithParams.searchParams.append('seLng', coordinates.seLng.toString());
+      const apiUrl = new URL('https://airbnb-listings-data.p.rapidapi.com/getListingsData');
+      apiUrl.searchParams.append('nwLat', coordinates.nwLat.toString());
+      apiUrl.searchParams.append('nwLng', coordinates.nwLng.toString());
+      apiUrl.searchParams.append('seLat', coordinates.seLat.toString());
+      apiUrl.searchParams.append('seLng', coordinates.seLng.toString());
 
-      const responseWithParams = await fetch(urlWithParams.toString(), {
+      const response = await fetch(apiUrl.toString(), {
         method: 'GET',
         headers: {
           'x-rapidapi-key': rapidApiKey,
@@ -58,48 +46,59 @@ serve(async (req) => {
         }
       });
 
-      console.log(`📊 Airbnb Listings Response Status: ${responseWithParams.status}`);
+      console.log(`📊 Airbnb Listings Response Status: ${response.status}`);
 
-      if (responseWithParams.ok) {
-        const apiData = await responseWithParams.json();
-        console.log(`✅ Airbnb Listings Response:`, JSON.stringify(apiData, null, 2));
+      if (response.ok) {
+        const apiData = await response.json();
+        console.log(`✅ Airbnb Listings Response received with ${Array.isArray(apiData.message) ? apiData.message.length : 0} listings`);
         
-        // Process the API response
-        const listings = apiData.data || apiData.listings || apiData.results || apiData;
+        // Process the API response - the data is in apiData.message array
+        const listings = apiData.message || [];
         
         if (Array.isArray(listings) && listings.length > 0) {
+          const processedProperties = listings.slice(0, 15).map((listing: any) => {
+            // Extract neighborhood from location or use city name
+            const neighborhood = extractNeighborhood(listing.name, city) || city;
+            
+            return {
+              id: listing.listingID || Math.random().toString(),
+              name: listing.name || 'Airbnb Property',
+              location: `${neighborhood}, ${city}`,
+              price: Math.round(listing.avg_booked_daily_rate_ltm || 150),
+              monthly_revenue: Math.round((listing.annual_revenue_ltm || 0) / 12),
+              occupancy_rate: Math.round(listing.avg_occupancy_rate_ltm || 75),
+              rating: 4.5, // Default rating since not in API response
+              reviews: 25, // Default reviews since not in API response
+              neighborhood: neighborhood
+            };
+          });
+          
           const processedData = {
             success: true,
             data: {
               city: city,
-              properties: listings.slice(0, 10).map((listing: any) => ({
-                id: listing.id || listing.listing_id || Math.random().toString(),
-                name: listing.name || listing.title || 'Airbnb Property',
-                location: `${listing.neighborhood || listing.location || listing.address || city}`,
-                price: listing.price || listing.nightly_rate || listing.basePrice || 150,
-                monthly_revenue: calculateMonthlyRevenue(listing),
-                occupancy_rate: listing.occupancy_rate || listing.occupancy || 75,
-                rating: listing.rating || listing.reviewScoresRating || listing.avgRating || 4.5,
-                reviews: listing.reviews || listing.numberOfReviews || listing.reviewCount || 25,
-                neighborhood: listing.neighborhood || listing.location || listing.district || city
-              }))
+              properties: processedProperties
             }
           };
+          
+          console.log(`✅ Successfully processed ${processedProperties.length} STR properties for ${city}`);
           
           return new Response(JSON.stringify(processedData), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           });
+        } else {
+          console.warn(`⚠️ No listings found in API response for ${city}`);
         }
       } else {
-        const errorText = await responseWithParams.text();
-        console.error(`❌ Airbnb Listings API failed with status: ${responseWithParams.status}, body: ${errorText}`);
+        const errorText = await response.text();
+        console.error(`❌ Airbnb Listings API failed with status: ${response.status}, body: ${errorText}`);
       }
 
     } catch (apiError) {
       console.error('❌ Airbnb Listings API failed:', apiError);
     }
 
-    // Fallback to market-specific STR data if API fails
+    // Fallback to market-specific STR data if API fails or returns no data
     console.log(`📡 Using market-specific STR data for ${city}`);
     return getFallbackResponse(city);
 
@@ -115,13 +114,34 @@ serve(async (req) => {
   }
 });
 
-// Calculate monthly revenue from listing data
-function calculateMonthlyRevenue(listing: any): number {
-  const nightlyRate = listing.price || listing.nightly_rate || listing.basePrice || 150;
-  const occupancyRate = listing.occupancy_rate || listing.occupancy || 75;
+// Extract neighborhood from property name or use fallback
+function extractNeighborhood(propertyName: string, city: string): string | null {
+  if (!propertyName) return null;
   
-  // Calculate monthly revenue: nightly rate * 30 days * occupancy rate
-  return Math.round(nightlyRate * 30 * (occupancyRate / 100));
+  const lowerName = propertyName.toLowerCase();
+  const lowerCity = city.toLowerCase();
+  
+  // Common neighborhood patterns for major cities
+  const neighborhoodPatterns: { [key: string]: string[] } = {
+    'new york': ['manhattan', 'brooklyn', 'queens', 'bronx', 'staten island', 'soho', 'tribeca', 'chelsea', 'greenwich village', 'upper east side', 'upper west side', 'lower east side', 'financial district', 'midtown', 'harlem', 'williamsburg', 'dumbo', 'park slope', 'astoria', 'long island city'],
+    'los angeles': ['hollywood', 'beverly hills', 'santa monica', 'venice', 'west hollywood', 'downtown', 'koreatown', 'silver lake', 'echo park', 'los feliz', 'brentwood', 'westwood', 'culver city', 'marina del rey'],
+    'austin': ['downtown', 'south austin', 'east austin', 'west austin', 'north austin', 'barton hills', 'zilker', 'mueller', 'rainey street', 'sixth street'],
+    'miami': ['south beach', 'downtown', 'brickell', 'wynwood', 'design district', 'coconut grove', 'coral gables', 'key biscayne', 'aventura', 'bal harbour'],
+    'chicago': ['loop', 'lincoln park', 'wicker park', 'bucktown', 'logan square', 'river north', 'gold coast', 'old town', 'lakeview', 'andersonville'],
+    'denver': ['lodo', 'capitol hill', 'rino', 'highlands', 'cherry creek', 'washington park', 'five points', 'baker', 'congress park'],
+    'san diego': ['gaslamp quarter', 'little italy', 'mission beach', 'pacific beach', 'la jolla', 'balboa park', 'hillcrest', 'north park', 'ocean beach'],
+    'nashville': ['downtown', 'music row', 'gulch', 'sobro', 'east nashville', 'west end', 'vanderbilt', 'germantown', 'the nations']
+  };
+  
+  const patterns = neighborhoodPatterns[lowerCity] || [];
+  
+  for (const pattern of patterns) {
+    if (lowerName.includes(pattern)) {
+      return pattern.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+  }
+  
+  return null;
 }
 
 // Get coordinates for major cities
@@ -214,6 +234,8 @@ function getFallbackResponse(city: string) {
       }
     };
     
+    console.log(`✅ Using fallback STR data for ${city} with ${marketStrData.length} properties`);
+    
     return new Response(JSON.stringify(processedData), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -242,6 +264,76 @@ function getMarketSpecificSTRData(city: string) {
   
   // Market data for STR properties based on recent market research
   const marketData: { [key: string]: any[] } = {
+    'new york': [
+      { 
+        id: 'str-ny-1',
+        name: 'Manhattan Studio',
+        location: 'Manhattan, New York',
+        price: 220,
+        monthly_revenue: 4950,
+        occupancy_rate: 75,
+        rating: 4.7,
+        reviews: 134,
+        neighborhood: 'Manhattan'
+      },
+      { 
+        id: 'str-ny-2',
+        name: 'Brooklyn Heights Apartment',
+        location: 'Brooklyn Heights, New York',
+        price: 180,
+        monthly_revenue: 4050,
+        occupancy_rate: 75,
+        rating: 4.5,
+        reviews: 98,
+        neighborhood: 'Brooklyn Heights'
+      },
+      { 
+        id: 'str-ny-3',
+        name: 'Queens Condo',
+        location: 'Astoria, New York',
+        price: 140,
+        monthly_revenue: 3150,
+        occupancy_rate: 75,
+        rating: 4.3,
+        reviews: 76,
+        neighborhood: 'Astoria'
+      }
+    ],
+    'los angeles': [
+      { 
+        id: 'str-la-1',
+        name: 'Hollywood Apartment',
+        location: 'Hollywood, Los Angeles',
+        price: 200,
+        monthly_revenue: 4500,
+        occupancy_rate: 75,
+        rating: 4.6,
+        reviews: 156,
+        neighborhood: 'Hollywood'
+      },
+      { 
+        id: 'str-la-2',
+        name: 'Venice Beach House',
+        location: 'Venice, Los Angeles',
+        price: 250,
+        monthly_revenue: 5625,
+        occupancy_rate: 75,
+        rating: 4.8,
+        reviews: 203,
+        neighborhood: 'Venice'
+      },
+      { 
+        id: 'str-la-3',
+        name: 'Santa Monica Condo',
+        location: 'Santa Monica, Los Angeles',
+        price: 280,
+        monthly_revenue: 6300,
+        occupancy_rate: 75,
+        rating: 4.7,
+        reviews: 189,
+        neighborhood: 'Santa Monica'
+      }
+    ],
     'san diego': [
       { 
         id: 'str-sd-1',
@@ -426,6 +518,76 @@ function getMarketSpecificSTRData(city: string) {
         rating: 4.4,
         reviews: 67,
         neighborhood: 'RiNo'
+      }
+    ],
+    'chicago': [
+      { 
+        id: 'str-ch-1',
+        name: 'Loop Apartment',
+        location: 'Loop, Chicago',
+        price: 160,
+        monthly_revenue: 3600,
+        occupancy_rate: 75,
+        rating: 4.4,
+        reviews: 98,
+        neighborhood: 'Loop'
+      },
+      { 
+        id: 'str-ch-2',
+        name: 'Lincoln Park Condo',
+        location: 'Lincoln Park, Chicago',
+        price: 140,
+        monthly_revenue: 3150,
+        occupancy_rate: 75,
+        rating: 4.3,
+        reviews: 76,
+        neighborhood: 'Lincoln Park'
+      },
+      { 
+        id: 'str-ch-3',
+        name: 'Wicker Park Loft',
+        location: 'Wicker Park, Chicago',
+        price: 135,
+        monthly_revenue: 3037,
+        occupancy_rate: 75,
+        rating: 4.5,
+        reviews: 89,
+        neighborhood: 'Wicker Park'
+      }
+    ],
+    'nashville': [
+      { 
+        id: 'str-na-1',
+        name: 'Downtown Nashville Condo',
+        location: 'Downtown, Nashville',
+        price: 145,
+        monthly_revenue: 3262,
+        occupancy_rate: 75,
+        rating: 4.4,
+        reviews: 87,
+        neighborhood: 'Downtown'
+      },
+      { 
+        id: 'str-na-2',
+        name: 'Music Row Apartment',
+        location: 'Music Row, Nashville',
+        price: 130,
+        monthly_revenue: 2925,
+        occupancy_rate: 75,
+        rating: 4.3,
+        reviews: 65,
+        neighborhood: 'Music Row'
+      },
+      { 
+        id: 'str-na-3',
+        name: 'East Nashville House',
+        location: 'East Nashville, Nashville',
+        price: 125,
+        monthly_revenue: 2812,
+        occupancy_rate: 75,
+        rating: 4.2,
+        reviews: 54,
+        neighborhood: 'East Nashville'
       }
     ]
   };
