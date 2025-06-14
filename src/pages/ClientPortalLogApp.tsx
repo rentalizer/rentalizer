@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -109,26 +108,6 @@ const ClientPortalLogApp = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
-                </div>
-                
-                {/* Quick Stats */}
-                <div className="grid grid-cols-4 gap-6">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-400">$18</div>
-                    <div className="text-xs text-gray-400">Total Revenue</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-400">1</div>
-                    <div className="text-xs text-gray-400">Active Users</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-400">4.8</div>
-                    <div className="text-xs text-gray-400">App Rating</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-400">100%</div>
-                    <div className="text-xs text-gray-400">Retention</div>
                   </div>
                 </div>
               </div>
