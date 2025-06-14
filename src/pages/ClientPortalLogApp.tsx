@@ -25,6 +25,16 @@ const clients = [
     joinedDate: '2025-04-13',
     daysSinceSignup: 62, // April 13 to June 14, 2025
     status: 'Active'
+  },
+  { 
+    id: '2', 
+    name: 'Sarah Chen', 
+    email: 'sarah.chen@example.com',
+    plan: 'Monthly Subscription',
+    monthlyRevenue: 9,
+    joinedDate: '2025-02-01',
+    daysSinceSignup: 133, // Feb 1 to June 14, 2025
+    status: 'Active'
   }
 ];
 
@@ -128,7 +138,9 @@ const ClientPortalLogApp = () => {
                     <div className="flex items-center gap-6 text-sm text-gray-300">
                       <div>
                         <span className="text-gray-400">Subscribed:</span>
-                        <span className="ml-1 text-white">April 13, 2025</span>
+                        <span className="ml-1 text-white">
+                          {new Date(currentClient.joinedDate).toLocaleDateString()}
+                        </span>
                       </div>
                       <div>
                         <span className="text-gray-400">Plan:</span>

@@ -26,8 +26,8 @@ interface ClientPaymentHistoryProps {
 }
 
 const getPaymentHistory = (clientId: string, timeRange: string, client?: Client) => {
-  // Real Stripe payment IDs from the dashboard
-  const payments = [
+  // Client 1 (Ramakrishna) - Original data
+  const client1Payments = [
     {
       id: 'pi_3RDJOUGjV9r2LUGm1d8bXk',
       timestamp: '2025-06-13 06:48:00',
@@ -66,6 +66,60 @@ const getPaymentHistory = (clientId: string, timeRange: string, client?: Client)
     }
   ];
 
+  // Client 2 (Sarah Chen) - New client data
+  const client2Payments = [
+    {
+      id: 'pi_3RDKLMGjV9r2LUGn2f9cYl',
+      timestamp: '2025-05-01 14:22:00',
+      type: 'subscription_payment',
+      amount: 9.00,
+      currency: 'USD',
+      status: 'succeeded',
+      description: 'Monthly subscription',
+      payment_method: 'Mastercard •••• 4242',
+      stripe_fee: 0.56,
+      net_amount: 8.44
+    },
+    {
+      id: 'pi_3RBHIJGjV9r2LUGo3g8dZm',
+      timestamp: '2025-04-01 14:22:00',
+      type: 'subscription_payment',
+      amount: 9.00,
+      currency: 'USD',
+      status: 'succeeded',
+      description: 'Monthly subscription',
+      payment_method: 'Mastercard •••• 4242',
+      stripe_fee: 0.56,
+      net_amount: 8.44
+    },
+    {
+      id: 'pi_3R9FGHGjV9r2LUGp4h7eAn',
+      timestamp: '2025-03-01 14:22:00',
+      type: 'subscription_payment',
+      amount: 9.00,
+      currency: 'USD',
+      status: 'succeeded',
+      description: 'Monthly subscription',
+      payment_method: 'Mastercard •••• 4242',
+      stripe_fee: 0.56,
+      net_amount: 8.44
+    },
+    {
+      id: 'pi_3R7DEFGjV9r2LUGq5i6fBo',
+      timestamp: '2025-02-01 14:22:00',
+      type: 'subscription_payment',
+      amount: 9.00,
+      currency: 'USD',
+      status: 'succeeded',
+      description: 'Monthly subscription',
+      payment_method: 'Mastercard •••• 4242',
+      stripe_fee: 0.56,
+      net_amount: 8.44
+    }
+  ];
+
+  const payments = clientId === '1' ? client1Payments : client2Payments;
+
   // Filter based on time range
   const now = new Date('2025-06-14');
   let cutoffDate = new Date();
@@ -84,7 +138,7 @@ const getPaymentHistory = (clientId: string, timeRange: string, client?: Client)
       cutoffDate.setTime(now.getTime() - (365 * 24 * 60 * 60 * 1000));
       break;
     default:
-      cutoffDate = new Date('2025-04-13');
+      cutoffDate = new Date(client?.joinedDate || '2025-02-01');
   }
 
   return payments.filter(payment => 
@@ -141,6 +195,8 @@ export const ClientPaymentHistory = ({ clientId, timeRange, client }: ClientPaym
   const totalPayments = payments.filter(p => p.type === 'subscription_payment').length;
   const successfulPayments = payments.filter(p => p.type === 'subscription_payment' && p.status === 'succeeded').length;
 
+  const subscriptionSince = client?.joinedDate ? new Date(client.joinedDate).toLocaleDateString() : 'N/A';
+
   return (
     <div className="space-y-4">
       {/* Payment Summary */}
@@ -187,7 +243,7 @@ export const ClientPaymentHistory = ({ clientId, timeRange, client }: ClientPaym
             <div>
               <p className="text-sm text-gray-400">Subscription Since</p>
               <p className="text-lg font-bold text-purple-400">
-                4/13/2025
+                {subscriptionSince}
               </p>
             </div>
           </div>

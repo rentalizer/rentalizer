@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -30,9 +29,9 @@ interface ClientActivityLogProps {
 }
 
 const getClientActivities = (clientId: string, timeRange: string, client?: Client) => {
-  // Real activity data - Updated to match actual totals: 2 logins, 4 searches, 3 calculations, 2 downloads
-  const activities = [
-    // Recent June 2025 activity (yesterday - June 13)
+  // Client 1 (Ramakrishna) - Original data
+  const client1Activities = [
+    // Recent June 2025 activity
     {
       id: 1,
       timestamp: '2025-06-13 16:22:30',
@@ -77,7 +76,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '4m 32s',
       link: '/calculations/roi-123main-20250613'
     },
-    // May 2025 activities - Limited to match totals
+    // May 2025 activities
     {
       id: 5,
       timestamp: '2025-05-20 11:15:33',
@@ -111,7 +110,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '8m 35s',
       link: '/searches/north-park-20250516'
     },
-    // April 2025 activities - Limited to match totals
+    // April 2025 activities
     {
       id: 8,
       timestamp: '2025-04-25 14:45:30',
@@ -158,8 +157,183 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
     }
   ];
 
-  // Filter based on time range - Fixed filtering logic to ensure April activities are included
-  const now = new Date('2025-06-14'); // Current date context
+  // Client 2 (Sarah Chen) - New client data
+  const client2Activities = [
+    // May 2025
+    {
+      id: 1,
+      timestamp: '2025-05-28 15:45:20',
+      activity: 'Property Analysis',
+      details: 'Analyzed luxury condo in downtown Seattle',
+      type: 'calculation',
+      icon: Calculator,
+      color: 'green',
+      duration: '12m 45s',
+      link: '/calculations/luxury-condo-seattle-20250528'
+    },
+    {
+      id: 2,
+      timestamp: '2025-05-25 09:30:15',
+      activity: 'Login',
+      details: 'Logged in via mobile app',
+      type: 'login',
+      icon: LogIn,
+      color: 'purple',
+      duration: '-',
+      link: '/auth/sessions/20250525093015'
+    },
+    {
+      id: 3,
+      timestamp: '2025-05-22 14:20:30',
+      activity: 'Market Research',
+      details: 'Researched Capitol Hill rental trends',
+      type: 'search',
+      icon: Search,
+      color: 'blue',
+      duration: '18m 22s',
+      link: '/searches/capitol-hill-trends-20250522'
+    },
+    {
+      id: 4,
+      timestamp: '2025-05-15 11:10:45',
+      activity: 'Report Download',
+      details: 'Downloaded quarterly market report',
+      type: 'download',
+      icon: Download,
+      color: 'orange',
+      duration: '-',
+      link: '/reports/quarterly-market-20250515'
+    },
+    // April 2025
+    {
+      id: 5,
+      timestamp: '2025-04-20 16:35:12',
+      activity: 'ROI Analysis',
+      details: 'Analyzed 4-unit apartment building ROI',
+      type: 'calculation',
+      icon: Calculator,
+      color: 'green',
+      duration: '25m 18s',
+      link: '/calculations/4unit-apartment-20250420'
+    },
+    {
+      id: 6,
+      timestamp: '2025-04-18 13:25:40',
+      activity: 'Neighborhood Search',
+      details: 'Searched Fremont district properties',
+      type: 'search',
+      icon: Search,
+      color: 'blue',
+      duration: '7m 33s',
+      link: '/searches/fremont-district-20250418'
+    },
+    {
+      id: 7,
+      timestamp: '2025-04-12 10:15:25',
+      activity: 'Login',
+      details: 'Logged in via web browser',
+      type: 'login',
+      icon: LogIn,
+      color: 'purple',
+      duration: '-',
+      link: '/auth/sessions/20250412101525'
+    },
+    // March 2025
+    {
+      id: 8,
+      timestamp: '2025-03-28 14:50:30',
+      activity: 'Cash Flow Model',
+      details: 'Built cash flow model for duplex investment',
+      type: 'calculation',
+      icon: Calculator,
+      color: 'green',
+      duration: '35m 42s',
+      link: '/calculations/duplex-cashflow-20250328'
+    },
+    {
+      id: 9,
+      timestamp: '2025-03-25 11:20:15',
+      activity: 'Market Analysis',
+      details: 'Analyzed Ballard neighborhood trends',
+      type: 'search',
+      icon: Search,
+      color: 'blue',
+      duration: '15m 20s',
+      link: '/searches/ballard-trends-20250325'
+    },
+    {
+      id: 10,
+      timestamp: '2025-03-20 09:40:50',
+      activity: 'Investment Report',
+      details: 'Downloaded investment strategy guide',
+      type: 'download',
+      icon: Download,
+      color: 'orange',
+      duration: '-',
+      link: '/reports/investment-strategy-20250320'
+    },
+    {
+      id: 11,
+      timestamp: '2025-03-15 16:25:35',
+      activity: 'Login',
+      details: 'Logged in via web browser',
+      type: 'login',
+      icon: LogIn,
+      color: 'purple',
+      duration: '-',
+      link: '/auth/sessions/20250315162535'
+    },
+    // February 2025
+    {
+      id: 12,
+      timestamp: '2025-02-25 13:30:20',
+      activity: 'Property Evaluation',
+      details: 'Evaluated single-family home potential',
+      type: 'calculation',
+      icon: Calculator,
+      color: 'green',
+      duration: '22m 15s',
+      link: '/calculations/sfh-evaluation-20250225'
+    },
+    {
+      id: 13,
+      timestamp: '2025-02-20 10:45:30',
+      activity: 'Market Research',
+      details: 'Researched University District market',
+      type: 'search',
+      icon: Search,
+      color: 'blue',
+      duration: '12m 45s',
+      link: '/searches/university-district-20250220'
+    },
+    {
+      id: 14,
+      timestamp: '2025-02-15 14:20:10',
+      activity: 'Login',
+      details: 'Logged in via mobile app',
+      type: 'login',
+      icon: LogIn,
+      color: 'purple',
+      duration: '-',
+      link: '/auth/sessions/20250215142010'
+    },
+    {
+      id: 15,
+      timestamp: '2025-02-01 09:15:45',
+      activity: 'First Login',
+      details: 'Initial account setup and first login',
+      type: 'login',
+      icon: LogIn,
+      color: 'purple',
+      duration: '-',
+      link: '/auth/sessions/20250201091545'
+    }
+  ];
+
+  const activities = clientId === '1' ? client1Activities : client2Activities;
+
+  // Filter based on time range
+  const now = new Date('2025-06-14');
   let cutoffDate = new Date();
   
   switch (timeRange) {
@@ -176,12 +350,10 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       cutoffDate.setTime(now.getTime() - (365 * 24 * 60 * 60 * 1000));
       break;
     default:
-      // For any other case, show all activities from signup date
-      cutoffDate = new Date('2025-04-13');
+      cutoffDate = new Date(client?.joinedDate || '2025-02-01');
   }
 
-  // Ensure we never filter out activities from before the signup date (April 13, 2025)
-  const signupDate = new Date('2025-04-13');
+  const signupDate = new Date(client?.joinedDate || '2025-02-01');
   if (cutoffDate > signupDate) {
     cutoffDate = signupDate;
   }
@@ -217,9 +389,7 @@ const getTypeColor = (type: string) => {
 };
 
 const handleActivityClick = (link: string) => {
-  // In a real application, this would navigate to the detailed view
   console.log('Navigating to:', link);
-  // For demo purposes, just show an alert
   alert(`Would navigate to: ${link}`);
 };
 
