@@ -65,10 +65,10 @@ const getPaymentHistory = (clientId: string, timeRange: string, client?: Client)
     }
   ];
 
-  // Client 2 (Ifeanyi Okoye) - Using real Stripe ID from screenshot
+  // Client 2 (Ifeanyi Okoye) - Using real Stripe payment IDs from screenshots
   const client2Payments = [
     {
-      id: 'pi_3RDJOUGjV9r2LUGm1d8bXk',
+      id: 'pi_3QsVAXGiyV9r2LUG0kGE92sh',
       timestamp: '2025-05-14 20:07:00',
       type: 'subscription_payment',
       amount: 9.00,
@@ -80,7 +80,7 @@ const getPaymentHistory = (clientId: string, timeRange: string, client?: Client)
       net_amount: 8.44
     },
     {
-      id: 'pi_3RBHIJGjV9r2LUGo3g8dZm7B',
+      id: 'pi_3R2fSGGiyV9r2LUG0ObUSkfv',
       timestamp: '2025-04-14 20:07:00',
       type: 'subscription_payment',
       amount: 9.00,
@@ -92,7 +92,7 @@ const getPaymentHistory = (clientId: string, timeRange: string, client?: Client)
       net_amount: 8.44
     },
     {
-      id: 'pi_3R9FGHGjV9r2LUGp4h7eAn8C',
+      id: 'pi_3R2fSGGiyV9r2LUG0ObUSkfv',
       timestamp: '2025-03-14 20:07:00',
       type: 'subscription_payment',
       amount: 9.00,
@@ -104,7 +104,7 @@ const getPaymentHistory = (clientId: string, timeRange: string, client?: Client)
       net_amount: 8.44
     },
     {
-      id: 'pi_3R7DEFGjV9r2LUGq5i6fBo9D',
+      id: 'pi_3QsVAXGiyV9r2LUG0kGE92sh',
       timestamp: '2025-02-14 20:07:00',
       type: 'subscription_payment',
       amount: 9.00,
