@@ -1,13 +1,12 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Smartphone, Calendar, TrendingUp, Users, Activity, Download, Star, User } from 'lucide-react';
-import { AppUsageOverview } from '@/components/app-portal/AppUsageOverview';
-import { UserEngagementView } from '@/components/app-portal/UserEngagementView';
-import { RevenueAnalytics } from '@/components/app-portal/RevenueAnalytics';
-import { TechnicalMetrics } from '@/components/app-portal/TechnicalMetrics';
+import { ClientActivityLog } from '@/components/app-portal/ClientActivityLog';
+import { ClientPaymentHistory } from '@/components/app-portal/ClientPaymentHistory';
 
 const timeRanges = [
   { value: '7d', label: 'Last 7 days' },
@@ -45,8 +44,8 @@ const ClientPortalLogApp = () => {
             Back
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-white">App Store Analytics Dashboard</h1>
-            <p className="text-gray-300 mt-1">Monthly subscription app performance metrics and user activity</p>
+            <h1 className="text-3xl font-bold text-white">Client Activity Dashboard</h1>
+            <p className="text-gray-300 mt-1">Individual client activity tracking and payment history</p>
           </div>
           <div className="flex items-center gap-4">
             <Smartphone className="h-8 w-8 text-purple-400" />
@@ -128,7 +127,7 @@ const ClientPortalLogApp = () => {
                     </div>
                     <div className="flex items-center gap-6 text-sm text-gray-300">
                       <div>
-                        <span className="text-gray-400">Joined:</span>
+                        <span className="text-gray-400">Subscribed:</span>
                         <span className="ml-1 text-white">April 13, 2025</span>
                       </div>
                       <div>
@@ -147,83 +146,53 @@ const ClientPortalLogApp = () => {
           </Card>
         </div>
 
-        {/* Analytics Tabs */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-slate-800/50 border border-purple-500/20">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">
+        {/* Client Activity Tabs */}
+        <Tabs defaultValue="activity" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2 bg-slate-800/50 border border-purple-500/20">
+            <TabsTrigger value="activity" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">
               <Activity className="h-4 w-4 mr-2" />
-              Usage Overview
+              Activity Log
             </TabsTrigger>
-            <TabsTrigger value="engagement" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">
-              <Users className="h-4 w-4 mr-2" />
-              User Engagement
-            </TabsTrigger>
-            <TabsTrigger value="revenue" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">
+            <TabsTrigger value="payments" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">
               <TrendingUp className="h-4 w-4 mr-2" />
-              Revenue Analytics
-            </TabsTrigger>
-            <TabsTrigger value="technical" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">
-              <Download className="h-4 w-4 mr-2" />
-              Technical Metrics
+              Payment History
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview">
+          <TabsContent value="activity">
             <Card className="bg-slate-800/50 border-purple-500/30">
               <CardHeader>
                 <CardTitle className="text-purple-300 flex items-center gap-2">
                   <Activity className="h-5 w-5" />
-                  App Usage Overview - {timeRanges.find(r => r.value === selectedTimeRange)?.label}
+                  Client Activity Log - {timeRanges.find(r => r.value === selectedTimeRange)?.label}
                 </CardTitle>
-                <p className="text-gray-400">Daily active users, session data, and feature usage analytics</p>
+                <p className="text-gray-400">Logins, searches, calculations, downloads, and market analysis activities</p>
               </CardHeader>
               <CardContent>
-                <AppUsageOverview timeRange={selectedTimeRange} />
+                <ClientActivityLog 
+                  clientId={selectedClient} 
+                  timeRange={selectedTimeRange}
+                  client={currentClient}
+                />
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="engagement">
-            <Card className="bg-slate-800/50 border-purple-500/30">
-              <CardHeader>
-                <CardTitle className="text-purple-300 flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  User Engagement Analytics
-                </CardTitle>
-                <p className="text-gray-400">User behavior patterns, retention rates, and engagement metrics</p>
-              </CardHeader>
-              <CardContent>
-                <UserEngagementView timeRange={selectedTimeRange} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="revenue">
+          <TabsContent value="payments">
             <Card className="bg-slate-800/50 border-purple-500/30">
               <CardHeader>
                 <CardTitle className="text-purple-300 flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
-                  Revenue & Subscription Analytics
+                  Payment History & Billing
                 </CardTitle>
-                <p className="text-gray-400">Monthly recurring revenue, churn analysis, and subscription metrics</p>
+                <p className="text-gray-400">Stripe payment logs, subscription events, and billing history</p>
               </CardHeader>
               <CardContent>
-                <RevenueAnalytics timeRange={selectedTimeRange} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="technical">
-            <Card className="bg-slate-800/50 border-purple-500/30">
-              <CardHeader>
-                <CardTitle className="text-purple-300 flex items-center gap-2">
-                  <Download className="h-5 w-5" />
-                  Technical Performance Metrics
-                </CardTitle>
-                <p className="text-gray-400">App performance, crash reports, and technical analytics</p>
-              </CardHeader>
-              <CardContent>
-                <TechnicalMetrics timeRange={selectedTimeRange} />
+                <ClientPaymentHistory 
+                  clientId={selectedClient} 
+                  timeRange={selectedTimeRange}
+                  client={currentClient}
+                />
               </CardContent>
             </Card>
           </TabsContent>
