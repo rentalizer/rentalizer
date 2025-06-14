@@ -24,6 +24,7 @@ import AcquisitionsAgent from "./pages/AcquisitionsAgent";
 import Community from "./pages/Community";
 import PMS from "./pages/PMS";
 import TestPMS from "./pages/TestPMS";
+import ClientPortalLog from "./pages/ClientPortalLog";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const AppRoutes = () => (
     <Route path="/community" element={<Community />} />
     <Route path="/pms" element={<PMS />} />
     <Route path="/testpms" element={<TestPMS />} />
+    <Route path="/client-portal-log" element={<ClientPortalLog />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
     <Route path="/terms-of-service" element={<TermsOfService />} />
