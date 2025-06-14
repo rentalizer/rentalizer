@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -26,7 +25,7 @@ interface ClientPaymentHistoryProps {
 }
 
 const getPaymentHistory = (clientId: string, timeRange: string, client?: Client) => {
-  // Mock Stripe payment data
+  // Mock Stripe payment data starting from April 13, 2025 at 6:48 AM
   const payments = [
     {
       id: 'pi_3NPqMA2eZvKYlo2C1234567',
@@ -59,14 +58,14 @@ const getPaymentHistory = (clientId: string, timeRange: string, client?: Client)
       amount: 9.00,
       currency: 'USD',
       status: 'succeeded',
-      description: 'Monthly Subscription - April 2025',
+      description: 'Monthly Subscription - April 2025 (2nd payment)',
       payment_method: '**** 4242',
       stripe_fee: 0.57,
       net_amount: 8.43
     },
     {
       id: 'sub_1NPqMA2eZvKYlo2C1234567',
-      timestamp: '2025-04-13 14:22:15',
+      timestamp: '2025-04-13 06:48:15',
       type: 'subscription_created',
       amount: 9.00,
       currency: 'USD',
