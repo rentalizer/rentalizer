@@ -6,6 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Add delay function to handle rate limits
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -28,53 +31,112 @@ serve(async (req) => {
     try {
       console.log(`📡 Trying Mashvisor API for ${city} with ${neighborhoodIds.length} neighborhoods`);
       
-      const strPromises = neighborhoodIds.map(async (neighData) => {
+      const strResults = [];
+      
+      // Process neighborhoods sequentially with delays to avoid rate limits
+      for (let i = 0; i < neighborhoodIds.length; i++) {
+        const neighData = neighborhoodIds[i];
+        
+        // Add delay between requests to avoid rate limits (except for first request)
+        if (i > 0) {
+          console.log(`⏱️ Waiting 2 seconds before next API call...`);
+          await delay(2000);
+        }
+        
         const apiUrl = `https://mashvisor-api.p.rapidapi.com/neighborhood/${neighData.id}/historical/airbnb`;
         
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            'x-rapidapi-key': rapidApiKey,
-            'x-rapidapi-host': 'mashvisor-api.p.rapidapi.com',
-            'Accept': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
-          },
-          // Add query parameters
-          ...(() => {
-            const url = new URL(apiUrl);
-            url.searchParams.append('average_by', 'occupancy');
-            url.searchParams.append('state', neighData.state);
-            url.searchParams.append('percentile_rate', '1');
-            return { url: url.toString() };
-          })()
-        });
+        console.log(`📡 Making API call ${i + 1}/${neighborhoodIds.length} for ${neighData.name}`);
+        
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+              'x-rapidapi-key': rapidApiKey,
+              'x-rapidapi-host': 'mashvisor-api.p.rapidapi.com',
+              'Accept': 'application/json',
+              'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
+            }
+          });
 
-        console.log(`📊 Mashvisor Response Status for ${neighData.name}: ${response.status}`);
-
-        if (response.ok) {
-          const apiData = await response.json();
-          console.log(`✅ Mashvisor Response for ${neighData.name}:`, JSON.stringify(apiData, null, 2));
+          // Add URL parameters properly after fetch
+          const urlWithParams = new URL(apiUrl);
+          urlWithParams.searchParams.append('average_by', 'occupancy');
+          urlWithParams.searchParams.append('state', neighData.state);
+          urlWithParams.searchParams.append('percentile_rate', '1');
           
-          return {
-            neighborhood: neighData.name,
-            data: apiData,
-            success: true
-          };
-        } else {
-          const errorText = await response.text();
-          console.error(`❌ Mashvisor API failed for ${neighData.name} with status: ${response.status}, body: ${errorText}`);
-          return {
+          // Make the actual request with parameters
+          const finalResponse = await fetch(urlWithParams.toString(), {
+            method: 'GET',
+            headers: {
+              'x-rapidapi-key': rapidApiKey,
+              'x-rapidapi-host': 'mashvisor-api.p.rapidapi.com',
+              'Accept': 'application/json',
+              'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
+            }
+          });
+
+          console.log(`📊 Mashvisor Response Status for ${neighData.name}: ${finalResponse.status}`);
+
+          if (finalResponse.ok) {
+            const apiData = await finalResponse.json();
+            console.log(`✅ Mashvisor Response for ${neighData.name}:`, JSON.stringify(apiData, null, 2));
+            
+            strResults.push({
+              neighborhood: neighData.name,
+              data: apiData,
+              success: true
+            });
+          } else if (finalResponse.status === 429) {
+            console.warn(`⏱️ Rate limited for ${neighData.name}, adding longer delay`);
+            await delay(5000); // Wait 5 seconds for rate limit
+            
+            // Retry once after rate limit
+            const retryResponse = await fetch(urlWithParams.toString(), {
+              method: 'GET',
+              headers: {
+                'x-rapidapi-key': rapidApiKey,
+                'x-rapidapi-host': 'mashvisor-api.p.rapidapi.com',
+                'Accept': 'application/json'
+              }
+            });
+            
+            if (retryResponse.ok) {
+              const retryData = await retryResponse.json();
+              console.log(`✅ Retry successful for ${neighData.name}`);
+              strResults.push({
+                neighborhood: neighData.name,
+                data: retryData,
+                success: true
+              });
+            } else {
+              console.error(`❌ Retry failed for ${neighData.name}: ${retryResponse.status}`);
+              strResults.push({
+                neighborhood: neighData.name,
+                data: null,
+                success: false
+              });
+            }
+          } else {
+            const errorText = await finalResponse.text();
+            console.error(`❌ Mashvisor API failed for ${neighData.name} with status: ${finalResponse.status}, body: ${errorText}`);
+            strResults.push({
+              neighborhood: neighData.name,
+              data: null,
+              success: false
+            });
+          }
+        } catch (requestError) {
+          console.error(`❌ Request error for ${neighData.name}:`, requestError);
+          strResults.push({
             neighborhood: neighData.name,
             data: null,
             success: false
-          };
+          });
         }
-      });
+      }
 
-      const strResults = await Promise.all(strPromises);
       const successfulResults = strResults.filter(result => result.success && result.data);
-
-      console.log(`✅ Got ${successfulResults.length} successful STR data responses`);
+      console.log(`✅ Got ${successfulResults.length} successful STR data responses out of ${strResults.length} attempts`);
 
       if (successfulResults.length > 0) {
         const processedData = {
