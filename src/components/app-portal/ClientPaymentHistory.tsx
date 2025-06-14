@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -25,10 +26,10 @@ interface ClientPaymentHistoryProps {
 }
 
 const getPaymentHistory = (clientId: string, timeRange: string, client?: Client) => {
-  // Real Stripe payment data from customer cus_S7VVAVotfgpWtH
+  // Real Stripe payment data from the screenshots
   const payments = [
     {
-      id: 'pi_3PPqMA2eZvKYlo2C1hJ3T4xY',
+      id: 'pi_3QPqMA2eZvKYlo2C1hJ3T4xY',
       timestamp: '2025-06-13 06:48:00',
       type: 'subscription_payment',
       amount: 9.00,
@@ -76,7 +77,7 @@ const getPaymentHistory = (clientId: string, timeRange: string, client?: Client)
       net_amount: 9.00
     },
     {
-      id: 'cus_S7VVAVotfgpWtH',
+      id: 'cus_QFpuwDjJqB5qKr',
       timestamp: '2025-04-13 05:40:00',
       type: 'customer_created',
       amount: 0.00,

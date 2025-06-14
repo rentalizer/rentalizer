@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -27,9 +28,9 @@ interface ClientActivityLogProps {
 }
 
 const getClientActivities = (clientId: string, timeRange: string, client?: Client) => {
-  // Activities from April 13 signup to present - totals: 9 logins, 12 searches, 6 calculations, 4 downloads
+  // Activities from April 13 signup to present - ensuring totals match: 9 logins, 12 searches, 6 calculations, 4 downloads
   const activities = [
-    // June 2025
+    // June 2025 (Recent activity)
     {
       id: 1,
       timestamp: '2025-06-14 09:32:15',
@@ -173,7 +174,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '6m 20s'
     },
     
-    // April 2025
+    // April 2025 - Starting from April 13
     {
       id: 15,
       timestamp: '2025-04-28 16:45:20',
