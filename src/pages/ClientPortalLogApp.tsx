@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Smartphone, Calendar, TrendingUp, Users, Activity, Download, Star } from 'lucide-react';
+import { ArrowLeft, Smartphone, Calendar, TrendingUp, Users, Activity, Download, Star, User } from 'lucide-react';
 import { AppUsageOverview } from '@/components/app-portal/AppUsageOverview';
 import { UserEngagementView } from '@/components/app-portal/UserEngagementView';
 import { RevenueAnalytics } from '@/components/app-portal/RevenueAnalytics';
@@ -17,8 +17,21 @@ const timeRanges = [
   { value: '12m', label: 'Last 12 months' }
 ];
 
+const clients = [
+  { 
+    id: '1', 
+    name: 'Ramakrishna Gummadi', 
+    email: 'rkr.gummadi@gmail.com',
+    plan: 'Premium',
+    joinedDate: '2024-01-15'
+  }
+];
+
 const ClientPortalLogApp = () => {
   const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
+  const [selectedClient, setSelectedClient] = useState('1');
+
+  const currentClient = clients.find(client => client.id === selectedClient);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -36,35 +49,63 @@ const ClientPortalLogApp = () => {
           <div className="flex items-center gap-4">
             <Smartphone className="h-8 w-8 text-purple-400" />
             <div className="text-right">
-              <div className="text-lg font-semibold text-white">PropertyCalc Pro</div>
+              <div className="text-lg font-semibold text-white">RentalizerCalc</div>
               <div className="text-sm text-gray-400">v2.1.4 • iOS & Android</div>
             </div>
           </div>
         </div>
 
-        {/* Time Range Selector */}
+        {/* Client and Time Range Selectors */}
         <div className="mb-8">
           <Card className="bg-slate-800/50 border-purple-500/30">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Calendar className="h-5 w-5 text-purple-400" />
-                  <div>
-                    <label className="text-sm font-medium text-gray-300 mb-2 block">
-                      Time Period
-                    </label>
-                    <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
-                      <SelectTrigger className="w-48 bg-slate-700/50 border-slate-600/50 text-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-slate-600">
-                        {timeRanges.map((range) => (
-                          <SelectItem key={range.value} value={range.value} className="text-gray-100 focus:bg-slate-700">
-                            {range.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                <div className="flex items-center gap-6">
+                  {/* Client Selector */}
+                  <div className="flex items-center gap-4">
+                    <User className="h-5 w-5 text-purple-400" />
+                    <div>
+                      <label className="text-sm font-medium text-gray-300 mb-2 block">
+                        Select Client
+                      </label>
+                      <Select value={selectedClient} onValueChange={setSelectedClient}>
+                        <SelectTrigger className="w-64 bg-slate-700/50 border-slate-600/50 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-slate-600 z-50">
+                          {clients.map((client) => (
+                            <SelectItem key={client.id} value={client.id} className="text-gray-100 focus:bg-slate-700">
+                              <div className="flex flex-col">
+                                <span className="font-medium">{client.name}</span>
+                                <span className="text-xs text-gray-400">{client.email}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Time Range Selector */}
+                  <div className="flex items-center gap-4">
+                    <Calendar className="h-5 w-5 text-purple-400" />
+                    <div>
+                      <label className="text-sm font-medium text-gray-300 mb-2 block">
+                        Time Period
+                      </label>
+                      <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
+                        <SelectTrigger className="w-48 bg-slate-700/50 border-slate-600/50 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-slate-600 z-50">
+                          {timeRanges.map((range) => (
+                            <SelectItem key={range.value} value={range.value} className="text-gray-100 focus:bg-slate-700">
+                              {range.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
                 
@@ -88,6 +129,22 @@ const ClientPortalLogApp = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Current Client Info */}
+              {currentClient && (
+                <div className="mt-4 pt-4 border-t border-slate-600/50">
+                  <div className="flex items-center gap-4 text-gray-300">
+                    <span className="text-sm">Viewing data for:</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-white">{currentClient.name}</span>
+                      <span className="text-sm text-gray-400">({currentClient.email})</span>
+                      <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded">
+                        {currentClient.plan}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
