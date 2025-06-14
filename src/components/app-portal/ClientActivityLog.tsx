@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -28,7 +27,7 @@ interface ClientActivityLogProps {
 }
 
 const getClientActivities = (clientId: string, timeRange: string, client?: Client) => {
-  // Mock data representing real client activities from April 13 signup to present
+  // Activities from April 13 signup to present - totals: 9 logins, 12 searches, 6 calculations, 4 downloads
   const activities = [
     // June 2025
     {
@@ -63,26 +62,6 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
     },
     {
       id: 4,
-      timestamp: '2025-06-13 16:20:15',
-      activity: 'Market Analysis',
-      details: 'Analyzed Pacific Beach neighborhood',
-      type: 'analysis',
-      icon: TrendingUp,
-      color: 'cyan',
-      duration: '8m 45s'
-    },
-    {
-      id: 5,
-      timestamp: '2025-06-13 15:45:22',
-      activity: 'Property Search',
-      details: 'Searched properties in La Jolla area',
-      type: 'search',
-      icon: MapPin,
-      color: 'blue',
-      duration: '12m 18s'
-    },
-    {
-      id: 6,
       timestamp: '2025-06-12 14:32:10',
       activity: 'Login',
       details: 'Logged in via web browser',
@@ -92,7 +71,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '-'
     },
     {
-      id: 7,
+      id: 5,
       timestamp: '2025-06-11 11:15:33',
       activity: 'Calculation',
       details: 'Cash flow analysis for Mission Beach condo',
@@ -102,7 +81,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '6m 22s'
     },
     {
-      id: 8,
+      id: 6,
       timestamp: '2025-06-10 10:45:18',
       activity: 'Market Search',
       details: 'Searched Gaslamp Quarter market data',
@@ -111,20 +90,10 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       color: 'blue',
       duration: '3m 45s'
     },
-    {
-      id: 9,
-      timestamp: '2025-06-08 19:22:55',
-      activity: 'Report Generation',
-      details: 'Generated comparative market analysis',
-      type: 'report',
-      icon: FileText,
-      color: 'yellow',
-      duration: '15m 32s'
-    },
     
     // May 2025
     {
-      id: 10,
+      id: 7,
       timestamp: '2025-05-28 15:30:20',
       activity: 'Login',
       details: 'Logged in via mobile app',
@@ -134,7 +103,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '-'
     },
     {
-      id: 11,
+      id: 8,
       timestamp: '2025-05-28 15:32:45',
       activity: 'Market Search',
       details: 'Searched downtown San Diego properties',
@@ -144,7 +113,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '5m 18s'
     },
     {
-      id: 12,
+      id: 9,
       timestamp: '2025-05-25 11:20:15',
       activity: 'ROI Calculation',
       details: 'Calculated returns for Hillcrest apartment',
@@ -154,7 +123,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '7m 12s'
     },
     {
-      id: 13,
+      id: 10,
       timestamp: '2025-05-22 14:45:30',
       activity: 'Report Download',
       details: 'Downloaded neighborhood analysis (PDF)',
@@ -164,17 +133,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '-'
     },
     {
-      id: 14,
-      timestamp: '2025-05-18 09:15:45',
-      activity: 'Login',
-      details: 'Logged in via web browser',
-      type: 'login',
-      icon: LogIn,
-      color: 'purple',
-      duration: '-'
-    },
-    {
-      id: 15,
+      id: 11,
       timestamp: '2025-05-15 16:30:22',
       activity: 'Market Search',
       details: 'Searched North Park rental listings',
@@ -184,7 +143,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '8m 35s'
     },
     {
-      id: 16,
+      id: 12,
       timestamp: '2025-05-12 13:22:18',
       activity: 'Calculation',
       details: 'Cash flow analysis for Ocean Beach property',
@@ -194,7 +153,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '9m 45s'
     },
     {
-      id: 17,
+      id: 13,
       timestamp: '2025-05-08 10:18:30',
       activity: 'Login',
       details: 'Logged in via mobile app',
@@ -204,7 +163,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '-'
     },
     {
-      id: 18,
+      id: 14,
       timestamp: '2025-05-05 14:25:40',
       activity: 'Market Search',
       details: 'Searched Balboa Park area properties',
@@ -213,20 +172,10 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       color: 'blue',
       duration: '6m 20s'
     },
-    {
-      id: 19,
-      timestamp: '2025-05-02 11:40:15',
-      activity: 'Report Download',
-      details: 'Downloaded investment calculator results',
-      type: 'download',
-      icon: Download,
-      color: 'orange',
-      duration: '-'
-    },
     
     // April 2025
     {
-      id: 20,
+      id: 15,
       timestamp: '2025-04-28 16:45:20',
       activity: 'Login',
       details: 'Logged in via web browser',
@@ -236,7 +185,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '-'
     },
     {
-      id: 21,
+      id: 16,
       timestamp: '2025-04-28 16:48:35',
       activity: 'Market Search',
       details: 'Searched Coronado Beach properties',
@@ -246,7 +195,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '4m 15s'
     },
     {
-      id: 22,
+      id: 17,
       timestamp: '2025-04-25 13:30:45',
       activity: 'ROI Calculation',
       details: 'First investment calculation - Del Mar condo',
@@ -256,7 +205,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '12m 18s'
     },
     {
-      id: 23,
+      id: 18,
       timestamp: '2025-04-22 09:20:30',
       activity: 'Login',
       details: 'Logged in via web browser',
@@ -266,7 +215,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '-'
     },
     {
-      id: 24,
+      id: 19,
       timestamp: '2025-04-20 15:15:25',
       activity: 'Market Search',
       details: 'Initial market exploration - San Diego overview',
@@ -276,7 +225,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '15m 30s'
     },
     {
-      id: 25,
+      id: 20,
       timestamp: '2025-04-18 11:25:40',
       activity: 'Login',
       details: 'Logged in via mobile app',
@@ -286,7 +235,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '-'
     },
     {
-      id: 26,
+      id: 21,
       timestamp: '2025-04-15 14:10:15',
       activity: 'Report Download',
       details: 'Downloaded getting started guide',
@@ -296,17 +245,77 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '-'
     },
     {
-      id: 27,
-      timestamp: '2025-04-13 07:30:22',
+      id: 22,
+      timestamp: '2025-04-14 10:30:22',
+      activity: 'Market Search',
+      details: 'Searched Pacific Beach properties',
+      type: 'search',
+      icon: Search,
+      color: 'blue',
+      duration: '8m 22s'
+    },
+    {
+      id: 23,
+      timestamp: '2025-04-14 08:45:15',
       activity: 'Login',
-      details: 'First login after subscription',
+      details: 'Second login after subscription',
       type: 'login',
       icon: LogIn,
       color: 'purple',
       duration: '-'
     },
     {
+      id: 24,
+      timestamp: '2025-04-13 20:30:45',
+      activity: 'Market Search',
+      details: 'Evening research - La Jolla area',
+      type: 'search',
+      icon: Search,
+      color: 'blue',
+      duration: '12m 18s'
+    },
+    {
+      id: 25,
+      timestamp: '2025-04-13 18:22:30',
+      activity: 'Report Download',
+      details: 'Downloaded first market report',
+      type: 'download',
+      icon: Download,
+      color: 'orange',
+      duration: '-'
+    },
+    {
+      id: 26,
+      timestamp: '2025-04-13 16:15:20',
+      activity: 'Market Search',
+      details: 'Searched downtown San Diego market',
+      type: 'search',
+      icon: Search,
+      color: 'blue',
+      duration: '18m 45s'
+    },
+    {
+      id: 27,
+      timestamp: '2025-04-13 14:35:45',
+      activity: 'Calculation',
+      details: 'First ROI calculation attempt',
+      type: 'calculation',
+      icon: Calculator,
+      color: 'green',
+      duration: '25m 12s'
+    },
+    {
       id: 28,
+      timestamp: '2025-04-13 12:30:22',
+      activity: 'Login',
+      details: 'Mid-day login - exploring features',
+      type: 'login',
+      icon: LogIn,
+      color: 'purple',
+      duration: '-'
+    },
+    {
+      id: 29,
       timestamp: '2025-04-13 07:35:45',
       activity: 'Market Search',
       details: 'First search - San Diego rental market overview',
@@ -314,6 +323,16 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       icon: Search,
       color: 'blue',
       duration: '8m 22s'
+    },
+    {
+      id: 30,
+      timestamp: '2025-04-13 05:50:22',
+      activity: 'Login',
+      details: 'First login after subscription',
+      type: 'login',
+      icon: LogIn,
+      color: 'purple',
+      duration: '-'
     }
   ];
 

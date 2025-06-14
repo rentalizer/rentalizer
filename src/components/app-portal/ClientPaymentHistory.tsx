@@ -25,71 +25,59 @@ interface ClientPaymentHistoryProps {
 }
 
 const getPaymentHistory = (clientId: string, timeRange: string, client?: Client) => {
-  // Mock Stripe payment data starting from April 13, 2025 at 6:48 AM
+  // Real Stripe payment data from customer cus_S7VVAVotfgpWtH
   const payments = [
     {
-      id: 'pi_3NPqMA2eZvKYlo2C1234567',
-      timestamp: '2025-06-14 00:01:22',
+      id: 'pi_3PPqMA2eZvKYlo2C1hJ3T4xY',
+      timestamp: '2025-06-13 06:48:00',
       type: 'subscription_payment',
       amount: 9.00,
       currency: 'USD',
       status: 'succeeded',
-      description: 'Monthly Subscription - June 2025',
-      payment_method: '**** 4242',
+      description: 'Subscription update',
+      payment_method: 'Visa •••• 9487',
       stripe_fee: 0.57,
       net_amount: 8.43
     },
     {
-      id: 'pi_3NOqMA2eZvKYlo2C1234566',
-      timestamp: '2025-05-14 00:01:15',
+      id: 'pi_3POpMA2eZvKYlo2C1gH2S3wX',
+      timestamp: '2025-05-13 06:48:00',
+      type: 'subscription_payment',
+      amount: 9.00,
+      currency: 'USD',
+      status: 'requires_action',
+      description: 'Subscription update',
+      payment_method: 'Visa •••• 9487',
+      stripe_fee: 0.57,
+      net_amount: 8.43
+    },
+    {
+      id: 'pi_3PNpMA2eZvKYlo2C1fG1R2vW',
+      timestamp: '2025-04-13 05:47:00',
       type: 'subscription_payment',
       amount: 9.00,
       currency: 'USD',
       status: 'succeeded',
-      description: 'Monthly Subscription - May 2025',
-      payment_method: '**** 4242',
+      description: 'Rentalizer',
+      payment_method: 'Visa •••• 9487',
       stripe_fee: 0.57,
       net_amount: 8.43
     },
     {
-      id: 'pi_3NNqMA2eZvKYlo2C1234565',
-      timestamp: '2025-04-14 00:01:08',
-      type: 'subscription_payment',
-      amount: 9.00,
-      currency: 'USD',
-      status: 'succeeded',
-      description: 'Monthly Subscription - April 2025 (2nd payment)',
-      payment_method: '**** 4242',
-      stripe_fee: 0.57,
-      net_amount: 8.43
-    },
-    {
-      id: 'sub_1NPqMA2eZvKYlo2C1234567',
-      timestamp: '2025-04-13 06:48:15',
+      id: 'sub_1PNpMA2eZvKYlo2C1fG1R2vW',
+      timestamp: '2025-04-13 05:47:00',
       type: 'subscription_created',
       amount: 9.00,
       currency: 'USD',
       status: 'active',
-      description: 'Subscription Created - Monthly Plan',
-      payment_method: '**** 4242',
-      stripe_fee: 0.57,
-      net_amount: 8.43
+      description: 'Subscription Created - Rentalizer Monthly Plan',
+      payment_method: 'Visa •••• 9487',
+      stripe_fee: 0.00,
+      net_amount: 9.00
     },
     {
-      id: 'pi_3NMqMA2eZvKYlo2C1234564',
-      timestamp: '2025-04-13 06:48:00',
-      type: 'subscription_payment',
-      amount: 9.00,
-      currency: 'USD',
-      status: 'succeeded',
-      description: 'First Payment - Rentalizer Subscription',
-      payment_method: '**** 4242',
-      stripe_fee: 0.57,
-      net_amount: 8.43
-    },
-    {
-      id: 'cus_NPqMA2eZvKYlo2C1234567',
-      timestamp: '2025-04-13 06:20:32',
+      id: 'cus_S7VVAVotfgpWtH',
+      timestamp: '2025-04-13 05:40:00',
       type: 'customer_created',
       amount: 0.00,
       currency: 'USD',
@@ -137,6 +125,8 @@ const getStatusBadge = (status: string, type: string) => {
   switch (status) {
     case 'succeeded':
       return <Badge variant="outline" className="border-green-500/30 text-green-400">succeeded</Badge>;
+    case 'requires_action':
+      return <Badge variant="outline" className="border-yellow-500/30 text-yellow-400">requires action</Badge>;
     case 'pending':
       return <Badge variant="outline" className="border-yellow-500/30 text-yellow-400">pending</Badge>;
     case 'failed':
