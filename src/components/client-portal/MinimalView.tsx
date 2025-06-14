@@ -5,7 +5,21 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Clock, ArrowRight, Filter } from 'lucide-react';
 
-const activities = [
+interface Student {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  level: string;
+  progress: number;
+  joinedDate: string;
+}
+
+interface MinimalViewProps {
+  student: Student;
+}
+
+const getActivities = (student: Student) => [
   {
     id: 1,
     title: 'Completed Advanced Market Analysis lesson',
@@ -16,7 +30,7 @@ const activities = [
   },
   {
     id: 2,
-    title: 'Received feedback on Portfolio Analysis #3',
+    title: `Received feedback on ${student.name}'s Portfolio Analysis #3`,
     type: 'feedback',
     status: 'new',
     timestamp: '4 hours ago',
@@ -73,8 +87,9 @@ const statusIcons = {
   earned: CheckCircle
 };
 
-export const MinimalView = () => {
+export const MinimalView = ({ student }: MinimalViewProps) => {
   const [filter, setFilter] = useState('all');
+  const activities = getActivities(student);
 
   const filteredActivities = filter === 'all' 
     ? activities 
@@ -85,15 +100,15 @@ export const MinimalView = () => {
       {/* Clean Header */}
       <div className="flex items-center justify-between border-b border-slate-600/30 pb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Activity Log</h1>
-          <p className="text-gray-400 mt-1">Track your learning progress and achievements</p>
+          <h1 className="text-2xl font-semibold text-white">Activity Log - {student.name}</h1>
+          <p className="text-gray-400 mt-1">Track learning progress and achievements</p>
         </div>
         <div className="flex items-center gap-3">
           <Badge variant="outline" className="border-green-500/30 text-green-400">
-            68% Complete
+            {student.progress}% Complete
           </Badge>
           <Badge variant="outline" className="border-yellow-500/30 text-yellow-400">
-            Level 3
+            {student.level}
           </Badge>
         </div>
       </div>

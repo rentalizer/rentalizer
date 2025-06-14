@@ -5,7 +5,21 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Clock, BookOpen, CheckCircle, MessageCircle, Star, TrendingUp } from 'lucide-react';
 
-const timelineData = [
+interface Student {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  level: string;
+  progress: number;
+  joinedDate: string;
+}
+
+interface TimelineViewProps {
+  student: Student;
+}
+
+const getTimelineData = (student: Student) => [
   {
     id: 1,
     type: 'lesson_completed',
@@ -20,7 +34,7 @@ const timelineData = [
     id: 2,
     type: 'comment',
     title: 'Received coach feedback',
-    description: 'Sarah Johnson replied to your portfolio submission',
+    description: `Coach replied to ${student.name}'s portfolio submission`,
     timestamp: '4 hours ago',
     icon: MessageCircle,
     color: 'bg-blue-500',
@@ -50,7 +64,7 @@ const timelineData = [
     id: 5,
     type: 'performance',
     title: 'Weekly Performance Report',
-    description: 'You\'re in the top 15% of students this week!',
+    description: `${student.name} is in the top 15% of students this week!`,
     timestamp: '3 days ago',
     icon: TrendingUp,
     color: 'bg-cyan-500',
@@ -58,7 +72,9 @@ const timelineData = [
   }
 ];
 
-export const TimelineView = () => {
+export const TimelineView = ({ student }: TimelineViewProps) => {
+  const timelineData = getTimelineData(student);
+
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
@@ -105,7 +121,7 @@ export const TimelineView = () => {
               <TrendingUp className="h-5 w-5 text-purple-400" />
               <div>
                 <p className="text-sm text-gray-400">Progress</p>
-                <p className="text-2xl font-bold text-purple-400">68%</p>
+                <p className="text-2xl font-bold text-purple-400">{student.progress}%</p>
               </div>
             </div>
           </CardContent>
@@ -145,7 +161,7 @@ export const TimelineView = () => {
                       </div>
                       <Avatar className="h-8 w-8">
                         <AvatarFallback className="bg-slate-600 text-xs">
-                          {item.type === 'comment' ? 'SJ' : 'ME'}
+                          {item.type === 'comment' ? 'CJ' : student.avatar}
                         </AvatarFallback>
                       </Avatar>
                     </div>
