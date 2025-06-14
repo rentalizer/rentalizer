@@ -22,8 +22,11 @@ const clients = [
     id: '1', 
     name: 'Ramakrishna Gummadi', 
     email: 'rkr.gummadi@gmail.com',
-    plan: 'Premium',
-    joinedDate: '2024-01-15'
+    plan: 'Monthly Subscription',
+    monthlyRevenue: 9,
+    joinedDate: '2025-04-13',
+    daysSinceSignup: 62, // April 13 to June 14, 2025
+    status: 'Active'
   }
 ];
 
@@ -112,19 +115,19 @@ const ClientPortalLogApp = () => {
                 {/* Quick Stats */}
                 <div className="grid grid-cols-4 gap-6">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-green-400">$12,847</div>
-                    <div className="text-xs text-gray-400">Monthly Revenue</div>
+                    <div className="text-2xl font-bold text-green-400">$18</div>
+                    <div className="text-xs text-gray-400">Total Revenue</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-400">2,341</div>
+                    <div className="text-2xl font-bold text-blue-400">1</div>
                     <div className="text-xs text-gray-400">Active Users</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-400">4.7</div>
+                    <div className="text-2xl font-bold text-purple-400">4.8</div>
                     <div className="text-xs text-gray-400">App Rating</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-400">89.2%</div>
+                    <div className="text-2xl font-bold text-orange-400">100%</div>
                     <div className="text-xs text-gray-400">Retention</div>
                   </div>
                 </div>
@@ -133,14 +136,30 @@ const ClientPortalLogApp = () => {
               {/* Current Client Info */}
               {currentClient && (
                 <div className="mt-4 pt-4 border-t border-slate-600/50">
-                  <div className="flex items-center gap-4 text-gray-300">
-                    <span className="text-sm">Viewing data for:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-white">{currentClient.name}</span>
-                      <span className="text-sm text-gray-400">({currentClient.email})</span>
-                      <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded">
-                        {currentClient.plan}
-                      </span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4 text-gray-300">
+                      <span className="text-sm">Viewing data for:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-white">{currentClient.name}</span>
+                        <span className="text-sm text-gray-400">({currentClient.email})</span>
+                        <span className="text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded">
+                          {currentClient.status}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-6 text-sm text-gray-300">
+                      <div>
+                        <span className="text-gray-400">Joined:</span>
+                        <span className="ml-1 text-white">April 13, 2025</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Plan:</span>
+                        <span className="ml-1 text-white">$9/month</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Days Active:</span>
+                        <span className="ml-1 text-white">{currentClient.daysSinceSignup}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
