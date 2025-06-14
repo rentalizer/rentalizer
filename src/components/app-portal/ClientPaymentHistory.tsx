@@ -65,7 +65,7 @@ const getPaymentHistory = (clientId: string, timeRange: string, client?: Client)
     }
   ];
 
-  // Client 2 (Sara Ifeanyi) - Updated client data
+  // Client 2 (Ifeanyi Okoye) - Updated client data
   const client2Payments = [
     {
       id: 'pi_3RDKLMGjV9r2LUGn2f9cYl',

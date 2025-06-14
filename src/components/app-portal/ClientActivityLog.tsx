@@ -156,7 +156,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
     }
   ];
 
-  // Client 2 (Sara Ifeanyi) - Updated client data
+  // Client 2 (Ifeanyi Okoye) - Updated client data
   const client2Activities = [
     // May 2025
     {

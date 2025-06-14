@@ -28,7 +28,7 @@ const clients = [
   },
   { 
     id: '2', 
-    name: 'Sara Ifeanyi', 
+    name: 'Ifeanyi Okoye', 
     email: 'ifeanyionline92@yahoo.com',
     plan: 'Monthly Subscription',
     monthlyRevenue: 9,
