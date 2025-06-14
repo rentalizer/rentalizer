@@ -44,14 +44,14 @@ const ClientPortalLogApp = () => {
             Back
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-white">Client Activity Dashboard</h1>
+            <h1 className="text-3xl font-bold text-white">RentalizerCalc Analytics Dashboard</h1>
             <p className="text-gray-300 mt-1">Individual client activity tracking and payment history</p>
           </div>
           <div className="flex items-center gap-4">
             <Smartphone className="h-8 w-8 text-purple-400" />
             <div className="text-right">
               <div className="text-lg font-semibold text-white">RentalizerCalc</div>
-              <div className="text-sm text-gray-400">v2.1.4 • iOS & Android</div>
+              <div className="text-sm text-gray-400">v2.1.4</div>
             </div>
           </div>
         </div>

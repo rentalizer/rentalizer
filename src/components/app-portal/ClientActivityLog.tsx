@@ -10,7 +10,8 @@ import {
   MapPin, 
   FileText,
   Clock,
-  TrendingUp
+  TrendingUp,
+  Activity
 } from 'lucide-react';
 
 interface Client {

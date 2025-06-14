@@ -77,8 +77,20 @@ const getPaymentHistory = (clientId: string, timeRange: string, client?: Client)
       net_amount: 8.43
     },
     {
+      id: 'pi_3NMqMA2eZvKYlo2C1234564',
+      timestamp: '2025-04-13 06:48:00',
+      type: 'subscription_payment',
+      amount: 9.00,
+      currency: 'USD',
+      status: 'succeeded',
+      description: 'First Payment - Rentalizer Subscription',
+      payment_method: '**** 4242',
+      stripe_fee: 0.57,
+      net_amount: 8.43
+    },
+    {
       id: 'cus_NPqMA2eZvKYlo2C1234567',
-      timestamp: '2025-04-13 14:20:32',
+      timestamp: '2025-04-13 06:20:32',
       type: 'customer_created',
       amount: 0.00,
       currency: 'USD',
