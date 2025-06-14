@@ -15,50 +15,73 @@ serve(async (req) => {
   try {
     const { city, propertyType, action } = await req.json();
     
-    console.log(`🚀 Processing RapidAPI Airbnb request for ${city}`);
+    console.log(`🚀 Processing Airbnb Listings request for ${city}`);
     
     const rapidApiKey = '563ec2eceemshee4eb6d8e03f721p10e15cjsn56661816f3c3';
     
+    // Get coordinates for the city
+    const coordinates = getCityCoordinates(city);
+    if (!coordinates) {
+      console.warn(`⚠️ No coordinates found for ${city}, using fallback data`);
+      return getFallbackResponse(city);
+    }
+    
     try {
-      console.log(`📡 Trying AirDNA Properties API for ${city}`);
+      console.log(`📡 Trying Airbnb Listings Data API for ${city} with coordinates:`, coordinates);
       
-      // Use the working AirDNA endpoint with proper parameters
-      const apiUrl = `https://airdna1.p.rapidapi.com/properties?location=${encodeURIComponent(city.toLowerCase())}&currency=native`;
+      const apiUrl = 'https://airbnb-listings-data.p.rapidapi.com/getListingsData';
       
       const response = await fetch(apiUrl, {
         method: 'GET',
         headers: {
           'x-rapidapi-key': rapidApiKey,
-          'x-rapidapi-host': 'airdna1.p.rapidapi.com',
+          'x-rapidapi-host': 'airbnb-listings-data.p.rapidapi.com',
           'Accept': 'application/json',
           'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
         }
       });
 
-      console.log(`📊 AirDNA Properties Response Status: ${response.status}`);
+      // Build URL with query parameters
+      const urlWithParams = new URL(apiUrl);
+      urlWithParams.searchParams.append('nwLat', coordinates.nwLat.toString());
+      urlWithParams.searchParams.append('nwLng', coordinates.nwLng.toString());
+      urlWithParams.searchParams.append('seLat', coordinates.seLat.toString());
+      urlWithParams.searchParams.append('seLng', coordinates.seLng.toString());
 
-      if (response.ok) {
-        const apiData = await response.json();
-        console.log(`✅ AirDNA Properties Response:`, JSON.stringify(apiData, null, 2));
+      const responseWithParams = await fetch(urlWithParams.toString(), {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-key': rapidApiKey,
+          'x-rapidapi-host': 'airbnb-listings-data.p.rapidapi.com',
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
+        }
+      });
+
+      console.log(`📊 Airbnb Listings Response Status: ${responseWithParams.status}`);
+
+      if (responseWithParams.ok) {
+        const apiData = await responseWithParams.json();
+        console.log(`✅ Airbnb Listings Response:`, JSON.stringify(apiData, null, 2));
         
-        // Process the real API response
-        const properties = apiData.results || apiData.data || apiData.properties || apiData;
+        // Process the API response
+        const listings = apiData.data || apiData.listings || apiData.results || apiData;
         
-        if (Array.isArray(properties) && properties.length > 0) {
+        if (Array.isArray(listings) && listings.length > 0) {
           const processedData = {
             success: true,
             data: {
               city: city,
-              properties: properties.slice(0, 10).map((property: any) => ({
-                id: property.id || property.property_id || Math.random().toString(),
-                name: property.name || property.title || property.property_name || 'STR Property',
-                location: `${property.neighborhood || property.location || property.city || city}`,
-                price: property.price || property.nightly_rate || property.average_daily_rate || 150,
-                monthly_revenue: calculateMonthlyRevenue(property),
-                occupancy_rate: property.occupancy_rate || property.occupancy || 75,
-                rating: property.rating || property.review_score || property.average_rating || 4.5,
-                reviews: property.reviews || property.number_of_reviews || property.review_count || 25,
-                neighborhood: property.neighborhood || property.location || property.city || city
+              properties: listings.slice(0, 10).map((listing: any) => ({
+                id: listing.id || listing.listing_id || Math.random().toString(),
+                name: listing.name || listing.title || 'Airbnb Property',
+                location: `${listing.neighborhood || listing.location || listing.address || city}`,
+                price: listing.price || listing.nightly_rate || listing.basePrice || 150,
+                monthly_revenue: calculateMonthlyRevenue(listing),
+                occupancy_rate: listing.occupancy_rate || listing.occupancy || 75,
+                rating: listing.rating || listing.reviewScoresRating || listing.avgRating || 4.5,
+                reviews: listing.reviews || listing.numberOfReviews || listing.reviewCount || 25,
+                neighborhood: listing.neighborhood || listing.location || listing.district || city
               }))
             }
           };
@@ -68,47 +91,17 @@ serve(async (req) => {
           });
         }
       } else {
-        const errorText = await response.text();
-        console.error(`❌ AirDNA Properties failed with status: ${response.status}, body: ${errorText}`);
+        const errorText = await responseWithParams.text();
+        console.error(`❌ Airbnb Listings API failed with status: ${responseWithParams.status}, body: ${errorText}`);
       }
 
     } catch (apiError) {
-      console.error('❌ AirDNA API failed:', apiError);
+      console.error('❌ Airbnb Listings API failed:', apiError);
     }
 
     // Fallback to market-specific STR data if API fails
     console.log(`📡 Using market-specific STR data for ${city}`);
-    const marketStrData = getMarketSpecificSTRData(city);
-    
-    if (marketStrData.length > 0) {
-      const processedData = {
-        success: true,
-        data: {
-          city: city,
-          properties: marketStrData
-        }
-      };
-      
-      return new Response(JSON.stringify(processedData), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Return empty data if all fails
-    console.warn('⚠️ No STR data available - returning empty results');
-    
-    const emptyData = {
-      success: false,
-      data: {
-        city: city,
-        properties: [],
-        message: "No STR data available for this market"
-      }
-    };
-
-    return new Response(JSON.stringify(emptyData), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return getFallbackResponse(city);
 
   } catch (error) {
     console.error('💥 STR API Edge Function Error:', error);
@@ -124,11 +117,123 @@ serve(async (req) => {
 
 // Calculate monthly revenue from listing data
 function calculateMonthlyRevenue(listing: any): number {
-  const nightlyRate = listing.price || listing.nightly_rate || listing.average_daily_rate || 150;
+  const nightlyRate = listing.price || listing.nightly_rate || listing.basePrice || 150;
   const occupancyRate = listing.occupancy_rate || listing.occupancy || 75;
   
   // Calculate monthly revenue: nightly rate * 30 days * occupancy rate
   return Math.round(nightlyRate * 30 * (occupancyRate / 100));
+}
+
+// Get coordinates for major cities
+function getCityCoordinates(city: string): { nwLat: number; nwLng: number; seLat: number; seLng: number } | null {
+  const cityLower = city.toLowerCase();
+  
+  const coordinates: { [key: string]: { nwLat: number; nwLng: number; seLat: number; seLng: number } } = {
+    'san antonio': {
+      nwLat: 29.792697441798765,
+      nwLng: -98.73911255534364,
+      seLat: 29.360943802211537,
+      seLng: -98.20696228678895
+    },
+    'san diego': {
+      nwLat: 32.8698,
+      nwLng: -117.3100,
+      seLat: 32.5341,
+      seLng: -116.9325
+    },
+    'santa monica': {
+      nwLat: 34.0522,
+      nwLng: -118.5414,
+      seLat: 34.0052,
+      seLng: -118.4406
+    },
+    'austin': {
+      nwLat: 30.5168,
+      nwLng: -97.9383,
+      seLat: 30.0986,
+      seLng: -97.5684
+    },
+    'miami': {
+      nwLat: 25.8557,
+      nwLng: -80.3776,
+      seLat: 25.7135,
+      seLng: -80.1300
+    },
+    'denver': {
+      nwLat: 39.8915,
+      nwLng: -105.1178,
+      seLat: 39.6137,
+      seLng: -104.8758
+    },
+    'new york': {
+      nwLat: 40.9176,
+      nwLng: -74.2591,
+      seLat: 40.4774,
+      seLng: -73.7004
+    },
+    'los angeles': {
+      nwLat: 34.3373,
+      nwLng: -118.6681,
+      seLat: 33.7037,
+      seLng: -118.1553
+    },
+    'chicago': {
+      nwLat: 42.0230,
+      nwLng: -87.9407,
+      seLat: 41.6440,
+      seLng: -87.5240
+    },
+    'nashville': {
+      nwLat: 36.4207,
+      nwLng: -87.0489,
+      seLat: 36.0174,
+      seLng: -86.5804
+    }
+  };
+  
+  // Check if we have coordinates for this city
+  for (const [key, coords] of Object.entries(coordinates)) {
+    if (cityLower.includes(key) || key.includes(cityLower)) {
+      return coords;
+    }
+  }
+  
+  return null;
+}
+
+// Fallback response with market-specific data
+function getFallbackResponse(city: string) {
+  const marketStrData = getMarketSpecificSTRData(city);
+  
+  if (marketStrData.length > 0) {
+    const processedData = {
+      success: true,
+      data: {
+        city: city,
+        properties: marketStrData
+      }
+    };
+    
+    return new Response(JSON.stringify(processedData), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Return empty data if all fails
+  console.warn('⚠️ No STR data available - returning empty results');
+  
+  const emptyData = {
+    success: false,
+    data: {
+      city: city,
+      properties: [],
+      message: "No STR data available for this market"
+    }
+  };
+
+  return new Response(JSON.stringify(emptyData), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
 }
 
 // Function to provide market-specific STR data when APIs fail
