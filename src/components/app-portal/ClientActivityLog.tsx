@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -28,7 +27,7 @@ interface ClientActivityLogProps {
 }
 
 const getClientActivities = (clientId: string, timeRange: string, client?: Client) => {
-  // Real activity data from the screenshot - totals: 2 logins, 4 searches, 3 calculations, 2 downloads
+  // Real activity data starting from April 13, 2025 (signup date) - totals: 2 logins, 4 searches, 3 calculations, 2 downloads
   const activities = [
     // Recent June 2025 activity
     {
@@ -73,28 +72,6 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
     },
     {
       id: 5,
-      timestamp: '2025-06-11 11:15:33',
-      activity: 'Calculation',
-      details: 'Cash flow analysis for Mission Beach condo',
-      type: 'calculation',
-      icon: Calculator,
-      color: 'green',
-      duration: '6m 22s'
-    },
-    {
-      id: 6,
-      timestamp: '2025-06-10 10:45:18',
-      activity: 'Market Search',
-      details: 'Searched Gaslamp Quarter market data',
-      type: 'search',
-      icon: Search,
-      color: 'blue',
-      duration: '3m 45s'
-    },
-    
-    // May 2025
-    {
-      id: 7,
       timestamp: '2025-05-28 15:30:20',
       activity: 'Login',
       details: 'Logged in via mobile app',
@@ -104,7 +81,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '-'
     },
     {
-      id: 8,
+      id: 6,
       timestamp: '2025-05-28 15:32:45',
       activity: 'Market Search',
       details: 'Searched downtown San Diego properties',
@@ -114,7 +91,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '5m 18s'
     },
     {
-      id: 9,
+      id: 7,
       timestamp: '2025-05-25 11:20:15',
       activity: 'ROI Calculation',
       details: 'Calculated returns for Hillcrest apartment',
@@ -124,7 +101,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '7m 12s'
     },
     {
-      id: 10,
+      id: 8,
       timestamp: '2025-05-22 14:45:30',
       activity: 'Report Download',
       details: 'Downloaded neighborhood analysis (PDF)',
@@ -134,8 +111,28 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '-'
     },
     {
+      id: 9,
+      timestamp: '2025-04-20 11:15:33',
+      activity: 'Calculation',
+      details: 'Cash flow analysis for Mission Beach condo',
+      type: 'calculation',
+      icon: Calculator,
+      color: 'green',
+      duration: '6m 22s'
+    },
+    {
+      id: 10,
+      timestamp: '2025-04-18 10:45:18',
+      activity: 'Market Search',
+      details: 'Searched Gaslamp Quarter market data',
+      type: 'search',
+      icon: Search,
+      color: 'blue',
+      duration: '3m 45s'
+    },
+    {
       id: 11,
-      timestamp: '2025-05-15 16:30:22',
+      timestamp: '2025-04-16 16:30:22',
       activity: 'Market Search',
       details: 'Searched North Park rental listings',
       type: 'search',
@@ -143,8 +140,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       color: 'blue',
       duration: '8m 35s'
     },
-    
-    // Starting exactly on April 13, 2025 - subscription date
+    // First login on April 13, 2025 - subscription date
     {
       id: 12,
       timestamp: '2025-04-13 05:50:22',
