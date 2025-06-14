@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -27,11 +25,35 @@ interface ClientPaymentHistoryProps {
 }
 
 const getPaymentHistory = (clientId: string, timeRange: string, client?: Client) => {
-  // Updated to match screenshot - only one successful payment
+  // Real Stripe payment IDs from the dashboard
   const payments = [
     {
-      id: 'pi_3QPqMA2eZvKYlo2C1hJ3T4xY',
+      id: 'pi_3RDJOUGjV9r2LUGm1d8bXk',
       timestamp: '2025-06-13 06:48:00',
+      type: 'subscription_payment',
+      amount: 9.00,
+      currency: 'USD',
+      status: 'succeeded',
+      description: 'Subscription update',
+      payment_method: 'Visa •••• 9487',
+      stripe_fee: 0.56,
+      net_amount: 8.44
+    },
+    {
+      id: 'pi_3ROJOUGjV9r2LUGOTnwZhM',
+      timestamp: '2025-05-13 06:47:00',
+      type: 'subscription_payment',
+      amount: 9.00,
+      currency: 'USD',
+      status: 'succeeded',
+      description: 'Subscription update',
+      payment_method: 'Visa •••• 9487',
+      stripe_fee: 0.56,
+      net_amount: 8.44
+    },
+    {
+      id: 'pi_3RQJOGjV9r2LUG5Fyedzdf',
+      timestamp: '2025-04-13 06:48:00',
       type: 'subscription_payment',
       amount: 9.00,
       currency: 'USD',
