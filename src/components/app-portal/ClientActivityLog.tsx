@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -146,7 +147,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
 
   // Filter based on time range - Fixed filtering logic to ensure April activities are included
   const now = new Date('2025-06-14'); // Current date context
-  const cutoffDate = new Date();
+  let cutoffDate = new Date();
   
   switch (timeRange) {
     case '7d':
