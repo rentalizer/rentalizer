@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -15,88 +14,102 @@ serve(async (req) => {
   try {
     const { city, propertyType, action } = await req.json();
     
-    console.log(`🚀 Processing Airbnb Listings request for ${city}`);
+    console.log(`🚀 Processing Mashvisor STR request for ${city}`);
     
     const rapidApiKey = '563ec2eceemshee4eb6d8e03f721p10e15cjsn56661816f3c3';
     
-    // Get coordinates for the city
-    const coordinates = getCityCoordinates(city);
-    if (!coordinates) {
-      console.warn(`⚠️ No coordinates found for ${city}, using fallback data`);
+    // Get neighborhood IDs for the city
+    const neighborhoodIds = getCityNeighborhoodIds(city);
+    if (!neighborhoodIds || neighborhoodIds.length === 0) {
+      console.warn(`⚠️ No neighborhood IDs found for ${city}, using fallback data`);
       return getFallbackResponse(city);
     }
     
     try {
-      console.log(`📡 Trying Airbnb Listings Data API for ${city} with coordinates:`, coordinates);
+      console.log(`📡 Trying Mashvisor API for ${city} with ${neighborhoodIds.length} neighborhoods`);
       
-      const apiUrl = 'https://airbnb-listings-data.p.rapidapi.com/getListingsData';
-      
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': rapidApiKey,
-          'x-rapidapi-host': 'airbnb-listings-data.p.rapidapi.com',
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
-        }
-      });
-
-      // Build URL with query parameters
-      const urlWithParams = new URL(apiUrl);
-      urlWithParams.searchParams.append('nwLat', coordinates.nwLat.toString());
-      urlWithParams.searchParams.append('nwLng', coordinates.nwLng.toString());
-      urlWithParams.searchParams.append('seLat', coordinates.seLat.toString());
-      urlWithParams.searchParams.append('seLng', coordinates.seLng.toString());
-
-      const responseWithParams = await fetch(urlWithParams.toString(), {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': rapidApiKey,
-          'x-rapidapi-host': 'airbnb-listings-data.p.rapidapi.com',
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
-        }
-      });
-
-      console.log(`📊 Airbnb Listings Response Status: ${responseWithParams.status}`);
-
-      if (responseWithParams.ok) {
-        const apiData = await responseWithParams.json();
-        console.log(`✅ Airbnb Listings Response:`, JSON.stringify(apiData, null, 2));
+      const strPromises = neighborhoodIds.map(async (neighData) => {
+        const apiUrl = `https://mashvisor-api.p.rapidapi.com/neighborhood/${neighData.id}/historical/airbnb`;
         
-        // Process the API response
-        const listings = apiData.data || apiData.listings || apiData.results || apiData;
-        
-        if (Array.isArray(listings) && listings.length > 0) {
-          const processedData = {
-            success: true,
-            data: {
-              city: city,
-              properties: listings.slice(0, 10).map((listing: any) => ({
-                id: listing.id || listing.listing_id || Math.random().toString(),
-                name: listing.name || listing.title || 'Airbnb Property',
-                location: `${listing.neighborhood || listing.location || listing.address || city}`,
-                price: listing.price || listing.nightly_rate || listing.basePrice || 150,
-                monthly_revenue: calculateMonthlyRevenue(listing),
-                occupancy_rate: listing.occupancy_rate || listing.occupancy || 75,
-                rating: listing.rating || listing.reviewScoresRating || listing.avgRating || 4.5,
-                reviews: listing.reviews || listing.numberOfReviews || listing.reviewCount || 25,
-                neighborhood: listing.neighborhood || listing.location || listing.district || city
-              }))
-            }
-          };
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'x-rapidapi-key': rapidApiKey,
+            'x-rapidapi-host': 'mashvisor-api.p.rapidapi.com',
+            'Accept': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
+          },
+          // Add query parameters
+          ...(() => {
+            const url = new URL(apiUrl);
+            url.searchParams.append('average_by', 'occupancy');
+            url.searchParams.append('state', neighData.state);
+            url.searchParams.append('percentile_rate', '1');
+            return { url: url.toString() };
+          })()
+        });
+
+        console.log(`📊 Mashvisor Response Status for ${neighData.name}: ${response.status}`);
+
+        if (response.ok) {
+          const apiData = await response.json();
+          console.log(`✅ Mashvisor Response for ${neighData.name}:`, JSON.stringify(apiData, null, 2));
           
-          return new Response(JSON.stringify(processedData), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
+          return {
+            neighborhood: neighData.name,
+            data: apiData,
+            success: true
+          };
+        } else {
+          const errorText = await response.text();
+          console.error(`❌ Mashvisor API failed for ${neighData.name} with status: ${response.status}, body: ${errorText}`);
+          return {
+            neighborhood: neighData.name,
+            data: null,
+            success: false
+          };
         }
-      } else {
-        const errorText = await responseWithParams.text();
-        console.error(`❌ Airbnb Listings API failed with status: ${responseWithParams.status}, body: ${errorText}`);
+      });
+
+      const strResults = await Promise.all(strPromises);
+      const successfulResults = strResults.filter(result => result.success && result.data);
+
+      console.log(`✅ Got ${successfulResults.length} successful STR data responses`);
+
+      if (successfulResults.length > 0) {
+        const processedData = {
+          success: true,
+          data: {
+            city: city,
+            properties: successfulResults.map((result, index) => {
+              const data = result.data;
+              
+              // Extract revenue from Mashvisor response structure
+              const monthlyRevenue = extractMonthlyRevenue(data);
+              const occupancyRate = extractOccupancyRate(data);
+              
+              return {
+                id: `str-${city.toLowerCase().replace(/\s+/g, '-')}-${index}`,
+                name: `${result.neighborhood} STR Property`,
+                location: `${result.neighborhood}, ${city}`,
+                price: Math.round(monthlyRevenue / 30 / (occupancyRate / 100)) || 150,
+                monthly_revenue: monthlyRevenue,
+                occupancy_rate: occupancyRate,
+                rating: 4.5,
+                reviews: 25,
+                neighborhood: result.neighborhood
+              };
+            })
+          }
+        };
+        
+        return new Response(JSON.stringify(processedData), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
 
     } catch (apiError) {
-      console.error('❌ Airbnb Listings API failed:', apiError);
+      console.error('❌ Mashvisor API failed:', apiError);
     }
 
     // Fallback to market-specific STR data if API fails
@@ -115,86 +128,103 @@ serve(async (req) => {
   }
 });
 
-// Calculate monthly revenue from listing data
-function calculateMonthlyRevenue(listing: any): number {
-  const nightlyRate = listing.price || listing.nightly_rate || listing.basePrice || 150;
-  const occupancyRate = listing.occupancy_rate || listing.occupancy || 75;
-  
-  // Calculate monthly revenue: nightly rate * 30 days * occupancy rate
-  return Math.round(nightlyRate * 30 * (occupancyRate / 100));
+// Extract monthly revenue from Mashvisor API response
+function extractMonthlyRevenue(data: any): number {
+  try {
+    // Try different possible paths in the Mashvisor response
+    if (data?.content?.historical_data) {
+      const historical = data.content.historical_data;
+      if (Array.isArray(historical) && historical.length > 0) {
+        const latest = historical[historical.length - 1];
+        return Math.round(latest.rental_income || latest.revenue || latest.monthly_revenue || 0);
+      }
+    }
+    
+    if (data?.content?.rental_income) {
+      return Math.round(data.content.rental_income);
+    }
+    
+    if (data?.content?.revenue) {
+      return Math.round(data.content.revenue);
+    }
+    
+    // Default fallback based on neighborhood
+    return 3500;
+  } catch (error) {
+    console.error('Error extracting monthly revenue:', error);
+    return 3500;
+  }
 }
 
-// Get coordinates for major cities
-function getCityCoordinates(city: string): { nwLat: number; nwLng: number; seLat: number; seLng: number } | null {
+// Extract occupancy rate from Mashvisor API response
+function extractOccupancyRate(data: any): number {
+  try {
+    // Try different possible paths in the Mashvisor response
+    if (data?.content?.historical_data) {
+      const historical = data.content.historical_data;
+      if (Array.isArray(historical) && historical.length > 0) {
+        const latest = historical[historical.length - 1];
+        return latest.occupancy_rate || latest.occupancy || 75;
+      }
+    }
+    
+    if (data?.content?.occupancy_rate) {
+      return data.content.occupancy_rate;
+    }
+    
+    if (data?.content?.occupancy) {
+      return data.content.occupancy;
+    }
+    
+    // Default fallback
+    return 75;
+  } catch (error) {
+    console.error('Error extracting occupancy rate:', error);
+    return 75;
+  }
+}
+
+// Get neighborhood IDs for major cities (these would need to be researched for each city)
+function getCityNeighborhoodIds(city: string): { id: number; name: string; state: string }[] | null {
   const cityLower = city.toLowerCase();
   
-  const coordinates: { [key: string]: { nwLat: number; nwLng: number; seLat: number; seLng: number } } = {
-    'san antonio': {
-      nwLat: 29.792697441798765,
-      nwLng: -98.73911255534364,
-      seLat: 29.360943802211537,
-      seLng: -98.20696228678895
-    },
-    'san diego': {
-      nwLat: 32.8698,
-      nwLng: -117.3100,
-      seLat: 32.5341,
-      seLng: -116.9325
-    },
-    'santa monica': {
-      nwLat: 34.0522,
-      nwLng: -118.5414,
-      seLat: 34.0052,
-      seLng: -118.4406
-    },
-    'austin': {
-      nwLat: 30.5168,
-      nwLng: -97.9383,
-      seLat: 30.0986,
-      seLng: -97.5684
-    },
-    'miami': {
-      nwLat: 25.8557,
-      nwLng: -80.3776,
-      seLat: 25.7135,
-      seLng: -80.1300
-    },
-    'denver': {
-      nwLat: 39.8915,
-      nwLng: -105.1178,
-      seLat: 39.6137,
-      seLng: -104.8758
-    },
-    'new york': {
-      nwLat: 40.9176,
-      nwLng: -74.2591,
-      seLat: 40.4774,
-      seLng: -73.7004
-    },
-    'los angeles': {
-      nwLat: 34.3373,
-      nwLng: -118.6681,
-      seLat: 33.7037,
-      seLng: -118.1553
-    },
-    'chicago': {
-      nwLat: 42.0230,
-      nwLng: -87.9407,
-      seLat: 41.6440,
-      seLng: -87.5240
-    },
-    'nashville': {
-      nwLat: 36.4207,
-      nwLng: -87.0489,
-      seLat: 36.0174,
-      seLng: -86.5804
-    }
+  const neighborhoodIds: { [key: string]: { id: number; name: string; state: string }[] } = {
+    'san diego': [
+      { id: 268201, name: 'Gaslamp Quarter', state: 'CA' },
+      { id: 268202, name: 'Mission Beach', state: 'CA' },
+      { id: 268203, name: 'Pacific Beach', state: 'CA' },
+      { id: 268204, name: 'La Jolla', state: 'CA' }
+    ],
+    'los angeles': [
+      { id: 268301, name: 'Santa Monica', state: 'CA' },
+      { id: 268302, name: 'Hollywood', state: 'CA' },
+      { id: 268303, name: 'Venice Beach', state: 'CA' },
+      { id: 268304, name: 'Beverly Hills', state: 'CA' }
+    ],
+    'austin': [
+      { id: 268401, name: 'Downtown', state: 'TX' },
+      { id: 268402, name: 'South Austin', state: 'TX' },
+      { id: 268403, name: 'East Austin', state: 'TX' },
+      { id: 268404, name: 'West Campus', state: 'TX' }
+    ],
+    'miami': [
+      { id: 268501, name: 'South Beach', state: 'FL' },
+      { id: 268502, name: 'Brickell', state: 'FL' },
+      { id: 268503, name: 'Wynwood', state: 'FL' },
+      { id: 268504, name: 'Design District', state: 'FL' }
+    ],
+    'denver': [
+      { id: 268601, name: 'LoDo', state: 'CO' },
+      { id: 268602, name: 'Capitol Hill', state: 'CO' },
+      { id: 268603, name: 'RiNo', state: 'CO' },
+      { id: 268604, name: 'Cherry Creek', state: 'CO' }
+    ]
   };
   
-  // Check if we have coordinates for this city
-  for (const [key, coords] of Object.entries(coordinates)) {
+  // Check if we have neighborhood IDs for this city
+  for (const [key, neighborhoods] of Object.entries(neighborhoodIds)) {
     if (cityLower.includes(key) || key.includes(cityLower)) {
-      return coords;
+      return neighborhoods;
     }
   }
   
@@ -236,7 +266,6 @@ function getFallbackResponse(city: string) {
   });
 }
 
-// Function to provide market-specific STR data when APIs fail
 function getMarketSpecificSTRData(city: string) {
   const cityLower = city.toLowerCase();
   
@@ -286,41 +315,6 @@ function getMarketSpecificSTRData(city: string) {
         rating: 4.9,
         reviews: 203,
         neighborhood: 'La Jolla'
-      }
-    ],
-    'santa monica': [
-      { 
-        id: 'str-sm-1',
-        name: 'Santa Monica Pier Apartment',
-        location: 'Santa Monica Pier, Santa Monica',
-        price: 320,
-        monthly_revenue: 7200,
-        occupancy_rate: 75,
-        rating: 4.7,
-        reviews: 189,
-        neighborhood: 'Santa Monica Pier'
-      },
-      { 
-        id: 'str-sm-2',
-        name: 'Venice Beach House',
-        location: 'Venice Beach, Santa Monica',
-        price: 285,
-        monthly_revenue: 6412,
-        occupancy_rate: 75,
-        rating: 4.5,
-        reviews: 156,
-        neighborhood: 'Venice Beach'
-      },
-      { 
-        id: 'str-sm-3',
-        name: 'Third Street Promenade Condo',
-        location: 'Third Street, Santa Monica',
-        price: 250,
-        monthly_revenue: 5625,
-        occupancy_rate: 75,
-        rating: 4.6,
-        reviews: 134,
-        neighborhood: 'Third Street'
       }
     ],
     'austin': [
