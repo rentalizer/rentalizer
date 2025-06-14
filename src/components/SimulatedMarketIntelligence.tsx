@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { MarketAnalysisForm } from '@/components/MarketAnalysisForm';
 import { MarketAnalysisResults } from '@/components/MarketAnalysisResults';
 import { fetchAirbnbEarningsData, processAirbnbEarningsData, fetchRealRentalData, processRentalData } from '@/services/rapidApiAirbnbService';
+import { findBestMatch } from '@/utils/fuzzyMatching';
 
 interface SubmarketData {
   submarket: string;
@@ -61,16 +62,32 @@ export const SimulatedMarketIntelligence = () => {
         
         console.log(`📊 STR data:`, processedSTR);
 
-        // Add STR data to existing submarkets where possible
+        // Add STR data to existing submarkets using FUZZY MATCHING
         processedSTR.properties.forEach(strProperty => {
-          const matchingSubmarket = submarkets.find(submarket => 
-            submarket.submarket.toLowerCase().includes(strProperty.neighborhood.toLowerCase())
-          );
+          console.log(`🔍 Fuzzy matching STR property neighborhood: "${strProperty.neighborhood}"`);
           
-          if (matchingSubmarket) {
-            matchingSubmarket.strRevenue = strProperty.monthlyRevenue;
-            matchingSubmarket.multiple = matchingSubmarket.medianRent > 0 ? 
-              strProperty.monthlyRevenue / matchingSubmarket.medianRent : 0;
+          // Get all submarket names for fuzzy matching
+          const submarketNames = submarkets.map(s => s.submarket);
+          
+          // Find best match using fuzzy matching
+          const bestMatch = findBestMatch(strProperty.neighborhood, submarketNames, 0.5);
+          
+          if (bestMatch) {
+            console.log(`✅ Fuzzy match found: "${strProperty.neighborhood}" -> "${bestMatch.match}" (similarity: ${bestMatch.similarity.toFixed(2)})`);
+            
+            const matchingSubmarket = submarkets.find(submarket => 
+              submarket.submarket === bestMatch.match
+            );
+            
+            if (matchingSubmarket) {
+              matchingSubmarket.strRevenue = strProperty.monthlyRevenue;
+              matchingSubmarket.multiple = matchingSubmarket.medianRent > 0 ? 
+                strProperty.monthlyRevenue / matchingSubmarket.medianRent : 0;
+              
+              console.log(`💰 Updated submarket "${matchingSubmarket.submarket}" with STR revenue: $${strProperty.monthlyRevenue}`);
+            }
+          } else {
+            console.log(`❌ No fuzzy match found for STR neighborhood: "${strProperty.neighborhood}"`);
           }
         });
       } catch (strError) {
@@ -83,12 +100,13 @@ export const SimulatedMarketIntelligence = () => {
       setBathrooms(bathCount);
       
       const rentalCount = submarkets.filter(d => d.medianRent > 0).length;
+      const strCount = submarkets.filter(d => d.strRevenue > 0).length;
       
-      console.log(`🎉 Analysis complete! ${submarkets.length} submarkets, ${rentalCount} with rental data`);
+      console.log(`🎉 Analysis complete! ${submarkets.length} submarkets, ${rentalCount} with rental data, ${strCount} with STR data`);
       
       toast({
         title: "Market Analysis Complete",
-        description: `Found ${submarkets.length} submarkets with ${rentalCount} having rental data from OpenAI.`,
+        description: `Found ${submarkets.length} submarkets with ${rentalCount} having rental data and ${strCount} having STR data from fuzzy matching.`,
       });
 
     } catch (error) {
@@ -116,9 +134,9 @@ export const SimulatedMarketIntelligence = () => {
           <div className="flex items-center gap-3">
             <Eye className="h-5 w-5 text-green-400" />
             <div>
-              <h3 className="font-semibold text-green-300">REAL CHATGPT RENTAL DATA</h3>
+              <h3 className="font-semibold text-green-300">REAL CHATGPT RENTAL DATA + FUZZY MATCHING</h3>
               <p className="text-sm text-gray-300">
-                This tool uses OpenAI ChatGPT for rental rates and real STR earnings to calculate accurate revenue multiples.
+                This tool uses OpenAI ChatGPT for rental rates, real STR earnings, and fuzzy matching to handle neighborhood name variations.
               </p>
             </div>
           </div>
