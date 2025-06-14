@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { MarketAnalysisForm } from '@/components/MarketAnalysisForm';
 import { MarketAnalysisResults } from '@/components/MarketAnalysisResults';
 import { fetchAirbnbEarningsData, processAirbnbEarningsData, fetchRealRentalData, processRentalData } from '@/services/rapidApiAirbnbService';
-import { findBestMatch } from '@/utils/fuzzyMatching';
+import { findBestMatch, findBestMatchAdvanced } from '@/utils/fuzzyMatching';
 
 interface SubmarketData {
   submarket: string;
@@ -54,7 +54,7 @@ export const SimulatedMarketIntelligence = () => {
 
       console.log(`📋 Final submarkets with rental data:`, submarkets);
 
-      // Step 3: Try to get STR data (optional)
+      // Step 3: Try to get STR data with enhanced fuzzy matching
       try {
         console.log(`🏠 Fetching STR earnings for ${city}`);
         const strApiData = await fetchAirbnbEarningsData(city, propType);
@@ -62,21 +62,30 @@ export const SimulatedMarketIntelligence = () => {
         
         console.log(`📊 STR data:`, processedSTR);
 
-        // Add STR data to existing submarkets using FUZZY MATCHING
+        // Enhanced STR data matching with multiple strategies
+        let exactMatches = 0;
+        let fuzzyMatches = 0;
+        let noMatches = 0;
+
         processedSTR.properties.forEach(strProperty => {
-          console.log(`🔍 Fuzzy matching STR property neighborhood: "${strProperty.neighborhood}"`);
+          console.log(`🔍 Enhanced fuzzy matching for STR property: "${strProperty.neighborhood}"`);
           
           // Get all submarket names for fuzzy matching
           const submarketNames = submarkets.map(s => s.submarket);
           
-          // Find best match using fuzzy matching
-          const bestMatch = findBestMatch(strProperty.neighborhood, submarketNames, 0.5);
+          // Try advanced matching first
+          const advancedMatch = findBestMatchAdvanced(strProperty.neighborhood, submarketNames, {
+            exactThreshold: 0.9,
+            aliasThreshold: 0.8,
+            fuzzyThreshold: 0.3,
+            allowPartialMatches: true
+          });
           
-          if (bestMatch) {
-            console.log(`✅ Fuzzy match found: "${strProperty.neighborhood}" -> "${bestMatch.match}" (similarity: ${bestMatch.similarity.toFixed(2)})`);
+          if (advancedMatch) {
+            console.log(`✅ Advanced match found: "${strProperty.neighborhood}" -> "${advancedMatch.match}" (${advancedMatch.matchType}, similarity: ${advancedMatch.similarity.toFixed(3)})`);
             
             const matchingSubmarket = submarkets.find(submarket => 
-              submarket.submarket === bestMatch.match
+              submarket.submarket === advancedMatch.match
             );
             
             if (matchingSubmarket) {
@@ -84,12 +93,42 @@ export const SimulatedMarketIntelligence = () => {
               matchingSubmarket.multiple = matchingSubmarket.medianRent > 0 ? 
                 strProperty.monthlyRevenue / matchingSubmarket.medianRent : 0;
               
-              console.log(`💰 Updated submarket "${matchingSubmarket.submarket}" with STR revenue: $${strProperty.monthlyRevenue}`);
+              if (advancedMatch.matchType === 'exact' || advancedMatch.matchType === 'alias') {
+                exactMatches++;
+              } else {
+                fuzzyMatches++;
+              }
+              
+              console.log(`💰 Updated submarket "${matchingSubmarket.submarket}" with STR revenue: $${strProperty.monthlyRevenue} (${advancedMatch.matchType} match)`);
             }
           } else {
-            console.log(`❌ No fuzzy match found for STR neighborhood: "${strProperty.neighborhood}"`);
+            // Fallback to basic fuzzy matching with lower threshold
+            const basicMatch = findBestMatch(strProperty.neighborhood, submarketNames, 0.2);
+            
+            if (basicMatch) {
+              console.log(`⚡ Fallback match found: "${strProperty.neighborhood}" -> "${basicMatch.match}" (similarity: ${basicMatch.similarity.toFixed(3)})`);
+              
+              const matchingSubmarket = submarkets.find(submarket => 
+                submarket.submarket === basicMatch.match
+              );
+              
+              if (matchingSubmarket) {
+                matchingSubmarket.strRevenue = strProperty.monthlyRevenue;
+                matchingSubmarket.multiple = matchingSubmarket.medianRent > 0 ? 
+                  strProperty.monthlyRevenue / matchingSubmarket.medianRent : 0;
+                
+                fuzzyMatches++;
+                console.log(`💰 Updated submarket "${matchingSubmarket.submarket}" with STR revenue: $${strProperty.monthlyRevenue} (fallback match)`);
+              }
+            } else {
+              noMatches++;
+              console.log(`❌ No match found for STR neighborhood: "${strProperty.neighborhood}"`);
+            }
           }
         });
+
+        console.log(`📊 Matching Results: ${exactMatches} exact/alias, ${fuzzyMatches} fuzzy, ${noMatches} unmatched`);
+
       } catch (strError) {
         console.warn('⚠️ STR data fetch failed, continuing with rental data only:', strError);
       }
@@ -106,7 +145,7 @@ export const SimulatedMarketIntelligence = () => {
       
       toast({
         title: "Market Analysis Complete",
-        description: `Found ${submarkets.length} submarkets with ${rentalCount} having rental data and ${strCount} having STR data from fuzzy matching.`,
+        description: `Found ${submarkets.length} submarkets with ${rentalCount} having rental data and ${strCount} having STR data using enhanced fuzzy matching.`,
       });
 
     } catch (error) {
@@ -134,9 +173,9 @@ export const SimulatedMarketIntelligence = () => {
           <div className="flex items-center gap-3">
             <Eye className="h-5 w-5 text-green-400" />
             <div>
-              <h3 className="font-semibold text-green-300">REAL CHATGPT RENTAL DATA + FUZZY MATCHING</h3>
+              <h3 className="font-semibold text-green-300">ENHANCED FUZZY MATCHING + REAL API DATA</h3>
               <p className="text-sm text-gray-300">
-                This tool uses OpenAI ChatGPT for rental rates, real STR earnings, and fuzzy matching to handle neighborhood name variations.
+                Now using advanced fuzzy matching with neighborhood aliases, phonetic similarity, and lower thresholds for better coverage.
               </p>
             </div>
           </div>
