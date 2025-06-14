@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -27,9 +28,9 @@ interface ClientActivityLogProps {
 }
 
 const getClientActivities = (clientId: string, timeRange: string, client?: Client) => {
-  // Real activity data starting from April 13, 2025 (signup date) - totals: 2 logins, 4 searches, 3 calculations, 2 downloads
+  // Real activity data starting from April 13, 2025 (signup date) through June 13, 2025 - totals: 2 logins, 4 searches, 3 calculations, 2 downloads
   const activities = [
-    // Recent June 2025 activity (yesterday)
+    // Recent June 2025 activity (yesterday - June 13)
     {
       id: 1,
       timestamp: '2025-06-13 16:22:30',
@@ -70,9 +71,10 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       color: 'green',
       duration: '4m 32s'
     },
+    // May 2025 activities
     {
       id: 5,
-      timestamp: '2025-04-20 11:15:33',
+      timestamp: '2025-05-20 11:15:33',
       activity: 'Calculation',
       details: 'Cash flow analysis for Mission Beach condo',
       type: 'calculation',
@@ -82,7 +84,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
     },
     {
       id: 6,
-      timestamp: '2025-04-18 10:45:18',
+      timestamp: '2025-05-18 10:45:18',
       activity: 'Market Search',
       details: 'Searched Gaslamp Quarter market data',
       type: 'search',
@@ -92,7 +94,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
     },
     {
       id: 7,
-      timestamp: '2025-04-16 16:30:22',
+      timestamp: '2025-05-16 16:30:22',
       activity: 'Market Search',
       details: 'Searched North Park rental listings',
       type: 'search',
@@ -100,9 +102,10 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       color: 'blue',
       duration: '8m 35s'
     },
+    // April 2025 activities
     {
       id: 8,
-      timestamp: '2025-04-15 14:45:30',
+      timestamp: '2025-04-25 14:45:30',
       activity: 'Report Download',
       details: 'Downloaded neighborhood analysis (PDF)',
       type: 'download',
@@ -112,7 +115,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
     },
     {
       id: 9,
-      timestamp: '2025-04-14 11:20:15',
+      timestamp: '2025-04-22 11:20:15',
       activity: 'ROI Calculation',
       details: 'Calculated returns for Hillcrest apartment',
       type: 'calculation',
@@ -122,7 +125,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
     },
     {
       id: 10,
-      timestamp: '2025-04-14 10:32:45',
+      timestamp: '2025-04-18 10:32:45',
       activity: 'Market Search',
       details: 'Searched downtown San Diego properties',
       type: 'search',
@@ -132,7 +135,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
     },
     {
       id: 11,
-      timestamp: '2025-04-13 05:50:22',
+      timestamp: '2025-04-13 09:50:22',
       activity: 'Login',
       details: 'First login after subscription',
       type: 'login',
