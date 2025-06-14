@@ -28,9 +28,9 @@ interface ClientActivityLogProps {
 }
 
 const getClientActivities = (clientId: string, timeRange: string, client?: Client) => {
-  // Activities from April 13 signup to present - ensuring totals match: 9 logins, 12 searches, 6 calculations, 4 downloads
+  // Real activity data from the screenshot - totals: 2 logins, 4 searches, 3 calculations, 2 downloads
   const activities = [
-    // June 2025 (Recent activity)
+    // Recent June 2025 activity
     {
       id: 1,
       timestamp: '2025-06-14 09:32:15',
@@ -143,190 +143,10 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       color: 'blue',
       duration: '8m 35s'
     },
+    
+    // Starting exactly on April 13, 2025 - subscription date
     {
       id: 12,
-      timestamp: '2025-05-12 13:22:18',
-      activity: 'Calculation',
-      details: 'Cash flow analysis for Ocean Beach property',
-      type: 'calculation',
-      icon: Calculator,
-      color: 'green',
-      duration: '9m 45s'
-    },
-    {
-      id: 13,
-      timestamp: '2025-05-08 10:18:30',
-      activity: 'Login',
-      details: 'Logged in via mobile app',
-      type: 'login',
-      icon: LogIn,
-      color: 'purple',
-      duration: '-'
-    },
-    {
-      id: 14,
-      timestamp: '2025-05-05 14:25:40',
-      activity: 'Market Search',
-      details: 'Searched Balboa Park area properties',
-      type: 'search',
-      icon: Search,
-      color: 'blue',
-      duration: '6m 20s'
-    },
-    
-    // April 2025 - Starting from April 13
-    {
-      id: 15,
-      timestamp: '2025-04-28 16:45:20',
-      activity: 'Login',
-      details: 'Logged in via web browser',
-      type: 'login',
-      icon: LogIn,
-      color: 'purple',
-      duration: '-'
-    },
-    {
-      id: 16,
-      timestamp: '2025-04-28 16:48:35',
-      activity: 'Market Search',
-      details: 'Searched Coronado Beach properties',
-      type: 'search',
-      icon: Search,
-      color: 'blue',
-      duration: '4m 15s'
-    },
-    {
-      id: 17,
-      timestamp: '2025-04-25 13:30:45',
-      activity: 'ROI Calculation',
-      details: 'First investment calculation - Del Mar condo',
-      type: 'calculation',
-      icon: Calculator,
-      color: 'green',
-      duration: '12m 18s'
-    },
-    {
-      id: 18,
-      timestamp: '2025-04-22 09:20:30',
-      activity: 'Login',
-      details: 'Logged in via web browser',
-      type: 'login',
-      icon: LogIn,
-      color: 'purple',
-      duration: '-'
-    },
-    {
-      id: 19,
-      timestamp: '2025-04-20 15:15:25',
-      activity: 'Market Search',
-      details: 'Initial market exploration - San Diego overview',
-      type: 'search',
-      icon: Search,
-      color: 'blue',
-      duration: '15m 30s'
-    },
-    {
-      id: 20,
-      timestamp: '2025-04-18 11:25:40',
-      activity: 'Login',
-      details: 'Logged in via mobile app',
-      type: 'login',
-      icon: LogIn,
-      color: 'purple',
-      duration: '-'
-    },
-    {
-      id: 21,
-      timestamp: '2025-04-15 14:10:15',
-      activity: 'Report Download',
-      details: 'Downloaded getting started guide',
-      type: 'download',
-      icon: Download,
-      color: 'orange',
-      duration: '-'
-    },
-    {
-      id: 22,
-      timestamp: '2025-04-14 10:30:22',
-      activity: 'Market Search',
-      details: 'Searched Pacific Beach properties',
-      type: 'search',
-      icon: Search,
-      color: 'blue',
-      duration: '8m 22s'
-    },
-    {
-      id: 23,
-      timestamp: '2025-04-14 08:45:15',
-      activity: 'Login',
-      details: 'Second login after subscription',
-      type: 'login',
-      icon: LogIn,
-      color: 'purple',
-      duration: '-'
-    },
-    {
-      id: 24,
-      timestamp: '2025-04-13 20:30:45',
-      activity: 'Market Search',
-      details: 'Evening research - La Jolla area',
-      type: 'search',
-      icon: Search,
-      color: 'blue',
-      duration: '12m 18s'
-    },
-    {
-      id: 25,
-      timestamp: '2025-04-13 18:22:30',
-      activity: 'Report Download',
-      details: 'Downloaded first market report',
-      type: 'download',
-      icon: Download,
-      color: 'orange',
-      duration: '-'
-    },
-    {
-      id: 26,
-      timestamp: '2025-04-13 16:15:20',
-      activity: 'Market Search',
-      details: 'Searched downtown San Diego market',
-      type: 'search',
-      icon: Search,
-      color: 'blue',
-      duration: '18m 45s'
-    },
-    {
-      id: 27,
-      timestamp: '2025-04-13 14:35:45',
-      activity: 'Calculation',
-      details: 'First ROI calculation attempt',
-      type: 'calculation',
-      icon: Calculator,
-      color: 'green',
-      duration: '25m 12s'
-    },
-    {
-      id: 28,
-      timestamp: '2025-04-13 12:30:22',
-      activity: 'Login',
-      details: 'Mid-day login - exploring features',
-      type: 'login',
-      icon: LogIn,
-      color: 'purple',
-      duration: '-'
-    },
-    {
-      id: 29,
-      timestamp: '2025-04-13 07:35:45',
-      activity: 'Market Search',
-      details: 'First search - San Diego rental market overview',
-      type: 'search',
-      icon: Search,
-      color: 'blue',
-      duration: '8m 22s'
-    },
-    {
-      id: 30,
       timestamp: '2025-04-13 05:50:22',
       activity: 'Login',
       details: 'First login after subscription',
