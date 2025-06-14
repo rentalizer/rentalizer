@@ -15,61 +15,58 @@ serve(async (req) => {
   try {
     const { city, propertyType, action } = await req.json();
     
-    console.log(`🚀 Processing RapidAPI Airbnb request for ${city}`);
+    console.log(`🚀 Processing AirDNA API request for ${city}`);
     
     const rapidApiKey = '563ec2eceemshee4eb6d8e03f721p10e15cjsn56661816f3c3';
     
     try {
-      console.log(`📡 Trying new Airbnb getListingsData API for ${city}`);
+      console.log(`📡 Trying AirDNA properties API for ${city}`);
       
-      // Get coordinates for the city
-      const coordinates = getCityCoordinates(city);
-      
-      if (coordinates) {
-        const response = await fetch(`https://airbnb-listings-data.p.rapidapi.com/getListingsData`, {
-          method: 'GET',
-          headers: {
-            'x-rapidapi-key': rapidApiKey,
-            'x-rapidapi-host': 'airbnb-listings-data.p.rapidapi.com',
-            'Accept': 'application/json'
-          }
-        });
+      const response = await fetch(`https://airdna1.p.rapidapi.com/properties`, {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-key': rapidApiKey,
+          'x-rapidapi-host': 'airdna1.p.rapidapi.com',
+          'Accept': 'application/json'
+        },
+        // Add query parameters using URLSearchParams
+        url: `https://airdna1.p.rapidapi.com/properties?location=${encodeURIComponent(city)}&currency=native`
+      });
 
-        console.log(`📊 getListingsData Response Status: ${response.status}`);
+      console.log(`📊 AirDNA Properties Response Status: ${response.status}`);
 
-        if (response.ok) {
-          const apiData = await response.json();
-          console.log(`✅ getListingsData Response:`, JSON.stringify(apiData, null, 2));
+      if (response.ok) {
+        const apiData = await response.json();
+        console.log(`✅ AirDNA Properties Response:`, JSON.stringify(apiData, null, 2));
+        
+        // Process the real API response
+        const listings = apiData.results || apiData.data || apiData.properties || apiData;
+        
+        if (Array.isArray(listings) && listings.length > 0) {
+          const processedData = {
+            success: true,
+            data: {
+              city: city,
+              properties: listings.map((listing: any) => ({
+                id: listing.id || listing.property_id || Math.random().toString(),
+                name: listing.name || listing.title || 'STR Property',
+                location: `${listing.neighborhood || listing.location || city}`,
+                price: listing.price?.amount || listing.price || listing.nightly_rate || 150,
+                monthly_revenue: calculateMonthlyRevenue(listing),
+                occupancy_rate: listing.occupancy_rate || 75,
+                rating: listing.rating || listing.review_score_rating || 4.5,
+                reviews: listing.reviews || listing.number_of_reviews || 25,
+                neighborhood: listing.neighborhood || listing.location || city
+              }))
+            }
+          };
           
-          // Process the real API response
-          const listings = apiData.results || apiData.data || apiData.listings || apiData;
-          
-          if (Array.isArray(listings) && listings.length > 0) {
-            const processedData = {
-              success: true,
-              data: {
-                city: city,
-                properties: listings.map((listing: any) => ({
-                  id: listing.id || listing.listing_id || Math.random().toString(),
-                  name: listing.name || listing.title || 'STR Property',
-                  location: `${listing.neighborhood || listing.location || city}`,
-                  price: listing.price?.amount || listing.price || listing.nightly_rate || 150,
-                  monthly_revenue: calculateMonthlyRevenue(listing),
-                  occupancy_rate: listing.occupancy_rate || 75,
-                  rating: listing.rating || listing.review_score_rating || 4.5,
-                  reviews: listing.reviews || listing.number_of_reviews || 25,
-                  neighborhood: listing.neighborhood || listing.location || city
-                }))
-              }
-            };
-            
-            return new Response(JSON.stringify(processedData), {
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            });
-          }
-        } else {
-          console.error(`❌ getListingsData failed with status: ${response.status}`);
+          return new Response(JSON.stringify(processedData), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
         }
+      } else {
+        console.error(`❌ AirDNA Properties failed with status: ${response.status}`);
       }
 
       // Fallback to market-specific STR data if API fails
@@ -121,53 +118,6 @@ serve(async (req) => {
     });
   }
 });
-
-// Get coordinates for major cities
-function getCityCoordinates(city: string) {
-  const cityLower = city.toLowerCase();
-  
-  const cityCoords: { [key: string]: { nwLat: string, nwLng: string, seLat: string, seLng: string } } = {
-    'san antonio': {
-      nwLat: '29.792697441798765',
-      nwLng: '-98.73911255534364',
-      seLat: '29.360943802211537',
-      seLng: '-98.20696228678895'
-    },
-    'san diego': {
-      nwLat: '33.0153',
-      nwLng: '-117.5100',
-      seLat: '32.5343',
-      seLng: '-116.9325'
-    },
-    'austin': {
-      nwLat: '30.5167',
-      nwLng: '-97.9442',
-      seLat: '30.0986',
-      seLng: '-97.5698'
-    },
-    'miami': {
-      nwLat: '25.9776',
-      nwLng: '-80.3182',
-      seLat: '25.6073',
-      seLng: '-80.1318'
-    },
-    'denver': {
-      nwLat: '39.9142',
-      nwLng: '-105.1178',
-      seLat: '39.6142',
-      seLng: '-104.8008'
-    }
-  };
-  
-  // Check if we have coordinates for this city
-  for (const [key, coords] of Object.entries(cityCoords)) {
-    if (cityLower.includes(key) || key.includes(cityLower)) {
-      return coords;
-    }
-  }
-  
-  return null;
-}
 
 // Calculate monthly revenue from listing data
 function calculateMonthlyRevenue(listing: any): number {
@@ -333,6 +283,30 @@ function getMarketSpecificSTRData(city: string) {
         rating: 4.4,
         reviews: 67,
         neighborhood: 'RiNo'
+      }
+    ],
+    'santa monica': [
+      { 
+        id: 'str-sm-1',
+        name: 'Santa Monica Beach Condo',
+        location: 'Santa Monica Beach, Santa Monica',
+        price: 320,
+        monthly_revenue: 7200,
+        occupancy_rate: 75,
+        rating: 4.8,
+        reviews: 189,
+        neighborhood: 'Santa Monica Beach'
+      },
+      { 
+        id: 'str-sm-2',
+        name: 'Third Street Promenade Apartment',
+        location: 'Third Street, Santa Monica',
+        price: 280,
+        monthly_revenue: 6300,
+        occupancy_rate: 75,
+        rating: 4.6,
+        reviews: 156,
+        neighborhood: 'Third Street'
       }
     ]
   };
