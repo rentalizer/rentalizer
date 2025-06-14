@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -22,8 +21,16 @@ serve(async (req) => {
     // Get coordinates for the city
     const coordinates = getCityCoordinates(city);
     if (!coordinates) {
-      console.warn(`⚠️ No coordinates found for ${city}, using fallback data`);
-      return getFallbackResponse(city);
+      console.warn(`⚠️ No coordinates found for ${city}, API call not possible`);
+      
+      // Only return fallback data for San Diego
+      const cityLower = city.toLowerCase();
+      if (cityLower.includes('san diego') || cityLower.includes('sandiego')) {
+        return getFallbackResponse(city);
+      }
+      
+      // For all other cities, return empty data
+      return getEmptyResponse(city);
     }
     
     try {
@@ -50,23 +57,43 @@ serve(async (req) => {
 
       if (response.ok) {
         const apiData = await response.json();
-        console.log(`✅ Airbnb Listings Response received with ${Array.isArray(apiData.message) ? apiData.message.length : 0} listings`);
+        console.log(`📊 Raw API response structure:`, {
+          hasMessage: !!apiData.message,
+          messageType: typeof apiData.message,
+          messageLength: Array.isArray(apiData.message) ? apiData.message.length : 'N/A',
+          keys: Object.keys(apiData)
+        });
         
         // Process the API response - the data is in apiData.message array
         const listings = apiData.message || [];
         
         if (Array.isArray(listings) && listings.length > 0) {
-          const processedProperties = listings.slice(0, 15).map((listing: any) => {
+          console.log(`✅ Found ${listings.length} listings, processing first 15...`);
+          
+          const processedProperties = listings.slice(0, 15).map((listing: any, index: number) => {
+            console.log(`🏠 Processing listing ${index}:`, {
+              id: listing.listingID,
+              name: listing.name?.substring(0, 50) + '...',
+              dailyRate: listing.avg_booked_daily_rate_ltm,
+              annualRevenue: listing.annual_revenue_ltm,
+              occupancy: listing.avg_occupancy_rate_ltm
+            });
+            
             // Extract neighborhood from location or use city name
             const neighborhood = extractNeighborhood(listing.name, city) || city;
+            
+            // Calculate monthly revenue more accurately
+            const dailyRate = listing.avg_booked_daily_rate_ltm || 0;
+            const occupancyRate = (listing.avg_occupancy_rate_ltm || 0) / 100;
+            const monthlyRevenue = Math.round(dailyRate * occupancyRate * 30);
             
             return {
               id: listing.listingID || Math.random().toString(),
               name: listing.name || 'Airbnb Property',
               location: `${neighborhood}, ${city}`,
-              price: Math.round(listing.avg_booked_daily_rate_ltm || 150),
-              monthly_revenue: Math.round((listing.annual_revenue_ltm || 0) / 12),
-              occupancy_rate: Math.round(listing.avg_occupancy_rate_ltm || 75),
+              price: Math.round(dailyRate),
+              monthly_revenue: monthlyRevenue,
+              occupancy_rate: Math.round(listing.avg_occupancy_rate_ltm || 0),
               rating: 4.5, // Default rating since not in API response
               reviews: 25, // Default reviews since not in API response
               neighborhood: neighborhood
@@ -98,9 +125,16 @@ serve(async (req) => {
       console.error('❌ Airbnb Listings API failed:', apiError);
     }
 
-    // Fallback to market-specific STR data if API fails or returns no data
-    console.log(`📡 Using market-specific STR data for ${city}`);
-    return getFallbackResponse(city);
+    // Only fallback to market data for San Diego
+    const cityLower = city.toLowerCase();
+    if (cityLower.includes('san diego') || cityLower.includes('sandiego')) {
+      console.log(`📡 Using fallback data for San Diego`);
+      return getFallbackResponse(city);
+    }
+
+    // For all other cities, return empty data when API fails
+    console.log(`📡 API failed for ${city}, returning empty data (no fallback)`);
+    return getEmptyResponse(city);
 
   } catch (error) {
     console.error('💥 STR API Edge Function Error:', error);
@@ -221,7 +255,7 @@ function getCityCoordinates(city: string): { nwLat: number; nwLng: number; seLat
   return null;
 }
 
-// Fallback response with market-specific data
+// Fallback response with market-specific data (only for San Diego)
 function getFallbackResponse(city: string) {
   const marketStrData = getMarketSpecificSTRData(city);
   
@@ -241,7 +275,11 @@ function getFallbackResponse(city: string) {
     });
   }
 
-  // Return empty data if all fails
+  return getEmptyResponse(city);
+}
+
+// New function to return empty data for unsupported cities
+function getEmptyResponse(city: string) {
   console.warn('⚠️ No STR data available - returning empty results');
   
   const emptyData = {
@@ -249,7 +287,7 @@ function getFallbackResponse(city: string) {
     data: {
       city: city,
       properties: [],
-      message: "No STR data available for this market"
+      message: `No STR data available for ${city}. Only San Diego has fallback data for testing.`
     }
   };
 
@@ -258,82 +296,12 @@ function getFallbackResponse(city: string) {
   });
 }
 
-// Function to provide market-specific STR data when APIs fail
+// Function to provide market-specific STR data (only for San Diego now)
 function getMarketSpecificSTRData(city: string) {
   const cityLower = city.toLowerCase();
   
-  // Market data for STR properties based on recent market research
+  // Only provide fallback data for San Diego
   const marketData: { [key: string]: any[] } = {
-    'new york': [
-      { 
-        id: 'str-ny-1',
-        name: 'Manhattan Studio',
-        location: 'Manhattan, New York',
-        price: 220,
-        monthly_revenue: 4950,
-        occupancy_rate: 75,
-        rating: 4.7,
-        reviews: 134,
-        neighborhood: 'Manhattan'
-      },
-      { 
-        id: 'str-ny-2',
-        name: 'Brooklyn Heights Apartment',
-        location: 'Brooklyn Heights, New York',
-        price: 180,
-        monthly_revenue: 4050,
-        occupancy_rate: 75,
-        rating: 4.5,
-        reviews: 98,
-        neighborhood: 'Brooklyn Heights'
-      },
-      { 
-        id: 'str-ny-3',
-        name: 'Queens Condo',
-        location: 'Astoria, New York',
-        price: 140,
-        monthly_revenue: 3150,
-        occupancy_rate: 75,
-        rating: 4.3,
-        reviews: 76,
-        neighborhood: 'Astoria'
-      }
-    ],
-    'los angeles': [
-      { 
-        id: 'str-la-1',
-        name: 'Hollywood Apartment',
-        location: 'Hollywood, Los Angeles',
-        price: 200,
-        monthly_revenue: 4500,
-        occupancy_rate: 75,
-        rating: 4.6,
-        reviews: 156,
-        neighborhood: 'Hollywood'
-      },
-      { 
-        id: 'str-la-2',
-        name: 'Venice Beach House',
-        location: 'Venice, Los Angeles',
-        price: 250,
-        monthly_revenue: 5625,
-        occupancy_rate: 75,
-        rating: 4.8,
-        reviews: 203,
-        neighborhood: 'Venice'
-      },
-      { 
-        id: 'str-la-3',
-        name: 'Santa Monica Condo',
-        location: 'Santa Monica, Los Angeles',
-        price: 280,
-        monthly_revenue: 6300,
-        occupancy_rate: 75,
-        rating: 4.7,
-        reviews: 189,
-        neighborhood: 'Santa Monica'
-      }
-    ],
     'san diego': [
       { 
         id: 'str-sd-1',
@@ -379,220 +347,10 @@ function getMarketSpecificSTRData(city: string) {
         reviews: 203,
         neighborhood: 'La Jolla'
       }
-    ],
-    'santa monica': [
-      { 
-        id: 'str-sm-1',
-        name: 'Santa Monica Pier Apartment',
-        location: 'Santa Monica Pier, Santa Monica',
-        price: 320,
-        monthly_revenue: 7200,
-        occupancy_rate: 75,
-        rating: 4.7,
-        reviews: 189,
-        neighborhood: 'Santa Monica Pier'
-      },
-      { 
-        id: 'str-sm-2',
-        name: 'Venice Beach House',
-        location: 'Venice Beach, Santa Monica',
-        price: 285,
-        monthly_revenue: 6412,
-        occupancy_rate: 75,
-        rating: 4.5,
-        reviews: 156,
-        neighborhood: 'Venice Beach'
-      },
-      { 
-        id: 'str-sm-3',
-        name: 'Third Street Promenade Condo',
-        location: 'Third Street, Santa Monica',
-        price: 250,
-        monthly_revenue: 5625,
-        occupancy_rate: 75,
-        rating: 4.6,
-        reviews: 134,
-        neighborhood: 'Third Street'
-      }
-    ],
-    'austin': [
-      { 
-        id: 'str-au-1',
-        name: 'Downtown Austin Condo',
-        location: 'Downtown, Austin',
-        price: 180,
-        monthly_revenue: 4050,
-        occupancy_rate: 75,
-        rating: 4.5,
-        reviews: 89,
-        neighborhood: 'Downtown'
-      },
-      { 
-        id: 'str-au-2',
-        name: 'South Austin House',
-        location: 'South Austin, Austin',
-        price: 150,
-        monthly_revenue: 3375,
-        occupancy_rate: 75,
-        rating: 4.3,
-        reviews: 67,
-        neighborhood: 'South Austin'
-      },
-      { 
-        id: 'str-au-3',
-        name: 'East Austin Loft',
-        location: 'East Austin, Austin',
-        price: 165,
-        monthly_revenue: 3712,
-        occupancy_rate: 75,
-        rating: 4.4,
-        reviews: 54,
-        neighborhood: 'East Austin'
-      }
-    ],
-    'miami': [
-      { 
-        id: 'str-mi-1',
-        name: 'South Beach Apartment',
-        location: 'South Beach, Miami',
-        price: 250,
-        monthly_revenue: 5625,
-        occupancy_rate: 75,
-        rating: 4.7,
-        reviews: 156,
-        neighborhood: 'South Beach'
-      },
-      { 
-        id: 'str-mi-2',
-        name: 'Brickell Condo',
-        location: 'Brickell, Miami',
-        price: 200,
-        monthly_revenue: 4500,
-        occupancy_rate: 75,
-        rating: 4.5,
-        reviews: 123,
-        neighborhood: 'Brickell'
-      },
-      { 
-        id: 'str-mi-3',
-        name: 'Wynwood Loft',
-        location: 'Wynwood, Miami',
-        price: 175,
-        monthly_revenue: 3937,
-        occupancy_rate: 75,
-        rating: 4.4,
-        reviews: 92,
-        neighborhood: 'Wynwood'
-      }
-    ],
-    'denver': [
-      { 
-        id: 'str-de-1',
-        name: 'LoDo Apartment',
-        location: 'LoDo, Denver',
-        price: 140,
-        monthly_revenue: 3150,
-        occupancy_rate: 75,
-        rating: 4.3,
-        reviews: 78,
-        neighborhood: 'LoDo'
-      },
-      { 
-        id: 'str-de-2',
-        name: 'Capitol Hill House',
-        location: 'Capitol Hill, Denver',
-        price: 120,
-        monthly_revenue: 2700,
-        occupancy_rate: 75,
-        rating: 4.2,
-        reviews: 56,
-        neighborhood: 'Capitol Hill'
-      },
-      { 
-        id: 'str-de-3',
-        name: 'RiNo Loft',
-        location: 'RiNo, Denver',
-        price: 130,
-        monthly_revenue: 2925,
-        occupancy_rate: 75,
-        rating: 4.4,
-        reviews: 67,
-        neighborhood: 'RiNo'
-      }
-    ],
-    'chicago': [
-      { 
-        id: 'str-ch-1',
-        name: 'Loop Apartment',
-        location: 'Loop, Chicago',
-        price: 160,
-        monthly_revenue: 3600,
-        occupancy_rate: 75,
-        rating: 4.4,
-        reviews: 98,
-        neighborhood: 'Loop'
-      },
-      { 
-        id: 'str-ch-2',
-        name: 'Lincoln Park Condo',
-        location: 'Lincoln Park, Chicago',
-        price: 140,
-        monthly_revenue: 3150,
-        occupancy_rate: 75,
-        rating: 4.3,
-        reviews: 76,
-        neighborhood: 'Lincoln Park'
-      },
-      { 
-        id: 'str-ch-3',
-        name: 'Wicker Park Loft',
-        location: 'Wicker Park, Chicago',
-        price: 135,
-        monthly_revenue: 3037,
-        occupancy_rate: 75,
-        rating: 4.5,
-        reviews: 89,
-        neighborhood: 'Wicker Park'
-      }
-    ],
-    'nashville': [
-      { 
-        id: 'str-na-1',
-        name: 'Downtown Nashville Condo',
-        location: 'Downtown, Nashville',
-        price: 145,
-        monthly_revenue: 3262,
-        occupancy_rate: 75,
-        rating: 4.4,
-        reviews: 87,
-        neighborhood: 'Downtown'
-      },
-      { 
-        id: 'str-na-2',
-        name: 'Music Row Apartment',
-        location: 'Music Row, Nashville',
-        price: 130,
-        monthly_revenue: 2925,
-        occupancy_rate: 75,
-        rating: 4.3,
-        reviews: 65,
-        neighborhood: 'Music Row'
-      },
-      { 
-        id: 'str-na-3',
-        name: 'East Nashville House',
-        location: 'East Nashville, Nashville',
-        price: 125,
-        monthly_revenue: 2812,
-        occupancy_rate: 75,
-        rating: 4.2,
-        reviews: 54,
-        neighborhood: 'East Nashville'
-      }
     ]
   };
   
-  // Check if we have data for this city
+  // Check if we have data for San Diego
   for (const [key, data] of Object.entries(marketData)) {
     if (cityLower.includes(key) || key.includes(cityLower)) {
       return data;
