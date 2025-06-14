@@ -72,46 +72,6 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
     },
     {
       id: 5,
-      timestamp: '2025-05-28 15:30:20',
-      activity: 'Login',
-      details: 'Logged in via mobile app',
-      type: 'login',
-      icon: LogIn,
-      color: 'purple',
-      duration: '-'
-    },
-    {
-      id: 6,
-      timestamp: '2025-05-28 15:32:45',
-      activity: 'Market Search',
-      details: 'Searched downtown San Diego properties',
-      type: 'search',
-      icon: Search,
-      color: 'blue',
-      duration: '5m 18s'
-    },
-    {
-      id: 7,
-      timestamp: '2025-05-25 11:20:15',
-      activity: 'ROI Calculation',
-      details: 'Calculated returns for Hillcrest apartment',
-      type: 'calculation',
-      icon: Calculator,
-      color: 'green',
-      duration: '7m 12s'
-    },
-    {
-      id: 8,
-      timestamp: '2025-05-22 14:45:30',
-      activity: 'Report Download',
-      details: 'Downloaded neighborhood analysis (PDF)',
-      type: 'download',
-      icon: Download,
-      color: 'orange',
-      duration: '-'
-    },
-    {
-      id: 9,
       timestamp: '2025-04-20 11:15:33',
       activity: 'Calculation',
       details: 'Cash flow analysis for Mission Beach condo',
@@ -121,7 +81,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '6m 22s'
     },
     {
-      id: 10,
+      id: 6,
       timestamp: '2025-04-18 10:45:18',
       activity: 'Market Search',
       details: 'Searched Gaslamp Quarter market data',
@@ -131,7 +91,7 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '3m 45s'
     },
     {
-      id: 11,
+      id: 7,
       timestamp: '2025-04-16 16:30:22',
       activity: 'Market Search',
       details: 'Searched North Park rental listings',
@@ -140,9 +100,38 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       color: 'blue',
       duration: '8m 35s'
     },
-    // First login on April 13, 2025 - subscription date
     {
-      id: 12,
+      id: 8,
+      timestamp: '2025-04-15 14:45:30',
+      activity: 'Report Download',
+      details: 'Downloaded neighborhood analysis (PDF)',
+      type: 'download',
+      icon: Download,
+      color: 'orange',
+      duration: '-'
+    },
+    {
+      id: 9,
+      timestamp: '2025-04-14 11:20:15',
+      activity: 'ROI Calculation',
+      details: 'Calculated returns for Hillcrest apartment',
+      type: 'calculation',
+      icon: Calculator,
+      color: 'green',
+      duration: '7m 12s'
+    },
+    {
+      id: 10,
+      timestamp: '2025-04-14 10:32:45',
+      activity: 'Market Search',
+      details: 'Searched downtown San Diego properties',
+      type: 'search',
+      icon: Search,
+      color: 'blue',
+      duration: '5m 18s'
+    },
+    {
+      id: 11,
       timestamp: '2025-04-13 05:50:22',
       activity: 'Login',
       details: 'First login after subscription',
