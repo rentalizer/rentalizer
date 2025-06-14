@@ -29,29 +29,9 @@ interface ClientActivityLogProps {
 const getClientActivities = (clientId: string, timeRange: string, client?: Client) => {
   // Real activity data starting from April 13, 2025 (signup date) - totals: 2 logins, 4 searches, 3 calculations, 2 downloads
   const activities = [
-    // Recent June 2025 activity
+    // Recent June 2025 activity (yesterday)
     {
       id: 1,
-      timestamp: '2025-06-14 09:32:15',
-      activity: 'Market Search',
-      details: 'Searched San Diego rental market',
-      type: 'search',
-      icon: Search,
-      color: 'blue',
-      duration: '2m 15s'
-    },
-    {
-      id: 2,
-      timestamp: '2025-06-14 09:30:12',
-      activity: 'ROI Calculation',
-      details: 'Calculated ROI for 123 Main St, San Diego',
-      type: 'calculation',
-      icon: Calculator,
-      color: 'green',
-      duration: '4m 32s'
-    },
-    {
-      id: 3,
       timestamp: '2025-06-13 16:22:30',
       activity: 'Report Download',
       details: 'Downloaded market analysis report (PDF)',
@@ -61,14 +41,34 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
       duration: '-'
     },
     {
-      id: 4,
-      timestamp: '2025-06-12 14:32:10',
+      id: 2,
+      timestamp: '2025-06-13 14:32:10',
       activity: 'Login',
       details: 'Logged in via web browser',
       type: 'login',
       icon: LogIn,
       color: 'purple',
       duration: '-'
+    },
+    {
+      id: 3,
+      timestamp: '2025-06-13 09:32:15',
+      activity: 'Market Search',
+      details: 'Searched San Diego rental market',
+      type: 'search',
+      icon: Search,
+      color: 'blue',
+      duration: '2m 15s'
+    },
+    {
+      id: 4,
+      timestamp: '2025-06-13 09:30:12',
+      activity: 'ROI Calculation',
+      details: 'Calculated ROI for 123 Main St, San Diego',
+      type: 'calculation',
+      icon: Calculator,
+      color: 'green',
+      duration: '4m 32s'
     },
     {
       id: 5,
