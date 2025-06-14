@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -214,7 +215,7 @@ export const ClientPaymentHistory = ({ clientId, timeRange, client }: ClientPaym
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-gray-500" />
                     <span className="text-sm">
-                      6/13/2025 6:48:00 AM
+                      {new Date(payment.timestamp).toLocaleDateString()} {new Date(payment.timestamp).toLocaleTimeString()}
                     </span>
                   </div>
                 </TableCell>
