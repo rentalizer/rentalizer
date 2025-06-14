@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, DollarSign, TrendingUp, Star, MapPin } from 'lucide-react';
+import { Search, DollarSign, TrendingUp, Star, MapPin, Code, Activity } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { fetchAirbnbEarningsData, processAirbnbEarningsData } from '@/services/rapidApiAirbnbService';
 
@@ -13,6 +13,7 @@ export const STREarningsAnalysis = () => {
   const [city, setCity] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [earningsData, setEarningsData] = useState<any>(null);
+  const [apiTestResult, setApiTestResult] = useState<any>(null);
 
   const handleAnalyze = async () => {
     if (!city.trim()) {
@@ -27,17 +28,26 @@ export const STREarningsAnalysis = () => {
     setIsLoading(true);
     
     try {
-      console.log(`🔍 Analyzing STR earnings for ${city}`);
+      console.log(`🔍 Testing Web Scraping API for ${city}`);
       
       const apiData = await fetchAirbnbEarningsData(city);
-      const processedData = processAirbnbEarningsData(apiData);
       
-      setEarningsData(processedData);
-      
-      toast({
-        title: "Analysis Complete",
-        description: `Found ${processedData.totalProperties} STR properties in ${city}`,
-      });
+      // Check if this is a web scraping API response
+      if (apiData.source === 'web-scraping-api') {
+        setApiTestResult(apiData);
+        toast({
+          title: "Web Scraping API Test",
+          description: `Web Scraping API response received for ${city}. Check results below.`,
+        });
+      } else {
+        const processedData = processAirbnbEarningsData(apiData);
+        setEarningsData(processedData);
+        
+        toast({
+          title: "Analysis Complete",
+          description: `Found ${processedData.totalProperties} STR properties in ${city}`,
+        });
+      }
       
     } catch (error) {
       console.error('STR earnings analysis error:', error);
@@ -56,7 +66,7 @@ export const STREarningsAnalysis = () => {
       {/* Header */}
       <div>
         <h2 className="text-xl font-bold text-gray-900">STR Earnings Analysis</h2>
-        <p className="text-gray-600">Analyze short-term rental earnings potential in any city</p>
+        <p className="text-gray-600">Test the new Web Scraping API for STR earnings data</p>
       </div>
 
       {/* Search Input */}
@@ -65,7 +75,7 @@ export const STREarningsAnalysis = () => {
           <div className="flex gap-4">
             <div className="flex-1">
               <Input
-                placeholder="Enter city name (e.g., San Francisco, Miami, Austin)"
+                placeholder="Enter city name to test Web Scraping API"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleAnalyze()}
@@ -73,13 +83,43 @@ export const STREarningsAnalysis = () => {
             </div>
             <Button onClick={handleAnalyze} disabled={isLoading}>
               <Search className="h-4 w-4 mr-2" />
-              {isLoading ? 'Analyzing...' : 'Analyze'}
+              {isLoading ? 'Testing API...' : 'Test API'}
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Results */}
+      {/* Web Scraping API Test Results */}
+      {apiTestResult && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Code className="h-5 w-5 text-blue-600" />
+              Web Scraping API Test Results
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Badge variant="outline" className="border-green-500 text-green-600">
+                  <Activity className="h-3 w-3 mr-1" />
+                  API Response Received
+                </Badge>
+                <span className="text-sm text-gray-600">City: {apiTestResult.data.city}</span>
+              </div>
+              
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium mb-2">Raw API Response:</h4>
+                <pre className="text-xs bg-white p-3 rounded border overflow-auto max-h-96">
+                  {JSON.stringify(apiTestResult.data.apiResponse, null, 2)}
+                </pre>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Regular Results */}
       {earningsData && (
         <>
           {/* Summary Stats */}

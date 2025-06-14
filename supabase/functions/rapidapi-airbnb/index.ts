@@ -1,3 +1,4 @@
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -14,10 +15,51 @@ serve(async (req) => {
   try {
     const { city, propertyType, action } = await req.json();
     
-    console.log(`🚀 Processing Airbnb Listings request for ${city}`);
+    console.log(`🚀 Processing STR Earnings request for ${city}`);
     
     const rapidApiKey = '563ec2eceemshee4eb6d8e03f721p10e15cjsn56661816f3c3';
     
+    // Test the new Web Scraping API first
+    try {
+      console.log(`🕷️ Testing Web Scraping API for ${city}`);
+      
+      const webScrapingResponse = await fetch('https://the-web-scraping-api.p.rapidapi.com/browser', {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-key': rapidApiKey,
+          'x-rapidapi-host': 'the-web-scraping-api.p.rapidapi.com',
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
+        }
+      });
+
+      console.log(`🕷️ Web Scraping API Response Status: ${webScrapingResponse.status}`);
+      
+      if (webScrapingResponse.ok) {
+        const webScrapingData = await webScrapingResponse.json();
+        console.log(`🕷️ Web Scraping API Response:`, webScrapingData);
+        
+        // Return the raw API response for testing
+        return new Response(JSON.stringify({
+          success: true,
+          source: 'web-scraping-api',
+          data: {
+            city: city,
+            apiResponse: webScrapingData,
+            properties: [] // Will be populated once we know the response structure
+          }
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } else {
+        const errorText = await webScrapingResponse.text();
+        console.error(`❌ Web Scraping API failed with status: ${webScrapingResponse.status}, body: ${errorText}`);
+      }
+
+    } catch (webScrapingError) {
+      console.error('❌ Web Scraping API failed:', webScrapingError);
+    }
+
     // Get coordinates for the city
     const coordinates = getCityCoordinates(city);
     if (!coordinates) {
