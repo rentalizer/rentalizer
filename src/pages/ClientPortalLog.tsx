@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -69,7 +70,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '2 hours ago',
-    date: '2024-12-16',
+    date: '2024-09-28',
     details: 'Module 4: Manage Properties • Final assessment completed',
     serverId: 'srv-us-east-1-prod-001'
   },
@@ -79,7 +80,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '5 hours ago',
-    date: '2024-12-15',
+    date: '2024-09-27',
     details: 'Module 4: Manage Properties • 98% completion score',
     serverId: 'srv-us-west-2-prod-003'
   },
@@ -89,7 +90,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '1 day ago',
-    date: '2024-12-14',
+    date: '2024-09-26',
     details: 'Module 4: Manage Properties • Practical exercise submitted',
     serverId: 'srv-us-central-1-prod-002'
   },
@@ -99,7 +100,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '2 days ago',
-    date: '2024-12-13',
+    date: '2024-09-25',
     details: 'Module 4: Manage Properties • Case study analysis',
     serverId: 'srv-us-east-1-prod-001'
   },
@@ -109,7 +110,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '3 days ago',
-    date: '2024-12-12',
+    date: '2024-09-24',
     details: 'Module 4: Manage Properties • Strategy workshop attended',
     serverId: 'srv-us-west-2-prod-003'
   },
@@ -119,7 +120,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '4 days ago',
-    date: '2024-12-11',
+    date: '2024-09-23',
     details: 'Module 4: Manage Properties • Optimization checklist completed',
     serverId: 'srv-eu-west-1-prod-001'
   },
@@ -129,7 +130,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '5 days ago',
-    date: '2024-12-10',
+    date: '2024-09-22',
     details: 'Module 4: Manage Properties • Photography portfolio submitted',
     serverId: 'srv-us-central-1-prod-002'
   },
@@ -139,7 +140,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '1 week ago',
-    date: '2024-12-09',
+    date: '2024-09-21',
     details: 'Module introduction and overview completed',
     serverId: 'srv-us-east-1-prod-001'
   },
@@ -149,7 +150,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '1 week ago',
-    date: '2024-12-08',
+    date: '2024-09-20',
     details: 'Module 3: Acquire Properties • Business expansion plan created',
     serverId: 'srv-us-west-2-prod-003'
   },
@@ -159,7 +160,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '1 week ago',
-    date: '2024-12-07',
+    date: '2024-09-19',
     details: 'Module 3: Acquire Properties • Negotiation strategies mastered',
     serverId: 'srv-us-central-1-prod-002'
   },
@@ -169,7 +170,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '1 week ago',
-    date: '2024-12-06',
+    date: '2024-09-18',
     details: 'Module 3: Acquire Properties • Application process optimized',
     serverId: 'srv-us-east-1-prod-001'
   },
@@ -179,7 +180,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '2 weeks ago',
-    date: '2024-12-01',
+    date: '2024-09-13',
     details: 'Module 3: Acquire Properties • Advanced acquisition strategies',
     serverId: 'srv-us-west-2-prod-003'
   },
@@ -189,7 +190,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '2 weeks ago',
-    date: '2024-11-28',
+    date: '2024-09-10',
     details: 'Module 3: Acquire Properties • Basic acquisition fundamentals',
     serverId: 'srv-eu-west-1-prod-001'
   },
@@ -199,7 +200,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '2 weeks ago',
-    date: '2024-11-25',
+    date: '2024-09-07',
     details: 'Module 3: Acquire Properties • Overview and strategy session',
     serverId: 'srv-us-central-1-prod-002'
   },
@@ -209,7 +210,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '3 weeks ago',
-    date: '2024-11-20',
+    date: '2024-09-02',
     details: 'Module introduction completed with 95% score',
     serverId: 'srv-us-east-1-prod-001'
   },
@@ -219,7 +220,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '3 weeks ago',
-    date: '2024-11-15',
+    date: '2024-08-28',
     details: 'Module 2: Select Markets • Competitive landscape analysis',
     serverId: 'srv-us-west-2-prod-003'
   },
@@ -229,7 +230,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '4 weeks ago',
-    date: '2024-11-10',
+    date: '2024-08-23',
     details: 'Module 2: Select Markets • Legal compliance workshop',
     serverId: 'srv-us-central-1-prod-002'
   },
@@ -239,7 +240,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '1 month ago',
-    date: '2024-11-05',
+    date: '2024-08-18',
     details: 'Module 2: Select Markets • Financial modeling exercise',
     serverId: 'srv-us-east-1-prod-001'
   },
@@ -249,7 +250,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '1 month ago',
-    date: '2024-10-30',
+    date: '2024-08-13',
     details: 'Module 2: Select Markets • Initial market analysis',
     serverId: 'srv-us-west-2-prod-003'
   },
@@ -259,7 +260,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '5 weeks ago',
-    date: '2024-10-25',
+    date: '2024-08-07',
     details: 'Module overview and market selection fundamentals',
     serverId: 'srv-eu-west-1-prod-001'
   },
@@ -269,7 +270,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '6 weeks ago',
-    date: '2024-10-15',
+    date: '2024-08-05',
     details: 'Module 1: Business Formation • Website launched successfully',
     serverId: 'srv-us-central-1-prod-002'
   },
@@ -279,7 +280,7 @@ const getActivities = (student: any) => [
     type: 'module',
     status: 'completed',
     timestamp: '7 weeks ago',
-    date: '2024-10-05',
+    date: '2024-08-03',
     details: 'Module 1: Business Formation • Legal entity established',
     serverId: 'srv-us-east-1-prod-001'
   },
@@ -288,8 +289,8 @@ const getActivities = (student: any) => [
     title: 'Started Module 1: Business Formation',
     type: 'module',
     status: 'completed',
-    timestamp: '2 months ago',
-    date: '2024-09-20',
+    timestamp: '8 weeks ago',
+    date: '2024-08-02',
     details: 'Course introduction and business fundamentals',
     serverId: 'srv-us-west-2-prod-003'
   },
@@ -298,7 +299,7 @@ const getActivities = (student: any) => [
     title: 'Enrolled in Real Estate Investment Course',
     type: 'module',
     status: 'completed',
-    timestamp: '4 months ago',
+    timestamp: '2 months ago',
     date: '2024-08-01',
     details: 'Welcome to the program! • Course enrollment confirmed',
     serverId: 'srv-us-east-1-prod-001'
@@ -400,7 +401,6 @@ const ClientPortalLog = () => {
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-slate-300">Viewing data for:</span>
                     <span className="font-semibold text-slate-100">{selectedStudent.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
