@@ -329,7 +329,81 @@ const getClientActivities = (clientId: string, timeRange: string, client?: Clien
     }
   ];
 
-  const activities = clientId === '1' ? client1Activities : client2Activities;
+  // Client 3 (Lindsay Sherman) - High-value client activities
+  const client3Activities = [
+    // Recent activity in 2025
+    {
+      id: 1,
+      timestamp: '2025-06-10 14:30:20',
+      activity: 'Accelerator Pro Access',
+      details: 'Accessed advanced market analysis tools',
+      type: 'calculation',
+      icon: Calculator,
+      color: 'green',
+      duration: '45m 30s',
+      link: '/accelerator/advanced-analysis-20250610'
+    },
+    {
+      id: 2,
+      timestamp: '2025-06-05 11:15:45',
+      activity: 'Premium Report Download',
+      details: 'Downloaded comprehensive market report (PDF)',
+      type: 'download',
+      icon: Download,
+      color: 'orange',
+      duration: '-',
+      link: '/reports/premium-market-20250605'
+    },
+    {
+      id: 3,
+      timestamp: '2025-05-28 16:20:15',
+      activity: 'Portfolio Analysis',
+      details: 'Analyzed 12-property investment portfolio',
+      type: 'calculation',
+      icon: Calculator,
+      color: 'green',
+      duration: '1h 15m',
+      link: '/calculations/portfolio-analysis-20250528'
+    },
+    {
+      id: 4,
+      timestamp: '2025-05-20 09:45:30',
+      activity: 'Login',
+      details: 'Logged in via web browser',
+      type: 'login',
+      icon: LogIn,
+      color: 'purple',
+      duration: '-',
+      link: '/auth/sessions/20250520094530'
+    },
+    // Activity from when she first joined (August 2024)
+    {
+      id: 5,
+      timestamp: '2024-08-15 10:30:00',
+      activity: 'Accelerator Pro Setup',
+      details: 'Completed onboarding and initial setup',
+      type: 'login',
+      icon: LogIn,
+      color: 'purple',
+      duration: '-',
+      link: '/auth/sessions/20240815103000'
+    },
+    {
+      id: 6,
+      timestamp: '2024-08-01 08:44:00',
+      activity: 'Purchase Completed',
+      details: 'Purchased Accelerator Pro package',
+      type: 'download',
+      icon: Download,
+      color: 'orange',
+      duration: '-',
+      link: '/purchase/accelerator-pro-20240801'
+    }
+  ];
+
+  const activities = clientId === '1' ? client1Activities : 
+                    clientId === '2' ? client2Activities : 
+                    client3Activities;
 
   // Filter based on time range
   const now = new Date('2025-06-14');

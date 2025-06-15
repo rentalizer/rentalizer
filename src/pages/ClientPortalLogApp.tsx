@@ -35,6 +35,16 @@ const clients = [
     joinedDate: '2025-02-14',
     daysSinceSignup: 120, // Feb 14 to June 14, 2025
     status: 'Active'
+  },
+  { 
+    id: '3', 
+    name: 'Lindsay Sherman', 
+    email: 'dutchess0085@gmail.com',
+    plan: 'Accelerator Pro',
+    monthlyRevenue: 2000,
+    joinedDate: '2024-08-01',
+    daysSinceSignup: 318, // Aug 1, 2024 to June 14, 2025
+    status: 'Active'
   }
 ];
 

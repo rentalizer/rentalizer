@@ -117,7 +117,25 @@ const getPaymentHistory = (clientId: string, timeRange: string, client?: Client)
     }
   ];
 
-  const payments = clientId === '1' ? client1Payments : client2Payments;
+  // Client 3 (Lindsay Sherman) - Using real data from screenshots
+  const client3Payments = [
+    {
+      id: 'ps_9h_oxxjFgS88tTZhRghYNfrl',
+      timestamp: '2024-08-01 08:44:00',
+      type: 'one_time_payment',
+      amount: 2000.00,
+      currency: 'USD',
+      status: 'succeeded',
+      description: 'Accelerator Pro (Variable)',
+      payment_method: 'Klarna',
+      stripe_fee: 58.00,
+      net_amount: 1942.00
+    }
+  ];
+
+  const payments = clientId === '1' ? client1Payments : 
+                  clientId === '2' ? client2Payments : 
+                  client3Payments;
 
   // Filter based on time range
   const now = new Date('2025-06-14');
@@ -186,13 +204,13 @@ const getTypeIcon = (type: string) => {
 export const ClientPaymentHistory = ({ clientId, timeRange, client }: ClientPaymentHistoryProps) => {
   const payments = getPaymentHistory(clientId, timeRange, client);
   
-  // Updated calculations to match single payment
+  // Updated calculations to handle different payment types
   const totalRevenue = payments
-    .filter(p => p.type === 'subscription_payment' && p.status === 'succeeded')
+    .filter(p => (p.type === 'subscription_payment' || p.type === 'one_time_payment') && p.status === 'succeeded')
     .reduce((sum, p) => sum + p.net_amount, 0);
   
-  const totalPayments = payments.filter(p => p.type === 'subscription_payment').length;
-  const successfulPayments = payments.filter(p => p.type === 'subscription_payment' && p.status === 'succeeded').length;
+  const totalPayments = payments.filter(p => p.type === 'subscription_payment' || p.type === 'one_time_payment').length;
+  const successfulPayments = payments.filter(p => (p.type === 'subscription_payment' || p.type === 'one_time_payment') && p.status === 'succeeded').length;
 
   const subscriptionSince = client?.joinedDate ? new Date(client.joinedDate).toLocaleDateString() : 'N/A';
 
@@ -260,7 +278,7 @@ export const ClientPaymentHistory = ({ clientId, timeRange, client }: ClientPaym
               <TableHead className="text-gray-300">Amount</TableHead>
               <TableHead className="text-gray-300">Payment Method</TableHead>
               <TableHead className="text-gray-300">Status</TableHead>
-              <TableHead className="text-gray-300">Stripe ID</TableHead>
+              <TableHead className="text-gray-300">Transaction ID</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -278,7 +296,7 @@ export const ClientPaymentHistory = ({ clientId, timeRange, client }: ClientPaym
                   <div className="flex items-center gap-2">
                     {getTypeIcon(payment.type)}
                     <span className="font-medium">
-                      Subscription Payment
+                      {payment.type === 'one_time_payment' ? 'One-Time Payment' : 'Subscription Payment'}
                     </span>
                   </div>
                 </TableCell>
