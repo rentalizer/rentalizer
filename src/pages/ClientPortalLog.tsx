@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -308,10 +307,10 @@ const getActivities = (student: any) => [
 
 const typeColors = {
   module: 'blue',
-  feedback: 'cyan',
-  assignment: 'purple',
-  live: 'orange',
-  achievement: 'yellow'
+  feedback: 'purple',
+  assignment: 'indigo',
+  live: 'blue',
+  achievement: 'purple'
 };
 
 const statusIcons = {
@@ -333,16 +332,16 @@ const ClientPortalLog = () => {
     : activities.filter(activity => activity.type === filter);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-      <div className="container max-w-6xl mx-auto px-6 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="container max-w-5xl mx-auto px-6 py-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white">
+          <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-800">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-slate-800">
               Student Portal Activity Log
             </h1>
           </div>
@@ -350,31 +349,31 @@ const ClientPortalLog = () => {
 
         {/* Student Selector */}
         <div className="mb-6">
-          <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm">
+          <Card className="bg-white/80 border-slate-200 backdrop-blur-sm shadow-sm">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <User className="h-5 w-5 text-slate-300" />
+                <User className="h-5 w-5 text-slate-500" />
                 <div className="flex-1">
-                  <label className="text-sm font-medium text-slate-200 mb-2 block">
+                  <label className="text-sm font-medium text-slate-700 mb-2 block">
                     Select Student
                   </label>
                   <Select value={selectedStudent.id} onValueChange={(value) => {
                     const student = students.find(s => s.id === value);
                     if (student) setSelectedStudent(student);
                   }}>
-                    <SelectTrigger className="w-full max-w-md bg-slate-700/50 border-slate-600/50 text-white">
+                    <SelectTrigger className="w-full max-w-md bg-white border-slate-300 text-slate-800">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700">
+                    <SelectContent className="bg-white border-slate-200">
                       {students.map((student) => (
-                        <SelectItem key={student.id} value={student.id} className="text-slate-100 focus:bg-slate-700">
+                        <SelectItem key={student.id} value={student.id} className="text-slate-800 focus:bg-blue-50">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white text-sm font-medium">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm font-medium">
                               {student.avatar}
                             </div>
                             <div>
                               <div className="font-medium">{student.name}</div>
-                              <div className="text-xs text-slate-400">{student.email} • {student.level}</div>
+                              <div className="text-xs text-slate-500">{student.email} • {student.level}</div>
                             </div>
                           </div>
                         </SelectItem>
@@ -383,11 +382,11 @@ const ClientPortalLog = () => {
                   </Select>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-slate-200">Current Progress</div>
-                  <div className="text-2xl font-bold text-white">
+                  <div className="text-sm text-slate-600">Current Progress</div>
+                  <div className="text-2xl font-bold text-slate-800">
                     {selectedStudent.progress}%
                   </div>
-                  <div className="text-xs text-slate-400">{selectedStudent.level} Level</div>
+                  <div className="text-xs text-slate-500">{selectedStudent.level} Level</div>
                 </div>
               </div>
             </CardContent>
@@ -396,29 +395,29 @@ const ClientPortalLog = () => {
 
         {/* Student Info Bar */}
         <div className="mb-6">
-          <Card className="bg-slate-800/30 border-slate-700/30 backdrop-blur-sm">
+          <Card className="bg-blue-50/50 border-blue-200/50 backdrop-blur-sm">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <span className="text-slate-300">Viewing data for:</span>
-                  <span className="font-semibold text-white">{selectedStudent.name}</span>
-                  <span className="text-slate-400">({selectedStudent.email})</span>
-                  <Badge variant="outline" className="border-green-500/30 text-green-400 bg-green-500/10">
+                  <span className="text-slate-600">Viewing data for:</span>
+                  <span className="font-semibold text-slate-800">{selectedStudent.name}</span>
+                  <span className="text-slate-500">({selectedStudent.email})</span>
+                  <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-50">
                     Active
                   </Badge>
                 </div>
                 <div className="flex items-center gap-6 text-sm">
                   <div>
-                    <span className="text-slate-400">Started: </span>
-                    <span className="text-white">{selectedStudent.joinedDate}</span>
+                    <span className="text-slate-500">Started: </span>
+                    <span className="text-slate-800">{selectedStudent.joinedDate}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400">Progress: </span>
-                    <span className="text-white">{selectedStudent.progress}%</span>
+                    <span className="text-slate-500">Progress: </span>
+                    <span className="text-slate-800">{selectedStudent.progress}%</span>
                   </div>
                   <div>
-                    <span className="text-slate-400">Level: </span>
-                    <span className="text-white">{selectedStudent.level}</span>
+                    <span className="text-slate-500">Level: </span>
+                    <span className="text-slate-800">{selectedStudent.level}</span>
                   </div>
                 </div>
               </div>
@@ -430,7 +429,7 @@ const ClientPortalLog = () => {
         <div className="space-y-6">
           {/* Filter Buttons */}
           <div className="flex items-center gap-2 mb-6">
-            <Filter className="h-4 w-4 text-slate-300" />
+            <Filter className="h-4 w-4 text-slate-500" />
             <div className="flex gap-1">
               {['all', 'module', 'assignment', 'feedback', 'achievement'].map((type) => (
                 <Button
@@ -440,8 +439,8 @@ const ClientPortalLog = () => {
                   onClick={() => setFilter(type)}
                   className={`capitalize text-xs ${
                     filter === type 
-                      ? 'bg-blue-600/80 text-white hover:bg-blue-600' 
-                      : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+                      ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                      : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
                   }`}
                 >
                   {type === 'all' ? 'All Activity' : type}
@@ -459,58 +458,52 @@ const ClientPortalLog = () => {
               return (
                 <Card 
                   key={activity.id} 
-                  className="bg-slate-800/30 border-slate-700/30 hover:border-slate-600/50 transition-all duration-200 hover:bg-slate-700/20 backdrop-blur-sm"
+                  className="bg-white/70 border-slate-200 hover:border-slate-300 transition-all duration-200 hover:bg-white/90 backdrop-blur-sm shadow-sm"
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <div className={`mt-1 w-2 h-2 rounded-full ${
-                        typeColor === 'blue' ? 'bg-blue-400' :
-                        typeColor === 'cyan' ? 'bg-cyan-400' :
-                        typeColor === 'purple' ? 'bg-indigo-400' :
-                        typeColor === 'orange' ? 'bg-orange-400' :
-                        typeColor === 'yellow' ? 'bg-yellow-400' :
-                        'bg-blue-400'
+                        typeColor === 'blue' ? 'bg-blue-500' :
+                        typeColor === 'purple' ? 'bg-purple-500' :
+                        typeColor === 'indigo' ? 'bg-indigo-500' :
+                        'bg-blue-500'
                       } flex-shrink-0`}></div>
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-white mb-1 leading-tight">
+                            <h3 className="font-medium text-slate-800 mb-1 leading-tight">
                               {activity.title}
                             </h3>
-                            <p className="text-sm text-slate-300 mb-2">
+                            <p className="text-sm text-slate-600 mb-2">
                               {activity.details}
                             </p>
                             <div className="flex items-center gap-3">
                               <Badge 
                                 variant="outline" 
                                 className={`text-xs ${
-                                  typeColor === 'blue' ? 'border-blue-500/30 text-blue-400 bg-blue-500/10' :
-                                  typeColor === 'cyan' ? 'border-cyan-500/30 text-cyan-400 bg-cyan-500/10' :
-                                  typeColor === 'purple' ? 'border-indigo-500/30 text-indigo-400 bg-indigo-500/10' :
-                                  typeColor === 'orange' ? 'border-orange-500/30 text-orange-400 bg-orange-500/10' :
-                                  typeColor === 'yellow' ? 'border-yellow-500/30 text-yellow-400 bg-yellow-500/10' :
-                                  'border-blue-500/30 text-blue-400 bg-blue-500/10'
+                                  typeColor === 'blue' ? 'border-blue-300 text-blue-700 bg-blue-50' :
+                                  typeColor === 'purple' ? 'border-purple-300 text-purple-700 bg-purple-50' :
+                                  typeColor === 'indigo' ? 'border-indigo-300 text-indigo-700 bg-indigo-50' :
+                                  'border-blue-300 text-blue-700 bg-blue-50'
                                 }`}
                               >
                                 {activity.type}
                               </Badge>
-                              <span className="text-xs text-slate-400">{activity.timestamp}</span>
-                              <span className="text-xs text-slate-500">•</span>
-                              <span className="text-xs text-slate-400">{activity.date}</span>
-                              <span className="text-xs text-slate-500">•</span>
-                              <span className="text-xs text-slate-500 font-mono">{activity.serverId}</span>
+                              <span className="text-xs text-slate-500">{activity.timestamp}</span>
+                              <span className="text-xs text-slate-400">•</span>
+                              <span className="text-xs text-slate-500">{activity.date}</span>
+                              <span className="text-xs text-slate-400">•</span>
+                              <span className="text-xs text-slate-400 font-mono">{activity.serverId}</span>
                             </div>
                           </div>
                           
                           <div className="flex-shrink-0">
                             <StatusIcon className={`h-5 w-5 ${
-                              typeColor === 'blue' ? 'text-blue-400' :
-                              typeColor === 'cyan' ? 'text-cyan-400' :
-                              typeColor === 'purple' ? 'text-indigo-400' :
-                              typeColor === 'orange' ? 'text-orange-400' :
-                              typeColor === 'yellow' ? 'text-yellow-400' :
-                              'text-blue-400'
+                              typeColor === 'blue' ? 'text-blue-500' :
+                              typeColor === 'purple' ? 'text-purple-500' :
+                              typeColor === 'indigo' ? 'text-indigo-500' :
+                              'text-blue-500'
                             }`} />
                           </div>
                         </div>
@@ -526,7 +519,7 @@ const ClientPortalLog = () => {
           <div className="text-center pt-6">
             <Button 
               variant="ghost" 
-              className="text-slate-300 hover:text-white hover:bg-slate-700/50"
+              className="text-slate-600 hover:text-slate-800 hover:bg-slate-100"
             >
               Load more activity
             </Button>
