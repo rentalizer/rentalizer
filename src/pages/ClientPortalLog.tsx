@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, User } from 'lucide-react';
+import { TimelineView } from '@/components/client-portal/TimelineView';
 import { DashboardView } from '@/components/client-portal/DashboardView';
 import { ProgressView } from '@/components/client-portal/ProgressView';
 import { MinimalView } from '@/components/client-portal/MinimalView';
@@ -128,8 +130,11 @@ const ClientPortalLog = () => {
         </div>
 
         {/* Design Variations */}
-        <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-slate-800/50 border border-cyan-500/20">
+        <Tabs defaultValue="timeline" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 bg-slate-800/50 border border-cyan-500/20">
+            <TabsTrigger value="timeline" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300">
+              Timeline View
+            </TabsTrigger>
             <TabsTrigger value="dashboard" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300">
               Dashboard Style
             </TabsTrigger>
@@ -141,10 +146,22 @@ const ClientPortalLog = () => {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="timeline">
+            <Card className="bg-slate-800/50 border-cyan-500/30">
+              <CardHeader>
+                <CardTitle className="text-cyan-300">Design 1: Timeline-Based Activity Log</CardTitle>
+                <p className="text-gray-400">Inspired by platforms like Kajabi and Teachable - chronological activity feed for {selectedStudent.name}</p>
+              </CardHeader>
+              <CardContent>
+                <TimelineView student={selectedStudent} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="dashboard">
             <Card className="bg-slate-800/50 border-cyan-500/30">
               <CardHeader>
-                <CardTitle className="text-cyan-300">Design 1: Dashboard-Style Overview</CardTitle>
+                <CardTitle className="text-cyan-300">Design 2: Dashboard-Style Overview</CardTitle>
                 <p className="text-gray-400">Inspired by MasterClass and Coursera - metrics-driven approach for {selectedStudent.name}</p>
               </CardHeader>
               <CardContent>
@@ -156,7 +173,7 @@ const ClientPortalLog = () => {
           <TabsContent value="progress">
             <Card className="bg-slate-800/50 border-cyan-500/30">
               <CardHeader>
-                <CardTitle className="text-cyan-300">Design 2: Progress-Focused Journey</CardTitle>
+                <CardTitle className="text-cyan-300">Design 3: Progress-Focused Journey</CardTitle>
                 <p className="text-gray-400">Inspired by Thinkific and LearnDash - learning path visualization for {selectedStudent.name}</p>
               </CardHeader>
               <CardContent>
@@ -168,7 +185,7 @@ const ClientPortalLog = () => {
           <TabsContent value="minimal">
             <Card className="bg-slate-800/50 border-cyan-500/30">
               <CardHeader>
-                <CardTitle className="text-cyan-300">Design 3: Minimal Clean Interface</CardTitle>
+                <CardTitle className="text-cyan-300">Design 4: Minimal Clean Interface</CardTitle>
                 <p className="text-gray-400">Inspired by Notion and Linear - clean, distraction-free design for {selectedStudent.name}</p>
               </CardHeader>
               <CardContent>
