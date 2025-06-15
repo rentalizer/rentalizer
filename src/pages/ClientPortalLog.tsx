@@ -71,7 +71,8 @@ const getActivities = (student: any) => [
     status: 'completed',
     timestamp: '2 hours ago',
     date: '2024-12-13',
-    details: 'Market Analysis Module • 95% quiz score'
+    details: 'Market Analysis Module • 95% quiz score',
+    serverId: 'srv-us-east-1-prod-001'
   },
   {
     id: 2,
@@ -80,7 +81,8 @@ const getActivities = (student: any) => [
     status: 'new',
     timestamp: '4 hours ago',
     date: '2024-12-13',
-    details: 'Mentor Richie Matthews • View feedback'
+    details: 'Mentor Richie Matthews • View feedback',
+    serverId: 'srv-us-west-2-prod-003'
   },
   {
     id: 3,
@@ -89,7 +91,8 @@ const getActivities = (student: any) => [
     status: 'in-progress',
     timestamp: '1 day ago',
     date: '2024-12-12',
-    details: 'Property Acquisition Module • 45 minutes remaining'
+    details: 'Property Acquisition Module • 45 minutes remaining',
+    serverId: 'srv-us-central-1-prod-002'
   },
   {
     id: 4,
@@ -98,7 +101,8 @@ const getActivities = (student: any) => [
     status: 'submitted',
     timestamp: '2 days ago',
     date: '2024-12-11',
-    details: 'Assignment #4 • Under review'
+    details: 'Assignment #4 • Under review',
+    serverId: 'srv-us-east-1-prod-001'
   },
   {
     id: 5,
@@ -107,7 +111,8 @@ const getActivities = (student: any) => [
     status: 'attended',
     timestamp: '3 days ago',
     date: '2024-12-10',
-    details: 'Expert Interview: Market Trends • 1h 30m'
+    details: 'Expert Interview: Market Trends • 1h 30m',
+    serverId: 'srv-us-west-2-prod-003'
   },
   {
     id: 6,
@@ -116,7 +121,8 @@ const getActivities = (student: any) => [
     status: 'earned',
     timestamp: '5 days ago',
     date: '2024-12-08',
-    details: '3 consecutive quizzes with 95%+ score'
+    details: '3 consecutive quizzes with 95%+ score',
+    serverId: 'srv-eu-west-1-prod-001'
   },
   {
     id: 7,
@@ -125,7 +131,8 @@ const getActivities = (student: any) => [
     status: 'completed',
     timestamp: '1 week ago',
     date: '2024-12-06',
-    details: 'Foundation Module • 98% final exam score'
+    details: 'Foundation Module • 98% final exam score',
+    serverId: 'srv-us-central-1-prod-002'
   },
   {
     id: 8,
@@ -134,7 +141,8 @@ const getActivities = (student: any) => [
     status: 'completed',
     timestamp: '4 months ago',
     date: '2024-08-01',
-    details: 'Welcome to the program! • Course enrollment'
+    details: 'Welcome to the program! • Course enrollment',
+    serverId: 'srv-us-east-1-prod-001'
   }
 ];
 
@@ -166,7 +174,7 @@ const ClientPortalLog = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
-      <div className="container mx-auto px-4 py-6">
+      <div className="container max-w-6xl mx-auto px-6 py-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
           <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white">
@@ -177,7 +185,6 @@ const ClientPortalLog = () => {
             <h1 className="text-2xl font-bold text-white">
               Student Portal Activity Log
             </h1>
-            <p className="text-slate-300 text-sm mt-1">Track learning progress and activity for high-ticket clients</p>
           </div>
         </div>
 
@@ -331,6 +338,8 @@ const ClientPortalLog = () => {
                               <span className="text-xs text-slate-400">{activity.timestamp}</span>
                               <span className="text-xs text-slate-500">•</span>
                               <span className="text-xs text-slate-400">{activity.date}</span>
+                              <span className="text-xs text-slate-500">•</span>
+                              <span className="text-xs text-slate-500 font-mono">{activity.serverId}</span>
                             </div>
                           </div>
                           
