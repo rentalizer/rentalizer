@@ -419,10 +419,6 @@ const ClientPortalLog = () => {
                     <span className="text-slate-400">Progress:</span>
                     <span className="text-slate-200">{selectedStudent.progress}%</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-slate-400">Level:</span>
-                    <span className="text-slate-200">{selectedStudent.level}</span>
-                  </div>
                 </div>
               </div>
             </CardContent>
