@@ -165,28 +165,28 @@ const ClientPortalLog = () => {
     : activities.filter(activity => activity.type === filter);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-cyan-900/20">
-      <div className="container mx-auto px-6 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-purple-900">
+      <div className="px-6 py-6">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-4 mb-6">
           <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold text-white">
               Student Portal Activity Log
             </h1>
-            <p className="text-slate-300 mt-1">Track learning progress and activity for high-ticket clients</p>
+            <p className="text-slate-300 text-sm mt-1">Track learning progress and activity for high-ticket clients</p>
           </div>
         </div>
 
         {/* Student Selector */}
-        <div className="mb-8">
-          <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
+        <div className="mb-6">
+          <Card className="bg-purple-800/30 border-purple-700/50">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <User className="h-5 w-5 text-cyan-400" />
+                <User className="h-5 w-5 text-slate-300" />
                 <div className="flex-1">
                   <label className="text-sm font-medium text-slate-200 mb-2 block">
                     Select Student
@@ -195,14 +195,14 @@ const ClientPortalLog = () => {
                     const student = students.find(s => s.id === value);
                     if (student) setSelectedStudent(student);
                   }}>
-                    <SelectTrigger className="w-full max-w-md bg-slate-800/60 border-slate-600 text-white">
+                    <SelectTrigger className="w-full max-w-md bg-purple-700/40 border-purple-600/50 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700 z-50">
+                    <SelectContent className="bg-purple-800 border-purple-700">
                       {students.map((student) => (
-                        <SelectItem key={student.id} value={student.id} className="text-slate-100 focus:bg-slate-700">
+                        <SelectItem key={student.id} value={student.id} className="text-slate-100 focus:bg-purple-700">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
                               {student.avatar}
                             </div>
                             <div>
@@ -217,7 +217,7 @@ const ClientPortalLog = () => {
                 </div>
                 <div className="text-right">
                   <div className="text-sm text-slate-200">Current Progress</div>
-                  <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                  <div className="text-2xl font-bold text-white">
                     {selectedStudent.progress}%
                   </div>
                   <div className="text-xs text-slate-400">{selectedStudent.level} Level</div>
@@ -227,24 +227,40 @@ const ClientPortalLog = () => {
           </Card>
         </div>
 
-        {/* Main Content */}
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Clean Header */}
-          <div className="flex items-center justify-between border-b border-slate-600/30 pb-6">
-            <div>
-              <h2 className="text-2xl font-semibold text-white">Activity Log - {selectedStudent.name}</h2>
-              <p className="text-slate-300 mt-1">Started learning: {selectedStudent.joinedDate}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Badge variant="outline" className="border-cyan-500/30 text-cyan-400 bg-cyan-500/10">
-                {selectedStudent.progress}% Complete
-              </Badge>
-              <Badge variant="outline" className="border-purple-500/30 text-purple-400 bg-purple-500/10">
-                {selectedStudent.level}
-              </Badge>
-            </div>
-          </div>
+        {/* Student Info Bar */}
+        <div className="mb-6">
+          <Card className="bg-purple-800/20 border-purple-700/30">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <span className="text-slate-300">Viewing data for:</span>
+                  <span className="font-semibold text-white">{selectedStudent.name}</span>
+                  <span className="text-slate-400">({selectedStudent.email})</span>
+                  <Badge variant="outline" className="border-green-500/30 text-green-400 bg-green-500/10">
+                    Active
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-6 text-sm">
+                  <div>
+                    <span className="text-slate-400">Started: </span>
+                    <span className="text-white">{selectedStudent.joinedDate}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">Progress: </span>
+                    <span className="text-white">{selectedStudent.progress}%</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">Level: </span>
+                    <span className="text-white">{selectedStudent.level}</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
+        {/* Main Content */}
+        <div className="space-y-6">
           {/* Filter Buttons */}
           <div className="flex items-center gap-2 mb-6">
             <Filter className="h-4 w-4 text-slate-300" />
@@ -257,8 +273,8 @@ const ClientPortalLog = () => {
                   onClick={() => setFilter(type)}
                   className={`capitalize text-xs ${
                     filter === type 
-                      ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white hover:from-cyan-600 hover:to-purple-700' 
-                      : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+                      ? 'bg-purple-600/80 text-white hover:bg-purple-600' 
+                      : 'text-slate-300 hover:text-white hover:bg-purple-700/50'
                   }`}
                 >
                   {type === 'all' ? 'All Activity' : type}
@@ -276,17 +292,17 @@ const ClientPortalLog = () => {
               return (
                 <Card 
                   key={activity.id} 
-                  className="bg-slate-800/30 border-slate-700/50 hover:border-slate-600/50 transition-all duration-200 hover:bg-slate-700/30 backdrop-blur-sm"
+                  className="bg-purple-800/20 border-purple-700/30 hover:border-purple-600/50 transition-all duration-200 hover:bg-purple-700/20"
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <div className={`mt-1 w-2 h-2 rounded-full ${
-                        typeColor === 'blue' ? 'bg-cyan-400' :
+                        typeColor === 'blue' ? 'bg-purple-400' :
                         typeColor === 'cyan' ? 'bg-cyan-400' :
                         typeColor === 'purple' ? 'bg-purple-400' :
                         typeColor === 'orange' ? 'bg-orange-400' :
                         typeColor === 'yellow' ? 'bg-yellow-400' :
-                        'bg-cyan-400'
+                        'bg-purple-400'
                       } flex-shrink-0`}></div>
                       
                       <div className="flex-1 min-w-0">
@@ -302,12 +318,12 @@ const ClientPortalLog = () => {
                               <Badge 
                                 variant="outline" 
                                 className={`text-xs ${
-                                  typeColor === 'blue' ? 'border-cyan-500/30 text-cyan-400 bg-cyan-500/10' :
+                                  typeColor === 'blue' ? 'border-purple-500/30 text-purple-400 bg-purple-500/10' :
                                   typeColor === 'cyan' ? 'border-cyan-500/30 text-cyan-400 bg-cyan-500/10' :
                                   typeColor === 'purple' ? 'border-purple-500/30 text-purple-400 bg-purple-500/10' :
                                   typeColor === 'orange' ? 'border-orange-500/30 text-orange-400 bg-orange-500/10' :
                                   typeColor === 'yellow' ? 'border-yellow-500/30 text-yellow-400 bg-yellow-500/10' :
-                                  'border-cyan-500/30 text-cyan-400 bg-cyan-500/10'
+                                  'border-purple-500/30 text-purple-400 bg-purple-500/10'
                                 }`}
                               >
                                 {activity.type}
@@ -320,12 +336,12 @@ const ClientPortalLog = () => {
                           
                           <div className="flex-shrink-0">
                             <StatusIcon className={`h-5 w-5 ${
-                              typeColor === 'blue' ? 'text-cyan-400' :
+                              typeColor === 'blue' ? 'text-purple-400' :
                               typeColor === 'cyan' ? 'text-cyan-400' :
                               typeColor === 'purple' ? 'text-purple-400' :
                               typeColor === 'orange' ? 'text-orange-400' :
                               typeColor === 'yellow' ? 'text-yellow-400' :
-                              'text-cyan-400'
+                              'text-purple-400'
                             }`} />
                           </div>
                         </div>
@@ -341,7 +357,7 @@ const ClientPortalLog = () => {
           <div className="text-center pt-6">
             <Button 
               variant="ghost" 
-              className="text-slate-300 hover:text-white hover:bg-slate-700/50"
+              className="text-slate-300 hover:text-white hover:bg-purple-700/50"
             >
               Load more activity
             </Button>
