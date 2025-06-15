@@ -56,32 +56,32 @@ const ClientPortalLogApp = () => {
   const currentClient = clients.find(client => client.id === selectedClient);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900">
-      <div className="container mx-auto px-6 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-purple-900">
+      <div className="px-6 py-6">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-4 mb-6">
           <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-white">
               RentalizerCalc Analytics Dashboard
             </h1>
-            <p className="text-slate-300 mt-1">Individual client activity tracking and payment history</p>
+            <p className="text-slate-300 text-sm mt-1">Individual client activity tracking and payment history</p>
           </div>
           <div className="flex items-center gap-4">
-            <Smartphone className="h-8 w-8 text-white" />
+            <Smartphone className="h-6 w-6 text-white" />
             <div className="text-right">
               <div className="text-lg font-semibold text-white">RentalizerCalc</div>
-              <div className="text-sm text-slate-400">v2.1.4</div>
+              <div className="text-xs text-slate-400">v2.1.4</div>
             </div>
           </div>
         </div>
 
         {/* Client and Time Period Selectors */}
-        <div className="mb-8">
-          <Card className="bg-slate-800/60 border-slate-700/50 backdrop-blur-sm">
+        <div className="mb-6">
+          <Card className="bg-purple-800/30 border-purple-700/50">
             <CardContent className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Client Selector */}
@@ -92,14 +92,14 @@ const ClientPortalLogApp = () => {
                       Select Client
                     </label>
                     <Select value={selectedClient} onValueChange={setSelectedClient}>
-                      <SelectTrigger className="w-full bg-slate-700/60 border-slate-600 text-white">
+                      <SelectTrigger className="w-full bg-purple-700/40 border-purple-600/50 text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-slate-700 z-50">
+                      <SelectContent className="bg-purple-800 border-purple-700">
                         {clients.map((client) => (
-                          <SelectItem key={client.id} value={client.id} className="text-slate-100 focus:bg-slate-700">
+                          <SelectItem key={client.id} value={client.id} className="text-slate-100 focus:bg-purple-700">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
                                 {client.name.split(' ').map(n => n[0]).join('')}
                               </div>
                               <div>
@@ -122,12 +122,12 @@ const ClientPortalLogApp = () => {
                       Time Period
                     </label>
                     <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
-                      <SelectTrigger className="w-full bg-slate-700/60 border-slate-600 text-white">
+                      <SelectTrigger className="w-full bg-purple-700/40 border-purple-600/50 text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-slate-700 z-50">
+                      <SelectContent className="bg-purple-800 border-purple-700">
                         {timeRanges.map((range) => (
-                          <SelectItem key={range.value} value={range.value} className="text-slate-100 focus:bg-slate-700">
+                          <SelectItem key={range.value} value={range.value} className="text-slate-100 focus:bg-purple-700">
                             {range.label}
                           </SelectItem>
                         ))}
@@ -141,8 +141,8 @@ const ClientPortalLogApp = () => {
         </div>
 
         {/* Client Info Bar */}
-        <div className="mb-8">
-          <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
+        <div className="mb-6">
+          <Card className="bg-purple-800/20 border-purple-700/30">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -173,22 +173,22 @@ const ClientPortalLogApp = () => {
         </div>
 
         {/* Main Content */}
-        <div className="max-w-6xl mx-auto space-y-6">
+        <div className="space-y-6">
           {/* Client Activity Tabs */}
           <Tabs defaultValue="activity" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 bg-slate-800/60 border border-slate-700">
-              <TabsTrigger value="activity" className="data-[state=active]:bg-purple-600/30 data-[state=active]:text-purple-200 text-slate-300">
+            <TabsList className="grid w-full grid-cols-2 bg-purple-800/40 border border-purple-700/50">
+              <TabsTrigger value="activity" className="data-[state=active]:bg-purple-600/50 data-[state=active]:text-white text-slate-300">
                 <Activity className="h-4 w-4 mr-2" />
                 Activity Log
               </TabsTrigger>
-              <TabsTrigger value="payments" className="data-[state=active]:bg-purple-600/30 data-[state=active]:text-purple-200 text-slate-300">
+              <TabsTrigger value="payments" className="data-[state=active]:bg-purple-600/50 data-[state=active]:text-white text-slate-300">
                 <TrendingUp className="h-4 w-4 mr-2" />
                 Payment History
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="activity">
-              <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
+              <Card className="bg-purple-800/20 border-purple-700/30">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <Activity className="h-5 w-5" />
@@ -207,7 +207,7 @@ const ClientPortalLogApp = () => {
             </TabsContent>
 
             <TabsContent value="payments">
-              <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
+              <Card className="bg-purple-800/20 border-purple-700/30">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
