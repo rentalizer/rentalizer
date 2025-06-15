@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, User, Filter, CheckCircle, Clock, ArrowRight } from 'lucide-react';
@@ -65,12 +66,12 @@ const students = [
 const getActivities = (student: any) => [
   {
     id: 1,
-    title: 'Completed Advanced Market Analysis lesson',
-    type: 'lesson',
+    title: 'Completed Module 2, Lesson 4: Advanced Market Analysis',
+    type: 'module',
     status: 'completed',
     timestamp: '2 hours ago',
     date: '2024-12-13',
-    details: 'Module 2, Lesson 8 • 95% quiz score'
+    details: 'Market Analysis Module • 95% quiz score'
   },
   {
     id: 2,
@@ -83,12 +84,12 @@ const getActivities = (student: any) => [
   },
   {
     id: 3,
-    title: 'Started Cash Flow Optimization module',
-    type: 'lesson',
+    title: 'Started Module 3, Lesson 1: Cash Flow Optimization',
+    type: 'module',
     status: 'in-progress',
     timestamp: '1 day ago',
     date: '2024-12-12',
-    details: 'Module 3 • 45 minutes remaining'
+    details: 'Property Acquisition Module • 45 minutes remaining'
   },
   {
     id: 4,
@@ -119,17 +120,17 @@ const getActivities = (student: any) => [
   },
   {
     id: 7,
-    title: 'Completed Real Estate Investment Fundamentals',
-    type: 'lesson',
+    title: 'Completed Module 1, Lesson 4: Real Estate Investment Fundamentals',
+    type: 'module',
     status: 'completed',
     timestamp: '1 week ago',
     date: '2024-12-06',
-    details: 'Module 1, Final Exam • 98% score'
+    details: 'Foundation Module • 98% final exam score'
   },
   {
     id: 8,
     title: 'Started Real Estate Investment Course',
-    type: 'lesson',
+    type: 'module',
     status: 'completed',
     timestamp: '4 months ago',
     date: '2024-08-01',
@@ -138,10 +139,10 @@ const getActivities = (student: any) => [
 ];
 
 const typeColors = {
-  lesson: 'blue',
-  feedback: 'green',
+  module: 'blue',
+  feedback: 'cyan',
   assignment: 'purple',
-  live: 'red',
+  live: 'orange',
   achievement: 'yellow'
 };
 
@@ -225,16 +226,16 @@ const ClientPortalLog = () => {
         {/* Main Content */}
         <div className="max-w-4xl mx-auto space-y-6">
           {/* Clean Header */}
-          <div className="flex items-center justify-between border-b border-slate-800 pb-6">
+          <div className="flex items-center justify-between border-b border-slate-600/30 pb-6">
             <div>
               <h2 className="text-2xl font-semibold text-white">Activity Log - {selectedStudent.name}</h2>
               <p className="text-slate-400 mt-1">Started learning: {selectedStudent.joinedDate}</p>
             </div>
             <div className="flex items-center gap-3">
-              <Badge variant="outline" className="border-green-500/30 text-green-400">
+              <Badge variant="outline" className="border-cyan-500/30 text-cyan-400">
                 {selectedStudent.progress}% Complete
               </Badge>
-              <Badge variant="outline" className="border-cyan-500/30 text-cyan-400">
+              <Badge variant="outline" className="border-blue-500/30 text-blue-400">
                 {selectedStudent.level}
               </Badge>
             </div>
@@ -244,7 +245,7 @@ const ClientPortalLog = () => {
           <div className="flex items-center gap-2 mb-6">
             <Filter className="h-4 w-4 text-slate-400" />
             <div className="flex gap-1">
-              {['all', 'lesson', 'assignment', 'feedback', 'achievement'].map((type) => (
+              {['all', 'module', 'assignment', 'feedback', 'achievement'].map((type) => (
                 <Button
                   key={type}
                   variant={filter === type ? 'default' : 'ghost'}
