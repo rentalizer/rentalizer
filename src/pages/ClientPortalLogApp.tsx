@@ -23,7 +23,7 @@ const clients = [
     plan: 'Monthly Subscription',
     monthlyRevenue: 9,
     joinedDate: '2025-04-13',
-    daysSinceSignup: 62, // April 13 to June 14, 2025
+    daysSinceSignup: 62,
     status: 'Active'
   },
   { 
@@ -33,7 +33,7 @@ const clients = [
     plan: 'Monthly Subscription',
     monthlyRevenue: 9,
     joinedDate: '2025-02-14',
-    daysSinceSignup: 120, // Feb 14 to June 14, 2025
+    daysSinceSignup: 120,
     status: 'Active'
   },
   { 
@@ -43,14 +43,14 @@ const clients = [
     plan: 'Accelerator Pro',
     monthlyRevenue: 2000,
     joinedDate: '2024-08-01',
-    daysSinceSignup: 318, // Aug 1, 2024 to June 14, 2025
+    daysSinceSignup: 318,
     status: 'Active'
   }
 ];
 
 const ClientPortalLogApp = () => {
   const [selectedTimeRange, setSelectedTimeRange] = useState('30d');
-  const [selectedClient, setSelectedClient] = useState('1');
+  const [selectedClient, setSelectedClient] = useState('3'); // Default to Lindsay Sherman
 
   const currentClient = clients.find(client => client.id === selectedClient);
 
@@ -154,7 +154,9 @@ const ClientPortalLogApp = () => {
                       </div>
                       <div>
                         <span className="text-gray-400">Plan:</span>
-                        <span className="ml-1 text-white">$9/month</span>
+                        <span className="ml-1 text-white">
+                          {currentClient.plan === 'Accelerator Pro' ? '$2,000.00' : '$9/month'}
+                        </span>
                       </div>
                       <div>
                         <span className="text-gray-400">Days Active:</span>
