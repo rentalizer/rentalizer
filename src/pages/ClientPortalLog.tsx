@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -70,6 +69,7 @@ const getActivities = (student: any) => [
     type: 'lesson',
     status: 'completed',
     timestamp: '2 hours ago',
+    date: '2024-12-13',
     details: 'Module 2, Lesson 8 • 95% quiz score'
   },
   {
@@ -78,6 +78,7 @@ const getActivities = (student: any) => [
     type: 'feedback',
     status: 'new',
     timestamp: '4 hours ago',
+    date: '2024-12-13',
     details: 'Coach Sarah Johnson • View feedback'
   },
   {
@@ -86,6 +87,7 @@ const getActivities = (student: any) => [
     type: 'lesson',
     status: 'in-progress',
     timestamp: '1 day ago',
+    date: '2024-12-12',
     details: 'Module 3 • 45 minutes remaining'
   },
   {
@@ -94,6 +96,7 @@ const getActivities = (student: any) => [
     type: 'assignment',
     status: 'submitted',
     timestamp: '2 days ago',
+    date: '2024-12-11',
     details: 'Assignment #4 • Under review'
   },
   {
@@ -102,6 +105,7 @@ const getActivities = (student: any) => [
     type: 'live',
     status: 'attended',
     timestamp: '3 days ago',
+    date: '2024-12-10',
     details: 'Expert Interview: Market Trends • 1h 30m'
   },
   {
@@ -110,7 +114,26 @@ const getActivities = (student: any) => [
     type: 'achievement',
     status: 'earned',
     timestamp: '5 days ago',
+    date: '2024-12-08',
     details: '3 consecutive quizzes with 95%+ score'
+  },
+  {
+    id: 7,
+    title: 'Completed Real Estate Investment Fundamentals',
+    type: 'lesson',
+    status: 'completed',
+    timestamp: '1 week ago',
+    date: '2024-12-06',
+    details: 'Module 1, Final Exam • 98% score'
+  },
+  {
+    id: 8,
+    title: 'Started Real Estate Investment Course',
+    type: 'lesson',
+    status: 'completed',
+    timestamp: '4 months ago',
+    date: '2024-08-01',
+    details: 'Welcome to the program! • Course enrollment'
   }
 ];
 
@@ -160,7 +183,7 @@ const ClientPortalLog = () => {
           <Card className="bg-slate-900/50 border-slate-800">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <User className="h-5 w-5 text-blue-400" />
+                <User className="h-5 w-5 text-cyan-400" />
                 <div className="flex-1">
                   <label className="text-sm font-medium text-slate-300 mb-2 block">
                     Select Student
@@ -176,7 +199,7 @@ const ClientPortalLog = () => {
                       {students.map((student) => (
                         <SelectItem key={student.id} value={student.id} className="text-slate-100 focus:bg-slate-700">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-sm font-medium">
+                            <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm font-medium">
                               {student.avatar}
                             </div>
                             <div>
@@ -191,7 +214,7 @@ const ClientPortalLog = () => {
                 </div>
                 <div className="text-right">
                   <div className="text-sm text-slate-300">Current Progress</div>
-                  <div className="text-2xl font-bold text-blue-400">{selectedStudent.progress}%</div>
+                  <div className="text-2xl font-bold text-cyan-400">{selectedStudent.progress}%</div>
                   <div className="text-xs text-slate-500">{selectedStudent.level} Level</div>
                 </div>
               </div>
@@ -205,13 +228,13 @@ const ClientPortalLog = () => {
           <div className="flex items-center justify-between border-b border-slate-800 pb-6">
             <div>
               <h2 className="text-2xl font-semibold text-white">Activity Log - {selectedStudent.name}</h2>
-              <p className="text-slate-400 mt-1">Track learning progress and achievements</p>
+              <p className="text-slate-400 mt-1">Started learning: {selectedStudent.joinedDate}</p>
             </div>
             <div className="flex items-center gap-3">
               <Badge variant="outline" className="border-green-500/30 text-green-400">
                 {selectedStudent.progress}% Complete
               </Badge>
-              <Badge variant="outline" className="border-blue-500/30 text-blue-400">
+              <Badge variant="outline" className="border-cyan-500/30 text-cyan-400">
                 {selectedStudent.level}
               </Badge>
             </div>
@@ -229,7 +252,7 @@ const ClientPortalLog = () => {
                   onClick={() => setFilter(type)}
                   className={`capitalize text-xs ${
                     filter === type 
-                      ? 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/30' 
+                      ? 'bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30' 
                       : 'text-slate-400 hover:text-slate-300 hover:bg-slate-800'
                   }`}
                 >
@@ -263,7 +286,7 @@ const ClientPortalLog = () => {
                             <p className="text-sm text-slate-400 mb-2">
                               {activity.details}
                             </p>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-3">
                               <Badge 
                                 variant="outline" 
                                 className={`text-xs border-${typeColor}-500/30 text-${typeColor}-400`}
@@ -271,6 +294,8 @@ const ClientPortalLog = () => {
                                 {activity.type}
                               </Badge>
                               <span className="text-xs text-slate-500">{activity.timestamp}</span>
+                              <span className="text-xs text-slate-600">•</span>
+                              <span className="text-xs text-slate-500">{activity.date}</span>
                             </div>
                           </div>
                           
