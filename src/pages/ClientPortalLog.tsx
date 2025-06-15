@@ -253,7 +253,7 @@ const ClientPortalLog = () => {
                   onClick={() => setFilter(type)}
                   className={`capitalize text-xs ${
                     filter === type 
-                      ? 'bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30' 
+                      ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white hover:from-cyan-600 hover:to-purple-700' 
                       : 'text-slate-400 hover:text-slate-300 hover:bg-slate-800'
                   }`}
                 >
@@ -276,7 +276,14 @@ const ClientPortalLog = () => {
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
-                      <div className={`mt-1 w-2 h-2 rounded-full bg-${typeColor}-400 flex-shrink-0`}></div>
+                      <div className={`mt-1 w-2 h-2 rounded-full ${
+                        typeColor === 'blue' ? 'bg-cyan-400' :
+                        typeColor === 'cyan' ? 'bg-cyan-400' :
+                        typeColor === 'purple' ? 'bg-purple-400' :
+                        typeColor === 'orange' ? 'bg-orange-400' :
+                        typeColor === 'yellow' ? 'bg-yellow-400' :
+                        'bg-cyan-400'
+                      } flex-shrink-0`}></div>
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-4">
@@ -290,7 +297,14 @@ const ClientPortalLog = () => {
                             <div className="flex items-center gap-3">
                               <Badge 
                                 variant="outline" 
-                                className={`text-xs border-${typeColor}-500/30 text-${typeColor}-400`}
+                                className={`text-xs ${
+                                  typeColor === 'blue' ? 'border-cyan-500/30 text-cyan-400' :
+                                  typeColor === 'cyan' ? 'border-cyan-500/30 text-cyan-400' :
+                                  typeColor === 'purple' ? 'border-purple-500/30 text-purple-400' :
+                                  typeColor === 'orange' ? 'border-orange-500/30 text-orange-400' :
+                                  typeColor === 'yellow' ? 'border-yellow-500/30 text-yellow-400' :
+                                  'border-cyan-500/30 text-cyan-400'
+                                }`}
                               >
                                 {activity.type}
                               </Badge>
@@ -301,7 +315,14 @@ const ClientPortalLog = () => {
                           </div>
                           
                           <div className="flex-shrink-0">
-                            <StatusIcon className={`h-5 w-5 text-${typeColor}-400`} />
+                            <StatusIcon className={`h-5 w-5 ${
+                              typeColor === 'blue' ? 'text-cyan-400' :
+                              typeColor === 'cyan' ? 'text-cyan-400' :
+                              typeColor === 'purple' ? 'text-purple-400' :
+                              typeColor === 'orange' ? 'text-orange-400' :
+                              typeColor === 'yellow' ? 'text-yellow-400' :
+                              'text-cyan-400'
+                            }`} />
                           </div>
                         </div>
                       </div>
