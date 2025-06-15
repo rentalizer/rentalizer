@@ -57,7 +57,7 @@ const students = [
     email: 'dutchess0085@gmail.com',
     avatar: 'LS',
     level: 'Advanced',
-    progress: 92,
+    progress: 100,
     joinedDate: '2024-08-01'
   }
 ];
@@ -234,7 +234,7 @@ const ClientPortalLog = () => {
               <Badge variant="outline" className="border-cyan-500/30 text-cyan-400">
                 {selectedStudent.progress}% Complete
               </Badge>
-              <Badge variant="outline" className="border-blue-500/30 text-blue-400">
+              <Badge variant="outline" className="border-purple-500/30 text-purple-400">
                 {selectedStudent.level}
               </Badge>
             </div>
