@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -72,7 +71,8 @@ const getActivities = (student: any) => [
     timestamp: '2 hours ago',
     date: '2024-09-28',
     details: 'Module 4: Manage Properties • Final assessment completed',
-    serverId: 'srv-us-east-1-prod-001'
+    serverId: 'srv-us-east-1-prod-001',
+    documentDownloaded: 'Automation Templates & Scaling Checklist.pdf'
   },
   {
     id: 2,
@@ -82,7 +82,8 @@ const getActivities = (student: any) => [
     timestamp: '5 hours ago',
     date: '2024-09-27',
     details: 'Module 4: Manage Properties • 98% completion score',
-    serverId: 'srv-us-west-2-prod-003'
+    serverId: 'srv-us-west-2-prod-003',
+    documentDownloaded: 'Housekeeper Hiring Guide.pdf'
   },
   {
     id: 3,
@@ -92,7 +93,8 @@ const getActivities = (student: any) => [
     timestamp: '1 day ago',
     date: '2024-09-26',
     details: 'Module 4: Manage Properties • Practical exercise submitted',
-    serverId: 'srv-us-central-1-prod-002'
+    serverId: 'srv-us-central-1-prod-002',
+    documentDownloaded: 'VA Hiring & Training Manual.pdf'
   },
   {
     id: 4,
@@ -102,7 +104,8 @@ const getActivities = (student: any) => [
     timestamp: '2 days ago',
     date: '2024-09-25',
     details: 'Module 4: Manage Properties • Case study analysis',
-    serverId: 'srv-us-east-1-prod-001'
+    serverId: 'srv-us-east-1-prod-001',
+    documentDownloaded: 'Remote Hosting Strategies.pdf'
   },
   {
     id: 5,
@@ -112,7 +115,8 @@ const getActivities = (student: any) => [
     timestamp: '3 days ago',
     date: '2024-09-24',
     details: 'Module 4: Manage Properties • Strategy workshop attended',
-    serverId: 'srv-us-west-2-prod-003'
+    serverId: 'srv-us-west-2-prod-003',
+    documentDownloaded: 'Mid-Term Rental Strategy Guide.pdf'
   },
   {
     id: 6,
@@ -122,7 +126,8 @@ const getActivities = (student: any) => [
     timestamp: '4 days ago',
     date: '2024-09-23',
     details: 'Module 4: Manage Properties • Optimization checklist completed',
-    serverId: 'srv-eu-west-1-prod-001'
+    serverId: 'srv-eu-west-1-prod-001',
+    documentDownloaded: 'Property Optimization Checklist.pdf'
   },
   {
     id: 7,
@@ -132,7 +137,8 @@ const getActivities = (student: any) => [
     timestamp: '5 days ago',
     date: '2024-09-22',
     details: 'Module 4: Manage Properties • Photography portfolio submitted',
-    serverId: 'srv-us-central-1-prod-002'
+    serverId: 'srv-us-central-1-prod-002',
+    documentDownloaded: 'Design & Photography Guide.pdf'
   },
   {
     id: 8,
@@ -142,7 +148,8 @@ const getActivities = (student: any) => [
     timestamp: '1 week ago',
     date: '2024-09-21',
     details: 'Module introduction and overview completed',
-    serverId: 'srv-us-east-1-prod-001'
+    serverId: 'srv-us-east-1-prod-001',
+    documentDownloaded: 'Module 4 Overview & Roadmap.pdf'
   },
   {
     id: 9,
@@ -152,7 +159,8 @@ const getActivities = (student: any) => [
     timestamp: '1 week ago',
     date: '2024-09-20',
     details: 'Module 3: Acquire Properties • Business expansion plan created',
-    serverId: 'srv-us-west-2-prod-003'
+    serverId: 'srv-us-west-2-prod-003',
+    documentDownloaded: 'Growth Planning Template.pdf'
   },
   {
     id: 10,
@@ -162,7 +170,8 @@ const getActivities = (student: any) => [
     timestamp: '1 week ago',
     date: '2024-09-19',
     details: 'Module 3: Acquire Properties • Negotiation strategies mastered',
-    serverId: 'srv-us-central-1-prod-002'
+    serverId: 'srv-us-central-1-prod-002',
+    documentDownloaded: 'Rent Concessions Negotiation Guide.pdf'
   },
   {
     id: 11,
@@ -172,7 +181,8 @@ const getActivities = (student: any) => [
     timestamp: '1 week ago',
     date: '2024-09-18',
     details: 'Module 3: Acquire Properties • Application process optimized',
-    serverId: 'srv-us-east-1-prod-001'
+    serverId: 'srv-us-east-1-prod-001',
+    documentDownloaded: 'Rental Application Checklist.pdf'
   },
   {
     id: 12,
@@ -182,7 +192,8 @@ const getActivities = (student: any) => [
     timestamp: '2 weeks ago',
     date: '2024-09-13',
     details: 'Module 3: Acquire Properties • Advanced acquisition strategies',
-    serverId: 'srv-us-west-2-prod-003'
+    serverId: 'srv-us-west-2-prod-003',
+    documentDownloaded: 'Advanced Acquisition Strategies.pdf'
   },
   {
     id: 13,
@@ -192,7 +203,8 @@ const getActivities = (student: any) => [
     timestamp: '2 weeks ago',
     date: '2024-09-10',
     details: 'Module 3: Acquire Properties • Basic acquisition fundamentals',
-    serverId: 'srv-eu-west-1-prod-001'
+    serverId: 'srv-eu-west-1-prod-001',
+    documentDownloaded: 'Property Acquisition Fundamentals.pdf'
   },
   {
     id: 14,
@@ -202,7 +214,8 @@ const getActivities = (student: any) => [
     timestamp: '2 weeks ago',
     date: '2024-09-07',
     details: 'Module 3: Acquire Properties • Overview and strategy session',
-    serverId: 'srv-us-central-1-prod-002'
+    serverId: 'srv-us-central-1-prod-002',
+    documentDownloaded: 'Property Acquisition Overview.pdf'
   },
   {
     id: 15,
@@ -212,7 +225,8 @@ const getActivities = (student: any) => [
     timestamp: '3 weeks ago',
     date: '2024-09-02',
     details: 'Module introduction completed with 95% score',
-    serverId: 'srv-us-east-1-prod-001'
+    serverId: 'srv-us-east-1-prod-001',
+    documentDownloaded: 'Module 3 Introduction Guide.pdf'
   },
   {
     id: 16,
@@ -222,7 +236,8 @@ const getActivities = (student: any) => [
     timestamp: '3 weeks ago',
     date: '2024-08-28',
     details: 'Module 2: Select Markets • Competitive landscape analysis',
-    serverId: 'srv-us-west-2-prod-003'
+    serverId: 'srv-us-west-2-prod-003',
+    documentDownloaded: 'Competitor Analysis Toolkit.pdf'
   },
   {
     id: 17,
@@ -232,7 +247,8 @@ const getActivities = (student: any) => [
     timestamp: '4 weeks ago',
     date: '2024-08-23',
     details: 'Module 2: Select Markets • Legal compliance workshop',
-    serverId: 'srv-us-central-1-prod-002'
+    serverId: 'srv-us-central-1-prod-002',
+    documentDownloaded: 'STR Legal Compliance Guide.pdf'
   },
   {
     id: 18,
@@ -242,7 +258,8 @@ const getActivities = (student: any) => [
     timestamp: '1 month ago',
     date: '2024-08-18',
     details: 'Module 2: Select Markets • Financial modeling exercise',
-    serverId: 'srv-us-east-1-prod-001'
+    serverId: 'srv-us-east-1-prod-001',
+    documentDownloaded: 'Cash Flow Analysis Template.pdf'
   },
   {
     id: 19,
@@ -252,7 +269,8 @@ const getActivities = (student: any) => [
     timestamp: '1 month ago',
     date: '2024-08-13',
     details: 'Module 2: Select Markets • Initial market analysis',
-    serverId: 'srv-us-west-2-prod-003'
+    serverId: 'srv-us-west-2-prod-003',
+    documentDownloaded: 'Market Research Methodology.pdf'
   },
   {
     id: 20,
@@ -262,7 +280,8 @@ const getActivities = (student: any) => [
     timestamp: '5 weeks ago',
     date: '2024-08-07',
     details: 'Module overview and market selection fundamentals',
-    serverId: 'srv-eu-west-1-prod-001'
+    serverId: 'srv-eu-west-1-prod-001',
+    documentDownloaded: 'Module 2 Market Selection Guide.pdf'
   },
   {
     id: 21,
@@ -272,7 +291,8 @@ const getActivities = (student: any) => [
     timestamp: '6 weeks ago',
     date: '2024-08-05',
     details: 'Module 1: Business Formation • Website launched successfully',
-    serverId: 'srv-us-central-1-prod-002'
+    serverId: 'srv-us-central-1-prod-002',
+    documentDownloaded: 'DIY Website Development Kit.pdf'
   },
   {
     id: 22,
@@ -282,7 +302,8 @@ const getActivities = (student: any) => [
     timestamp: '7 weeks ago',
     date: '2024-08-03',
     details: 'Module 1: Business Formation • Legal entity established',
-    serverId: 'srv-us-east-1-prod-001'
+    serverId: 'srv-us-east-1-prod-001',
+    documentDownloaded: 'Business Formation Legal Guide.pdf'
   },
   {
     id: 23,
@@ -292,7 +313,8 @@ const getActivities = (student: any) => [
     timestamp: '8 weeks ago',
     date: '2024-08-02',
     details: 'Course introduction and business fundamentals',
-    serverId: 'srv-us-west-2-prod-003'
+    serverId: 'srv-us-west-2-prod-003',
+    documentDownloaded: 'Module 1 Business Fundamentals.pdf'
   },
   {
     id: 24,
@@ -302,7 +324,8 @@ const getActivities = (student: any) => [
     timestamp: '2 months ago',
     date: '2024-08-01',
     details: 'Welcome to the program! • Course enrollment confirmed',
-    serverId: 'srv-us-east-1-prod-001'
+    serverId: 'srv-us-east-1-prod-001',
+    documentDownloaded: 'Course Welcome Package.pdf'
   }
 ];
 
@@ -387,7 +410,7 @@ const ClientPortalLog = () => {
                   <div className="text-2xl font-bold text-slate-100">
                     {selectedStudent.progress}%
                   </div>
-                  <div className="text-xs text-slate-400">{selectedStudent.level} Level</div>
+                  <div className="text-xs text-slate-400">{selectedStudent.level}</div>
                 </div>
               </div>
             </CardContent>
@@ -477,6 +500,9 @@ const ClientPortalLog = () => {
                             <p className="text-sm text-slate-300 mb-2">
                               {activity.details}
                             </p>
+                            <div className="text-sm text-slate-400 mb-2">
+                              <span className="font-medium">Document Downloaded:</span> {activity.documentDownloaded}
+                            </div>
                             <div className="flex items-center gap-3">
                               <Badge 
                                 variant="outline" 
@@ -492,7 +518,7 @@ const ClientPortalLog = () => {
                               <span className="text-xs text-slate-500">•</span>
                               <span className="text-xs text-slate-400">{activity.date}</span>
                               <span className="text-xs text-slate-500">•</span>
-                              <span className="text-xs text-slate-500 font-mono">{activity.serverId}</span>
+                              <span className="text-xs text-slate-500 font-mono">Server ID#: {activity.serverId}</span>
                             </div>
                           </div>
                           
