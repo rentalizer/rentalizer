@@ -393,30 +393,34 @@ const ClientPortalLog = () => {
           </Card>
         </div>
 
-        {/* Student Info Bar */}
+        {/* Student Info Bar - Fixed layout to prevent overlap */}
         <div className="mb-6">
           <Card className="bg-slate-700/40 border-slate-600 backdrop-blur-sm">
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <span className="text-slate-300">Viewing data for:</span>
-                  <span className="font-semibold text-slate-100">{selectedStudent.name}</span>
-                  <span className="text-slate-400">({selectedStudent.email})</span>
-                  <Badge variant="outline" className="border-blue-500 text-blue-300 bg-blue-900/30">
-                    Active
-                  </Badge>
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-300">Viewing data for:</span>
+                    <span className="font-semibold text-slate-100">{selectedStudent.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-slate-400">({selectedStudent.email})</span>
+                    <Badge variant="outline" className="border-blue-500 text-blue-300 bg-blue-900/30">
+                      Active
+                    </Badge>
+                  </div>
                 </div>
-                <div className="flex items-center gap-6 text-sm">
-                  <div>
-                    <span className="text-slate-400">Started: </span>
+                <div className="flex flex-wrap items-center gap-4 text-sm">
+                  <div className="flex items-center gap-1">
+                    <span className="text-slate-400">Started:</span>
                     <span className="text-slate-200">{selectedStudent.joinedDate}</span>
                   </div>
-                  <div>
-                    <span className="text-slate-400">Progress: </span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-slate-400">Progress:</span>
                     <span className="text-slate-200">{selectedStudent.progress}%</span>
                   </div>
-                  <div>
-                    <span className="text-slate-400">Level: </span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-slate-400">Level:</span>
                     <span className="text-slate-200">{selectedStudent.level}</span>
                   </div>
                 </div>
