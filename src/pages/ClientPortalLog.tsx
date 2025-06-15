@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, User, Filter, CheckCircle, Clock, ArrowRight } from 'lucide-react';
+import { ArrowLeft, User, Filter, CheckCircle, Clock, ArrowRight, Check } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const students = [
@@ -65,7 +65,6 @@ const students = [
 const getActivities = (student: any) => [
   {
     id: 1,
-    title: 'Completed Automations & Scaling Module',
     type: 'module',
     status: 'completed',
     timestamp: '2 hours ago',
@@ -76,7 +75,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 2,
-    title: 'Completed Hiring Your Housekeepers Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '5 hours ago',
@@ -87,7 +85,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 3,
-    title: 'Completed Hiring Your Virtual Assistants Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '1 day ago',
@@ -98,7 +95,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 4,
-    title: 'Completed Hosting Remotely Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '2 days ago',
@@ -109,7 +105,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 5,
-    title: 'Completed Mid Term Rentals Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '3 days ago',
@@ -120,7 +115,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 6,
-    title: 'Completed Property Optimization To Stay Booked Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '4 days ago',
@@ -131,7 +125,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 7,
-    title: 'Completed Property Listing: Budgeting, Design & Photography Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '5 days ago',
@@ -142,7 +135,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 8,
-    title: 'Started Module 4: Manage Properties',
     type: 'module',
     status: 'completed',
     timestamp: '1 week ago',
@@ -153,7 +145,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 9,
-    title: 'Completed Growth Planning Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '1 week ago',
@@ -164,7 +155,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 10,
-    title: 'Completed Rent Concessions Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '1 week ago',
@@ -175,7 +165,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 11,
-    title: 'Completed Rental Applications Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '1 week ago',
@@ -186,7 +175,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 12,
-    title: 'Completed Property Acquisition II Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '2 weeks ago',
@@ -197,7 +185,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 13,
-    title: 'Completed Acquisitions I Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '2 weeks ago',
@@ -208,7 +195,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 14,
-    title: 'Completed Property Acquisitions Overview',
     type: 'module',
     status: 'completed',
     timestamp: '2 weeks ago',
@@ -219,7 +205,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 15,
-    title: 'Started Module 3: Acquire Properties',
     type: 'module',
     status: 'completed',
     timestamp: '3 weeks ago',
@@ -230,7 +215,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 16,
-    title: 'Completed Competitor Analysis Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '3 weeks ago',
@@ -241,7 +225,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 17,
-    title: 'Completed STR Ordinances Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '4 weeks ago',
@@ -252,7 +235,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 18,
-    title: 'Completed Cash Flow Analysis Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '1 month ago',
@@ -263,7 +245,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 19,
-    title: 'Completed Market Research Step 1 Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '1 month ago',
@@ -274,7 +255,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 20,
-    title: 'Started Module 2: Select Markets',
     type: 'module',
     status: 'completed',
     timestamp: '5 weeks ago',
@@ -285,7 +265,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 21,
-    title: 'Completed DIY Website Development Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '6 weeks ago',
@@ -296,7 +275,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 22,
-    title: 'Completed Business Formation Lesson',
     type: 'module',
     status: 'completed',
     timestamp: '7 weeks ago',
@@ -307,7 +285,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 23,
-    title: 'Started Module 1: Business Formation',
     type: 'module',
     status: 'completed',
     timestamp: '8 weeks ago',
@@ -318,7 +295,6 @@ const getActivities = (student: any) => [
   },
   {
     id: 24,
-    title: 'Enrolled in Real Estate Investment Course',
     type: 'module',
     status: 'completed',
     timestamp: '2 months ago',
@@ -397,7 +373,7 @@ const ClientPortalLog = () => {
                             </div>
                             <div>
                               <div className="font-medium">{student.name}</div>
-                              <div className="text-xs text-slate-400">{student.email} • {student.level}</div>
+                              <div className="text-xs text-slate-400">{student.email}</div>
                             </div>
                           </div>
                         </SelectItem>
@@ -410,7 +386,6 @@ const ClientPortalLog = () => {
                   <div className="text-2xl font-bold text-slate-100">
                     {selectedStudent.progress}%
                   </div>
-                  <div className="text-xs text-slate-400">{selectedStudent.level}</div>
                 </div>
               </div>
             </CardContent>
@@ -473,7 +448,7 @@ const ClientPortalLog = () => {
           </div>
 
           {/* Activity List */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             {filteredActivities.map((activity, index) => {
               const StatusIcon = statusIcons[activity.status];
               const typeColor = typeColors[activity.type];
@@ -483,7 +458,7 @@ const ClientPortalLog = () => {
                   key={activity.id} 
                   className="bg-slate-800/50 border-slate-600 hover:border-slate-500 transition-all duration-200 hover:bg-slate-800/70 backdrop-blur-sm shadow-lg"
                 >
-                  <CardContent className="p-4">
+                  <CardContent className="p-3">
                     <div className="flex items-start gap-3">
                       <div className={`mt-1 w-2 h-2 rounded-full ${
                         typeColor === 'blue' ? 'bg-blue-500' :
@@ -494,14 +469,12 @@ const ClientPortalLog = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-medium text-slate-100 mb-1 leading-tight">
-                              {activity.title}
-                            </h3>
                             <p className="text-sm text-slate-300 mb-2">
                               {activity.details}
                             </p>
-                            <div className="text-sm text-slate-400 mb-2">
-                              <span className="font-medium">Document Downloaded:</span> {activity.documentDownloaded}
+                            <div className="flex items-center gap-2 text-sm text-slate-400 mb-2">
+                              <Check className="h-4 w-4 text-green-400" />
+                              <span className="text-slate-300">{activity.documentDownloaded}</span>
                             </div>
                             <div className="flex items-center gap-3">
                               <Badge 
