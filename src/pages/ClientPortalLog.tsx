@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -173,7 +174,7 @@ const ClientPortalLog = () => {
             Back
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-white">Client Portal Activity Log</h1>
+            <h1 className="text-3xl font-bold text-white">Student Portal Activity Log</h1>
             <p className="text-slate-400 mt-1">Track learning progress and activity for high-ticket clients</p>
           </div>
         </div>
