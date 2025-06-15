@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -55,11 +54,20 @@ const students = [
     level: 'Intermediate',
     progress: 58,
     joinedDate: '2024-02-05'
+  },
+  {
+    id: '6',
+    name: 'Lindsay Sherman',
+    email: 'dutchess0085@gmail.com',
+    avatar: 'LS',
+    level: 'Advanced',
+    progress: 92,
+    joinedDate: '2024-08-01'
   }
 ];
 
 const ClientPortalLog = () => {
-  const [selectedStudent, setSelectedStudent] = useState(students[0]);
+  const [selectedStudent, setSelectedStudent] = useState(students[5]); // Default to Lindsay Sherman
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
