@@ -165,42 +165,44 @@ const ClientPortalLog = () => {
     : activities.filter(activity => activity.type === filter);
 
   return (
-    <div className="min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900/20 to-cyan-900/20">
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="sm" className="text-slate-400 hover:text-slate-300">
+          <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-white">Student Portal Activity Log</h1>
-            <p className="text-slate-400 mt-1">Track learning progress and activity for high-ticket clients</p>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              Student Portal Activity Log
+            </h1>
+            <p className="text-slate-300 mt-1">Track learning progress and activity for high-ticket clients</p>
           </div>
         </div>
 
         {/* Student Selector */}
         <div className="mb-8">
-          <Card className="bg-slate-900/50 border-slate-800">
+          <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
                 <User className="h-5 w-5 text-cyan-400" />
                 <div className="flex-1">
-                  <label className="text-sm font-medium text-slate-300 mb-2 block">
+                  <label className="text-sm font-medium text-slate-200 mb-2 block">
                     Select Student
                   </label>
                   <Select value={selectedStudent.id} onValueChange={(value) => {
                     const student = students.find(s => s.id === value);
                     if (student) setSelectedStudent(student);
                   }}>
-                    <SelectTrigger className="w-full max-w-md bg-slate-800/50 border-slate-700 text-white">
+                    <SelectTrigger className="w-full max-w-md bg-slate-800/60 border-slate-600 text-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-slate-800 border-slate-700 z-50">
                       {students.map((student) => (
                         <SelectItem key={student.id} value={student.id} className="text-slate-100 focus:bg-slate-700">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm font-medium">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
                               {student.avatar}
                             </div>
                             <div>
@@ -214,9 +216,11 @@ const ClientPortalLog = () => {
                   </Select>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-slate-300">Current Progress</div>
-                  <div className="text-2xl font-bold text-cyan-400">{selectedStudent.progress}%</div>
-                  <div className="text-xs text-slate-500">{selectedStudent.level} Level</div>
+                  <div className="text-sm text-slate-200">Current Progress</div>
+                  <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                    {selectedStudent.progress}%
+                  </div>
+                  <div className="text-xs text-slate-400">{selectedStudent.level} Level</div>
                 </div>
               </div>
             </CardContent>
@@ -229,13 +233,13 @@ const ClientPortalLog = () => {
           <div className="flex items-center justify-between border-b border-slate-600/30 pb-6">
             <div>
               <h2 className="text-2xl font-semibold text-white">Activity Log - {selectedStudent.name}</h2>
-              <p className="text-slate-400 mt-1">Started learning: {selectedStudent.joinedDate}</p>
+              <p className="text-slate-300 mt-1">Started learning: {selectedStudent.joinedDate}</p>
             </div>
             <div className="flex items-center gap-3">
-              <Badge variant="outline" className="border-cyan-500/30 text-cyan-400">
+              <Badge variant="outline" className="border-cyan-500/30 text-cyan-400 bg-cyan-500/10">
                 {selectedStudent.progress}% Complete
               </Badge>
-              <Badge variant="outline" className="border-purple-500/30 text-purple-400">
+              <Badge variant="outline" className="border-purple-500/30 text-purple-400 bg-purple-500/10">
                 {selectedStudent.level}
               </Badge>
             </div>
@@ -243,7 +247,7 @@ const ClientPortalLog = () => {
 
           {/* Filter Buttons */}
           <div className="flex items-center gap-2 mb-6">
-            <Filter className="h-4 w-4 text-slate-400" />
+            <Filter className="h-4 w-4 text-slate-300" />
             <div className="flex gap-1">
               {['all', 'module', 'assignment', 'feedback', 'achievement'].map((type) => (
                 <Button
@@ -254,7 +258,7 @@ const ClientPortalLog = () => {
                   className={`capitalize text-xs ${
                     filter === type 
                       ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white hover:from-cyan-600 hover:to-purple-700' 
-                      : 'text-slate-400 hover:text-slate-300 hover:bg-slate-800'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
                   }`}
                 >
                   {type === 'all' ? 'All Activity' : type}
@@ -272,7 +276,7 @@ const ClientPortalLog = () => {
               return (
                 <Card 
                   key={activity.id} 
-                  className="bg-slate-900/30 border-slate-800 hover:border-slate-700 transition-all duration-200 hover:bg-slate-800/30"
+                  className="bg-slate-800/30 border-slate-700/50 hover:border-slate-600/50 transition-all duration-200 hover:bg-slate-700/30 backdrop-blur-sm"
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
@@ -291,26 +295,26 @@ const ClientPortalLog = () => {
                             <h3 className="font-medium text-white mb-1 leading-tight">
                               {activity.title}
                             </h3>
-                            <p className="text-sm text-slate-400 mb-2">
+                            <p className="text-sm text-slate-300 mb-2">
                               {activity.details}
                             </p>
                             <div className="flex items-center gap-3">
                               <Badge 
                                 variant="outline" 
                                 className={`text-xs ${
-                                  typeColor === 'blue' ? 'border-cyan-500/30 text-cyan-400' :
-                                  typeColor === 'cyan' ? 'border-cyan-500/30 text-cyan-400' :
-                                  typeColor === 'purple' ? 'border-purple-500/30 text-purple-400' :
-                                  typeColor === 'orange' ? 'border-orange-500/30 text-orange-400' :
-                                  typeColor === 'yellow' ? 'border-yellow-500/30 text-yellow-400' :
-                                  'border-cyan-500/30 text-cyan-400'
+                                  typeColor === 'blue' ? 'border-cyan-500/30 text-cyan-400 bg-cyan-500/10' :
+                                  typeColor === 'cyan' ? 'border-cyan-500/30 text-cyan-400 bg-cyan-500/10' :
+                                  typeColor === 'purple' ? 'border-purple-500/30 text-purple-400 bg-purple-500/10' :
+                                  typeColor === 'orange' ? 'border-orange-500/30 text-orange-400 bg-orange-500/10' :
+                                  typeColor === 'yellow' ? 'border-yellow-500/30 text-yellow-400 bg-yellow-500/10' :
+                                  'border-cyan-500/30 text-cyan-400 bg-cyan-500/10'
                                 }`}
                               >
                                 {activity.type}
                               </Badge>
-                              <span className="text-xs text-slate-500">{activity.timestamp}</span>
-                              <span className="text-xs text-slate-600">•</span>
-                              <span className="text-xs text-slate-500">{activity.date}</span>
+                              <span className="text-xs text-slate-400">{activity.timestamp}</span>
+                              <span className="text-xs text-slate-500">•</span>
+                              <span className="text-xs text-slate-400">{activity.date}</span>
                             </div>
                           </div>
                           
@@ -337,7 +341,7 @@ const ClientPortalLog = () => {
           <div className="text-center pt-6">
             <Button 
               variant="ghost" 
-              className="text-slate-400 hover:text-slate-300 hover:bg-slate-800"
+              className="text-slate-300 hover:text-white hover:bg-slate-700/50"
             >
               Load more activity
             </Button>
