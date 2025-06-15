@@ -1,14 +1,10 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, User } from 'lucide-react';
-import { TimelineView } from '@/components/client-portal/TimelineView';
-import { DashboardView } from '@/components/client-portal/DashboardView';
-import { ProgressView } from '@/components/client-portal/ProgressView';
-import { MinimalView } from '@/components/client-portal/MinimalView';
+import { ArrowLeft, User, Filter, CheckCircle, Clock, ArrowRight } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 const students = [
   {
@@ -67,51 +63,125 @@ const students = [
   }
 ];
 
+const getActivities = (student: any) => [
+  {
+    id: 1,
+    title: 'Completed Advanced Market Analysis lesson',
+    type: 'lesson',
+    status: 'completed',
+    timestamp: '2 hours ago',
+    details: 'Module 2, Lesson 8 • 95% quiz score'
+  },
+  {
+    id: 2,
+    title: `Received feedback on ${student.name}'s Portfolio Analysis #3`,
+    type: 'feedback',
+    status: 'new',
+    timestamp: '4 hours ago',
+    details: 'Coach Sarah Johnson • View feedback'
+  },
+  {
+    id: 3,
+    title: 'Started Cash Flow Optimization module',
+    type: 'lesson',
+    status: 'in-progress',
+    timestamp: '1 day ago',
+    details: 'Module 3 • 45 minutes remaining'
+  },
+  {
+    id: 4,
+    title: 'Submitted Property Analysis Assignment',
+    type: 'assignment',
+    status: 'submitted',
+    timestamp: '2 days ago',
+    details: 'Assignment #4 • Under review'
+  },
+  {
+    id: 5,
+    title: 'Joined live Q&A session',
+    type: 'live',
+    status: 'attended',
+    timestamp: '3 days ago',
+    details: 'Expert Interview: Market Trends • 1h 30m'
+  },
+  {
+    id: 6,
+    title: 'Achieved milestone: Analysis Expert',
+    type: 'achievement',
+    status: 'earned',
+    timestamp: '5 days ago',
+    details: '3 consecutive quizzes with 95%+ score'
+  }
+];
+
+const typeColors = {
+  lesson: 'blue',
+  feedback: 'green',
+  assignment: 'purple',
+  live: 'red',
+  achievement: 'yellow'
+};
+
+const statusIcons = {
+  completed: CheckCircle,
+  new: ArrowRight,
+  'in-progress': Clock,
+  submitted: CheckCircle,
+  attended: CheckCircle,
+  earned: CheckCircle
+};
+
 const ClientPortalLog = () => {
   const [selectedStudent, setSelectedStudent] = useState(students[5]); // Default to Lindsay Sherman
+  const [filter, setFilter] = useState('all');
+  
+  const activities = getActivities(selectedStudent);
+  const filteredActivities = filter === 'all' 
+    ? activities 
+    : activities.filter(activity => activity.type === filter);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-slate-950">
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="sm" className="text-purple-300 hover:text-purple-200">
+          <Button variant="ghost" size="sm" className="text-slate-400 hover:text-slate-300">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
           <div className="flex-1">
             <h1 className="text-3xl font-bold text-white">Client Portal Activity Log</h1>
-            <p className="text-gray-300 mt-1">Design variations for high-ticket info product platforms</p>
+            <p className="text-slate-400 mt-1">Track learning progress and activity for high-ticket clients</p>
           </div>
         </div>
 
         {/* Student Selector */}
         <div className="mb-8">
-          <Card className="bg-slate-800/50 border-purple-500/30">
+          <Card className="bg-slate-900/50 border-slate-800">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <User className="h-5 w-5 text-purple-400" />
+                <User className="h-5 w-5 text-blue-400" />
                 <div className="flex-1">
-                  <label className="text-sm font-medium text-gray-300 mb-2 block">
+                  <label className="text-sm font-medium text-slate-300 mb-2 block">
                     Select Student
                   </label>
                   <Select value={selectedStudent.id} onValueChange={(value) => {
                     const student = students.find(s => s.id === value);
                     if (student) setSelectedStudent(student);
                   }}>
-                    <SelectTrigger className="w-full max-w-md bg-slate-700/50 border-slate-600/50 text-white">
+                    <SelectTrigger className="w-full max-w-md bg-slate-800/50 border-slate-700 text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-600">
+                    <SelectContent className="bg-slate-800 border-slate-700 z-50">
                       {students.map((student) => (
-                        <SelectItem key={student.id} value={student.id} className="text-gray-100 focus:bg-slate-700">
+                        <SelectItem key={student.id} value={student.id} className="text-slate-100 focus:bg-slate-700">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 text-sm font-medium">
+                            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-sm font-medium">
                               {student.avatar}
                             </div>
                             <div>
                               <div className="font-medium">{student.name}</div>
-                              <div className="text-xs text-gray-400">{student.email} • {student.level}</div>
+                              <div className="text-xs text-slate-400">{student.email} • {student.level}</div>
                             </div>
                           </div>
                         </SelectItem>
@@ -120,80 +190,112 @@ const ClientPortalLog = () => {
                   </Select>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-gray-300">Current Progress</div>
-                  <div className="text-2xl font-bold text-purple-400">{selectedStudent.progress}%</div>
-                  <div className="text-xs text-gray-500">{selectedStudent.level} Level</div>
+                  <div className="text-sm text-slate-300">Current Progress</div>
+                  <div className="text-2xl font-bold text-blue-400">{selectedStudent.progress}%</div>
+                  <div className="text-xs text-slate-500">{selectedStudent.level} Level</div>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Design Variations */}
-        <Tabs defaultValue="timeline" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-slate-800/50 border border-purple-500/20">
-            <TabsTrigger value="timeline" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">
-              Timeline View
-            </TabsTrigger>
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">
-              Dashboard Style
-            </TabsTrigger>
-            <TabsTrigger value="progress" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">
-              Progress Focused
-            </TabsTrigger>
-            <TabsTrigger value="minimal" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">
-              Minimal Clean
-            </TabsTrigger>
-          </TabsList>
+        {/* Main Content */}
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Clean Header */}
+          <div className="flex items-center justify-between border-b border-slate-800 pb-6">
+            <div>
+              <h2 className="text-2xl font-semibold text-white">Activity Log - {selectedStudent.name}</h2>
+              <p className="text-slate-400 mt-1">Track learning progress and achievements</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge variant="outline" className="border-green-500/30 text-green-400">
+                {selectedStudent.progress}% Complete
+              </Badge>
+              <Badge variant="outline" className="border-blue-500/30 text-blue-400">
+                {selectedStudent.level}
+              </Badge>
+            </div>
+          </div>
 
-          <TabsContent value="timeline">
-            <Card className="bg-slate-800/50 border-purple-500/30">
-              <CardHeader>
-                <CardTitle className="text-purple-300">Design 1: Timeline-Based Activity Log</CardTitle>
-                <p className="text-gray-400">Inspired by platforms like Kajabi and Teachable - chronological activity feed for {selectedStudent.name}</p>
-              </CardHeader>
-              <CardContent>
-                <TimelineView student={selectedStudent} />
-              </CardContent>
-            </Card>
-          </TabsContent>
+          {/* Filter Buttons */}
+          <div className="flex items-center gap-2 mb-6">
+            <Filter className="h-4 w-4 text-slate-400" />
+            <div className="flex gap-1">
+              {['all', 'lesson', 'assignment', 'feedback', 'achievement'].map((type) => (
+                <Button
+                  key={type}
+                  variant={filter === type ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setFilter(type)}
+                  className={`capitalize text-xs ${
+                    filter === type 
+                      ? 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/30' 
+                      : 'text-slate-400 hover:text-slate-300 hover:bg-slate-800'
+                  }`}
+                >
+                  {type === 'all' ? 'All Activity' : type}
+                </Button>
+              ))}
+            </div>
+          </div>
 
-          <TabsContent value="dashboard">
-            <Card className="bg-slate-800/50 border-purple-500/30">
-              <CardHeader>
-                <CardTitle className="text-purple-300">Design 2: Dashboard-Style Overview</CardTitle>
-                <p className="text-gray-400">Inspired by MasterClass and Coursera - metrics-driven approach for {selectedStudent.name}</p>
-              </CardHeader>
-              <CardContent>
-                <DashboardView student={selectedStudent} />
-              </CardContent>
-            </Card>
-          </TabsContent>
+          {/* Activity List */}
+          <div className="space-y-3">
+            {filteredActivities.map((activity, index) => {
+              const StatusIcon = statusIcons[activity.status];
+              const typeColor = typeColors[activity.type];
+              
+              return (
+                <Card 
+                  key={activity.id} 
+                  className="bg-slate-900/30 border-slate-800 hover:border-slate-700 transition-all duration-200 hover:bg-slate-800/30"
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-1 w-2 h-2 rounded-full bg-${typeColor}-400 flex-shrink-0`}></div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-white mb-1 leading-tight">
+                              {activity.title}
+                            </h3>
+                            <p className="text-sm text-slate-400 mb-2">
+                              {activity.details}
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <Badge 
+                                variant="outline" 
+                                className={`text-xs border-${typeColor}-500/30 text-${typeColor}-400`}
+                              >
+                                {activity.type}
+                              </Badge>
+                              <span className="text-xs text-slate-500">{activity.timestamp}</span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex-shrink-0">
+                            <StatusIcon className={`h-5 w-5 text-${typeColor}-400`} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
 
-          <TabsContent value="progress">
-            <Card className="bg-slate-800/50 border-purple-500/30">
-              <CardHeader>
-                <CardTitle className="text-purple-300">Design 3: Progress-Focused Journey</CardTitle>
-                <p className="text-gray-400">Inspired by Thinkific and LearnDash - learning path visualization for {selectedStudent.name}</p>
-              </CardHeader>
-              <CardContent>
-                <ProgressView student={selectedStudent} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="minimal">
-            <Card className="bg-slate-800/50 border-purple-500/30">
-              <CardHeader>
-                <CardTitle className="text-purple-300">Design 4: Minimal Clean Interface</CardTitle>
-                <p className="text-gray-400">Inspired by Notion and Linear - clean, distraction-free design for {selectedStudent.name}</p>
-              </CardHeader>
-              <CardContent>
-                <MinimalView student={selectedStudent} />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          {/* Load More */}
+          <div className="text-center pt-6">
+            <Button 
+              variant="ghost" 
+              className="text-slate-400 hover:text-slate-300 hover:bg-slate-800"
+            >
+              Load more activity
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
