@@ -56,7 +56,7 @@ const ClientPortalLogApp = () => {
   const currentClient = clients.find(client => client.id === selectedClient);
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-indigo-900">
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -65,13 +65,13 @@ const ClientPortalLogApp = () => {
             Back
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-white">
               RentalizerCalc Analytics Dashboard
             </h1>
             <p className="text-slate-300 mt-1">Individual client activity tracking and payment history</p>
           </div>
           <div className="flex items-center gap-4">
-            <Smartphone className="h-8 w-8 text-purple-400" />
+            <Smartphone className="h-8 w-8 text-white" />
             <div className="text-right">
               <div className="text-lg font-semibold text-white">RentalizerCalc</div>
               <div className="text-sm text-slate-400">v2.1.4</div>
@@ -79,43 +79,93 @@ const ClientPortalLogApp = () => {
           </div>
         </div>
 
-        {/* Client Selector Card */}
+        {/* Client and Time Period Selectors */}
+        <div className="mb-8">
+          <Card className="bg-slate-800/60 border-slate-700/50 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Client Selector */}
+                <div className="flex items-center gap-4">
+                  <User className="h-5 w-5 text-slate-300" />
+                  <div className="flex-1">
+                    <label className="text-sm font-medium text-slate-200 mb-2 block">
+                      Select Client
+                    </label>
+                    <Select value={selectedClient} onValueChange={setSelectedClient}>
+                      <SelectTrigger className="w-full bg-slate-700/60 border-slate-600 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-slate-700 z-50">
+                        {clients.map((client) => (
+                          <SelectItem key={client.id} value={client.id} className="text-slate-100 focus:bg-slate-700">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-white text-sm font-medium">
+                                {client.name.split(' ').map(n => n[0]).join('')}
+                              </div>
+                              <div>
+                                <div className="font-medium">{client.name}</div>
+                                <div className="text-xs text-slate-400">{client.email}</div>
+                              </div>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Time Period Selector */}
+                <div className="flex items-center gap-4">
+                  <Calendar className="h-5 w-5 text-slate-300" />
+                  <div className="flex-1">
+                    <label className="text-sm font-medium text-slate-200 mb-2 block">
+                      Time Period
+                    </label>
+                    <Select value={selectedTimeRange} onValueChange={setSelectedTimeRange}>
+                      <SelectTrigger className="w-full bg-slate-700/60 border-slate-600 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-slate-700 z-50">
+                        {timeRanges.map((range) => (
+                          <SelectItem key={range.value} value={range.value} className="text-slate-100 focus:bg-slate-700">
+                            {range.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Client Info Bar */}
         <div className="mb-8">
           <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <User className="h-5 w-5 text-cyan-400" />
-                <div className="flex-1">
-                  <label className="text-sm font-medium text-slate-200 mb-2 block">
-                    Select Client
-                  </label>
-                  <Select value={selectedClient} onValueChange={setSelectedClient}>
-                    <SelectTrigger className="w-full max-w-md bg-slate-800/60 border-slate-600 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700 z-50">
-                      {clients.map((client) => (
-                        <SelectItem key={client.id} value={client.id} className="text-slate-100 focus:bg-slate-700">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
-                              {client.name.split(' ').map(n => n[0]).join('')}
-                            </div>
-                            <div>
-                              <div className="font-medium">{client.name}</div>
-                              <div className="text-xs text-slate-400">{client.email} • {client.plan}</div>
-                            </div>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <span className="text-slate-300">Viewing data for:</span>
+                  <span className="font-semibold text-white">{currentClient?.name}</span>
+                  <span className="text-slate-400">({currentClient?.email})</span>
+                  <Badge variant="outline" className="border-green-500/30 text-green-400 bg-green-500/10">
+                    Active
+                  </Badge>
                 </div>
-                <div className="text-right">
-                  <div className="text-sm text-slate-200">Current Progress</div>
-                  <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                    100%
+                <div className="flex items-center gap-6 text-sm">
+                  <div>
+                    <span className="text-slate-400">Subscribed: </span>
+                    <span className="text-white">7/31/2024</span>
                   </div>
-                  <div className="text-xs text-slate-400">Advanced Level</div>
+                  <div>
+                    <span className="text-slate-400">Plan: </span>
+                    <span className="text-white">${currentClient?.monthlyRevenue.toFixed(2)}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">Days Active: </span>
+                    <span className="text-white">318</span>
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -123,31 +173,15 @@ const ClientPortalLogApp = () => {
         </div>
 
         {/* Main Content */}
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Clean Header */}
-          <div className="flex items-center justify-between border-b border-slate-600/30 pb-6">
-            <div>
-              <h2 className="text-2xl font-semibold text-white">Activity Log - {currentClient?.name}</h2>
-              <p className="text-slate-300 mt-1">Started learning: {currentClient?.joinedDate}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <Badge variant="outline" className="border-cyan-500/30 text-cyan-400 bg-cyan-500/10">
-                100% Complete
-              </Badge>
-              <Badge variant="outline" className="border-purple-500/30 text-purple-400 bg-purple-500/10">
-                Advanced
-              </Badge>
-            </div>
-          </div>
-
+        <div className="max-w-6xl mx-auto space-y-6">
           {/* Client Activity Tabs */}
           <Tabs defaultValue="activity" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 bg-slate-800/40 border border-slate-700">
-              <TabsTrigger value="activity" className="data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-300 text-slate-300">
+            <TabsList className="grid w-full grid-cols-2 bg-slate-800/60 border border-slate-700">
+              <TabsTrigger value="activity" className="data-[state=active]:bg-purple-600/30 data-[state=active]:text-purple-200 text-slate-300">
                 <Activity className="h-4 w-4 mr-2" />
                 Activity Log
               </TabsTrigger>
-              <TabsTrigger value="payments" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300 text-slate-300">
+              <TabsTrigger value="payments" className="data-[state=active]:bg-purple-600/30 data-[state=active]:text-purple-200 text-slate-300">
                 <TrendingUp className="h-4 w-4 mr-2" />
                 Payment History
               </TabsTrigger>
@@ -156,7 +190,7 @@ const ClientPortalLogApp = () => {
             <TabsContent value="activity">
               <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle className="text-cyan-400 flex items-center gap-2">
+                  <CardTitle className="text-white flex items-center gap-2">
                     <Activity className="h-5 w-5" />
                     Client Activity Log - {timeRanges.find(r => r.value === selectedTimeRange)?.label}
                   </CardTitle>
@@ -175,7 +209,7 @@ const ClientPortalLogApp = () => {
             <TabsContent value="payments">
               <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle className="text-purple-400 flex items-center gap-2">
+                  <CardTitle className="text-white flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
                     Payment History & Billing
                   </CardTitle>
