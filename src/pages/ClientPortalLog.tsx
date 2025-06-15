@@ -467,7 +467,8 @@ const ClientPortalLog = () => {
                               </Badge>
                               <span className="text-xs text-slate-400">{activity.date}</span>
                               <span className="text-xs text-slate-500">•</span>
-                              <span className="text-xs text-slate-500 font-mono">Server ID#: {activity.serverId}</span>
+                              <span className="text-xs text-slate-200 font-mono">Server ID#: </span>
+                              <span className="text-xs text-slate-100 font-mono font-medium">{activity.serverId}</span>
                             </div>
                           </div>
                           
