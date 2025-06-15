@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -80,7 +79,7 @@ const getActivities = (student: any) => [
     status: 'new',
     timestamp: '4 hours ago',
     date: '2024-12-13',
-    details: 'Coach Sarah Johnson • View feedback'
+    details: 'Mentor Richie Matthews • View feedback'
   },
   {
     id: 3,
