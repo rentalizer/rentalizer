@@ -23,19 +23,32 @@ export const SimulatedMarketIntelligence = () => {
   const [propertyType, setPropertyType] = useState<string>('2');
   const [bathrooms, setBathrooms] = useState<string>('2');
   const [isLoading, setIsLoading] = useState(false);
+  const [apiStatus, setApiStatus] = useState<{rentalApiWorking: boolean, strApiWorking: boolean}>({
+    rentalApiWorking: true,
+    strApiWorking: true
+  });
 
   const handleMarketAnalysis = async (city: string, propType: string, bathCount: string, neighborhood?: string) => {
     setIsLoading(true);
+    let rentalApiWorking = true;
+    let strApiWorking = true;
     
     try {
       console.log(`🚀 Starting market analysis for ${neighborhood ? neighborhood + ', ' + city : city} - ${propType}BR/${bathCount}BA`);
       
       // Step 1: Get rental data from OpenAI for specific neighborhood or city
       console.log(`🤖 Fetching OpenAI rental data for ${neighborhood ? neighborhood + ', ' + city : city}`);
-      const rentalApiData = await fetchRealRentalData(city, propType, neighborhood);
-      const rentals = processRentalData(rentalApiData);
       
-      console.log(`📊 Processed OpenAI rental data:`, rentals);
+      let rentals = [];
+      try {
+        const rentalApiData = await fetchRealRentalData(city, propType, neighborhood);
+        rentals = processRentalData(rentalApiData);
+        console.log(`📊 Processed OpenAI rental data:`, rentals);
+      } catch (rentalError) {
+        console.error('❌ Rental API failed:', rentalError);
+        rentalApiWorking = false;
+        rentals = []; // Empty array when API fails
+      }
 
       // Step 2: Create submarkets DIRECTLY from OpenAI rental data
       const submarkets: SubmarketData[] = rentals.map((rental: any, index: number) => {
@@ -130,8 +143,13 @@ export const SimulatedMarketIntelligence = () => {
         console.log(`📊 Matching Results: ${exactMatches} exact/alias, ${fuzzyMatches} fuzzy, ${noMatches} unmatched`);
 
       } catch (strError) {
-        console.warn('⚠️ STR data fetch failed, continuing with rental data only:', strError);
+        console.error('⚠️ STR data fetch failed:', strError);
+        strApiWorking = false;
+        // Don't treat this as a failure - continue with rental data only
       }
+
+      // Update API status
+      setApiStatus({ rentalApiWorking, strApiWorking });
 
       setSubmarketData(submarkets);
       setCityName(city);
@@ -150,9 +168,10 @@ export const SimulatedMarketIntelligence = () => {
 
     } catch (error) {
       console.error('❌ Market analysis error:', error);
+      setApiStatus({ rentalApiWorking: false, strApiWorking: false });
       toast({
         title: "Analysis Failed",
-        description: "Unable to fetch rental data from OpenAI. Please check your API key.",
+        description: "Unable to fetch data. Please check your API configuration.",
         variant: "destructive",
       });
       setSubmarketData([]);
@@ -165,8 +184,30 @@ export const SimulatedMarketIntelligence = () => {
     setSelectedSubmarkets(selected);
   };
 
+  // Show alert only when APIs actually fail
+  const showApiFailureAlert = !apiStatus.rentalApiWorking || !apiStatus.strApiWorking;
+
   return (
     <div className="space-y-8">
+      {/* API Failure Alert - Only show for real API failures */}
+      {showApiFailureAlert && submarketData.length === 0 && (
+        <Card className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border-red-500/30">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              <div>
+                <h3 className="font-semibold text-red-700">API Connection Issues</h3>
+                <p className="text-sm text-gray-600">
+                  {!apiStatus.rentalApiWorking && !apiStatus.strApiWorking && "Both rental and STR APIs are not responding. Check your API keys."}
+                  {!apiStatus.rentalApiWorking && apiStatus.strApiWorking && "Rental data API is not responding. Check your OpenAI API key."}
+                  {apiStatus.rentalApiWorking && !apiStatus.strApiWorking && "STR data API is not responding. Check your RapidAPI key."}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Updated Data Notice */}
       <Card className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-green-500/30">
         <CardContent className="p-4">
@@ -180,7 +221,7 @@ export const SimulatedMarketIntelligence = () => {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </div>
 
       {/* Market Analysis Input */}
       <MarketAnalysisForm onAnalyze={handleMarketAnalysis} isLoading={isLoading} />
