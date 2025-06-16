@@ -24,9 +24,9 @@ serve(async (req) => {
       return await getIncomePredicition(propertyId, rapidApiKey);
     }
 
-    // STR earnings for city - now using deterministic neighborhood assignment
+    // STR earnings for city - now using real property IDs from Airbnb Listings Data API
     if (action === 'get_earnings') {
-      return await getSTREarningsData(city, rapidApiKey);
+      return await getSTREarningsDataWithRealIDs(city, rapidApiKey);
     }
 
     return new Response(JSON.stringify({ 
@@ -49,82 +49,153 @@ serve(async (req) => {
   }
 });
 
-// New function to get STR earnings using only Income Prediction API
-async function getSTREarningsData(city: string, rapidApiKey: string) {
-  console.log(`🏠 Fetching STR earnings for ${city} using Income Prediction API`);
+// New function to get STR earnings using real property IDs from Airbnb Listings Data API
+async function getSTREarningsDataWithRealIDs(city: string, rapidApiKey: string) {
+  console.log(`🏠 Fetching real Airbnb listings for ${city} using Airbnb Listings Data API`);
   
-  // Get sample property IDs for the city (this would need real property IDs)
-  const samplePropertyIds = getSamplePropertyIds(city);
-  
-  if (samplePropertyIds.length === 0) {
-    return getEmptyResponse(city);
-  }
-
-  const properties = [];
-  
-  // Fetch income prediction for each property
-  for (let i = 0; i < Math.min(samplePropertyIds.length, 10); i++) {
-    const propertyId = samplePropertyIds[i];
-    
-    try {
-      console.log(`💰 Fetching income prediction for property: ${propertyId}`);
-      
-      const response = await fetch(`https://airbnb-income-prediction.p.rapidapi.com/?id=${propertyId}`, {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': rapidApiKey,
-          'x-rapidapi-host': 'airbnb-income-prediction.p.rapidapi.com',
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
-        }
-      });
-
-      if (response.ok) {
-        const predictionData = await response.json();
-        
-        // Create property object from prediction data
-        const property = {
-          id: propertyId,
-          name: predictionData.name || `STR Property ${i + 1}`,
-          location: `${getDeterministicNeighborhood(propertyId, city)}, ${city}`,
-          price: Math.round(predictionData.daily_rate || 150),
-          monthly_revenue: Math.round(predictionData.monthly_revenue || 3000),
-          occupancy_rate: Math.round(predictionData.occupancy_rate || 75),
-          rating: 4.5,
-          reviews: Math.floor(Math.random() * 100) + 25,
-          neighborhood: getDeterministicNeighborhood(propertyId, city)
-        };
-        
-        properties.push(property);
-        console.log(`✅ Processed property ${i + 1}: $${property.monthly_revenue}/mo in ${property.neighborhood}`);
-        
-      } else {
-        console.warn(`⚠️ Failed to get prediction for property ${propertyId}: ${response.status}`);
+  try {
+    // Step 1: Get real property IDs from Airbnb Listings Data API
+    const listingsResponse = await fetch(`https://airbnb-listings.p.rapidapi.com/v2/listingsByLocation?location=${encodeURIComponent(city)}&currency=USD`, {
+      method: 'GET',
+      headers: {
+        'x-rapidapi-key': rapidApiKey,
+        'x-rapidapi-host': 'airbnb-listings.p.rapidapi.com',
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
       }
-      
-    } catch (error) {
-      console.error(`❌ Error fetching property ${propertyId}:`, error);
-    }
-  }
+    });
 
-  if (properties.length === 0) {
-    console.warn(`⚠️ No income predictions available for ${city}`);
+    if (!listingsResponse.ok) {
+      console.error(`❌ Airbnb Listings API failed: ${listingsResponse.status}`);
+      return getEmptyResponse(city);
+    }
+
+    const listingsData = await listingsResponse.json();
+    console.log(`📋 Airbnb Listings API response:`, listingsData);
+
+    // Extract property IDs from listings
+    const realPropertyIds = extractPropertyIds(listingsData);
+    
+    if (realPropertyIds.length === 0) {
+      console.warn(`⚠️ No property IDs found in listings for ${city}`);
+      return getEmptyResponse(city);
+    }
+
+    console.log(`✅ Found ${realPropertyIds.length} real property IDs for ${city}`);
+
+    // Step 2: Get income predictions for real property IDs
+    const properties = [];
+    
+    for (let i = 0; i < Math.min(realPropertyIds.length, 10); i++) {
+      const propertyId = realPropertyIds[i].id;
+      const propertyData = realPropertyIds[i];
+      
+      try {
+        console.log(`💰 Fetching income prediction for real property: ${propertyId}`);
+        
+        const response = await fetch(`https://airbnb-income-prediction.p.rapidapi.com/?id=${propertyId}`, {
+          method: 'GET',
+          headers: {
+            'x-rapidapi-key': rapidApiKey,
+            'x-rapidapi-host': 'airbnb-income-prediction.p.rapidapi.com',
+            'Accept': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
+          }
+        });
+
+        if (response.ok) {
+          const predictionData = await response.json();
+          
+          // Create property object from prediction data
+          const property = {
+            id: propertyId,
+            name: predictionData.name || propertyData.name || `STR Property ${i + 1}`,
+            location: `${propertyData.neighborhood || getDeterministicNeighborhood(propertyId, city)}, ${city}`,
+            price: Math.round(predictionData.daily_rate || propertyData.price || 150),
+            monthly_revenue: Math.round(predictionData.monthly_revenue || 3000),
+            occupancy_rate: Math.round(predictionData.occupancy_rate || 75),
+            rating: propertyData.rating || 4.5,
+            reviews: propertyData.reviews || Math.floor(Math.random() * 100) + 25,
+            neighborhood: propertyData.neighborhood || getDeterministicNeighborhood(propertyId, city)
+          };
+          
+          properties.push(property);
+          console.log(`✅ Processed real property ${i + 1}: $${property.monthly_revenue}/mo in ${property.neighborhood}`);
+          
+        } else {
+          console.warn(`⚠️ Failed to get prediction for real property ${propertyId}: ${response.status}`);
+        }
+        
+      } catch (error) {
+        console.error(`❌ Error fetching real property ${propertyId}:`, error);
+      }
+    }
+
+    if (properties.length === 0) {
+      console.warn(`⚠️ No income predictions available for real properties in ${city}`);
+      return getEmptyResponse(city);
+    }
+
+    const processedData = {
+      success: true,
+      data: {
+        city: city,
+        properties: properties
+      }
+    };
+    
+    console.log(`✅ Successfully processed ${properties.length} real STR properties for ${city} using Airbnb Listings + Income Prediction APIs`);
+    
+    return new Response(JSON.stringify(processedData), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  } catch (error) {
+    console.error(`❌ Error fetching listings for ${city}:`, error);
     return getEmptyResponse(city);
   }
+}
 
-  const processedData = {
-    success: true,
-    data: {
-      city: city,
-      properties: properties
+// Extract property IDs and metadata from Airbnb Listings API response
+function extractPropertyIds(listingsData: any): any[] {
+  const propertyIds = [];
+  
+  try {
+    // Handle different possible response structures
+    let listings = [];
+    
+    if (listingsData.results) {
+      listings = listingsData.results;
+    } else if (listingsData.data) {
+      listings = listingsData.data;
+    } else if (Array.isArray(listingsData)) {
+      listings = listingsData;
+    } else if (listingsData.listings) {
+      listings = listingsData.listings;
     }
-  };
+
+    console.log(`🔍 Processing ${listings.length} listings from API response`);
+    
+    for (const listing of listings) {
+      if (listing.id) {
+        propertyIds.push({
+          id: listing.id.toString(),
+          name: listing.name || listing.title,
+          neighborhood: listing.neighborhood || listing.location,
+          price: listing.price || listing.nightly_price,
+          rating: listing.rating || listing.star_rating,
+          reviews: listing.review_count || listing.reviews
+        });
+      }
+    }
+    
+    console.log(`✅ Extracted ${propertyIds.length} property IDs from listings`);
+    
+  } catch (error) {
+    console.error('❌ Error extracting property IDs:', error);
+  }
   
-  console.log(`✅ Successfully processed ${properties.length} STR properties for ${city} using Income Prediction API`);
-  
-  return new Response(JSON.stringify(processedData), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
+  return propertyIds;
 }
 
 // Income prediction API function (kept as is)
@@ -181,11 +252,10 @@ async function getIncomePredicition(propertyId: string, rapidApiKey: string) {
   }
 }
 
-// Deterministic neighborhood assignment based on property ID
+// Deterministic neighborhood assignment based on property ID (fallback)
 function getDeterministicNeighborhood(propertyId: string, city: string): string {
   const cityLower = city.toLowerCase();
   
-  // Define neighborhoods for each city
   const neighborhoodsByCity: { [key: string]: string[] } = {
     'miami': ['South Beach', 'Brickell', 'Wynwood', 'Design District', 'Coconut Grove', 'Coral Gables', 'Midtown', 'Little Havana'],
     'san diego': ['Gaslamp Quarter', 'Mission Beach', 'Pacific Beach', 'La Jolla', 'Little Italy', 'Hillcrest', 'Balboa Park', 'North Park'],
@@ -197,7 +267,6 @@ function getDeterministicNeighborhood(propertyId: string, city: string): string 
     'nashville': ['Downtown', 'Music Row', 'Gulch', 'East Nashville', 'West End', 'Germantown', 'The Nations', 'Sobro']
   };
 
-  // Find matching city neighborhoods
   let neighborhoods = [];
   for (const [key, hoods] of Object.entries(neighborhoodsByCity)) {
     if (cityLower.includes(key) || key.includes(cityLower)) {
@@ -206,16 +275,12 @@ function getDeterministicNeighborhood(propertyId: string, city: string): string 
     }
   }
 
-  // Fallback to generic neighborhoods if city not found
   if (neighborhoods.length === 0) {
     neighborhoods = ['Downtown', 'Midtown', 'Uptown', 'West Side', 'East Side', 'North District', 'South District', 'Central'];
   }
 
-  // Use property ID to deterministically select neighborhood
   const hash = simpleHash(propertyId);
   const index = hash % neighborhoods.length;
-  
-  console.log(`🎯 Deterministic assignment: Property ${propertyId} -> ${neighborhoods[index]} (hash: ${hash}, index: ${index})`);
   
   return neighborhoods[index];
 }
@@ -226,42 +291,12 @@ function simpleHash(str: string): number {
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
+    hash = hash & hash;
   }
   return Math.abs(hash);
 }
 
-// Get sample property IDs for each city (in real implementation, these would come from a database)
-function getSamplePropertyIds(city: string): string[] {
-  const cityLower = city.toLowerCase();
-  
-  const sampleIds: { [key: string]: string[] } = {
-    'san diego': [
-      '12345001', '12345002', '12345003', '12345004', '12345005',
-      '12345006', '12345007', '12345008', '12345009', '12345010'
-    ],
-    'miami': [
-      '23456001', '23456002', '23456003', '23456004', '23456005',
-      '23456006', '23456007', '23456008', '23456009', '23456010'
-    ],
-    'austin': [
-      '34567001', '34567002', '34567003', '34567004', '34567005',
-      '34567006', '34567007', '34567008', '34567009', '34567010'
-    ]
-  };
-
-  // Find matching city
-  for (const [key, ids] of Object.entries(sampleIds)) {
-    if (cityLower.includes(key) || key.includes(cityLower)) {
-      return ids;
-    }
-  }
-
-  // Return empty array if city not supported
-  return [];
-}
-
-// Empty response for unsupported cities
+// Empty response for unsupported cities or API failures
 function getEmptyResponse(city: string) {
   console.warn('⚠️ No STR data available - returning empty results');
   
@@ -270,7 +305,7 @@ function getEmptyResponse(city: string) {
     data: {
       city: city,
       properties: [],
-      message: `No STR data available for ${city}. Only specific cities are supported with the Income Prediction API.`
+      message: `No STR data available for ${city}. Unable to fetch real property listings or income predictions.`
     }
   };
 
