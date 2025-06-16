@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 interface AirbnbProperty {
@@ -45,6 +44,31 @@ export const fetchAirbnbEarningsData = async (city: string, propertyType: string
   }
 };
 
+// New function for income prediction
+export const fetchIncomePredicition = async (propertyId: string) => {
+  try {
+    console.log(`💰 Calling Income Prediction API for property: ${propertyId}`);
+    
+    const { data, error } = await supabase.functions.invoke('rapidapi-airbnb', {
+      body: {
+        propertyId,
+        action: 'get_income_prediction'
+      }
+    });
+
+    if (error) {
+      throw new Error(`Income Prediction API call failed: ${error.message}`);
+    }
+
+    console.log('✅ Income Prediction response:', data);
+    
+    return data;
+  } catch (error) {
+    console.error('❌ Income Prediction API error:', error);
+    throw error;
+  }
+};
+
 export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
   console.log('🔍 Processing RapidAPI Airbnb earnings data:', apiData);
   
@@ -66,7 +90,6 @@ export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
     }));
   }
   
-  // If API failed, don't calculate averages from zero values
   const validProperties = processedProperties.filter(prop => prop.monthlyRevenue > 0);
   const averageRevenue = validProperties.length > 0 
     ? validProperties.reduce((sum, prop) => sum + prop.monthlyRevenue, 0) / validProperties.length

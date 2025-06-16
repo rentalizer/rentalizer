@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -13,31 +12,33 @@ serve(async (req) => {
   }
 
   try {
-    const { city, propertyType, action } = await req.json();
+    const { city, propertyType, action, propertyId } = await req.json();
     
-    console.log(`🚀 Processing STR Earnings request for ${city}`);
+    console.log(`🚀 Processing STR request: ${action} for ${city}`);
     
     const rapidApiKey = '563ec2eceemshee4eb6d8e03f721p10e15cjsn56661816f3c3';
 
-    // Get coordinates for the city
+    // New action for income prediction
+    if (action === 'get_income_prediction' && propertyId) {
+      return await getIncomePredicition(propertyId, rapidApiKey);
+    }
+
+    // Existing earnings data logic
     const coordinates = getCityCoordinates(city);
     if (!coordinates) {
       console.warn(`⚠️ No coordinates found for ${city}, API call not possible`);
       
-      // Only return fallback data for San Diego
       const cityLower = city.toLowerCase();
       if (cityLower.includes('san diego') || cityLower.includes('sandiego')) {
         return getFallbackResponse(city);
       }
       
-      // For all other cities, return empty data
       return getEmptyResponse(city);
     }
     
     try {
       console.log(`📡 Trying Airbnb Listings Data API for ${city} with coordinates:`, coordinates);
       
-      // Build URL with query parameters
       const apiUrl = new URL('https://airbnb-listings-data.p.rapidapi.com/getListingsData');
       apiUrl.searchParams.append('nwLat', coordinates.nwLat.toString());
       apiUrl.searchParams.append('nwLng', coordinates.nwLng.toString());
@@ -65,7 +66,6 @@ serve(async (req) => {
           keys: Object.keys(apiData)
         });
         
-        // Process the API response - the data is in apiData.message array
         const listings = apiData.message || [];
         
         if (Array.isArray(listings) && listings.length > 0) {
@@ -80,10 +80,7 @@ serve(async (req) => {
               occupancy: listing.avg_occupancy_rate_ltm
             });
             
-            // Extract neighborhood from location or use city name
             const neighborhood = extractNeighborhood(listing.name, city) || city;
-            
-            // Calculate monthly revenue more accurately
             const dailyRate = listing.avg_booked_daily_rate_ltm || 0;
             const occupancyRate = (listing.avg_occupancy_rate_ltm || 0) / 100;
             const monthlyRevenue = Math.round(dailyRate * occupancyRate * 30);
@@ -95,8 +92,8 @@ serve(async (req) => {
               price: Math.round(dailyRate),
               monthly_revenue: monthlyRevenue,
               occupancy_rate: Math.round(listing.avg_occupancy_rate_ltm || 0),
-              rating: 4.5, // Default rating since not in API response
-              reviews: 25, // Default reviews since not in API response
+              rating: 4.5,
+              reviews: 25,
               neighborhood: neighborhood
             };
           });
@@ -126,14 +123,12 @@ serve(async (req) => {
       console.error('❌ Airbnb Listings API failed:', apiError);
     }
 
-    // Only fallback to market data for San Diego
     const cityLower = city.toLowerCase();
     if (cityLower.includes('san diego') || cityLower.includes('sandiego')) {
       console.log(`📡 Using fallback data for San Diego`);
       return getFallbackResponse(city);
     }
 
-    // For all other cities, return empty data when API fails
     console.log(`📡 API failed for ${city}, returning empty data (no fallback)`);
     return getEmptyResponse(city);
 
@@ -148,6 +143,60 @@ serve(async (req) => {
     });
   }
 });
+
+// New function for income prediction API
+async function getIncomePredicition(propertyId: string, rapidApiKey: string) {
+  try {
+    console.log(`💰 Fetching income prediction for property ID: ${propertyId}`);
+    
+    const response = await fetch(`https://airbnb-income-prediction.p.rapidapi.com/?id=${propertyId}`, {
+      method: 'GET',
+      headers: {
+        'x-rapidapi-key': rapidApiKey,
+        'x-rapidapi-host': 'airbnb-income-prediction.p.rapidapi.com',
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (compatible; Supabase-Edge-Function/1.0)'
+      }
+    });
+
+    console.log(`💰 Income Prediction Response Status: ${response.status}`);
+
+    if (response.ok) {
+      const predictionData = await response.json();
+      console.log(`✅ Income prediction data received:`, predictionData);
+      
+      return new Response(JSON.stringify({
+        success: true,
+        data: predictionData,
+        propertyId: propertyId
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    } else {
+      const errorText = await response.text();
+      console.error(`❌ Income Prediction API failed with status: ${response.status}, body: ${errorText}`);
+      
+      return new Response(JSON.stringify({
+        success: false,
+        error: `Income prediction API failed: ${response.status}`,
+        propertyId: propertyId
+      }), {
+        status: response.status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+  } catch (error) {
+    console.error('❌ Income Prediction API error:', error);
+    return new Response(JSON.stringify({
+      success: false,
+      error: error.message,
+      propertyId: propertyId
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+}
 
 // Extract neighborhood from property name or use fallback
 function extractNeighborhood(propertyName: string, city: string): string | null {
