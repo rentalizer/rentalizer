@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Eye, AlertTriangle } from 'lucide-react';
@@ -22,6 +23,7 @@ export const SimulatedMarketIntelligence = () => {
   const [propertyType, setPropertyType] = useState<string>('2');
   const [bathrooms, setBathrooms] = useState<string>('2');
   const [isLoading, setIsLoading] = useState(false);
+  const [hasRunAnalysis, setHasRunAnalysis] = useState(false);
   const [apiStatus, setApiStatus] = useState<{rentalApiWorking: boolean, strApiWorking: boolean}>({
     rentalApiWorking: true,
     strApiWorking: true
@@ -29,6 +31,7 @@ export const SimulatedMarketIntelligence = () => {
 
   const handleMarketAnalysis = async (city: string, propType: string, bathCount: string, neighborhood?: string) => {
     setIsLoading(true);
+    setHasRunAnalysis(true);
     let rentalApiWorking = true;
     let strApiWorking = true;
     
@@ -183,13 +186,13 @@ export const SimulatedMarketIntelligence = () => {
     setSelectedSubmarkets(selected);
   };
 
-  // Show alert only when APIs actually fail
-  const showApiFailureAlert = !apiStatus.rentalApiWorking || !apiStatus.strApiWorking;
+  // Only show alert when analysis has been attempted AND APIs failed AND no data was returned
+  const showApiFailureAlert = hasRunAnalysis && (!apiStatus.rentalApiWorking || !apiStatus.strApiWorking) && submarketData.length === 0;
 
   return (
     <div className="space-y-8">
-      {/* API Failure Alert - Only show for real API failures */}
-      {showApiFailureAlert && submarketData.length === 0 && (
+      {/* API Failure Alert - Only show for real API failures after analysis attempt */}
+      {showApiFailureAlert && (
         <Card className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border-red-500/30">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
