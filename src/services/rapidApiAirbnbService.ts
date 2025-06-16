@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 interface AirbnbProperty {
@@ -11,18 +10,20 @@ interface AirbnbProperty {
   rating: number;
   reviews: number;
   neighborhood: string;
+  api_source?: string;
 }
 
 interface AirbnbEarningsData {
   properties: AirbnbProperty[];
   averageRevenue: number;
   totalProperties: number;
+  realPredictions?: number;
   city: string;
 }
 
 export const fetchAirbnbEarningsData = async (city: string, propertyType: string = '2') => {
   try {
-    console.log(`🚀 Calling Income Prediction API for STR earnings in ${city}`);
+    console.log(`🚀 Calling Enhanced Dual API for STR earnings in ${city}`);
     
     const { data, error } = await supabase.functions.invoke('rapidapi-airbnb', {
       body: {
@@ -33,14 +34,14 @@ export const fetchAirbnbEarningsData = async (city: string, propertyType: string
     });
 
     if (error) {
-      throw new Error(`Income Prediction API call failed: ${error.message}`);
+      throw new Error(`Enhanced dual API call failed: ${error.message}`);
     }
 
-    console.log('✅ Income Prediction API response:', data);
+    console.log('✅ Enhanced dual API response:', data);
     
     return data;
   } catch (error) {
-    console.error('❌ Income Prediction API error:', error);
+    console.error('❌ Enhanced dual API error:', error);
     throw error;
   }
 };
@@ -71,7 +72,7 @@ export const fetchIncomePredicition = async (propertyId: string) => {
 };
 
 export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
-  console.log('🔍 Processing Income Prediction API earnings data:', apiData);
+  console.log('🔍 Processing Enhanced Dual API earnings data:', apiData);
   
   let processedProperties: AirbnbProperty[] = [];
   
@@ -87,7 +88,8 @@ export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
       occupancyRate: property.occupancy_rate || 0,
       rating: property.rating || 4.5,
       reviews: property.reviews || 0,
-      neighborhood: property.neighborhood || 'Unknown'
+      neighborhood: property.neighborhood || 'Unknown',
+      api_source: property.api_source || 'unknown'
     }));
   }
   
@@ -96,10 +98,14 @@ export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
     ? validProperties.reduce((sum, prop) => sum + prop.monthlyRevenue, 0) / validProperties.length
     : 0;
   
+  // Extract real predictions count from data sources
+  const realPredictions = apiData?.data?.data_sources?.real_predictions || 0;
+  
   return {
     properties: processedProperties,
     averageRevenue: Math.round(averageRevenue),
     totalProperties: processedProperties.length,
+    realPredictions: realPredictions,
     city: apiData?.data?.city || 'Unknown City'
   };
 };
