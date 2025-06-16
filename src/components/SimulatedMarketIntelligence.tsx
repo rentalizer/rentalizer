@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Eye, AlertTriangle } from 'lucide-react';
@@ -221,7 +220,7 @@ export const SimulatedMarketIntelligence = () => {
             </div>
           </div>
         </CardContent>
-      </div>
+      </Card>
 
       {/* Market Analysis Input */}
       <MarketAnalysisForm onAnalyze={handleMarketAnalysis} isLoading={isLoading} />
