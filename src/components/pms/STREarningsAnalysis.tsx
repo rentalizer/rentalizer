@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, DollarSign, TrendingUp, Star, MapPin, Code, Activity } from 'lucide-react';
+import { Search, DollarSign, TrendingUp, Star, MapPin, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { fetchAirbnbEarningsData, processAirbnbEarningsData } from '@/services/rapidApiAirbnbService';
 
@@ -13,7 +13,6 @@ export const STREarningsAnalysis = () => {
   const [city, setCity] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [earningsData, setEarningsData] = useState<any>(null);
-  const [apiTestResult, setApiTestResult] = useState<any>(null);
 
   const handleAnalyze = async () => {
     if (!city.trim()) {
@@ -28,32 +27,22 @@ export const STREarningsAnalysis = () => {
     setIsLoading(true);
     
     try {
-      console.log(`🔍 Testing Web Scraping API for ${city}`);
+      console.log(`🔍 Using Income Prediction API for ${city}`);
       
       const apiData = await fetchAirbnbEarningsData(city);
+      const processedData = processAirbnbEarningsData(apiData);
+      setEarningsData(processedData);
       
-      // Check if this is a web scraping API response
-      if (apiData.source === 'web-scraping-api') {
-        setApiTestResult(apiData);
-        toast({
-          title: "Web Scraping API Test",
-          description: `Web Scraping API response received for ${city}. Check results below.`,
-        });
-      } else {
-        const processedData = processAirbnbEarningsData(apiData);
-        setEarningsData(processedData);
-        
-        toast({
-          title: "Analysis Complete",
-          description: `Found ${processedData.totalProperties} STR properties in ${city}`,
-        });
-      }
+      toast({
+        title: "Analysis Complete",
+        description: `Found ${processedData.totalProperties} STR properties in ${city} using Income Prediction API`,
+      });
       
     } catch (error) {
       console.error('STR earnings analysis error:', error);
       toast({
         title: "Analysis Failed",
-        description: "Unable to fetch STR earnings data. Please try again.",
+        description: "Unable to fetch STR earnings data. This city may not be supported yet.",
         variant: "destructive"
       });
     } finally {
@@ -66,8 +55,23 @@ export const STREarningsAnalysis = () => {
       {/* Header */}
       <div>
         <h2 className="text-xl font-bold text-gray-900">STR Earnings Analysis</h2>
-        <p className="text-gray-600">Test the new Web Scraping API for STR earnings data</p>
+        <p className="text-gray-600">Using Income Prediction API with deterministic neighborhood assignment</p>
       </div>
+
+      {/* API Info Banner */}
+      <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <Zap className="h-5 w-5 text-blue-600" />
+            <div>
+              <h3 className="font-semibold text-blue-700">Income Prediction API</h3>
+              <p className="text-sm text-gray-600">
+                Now using only the Income Prediction API with deterministic neighborhood assignment for consistent results.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Search Input */}
       <Card>
@@ -75,7 +79,7 @@ export const STREarningsAnalysis = () => {
           <div className="flex gap-4">
             <div className="flex-1">
               <Input
-                placeholder="Enter city name to test Web Scraping API"
+                placeholder="Enter city name (San Diego, Miami, Austin, etc.)"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleAnalyze()}
@@ -83,43 +87,13 @@ export const STREarningsAnalysis = () => {
             </div>
             <Button onClick={handleAnalyze} disabled={isLoading}>
               <Search className="h-4 w-4 mr-2" />
-              {isLoading ? 'Testing API...' : 'Test API'}
+              {isLoading ? 'Analyzing...' : 'Analyze STR Market'}
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Web Scraping API Test Results */}
-      {apiTestResult && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Code className="h-5 w-5 text-blue-600" />
-              Web Scraping API Test Results
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <Badge variant="outline" className="border-green-500 text-green-600">
-                  <Activity className="h-3 w-3 mr-1" />
-                  API Response Received
-                </Badge>
-                <span className="text-sm text-gray-600">City: {apiTestResult.data.city}</span>
-              </div>
-              
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium mb-2">Raw API Response:</h4>
-                <pre className="text-xs bg-white p-3 rounded border overflow-auto max-h-96">
-                  {JSON.stringify(apiTestResult.data.apiResponse, null, 2)}
-                </pre>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Regular Results */}
+      {/* Results */}
       {earningsData && (
         <>
           {/* Summary Stats */}
@@ -164,7 +138,7 @@ export const STREarningsAnalysis = () => {
           {/* Properties List */}
           <Card>
             <CardHeader>
-              <CardTitle>STR Properties</CardTitle>
+              <CardTitle>STR Properties (Income Prediction API)</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -177,7 +151,9 @@ export const STREarningsAnalysis = () => {
                       <h3 className="font-medium text-gray-900">{property.name}</h3>
                       <p className="text-sm text-gray-600 mb-2">{property.location}</p>
                       <div className="flex items-center space-x-4 text-sm">
-                        <Badge variant="outline">{property.neighborhood}</Badge>
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          {property.neighborhood}
+                        </Badge>
                         <span className="flex items-center">
                           <Star className="h-3 w-3 text-yellow-500 mr-1" />
                           {property.rating} ({property.reviews} reviews)

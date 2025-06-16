@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 interface AirbnbProperty {
@@ -21,7 +22,7 @@ interface AirbnbEarningsData {
 
 export const fetchAirbnbEarningsData = async (city: string, propertyType: string = '2') => {
   try {
-    console.log(`🚀 Calling RapidAPI Airbnb Scraper for ${city}`);
+    console.log(`🚀 Calling Income Prediction API for STR earnings in ${city}`);
     
     const { data, error } = await supabase.functions.invoke('rapidapi-airbnb', {
       body: {
@@ -32,19 +33,19 @@ export const fetchAirbnbEarningsData = async (city: string, propertyType: string
     });
 
     if (error) {
-      throw new Error(`RapidAPI call failed: ${error.message}`);
+      throw new Error(`Income Prediction API call failed: ${error.message}`);
     }
 
-    console.log('✅ RapidAPI Airbnb response:', data);
+    console.log('✅ Income Prediction API response:', data);
     
     return data;
   } catch (error) {
-    console.error('❌ RapidAPI Airbnb error:', error);
+    console.error('❌ Income Prediction API error:', error);
     throw error;
   }
 };
 
-// New function for income prediction
+// Income prediction for specific property
 export const fetchIncomePredicition = async (propertyId: string) => {
   try {
     console.log(`💰 Calling Income Prediction API for property: ${propertyId}`);
@@ -70,7 +71,7 @@ export const fetchIncomePredicition = async (propertyId: string) => {
 };
 
 export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
-  console.log('🔍 Processing RapidAPI Airbnb earnings data:', apiData);
+  console.log('🔍 Processing Income Prediction API earnings data:', apiData);
   
   let processedProperties: AirbnbProperty[] = [];
   
@@ -78,15 +79,15 @@ export const processAirbnbEarningsData = (apiData: any): AirbnbEarningsData => {
     const properties = apiData.data.properties || [];
     
     processedProperties = properties.map((property: any) => ({
-      id: property.id || property.listing_id || Math.random().toString(),
-      name: property.name || property.title || 'No Data Available',
-      location: property.location || property.address || 'No Data Available',
-      price: property.price || property.nightly_rate || 0,
-      monthlyRevenue: property.monthly_revenue || (property.price * 20) || 0,
-      occupancyRate: property.occupancy_rate || property.occupancy || 0,
-      rating: property.rating || property.review_score || 0,
-      reviews: property.reviews || property.review_count || 0,
-      neighborhood: property.neighborhood || property.district || 'No Data Available'
+      id: property.id || Math.random().toString(),
+      name: property.name || 'STR Property',
+      location: property.location || 'Location Not Available',
+      price: property.price || 0,
+      monthlyRevenue: property.monthly_revenue || 0,
+      occupancyRate: property.occupancy_rate || 0,
+      rating: property.rating || 4.5,
+      reviews: property.reviews || 0,
+      neighborhood: property.neighborhood || 'Unknown'
     }));
   }
   
