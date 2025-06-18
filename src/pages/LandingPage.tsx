@@ -226,9 +226,9 @@ const LandingPage = () => {
             </div>
             <p className="text-lg text-white font-medium mb-8">By Richie Matthews</p>
             
-            {/* Updated Tagline */}
+            {/* Updated Tagline - Smaller text to fit on one line */}
             <div className="mb-12 px-4">
-              <p className="text-2xl md:text-3xl lg:text-4xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
+              <p className="text-xl md:text-2xl lg:text-3xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
                 All-in-One AI Platform to Launch and Scale a Rental Arbitrage Business
               </p>
             </div>
