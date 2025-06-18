@@ -229,7 +229,7 @@ const LandingPage = () => {
             {/* Updated Tagline - Smaller text to fit on one line */}
             <div className="mb-12 px-4">
               <p className="text-xl md:text-2xl lg:text-3xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
-                All-in-One AI Platform to Launch and Scale a Rental Arbitrage Business
+                All-in-One AI Platform to Launch and Scale Your Rental Arbitrage Business
               </p>
             </div>
 
