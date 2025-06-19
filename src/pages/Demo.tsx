@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -47,7 +48,6 @@ import { MapView } from '@/components/MapView';
 import { AcquisitionsCRMDemo } from '@/components/AcquisitionsCRMDemo';
 import { PMSDemo } from '@/components/PMSDemo';
 import { ResultsTable } from '@/components/ResultsTable';
-import { LoginDialog } from '@/components/LoginDialog';
 
 const Demo = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -144,7 +144,7 @@ const Demo = () => {
     }
   };
 
-  const handleStepClick = (stepId) => {
+  const handleStepClick = (stepId: number) => {
     if (manualMode || !demoRunning) {
       setCurrentStep(stepId);
       if (!manualMode) {
@@ -152,6 +152,10 @@ const Demo = () => {
         setDemoRunning(false);
       }
     }
+  };
+
+  const handleGetStarted = () => {
+    window.location.href = '/pricing';
   };
 
   const steps = [
@@ -175,7 +179,7 @@ const Demo = () => {
     { id: 18, title: "Get Started Today", description: "Join thousands of successful investors", icon: Star, category: "sales" }
   ];
 
-  const getStepColor = (step, category) => {
+  const getStepColor = (step: number, category: string) => {
     if (step <= currentStep) {
       switch (category) {
         case "market":
@@ -195,7 +199,7 @@ const Demo = () => {
     return "bg-gray-700";
   };
 
-  const getStepBorder = (step, category) => {
+  const getStepBorder = (step: number, category: string) => {
     if (step === currentStep && (demoRunning || manualMode)) {
       switch (category) {
         case "market":
@@ -440,6 +444,15 @@ const Demo = () => {
                 <Play className="mr-3 h-6 w-6" />
                 Start Live Demo Now
               </Button>
+              <Button 
+                onClick={() => setManualMode(true)}
+                size="lg"
+                variant="outline"
+                className="px-12 py-6 text-xl font-bold border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 transform hover:scale-105 transition-all duration-300"
+              >
+                <Settings className="mr-3 h-6 w-6" />
+                Manual Exploration
+              </Button>
             </div>
             
             {/* Trust Indicators */}
@@ -518,36 +531,21 @@ const Demo = () => {
           </div>
         </div>
 
-        {/* Step Indicator Dots */}
-        <div className="mb-12">
-          <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
-            {steps.map((step, index) => (
-              <div 
-                key={step.id}
-                onClick={() => handleStepClick(step.id)}
-                className={`cursor-pointer group relative`}
-                title={`Step ${step.id}: ${step.title}`}
-              >
-                <div className={`
-                  w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300
-                  ${getStepColor(step.id, step.category)}
-                  ${getStepBorder(step.id, step.category)}
-                  ${step.id <= currentStep ? 'text-white' : 'text-gray-400'}
-                  hover:scale-110
-                `}>
-                  {step.id}
-                </div>
-                
-                {/* Tooltip */}
-                <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                  <div className="bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                    {step.title}
-                  </div>
-                </div>
-              </div>
-            ))}
+        {/* 18 Steps Indicator Dots */}
+        {(demoRunning || manualMode) && (
+          <div className="flex justify-center mb-8">
+            <div className="flex gap-2 flex-wrap justify-center max-w-4xl">
+              {steps.map((step) => (
+                <button
+                  key={step.id}
+                  onClick={() => handleStepClick(step.id)}
+                  className={`w-4 h-4 rounded-full transition-all duration-300 ${getStepColor(step.id, step.category)} ${getStepBorder(step.id, step.category)} hover:scale-110`}
+                  title={`${step.title}: ${step.description}`}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Compact Current Step Display */}
         {(demoRunning || manualMode) && (
@@ -979,13 +977,12 @@ const Demo = () => {
                             <span className="text-gray-300">ROI & Cash Flow Analysis</span>
                           </div>
                         </div>
-                        <LoginDialog 
-                          trigger={
-                            <Button className="w-full bg-cyan-600 hover:bg-cyan-700 text-white">
-                              Get Started
-                            </Button>
-                          }
-                        />
+                        <Button 
+                          onClick={handleGetStarted}
+                          className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
+                        >
+                          Get Started
+                        </Button>
                       </div>
 
                       {/* All-In-One System Plan */}
@@ -1023,13 +1020,12 @@ const Demo = () => {
                             <span className="text-gray-300">Priority Support</span>
                           </div>
                         </div>
-                        <LoginDialog 
-                          trigger={
-                            <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold">
-                              Get Started
-                            </Button>
-                          }
-                        />
+                        <Button 
+                          onClick={handleGetStarted}
+                          className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold"
+                        >
+                          Get Started
+                        </Button>
                       </div>
                     </div>
 
@@ -1086,10 +1082,10 @@ const Demo = () => {
               </Card>
             )}
           </div>
-        </div>
-
-        <Footer />
+        )}
       </div>
+
+      <Footer />
     </div>
   );
 };
