@@ -153,6 +153,11 @@ const Test5 = () => {
     }
   };
 
+  const handleGetStarted = () => {
+    // Navigate to pricing or registration page
+    window.location.href = '/pricing';
+  };
+
   const steps = [
     { id: 1, title: "Market Research", description: "AI analyzes rental markets", icon: Search, category: "market" },
     { id: 2, title: "Market Scoring", description: "Evaluates profitability metrics", icon: BarChart3, category: "market" },
@@ -407,24 +412,7 @@ const Test5 = () => {
           {/* Workflow Overview */}
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-8">Complete 18-Step Workflow</h2>
-            <div className="flex justify-center items-center gap-2 mb-8 flex-wrap">
-              {steps.map((step, index) => (
-                <div key={step.id} className="flex items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold transition-all duration-300 ${
-                    step.category === 'market' ? 'bg-cyan-500' :
-                    step.category === 'acquisition' ? 'bg-purple-500' :
-                    step.category === 'pms' ? 'bg-blue-500' :
-                    step.category === 'community' ? 'bg-cyan-500' :
-                    'bg-purple-500'
-                  }`}>
-                    {step.id}
-                  </div>
-                  {index < steps.length - 1 && (
-                    <ArrowRight className="h-4 w-4 text-gray-500 mx-1" />
-                  )}
-                </div>
-              ))}
-            </div>
+            {/* Removed the step indicator circles as requested */}
             
             {/* Category Labels */}
             <div className="flex justify-center items-center gap-8 flex-wrap">
@@ -547,60 +535,43 @@ const Test5 = () => {
           </div>
         </div>
 
-        {/* Streamlined Progress Flow */}
-        <div className="max-w-6xl mx-auto mb-8">
-          <div className="flex justify-center items-center gap-4 mb-6 flex-wrap">
-            {steps.map((step) => (
-              <div
-                key={step.id}
-                onClick={() => handleStepClick(step.id)}
-                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 cursor-pointer ${getStepColor(step.id, step.category)} ${getStepBorder(step.id, step.category)} ${
-                  manualMode || !demoRunning ? 'hover:scale-110' : ''
-                }`}
-              >
-                <span className="text-white text-sm font-bold">{step.id}</span>
+        {/* Compact Current Step Display */}
+        {(demoRunning || manualMode) && (
+          <div className="text-center mb-6">
+            <div className="bg-slate-800/50 backdrop-blur-lg border border-gray-700 rounded-lg p-4 max-w-lg mx-auto">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                {React.createElement(steps[currentStep - 1]?.icon || Search, {
+                  className: `h-6 w-6 ${
+                    steps[currentStep - 1]?.category === 'market' ? 'text-cyan-400' :
+                    steps[currentStep - 1]?.category === 'acquisition' ? 'text-purple-400' :
+                    steps[currentStep - 1]?.category === 'pms' ? 'text-blue-400' :
+                    steps[currentStep - 1]?.category === 'sales' ? 'text-purple-400' :
+                    'text-cyan-400'
+                  }`
+                })}
+                <h3 className="text-xl font-bold text-white">
+                  Step {currentStep}: {steps[currentStep - 1]?.title}
+                </h3>
               </div>
-            ))}
-          </div>
-
-          {/* Compact Current Step Display */}
-          {(demoRunning || manualMode) && (
-            <div className="text-center mb-6">
-              <div className="bg-slate-800/50 backdrop-blur-lg border border-gray-700 rounded-lg p-4 max-w-lg mx-auto">
-                <div className="flex items-center justify-center gap-3 mb-2">
-                  {React.createElement(steps[currentStep - 1]?.icon || Search, {
-                    className: `h-6 w-6 ${
-                      steps[currentStep - 1]?.category === 'market' ? 'text-cyan-400' :
-                      steps[currentStep - 1]?.category === 'acquisition' ? 'text-purple-400' :
-                      steps[currentStep - 1]?.category === 'pms' ? 'text-blue-400' :
-                      steps[currentStep - 1]?.category === 'sales' ? 'text-purple-400' :
-                      'text-cyan-400'
-                    }`
-                  })}
-                  <h3 className="text-xl font-bold text-white">
-                    Step {currentStep}: {steps[currentStep - 1]?.title}
-                  </h3>
-                </div>
-                <p className="text-gray-300 text-sm mb-3 whitespace-normal break-words">
-                  {steps[currentStep - 1]?.description}
-                </p>
-                <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                  steps[currentStep - 1]?.category === 'market' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' :
-                  steps[currentStep - 1]?.category === 'acquisition' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
-                  steps[currentStep - 1]?.category === 'pms' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
-                  steps[currentStep - 1]?.category === 'sales' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
-                  'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-                }`}>
-                  {steps[currentStep - 1]?.category === 'market' ? 'Market Intelligence' :
-                   steps[currentStep - 1]?.category === 'acquisition' ? 'Acquisition CRM' :
-                   steps[currentStep - 1]?.category === 'pms' ? 'Property Management' :
-                   steps[currentStep - 1]?.category === 'sales' ? 'Get Started' :
-                   'Community'}
-                </div>
+              <p className="text-gray-300 text-sm mb-3 whitespace-normal break-words">
+                {steps[currentStep - 1]?.description}
+              </p>
+              <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                steps[currentStep - 1]?.category === 'market' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' :
+                steps[currentStep - 1]?.category === 'acquisition' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
+                steps[currentStep - 1]?.category === 'pms' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
+                steps[currentStep - 1]?.category === 'sales' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
+                'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+              }`}>
+                {steps[currentStep - 1]?.category === 'market' ? 'Market Intelligence' :
+                 steps[currentStep - 1]?.category === 'acquisition' ? 'Acquisition CRM' :
+                 steps[currentStep - 1]?.category === 'pms' ? 'Property Management' :
+                 steps[currentStep - 1]?.category === 'sales' ? 'Get Started' :
+                 'Community'}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Step-Specific Visual Demonstrations */}
         {(demoRunning || manualMode) && (
@@ -994,7 +965,10 @@ const Test5 = () => {
                             <span className="text-gray-300">ROI & Cash Flow Analysis</span>
                           </div>
                         </div>
-                        <Button className="w-full bg-cyan-600 hover:bg-cyan-700 text-white">
+                        <Button 
+                          onClick={handleGetStarted}
+                          className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
+                        >
                           Get Started
                         </Button>
                       </div>
@@ -1015,26 +989,29 @@ const Test5 = () => {
                           <div className="text-cyan-300 font-medium text-sm mb-3">Everything in Market Insights + Calculator, plus:</div>
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-purple-400" />
-                            <span className="text-gray-300">Acquisitions Agent</span>
+                            <span className="text-gray-300">Market Intelligence Tool</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-purple-400" />
-                            <span className="text-gray-300">Front Desk Management</span>
+                            <span className="text-gray-300">Acquisition CRM & Calculator</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-purple-400" />
-                            <span className="text-gray-300">AI-Powered Outreach</span>
+                            <span className="text-gray-300">Property Management System</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-purple-400" />
-                            <span className="text-gray-300">Automated Guest Management</span>
+                            <span className="text-gray-300">Community</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-purple-400" />
                             <span className="text-gray-300">Priority Support</span>
                           </div>
                         </div>
-                        <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold">
+                        <Button 
+                          onClick={handleGetStarted}
+                          className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold"
+                        >
                           Get Started
                         </Button>
                       </div>
