@@ -1,4 +1,5 @@
 
+
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 
@@ -25,7 +26,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { user_email, user_id, signup_timestamp }: NewUserNotification = await req.json();
 
     const emailResponse = await resend.emails.send({
-      from: "Rentalizer <notifications@rentalarbuniversity.com>",
+      from: "Rentalizer <support@rentalarbuniversity.com>",
       to: ["support@rentalarbuniversity.com"],
       subject: "🎉 New User Signup - Rentalizer",
       html: `
@@ -67,3 +68,4 @@ const handler = async (req: Request): Promise<Response> => {
 };
 
 serve(handler);
+
