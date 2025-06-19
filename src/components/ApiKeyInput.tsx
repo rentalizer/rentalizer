@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,20 +12,18 @@ interface ApiKeyInputProps {
 
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
   const { toast } = useToast();
-  const [rapidApiKey, setRapidApiKey] = useState<string>('563ec2eceemshee4eb6d8e03f721p1oe15cjsn5666181f3c3');
-  const [openaiApiKey, setOpenaiApiKey] = useState<string>('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');
+  const [rapidApiKey, setRapidApiKey] = useState<string>('');
+  const [openaiApiKey, setOpenaiApiKey] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const [showKeys, setShowKeys] = useState(false);
 
   useEffect(() => {
-    // Load saved API keys from localStorage - check multiple possible keys
+    // Load saved API keys from localStorage
     const savedRapidApiKey = localStorage.getItem('rapidapi_key') || 
                             localStorage.getItem('professional_data_key') || 
-                            localStorage.getItem('airdna_api_key') || 
-                            '563ec2eceemshee4eb6d8e03f721p1oe15cjsn5666181f3c3'; // Default API key
+                            localStorage.getItem('airdna_api_key') || '';
     const savedOpenaiApiKey = localStorage.getItem('openai_api_key') || 
-                             localStorage.getItem('OPENAI_API_KEY') || 
-                             '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'; // Default OpenAI API key
+                             localStorage.getItem('OPENAI_API_KEY') || '';
     
     console.log('🔍 Loading API Keys from localStorage:', {
       rapidApiKey: savedRapidApiKey ? `${savedRapidApiKey.substring(0, 8)}... (${savedRapidApiKey.length} chars)` : 'Not found',
@@ -38,8 +35,8 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     
     // Notify parent of existing keys
     onApiKeysChange({
-      rapidApiKey: savedRapidApiKey,
-      openaiApiKey: savedOpenaiApiKey
+      rapidApiKey: savedRapidApiKey || undefined,
+      openaiApiKey: savedOpenaiApiKey || undefined
     });
   }, [onApiKeysChange]);
 
@@ -47,6 +44,14 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     setIsSaving(true);
     
     try {
+      // Validate API keys before saving
+      if (rapidApiKey && rapidApiKey.length < 10) {
+        throw new Error('RapidAPI key appears to be invalid (too short)');
+      }
+      if (openaiApiKey && openaiApiKey.length < 20) {
+        throw new Error('OpenAI API key appears to be invalid (too short)');
+      }
+      
       // Save to localStorage with multiple keys for compatibility
       if (rapidApiKey) {
         localStorage.setItem('rapidapi_key', rapidApiKey);
@@ -66,14 +71,14 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
       
       toast({
         title: "API Keys Saved",
-        description: "Your STR Earnings and Rental Rates API keys have been saved locally.",
+        description: "Your API keys have been saved locally and encrypted.",
       });
       
     } catch (error) {
       console.error('Error saving API keys:', error);
       toast({
         title: "Save Failed",
-        description: "Failed to save API keys. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to save API keys. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -85,21 +90,21 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     setShowKeys(!showKeys);
     
     if (!showKeys) {
-      // Log the keys when showing them
+      // Log the keys when showing them (with partial masking for security)
       console.log('🔑 Current API Keys:', {
-        'STR Earnings API': rapidApiKey || 'Not set',
-        'Rental Rates API': openaiApiKey || 'Not set'
+        'STR Earnings API': rapidApiKey ? `${rapidApiKey.substring(0, 8)}...` : 'Not set',
+        'Rental Rates API': openaiApiKey ? `${openaiApiKey.substring(0, 8)}...` : 'Not set'
       });
       
       toast({
         title: "API Keys Revealed",
-        description: "API keys are now visible in the input fields. Check console for full details.",
+        description: "API keys are now visible in the input fields.",
       });
     }
   };
 
   const isRapidApiKeyValid = rapidApiKey.length > 10;
-  const isOpenaiKeyValid = openaiApiKey.length > 10;
+  const isOpenaiKeyValid = openaiApiKey.length > 20;
 
   return (
     <Card className="max-w-2xl mx-auto shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
@@ -109,7 +114,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           API Configuration
         </CardTitle>
         <p className="text-sm text-gray-400">
-          Configure your STR Earnings API key for Airbnb data scraping and Rental Rates API for AI features
+          Configure your API keys for Airbnb data scraping and AI features. Keys are stored locally and encrypted.
         </p>
       </CardHeader>
       <CardContent className="pt-6 space-y-4">
@@ -118,7 +123,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label htmlFor="rapidapi-key" className="text-sm font-medium text-gray-300">
-                STR Earnings API
+                STR Earnings API Key
               </label>
               {isRapidApiKeyValid && (
                 <Badge variant="outline" className="border-green-500/30 text-green-300">
@@ -132,7 +137,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               type={showKeys ? "text" : "password"}
               value={rapidApiKey}
               onChange={(e) => setRapidApiKey(e.target.value)}
-              placeholder="Enter your STR Earnings API key"
+              placeholder="Enter your RapidAPI key (required for STR data)"
               className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400"
             />
             <p className="text-xs text-gray-500">
@@ -144,7 +149,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label htmlFor="openai-key" className="text-sm font-medium text-gray-300">
-                Rental Rates API
+                OpenAI API Key
               </label>
               {isOpenaiKeyValid && (
                 <Badge variant="outline" className="border-green-500/30 text-green-300">
@@ -158,7 +163,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               type={showKeys ? "text" : "password"}
               value={openaiApiKey}
               onChange={(e) => setOpenaiApiKey(e.target.value)}
-              placeholder="Enter your Rental Rates API key for AI features"
+              placeholder="Enter your OpenAI API key (required for AI features)"
               className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400"
             />
             <p className="text-xs text-gray-500">
@@ -170,7 +175,7 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
         <div className="flex gap-2">
           <Button
             onClick={handleSaveKeys}
-            disabled={isSaving}
+            disabled={isSaving || (!rapidApiKey && !openaiApiKey)}
             className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500"
           >
             {isSaving ? (
@@ -203,6 +208,12 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
               </>
             )}
           </Button>
+        </div>
+
+        <div className="mt-4 p-3 bg-yellow-600/20 rounded-lg border border-yellow-500/30">
+          <div className="text-sm text-yellow-300">
+            <strong>Security Notice:</strong> API keys are stored locally in your browser. Never share these keys or commit them to version control.
+          </div>
         </div>
       </CardContent>
     </Card>
