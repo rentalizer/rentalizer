@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -228,9 +229,9 @@ const Test5 = () => {
         {/* Hero Section */}
         <div className="container mx-auto px-4 py-16">
           <div className="text-center mb-16">
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto mb-8">
-              From market research to property management - see how our AI-powered platform automates every step of building a profitable short-term rental business.
-            </p>
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8">
+              From market research to property acquisition and management - see how our AI-powered platform automates every step of building and scaling a profitable rental business.
+            </h1>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
               <Button 
@@ -349,7 +350,7 @@ const Test5 = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-gray-300">
-                  Manage all your properties across Airbnb, VRBO, and Booking.com with unified calendars and automated guest messaging.
+                  Manage all your properties across Airbnb, VRBO, Booking.com, Expedia, Google Travel, Trip.com, Sam.Gov, Furnished Finders, and ALE Solutions with unified calendars and automated guest messaging.
                 </p>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="bg-red-900/20 border border-red-500/30 rounded p-3 text-center">
@@ -411,7 +412,7 @@ const Test5 = () => {
             <h2 className="text-4xl font-bold text-white mb-8">Complete 18-Step Workflow</h2>
             
             {/* Category Labels */}
-            <div className="flex justify-center items-center gap-8 flex-wrap">
+            <div className="flex justify-center items-center gap-8 flex-wrap mb-8">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-cyan-500 rounded"></div>
                 <span className="text-gray-300">Market Intelligence</span>
@@ -424,6 +425,18 @@ const Test5 = () => {
                 <div className="w-4 h-4 bg-blue-500 rounded"></div>
                 <span className="text-gray-300">Property Management</span>
               </div>
+            </div>
+
+            {/* 18 Step Dots Visualization */}
+            <div className="flex justify-center items-center gap-3 flex-wrap max-w-4xl mx-auto">
+              {steps.map((step, index) => (
+                <div
+                  key={step.id}
+                  className={`w-4 h-4 rounded-full cursor-pointer transition-all duration-300 ${getStepColor(step.id, step.category)} ${getStepBorder(step.id, step.category)}`}
+                  onClick={() => handleStepClick(step.id)}
+                  title={`Step ${step.id}: ${step.title}`}
+                />
+              ))}
             </div>
           </div>
 
@@ -453,22 +466,6 @@ const Test5 = () => {
                 <Settings className="mr-3 h-6 w-6" />
                 Manual Exploration
               </Button>
-            </div>
-            
-            {/* Trust Indicators */}
-            <div className="flex items-center justify-center gap-8 mt-8 text-sm text-gray-400">
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                <span>No Credit Card Required</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                <span>5-minute Demo</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Star className="h-4 w-4" />
-                <span>Join 10,000+ Investors</span>
-              </div>
             </div>
           </div>
         </div>
