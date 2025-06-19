@@ -685,37 +685,37 @@ const Test5 = () => {
 
                     {/* Pricing Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                      {/* Starter Plan */}
+                      {/* Market Insights + Calculator Plan */}
                       <div className="bg-slate-800/50 rounded-lg p-6 border border-cyan-500/30 relative">
                         <div className="text-center mb-6">
-                          <h4 className="text-xl font-bold text-cyan-400 mb-2">Starter Plan</h4>
-                          <div className="text-3xl font-bold text-white mb-1">$97<span className="text-lg text-gray-400">/month</span></div>
+                          <h4 className="text-xl font-bold text-cyan-400 mb-2">Market Insights + Calculator</h4>
+                          <div className="text-3xl font-bold text-white mb-1">$1,950<span className="text-lg text-gray-400">/month</span></div>
                           <p className="text-gray-400 text-sm">Perfect for getting started</p>
                         </div>
                         <div className="space-y-3 mb-6">
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-cyan-400" />
-                            <span className="text-gray-300">Market analysis for 5 cities</span>
+                            <span className="text-gray-300">Market Intelligence Tool</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-cyan-400" />
-                            <span className="text-gray-300">Basic property search</span>
+                            <span className="text-gray-300">Property Calculator</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-cyan-400" />
-                            <span className="text-gray-300">ROI calculator</span>
+                            <span className="text-gray-300">Live Airbnb Revenue Data</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-cyan-400" />
-                            <span className="text-gray-300">Email support</span>
+                            <span className="text-gray-300">ROI & Cash Flow Analysis</span>
                           </div>
                         </div>
                         <Button className="w-full bg-cyan-600 hover:bg-cyan-700 text-white">
-                          Start Free Trial
+                          Get Started
                         </Button>
                       </div>
 
-                      {/* Pro Plan */}
+                      {/* All-In-One System Plan */}
                       <div className="bg-gradient-to-br from-purple-800/30 to-yellow-800/30 rounded-lg p-6 border border-yellow-500/50 relative">
                         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                           <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold px-4 py-1">
@@ -723,34 +723,35 @@ const Test5 = () => {
                           </Badge>
                         </div>
                         <div className="text-center mb-6">
-                          <h4 className="text-xl font-bold text-yellow-400 mb-2">Pro Plan</h4>
-                          <div className="text-3xl font-bold text-white mb-1">$197<span className="text-lg text-gray-400">/month</span></div>
-                          <p className="text-gray-400 text-sm">For serious investors</p>
+                          <h4 className="text-xl font-bold text-yellow-400 mb-2">All-In-One System</h4>
+                          <div className="text-3xl font-bold text-white mb-1">$2,950<span className="text-lg text-gray-400">/month</span></div>
+                          <p className="text-gray-400 text-sm">Complete rental arbitrage solution</p>
                         </div>
                         <div className="space-y-3 mb-6">
+                          <div className="text-cyan-300 font-medium text-sm mb-3">Everything in Market Insights + Calculator, plus:</div>
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-yellow-400" />
-                            <span className="text-gray-300">Unlimited market analysis</span>
+                            <span className="text-gray-300">Acquisitions Agent</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-yellow-400" />
-                            <span className="text-gray-300">Advanced property search & AI outreach</span>
+                            <span className="text-gray-300">Front Desk Management</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-yellow-400" />
-                            <span className="text-gray-300">Full PMS integration</span>
+                            <span className="text-gray-300">AI-Powered Outreach</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-yellow-400" />
-                            <span className="text-gray-300">Priority support & community access</span>
+                            <span className="text-gray-300">Automated Guest Management</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <CheckCircle2 className="h-4 w-4 text-yellow-400" />
-                            <span className="text-gray-300">Expert consultation calls</span>
+                            <span className="text-gray-300">Priority Support</span>
                           </div>
                         </div>
                         <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold">
-                          Start Free Trial
+                          Get Started
                         </Button>
                       </div>
                     </div>
