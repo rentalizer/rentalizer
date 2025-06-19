@@ -31,7 +31,11 @@ import {
   Video,
   Heart,
   Reply,
-  Pin
+  Pin,
+  Zap,
+  Clock,
+  Shield,
+  Target
 } from 'lucide-react';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
@@ -111,10 +115,10 @@ const Test5 = () => {
     if (demoRunning && !manualMode) {
       const stepTimer = setInterval(() => {
         setCurrentStep((prev) => {
-          if (prev >= 17) {
+          if (prev >= 18) {
             setDemoRunning(false);
             setManualMode(true);
-            return 17;
+            return 18;
           }
           return prev + 1;
         });
@@ -162,7 +166,8 @@ const Test5 = () => {
     { id: 14, title: "Guest Messaging", description: "Automated communication", icon: MessageSquare, category: "pms" },
     { id: 15, title: "Check-in Automation", description: "Streamlined guest experience", icon: Settings, category: "pms" },
     { id: 16, title: "Performance Tracking", description: "Revenue & occupancy analytics", icon: BarChart3, category: "pms" },
-    { id: 17, title: "Community Support", description: "Connect with other investors", icon: Users, category: "community" }
+    { id: 17, title: "Community Support", description: "Connect with other investors", icon: Users, category: "community" },
+    { id: 18, title: "Get Started Today", description: "Join thousands of successful investors", icon: Star, category: "sales" }
   ];
 
   const getStepColor = (step, category) => {
@@ -176,6 +181,8 @@ const Test5 = () => {
           return "bg-blue-500";
         case "community":
           return "bg-cyan-500";
+        case "sales":
+          return "bg-gradient-to-r from-yellow-500 to-orange-500";
         default:
           return "bg-gray-500";
       }
@@ -194,6 +201,8 @@ const Test5 = () => {
           return "ring-2 ring-blue-400 ring-offset-2 ring-offset-slate-900";
         case "community":
           return "ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900";
+        case "sales":
+          return "ring-2 ring-yellow-400 ring-offset-2 ring-offset-slate-900";
         default:
           return "ring-2 ring-gray-400 ring-offset-2 ring-offset-slate-900";
       }
@@ -280,6 +289,7 @@ const Test5 = () => {
                       steps[currentStep - 1]?.category === 'market' ? 'text-cyan-400' :
                       steps[currentStep - 1]?.category === 'acquisition' ? 'text-purple-400' :
                       steps[currentStep - 1]?.category === 'pms' ? 'text-blue-400' :
+                      steps[currentStep - 1]?.category === 'sales' ? 'text-yellow-400' :
                       'text-orange-400'
                     }`
                   })}
@@ -294,11 +304,13 @@ const Test5 = () => {
                   steps[currentStep - 1]?.category === 'market' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' :
                   steps[currentStep - 1]?.category === 'acquisition' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
                   steps[currentStep - 1]?.category === 'pms' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
+                  steps[currentStep - 1]?.category === 'sales' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' :
                   'bg-orange-500/20 text-orange-300 border border-orange-500/30'
                 }`}>
                   {steps[currentStep - 1]?.category === 'market' ? 'Market Intelligence' :
                    steps[currentStep - 1]?.category === 'acquisition' ? 'Acquisition CRM' :
                    steps[currentStep - 1]?.category === 'pms' ? 'Property Management' :
+                   steps[currentStep - 1]?.category === 'sales' ? 'Get Started' :
                    'Community'}
                 </div>
               </div>
@@ -623,6 +635,201 @@ const Test5 = () => {
                             <Star className="h-3 w-3 text-yellow-400" />
                             <span className="text-yellow-400 text-xs">5.0</span>
                           </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Sales Step (18) */}
+            {currentStep === 18 && (
+              <Card className="bg-gradient-to-br from-slate-800/50 to-slate-700/50 border-yellow-500/30 animate-fade-in">
+                <CardHeader>
+                  <CardTitle className="text-center text-3xl bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <Star className="h-8 w-8 text-yellow-400" />
+                    Ready to Transform Your Real Estate Business?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="max-w-4xl mx-auto space-y-8">
+                    {/* Hero Section */}
+                    <div className="text-center space-y-4">
+                      <h3 className="text-2xl font-bold text-white mb-4">
+                        Join 10,000+ Successful Rental Arbitrage Investors
+                      </h3>
+                      <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+                        You've seen the complete workflow. Now it's time to put it into action and start building your rental empire with our AI-powered platform.
+                      </p>
+                    </div>
+
+                    {/* Features Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                      <div className="bg-slate-800/50 rounded-lg p-6 border border-cyan-500/20 text-center">
+                        <Zap className="h-12 w-12 text-cyan-400 mx-auto mb-4" />
+                        <h4 className="text-lg font-semibold text-white mb-2">Lightning Fast Setup</h4>
+                        <p className="text-gray-400 text-sm">Get started in minutes, not weeks. Our AI handles the complex market analysis instantly.</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded-lg p-6 border border-purple-500/20 text-center">
+                        <Target className="h-12 w-12 text-purple-400 mx-auto mb-4" />
+                        <h4 className="text-lg font-semibold text-white mb-2">Precision Targeting</h4>
+                        <p className="text-gray-400 text-sm">Find the most profitable properties with AI-driven market intelligence and scoring.</p>
+                      </div>
+                      <div className="bg-slate-800/50 rounded-lg p-6 border border-yellow-500/20 text-center">
+                        <TrendingUp className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
+                        <h4 className="text-lg font-semibold text-white mb-2">Proven Results</h4>
+                        <p className="text-gray-400 text-sm">Our users average 23% higher ROI compared to traditional methods.</p>
+                      </div>
+                    </div>
+
+                    {/* Pricing Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                      {/* Starter Plan */}
+                      <div className="bg-slate-800/50 rounded-lg p-6 border border-cyan-500/30 relative">
+                        <div className="text-center mb-6">
+                          <h4 className="text-xl font-bold text-cyan-400 mb-2">Starter Plan</h4>
+                          <div className="text-3xl font-bold text-white mb-1">$97<span className="text-lg text-gray-400">/month</span></div>
+                          <p className="text-gray-400 text-sm">Perfect for getting started</p>
+                        </div>
+                        <div className="space-y-3 mb-6">
+                          <div className="flex items-center gap-2 text-sm">
+                            <CheckCircle2 className="h-4 w-4 text-cyan-400" />
+                            <span className="text-gray-300">Market analysis for 5 cities</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <CheckCircle2 className="h-4 w-4 text-cyan-400" />
+                            <span className="text-gray-300">Basic property search</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <CheckCircle2 className="h-4 w-4 text-cyan-400" />
+                            <span className="text-gray-300">ROI calculator</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <CheckCircle2 className="h-4 w-4 text-cyan-400" />
+                            <span className="text-gray-300">Email support</span>
+                          </div>
+                        </div>
+                        <Button className="w-full bg-cyan-600 hover:bg-cyan-700 text-white">
+                          Start Free Trial
+                        </Button>
+                      </div>
+
+                      {/* Pro Plan */}
+                      <div className="bg-gradient-to-br from-purple-800/30 to-yellow-800/30 rounded-lg p-6 border border-yellow-500/50 relative">
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                          <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold px-4 py-1">
+                            MOST POPULAR
+                          </Badge>
+                        </div>
+                        <div className="text-center mb-6">
+                          <h4 className="text-xl font-bold text-yellow-400 mb-2">Pro Plan</h4>
+                          <div className="text-3xl font-bold text-white mb-1">$197<span className="text-lg text-gray-400">/month</span></div>
+                          <p className="text-gray-400 text-sm">For serious investors</p>
+                        </div>
+                        <div className="space-y-3 mb-6">
+                          <div className="flex items-center gap-2 text-sm">
+                            <CheckCircle2 className="h-4 w-4 text-yellow-400" />
+                            <span className="text-gray-300">Unlimited market analysis</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <CheckCircle2 className="h-4 w-4 text-yellow-400" />
+                            <span className="text-gray-300">Advanced property search & AI outreach</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <CheckCircle2 className="h-4 w-4 text-yellow-400" />
+                            <span className="text-gray-300">Full PMS integration</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <CheckCircle2 className="h-4 w-4 text-yellow-400" />
+                            <span className="text-gray-300">Priority support & community access</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <CheckCircle2 className="h-4 w-4 text-yellow-400" />
+                            <span className="text-gray-300">Expert consultation calls</span>
+                          </div>
+                        </div>
+                        <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold">
+                          Start Free Trial
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Social Proof */}
+                    <div className="bg-slate-800/30 rounded-lg p-6 border border-gray-700">
+                      <div className="text-center mb-6">
+                        <h4 className="text-lg font-semibold text-white mb-2">Trusted by Industry Leaders</h4>
+                        <div className="flex items-center justify-center gap-8 text-sm text-gray-400">
+                          <div className="flex items-center gap-2">
+                            <Star className="h-4 w-4 text-yellow-400" />
+                            <span>4.9/5 Average Rating</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-cyan-400" />
+                            <span>10,000+ Active Users</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <TrendingUp className="h-4 w-4 text-green-400" />
+                            <span>$50M+ Properties Analyzed</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Testimonials */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-slate-700/50 rounded p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                              JS
+                            </div>
+                            <div>
+                              <div className="text-white font-medium text-sm">Jessica Smith</div>
+                              <div className="text-gray-400 text-xs">Real Estate Investor</div>
+                            </div>
+                          </div>
+                          <p className="text-gray-300 text-sm">"Increased my portfolio from 2 to 15 properties in just 8 months using this platform."</p>
+                        </div>
+                        <div className="bg-slate-700/50 rounded p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-yellow-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                              MD
+                            </div>
+                            <div>
+                              <div className="text-white font-medium text-sm">Mark Davis</div>
+                              <div className="text-gray-400 text-xs">STR Entrepreneur</div>
+                            </div>
+                          </div>
+                          <p className="text-gray-300 text-sm">"The AI market analysis saved me weeks of research and helped me find my most profitable deals."</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Call to Action */}
+                    <div className="text-center bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-lg p-8 border border-yellow-500/30">
+                      <h4 className="text-2xl font-bold text-white mb-4">
+                        Start Your 14-Day Free Trial Today
+                      </h4>
+                      <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+                        No credit card required. Cancel anytime. Join thousands of successful investors who are already using our platform to build their rental empires.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <Button size="lg" className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold px-8 py-4 text-lg">
+                          Start Free Trial
+                          <ArrowRight className="ml-2 h-5 w-5" />
+                        </Button>
+                        <Button size="lg" variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 px-8 py-4 text-lg">
+                          Schedule Demo Call
+                          <Calendar className="ml-2 h-5 w-5" />
+                        </Button>
+                      </div>
+                      <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-400">
+                        <div className="flex items-center gap-1">
+                          <Shield className="h-4 w-4" />
+                          <span>Secure & GDPR Compliant</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          <span>Setup in Under 5 Minutes</span>
                         </div>
                       </div>
                     </div>
