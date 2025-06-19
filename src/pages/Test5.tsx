@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -288,7 +287,7 @@ const Test5 = () => {
                     Step {currentStep}: {steps[currentStep - 1]?.title}
                   </h3>
                 </div>
-                <p className="text-gray-300 text-sm mb-3">
+                <p className="text-gray-300 text-sm mb-3 whitespace-normal break-words">
                   {steps[currentStep - 1]?.description}
                 </p>
                 <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
