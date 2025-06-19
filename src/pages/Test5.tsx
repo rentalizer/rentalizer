@@ -228,11 +228,7 @@ const Test5 = () => {
         {/* Hero Section */}
         <div className="container mx-auto px-4 py-16">
           <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8">
-              From Market Research To Property Acquisition And Management - See How Our AI-Powered Platform Automates Every Step Of Building And Scaling A Profitable Rental Business.
-            </h1>
-            
-            {/* 18 Step Dots Visualization - Moved to top */}
+            {/* 18 Step Dots Visualization - At the top */}
             <div className="mb-12">
               <h2 className="text-2xl font-bold text-white mb-6">Complete 18-Step Workflow</h2>
               
@@ -264,6 +260,10 @@ const Test5 = () => {
                 ))}
               </div>
             </div>
+            
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8">
+              See How Our AI-Powered Platform Automates Every Step Of Building And Scaling A Profitable Rental Business.
+            </h1>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
               <Button 
@@ -421,35 +421,6 @@ const Test5 = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
-
-          {/* Call to Action */}
-          <div className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 rounded-2xl p-12 border border-purple-500/30 text-center">
-            <h3 className="text-3xl font-bold text-white mb-4">
-              Ready to See It All in Action?
-            </h3>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Experience the complete workflow that's helping thousands of investors build profitable rental arbitrage businesses.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Button 
-                onClick={handleRunDemo}
-                size="lg"
-                className="px-12 py-6 text-xl font-bold bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white transform hover:scale-105 transition-all duration-300 shadow-2xl"
-              >
-                <Play className="mr-3 h-6 w-6" />
-                Start Live Demo Now
-              </Button>
-              <Button 
-                onClick={() => setManualMode(true)}
-                size="lg"
-                variant="outline"
-                className="px-12 py-6 text-xl font-bold border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 transform hover:scale-105 transition-all duration-300"
-              >
-                <Settings className="mr-3 h-6 w-6" />
-                Manual Exploration
-              </Button>
-            </div>
           </div>
         </div>
 
@@ -1046,10 +1017,10 @@ const Test5 = () => {
               </Card>
             )}
           </div>
-        )}
-      </div>
+        </div>
 
-      <Footer />
+        <Footer />
+      </div>
     </div>
   );
 };
