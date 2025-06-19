@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -320,7 +321,7 @@ const Test5 = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="max-w-md mx-auto space-y-4">
-                    <div>
+                    <div className="relative">
                       <Label htmlFor="target-city" className="text-sm font-medium text-gray-300">
                         Enter Target City
                       </Label>
@@ -334,7 +335,7 @@ const Test5 = () => {
                         placeholder="e.g., San Diego, Austin, Miami"
                       />
                       {typedCity && (
-                        <div className="absolute ml-2 mt-1">
+                        <div className="absolute right-3 top-9">
                           <div className="w-0.5 h-5 bg-cyan-400 animate-pulse"></div>
                         </div>
                       )}
@@ -346,7 +347,9 @@ const Test5 = () => {
                           <SelectTrigger className={`mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 transition-all duration-200 ${
                             selectedBedrooms ? 'border-cyan-500 ring-1 ring-cyan-500/20' : ''
                           }`}>
-                            <SelectValue placeholder="Select bedrooms" />
+                            <SelectValue placeholder="Select bedrooms">
+                              {selectedBedrooms ? `${selectedBedrooms} Bedrooms` : "Select bedrooms"}
+                            </SelectValue>
                           </SelectTrigger>
                         </Select>
                       </div>
@@ -356,7 +359,9 @@ const Test5 = () => {
                           <SelectTrigger className={`mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 transition-all duration-200 ${
                             selectedBathrooms ? 'border-cyan-500 ring-1 ring-cyan-500/20' : ''
                           }`}>
-                            <SelectValue placeholder="Select bathrooms" />
+                            <SelectValue placeholder="Select bathrooms">
+                              {selectedBathrooms ? `${selectedBathrooms} Bathrooms` : "Select bathrooms"}
+                            </SelectValue>
                           </SelectTrigger>
                         </Select>
                       </div>
