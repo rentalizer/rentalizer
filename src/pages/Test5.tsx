@@ -35,7 +35,11 @@ import {
   Zap,
   Clock,
   Shield,
-  Target
+  Target,
+  Crown,
+  Eye,
+  Layers,
+  Activity
 } from 'lucide-react';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
@@ -209,6 +213,286 @@ const Test5 = () => {
     }
     return "";
   };
+
+  // Show amazing landing page when no demo is running
+  if (!demoRunning && !manualMode) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <TopNavBar />
+        
+        {/* Hero Section */}
+        <div className="container mx-auto px-4 py-16">
+          <div className="text-center mb-16">
+            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-6">
+              The Complete Rental Arbitrage System
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto mb-8">
+              From market research to property management - see how our AI-powered platform automates every step of building a profitable short-term rental business.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+              <Button 
+                onClick={handleRunDemo}
+                size="lg"
+                className="px-12 py-6 text-xl font-bold bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white transform hover:scale-105 transition-all duration-300 shadow-2xl"
+              >
+                <Play className="mr-3 h-6 w-6" />
+                Watch Live Demo
+              </Button>
+              <Button 
+                onClick={() => setManualMode(true)}
+                size="lg"
+                variant="outline"
+                className="px-12 py-6 text-xl font-bold border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 transform hover:scale-105 transition-all duration-300"
+              >
+                <Eye className="mr-3 h-6 w-6" />
+                Explore Manually
+              </Button>
+            </div>
+
+            {/* Key Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              <div className="bg-slate-800/50 rounded-xl p-6 border border-cyan-500/20">
+                <div className="text-3xl font-bold text-cyan-400 mb-2">10,000+</div>
+                <div className="text-gray-300">Active Investors</div>
+              </div>
+              <div className="bg-slate-800/50 rounded-xl p-6 border border-purple-500/20">
+                <div className="text-3xl font-bold text-purple-400 mb-2">$50M+</div>
+                <div className="text-gray-300">Properties Analyzed</div>
+              </div>
+              <div className="bg-slate-800/50 rounded-xl p-6 border border-blue-500/20">
+                <div className="text-3xl font-bold text-blue-400 mb-2">23%</div>
+                <div className="text-gray-300">Higher ROI vs Traditional</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature Preview Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+            {/* Market Intelligence Preview */}
+            <Card className="bg-gradient-to-br from-cyan-900/30 to-slate-800/50 border border-cyan-500/30 hover:border-cyan-500/50 transition-all duration-300 group">
+              <CardHeader>
+                <CardTitle className="text-2xl text-cyan-300 flex items-center gap-3">
+                  <Search className="h-8 w-8" />
+                  AI Market Intelligence
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-gray-300">
+                  Analyze any market in seconds with AI-powered research that identifies the most profitable neighborhoods for rental arbitrage.
+                </p>
+                <div className="bg-slate-800/50 rounded-lg p-4">
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div className="text-center">
+                      <div className="text-cyan-400 font-bold text-lg">$7,948</div>
+                      <div className="text-gray-400">Avg STR Revenue</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-cyan-400 font-bold text-lg">1.77x</div>
+                      <div className="text-gray-400">Revenue Multiple</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-cyan-400 font-bold text-lg">85%</div>
+                      <div className="text-gray-400">Occupancy Rate</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-gray-400">
+                  <MapPin className="h-4 w-4" />
+                  <span>Little Italy, San Diego - Top performing submarket</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Acquisitions CRM Preview */}
+            <Card className="bg-gradient-to-br from-purple-900/30 to-slate-800/50 border border-purple-500/30 hover:border-purple-500/50 transition-all duration-300 group">
+              <CardHeader>
+                <CardTitle className="text-2xl text-purple-300 flex items-center gap-3">
+                  <Building className="h-8 w-8" />
+                  Smart Acquisitions CRM
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-gray-300">
+                  Find and contact property owners with AI-generated personalized outreach campaigns that get results.
+                </p>
+                <div className="space-y-3">
+                  <div className="bg-slate-800/50 rounded-lg p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Home className="h-5 w-5 text-purple-400" />
+                      <div>
+                        <div className="text-white font-medium">Downtown Loft - 2BR/2BA</div>
+                        <div className="text-gray-400 text-sm">$3,200/month rent</div>
+                      </div>
+                    </div>
+                    <Badge className="bg-purple-500/20 text-purple-300">High ROI</Badge>
+                  </div>
+                  <div className="bg-slate-800/50 rounded-lg p-3">
+                    <div className="text-sm text-gray-300 mb-2">AI-Generated Email:</div>
+                    <div className="text-xs text-gray-400 italic">
+                      "Hi Sarah, I noticed your beautiful property in Little Italy. I'm a professional rental operator..."
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Property Management Preview */}
+            <Card className="bg-gradient-to-br from-blue-900/30 to-slate-800/50 border border-blue-500/30 hover:border-blue-500/50 transition-all duration-300 group">
+              <CardHeader>
+                <CardTitle className="text-2xl text-blue-300 flex items-center gap-3">
+                  <Settings className="h-8 w-8" />
+                  Automated Property Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-gray-300">
+                  Manage all your properties across Airbnb, VRBO, and Booking.com with unified calendars and automated guest messaging.
+                </p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="bg-red-900/20 border border-red-500/30 rounded p-3 text-center">
+                    <div className="text-red-300 font-bold">Airbnb</div>
+                    <div className="text-xs text-gray-400">24 bookings</div>
+                  </div>
+                  <div className="bg-blue-900/20 border border-blue-500/30 rounded p-3 text-center">
+                    <div className="text-blue-300 font-bold">VRBO</div>
+                    <div className="text-xs text-gray-400">15 bookings</div>
+                  </div>
+                  <div className="bg-purple-900/20 border border-purple-500/30 rounded p-3 text-center">
+                    <div className="text-purple-300 font-bold">Booking.com</div>
+                    <div className="text-xs text-gray-400">8 bookings</div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-400">Automated responses:</span>
+                  <span className="text-blue-400 font-bold">98% guest satisfaction</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Community & Support Preview */}
+            <Card className="bg-gradient-to-br from-cyan-900/30 to-slate-800/50 border border-cyan-500/30 hover:border-cyan-500/50 transition-all duration-300 group">
+              <CardHeader>
+                <CardTitle className="text-2xl text-cyan-300 flex items-center gap-3">
+                  <Users className="h-8 w-8" />
+                  Expert Community & Support
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-gray-300">
+                  Join a thriving community of rental arbitrage experts with exclusive video library, live events, and 1-on-1 support.
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 text-sm">
+                    <Video className="h-4 w-4 text-cyan-400" />
+                    <span className="text-gray-300">50+ Training Videos</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <Calendar className="h-4 w-4 text-cyan-400" />
+                    <span className="text-gray-300">Weekly Live Q&A Sessions</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <FileText className="h-4 w-4 text-cyan-400" />
+                    <span className="text-gray-300">Legal Document Templates</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <Star className="h-4 w-4 text-cyan-400" />
+                    <span className="text-gray-300">Expert Network Access</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Workflow Overview */}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-8">Complete 18-Step Workflow</h2>
+            <div className="flex justify-center items-center gap-2 mb-8 flex-wrap">
+              {steps.map((step, index) => (
+                <div key={step.id} className="flex items-center">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold transition-all duration-300 ${
+                    step.category === 'market' ? 'bg-cyan-500' :
+                    step.category === 'acquisition' ? 'bg-purple-500' :
+                    step.category === 'pms' ? 'bg-blue-500' :
+                    step.category === 'community' ? 'bg-cyan-500' :
+                    'bg-purple-500'
+                  }`}>
+                    {step.id}
+                  </div>
+                  {index < steps.length - 1 && (
+                    <ArrowRight className="h-4 w-4 text-gray-500 mx-1" />
+                  )}
+                </div>
+              ))}
+            </div>
+            
+            {/* Category Labels */}
+            <div className="flex justify-center items-center gap-8 flex-wrap">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-cyan-500 rounded"></div>
+                <span className="text-gray-300">Market Intelligence</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-purple-500 rounded"></div>
+                <span className="text-gray-300">Acquisitions CRM</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                <span className="text-gray-300">Property Management</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Call to Action */}
+          <div className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 rounded-2xl p-12 border border-purple-500/30 text-center">
+            <h3 className="text-3xl font-bold text-white mb-4">
+              Ready to See It All in Action?
+            </h3>
+            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+              Experience the complete workflow that's helping thousands of investors build profitable rental arbitrage businesses.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Button 
+                onClick={handleRunDemo}
+                size="lg"
+                className="px-12 py-6 text-xl font-bold bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white transform hover:scale-105 transition-all duration-300 shadow-2xl"
+              >
+                <Play className="mr-3 h-6 w-6" />
+                Start Live Demo Now
+              </Button>
+              <Button 
+                onClick={() => setManualMode(true)}
+                size="lg"
+                variant="outline"
+                className="px-12 py-6 text-xl font-bold border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 transform hover:scale-105 transition-all duration-300"
+              >
+                <Settings className="mr-3 h-6 w-6" />
+                Manual Exploration
+              </Button>
+            </div>
+            
+            {/* Trust Indicators */}
+            <div className="flex items-center justify-center gap-8 mt-8 text-sm text-gray-400">
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                <span>No Credit Card Required</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                <span>5-minute Demo</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Star className="h-4 w-4" />
+                <span>Join 10,000+ Investors</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
