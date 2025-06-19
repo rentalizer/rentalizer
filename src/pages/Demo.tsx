@@ -528,37 +528,35 @@ const Demo = () => {
         </div>
 
         {/* Step Indicator Dots */}
-        {(demoRunning || manualMode) && (
-          <div className="mb-12">
-            <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
-              {steps.map((step, index) => (
-                <div 
-                  key={step.id}
-                  onClick={() => handleStepClick(step.id)}
-                  className={`cursor-pointer group relative`}
-                  title={`Step ${step.id}: ${step.title}`}
-                >
-                  <div className={`
-                    w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300
-                    ${getStepColor(step.id, step.category)}
-                    ${getStepBorder(step.id, step.category)}
-                    ${step.id <= currentStep ? 'text-white' : 'text-gray-400'}
-                    hover:scale-110
-                  `}>
-                    {step.id}
-                  </div>
-                  
-                  {/* Tooltip */}
-                  <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                    <div className="bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                      {step.title}
-                    </div>
+        <div className="mb-12">
+          <div className="flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
+            {steps.map((step, index) => (
+              <div 
+                key={step.id}
+                onClick={() => handleStepClick(step.id)}
+                className={`cursor-pointer group relative`}
+                title={`Step ${step.id}: ${step.title}`}
+              >
+                <div className={`
+                  w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300
+                  ${getStepColor(step.id, step.category)}
+                  ${getStepBorder(step.id, step.category)}
+                  ${step.id <= currentStep ? 'text-white' : 'text-gray-400'}
+                  hover:scale-110
+                `}>
+                  {step.id}
+                </div>
+                
+                {/* Tooltip */}
+                <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                  <div className="bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                    {step.title}
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
 
         {/* Compact Current Step Display */}
         {(demoRunning || manualMode) && (
@@ -1097,10 +1095,10 @@ const Demo = () => {
               </Card>
             )}
           </div>
-        )}
-      </div>
+        </div>
 
-      <Footer />
+        <Footer />
+      </div>
     </div>
   );
 };
