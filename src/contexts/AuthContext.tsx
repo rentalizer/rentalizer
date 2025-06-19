@@ -35,7 +35,7 @@ export const useAuth = () => {
 
 const sendNewUserNotification = async (userEmail: string, userId: string) => {
   try {
-    console.log('Sending new user notification for:', userEmail);
+    console.log('🔔 Sending new user notification for:', userEmail);
     
     const { data, error } = await supabase.functions.invoke('notify-new-user', {
       body: {
@@ -46,18 +46,18 @@ const sendNewUserNotification = async (userEmail: string, userId: string) => {
     });
 
     if (error) {
-      console.error('Error sending new user notification:', error);
+      console.error('❌ Error sending new user notification:', error);
     } else {
-      console.log('New user notification sent successfully');
+      console.log('✅ New user notification sent successfully:', data);
     }
   } catch (error) {
-    console.error('Failed to send new user notification:', error);
+    console.error('💥 Failed to send new user notification:', error);
   }
 };
 
 const sendWelcomeEmail = async (userEmail: string, userId: string) => {
   try {
-    console.log('Sending welcome email to:', userEmail);
+    console.log('📧 Sending welcome email to:', userEmail);
     
     const { data, error } = await supabase.functions.invoke('send-welcome-email', {
       body: {
@@ -67,12 +67,12 @@ const sendWelcomeEmail = async (userEmail: string, userId: string) => {
     });
 
     if (error) {
-      console.error('Error sending welcome email:', error);
+      console.error('❌ Error sending welcome email:', error);
     } else {
-      console.log('Welcome email sent successfully');
+      console.log('✅ Welcome email sent successfully:', data);
     }
   } catch (error) {
-    console.error('Failed to send welcome email:', error);
+    console.error('💥 Failed to send welcome email:', error);
   }
 };
 
@@ -322,10 +322,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('✅ Sign up successful for:', email);
     
     if (data.user && data.user.email) {
+      console.log('🚀 Triggering notification emails for new user:', data.user.email);
+      
+      // Call both notification functions immediately
       setTimeout(() => {
         sendNewUserNotification(data.user!.email!, data.user!.id);
         sendWelcomeEmail(data.user!.email!, data.user!.id);
-      }, 1000);
+      }, 500);
     }
   };
 
