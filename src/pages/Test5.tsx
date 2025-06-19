@@ -261,7 +261,7 @@ const Test5 = () => {
               </div>
             </div>
             
-            <h1 className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8">
+            <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8">
               See How Our AI-Powered Platform Automates Every Step Of Building And Scaling A Profitable Rental Business
             </h1>
             
@@ -273,15 +273,6 @@ const Test5 = () => {
               >
                 <Play className="mr-3 h-6 w-6" />
                 Watch Live Demo
-              </Button>
-              <Button 
-                onClick={() => setManualMode(true)}
-                size="lg"
-                variant="outline"
-                className="px-12 py-6 text-xl font-bold border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 transform hover:scale-105 transition-all duration-300"
-              >
-                <Eye className="mr-3 h-6 w-6" />
-                Explore Manually
               </Button>
             </div>
           </div>
@@ -779,7 +770,7 @@ const Test5 = () => {
                   </div>
 
                   {/* Expert Network Section */}
-                  <div className="bg-slate-700/30 rounded-lg p-6 border border-cyan-500/20">
+                  <div className="bg-slate-700/30 rounded-lg p-6 border border-cyan-500/30">
                     <h4 className="font-semibold text-cyan-300 mb-4 flex items-center gap-2">
                       <Users className="h-5 w-5" />
                       Expert Network
