@@ -55,6 +55,27 @@ const sendNewUserNotification = async (userEmail: string, userId: string) => {
   }
 };
 
+const sendWelcomeEmail = async (userEmail: string, userId: string) => {
+  try {
+    console.log('Sending welcome email to:', userEmail);
+    
+    const { data, error } = await supabase.functions.invoke('send-welcome-email', {
+      body: {
+        user_email: userEmail,
+        user_id: userId
+      }
+    });
+
+    if (error) {
+      console.error('Error sending welcome email:', error);
+    } else {
+      console.log('Welcome email sent successfully');
+    }
+  } catch (error) {
+    console.error('Failed to send welcome email:', error);
+  }
+};
+
 const createUserProfile = async (userId: string, email: string) => {
   try {
     console.log('Creating user profile for:', email);
@@ -303,7 +324,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (data.user && data.user.email) {
       setTimeout(() => {
         sendNewUserNotification(data.user!.email!, data.user!.id);
-      }, 2000);
+        sendWelcomeEmail(data.user!.email!, data.user!.id);
+      }, 1000);
     }
   };
 
