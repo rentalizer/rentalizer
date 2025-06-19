@@ -290,7 +290,7 @@ const Test5 = () => {
                       steps[currentStep - 1]?.category === 'acquisition' ? 'text-purple-400' :
                       steps[currentStep - 1]?.category === 'pms' ? 'text-blue-400' :
                       steps[currentStep - 1]?.category === 'sales' ? 'text-purple-400' :
-                      'text-orange-400'
+                      'text-cyan-400'
                     }`
                   })}
                   <h3 className="text-xl font-bold text-white">
@@ -305,7 +305,7 @@ const Test5 = () => {
                   steps[currentStep - 1]?.category === 'acquisition' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
                   steps[currentStep - 1]?.category === 'pms' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
                   steps[currentStep - 1]?.category === 'sales' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
-                  'bg-orange-500/20 text-orange-300 border border-orange-500/30'
+                  'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
                 }`}>
                   {steps[currentStep - 1]?.category === 'market' ? 'Market Intelligence' :
                    steps[currentStep - 1]?.category === 'acquisition' ? 'Acquisition CRM' :
@@ -649,7 +649,7 @@ const Test5 = () => {
                 <CardHeader>
                   <CardTitle className="text-center text-3xl bg-gradient-to-r from-cyan-400 via-purple-400 to-blue-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
                     <Star className="h-8 w-8 text-purple-400" />
-                    Ready to Transform Your Real Estate Business?
+                    Ready to Start or Scale Your Rental Business?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -770,7 +770,7 @@ const Test5 = () => {
                             <span>10,000+ Active Users</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <TrendingUp className="h-4 w-4 text-green-400" />
+                            <TrendingUp className="h-4 w-4 text-cyan-400" />
                             <span>$50M+ Properties Analyzed</span>
                           </div>
                         </div>
@@ -801,36 +801,6 @@ const Test5 = () => {
                             </div>
                           </div>
                           <p className="text-gray-300 text-sm">"The AI market analysis saved me weeks of research and helped me find my most profitable deals."</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Call to Action */}
-                    <div className="text-center bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg p-8 border border-purple-500/30">
-                      <h4 className="text-2xl font-bold text-white mb-4">
-                        Start Your 14-Day Free Trial Today
-                      </h4>
-                      <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-                        No credit card required. Cancel anytime. Join thousands of successful investors who are already using our platform to build their rental empires.
-                      </p>
-                      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                        <Button size="lg" className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white font-bold px-8 py-4 text-lg">
-                          Start Free Trial
-                          <ArrowRight className="ml-2 h-5 w-5" />
-                        </Button>
-                        <Button size="lg" variant="outline" className="border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 px-8 py-4 text-lg">
-                          Schedule Demo Call
-                          <Calendar className="ml-2 h-5 w-5" />
-                        </Button>
-                      </div>
-                      <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-400">
-                        <div className="flex items-center gap-1">
-                          <Shield className="h-4 w-4" />
-                          <span>Secure & GDPR Compliant</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          <span>Setup in Under 5 Minutes</span>
                         </div>
                       </div>
                     </div>
