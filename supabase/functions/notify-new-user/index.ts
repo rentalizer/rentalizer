@@ -26,7 +26,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const emailResponse = await resend.emails.send({
       from: "Rentalizer <notifications@istayusa.com>",
-      to: ["rich@istayusa.com"],
+      to: ["support@rentalarbuniversity.com"],
       subject: "🎉 New User Signup - Rentalizer",
       html: `
         <h1>New User Signup Alert</h1>
