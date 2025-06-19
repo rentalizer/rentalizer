@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -230,8 +229,41 @@ const Test5 = () => {
         <div className="container mx-auto px-4 py-16">
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-8">
-              From market research to property acquisition and management - see how our AI-powered platform automates every step of building and scaling a profitable rental business.
+              From Market Research To Property Acquisition And Management - See How Our AI-Powered Platform Automates Every Step Of Building And Scaling A Profitable Rental Business.
             </h1>
+            
+            {/* 18 Step Dots Visualization - Moved to top */}
+            <div className="mb-12">
+              <h2 className="text-2xl font-bold text-white mb-6">Complete 18-Step Workflow</h2>
+              
+              {/* Category Labels */}
+              <div className="flex justify-center items-center gap-8 flex-wrap mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-cyan-500 rounded"></div>
+                  <span className="text-gray-300">Market Intelligence</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-purple-500 rounded"></div>
+                  <span className="text-gray-300">Acquisitions CRM</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                  <span className="text-gray-300">Property Management</span>
+                </div>
+              </div>
+
+              {/* 18 Step Dots */}
+              <div className="flex justify-center items-center gap-3 flex-wrap max-w-4xl mx-auto">
+                {steps.map((step, index) => (
+                  <div
+                    key={step.id}
+                    className={`w-4 h-4 rounded-full cursor-pointer transition-all duration-300 ${getStepColor(step.id, step.category)} ${getStepBorder(step.id, step.category)}`}
+                    onClick={() => handleStepClick(step.id)}
+                    title={`Step ${step.id}: ${step.title}`}
+                  />
+                ))}
+              </div>
+            </div>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
               <Button 
@@ -251,22 +283,6 @@ const Test5 = () => {
                 <Eye className="mr-3 h-6 w-6" />
                 Explore Manually
               </Button>
-            </div>
-
-            {/* Key Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              <div className="bg-slate-800/50 rounded-xl p-6 border border-cyan-500/20">
-                <div className="text-3xl font-bold text-cyan-400 mb-2">10,000+</div>
-                <div className="text-gray-300">Active Investors</div>
-              </div>
-              <div className="bg-slate-800/50 rounded-xl p-6 border border-purple-500/20">
-                <div className="text-3xl font-bold text-purple-400 mb-2">$50M+</div>
-                <div className="text-gray-300">Properties Analyzed</div>
-              </div>
-              <div className="bg-slate-800/50 rounded-xl p-6 border border-blue-500/20">
-                <div className="text-3xl font-bold text-blue-400 mb-2">23%</div>
-                <div className="text-gray-300">Higher ROI vs Traditional</div>
-              </div>
             </div>
           </div>
 
@@ -405,39 +421,6 @@ const Test5 = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
-
-          {/* Workflow Overview */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-8">Complete 18-Step Workflow</h2>
-            
-            {/* Category Labels */}
-            <div className="flex justify-center items-center gap-8 flex-wrap mb-8">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-cyan-500 rounded"></div>
-                <span className="text-gray-300">Market Intelligence</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-purple-500 rounded"></div>
-                <span className="text-gray-300">Acquisitions CRM</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-blue-500 rounded"></div>
-                <span className="text-gray-300">Property Management</span>
-              </div>
-            </div>
-
-            {/* 18 Step Dots Visualization */}
-            <div className="flex justify-center items-center gap-3 flex-wrap max-w-4xl mx-auto">
-              {steps.map((step, index) => (
-                <div
-                  key={step.id}
-                  className={`w-4 h-4 rounded-full cursor-pointer transition-all duration-300 ${getStepColor(step.id, step.category)} ${getStepBorder(step.id, step.category)}`}
-                  onClick={() => handleStepClick(step.id)}
-                  title={`Step ${step.id}: ${step.title}`}
-                />
-              ))}
-            </div>
           </div>
 
           {/* Call to Action */}
