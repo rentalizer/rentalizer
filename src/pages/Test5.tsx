@@ -464,21 +464,6 @@ const Test5 = () => {
                 </>
               )}
             </Button>
-            
-            {(manualMode || !demoRunning) && (
-              <Button 
-                onClick={() => {
-                  setManualMode(true);
-                  setDemoRunning(false);
-                }}
-                size="lg"
-                variant="outline"
-                className="px-8 py-4 text-lg font-semibold border-cyan-500 text-cyan-400 hover:bg-cyan-500/10"
-              >
-                Manual Demo
-                <Settings className="ml-2 h-5 w-5" />
-              </Button>
-            )}
           </div>
         </div>
 
