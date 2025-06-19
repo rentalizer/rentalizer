@@ -159,7 +159,6 @@ const Test5 = () => {
             Live Demo: Complete Rental Arbitrage Workflow
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-            Watch how Rentalizer.AI guides you through every step from market research to property management
           </p>
           
           {/* Run Demo Button */}
