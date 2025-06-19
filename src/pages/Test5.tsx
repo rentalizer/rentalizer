@@ -228,9 +228,6 @@ const Test5 = () => {
         {/* Hero Section */}
         <div className="container mx-auto px-4 py-16">
           <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-6">
-              The Complete Rental Arbitrage System
-            </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto mb-8">
               From market research to property management - see how our AI-powered platform automates every step of building a profitable short-term rental business.
             </p>
@@ -402,7 +399,7 @@ const Test5 = () => {
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Star className="h-4 w-4 text-cyan-400" />
-                    <span className="text-gray-300">Expert Network Access</span>
+                    <span>Expert Network Access</span>
                   </div>
                 </div>
               </CardContent>
@@ -412,7 +409,6 @@ const Test5 = () => {
           {/* Workflow Overview */}
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-8">Complete 18-Step Workflow</h2>
-            {/* Removed the step indicator circles as requested */}
             
             {/* Category Labels */}
             <div className="flex justify-center items-center gap-8 flex-wrap">
