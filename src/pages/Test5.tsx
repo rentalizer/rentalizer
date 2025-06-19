@@ -1017,10 +1017,10 @@ const Test5 = () => {
               </Card>
             )}
           </div>
-        </div>
-
-        <Footer />
+        )}
       </div>
+
+      <Footer />
     </div>
   );
 };
