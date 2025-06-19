@@ -44,6 +44,12 @@ const Test5 = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [demoRunning, setDemoRunning] = useState(false);
   const [manualMode, setManualMode] = useState(false);
+  
+  // Typing simulation states
+  const [typedCity, setTypedCity] = useState('');
+  const [selectedBedrooms, setSelectedBedrooms] = useState('');
+  const [selectedBathrooms, setSelectedBathrooms] = useState('');
+  const [buttonPressed, setButtonPressed] = useState(false);
 
   // Mock data for market analysis demos
   const mockMarketData = [
@@ -54,6 +60,52 @@ const Test5 = () => {
     { submarket: "La Jolla", strRevenue: 0, medianRent: 4800, multiple: 0 },
     { submarket: "Pacific Beach", strRevenue: 0, medianRent: 4000, multiple: 0 }
   ];
+
+  // Typing simulation effect
+  useEffect(() => {
+    if (currentStep === 1 && (demoRunning || manualMode)) {
+      const cityText = "San Diego";
+      let cityIndex = 0;
+      
+      // Reset states
+      setTypedCity('');
+      setSelectedBedrooms('');
+      setSelectedBathrooms('');
+      setButtonPressed(false);
+      
+      // Type city name
+      const cityTimer = setInterval(() => {
+        if (cityIndex < cityText.length) {
+          setTypedCity(cityText.slice(0, cityIndex + 1));
+          cityIndex++;
+        } else {
+          clearInterval(cityTimer);
+          
+          // After city typing, select bedrooms
+          setTimeout(() => {
+            setSelectedBedrooms('2');
+            
+            // Then select bathrooms
+            setTimeout(() => {
+              setSelectedBathrooms('2');
+              
+              // Finally press the button
+              setTimeout(() => {
+                setButtonPressed(true);
+                
+                // Reset button press after animation
+                setTimeout(() => {
+                  setButtonPressed(false);
+                }, 200);
+              }, 500);
+            }, 500);
+          }, 500);
+        }
+      }, 100);
+
+      return () => clearInterval(cityTimer);
+    }
+  }, [currentStep, demoRunning, manualMode]);
 
   useEffect(() => {
     if (demoRunning && !manualMode) {
@@ -257,7 +309,7 @@ const Test5 = () => {
         {/* Step-Specific Visual Demonstrations */}
         {(demoRunning || manualMode) && (
           <div className="mb-12 space-y-8">
-            {/* Step 1: Market Research - Search Field */}
+            {/* Step 1: Market Research - Search Field with Typing Animation */}
             {currentStep === 1 && (
               <Card className="bg-slate-800/50 border-cyan-500/20 animate-fade-in">
                 <CardHeader>
@@ -274,30 +326,47 @@ const Test5 = () => {
                       </Label>
                       <Input
                         id="target-city"
-                        value="San Diego"
+                        value={typedCity}
                         readOnly
-                        className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400"
+                        className={`mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 transition-all duration-200 ${
+                          typedCity ? 'border-cyan-500' : ''
+                        }`}
+                        placeholder="e.g., San Diego, Austin, Miami"
                       />
+                      {typedCity && (
+                        <div className="absolute ml-2 mt-1">
+                          <div className="w-0.5 h-5 bg-cyan-400 animate-pulse"></div>
+                        </div>
+                      )}
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label className="text-sm font-medium text-gray-300">Bedrooms</Label>
-                        <Select value="2" disabled>
-                          <SelectTrigger className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100">
-                            <SelectValue placeholder="2 Bedrooms" />
+                        <Select value={selectedBedrooms} disabled>
+                          <SelectTrigger className={`mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 transition-all duration-200 ${
+                            selectedBedrooms ? 'border-cyan-500 ring-1 ring-cyan-500/20' : ''
+                          }`}>
+                            <SelectValue placeholder="Select bedrooms" />
                           </SelectTrigger>
                         </Select>
                       </div>
                       <div>
                         <Label className="text-sm font-medium text-gray-300">Bathrooms</Label>
-                        <Select value="2" disabled>
-                          <SelectTrigger className="mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100">
-                            <SelectValue placeholder="2 Bathrooms" />
+                        <Select value={selectedBathrooms} disabled>
+                          <SelectTrigger className={`mt-1 border-cyan-500/30 bg-gray-800/50 text-gray-100 transition-all duration-200 ${
+                            selectedBathrooms ? 'border-cyan-500 ring-1 ring-cyan-500/20' : ''
+                          }`}>
+                            <SelectValue placeholder="Select bathrooms" />
                           </SelectTrigger>
                         </Select>
                       </div>
                     </div>
-                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500">
+                    <Button 
+                      className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 transition-all duration-200 ${
+                        buttonPressed ? 'scale-95 shadow-inner' : 'scale-100'
+                      }`}
+                      disabled={!typedCity || !selectedBedrooms || !selectedBathrooms}
+                    >
                       <Search className="h-4 w-4 mr-2" />
                       Analyze Market
                     </Button>
