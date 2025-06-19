@@ -440,15 +440,6 @@ const Demo = () => {
                 <Play className="mr-3 h-6 w-6" />
                 Start Live Demo Now
               </Button>
-              <Button 
-                onClick={() => setManualMode(true)}
-                size="lg"
-                variant="outline"
-                className="px-12 py-6 text-xl font-bold border-2 border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 transform hover:scale-105 transition-all duration-300"
-              >
-                <Settings className="mr-3 h-6 w-6" />
-                Manual Exploration
-              </Button>
             </div>
             
             {/* Trust Indicators */}
