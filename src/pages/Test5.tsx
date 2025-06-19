@@ -182,7 +182,7 @@ const Test5 = () => {
         case "community":
           return "bg-cyan-500";
         case "sales":
-          return "bg-gradient-to-r from-yellow-500 to-orange-500";
+          return "bg-gradient-to-r from-purple-500 to-blue-500";
         default:
           return "bg-gray-500";
       }
@@ -202,7 +202,7 @@ const Test5 = () => {
         case "community":
           return "ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900";
         case "sales":
-          return "ring-2 ring-yellow-400 ring-offset-2 ring-offset-slate-900";
+          return "ring-2 ring-purple-400 ring-offset-2 ring-offset-slate-900";
         default:
           return "ring-2 ring-gray-400 ring-offset-2 ring-offset-slate-900";
       }
@@ -289,7 +289,7 @@ const Test5 = () => {
                       steps[currentStep - 1]?.category === 'market' ? 'text-cyan-400' :
                       steps[currentStep - 1]?.category === 'acquisition' ? 'text-purple-400' :
                       steps[currentStep - 1]?.category === 'pms' ? 'text-blue-400' :
-                      steps[currentStep - 1]?.category === 'sales' ? 'text-yellow-400' :
+                      steps[currentStep - 1]?.category === 'sales' ? 'text-purple-400' :
                       'text-orange-400'
                     }`
                   })}
@@ -304,7 +304,7 @@ const Test5 = () => {
                   steps[currentStep - 1]?.category === 'market' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' :
                   steps[currentStep - 1]?.category === 'acquisition' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
                   steps[currentStep - 1]?.category === 'pms' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
-                  steps[currentStep - 1]?.category === 'sales' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' :
+                  steps[currentStep - 1]?.category === 'sales' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
                   'bg-orange-500/20 text-orange-300 border border-orange-500/30'
                 }`}>
                   {steps[currentStep - 1]?.category === 'market' ? 'Market Intelligence' :
@@ -462,7 +462,7 @@ const Test5 = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <Pin className="h-3 w-3 text-yellow-400" />
+                              <Pin className="h-3 w-3 text-purple-400" />
                               <span className="text-sm font-medium text-white truncate">Welcome to the Community!</span>
                             </div>
                             <div className="text-xs text-gray-400">Richie Matthews • 2h ago</div>
@@ -606,8 +606,8 @@ const Test5 = () => {
                           <div className="text-white font-medium">Sarah Chen</div>
                           <div className="text-gray-400 text-sm">STR Expert • 47 properties</div>
                           <div className="flex items-center gap-1 mt-1">
-                            <Star className="h-3 w-3 text-yellow-400" />
-                            <span className="text-yellow-400 text-xs">4.9</span>
+                            <Star className="h-3 w-3 text-cyan-400" />
+                            <span className="text-cyan-400 text-xs">4.9</span>
                           </div>
                         </div>
                       </div>
@@ -619,8 +619,8 @@ const Test5 = () => {
                           <div className="text-white font-medium">Mike Rodriguez</div>
                           <div className="text-gray-400 text-sm">Market Analyst • Austin specialist</div>
                           <div className="flex items-center gap-1 mt-1">
-                            <Star className="h-3 w-3 text-yellow-400" />
-                            <span className="text-yellow-400 text-xs">4.8</span>
+                            <Star className="h-3 w-3 text-cyan-400" />
+                            <span className="text-cyan-400 text-xs">4.8</span>
                           </div>
                         </div>
                       </div>
@@ -632,8 +632,8 @@ const Test5 = () => {
                           <div className="text-white font-medium">Lisa Thompson</div>
                           <div className="text-gray-400 text-sm">Legal Expert • Contract specialist</div>
                           <div className="flex items-center gap-1 mt-1">
-                            <Star className="h-3 w-3 text-yellow-400" />
-                            <span className="text-yellow-400 text-xs">5.0</span>
+                            <Star className="h-3 w-3 text-cyan-400" />
+                            <span className="text-cyan-400 text-xs">5.0</span>
                           </div>
                         </div>
                       </div>
@@ -645,10 +645,10 @@ const Test5 = () => {
 
             {/* Sales Step (18) */}
             {currentStep === 18 && (
-              <Card className="bg-gradient-to-br from-slate-800/50 to-slate-700/50 border-yellow-500/30 animate-fade-in">
+              <Card className="bg-gradient-to-br from-slate-800/50 to-slate-700/50 border-purple-500/30 animate-fade-in">
                 <CardHeader>
-                  <CardTitle className="text-center text-3xl bg-gradient-to-r from-yellow-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
-                    <Star className="h-8 w-8 text-yellow-400" />
+                  <CardTitle className="text-center text-3xl bg-gradient-to-r from-cyan-400 via-purple-400 to-blue-400 bg-clip-text text-transparent flex items-center justify-center gap-2">
+                    <Star className="h-8 w-8 text-purple-400" />
                     Ready to Transform Your Real Estate Business?
                   </CardTitle>
                 </CardHeader>
@@ -676,8 +676,8 @@ const Test5 = () => {
                         <h4 className="text-lg font-semibold text-white mb-2">Precision Targeting</h4>
                         <p className="text-gray-400 text-sm">Find the most profitable properties with AI-driven market intelligence and scoring.</p>
                       </div>
-                      <div className="bg-slate-800/50 rounded-lg p-6 border border-yellow-500/20 text-center">
-                        <TrendingUp className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
+                      <div className="bg-slate-800/50 rounded-lg p-6 border border-blue-500/20 text-center">
+                        <TrendingUp className="h-12 w-12 text-blue-400 mx-auto mb-4" />
                         <h4 className="text-lg font-semibold text-white mb-2">Proven Results</h4>
                         <p className="text-gray-400 text-sm">Our users average 23% higher ROI compared to traditional methods.</p>
                       </div>
@@ -716,41 +716,41 @@ const Test5 = () => {
                       </div>
 
                       {/* All-In-One System Plan */}
-                      <div className="bg-gradient-to-br from-purple-800/30 to-yellow-800/30 rounded-lg p-6 border border-yellow-500/50 relative">
+                      <div className="bg-gradient-to-br from-purple-800/30 to-blue-800/30 rounded-lg p-6 border border-purple-500/50 relative">
                         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                          <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold px-4 py-1">
+                          <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold px-4 py-1">
                             MOST POPULAR
                           </Badge>
                         </div>
                         <div className="text-center mb-6">
-                          <h4 className="text-xl font-bold text-yellow-400 mb-2">All-In-One System</h4>
+                          <h4 className="text-xl font-bold text-purple-400 mb-2">All-In-One System</h4>
                           <div className="text-3xl font-bold text-white mb-1">$2,950<span className="text-lg text-gray-400">/month</span></div>
                           <p className="text-gray-400 text-sm">Complete rental arbitrage solution</p>
                         </div>
                         <div className="space-y-3 mb-6">
                           <div className="text-cyan-300 font-medium text-sm mb-3">Everything in Market Insights + Calculator, plus:</div>
                           <div className="flex items-center gap-2 text-sm">
-                            <CheckCircle2 className="h-4 w-4 text-yellow-400" />
+                            <CheckCircle2 className="h-4 w-4 text-purple-400" />
                             <span className="text-gray-300">Acquisitions Agent</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
-                            <CheckCircle2 className="h-4 w-4 text-yellow-400" />
+                            <CheckCircle2 className="h-4 w-4 text-purple-400" />
                             <span className="text-gray-300">Front Desk Management</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
-                            <CheckCircle2 className="h-4 w-4 text-yellow-400" />
+                            <CheckCircle2 className="h-4 w-4 text-purple-400" />
                             <span className="text-gray-300">AI-Powered Outreach</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
-                            <CheckCircle2 className="h-4 w-4 text-yellow-400" />
+                            <CheckCircle2 className="h-4 w-4 text-purple-400" />
                             <span className="text-gray-300">Automated Guest Management</span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
-                            <CheckCircle2 className="h-4 w-4 text-yellow-400" />
+                            <CheckCircle2 className="h-4 w-4 text-purple-400" />
                             <span className="text-gray-300">Priority Support</span>
                           </div>
                         </div>
-                        <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold">
+                        <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold">
                           Get Started
                         </Button>
                       </div>
@@ -762,7 +762,7 @@ const Test5 = () => {
                         <h4 className="text-lg font-semibold text-white mb-2">Trusted by Industry Leaders</h4>
                         <div className="flex items-center justify-center gap-8 text-sm text-gray-400">
                           <div className="flex items-center gap-2">
-                            <Star className="h-4 w-4 text-yellow-400" />
+                            <Star className="h-4 w-4 text-cyan-400" />
                             <span>4.9/5 Average Rating</span>
                           </div>
                           <div className="flex items-center gap-2">
@@ -792,7 +792,7 @@ const Test5 = () => {
                         </div>
                         <div className="bg-slate-700/50 rounded p-4">
                           <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-yellow-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
                               MD
                             </div>
                             <div>
@@ -806,7 +806,7 @@ const Test5 = () => {
                     </div>
 
                     {/* Call to Action */}
-                    <div className="text-center bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-lg p-8 border border-yellow-500/30">
+                    <div className="text-center bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg p-8 border border-purple-500/30">
                       <h4 className="text-2xl font-bold text-white mb-4">
                         Start Your 14-Day Free Trial Today
                       </h4>
@@ -814,7 +814,7 @@ const Test5 = () => {
                         No credit card required. Cancel anytime. Join thousands of successful investors who are already using our platform to build their rental empires.
                       </p>
                       <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                        <Button size="lg" className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-black font-bold px-8 py-4 text-lg">
+                        <Button size="lg" className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-400 hover:to-blue-400 text-white font-bold px-8 py-4 text-lg">
                           Start Free Trial
                           <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
