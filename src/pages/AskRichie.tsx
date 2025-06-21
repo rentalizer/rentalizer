@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +24,7 @@ const AskRichie = () => {
     {
       id: '1',
       type: 'assistant',
-      content: "Hey there! I'm Richie's AI assistant, trained on all his rental arbitrage expertise. I'm here to help you with questions about starting and managing your rental business. What would you like to know?",
+      content: "Hey There! I'm Richie's AI Assistant, Trained On All His Rental Arbitrage Expertise. I'm Here To Help You With Questions About Starting And Managing Your Rental Business. What Would You Like To Know?",
       timestamp: new Date()
     }
   ]);
@@ -50,55 +51,28 @@ const AskRichie = () => {
       period: '',
       questions: 3,
       features: [
-        '3 AI questions',
-        'Basic rental arbitrage guidance',
-        'Access to quick tips'
+        '3 AI Questions',
+        'Basic Rental Arbitrage Guidance',
+        'Access To Quick Tips'
       ],
       popular: false
-    },
-    {
-      id: 'essential',
-      name: 'Essential',
-      price: '$97',
-      period: '/month',
-      questions: 25,
-      features: [
-        '25 AI questions per month',
-        'Priority response time',
-        'Advanced rental strategies',
-        'Market analysis guidance'
-      ],
-      popular: true
     },
     {
       id: 'professional',
       name: 'Professional',
       price: '$297',
       period: '/month',
-      questions: 100,
+      questions: 300,
       features: [
-        '100 AI questions per month',
-        'Fastest response time',
-        'Advanced deal analysis',
-        'Scaling strategies',
-        'Legal compliance guidance'
+        '300 AI Questions Per Month',
+        'Priority Response Time',
+        'Advanced Rental Strategies',
+        'Market Analysis Guidance',
+        'Advanced Deal Analysis',
+        'Scaling Strategies',
+        'Legal Compliance Guidance'
       ],
-      popular: false
-    },
-    {
-      id: 'unlimited',
-      name: 'Unlimited',
-      price: '$497',
-      period: '/month',
-      questions: 999999,
-      features: [
-        'Unlimited AI questions',
-        'Instant responses',
-        'Advanced automation strategies',
-        'Portfolio optimization',
-        'Direct escalation path to Richie'
-      ],
-      popular: false
+      popular: true
     }
   ];
 
@@ -256,7 +230,7 @@ const AskRichie = () => {
               
               <div className="mb-12 px-4">
                 <p className="text-xl md:text-2xl text-white max-w-4xl mx-auto leading-relaxed">
-                  Get Instant Answers from Richie's AI - Trained on all of Richie's live coaching sessions, documents, and rental arbitrage expertise.
+                  Get Instant Answers From Richie's AI - Trained On All Of Richie's Live Coaching Sessions, Documents, And Rental Arbitrage Expertise.
                 </p>
               </div>
 
@@ -274,7 +248,7 @@ const AskRichie = () => {
             {/* Pricing Plans */}
             <div className="mb-12">
               <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-8">Choose Your Plan</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                 {pricingPlans.map((plan) => (
                   <div key={plan.id} className="group relative">
                     <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
@@ -298,7 +272,7 @@ const AskRichie = () => {
                           <span className="text-lg text-gray-400">{plan.period}</span>
                         </div>
                         <p className="text-gray-400">
-                          {plan.questions === 999999 ? 'Unlimited' : plan.questions} questions{plan.period && ' per month'}
+                          {plan.questions} questions{plan.period && ' per month'}
                         </p>
                       </CardHeader>
                       
@@ -344,21 +318,21 @@ const AskRichie = () => {
                       <Zap className="h-6 w-6 text-cyan-400" />
                     </div>
                     <h4 className="font-semibold text-white mb-2">Instant Answers</h4>
-                    <p className="text-gray-400 text-sm">Get immediate responses to your rental arbitrage questions, 24/7</p>
+                    <p className="text-gray-400 text-sm">Get Immediate Responses To Your Rental Arbitrage Questions, 24/7</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
                       <Star className="h-6 w-6 text-purple-400" />
                     </div>
                     <h4 className="font-semibold text-white mb-2">Richie's Expertise</h4>
-                    <p className="text-gray-400 text-sm">Trained on all live sessions and proven strategies from the $5K program</p>
+                    <p className="text-gray-400 text-sm">Trained On All Live Sessions And Proven Strategies From The $5K Program</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-cyan-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
                       <Crown className="h-6 w-6 text-cyan-400" />
                     </div>
                     <h4 className="font-semibold text-white mb-2">Proven Results</h4>
-                    <p className="text-gray-400 text-sm">Get guidance that's helped thousands build successful rental businesses</p>
+                    <p className="text-gray-400 text-sm">Get Guidance That's Helped Thousands Build Successful Rental Businesses</p>
                   </div>
                 </div>
               </CardContent>
@@ -425,7 +399,7 @@ const AskRichie = () => {
           <div className="container mx-auto px-4 py-16">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">Choose Your Plan</h2>
-              <p className="text-gray-300">Select the plan that best fits your needs</p>
+              <p className="text-gray-300">Select The Plan That Best Fits Your Needs</p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 mb-8 max-w-4xl mx-auto">
@@ -453,7 +427,7 @@ const AskRichie = () => {
                         <span className="text-lg text-gray-400">{plan.period}</span>
                       </div>
                       <p className="text-gray-400">
-                        {plan.questions === 999999 ? 'Unlimited' : plan.questions} questions{plan.period && ' per month'}
+                        {plan.questions} questions{plan.period && ' per month'}
                       </p>
                     </CardHeader>
                     
@@ -530,7 +504,7 @@ const AskRichie = () => {
                   {currentPlan.name} Plan
                 </Badge>
                 <p className="text-xs text-gray-400 mt-1">
-                  {remainingQuestions === 999999 ? 'Unlimited' : remainingQuestions} questions remaining
+                  {remainingQuestions} questions remaining
                 </p>
               </div>
               <Button
@@ -565,7 +539,7 @@ const AskRichie = () => {
                 Richie's AI Assistant
               </CardTitle>
               <p className="text-gray-400 text-sm">
-                Trained on Richie's live coaching sessions, documents, and rental arbitrage expertise
+                Trained On Richie's Live Coaching Sessions, Documents, And Rental Arbitrage Expertise
               </p>
             </CardHeader>
             
@@ -620,7 +594,7 @@ const AskRichie = () => {
                     <div className="bg-slate-700/50 rounded-lg px-4 py-3">
                       <div className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin text-cyan-400" />
-                        <span className="text-gray-400">Richie's AI is thinking...</span>
+                        <span className="text-gray-400">Richie's AI Is Thinking...</span>
                       </div>
                     </div>
                   </div>
@@ -631,9 +605,9 @@ const AskRichie = () => {
 
               {/* Input Area */}
               <div className="border-t border-gray-700/50 p-6">
-                {remainingQuestions === 0 && currentPlan.questions !== 999999 ? (
+                {remainingQuestions === 0 ? (
                   <div className="text-center py-4">
-                    <p className="text-gray-400 mb-3">You've used all your questions for this month.</p>
+                    <p className="text-gray-400 mb-3">You've Used All Your Questions For This Month.</p>
                     <Button
                       onClick={() => setSelectedPlan(null)}
                       className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
@@ -648,7 +622,7 @@ const AskRichie = () => {
                         value={inputMessage}
                         onChange={(e) => setInputMessage(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        placeholder="Ask Richie's AI about rental arbitrage, property management, scaling strategies..."
+                        placeholder="Ask Richie's AI About Rental Arbitrage, Property Management, Scaling Strategies..."
                         className="flex-1 bg-slate-700/50 border-gray-600/50 text-white placeholder-gray-400 min-h-[60px] resize-none"
                         disabled={isLoading}
                       />
@@ -661,7 +635,7 @@ const AskRichie = () => {
                       </Button>
                     </div>
                     <p className="text-xs text-gray-500 mt-2">
-                      Press Enter to send, Shift+Enter for new line
+                      Press Enter To Send, Shift+Enter For New Line
                     </p>
                   </>
                 )}
@@ -675,10 +649,10 @@ const AskRichie = () => {
               <CardContent className="p-4">
                 <h3 className="font-semibold text-cyan-300 mb-2">💡 Quick Tips</h3>
                 <ul className="text-sm text-gray-400 space-y-1">
-                  <li>• Ask about property selection criteria</li>
-                  <li>• Get help with pricing strategies</li>
-                  <li>• Learn about automation tools</li>
-                  <li>• Understand legal requirements</li>
+                  <li>• Ask About Property Selection Criteria</li>
+                  <li>• Get Help With Pricing Strategies</li>
+                  <li>• Learn About Automation Tools</li>
+                  <li>• Understand Legal Requirements</li>
                 </ul>
               </CardContent>
             </Card>
@@ -687,10 +661,10 @@ const AskRichie = () => {
               <CardContent className="p-4">
                 <h3 className="font-semibold text-cyan-300 mb-2">🎯 Popular Questions</h3>
                 <ul className="text-sm text-gray-400 space-y-1">
-                  <li>• "How do I find my first rental property?"</li>
-                  <li>• "What's the best way to scale to 10 units?"</li>
-                  <li>• "How should I handle difficult guests?"</li>
-                  <li>• "What are the key metrics to track?"</li>
+                  <li>• "How Do I Find My First Rental Property?"</li>
+                  <li>• "What's The Best Way To Scale To 10 Units?"</li>
+                  <li>• "How Should I Handle Difficult Guests?"</li>
+                  <li>• "What Are The Key Metrics To Track?"</li>
                 </ul>
               </CardContent>
             </Card>
@@ -701,6 +675,96 @@ const AskRichie = () => {
       <Footer />
     </div>
   );
+
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim()) return;
+
+    // Check question limits
+    if (!user) return;
+    
+    const userPlan = pricingPlans.find(plan => plan.id === selectedPlan) || pricingPlans[0];
+    if (questionCount >= userPlan.questions) {
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'assistant',
+        content: `You've Reached Your Question Limit Of ${userPlan.questions} Questions For The ${userPlan.name} Plan. Please Upgrade To Continue Asking Questions.`,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      return;
+    }
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: inputMessage,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+    setIsLoading(true);
+    setQuestionCount(prev => prev + 1);
+
+    try {
+      // Call your AI assistant API here
+      const response = await fetch('/api/ask-richie', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: inputMessage,
+          conversationHistory: messages
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response');
+      }
+
+      const data = await response.json();
+      
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'assistant',
+        content: data.response,
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'assistant',
+        content: "I'm Sorry, I'm Having Trouble Connecting Right Now. Please Try Again In A Moment.",
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  };
+
+  const handleSelectPlan = (planId: string) => {
+    setSelectedPlan(planId);
+    setQuestionCount(0); // Reset question count when plan changes
+  };
 };
 
 export default AskRichie;
