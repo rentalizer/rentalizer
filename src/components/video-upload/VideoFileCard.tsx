@@ -43,34 +43,30 @@ export const VideoFileCard = ({
     }
   };
 
-  const markAsReady = () => {
-    // Allow marking as ready even without transcript
-    const title = video.title || `Video - ${video.file.name.replace(/\.[^/.]+$/, "")}`;
-    onUpdate(video.id, { 
-      status: 'ready' as const,
-      title: title,
-      transcript: video.transcript || 'No transcript provided'
-    });
-  };
-
   const getStatusProgress = () => {
     const status = video.status;
+    const hasContent = video.title || video.transcript.trim();
+    
     switch (status) {
       case 'pending':
-        return { progress: 25, text: 'Stage 1: Awaiting Processing', color: 'bg-yellow-500' };
+        if (hasContent) {
+          return { progress: 100, text: 'Ready for Upload', color: 'bg-green-500' };
+        }
+        return { progress: 25, text: 'Awaiting Content', color: 'bg-yellow-500' };
       case 'generating-title':
-        return { progress: 50, text: 'Stage 2: Generating Title', color: 'bg-blue-500' };
+        return { progress: 75, text: 'Generating Title...', color: 'bg-blue-500' };
       case 'ready':
-        return { progress: 75, text: 'Stage 3: Ready for Upload', color: 'bg-green-500' };
+        return { progress: 100, text: 'Ready for Upload', color: 'bg-green-500' };
       case 'uploaded':
-        return { progress: 100, text: 'Stage 4: Uploaded to Knowledge Base', color: 'bg-green-600' };
+        return { progress: 100, text: 'Uploaded Successfully', color: 'bg-green-600' };
       default:
-        return { progress: 0, text: 'Unknown Stage', color: 'bg-gray-500' };
+        return { progress: 0, text: 'Unknown Status', color: 'bg-gray-500' };
     }
   };
 
   const statusInfo = getStatusProgress();
   const isGeneratingTitle = video.status === 'generating-title';
+  const isReadyForUpload = video.status === 'ready' || (video.status === 'pending' && (video.title || video.transcript.trim()));
 
   return (
     <Card>
@@ -90,7 +86,7 @@ export const VideoFileCard = ({
                 )}
               </div>
               <div className="flex items-center gap-2">
-                {video.status === 'ready' && (
+                {isReadyForUpload && (
                   <Badge className="bg-green-100 text-green-800">
                     <Check className="h-3 w-3 mr-1" />
                     Ready to Upload
@@ -108,20 +104,11 @@ export const VideoFileCard = ({
                     Uploaded
                   </Badge>
                 )}
-                {video.status === 'pending' && (
-                  <div className="flex gap-2">
-                    <Badge variant="outline">
-                      <AlertCircle className="h-3 w-3 mr-1" />
-                      Ready for Upload
-                    </Badge>
-                    <Button
-                      size="sm"
-                      onClick={markAsReady}
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      Mark as Ready
-                    </Button>
-                  </div>
+                {!isReadyForUpload && !isGeneratingTitle && video.status !== 'uploaded' && (
+                  <Badge variant="outline">
+                    <AlertCircle className="h-3 w-3 mr-1" />
+                    Add Content
+                  </Badge>
                 )}
                 <Button
                   variant="ghost"
@@ -147,10 +134,15 @@ export const VideoFileCard = ({
                 />
               </div>
               <div className="flex justify-between text-xs text-gray-400">
-                <span className={video.status === 'pending' ? 'font-medium text-yellow-600' : ''}>Pending</span>
-                <span className={isGeneratingTitle ? 'font-medium text-blue-600' : ''}>Processing</span>
-                <span className={video.status === 'ready' ? 'font-medium text-green-600' : ''}>Ready</span>
-                <span className={video.status === 'uploaded' ? 'font-medium text-green-700' : ''}>Uploaded</span>
+                <span className={!isReadyForUpload && !isGeneratingTitle ? 'font-medium text-yellow-600' : ''}>
+                  Add Content
+                </span>
+                <span className={isGeneratingTitle ? 'font-medium text-blue-600' : ''}>
+                  Processing
+                </span>
+                <span className={isReadyForUpload ? 'font-medium text-green-600' : ''}>
+                  Ready
+                </span>
               </div>
             </div>
 
@@ -177,7 +169,7 @@ export const VideoFileCard = ({
                 className={video.transcript.trim() ? "border-green-200 bg-green-50" : ""}
               />
               <p className="text-xs text-gray-500">
-                You can upload the video without a transcript and add it later if needed.
+                Add a transcript or title to make this video ready for upload. You can also upload without content and add it later.
               </p>
             </div>
           </div>
