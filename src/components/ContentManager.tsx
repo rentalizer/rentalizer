@@ -20,7 +20,8 @@ import {
   Database,
   Play,
   Trash2,
-  FileVideo
+  FileVideo,
+  Wand2
 } from 'lucide-react';
 
 interface VideoContent {
@@ -42,6 +43,7 @@ export const ContentManager = () => {
   const [manualTranscript, setManualTranscript] = useState('');
   const [manualTitle, setManualTitle] = useState('');
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
 
   const commonTopics = [
     'Property Selection',
@@ -157,23 +159,69 @@ export const ContentManager = () => {
     }
   };
 
-  const addManualContent = () => {
-    if (!manualTitle.trim() || !manualTranscript.trim()) {
+  const generateManualTitle = async () => {
+    if (!manualTranscript.trim()) {
       toast({
-        title: "Missing Information",
-        description: "Please provide both title and transcript",
+        title: "No Transcript",
+        description: "Please add a transcript first to generate a title",
         variant: "destructive"
       });
       return;
     }
 
+    setIsGeneratingTitle(true);
+
+    try {
+      const response = await fetch('/api/generate-video-title', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ transcript: manualTranscript }),
+      });
+
+      const data = await response.json();
+      setManualTitle(data.title || 'AI Generated Title');
+
+      toast({
+        title: "Title Generated",
+        description: "AI has generated a title based on your transcript",
+      });
+
+    } catch (error) {
+      console.error('Error generating title:', error);
+      setManualTitle(`Content ${Date.now().toString().substring(0, 8)}`);
+      
+      toast({
+        title: "Title Generation Failed",
+        description: "Using fallback title. You can edit it manually.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingTitle(false);
+    }
+  };
+
+  const addManualContent = () => {
+    if (!manualTranscript.trim()) {
+      toast({
+        title: "Missing Transcript",
+        description: "Please provide a transcript",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Use generated title or create a fallback
+    const finalTitle = manualTitle.trim() || `Content ${Date.now().toString().substring(0, 8)}`;
+
     const newVideo: VideoContent = {
       id: Date.now().toString(),
-      title: manualTitle,
+      title: finalTitle,
       url: 'manual-upload',
       transcript: manualTranscript,
       status: 'completed',
-      topics: selectedTopics,
+      topics: selectedTopics.length > 0 ? selectedTopics : ['Q&A Session'],
       processedAt: new Date()
     };
 
@@ -370,11 +418,28 @@ export const ContentManager = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Input
-                placeholder="Content Title (e.g., 'Property Selection Strategy Session')"
-                value={manualTitle}
-                onChange={(e) => setManualTitle(e.target.value)}
-              />
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <label className="text-sm font-medium">Content Title (AI Generated)</label>
+                  {manualTranscript.trim() && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={generateManualTitle}
+                      disabled={isGeneratingTitle}
+                    >
+                      <Wand2 className="h-3 w-3 mr-1" />
+                      {isGeneratingTitle ? 'Generating...' : 'Generate Title'}
+                    </Button>
+                  )}
+                </div>
+                <Input
+                  placeholder="AI will generate a title based on your transcript..."
+                  value={manualTitle}
+                  onChange={(e) => setManualTitle(e.target.value)}
+                  className={manualTitle ? "bg-green-50 border-green-200" : ""}
+                />
+              </div>
               
               <div>
                 <label className="text-sm font-medium mb-2 block">Topics (select relevant topics)</label>
@@ -398,14 +463,27 @@ export const ContentManager = () => {
                 </div>
               </div>
 
-              <Textarea
-                placeholder="Paste transcript or written content here..."
-                value={manualTranscript}
-                onChange={(e) => setManualTranscript(e.target.value)}
-                rows={10}
-              />
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Content Transcript *</label>
+                <Textarea
+                  placeholder="Paste transcript or written content here..."
+                  value={manualTranscript}
+                  onChange={(e) => {
+                    setManualTranscript(e.target.value);
+                    // Auto-generate title when transcript is added
+                    if (e.target.value.trim() && !manualTitle) {
+                      generateManualTitle();
+                    }
+                  }}
+                  rows={10}
+                />
+              </div>
               
-              <Button onClick={addManualContent} className="w-full">
+              <Button 
+                onClick={addManualContent} 
+                className="w-full"
+                disabled={!manualTranscript.trim()}
+              >
                 <Upload className="h-4 w-4 mr-2" />
                 Add to Knowledge Base
               </Button>
