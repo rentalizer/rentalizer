@@ -43,6 +43,10 @@ export const ContentManager = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [manualTranscript, setManualTranscript] = useState('');
 
+  // Debug logging to see what videos we have
+  console.log('ContentManager videos:', videos);
+  console.log('Completed videos:', videos.filter(v => v.status === 'completed'));
+
   const commonTopics = [
     'Property Selection',
     '3X Strategy', 
@@ -225,6 +229,7 @@ export const ContentManager = () => {
   };
 
   const handleVideosAdded = (newVideos: any[]) => {
+    console.log('Adding videos to knowledge base:', newVideos);
     addVideos(newVideos);
   };
 
@@ -397,13 +402,26 @@ export const ContentManager = () => {
         <TabsContent value="manage" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Content Library</CardTitle>
+              <CardTitle>Content Library ({videos.filter(v => v.status === 'completed').length} items)</CardTitle>
             </CardHeader>
             <CardContent>
               {videos.filter(v => v.status === 'completed').length === 0 ? (
-                <p className="text-gray-500 text-center py-8">
-                  No processed content yet. Add videos or manual content to get started.
-                </p>
+                <div className="text-center py-8">
+                  <p className="text-gray-500 mb-4">
+                    No processed content yet. Add videos or manual content to get started.
+                  </p>
+                  <div className="bg-yellow-50 p-4 rounded-lg">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Debug Info:</strong> Total videos in context: {videos.length}
+                    </p>
+                    <p className="text-xs text-yellow-700 mt-1">
+                      Videos by status: {JSON.stringify(videos.reduce((acc, v) => {
+                        acc[v.status] = (acc[v.status] || 0) + 1;
+                        return acc;
+                      }, {} as Record<string, number>))}
+                    </p>
+                  </div>
+                </div>
               ) : (
                 <div className="space-y-4">
                   {videos.filter(v => v.status === 'completed').map((video) => (

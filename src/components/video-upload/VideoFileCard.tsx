@@ -80,6 +80,12 @@ export const VideoFileCard = ({
                     Generating Title...
                   </Badge>
                 )}
+                {video.status === 'uploaded' && (
+                  <Badge className="bg-blue-100 text-blue-800">
+                    <Check className="h-3 w-3 mr-1" />
+                    Uploaded
+                  </Badge>
+                )}
                 {video.status === 'pending' && (
                   <div className="flex gap-2">
                     <Badge variant="outline">
