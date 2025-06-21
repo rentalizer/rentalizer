@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -5,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Send, MessageCircle, User, Bot, Loader2, Crown, ArrowLeft, Lock, Zap, Star, CheckCircle, LogOut, BarChart3, Database, TrendingUp, BookOpen } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
   id: string;
@@ -19,6 +21,7 @@ interface Message {
 
 const AskRichie = () => {
   const { user, isSubscribed, signOut } = useAuth();
+  const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -31,8 +34,8 @@ const AskRichie = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [questionCount, setQuestionCount] = useState(0);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -74,6 +77,68 @@ const AskRichie = () => {
       popular: true
     }
   ];
+
+  const handleStripeCheckout = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to upgrade your subscription.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsProcessingPayment(true);
+      
+      console.log('🔄 Creating Stripe checkout session...');
+      
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        throw new Error('Not authenticated');
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          plan: 'professional',
+          billing: 'monthly',
+          amount: 99700, // $997 in cents
+          planName: 'Ask Richie AI - Professional Plan'
+        },
+        headers: {
+          Authorization: `Bearer ${session.session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('❌ Checkout error:', error);
+        throw error;
+      }
+
+      console.log('✅ Checkout session created:', data);
+      
+      if (data?.url) {
+        // Open Stripe checkout in a new tab
+        window.open(data.url, '_blank');
+        
+        toast({
+          title: "Redirecting to Stripe...",
+          description: "Opening payment page in a new tab.",
+        });
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('💥 Payment error:', error);
+      toast({
+        title: "Payment Error",
+        description: "Failed to start checkout process. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -161,8 +226,12 @@ const AskRichie = () => {
   };
 
   const handleSelectPlan = (planId: string) => {
-    setSelectedPlan(planId);
-    setQuestionCount(0); // Reset question count when plan changes
+    if (planId === 'professional') {
+      handleStripeCheckout();
+    } else {
+      setSelectedPlan(planId);
+      setQuestionCount(0); // Reset question count when plan changes
+    }
   };
 
   // If user is not logged in, show login/pricing page
@@ -175,21 +244,12 @@ const AskRichie = () => {
           <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500/5 blur-3xl"></div>
         </div>
 
-        {/* Header */}
+        {/* Header - Restricted Navigation */}
         <header className="relative z-20 w-full border-b border-gray-500/50 bg-slate-700/90 backdrop-blur-lg">
           <div className="container mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
-              {/* Logo */}
+              {/* Logo - No back button, users stay on this page */}
               <div className="flex items-center gap-3">
-                <Button
-                  onClick={() => navigate('/')}
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-400 hover:text-cyan-400"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
-                </Button>
                 <BarChart3 className="h-8 w-8 text-cyan-400 neon-text" />
                 <div>
                   <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -377,26 +437,15 @@ const AskRichie = () => {
           <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500/5 blur-3xl"></div>
         </div>
 
-        {/* Header */}
+        {/* Header - Restricted Navigation */}
         <header className="relative z-20 w-full border-b border-gray-500/50 bg-slate-700/90 backdrop-blur-lg">
           <div className="container mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Button
-                  onClick={() => navigate('/')}
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-400 hover:text-cyan-400"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
-                </Button>
-                <div className="flex items-center gap-3">
-                  <BarChart3 className="h-8 w-8 text-cyan-400 neon-text" />
-                  <div>
-                    <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">RENTALIZER</h1>
-                    <p className="text-sm text-gray-400">Ask Richie AI</p>
-                  </div>
+              <div className="flex items-center gap-3">
+                <BarChart3 className="h-8 w-8 text-cyan-400 neon-text" />
+                <div>
+                  <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">RENTALIZER</h1>
+                  <p className="text-sm text-gray-400">Ask Richie AI</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -470,8 +519,10 @@ const AskRichie = () => {
                             : 'bg-slate-700 hover:bg-slate-600'
                         } text-white`}
                         onClick={() => handleSelectPlan(plan.id)}
+                        disabled={plan.id === 'professional' && isProcessingPayment}
                       >
-                        {plan.id === 'free' ? 'Start Free Trial' : 'Select Plan'}
+                        {plan.id === 'free' ? 'Start Free Trial' : 
+                         isProcessingPayment ? 'Processing...' : 'Select Plan'}
                       </Button>
                     </CardContent>
                   </Card>
@@ -498,26 +549,15 @@ const AskRichie = () => {
         <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500/5 blur-3xl"></div>
       </div>
 
-      {/* Header */}
+      {/* Header - Restricted Navigation */}
       <header className="relative z-20 w-full border-b border-gray-500/50 bg-slate-700/90 backdrop-blur-lg">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                onClick={() => navigate('/')}
-                variant="ghost"
-                size="sm"
-                className="text-gray-400 hover:text-cyan-400"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-              <div className="flex items-center gap-3">
-                <BarChart3 className="h-8 w-8 text-cyan-400 neon-text" />
-                <div>
-                  <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">RENTALIZER</h1>
-                  <p className="text-sm text-gray-400">Ask Richie AI</p>
-                </div>
+            <div className="flex items-center gap-3">
+              <BarChart3 className="h-8 w-8 text-cyan-400 neon-text" />
+              <div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">RENTALIZER</h1>
+                <p className="text-sm text-gray-400">Ask Richie AI</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -631,10 +671,11 @@ const AskRichie = () => {
                   <div className="text-center py-4">
                     <p className="text-gray-400 mb-3">You've Used All Your Questions For This Month.</p>
                     <Button
-                      onClick={() => setSelectedPlan(null)}
+                      onClick={handleStripeCheckout}
+                      disabled={isProcessingPayment}
                       className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
                     >
-                      Upgrade Plan
+                      {isProcessingPayment ? 'Processing...' : 'Upgrade Plan'}
                     </Button>
                   </div>
                 ) : (
