@@ -56,11 +56,21 @@ export const VideoFileCard = ({
   const getStatusProgress = () => {
     const status = video.status;
     const hasContent = video.title || video.transcript.trim();
+    const fileSize = video.file.size;
+    const isLargeFile = fileSize > 100 * 1024 * 1024; // 100MB threshold
     
     switch (status) {
       case 'pending':
-        // Always show 100% for pending videos so they can be uploaded
-        return { progress: 100, text: 'Ready for Upload', color: 'bg-green-500' };
+        if (hasContent) {
+          // If has content, show 90% (can be uploaded but not fully optimized)
+          return { progress: 90, text: 'Ready for Upload', color: 'bg-green-500' };
+        } else if (isLargeFile) {
+          // Large files without content show lower progress
+          return { progress: 25, text: 'Large File - Add Content to Optimize', color: 'bg-yellow-500' };
+        } else {
+          // Small files without content
+          return { progress: 50, text: 'Add Content to Optimize', color: 'bg-yellow-500' };
+        }
       case 'generating-title':
         return { progress: 75, text: 'Generating Title...', color: 'bg-blue-500' };
       case 'ready':
@@ -76,6 +86,7 @@ export const VideoFileCard = ({
   const isGeneratingTitle = video.status === 'generating-title';
   const isReadyForUpload = video.status === 'ready' || video.status === 'pending';
   const hasContent = video.title || video.transcript.trim();
+  const isLargeFile = video.file.size > 100 * 1024 * 1024; // 100MB
 
   return (
     <Card>
@@ -89,16 +100,23 @@ export const VideoFileCard = ({
                 <p className="text-sm text-gray-600">{video.file.name}</p>
                 <p className="text-xs text-gray-500">
                   {formatFileSize(video.file.size)}
+                  {isLargeFile && <span className="text-orange-600 ml-2">• Large File</span>}
                 </p>
                 {video.title && (
                   <p className="text-sm font-medium mt-1 text-green-700">{video.title}</p>
                 )}
               </div>
               <div className="flex items-center gap-2">
-                {isReadyForUpload && (
+                {isReadyForUpload && hasContent && (
                   <Badge className="bg-green-100 text-green-800">
                     <Check className="h-3 w-3 mr-1" />
                     Ready to Upload
+                  </Badge>
+                )}
+                {isReadyForUpload && !hasContent && (
+                  <Badge variant="outline" className="bg-yellow-50 text-yellow-700">
+                    <Clock className="h-3 w-3 mr-1" />
+                    Can Upload (No Content)
                   </Badge>
                 )}
                 {isGeneratingTitle && (
@@ -111,12 +129,6 @@ export const VideoFileCard = ({
                   <Badge className="bg-blue-100 text-blue-800">
                     <Check className="h-3 w-3 mr-1" />
                     Uploaded
-                  </Badge>
-                )}
-                {video.status === 'pending' && !hasContent && (
-                  <Badge variant="outline" className="bg-yellow-50 text-yellow-700">
-                    <AlertCircle className="h-3 w-3 mr-1" />
-                    No Content
                   </Badge>
                 )}
                 <Button
@@ -144,16 +156,27 @@ export const VideoFileCard = ({
               </div>
               <div className="flex justify-between text-xs text-gray-400">
                 <span className={video.status === 'pending' && !hasContent ? 'font-medium text-yellow-600' : ''}>
-                  Add Content
+                  File Added
                 </span>
-                <span className={isGeneratingTitle ? 'font-medium text-blue-600' : ''}>
-                  Processing
+                <span className={hasContent && video.status === 'pending' ? 'font-medium text-green-600' : isGeneratingTitle ? 'font-medium text-blue-600' : ''}>
+                  {hasContent ? 'Content Added' : 'Add Content'}
                 </span>
-                <span className={isReadyForUpload ? 'font-medium text-green-600' : ''}>
+                <span className={isReadyForUpload && hasContent ? 'font-medium text-green-600' : ''}>
                   Ready
                 </span>
               </div>
             </div>
+
+            {isLargeFile && !hasContent && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-orange-600" />
+                  <p className="text-sm text-orange-800">
+                    <strong>Large File Detected:</strong> Adding a transcript will help generate better titles and improve searchability.
+                  </p>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -178,7 +201,7 @@ export const VideoFileCard = ({
                 className={video.transcript.trim() ? "border-green-200 bg-green-50" : ""}
               />
               <p className="text-xs text-gray-500">
-                Videos can be uploaded without content and transcripts can be added later. Adding content now will auto-generate titles.
+                Videos can be uploaded without content and transcripts can be added later. Adding content now will auto-generate titles and improve organization.
               </p>
             </div>
           </div>
