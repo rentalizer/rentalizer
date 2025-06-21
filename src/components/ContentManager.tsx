@@ -178,7 +178,12 @@ export const ContentManager = () => {
       processedAt: new Date()
     };
 
-    setVideos(prev => [...prev, newVideo]);
+    console.log('Adding manual content:', newVideo);
+    setVideos(prev => {
+      const newVideos = [...prev, newVideo];
+      console.log('Updated videos state:', newVideos);
+      return newVideos;
+    });
     setManualTranscript('');
 
     toast({
@@ -226,8 +231,21 @@ export const ContentManager = () => {
     });
   };
 
+  // Handle videos added from bulk upload
+  const handleVideosAdded = (newVideos: any[]) => {
+    console.log('Videos added from bulk upload:', newVideos);
+    setVideos(prev => {
+      const updatedVideos = [...prev, ...newVideos];
+      console.log('Updated videos after bulk upload:', updatedVideos);
+      return updatedVideos;
+    });
+  };
+
   const completedCount = videos.filter(v => v.status === 'completed').length;
   const progressPercentage = videos.length > 0 ? (completedCount / videos.length) * 100 : 0;
+
+  console.log('Current videos state:', videos);
+  console.log('Completed count:', completedCount);
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
@@ -264,7 +282,7 @@ export const ContentManager = () => {
 
         <TabsContent value="bulk-upload" className="space-y-4">
           <BulkVideoUpload 
-            onVideosAdded={(newVideos) => setVideos(prev => [...prev, ...newVideos])}
+            onVideosAdded={handleVideosAdded}
             commonTopics={commonTopics}
           />
         </TabsContent>
