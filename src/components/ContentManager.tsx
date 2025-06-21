@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import { youtubeTranscriptService } from '@/services/youtubeTranscriptService';
 import { 
   Upload, 
   Youtube, 
@@ -43,7 +43,7 @@ export const ContentManager = () => {
 
   const commonTopics = [
     'Property Selection',
-    '3X Strategy',
+    '3X Strategy', 
     'Rental Arbitrage',
     'Market Analysis',
     'Deal Structure',
@@ -69,43 +69,23 @@ export const ContentManager = () => {
     setIsProcessing(true);
     
     try {
-      // Simulate API call to extract playlist videos
-      // In a real implementation, you'd call a backend service
-      const mockVideos: VideoContent[] = [
-        {
-          id: '1',
-          title: 'Richie Matthews - Complete 3X Rental Strategy Overview',
-          url: 'https://youtube.com/watch?v=example1',
-          transcript: '',
-          status: 'pending',
-          topics: ['3X Strategy', 'Rental Arbitrage'],
-          duration: '45:32'
-        },
-        {
-          id: '2',
-          title: 'Property Selection Masterclass - Finding Perfect Units',
-          url: 'https://youtube.com/watch?v=example2',
-          transcript: '',
-          status: 'pending',
-          topics: ['Property Selection', 'Market Analysis'],
-          duration: '38:15'
-        },
-        {
-          id: '3',
-          title: 'Student Q&A - Common Challenges & Solutions',
-          url: 'https://youtube.com/watch?v=example3',
-          transcript: '',
-          status: 'pending',
-          topics: ['Q&A Session', 'Property Management'],
-          duration: '52:08'
-        }
-      ];
+      const extractedVideos = await youtubeTranscriptService.extractPlaylistVideos(playlistUrl);
+      
+      const videoContent: VideoContent[] = extractedVideos.map(video => ({
+        id: video.id,
+        title: video.title,
+        url: video.url,
+        transcript: '',
+        status: 'pending' as const,
+        topics: [], // Will be assigned during processing
+        duration: video.duration
+      }));
 
-      setVideos(mockVideos);
+      setVideos(videoContent);
       
       toast({
         title: "Playlist Loaded",
-        description: `Found ${mockVideos.length} videos ready for processing`,
+        description: `Found ${videoContent.length} videos ready for processing`,
       });
     } catch (error) {
       toast({
@@ -123,38 +103,52 @@ export const ContentManager = () => {
       v.id === videoId ? { ...v, status: 'processing' } : v
     ));
 
-    // Simulate transcript extraction
-    setTimeout(() => {
-      const sampleTranscript = `Welcome everyone to today's session on the 3X rental strategy. 
+    try {
+      const video = videos.find(v => v.id === videoId);
+      if (!video) {
+        throw new Error('Video not found');
+      }
 
-Today we're going to dive deep into how to find properties that can generate 3 times the market rent through short-term rental arbitrage. 
+      // Extract video ID from URL
+      const extractedVideoId = await youtubeTranscriptService.extractVideoId(video.url);
+      if (!extractedVideoId) {
+        throw new Error('Invalid YouTube URL');
+      }
 
-The key is understanding that we're not buying properties - we're renting them and then subletting them on platforms like Airbnb for significantly higher rates.
-
-First, let's talk about property selection criteria:
-1. Location near tourist attractions or business districts
-2. Properties that landlords are willing to rent for 12+ month leases
-3. Units that can be furnished and staged attractively
-4. Markets with strong short-term rental demand
-
-The mathematics are simple: if market rent is $1000/month, we need to generate $3000/month in gross revenue to hit our 3X target. After our rent, utilities, cleaning, and other expenses, we're typically left with $1200-1500 in profit per unit.
-
-Let me walk you through a real example from one of our students in Austin, Texas...`;
+      // Extract the real transcript
+      const transcript = await youtubeTranscriptService.extractTranscript(extractedVideoId);
+      
+      // Auto-assign topics based on video title
+      const autoTopics = commonTopics.filter(topic => 
+        video.title.toLowerCase().includes(topic.toLowerCase()) ||
+        transcript.toLowerCase().includes(topic.toLowerCase())
+      );
 
       setVideos(prev => prev.map(v => 
         v.id === videoId ? { 
           ...v, 
           status: 'completed',
-          transcript: sampleTranscript,
+          transcript: transcript,
+          topics: autoTopics.length > 0 ? autoTopics : ['Q&A Session'], // Default fallback
           processedAt: new Date()
         } : v
       ));
 
       toast({
-        title: "Transcript Extracted",
-        description: "Video transcript has been processed successfully",
+        title: "Real Transcript Extracted",
+        description: "Video transcript has been processed from YouTube",
       });
-    }, 3000);
+    } catch (error) {
+      setVideos(prev => prev.map(v => 
+        v.id === videoId ? { ...v, status: 'error' } : v
+      ));
+      
+      toast({
+        title: "Processing Failed",
+        description: "Failed to extract transcript from YouTube video",
+        variant: "destructive"
+      });
+    }
   };
 
   const addManualContent = () => {
@@ -285,9 +279,12 @@ Let me walk you through a real example from one of our students in Austin, Texas
                   {isProcessing ? 'Loading...' : 'Extract Videos'}
                 </Button>
               </div>
-              <p className="text-sm text-gray-600">
-                Paste the YouTube playlist URL to automatically extract all videos and their transcripts.
-              </p>
+              <div className="bg-blue-50 p-3 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Real YouTube Processing:</strong> This will extract actual transcripts from YouTube videos. 
+                  The system will process the real content from the videos you provide.
+                </p>
+              </div>
             </CardContent>
           </Card>
 
@@ -320,13 +317,13 @@ Let me walk you through a real example from one of our students in Austin, Texas
                             onClick={() => processVideoTranscript(video.id)}
                           >
                             <Play className="h-4 w-4 mr-1" />
-                            Process
+                            Process Real Transcript
                           </Button>
                         )}
                         {video.status === 'processing' && (
                           <Badge variant="outline">
                             <Clock className="h-3 w-3 mr-1" />
-                            Processing...
+                            Extracting...
                           </Badge>
                         )}
                         {video.status === 'completed' && (
