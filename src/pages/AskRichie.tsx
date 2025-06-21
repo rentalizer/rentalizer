@@ -1,11 +1,10 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, MessageCircle, User, Bot, Loader2, Crown, ArrowLeft, Lock, Zap, Star, CheckCircle } from 'lucide-react';
+import { Send, MessageCircle, User, Bot, Loader2, Crown, ArrowLeft, Lock, Zap, Star, CheckCircle, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginDialog } from '@/components/LoginDialog';
@@ -18,7 +17,7 @@ interface Message {
 }
 
 const AskRichie = () => {
-  const { user, isSubscribed } = useAuth();
+  const { user, isSubscribed, signOut } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -485,6 +484,15 @@ const AskRichie = () => {
                 className="border-gray-600 text-gray-300 hover:bg-gray-800"
               >
                 Change Plan
+              </Button>
+              <Button
+                onClick={signOut}
+                variant="outline"
+                size="sm"
+                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
               </Button>
             </div>
           </div>
