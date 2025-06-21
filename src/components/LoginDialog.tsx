@@ -66,15 +66,15 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
         console.log('📝 Attempting sign up...');
         await signUp(email, password);
         toast({
-          title: "✅ Account Created",
-          description: "Welcome to Rentalizer! You now have trial access.",
+          title: "✅ Account Created Successfully!",
+          description: "Welcome to Ask Richie AI! You can now start asking questions.",
         });
       } else {
         console.log('🔑 Attempting sign in...');
         await signIn(email, password);
         toast({
-          title: "✅ Signed In",
-          description: "Welcome back to Rentalizer!",
+          title: "✅ Signed In Successfully!",
+          description: "Welcome back to Ask Richie AI!",
         });
       }
       
@@ -87,11 +87,18 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
       console.error('❌ Authentication error:', error);
       
       let errorMessage = "Please check your credentials and try again.";
+      let shouldSuggestSignUp = false;
       
       if (error.message?.includes('Invalid login credentials')) {
-        errorMessage = "Invalid email or password. Please check and try again.";
+        if (!isSignUp) {
+          errorMessage = "Account not found. Would you like to create a new account instead?";
+          shouldSuggestSignUp = true;
+        } else {
+          errorMessage = "Failed to create account. Please try again or contact support.";
+        }
       } else if (error.message?.includes('User already registered')) {
         errorMessage = "An account with this email already exists. Try signing in instead.";
+        setIsSignUp(false);
       } else if (error.message?.includes('timeout')) {
         errorMessage = "Connection timeout. Please check your internet and try again.";
       } else if (error.message) {
@@ -99,10 +106,21 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
       }
       
       toast({
-        title: "❌ Authentication Failed",
+        title: `❌ ${isSignUp ? 'Sign Up' : 'Sign In'} Failed`,
         description: errorMessage,
         variant: "destructive",
       });
+
+      // Auto-suggest sign up if login failed with invalid credentials
+      if (shouldSuggestSignUp) {
+        setTimeout(() => {
+          toast({
+            title: "💡 Need an Account?",
+            description: "Click 'Need an account? Sign up' below to create a new account.",
+          });
+        }, 2000);
+      }
+      
     } finally {
       console.log('🏁 Authentication process completed');
       setIsSubmitting(false);
@@ -143,12 +161,12 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
             ) : isSignUp ? (
               <>
                 <UserPlus className="h-5 w-5" />
-                Sign Up for Rentalizer
+                Create Account
               </>
             ) : (
               <>
                 <LogIn className="h-5 w-5" />
-                Sign In to Rentalizer
+                Sign In
               </>
             )}
           </DialogTitle>
@@ -156,8 +174,8 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
             {showPasswordReset 
               ? "Reset your password to regain access to your account"
               : isSignUp 
-                ? "Create your account to access professional STR market analysis"
-                : "Sign in to access your subscription and professional market data"
+                ? "Create your account to start using Ask Richie AI"
+                : "Sign in to access Ask Richie AI"
             }
           </DialogDescription>
         </DialogHeader>
@@ -221,7 +239,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
             {isSignUp && (
               <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-3">
                 <p className="text-xs text-cyan-200">
-                  💎 New accounts get trial access. Use email with "premium" for demo subscription.
+                  🎉 New accounts get immediate access to Ask Richie AI with trial features!
                 </p>
               </div>
             )}
@@ -240,7 +258,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
                 ) : isSignUp ? (
                   <>
                     <UserPlus className="h-4 w-4 mr-2" />
-                    Sign Up
+                    Create Account
                   </>
                 ) : (
                   <>
@@ -260,7 +278,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
               </Button>
             </div>
 
-            <div className="text-center pt-2">
+            <div className="text-center pt-2 border-t border-gray-700/50">
               <Button
                 type="button"
                 variant="ghost"
@@ -269,8 +287,8 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
                 className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
               >
                 {isSignUp 
-                  ? "Already have an account? Sign in" 
-                  : "Need an account? Sign up"
+                  ? "Already have an account? Sign in instead" 
+                  : "Need an account? Sign up to get started"
                 }
               </Button>
             </div>
