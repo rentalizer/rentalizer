@@ -87,7 +87,7 @@ const AskRichie = () => {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: `You've reached your question limit of ${userPlan.questions} questions for the ${userPlan.name} plan. Please upgrade to continue asking questions.`,
+        content: `You've Reached Your Question Limit Of ${userPlan.questions} Questions For The ${userPlan.name} Plan. Please Upgrade To Continue Asking Questions.`,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -138,7 +138,7 @@ const AskRichie = () => {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
+        content: "I'm Sorry, I'm Having Trouble Connecting Right Now. Please Try Again In A Moment.",
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -675,96 +675,6 @@ const AskRichie = () => {
       <Footer />
     </div>
   );
-
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
-
-    // Check question limits
-    if (!user) return;
-    
-    const userPlan = pricingPlans.find(plan => plan.id === selectedPlan) || pricingPlans[0];
-    if (questionCount >= userPlan.questions) {
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'assistant',
-        content: `You've Reached Your Question Limit Of ${userPlan.questions} Questions For The ${userPlan.name} Plan. Please Upgrade To Continue Asking Questions.`,
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-      return;
-    }
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: inputMessage,
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
-    setIsLoading(true);
-    setQuestionCount(prev => prev + 1);
-
-    try {
-      // Call your AI assistant API here
-      const response = await fetch('/api/ask-richie', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: inputMessage,
-          conversationHistory: messages
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
-
-      const data = await response.json();
-      
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'assistant',
-        content: data.response,
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
-    } catch (error) {
-      console.error('Error sending message:', error);
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'assistant',
-        content: "I'm Sorry, I'm Having Trouble Connecting Right Now. Please Try Again In A Moment.",
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
-    });
-  };
-
-  const handleSelectPlan = (planId: string) => {
-    setSelectedPlan(planId);
-    setQuestionCount(0); // Reset question count when plan changes
-  };
 };
 
 export default AskRichie;
