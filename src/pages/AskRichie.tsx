@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +10,7 @@ import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 interface Message {
   id: string;
@@ -445,8 +445,14 @@ const AskRichie = () => {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="text-right">
-                  <p className="text-gray-300">Welcome back, {user.email}</p>
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Richie Matthews" />
+                    <AvatarFallback>RM</AvatarFallback>
+                  </Avatar>
+                  <div className="text-right">
+                    <p className="text-gray-300">Welcome back, {user.email}</p>
+                  </div>
                 </div>
                 <Button
                   onClick={signOut}
@@ -557,13 +563,19 @@ const AskRichie = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-right">
-                <Badge variant="outline" className="border-cyan-500/50 text-cyan-300">
-                  {currentPlan.name} Plan
-                </Badge>
-                <p className="text-xs text-gray-400 mt-1">
-                  {remainingQuestions} Questions Remaining
-                </p>
+              <div className="flex items-center gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Richie Matthews" />
+                  <AvatarFallback>RM</AvatarFallback>
+                </Avatar>
+                <div className="text-right">
+                  <Badge variant="outline" className="border-cyan-500/50 text-cyan-300">
+                    {currentPlan.name} Plan
+                  </Badge>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {remainingQuestions} Questions Remaining
+                  </p>
+                </div>
               </div>
               <Button
                 onClick={() => setSelectedPlan(null)}
@@ -593,7 +605,10 @@ const AskRichie = () => {
           <Card className="h-[calc(100vh-200px)] bg-slate-800/80 backdrop-blur-lg border-cyan-500/30">
             <CardHeader className="pb-4">
               <CardTitle className="text-cyan-300 flex items-center gap-2">
-                <Bot className="h-5 w-5" />
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Richie Matthews" />
+                  <AvatarFallback>RM</AvatarFallback>
+                </Avatar>
                 Richie's AI Assistant
               </CardTitle>
               <p className="text-gray-400 text-sm">
@@ -611,9 +626,10 @@ const AskRichie = () => {
                   >
                     {message.type === 'assistant' && (
                       <div className="flex-shrink-0">
-                        <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center">
-                          <Bot className="h-4 w-4 text-white" />
-                        </div>
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Richie Matthews" />
+                          <AvatarFallback>RM</AvatarFallback>
+                        </Avatar>
                       </div>
                     )}
                     
@@ -645,9 +661,10 @@ const AskRichie = () => {
                 {isLoading && (
                   <div className="flex gap-3 justify-start">
                     <div className="flex-shrink-0">
-                      <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center">
-                        <Bot className="h-4 w-4 text-white" />
-                      </div>
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Richie Matthews" />
+                        <AvatarFallback>RM</AvatarFallback>
+                      </Avatar>
                     </div>
                     <div className="bg-slate-700/50 rounded-lg px-4 py-3">
                       <div className="flex items-center gap-2">
