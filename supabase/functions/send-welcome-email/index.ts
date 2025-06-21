@@ -24,7 +24,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { user_email, user_id }: WelcomeEmailRequest = await req.json();
 
     const emailResponse = await resend.emails.send({
-      from: "Rentalizer <notifications@rentalarbuniversity.com>",
+      from: "Rentalizer <support@rentalarbuniversity.com>",
       to: [user_email],
       subject: "Welcome to Rentalizer! Your Trial Access is Ready",
       html: `
