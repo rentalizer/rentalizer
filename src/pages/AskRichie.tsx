@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -316,11 +315,12 @@ const AskRichie = () => {
                 </p>
               </div>
 
-              <div className="flex justify-center mb-8">
+              <div className="flex flex-col items-center mb-8">
+                <p className="text-lg text-cyan-300 mb-3 font-medium">As Your Personal Trainer</p>
                 <LoginDialog
                   trigger={
                     <Button size="lg" className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-3">
-                      Start Your AI Mentorship Now
+                      Start Your AI Training Now
                     </Button>
                   }
                 />
