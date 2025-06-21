@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { BulkVideoUpload } from './BulkVideoUpload';
+import { BulkTranscriptUpload } from './BulkTranscriptUpload';
 import { KnowledgeChat } from './KnowledgeChat';
 import { useKnowledgeBase } from '@/contexts/KnowledgeBaseContext';
 import { youtubeTranscriptService } from '@/services/youtubeTranscriptService';
@@ -43,7 +44,6 @@ export const ContentManager = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [manualTranscript, setManualTranscript] = useState('');
 
-  // Debug logging to see what videos we have
   console.log('ContentManager videos:', videos);
   console.log('Completed videos:', videos.filter(v => v.status === 'completed'));
 
@@ -228,9 +228,9 @@ export const ContentManager = () => {
     });
   };
 
-  const handleVideosAdded = (newVideos: any[]) => {
-    console.log('Adding videos to knowledge base:', newVideos);
-    addVideos(newVideos);
+  const handleTranscriptsAdded = (newTranscripts: any[]) => {
+    console.log('Adding transcripts to knowledge base:', newTranscripts);
+    addVideos(newTranscripts);
   };
 
   const completedCount = videos.filter(v => v.status === 'completed').length;
@@ -261,18 +261,18 @@ export const ContentManager = () => {
         </CardHeader>
       </Card>
 
-      <Tabs defaultValue="bulk-upload" className="space-y-4">
+      <Tabs defaultValue="bulk-transcripts" className="space-y-4">
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="bulk-upload">Bulk Upload</TabsTrigger>
-          <TabsTrigger value="youtube">YouTube Extraction</TabsTrigger>
+          <TabsTrigger value="bulk-transcripts">Bulk Transcripts</TabsTrigger>
+          <TabsTrigger value="youtube">YouTube Links</TabsTrigger>
           <TabsTrigger value="manual">Manual Upload</TabsTrigger>
           <TabsTrigger value="manage">Manage Content</TabsTrigger>
           <TabsTrigger value="test-chat">Test Chat</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="bulk-upload" className="space-y-4">
-          <BulkVideoUpload 
-            onVideosAdded={handleVideosAdded}
+        <TabsContent value="bulk-transcripts" className="space-y-4">
+          <BulkTranscriptUpload 
+            onTranscriptsAdded={handleTranscriptsAdded}
             commonTopics={commonTopics}
           />
         </TabsContent>
@@ -408,7 +408,7 @@ export const ContentManager = () => {
               {videos.filter(v => v.status === 'completed').length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500 mb-4">
-                    No processed content yet. Add videos or manual content to get started.
+                    No processed content yet. Add transcripts or YouTube links to get started.
                   </p>
                   <div className="bg-yellow-50 p-4 rounded-lg">
                     <p className="text-sm text-yellow-800">
