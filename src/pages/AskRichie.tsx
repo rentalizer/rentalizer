@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,7 +50,7 @@ const AskRichie = () => {
       period: '',
       questions: 3,
       features: [
-        '3 AI Questions',
+        '3 Questions',
         'Basic Rental Arbitrage Guidance',
         'Access To Quick Tips'
       ],
