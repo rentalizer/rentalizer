@@ -306,7 +306,7 @@ const AskRichie = () => {
                         <ul className="space-y-2">
                           {plan.features.map((feature, index) => (
                             <li key={index} className="flex items-start gap-2 text-sm text-gray-300">
-                              <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
+                              <CheckCircle className="h-4 w-4 text-cyan-400 mt-0.5 flex-shrink-0" />
                               {feature}
                             </li>
                           ))}
@@ -354,8 +354,8 @@ const AskRichie = () => {
                     <p className="text-gray-400 text-sm">Trained on all live sessions and proven strategies from the $5K program</p>
                   </div>
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Crown className="h-6 w-6 text-green-400" />
+                    <div className="w-12 h-12 bg-cyan-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Crown className="h-6 w-6 text-cyan-400" />
                     </div>
                     <h4 className="font-semibold text-white mb-2">Proven Results</h4>
                     <p className="text-gray-400 text-sm">Get guidance that's helped thousands build successful rental businesses</p>
@@ -459,7 +459,7 @@ const AskRichie = () => {
                       <ul className="space-y-2">
                         {plan.features.map((feature, index) => (
                           <li key={index} className="flex items-start gap-2 text-sm text-gray-300">
-                            <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
+                            <CheckCircle className="h-4 w-4 text-cyan-400 mt-0.5 flex-shrink-0" />
                             {feature}
                           </li>
                         ))}
