@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -297,17 +298,17 @@ const AskRichie = () => {
                   <div className="bg-slate-800/50 rounded-lg p-4 border border-cyan-500/20">
                     <Database className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
                     <h3 className="text-white font-semibold mb-2">Thousands Of Hours</h3>
-                    <p className="text-gray-300 text-sm">Trained on every live coaching session, masterclass, and strategy document from Richie's $5K program</p>
+                    <p className="text-gray-300 text-sm">Trained On Every Live Coaching Session, Masterclass, And Strategy Document From Richie's Program</p>
                   </div>
                   <div className="bg-slate-800/50 rounded-lg p-4 border border-purple-500/20">
                     <TrendingUp className="h-8 w-8 text-purple-400 mx-auto mb-2" />
                     <h3 className="text-white font-semibold mb-2">Weekly Updates</h3>
-                    <p className="text-gray-300 text-sm">Continuously updated with the latest strategies, market insights, and success case studies</p>
+                    <p className="text-gray-300 text-sm">Continuously Updated With The Latest Strategies, Market Insights, And Success Case Studies</p>
                   </div>
                   <div className="bg-slate-800/50 rounded-lg p-4 border border-cyan-500/20">
                     <BookOpen className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
                     <h3 className="text-white font-semibold mb-2">Complete Knowledge Base</h3>
-                    <p className="text-gray-300 text-sm">Every Q&A, troubleshooting guide, and advanced technique from years of student interactions</p>
+                    <p className="text-gray-300 text-sm">Every Q&A, Troubleshooting Guide, And Advanced Technique From Years Of Student Interactions</p>
                   </div>
                 </div>
                 
@@ -403,7 +404,7 @@ const AskRichie = () => {
                       <Database className="h-6 w-6 text-purple-400" />
                     </div>
                     <h4 className="font-semibold text-white mb-2">Complete Knowledge Archive</h4>
-                    <p className="text-gray-400 text-sm">Access To Every Strategy, Case Study, And Solution From The Entire $5K Program Library</p>
+                    <p className="text-gray-400 text-sm">Access To Every Strategy, Case Study, And Solution From The Entire Program Library</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-cyan-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
