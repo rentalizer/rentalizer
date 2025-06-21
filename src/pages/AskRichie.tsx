@@ -60,11 +60,11 @@ const AskRichie = () => {
     {
       id: 'professional',
       name: 'Professional',
-      price: '$297',
+      price: '$997',
       period: '/month',
       questions: 300,
       features: [
-        '300 AI Questions Per Month',
+        '300 Questions Per Month',
         'Priority Response Time',
         'Advanced Rental Strategies',
         'Market Analysis Guidance',
@@ -272,7 +272,7 @@ const AskRichie = () => {
                           <span className="text-lg text-gray-400">{plan.period}</span>
                         </div>
                         <p className="text-gray-400">
-                          {plan.questions} questions{plan.period && ' per month'}
+                          {plan.questions} Questions{plan.period && ' Per Month'}
                         </p>
                       </CardHeader>
                       
@@ -427,7 +427,7 @@ const AskRichie = () => {
                         <span className="text-lg text-gray-400">{plan.period}</span>
                       </div>
                       <p className="text-gray-400">
-                        {plan.questions} questions{plan.period && ' per month'}
+                        {plan.questions} Questions{plan.period && ' Per Month'}
                       </p>
                     </CardHeader>
                     
@@ -504,7 +504,7 @@ const AskRichie = () => {
                   {currentPlan.name} Plan
                 </Badge>
                 <p className="text-xs text-gray-400 mt-1">
-                  {remainingQuestions} questions remaining
+                  {remainingQuestions} Questions Remaining
                 </p>
               </div>
               <Button
