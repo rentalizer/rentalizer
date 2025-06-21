@@ -315,8 +315,7 @@ const AskRichie = () => {
                 </p>
               </div>
 
-              <div className="flex flex-col items-center mb-8">
-                <p className="text-lg text-cyan-300 mb-3 font-medium">As Your Personal Trainer</p>
+              <div className="flex justify-center mb-8">
                 <LoginDialog
                   trigger={
                     <Button size="lg" className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-3">
@@ -329,7 +328,6 @@ const AskRichie = () => {
 
             {/* Pricing Plans */}
             <div className="mb-12">
-              <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-8">Choose Your Access Level</h2>
               <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                 {pricingPlans.map((plan) => (
                   <div key={plan.id} className="group relative">
@@ -391,9 +389,6 @@ const AskRichie = () => {
             {/* Value Proposition */}
             <Card className="bg-slate-800/30 border-cyan-500/30 backdrop-blur-lg">
               <CardContent className="p-8">
-                <h3 className="text-2xl font-bold text-cyan-300 mb-6 text-center">
-                  Why Thousands Of Students Trust Ask Richie AI
-                </h3>
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="text-center">
                     <div className="w-12 h-12 bg-cyan-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
