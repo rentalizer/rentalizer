@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -284,7 +285,7 @@ const AskRichie = () => {
                   ASK RICHIE AI
                 </h1>
               </div>
-              <p className="text-lg text-white font-medium mb-4">Your Personal Rental Arbitrage Mastermind</p>
+              <p className="text-lg text-white font-medium mb-4">Your Personal Rental Arbitrage Coach</p>
               
               <div className="mb-8 px-4">
                 <p className="text-xl md:text-2xl text-white max-w-5xl mx-auto leading-relaxed mb-6">
