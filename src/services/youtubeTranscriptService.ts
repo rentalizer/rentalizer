@@ -56,33 +56,40 @@ class YouTubeTranscriptService {
 
   async extractTranscript(videoId: string): Promise<string> {
     try {
-      // Note: This is a simplified approach. In production, you'd want to use:
-      // 1. YouTube Data API v3 for official access
-      // 2. A dedicated transcript service
-      // 3. Or a backend service that handles the extraction
+      console.log('Attempting to extract transcript for video ID:', videoId);
       
-      // For now, we'll simulate the transcript extraction with a call to get captions
-      const response = await fetch(`https://www.youtube.com/watch?v=${videoId}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch video page');
-      }
+      // Since we can't directly access YouTube's transcript API from the browser,
+      // we'll provide a realistic simulation that explains the limitation
+      const simulatedTranscript = `
+[Transcript Processing Notice]
 
-      // In a real implementation, you would parse the page for transcript data
-      // or use YouTube's official API with proper authentication
-      
-      // For demonstration, we'll return a placeholder that indicates real processing
-      return `[Real transcript extraction for video ID: ${videoId}]
-      
-This is where the actual transcript would be extracted from the YouTube video.
-To implement real transcript extraction, you would need to:
+To extract real YouTube transcripts, this system needs:
 
-1. Set up YouTube Data API v3 credentials
-2. Use the YouTube API to get caption tracks
-3. Download and parse the caption files
-4. Or integrate with a third-party transcript service
+1. YouTube Data API v3 credentials (API key)
+2. Backend service to handle CORS restrictions
+3. Access to YouTube's caption/transcript endpoints
 
-The video processing system is now set up to handle real YouTube URLs and extract actual transcripts when the proper API integration is configured.`;
+Current Status: Browser-based transcript extraction is limited by:
+- CORS policies preventing direct YouTube API calls
+- YouTube's authentication requirements
+- Rate limiting on public endpoints
+
+Suggested Implementation:
+- Set up a backend service with YouTube API credentials
+- Use official YouTube Data API v3 for caption access
+- Implement proper authentication and error handling
+
+For video ID: ${videoId}
+This would contain the actual spoken content from the video, including:
+- Main talking points about 3X rental strategy
+- Property selection criteria and tips
+- Q&A responses and common solutions
+- Market analysis insights
+- Implementation strategies and examples
+
+To enable real transcript extraction, please configure the YouTube Data API integration.`;
+
+      return simulatedTranscript;
       
     } catch (error) {
       console.error('Error extracting transcript:', error);
@@ -127,38 +134,14 @@ The video processing system is now set up to handle real YouTube URLs and extrac
     try {
       console.log('Extracting from channel:', channelUrl);
       
-      // For now, return sample videos from Richie Matthews channel
-      // In production, you'd use YouTube Data API to get actual channel videos
+      // Since we can't access YouTube API directly from browser, 
+      // we'll return a message explaining the limitation
       return [
         {
-          id: 'richie_video_1',
-          url: 'https://youtube.com/watch?v=example1',
-          title: 'Richie Matthews - Complete 3X Rental Strategy Overview',
-          duration: '45:32'
-        },
-        {
-          id: 'richie_video_2', 
-          url: 'https://youtube.com/watch?v=example2',
-          title: 'Property Selection Masterclass - Finding Perfect Units',
-          duration: '38:15'
-        },
-        {
-          id: 'richie_video_3',
-          url: 'https://youtube.com/watch?v=example3', 
-          title: 'Student Q&A - Common Challenges & Solutions',
-          duration: '52:08'
-        },
-        {
-          id: 'richie_video_4',
-          url: 'https://youtube.com/watch?v=example4', 
-          title: 'Advanced 3X Strategy Implementation',
-          duration: '41:22'
-        },
-        {
-          id: 'richie_video_5',
-          url: 'https://youtube.com/watch?v=example5', 
-          title: 'Market Analysis Deep Dive',
-          duration: '36:45'
+          id: 'channel_notice_1',
+          url: channelUrl, // Use the actual channel URL instead of fake video URLs
+          title: 'Channel Video Extraction - API Setup Required',
+          duration: '0:00'
         }
       ];
     } catch (error) {
@@ -193,26 +176,14 @@ The video processing system is now set up to handle real YouTube URLs and extrac
 
       console.log('Extracting from playlist:', playlistMatch[1]);
 
-      // In a real implementation, you'd use YouTube Data API to get playlist items
-      // For now, we'll return a simulated response
+      // Since we can't access YouTube API directly from browser,
+      // we'll return a message explaining the limitation
       return [
         {
-          id: 'playlist_video_1',
-          url: 'https://youtube.com/watch?v=example1',
-          title: 'Richie Matthews - Complete 3X Rental Strategy Overview',
-          duration: '45:32'
-        },
-        {
-          id: 'playlist_video_2', 
-          url: 'https://youtube.com/watch?v=example2',
-          title: 'Property Selection Masterclass - Finding Perfect Units',
-          duration: '38:15'
-        },
-        {
-          id: 'playlist_video_3',
-          url: 'https://youtube.com/watch?v=example3', 
-          title: 'Student Q&A - Common Challenges & Solutions',
-          duration: '52:08'
+          id: 'playlist_notice_1',
+          url: playlistUrl, // Use the actual playlist URL instead of fake video URLs
+          title: 'Playlist Video Extraction - API Setup Required',
+          duration: '0:00'
         }
       ];
     } catch (error) {
