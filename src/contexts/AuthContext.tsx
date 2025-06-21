@@ -320,15 +320,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     console.log('✅ Sign up successful for:', email);
+    console.log('📋 Sign up data:', data);
     
     if (data.user && data.user.email) {
-      console.log('🚀 Triggering notification emails for new user:', data.user.email);
+      console.log('🚀 New user created, triggering notification emails for:', data.user.email);
+      console.log('📊 User data:', { id: data.user.id, email: data.user.email, confirmed: data.user.email_confirmed_at });
       
-      // Call both notification functions immediately
-      setTimeout(() => {
-        sendNewUserNotification(data.user!.email!, data.user!.id);
-        sendWelcomeEmail(data.user!.email!, data.user!.id);
-      }, 500);
+      // Call both notification functions immediately after successful signup
+      try {
+        console.log('📬 Calling notification functions...');
+        await Promise.all([
+          sendNewUserNotification(data.user.email, data.user.id),
+          sendWelcomeEmail(data.user.email, data.user.id)
+        ]);
+        console.log('✅ All notification functions called');
+      } catch (emailError) {
+        console.error('❌ Error calling notification functions:', emailError);
+      }
+    } else {
+      console.log('⚠️ No user data received from signup');
     }
   };
 
