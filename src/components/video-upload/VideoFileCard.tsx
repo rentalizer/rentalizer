@@ -54,7 +54,8 @@ export const VideoFileCard = ({
   };
 
   const getStatusProgress = () => {
-    switch (video.status) {
+    const status = video.status;
+    switch (status) {
       case 'pending':
         return { progress: 25, text: 'Stage 1: Awaiting Processing', color: 'bg-yellow-500' };
       case 'generating-title':
