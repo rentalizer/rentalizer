@@ -82,12 +82,15 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
   };
 
   const uploadAllVideos = async () => {
-    const readyVideos = videoFiles.filter(v => v.status === 'ready' && v.transcript.trim());
+    // Include both ready and pending videos for upload
+    const uploadableVideos = videoFiles.filter(v => 
+      v.status === 'ready' || v.status === 'pending'
+    );
     
-    if (readyVideos.length === 0) {
+    if (uploadableVideos.length === 0) {
       toast({
-        title: "No Videos Ready",
-        description: "Please add transcripts to at least one video",
+        title: "No Videos to Upload",
+        description: "Please add some videos first",
         variant: "destructive"
       });
       return;
@@ -96,11 +99,11 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
     setIsUploading(true);
 
     try {
-      const processedVideos: ProcessedVideo[] = readyVideos.map(video => ({
+      const processedVideos: ProcessedVideo[] = uploadableVideos.map(video => ({
         id: video.id,
-        title: video.title,
+        title: video.title || `Video - ${video.file.name.replace(/\.[^/.]+$/, "")}`,
         url: `local-upload-${video.file.name}`,
-        transcript: video.transcript,
+        transcript: video.transcript || 'No transcript provided',
         status: 'completed' as const,
         topics: video.topics.length > 0 ? video.topics : ['Q&A Session'],
         processedAt: new Date()
@@ -109,11 +112,11 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
       onVideosAdded(processedVideos);
 
       // Remove uploaded videos from the list
-      setVideoFiles(prev => prev.filter(v => !readyVideos.includes(v)));
+      setVideoFiles(prev => prev.filter(v => !uploadableVideos.includes(v)));
 
       toast({
         title: "Upload Complete",
-        description: `Successfully uploaded ${readyVideos.length} video${readyVideos.length > 1 ? 's' : ''} to knowledge base`,
+        description: `Successfully uploaded ${uploadableVideos.length} video${uploadableVideos.length > 1 ? 's' : ''} to knowledge base`,
       });
     } catch (error) {
       toast({

@@ -40,6 +40,16 @@ export const VideoFileCard = ({
     }
   };
 
+  const markAsReady = () => {
+    // Allow marking as ready even without transcript
+    const title = video.title || `Video - ${video.file.name.replace(/\.[^/.]+$/, "")}`;
+    onUpdate(video.id, { 
+      status: 'ready',
+      title: title,
+      transcript: video.transcript || 'No transcript provided'
+    });
+  };
+
   return (
     <Card>
       <CardContent className="p-4">
@@ -58,7 +68,7 @@ export const VideoFileCard = ({
                 )}
               </div>
               <div className="flex items-center gap-2">
-                {video.status === 'ready' && video.transcript.trim() && (
+                {video.status === 'ready' && (
                   <Badge className="bg-green-100 text-green-800">
                     <Check className="h-3 w-3 mr-1" />
                     Ready to Upload
@@ -71,10 +81,19 @@ export const VideoFileCard = ({
                   </Badge>
                 )}
                 {video.status === 'pending' && (
-                  <Badge variant="outline">
-                    <AlertCircle className="h-3 w-3 mr-1" />
-                    Add Transcript
-                  </Badge>
+                  <div className="flex gap-2">
+                    <Badge variant="outline">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      Ready for Upload
+                    </Badge>
+                    <Button
+                      size="sm"
+                      onClick={markAsReady}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      Mark as Ready
+                    </Button>
+                  </div>
                 )}
                 <Button
                   variant="ghost"
@@ -88,7 +107,7 @@ export const VideoFileCard = ({
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <label className="text-sm font-medium">Video Transcript *</label>
+                <label className="text-sm font-medium">Video Transcript (Optional)</label>
                 {video.transcript.trim() && video.status !== 'generating-title' && (
                   <Button
                     size="sm"
@@ -102,12 +121,15 @@ export const VideoFileCard = ({
                 )}
               </div>
               <Textarea
-                placeholder="Paste or type the video transcript here..."
+                placeholder="Paste or type the video transcript here (optional)..."
                 value={video.transcript}
                 onChange={(e) => handleTranscriptChange(e.target.value)}
                 rows={6}
                 className={video.transcript.trim() ? "border-green-200 bg-green-50" : ""}
               />
+              <p className="text-xs text-gray-500">
+                You can upload the video without a transcript and add it later if needed.
+              </p>
             </div>
           </div>
         </div>

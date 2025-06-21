@@ -16,7 +16,11 @@ export const VideoUploadProgress = ({
   onUploadAll, 
   isUploading 
 }: VideoUploadProgressProps) => {
-  const readyCount = videoFiles.filter(v => v.status === 'ready' && v.transcript.trim()).length;
+  // Count videos that are ready OR pending (since pending can now be uploaded)
+  const readyCount = videoFiles.filter(v => 
+    v.status === 'ready' || v.status === 'pending'
+  ).length;
+  
   const progressPercentage = videoFiles.length > 0 ? (readyCount / videoFiles.length) * 100 : 0;
 
   if (videoFiles.length === 0) return null;
