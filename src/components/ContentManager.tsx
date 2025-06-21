@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { BulkVideoUpload } from './BulkVideoUpload';
+import { KnowledgeChat } from './KnowledgeChat';
+import { useKnowledgeBase } from '@/contexts/KnowledgeBaseContext';
 import { youtubeTranscriptService } from '@/services/youtubeTranscriptService';
 import { 
   Upload, 
@@ -20,7 +22,7 @@ import {
   Database,
   Play,
   Trash2,
-  FileVideo
+  MessageSquare
 } from 'lucide-react';
 
 interface VideoContent {
@@ -36,7 +38,7 @@ interface VideoContent {
 
 export const ContentManager = () => {
   const { toast } = useToast();
-  const [videos, setVideos] = useState<VideoContent[]>([]);
+  const { videos, setVideos, addVideos } = useKnowledgeBase();
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [manualTranscript, setManualTranscript] = useState('');
@@ -77,11 +79,11 @@ export const ContentManager = () => {
         url: video.url,
         transcript: '',
         status: 'pending' as const,
-        topics: [], // Will be assigned during processing
+        topics: [],
         duration: video.duration
       }));
 
-      setVideos(videoContent);
+      setVideos([...videos, ...videoContent]);
       
       const urlType = youtubeUrl.includes('/@') || youtubeUrl.includes('/channel/') ? 'channel' :
                      youtubeUrl.includes('list=') ? 'playlist' : 'video';
@@ -103,7 +105,7 @@ export const ContentManager = () => {
   };
 
   const processVideoTranscript = async (videoId: string) => {
-    setVideos(prev => prev.map(v => 
+    setVideos(videos.map(v => 
       v.id === videoId ? { ...v, status: 'processing' } : v
     ));
 
@@ -113,27 +115,24 @@ export const ContentManager = () => {
         throw new Error('Video not found');
       }
 
-      // Extract video ID from URL
       const extractedVideoId = await youtubeTranscriptService.extractVideoId(video.url);
       if (!extractedVideoId) {
         throw new Error('Invalid YouTube URL');
       }
 
-      // Extract the real transcript
       const transcript = await youtubeTranscriptService.extractTranscript(extractedVideoId);
       
-      // Auto-assign topics based on video title
       const autoTopics = commonTopics.filter(topic => 
         video.title.toLowerCase().includes(topic.toLowerCase()) ||
         transcript.toLowerCase().includes(topic.toLowerCase())
       );
 
-      setVideos(prev => prev.map(v => 
+      setVideos(videos.map(v => 
         v.id === videoId ? { 
           ...v, 
           status: 'completed',
           transcript: transcript,
-          topics: autoTopics.length > 0 ? autoTopics : ['Q&A Session'], // Default fallback
+          topics: autoTopics.length > 0 ? autoTopics : ['Q&A Session'],
           processedAt: new Date()
         } : v
       ));
@@ -143,7 +142,7 @@ export const ContentManager = () => {
         description: "Video transcript has been processed from YouTube",
       });
     } catch (error) {
-      setVideos(prev => prev.map(v => 
+      setVideos(videos.map(v => 
         v.id === videoId ? { ...v, status: 'error' } : v
       ));
       
@@ -165,7 +164,6 @@ export const ContentManager = () => {
       return;
     }
 
-    // Create a fallback title
     const finalTitle = `Content ${Date.now().toString().substring(0, 8)}`;
 
     const newVideo: VideoContent = {
@@ -178,12 +176,7 @@ export const ContentManager = () => {
       processedAt: new Date()
     };
 
-    console.log('Adding manual content:', newVideo);
-    setVideos(prev => {
-      const newVideos = [...prev, newVideo];
-      console.log('Updated videos state:', newVideos);
-      return newVideos;
-    });
+    addVideos([newVideo]);
     setManualTranscript('');
 
     toast({
@@ -224,28 +217,19 @@ export const ContentManager = () => {
   };
 
   const deleteVideo = (videoId: string) => {
-    setVideos(prev => prev.filter(v => v.id !== videoId));
+    setVideos(videos.filter(v => v.id !== videoId));
     toast({
       title: "Content Removed",
       description: "Video has been removed from the knowledge base",
     });
   };
 
-  // Handle videos added from bulk upload
   const handleVideosAdded = (newVideos: any[]) => {
-    console.log('Videos added from bulk upload:', newVideos);
-    setVideos(prev => {
-      const updatedVideos = [...prev, ...newVideos];
-      console.log('Updated videos after bulk upload:', updatedVideos);
-      return updatedVideos;
-    });
+    addVideos(newVideos);
   };
 
   const completedCount = videos.filter(v => v.status === 'completed').length;
   const progressPercentage = videos.length > 0 ? (completedCount / videos.length) * 100 : 0;
-
-  console.log('Current videos state:', videos);
-  console.log('Completed count:', completedCount);
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
@@ -273,11 +257,12 @@ export const ContentManager = () => {
       </Card>
 
       <Tabs defaultValue="bulk-upload" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="bulk-upload">Bulk Upload</TabsTrigger>
           <TabsTrigger value="youtube">YouTube Extraction</TabsTrigger>
           <TabsTrigger value="manual">Manual Upload</TabsTrigger>
           <TabsTrigger value="manage">Manage Content</TabsTrigger>
+          <TabsTrigger value="test-chat">Test Chat</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bulk-upload" className="space-y-4">
@@ -457,6 +442,10 @@ export const ContentManager = () => {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="test-chat" className="space-y-4">
+          <KnowledgeChat />
         </TabsContent>
       </Tabs>
     </div>
