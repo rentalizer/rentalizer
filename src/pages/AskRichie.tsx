@@ -368,8 +368,19 @@ const AskRichie = () => {
                   </div>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-gray-300">Welcome back, {user.email}</p>
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <p className="text-gray-300">Welcome back, {user.email}</p>
+                </div>
+                <Button
+                  onClick={signOut}
+                  variant="outline"
+                  size="sm"
+                  className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
               </div>
             </div>
           </div>
