@@ -26,6 +26,7 @@ import PMS from "./pages/PMS";
 import TestPMS from "./pages/TestPMS";
 import ClientPortalLog from "./pages/ClientPortalLog";
 import ClientPortalLogApp from "./pages/ClientPortalLogApp";
+import AskRichie from "./pages/AskRichie";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const AppRoutes = () => (
     <Route path="/testpms" element={<TestPMS />} />
     <Route path="/client-portal-log" element={<ClientPortalLog />} />
     <Route path="/client-portal-log-app" element={<ClientPortalLogApp />} />
+    <Route path="/askrichie" element={<AskRichie />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
     <Route path="/terms-of-service" element={<TermsOfService />} />
