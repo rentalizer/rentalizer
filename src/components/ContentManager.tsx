@@ -42,7 +42,6 @@ export const ContentManager = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [manualTranscript, setManualTranscript] = useState('');
   const [manualTitle, setManualTitle] = useState('');
-  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
 
   const commonTopics = [
@@ -221,14 +220,13 @@ export const ContentManager = () => {
       url: 'manual-upload',
       transcript: manualTranscript,
       status: 'completed',
-      topics: selectedTopics.length > 0 ? selectedTopics : ['Q&A Session'],
+      topics: ['Q&A Session'],
       processedAt: new Date()
     };
 
     setVideos(prev => [...prev, newVideo]);
     setManualTitle('');
     setManualTranscript('');
-    setSelectedTopics([]);
 
     toast({
       title: "Content Added",
@@ -441,28 +439,6 @@ export const ContentManager = () => {
                 />
               </div>
               
-              <div>
-                <label className="text-sm font-medium mb-2 block">Topics (select relevant topics)</label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {commonTopics.map(topic => (
-                    <Badge
-                      key={topic}
-                      variant={selectedTopics.includes(topic) ? "default" : "outline"}
-                      className="cursor-pointer"
-                      onClick={() => {
-                        setSelectedTopics(prev => 
-                          prev.includes(topic) 
-                            ? prev.filter(t => t !== topic)
-                            : [...prev, topic]
-                        );
-                      }}
-                    >
-                      {topic}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
               <div className="space-y-2">
                 <label className="text-sm font-medium">Content Transcript *</label>
                 <Textarea

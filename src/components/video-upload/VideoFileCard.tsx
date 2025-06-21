@@ -86,26 +86,10 @@ export const VideoFileCard = ({
               </div>
             </div>
 
-            <div>
-              <label className="text-sm font-medium mb-2 block">Topics (select relevant topics)</label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {commonTopics.map(topic => (
-                  <Badge
-                    key={topic}
-                    variant={video.topics.includes(topic) ? "default" : "outline"}
-                    className="cursor-pointer"
-                    onClick={() => onToggleTopic(video.id, topic)}
-                  >
-                    {topic}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <label className="text-sm font-medium">Video Transcript *</label>
-                {video.transcript.trim() && (video.status === 'pending' || video.status === 'ready') && (
+                {video.transcript.trim() && video.status !== 'generating-title' && (
                   <Button
                     size="sm"
                     variant="outline"
