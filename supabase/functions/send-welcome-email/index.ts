@@ -24,7 +24,7 @@ const handler = async (req: Request): Promise<Response> => {
     const { user_email, user_id }: WelcomeEmailRequest = await req.json();
 
     const emailResponse = await resend.emails.send({
-      from: "Ask Richie AI <onboarding@resend.dev>",
+      from: "Ask Richie AI <support@rentalarbuniversity.com>",
       to: [user_email],
       subject: "Welcome to Ask Richie AI! Your Trial Access is Ready",
       html: `
