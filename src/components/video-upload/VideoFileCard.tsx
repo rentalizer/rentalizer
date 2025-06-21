@@ -47,7 +47,7 @@ export const VideoFileCard = ({
     // Allow marking as ready even without transcript
     const title = video.title || `Video - ${video.file.name.replace(/\.[^/.]+$/, "")}`;
     onUpdate(video.id, { 
-      status: 'ready',
+      status: 'ready' as const,
       title: title,
       transcript: video.transcript || 'No transcript provided'
     });
