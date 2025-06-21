@@ -105,7 +105,7 @@ export const VideoFileCard = ({
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <label className="text-sm font-medium">Video Transcript *</label>
-                {video.transcript.trim() && video.status === 'pending' && (
+                {video.transcript.trim() && (video.status === 'pending' || video.status === 'ready') && (
                   <Button
                     size="sm"
                     variant="outline"
