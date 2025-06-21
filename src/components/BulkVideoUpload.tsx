@@ -1,8 +1,6 @@
-
 import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -12,7 +10,8 @@ import {
   FileVideo, 
   X, 
   Check,
-  AlertCircle
+  AlertCircle,
+  Wand2
 } from 'lucide-react';
 
 interface VideoFile {
@@ -21,7 +20,7 @@ interface VideoFile {
   title: string;
   transcript: string;
   topics: string[];
-  status: 'pending' | 'ready' | 'uploaded';
+  status: 'pending' | 'generating-title' | 'ready' | 'uploaded';
 }
 
 interface BulkVideoUploadProps {
@@ -42,6 +41,44 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
   const [videoFiles, setVideoFiles] = useState<VideoFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  const generateTitle = async (videoId: string, transcript: string) => {
+    if (!transcript.trim()) return;
+
+    setVideoFiles(prev => prev.map(video => 
+      video.id === videoId ? { ...video, status: 'generating-title' } : video
+    ));
+
+    try {
+      const response = await fetch('/api/generate-video-title', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ transcript }),
+      });
+
+      const data = await response.json();
+      
+      setVideoFiles(prev => prev.map(video => 
+        video.id === videoId ? { 
+          ...video, 
+          title: data.title || 'AI Generated Title',
+          status: 'ready'
+        } : video
+      ));
+
+    } catch (error) {
+      console.error('Error generating title:', error);
+      setVideoFiles(prev => prev.map(video => 
+        video.id === videoId ? { 
+          ...video, 
+          title: `Video ${videoId.substring(0, 8)}`,
+          status: 'ready'
+        } : video
+      ));
+    }
+  };
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -77,7 +114,7 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
     const newVideoFiles: VideoFile[] = videoFiles.map(file => ({
       id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
       file,
-      title: file.name.replace(/\.[^/.]+$/, ""),
+      title: '',
       transcript: '',
       topics: [],
       status: 'pending'
@@ -104,7 +141,7 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
       const newVideoFiles: VideoFile[] = videoFiles.map(file => ({
         id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
         file,
-        title: file.name.replace(/\.[^/.]+$/, ""),
+        title: '',
         transcript: '',
         topics: [],
         status: 'pending'
@@ -143,7 +180,7 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
     if (readyVideos.length === 0) {
       toast({
         title: "No Videos Ready",
-        description: "Please add titles and transcripts to at least one video",
+        description: "Please add transcripts to at least one video",
         variant: "destructive"
       });
       return;
@@ -231,7 +268,7 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
               Drop video files here or click to browse
             </p>
             <p className="text-sm text-gray-600 mb-4">
-              Supports MP4, MOV, AVI files
+              Supports MP4, MOV, AVI files. AI will generate titles automatically.
             </p>
             <input
               type="file"
@@ -267,6 +304,9 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
                         <p className="text-xs text-gray-500">
                           {(video.file.size / (1024 * 1024)).toFixed(1)} MB
                         </p>
+                        {video.title && (
+                          <p className="text-sm font-medium mt-1">{video.title}</p>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         {video.status === 'ready' && (
@@ -275,10 +315,16 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
                             Ready
                           </Badge>
                         )}
+                        {video.status === 'generating-title' && (
+                          <Badge variant="outline">
+                            <Wand2 className="h-3 w-3 mr-1" />
+                            Generating Title...
+                          </Badge>
+                        )}
                         {video.status === 'pending' && (
                           <Badge variant="outline">
                             <AlertCircle className="h-3 w-3 mr-1" />
-                            Needs Info
+                            Add Transcript
                           </Badge>
                         )}
                         <Button
@@ -290,12 +336,6 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
                         </Button>
                       </div>
                     </div>
-
-                    <Input
-                      placeholder="Video title (e.g., 'Property Selection Strategy Session')"
-                      value={video.title}
-                      onChange={(e) => updateVideoFile(video.id, { title: e.target.value })}
-                    />
 
                     <div>
                       <label className="text-sm font-medium mb-2 block">Topics (select relevant topics)</label>
@@ -313,16 +353,36 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
                       </div>
                     </div>
 
-                    <Textarea
-                      placeholder="Paste or type the video transcript here..."
-                      value={video.transcript}
-                      onChange={(e) => {
-                        const transcript = e.target.value;
-                        const status = transcript.trim() && video.title.trim() ? 'ready' : 'pending';
-                        updateVideoFile(video.id, { transcript, status });
-                      }}
-                      rows={6}
-                    />
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium">Video Transcript</label>
+                        {video.transcript.trim() && !video.title && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => generateTitle(video.id, video.transcript)}
+                            disabled={video.status === 'generating-title'}
+                          >
+                            <Wand2 className="h-3 w-3 mr-1" />
+                            Generate Title
+                          </Button>
+                        )}
+                      </div>
+                      <Textarea
+                        placeholder="Paste or type the video transcript here..."
+                        value={video.transcript}
+                        onChange={(e) => {
+                          const transcript = e.target.value;
+                          updateVideoFile(video.id, { transcript });
+                          
+                          // Auto-generate title when transcript is added
+                          if (transcript.trim() && !video.title && video.status === 'pending') {
+                            generateTitle(video.id, transcript);
+                          }
+                        }}
+                        rows={6}
+                      />
+                    </div>
                   </div>
                 </div>
               </CardContent>
