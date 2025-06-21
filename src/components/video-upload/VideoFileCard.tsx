@@ -95,7 +95,7 @@ export const VideoFileCard = ({
                     Ready to Upload
                   </Badge>
                 )}
-                {video.status === 'generating-title' && (
+                {(video.status as VideoFile['status']) === 'generating-title' && (
                   <Badge variant="outline">
                     <Wand2 className="h-3 w-3 mr-1" />
                     Generating Title...
@@ -147,7 +147,7 @@ export const VideoFileCard = ({
               </div>
               <div className="flex justify-between text-xs text-gray-400">
                 <span className={video.status === 'pending' ? 'font-medium text-yellow-600' : ''}>Pending</span>
-                <span className={video.status === 'generating-title' ? 'font-medium text-blue-600' : ''}>Processing</span>
+                <span className={(video.status as VideoFile['status']) === 'generating-title' ? 'font-medium text-blue-600' : ''}>Processing</span>
                 <span className={video.status === 'ready' ? 'font-medium text-green-600' : ''}>Ready</span>
                 <span className={video.status === 'uploaded' ? 'font-medium text-green-700' : ''}>Uploaded</span>
               </div>
@@ -156,12 +156,12 @@ export const VideoFileCard = ({
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <label className="text-sm font-medium">Video Transcript (Optional)</label>
-                {video.transcript.trim() && video.status !== 'generating-title' && (
+                {video.transcript.trim() && (video.status as VideoFile['status']) !== 'generating-title' && (
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => onGenerateTitle(video.id, video.transcript)}
-                    disabled={video.status === 'generating-title'}
+                    disabled={(video.status as VideoFile['status']) === 'generating-title'}
                   >
                     <Wand2 className="h-3 w-3 mr-1" />
                     Generate Title
