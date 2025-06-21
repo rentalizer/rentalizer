@@ -58,12 +58,24 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
         body: JSON.stringify({ transcript }),
       });
 
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const text = await response.text();
+      let data;
+      
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error('Failed to parse JSON:', text);
+        throw new Error('Invalid response from server');
+      }
       
       setVideoFiles(prev => prev.map(video => 
         video.id === videoId ? { 
           ...video, 
-          title: data.title || 'AI Generated Title',
+          title: data.title || `Video ${videoId.substring(0, 8)}`,
           status: 'ready'
         } : video
       ));
@@ -77,6 +89,12 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
           status: 'ready'
         } : video
       ));
+      
+      toast({
+        title: "Title Generation Failed",
+        description: "Using fallback title. You can edit it manually.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -175,7 +193,7 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
   };
 
   const uploadAllVideos = async () => {
-    const readyVideos = videoFiles.filter(v => v.status === 'ready');
+    const readyVideos = videoFiles.filter(v => v.status === 'ready' && v.transcript.trim());
     
     if (readyVideos.length === 0) {
       toast({
@@ -219,7 +237,7 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
     }
   };
 
-  const readyCount = videoFiles.filter(v => v.status === 'ready').length;
+  const readyCount = videoFiles.filter(v => v.status === 'ready' && v.transcript.trim()).length;
   const progressPercentage = videoFiles.length > 0 ? (readyCount / videoFiles.length) * 100 : 0;
 
   return (
@@ -244,9 +262,10 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
                   onClick={uploadAllVideos} 
                   disabled={isUploading}
                   size="sm"
+                  className="bg-green-600 hover:bg-green-700"
                 >
                   <Upload className="h-4 w-4 mr-2" />
-                  Upload {readyCount} Video{readyCount > 1 ? 's' : ''}
+                  {isUploading ? 'Uploading...' : `Upload ${readyCount} Video${readyCount > 1 ? 's' : ''}`}
                 </Button>
               )}
             </div>
@@ -305,14 +324,14 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
                           {(video.file.size / (1024 * 1024)).toFixed(1)} MB
                         </p>
                         {video.title && (
-                          <p className="text-sm font-medium mt-1">{video.title}</p>
+                          <p className="text-sm font-medium mt-1 text-green-700">{video.title}</p>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        {video.status === 'ready' && (
+                        {video.status === 'ready' && video.transcript.trim() && (
                           <Badge className="bg-green-100 text-green-800">
                             <Check className="h-3 w-3 mr-1" />
-                            Ready
+                            Ready to Upload
                           </Badge>
                         )}
                         {video.status === 'generating-title' && (
@@ -355,8 +374,8 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
 
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <label className="text-sm font-medium">Video Transcript</label>
-                        {video.transcript.trim() && !video.title && (
+                        <label className="text-sm font-medium">Video Transcript *</label>
+                        {video.transcript.trim() && video.status === 'pending' && (
                           <Button
                             size="sm"
                             variant="outline"
@@ -375,12 +394,13 @@ export const BulkVideoUpload = ({ onVideosAdded, commonTopics }: BulkVideoUpload
                           const transcript = e.target.value;
                           updateVideoFile(video.id, { transcript });
                           
-                          // Auto-generate title when transcript is added
+                          // Auto-generate title when transcript is added and no title exists
                           if (transcript.trim() && !video.title && video.status === 'pending') {
                             generateTitle(video.id, transcript);
                           }
                         }}
                         rows={6}
+                        className={video.transcript.trim() ? "border-green-200 bg-green-50" : ""}
                       />
                     </div>
                   </div>

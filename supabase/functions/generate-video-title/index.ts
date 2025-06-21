@@ -14,13 +14,25 @@ serve(async (req) => {
   try {
     const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
     if (!openaiApiKey) {
-      throw new Error("OPENAI_API_KEY not configured");
+      return new Response(JSON.stringify({ 
+        error: "OPENAI_API_KEY not configured",
+        title: "Untitled Video"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
     }
 
     const { transcript } = await req.json();
     
     if (!transcript || transcript.trim().length < 10) {
-      throw new Error("Transcript too short to generate a meaningful title");
+      return new Response(JSON.stringify({ 
+        error: "Transcript too short",
+        title: "Untitled Video"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
 
     const prompt = `Based on this video transcript, generate a concise, professional title (max 60 characters) that captures the main topic. Focus on the key subject matter, strategy, or lesson being discussed.
@@ -53,11 +65,19 @@ Return only the title, nothing else.`;
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`OpenAI API error: ${response.status} - ${errorText}`);
+      return new Response(JSON.stringify({ 
+        error: `OpenAI API error: ${response.status}`,
+        title: "AI Generated Title"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      });
     }
 
     const data = await response.json();
-    const title = data.choices[0].message.content.trim().replace(/['"]/g, '');
+    const title = data.choices?.[0]?.message?.content?.trim()?.replace(/['"]/g, '') || "AI Generated Title";
 
     return new Response(JSON.stringify({ title }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -69,7 +89,7 @@ Return only the title, nothing else.`;
     
     return new Response(JSON.stringify({ 
       error: error.message || "Failed to generate title",
-      title: "Untitled Video" // Fallback title
+      title: "Untitled Video"
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
