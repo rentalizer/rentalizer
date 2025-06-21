@@ -43,16 +43,24 @@ export const VideoFileCard = ({
     }
   };
 
+  const markAsReady = () => {
+    // Allow marking as ready even without transcript
+    const title = video.title || `Video - ${video.file.name.replace(/\.[^/.]+$/, "")}`;
+    onUpdate(video.id, { 
+      status: 'ready' as const,
+      title: title,
+      transcript: video.transcript || 'No transcript provided'
+    });
+  };
+
   const getStatusProgress = () => {
     const status = video.status;
     const hasContent = video.title || video.transcript.trim();
     
     switch (status) {
       case 'pending':
-        if (hasContent) {
-          return { progress: 100, text: 'Ready for Upload', color: 'bg-green-500' };
-        }
-        return { progress: 25, text: 'Awaiting Content', color: 'bg-yellow-500' };
+        // Always show 100% for pending videos so they can be uploaded
+        return { progress: 100, text: 'Ready for Upload', color: 'bg-green-500' };
       case 'generating-title':
         return { progress: 75, text: 'Generating Title...', color: 'bg-blue-500' };
       case 'ready':
@@ -66,7 +74,8 @@ export const VideoFileCard = ({
 
   const statusInfo = getStatusProgress();
   const isGeneratingTitle = video.status === 'generating-title';
-  const isReadyForUpload = video.status === 'ready' || (video.status === 'pending' && (video.title || video.transcript.trim()));
+  const isReadyForUpload = video.status === 'ready' || video.status === 'pending';
+  const hasContent = video.title || video.transcript.trim();
 
   return (
     <Card>
@@ -104,10 +113,10 @@ export const VideoFileCard = ({
                     Uploaded
                   </Badge>
                 )}
-                {!isReadyForUpload && !isGeneratingTitle && video.status !== 'uploaded' && (
-                  <Badge variant="outline">
+                {video.status === 'pending' && !hasContent && (
+                  <Badge variant="outline" className="bg-yellow-50 text-yellow-700">
                     <AlertCircle className="h-3 w-3 mr-1" />
-                    Add Content
+                    No Content
                   </Badge>
                 )}
                 <Button
@@ -134,7 +143,7 @@ export const VideoFileCard = ({
                 />
               </div>
               <div className="flex justify-between text-xs text-gray-400">
-                <span className={!isReadyForUpload && !isGeneratingTitle ? 'font-medium text-yellow-600' : ''}>
+                <span className={video.status === 'pending' && !hasContent ? 'font-medium text-yellow-600' : ''}>
                   Add Content
                 </span>
                 <span className={isGeneratingTitle ? 'font-medium text-blue-600' : ''}>
@@ -169,7 +178,7 @@ export const VideoFileCard = ({
                 className={video.transcript.trim() ? "border-green-200 bg-green-50" : ""}
               />
               <p className="text-xs text-gray-500">
-                Add a transcript or title to make this video ready for upload. You can also upload without content and add it later.
+                Videos can be uploaded without content and transcripts can be added later. Adding content now will auto-generate titles.
               </p>
             </div>
           </div>
