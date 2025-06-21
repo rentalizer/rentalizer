@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Send, MessageCircle, User, Bot, Loader2, Crown, ArrowLeft, Lock, Zap, Star, CheckCircle, LogOut, BarChart3 } from 'lucide-react';
+import { Send, MessageCircle, User, Bot, Loader2, Crown, ArrowLeft, Lock, Zap, Star, CheckCircle, LogOut, BarChart3, Database, TrendingUp, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginDialog } from '@/components/LoginDialog';
@@ -225,11 +225,34 @@ const AskRichie = () => {
                   ASK RICHIE AI
                 </h1>
               </div>
-              <p className="text-lg text-white font-medium mb-4">Your Personal Rental Arbitrage Coach</p>
+              <p className="text-lg text-white font-medium mb-4">Your Personal Rental Arbitrage Mastermind</p>
               
-              <div className="mb-12 px-4">
-                <p className="text-xl md:text-2xl text-white max-w-4xl mx-auto leading-relaxed">
-                  Get Instant Answers From Richie's AI - Trained On All Of Richie's Live Coaching Sessions, Documents, And Rental Arbitrage Expertise.
+              <div className="mb-8 px-4">
+                <p className="text-xl md:text-2xl text-white max-w-5xl mx-auto leading-relaxed mb-6">
+                  Get Instant Access To The Mind Of Richie Matthews - The Man Who Acquired 60 Rental Properties Without Buying Them And Earned Over $6,000,000 Using His Proven 3X Rental Strategy.
+                </p>
+                
+                {/* Comprehensive Training Highlights */}
+                <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
+                  <div className="bg-slate-800/50 rounded-lg p-4 border border-cyan-500/20">
+                    <Database className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
+                    <h3 className="text-white font-semibold mb-2">Thousands Of Hours</h3>
+                    <p className="text-gray-300 text-sm">Trained on every live coaching session, masterclass, and strategy document from Richie's $5K program</p>
+                  </div>
+                  <div className="bg-slate-800/50 rounded-lg p-4 border border-purple-500/20">
+                    <TrendingUp className="h-8 w-8 text-purple-400 mx-auto mb-2" />
+                    <h3 className="text-white font-semibold mb-2">Weekly Updates</h3>
+                    <p className="text-gray-300 text-sm">Continuously updated with the latest strategies, market insights, and success case studies</p>
+                  </div>
+                  <div className="bg-slate-800/50 rounded-lg p-4 border border-cyan-500/20">
+                    <BookOpen className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
+                    <h3 className="text-white font-semibold mb-2">Complete Knowledge Base</h3>
+                    <p className="text-gray-300 text-sm">Every Q&A, troubleshooting guide, and advanced technique from years of student interactions</p>
+                  </div>
+                </div>
+                
+                <p className="text-lg text-gray-300 max-w-4xl mx-auto">
+                  This Isn't Just Another Chatbot - It's Like Having Richie Matthews As Your Personal Mentor, Available 24/7 To Answer Every Question About Building Your Rental Empire.
                 </p>
               </div>
 
@@ -237,7 +260,7 @@ const AskRichie = () => {
                 <LoginDialog
                   trigger={
                     <Button size="lg" className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-3">
-                      Sign In / Create Account
+                      Start Your AI Mentorship Now
                     </Button>
                   }
                 />
@@ -246,7 +269,7 @@ const AskRichie = () => {
 
             {/* Pricing Plans */}
             <div className="mb-12">
-              <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-8">Choose Your Plan</h2>
+              <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-8">Choose Your Access Level</h2>
               <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
                 {pricingPlans.map((plan) => (
                   <div key={plan.id} className="group relative">
@@ -309,29 +332,29 @@ const AskRichie = () => {
             <Card className="bg-slate-800/30 border-cyan-500/30 backdrop-blur-lg">
               <CardContent className="p-8">
                 <h3 className="text-2xl font-bold text-cyan-300 mb-6 text-center">
-                  Why Students Choose Ask Richie AI
+                  Why Thousands Of Students Trust Ask Richie AI
                 </h3>
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="text-center">
                     <div className="w-12 h-12 bg-cyan-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
                       <Zap className="h-6 w-6 text-cyan-400" />
                     </div>
-                    <h4 className="font-semibold text-white mb-2">Instant Answers</h4>
-                    <p className="text-gray-400 text-sm">Get Immediate Responses To Your Rental Arbitrage Questions, 24/7</p>
+                    <h4 className="font-semibold text-white mb-2">Instant Expert Answers</h4>
+                    <p className="text-gray-400 text-sm">Get Immediate Responses From Years Of Richie's Experience, Available 24/7 Without Waiting For Office Hours</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Star className="h-6 w-6 text-purple-400" />
+                      <Database className="h-6 w-6 text-purple-400" />
                     </div>
-                    <h4 className="font-semibold text-white mb-2">Richie's Expertise</h4>
-                    <p className="text-gray-400 text-sm">Trained On All Live Sessions And Proven Strategies From The $5K Program</p>
+                    <h4 className="font-semibold text-white mb-2">Complete Knowledge Archive</h4>
+                    <p className="text-gray-400 text-sm">Access To Every Strategy, Case Study, And Solution From The Entire $5K Program Library</p>
                   </div>
                   <div className="text-center">
                     <div className="w-12 h-12 bg-cyan-500/10 rounded-full flex items-center justify-center mx-auto mb-3">
                       <Crown className="h-6 w-6 text-cyan-400" />
                     </div>
-                    <h4 className="font-semibold text-white mb-2">Proven Results</h4>
-                    <p className="text-gray-400 text-sm">Get Guidance That's Helped Thousands Build Successful Rental Businesses</p>
+                    <h4 className="font-semibold text-white mb-2">Proven $6M+ Track Record</h4>
+                    <p className="text-gray-400 text-sm">Learn From The Exact Methods That Built A Multi-Million Dollar Rental Portfolio</p>
                   </div>
                 </div>
               </CardContent>
