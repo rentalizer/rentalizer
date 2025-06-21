@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import { BulkVideoUpload } from './BulkVideoUpload';
 import { youtubeTranscriptService } from '@/services/youtubeTranscriptService';
 import { 
   Upload, 
@@ -18,7 +19,8 @@ import {
   AlertCircle,
   Database,
   Play,
-  Trash2
+  Trash2,
+  FileVideo
 } from 'lucide-react';
 
 interface VideoContent {
@@ -253,12 +255,20 @@ export const ContentManager = () => {
         </CardHeader>
       </Card>
 
-      <Tabs defaultValue="youtube" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+      <Tabs defaultValue="bulk-upload" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="bulk-upload">Bulk Upload</TabsTrigger>
           <TabsTrigger value="youtube">YouTube Extraction</TabsTrigger>
           <TabsTrigger value="manual">Manual Upload</TabsTrigger>
           <TabsTrigger value="manage">Manage Content</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="bulk-upload" className="space-y-4">
+          <BulkVideoUpload 
+            onVideosAdded={(newVideos) => setVideos(prev => [...prev, ...newVideos])}
+            commonTopics={commonTopics}
+          />
+        </TabsContent>
 
         <TabsContent value="youtube" className="space-y-4">
           <Card>
