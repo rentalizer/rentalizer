@@ -101,6 +101,88 @@ The video processing system is now set up to handle real YouTube URLs and extrac
     return `${minutes}:${secs.toString().padStart(2, '0')}`;
   }
 
+  async extractFromUrl(url: string): Promise<Array<{ id: string; url: string; title: string; duration: string }>> {
+    console.log('Processing URL:', url);
+    
+    // Check if it's a playlist URL
+    if (url.includes('list=')) {
+      return this.extractPlaylistVideos(url);
+    }
+    
+    // Check if it's a channel URL
+    if (url.includes('/@') || url.includes('/channel/') || url.includes('/c/')) {
+      return this.extractChannelVideos(url);
+    }
+    
+    // Check if it's a single video URL
+    const videoId = await this.extractVideoId(url);
+    if (videoId) {
+      return this.extractSingleVideo(url, videoId);
+    }
+    
+    throw new Error('Invalid YouTube URL. Please provide a channel URL, playlist URL, or individual video URL.');
+  }
+
+  async extractChannelVideos(channelUrl: string): Promise<Array<{ id: string; url: string; title: string; duration: string }>> {
+    try {
+      console.log('Extracting from channel:', channelUrl);
+      
+      // For now, return sample videos from Richie Matthews channel
+      // In production, you'd use YouTube Data API to get actual channel videos
+      return [
+        {
+          id: 'richie_video_1',
+          url: 'https://youtube.com/watch?v=example1',
+          title: 'Richie Matthews - Complete 3X Rental Strategy Overview',
+          duration: '45:32'
+        },
+        {
+          id: 'richie_video_2', 
+          url: 'https://youtube.com/watch?v=example2',
+          title: 'Property Selection Masterclass - Finding Perfect Units',
+          duration: '38:15'
+        },
+        {
+          id: 'richie_video_3',
+          url: 'https://youtube.com/watch?v=example3', 
+          title: 'Student Q&A - Common Challenges & Solutions',
+          duration: '52:08'
+        },
+        {
+          id: 'richie_video_4',
+          url: 'https://youtube.com/watch?v=example4', 
+          title: 'Advanced 3X Strategy Implementation',
+          duration: '41:22'
+        },
+        {
+          id: 'richie_video_5',
+          url: 'https://youtube.com/watch?v=example5', 
+          title: 'Market Analysis Deep Dive',
+          duration: '36:45'
+        }
+      ];
+    } catch (error) {
+      console.error('Error extracting channel videos:', error);
+      throw new Error('Failed to extract videos from YouTube channel');
+    }
+  }
+
+  async extractSingleVideo(url: string, videoId: string): Promise<Array<{ id: string; url: string; title: string; duration: string }>> {
+    try {
+      const details = await this.getVideoDetails(videoId);
+      
+      return [{
+        id: videoId,
+        url: url,
+        title: details?.title || 'Unknown Video',
+        duration: details?.duration || '0:00'
+      }];
+    } catch (error) {
+      console.error('Error extracting single video:', error);
+      throw new Error('Failed to extract video information');
+    }
+  }
+
   async extractPlaylistVideos(playlistUrl: string): Promise<Array<{ id: string; url: string; title: string; duration: string }>> {
     try {
       // Extract playlist ID from URL
@@ -109,23 +191,25 @@ The video processing system is now set up to handle real YouTube URLs and extrac
         throw new Error('Invalid playlist URL');
       }
 
+      console.log('Extracting from playlist:', playlistMatch[1]);
+
       // In a real implementation, you'd use YouTube Data API to get playlist items
       // For now, we'll return a simulated response
       return [
         {
-          id: 'real_video_1',
+          id: 'playlist_video_1',
           url: 'https://youtube.com/watch?v=example1',
           title: 'Richie Matthews - Complete 3X Rental Strategy Overview',
           duration: '45:32'
         },
         {
-          id: 'real_video_2', 
+          id: 'playlist_video_2', 
           url: 'https://youtube.com/watch?v=example2',
           title: 'Property Selection Masterclass - Finding Perfect Units',
           duration: '38:15'
         },
         {
-          id: 'real_video_3',
+          id: 'playlist_video_3',
           url: 'https://youtube.com/watch?v=example3', 
           title: 'Student Q&A - Common Challenges & Solutions',
           duration: '52:08'

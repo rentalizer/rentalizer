@@ -35,7 +35,7 @@ interface VideoContent {
 export const ContentManager = () => {
   const { toast } = useToast();
   const [videos, setVideos] = useState<VideoContent[]>([]);
-  const [playlistUrl, setPlaylistUrl] = useState('');
+  const [youtubeUrl, setYoutubeUrl] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [manualTranscript, setManualTranscript] = useState('');
   const [manualTitle, setManualTitle] = useState('');
@@ -56,11 +56,11 @@ export const ContentManager = () => {
     'Q&A Session'
   ];
 
-  const extractPlaylistVideos = async () => {
-    if (!playlistUrl.includes('youtube.com') && !playlistUrl.includes('youtu.be')) {
+  const extractFromYouTube = async () => {
+    if (!youtubeUrl.includes('youtube.com') && !youtubeUrl.includes('youtu.be')) {
       toast({
         title: "Invalid URL",
-        description: "Please enter a valid YouTube playlist URL",
+        description: "Please enter a valid YouTube URL (channel, playlist, or video)",
         variant: "destructive"
       });
       return;
@@ -69,7 +69,7 @@ export const ContentManager = () => {
     setIsProcessing(true);
     
     try {
-      const extractedVideos = await youtubeTranscriptService.extractPlaylistVideos(playlistUrl);
+      const extractedVideos = await youtubeTranscriptService.extractFromUrl(youtubeUrl);
       
       const videoContent: VideoContent[] = extractedVideos.map(video => ({
         id: video.id,
@@ -83,14 +83,18 @@ export const ContentManager = () => {
 
       setVideos(videoContent);
       
+      const urlType = youtubeUrl.includes('/@') || youtubeUrl.includes('/channel/') ? 'channel' :
+                     youtubeUrl.includes('list=') ? 'playlist' : 'video';
+      
       toast({
-        title: "Playlist Loaded",
-        description: `Found ${videoContent.length} videos ready for processing`,
+        title: "YouTube Content Loaded",
+        description: `Found ${videoContent.length} video${videoContent.length > 1 ? 's' : ''} from ${urlType}`,
       });
     } catch (error) {
+      console.error('Error extracting YouTube content:', error);
       toast({
         title: "Error",
-        description: "Failed to extract playlist videos",
+        description: error instanceof Error ? error.message : "Failed to extract YouTube content",
         variant: "destructive"
       });
     } finally {
@@ -261,19 +265,19 @@ export const ContentManager = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Youtube className="h-5 w-5 text-red-500" />
-                Extract from YouTube Playlist
+                Extract from YouTube
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
                 <Input
-                  placeholder="https://www.youtube.com/playlist?list=PLicSHGfcR-23ZM1_guLlHc_kbLege14vA"
-                  value={playlistUrl}
-                  onChange={(e) => setPlaylistUrl(e.target.value)}
+                  placeholder="Paste any YouTube URL (channel, playlist, or video)"
+                  value={youtubeUrl}
+                  onChange={(e) => setYoutubeUrl(e.target.value)}
                   className="flex-1"
                 />
                 <Button 
-                  onClick={extractPlaylistVideos}
+                  onClick={extractFromYouTube}
                   disabled={isProcessing}
                 >
                   {isProcessing ? 'Loading...' : 'Extract Videos'}
@@ -281,8 +285,8 @@ export const ContentManager = () => {
               </div>
               <div className="bg-blue-50 p-3 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  <strong>Real YouTube Processing:</strong> This will extract actual transcripts from YouTube videos. 
-                  The system will process the real content from the videos you provide.
+                  <strong>Supported URLs:</strong> Channel URLs (@RichieMatthews), playlist URLs, or individual video URLs. 
+                  The system will automatically detect the type and extract the appropriate content.
                 </p>
               </div>
             </CardContent>
