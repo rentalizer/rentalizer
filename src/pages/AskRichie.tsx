@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -290,7 +289,7 @@ const AskRichie = () => {
               
               <div className="mb-8 px-4">
                 <p className="text-xl md:text-2xl text-white max-w-5xl mx-auto leading-relaxed mb-6">
-                  Get Instant Access To The Rental Arbitrage Expertise Of Richie Matthews - Who Acquired 60 Rental Properties Without Buying Them And Earned Over $6,000,000 Using His Proven 3X Rental Strategy.
+                  Master The Exact 3X Rental Strategy That Built A $6,000,000 Portfolio - Richie's Complete System For Acquiring Properties Without Buying Them, Now Available As Your Personal AI Mentor 24/7.
                 </p>
                 
                 {/* Comprehensive Training Highlights */}
