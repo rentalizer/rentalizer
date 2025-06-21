@@ -4,12 +4,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import { 
   FileVideo, 
   X, 
   Check,
   AlertCircle,
-  Wand2
+  Wand2,
+  Clock,
+  Upload
 } from 'lucide-react';
 import { VideoFile } from './types';
 import { formatFileSize } from './videoUploadUtils';
@@ -49,6 +52,23 @@ export const VideoFileCard = ({
       transcript: video.transcript || 'No transcript provided'
     });
   };
+
+  const getStatusProgress = () => {
+    switch (video.status) {
+      case 'pending':
+        return { progress: 25, text: 'Stage 1: Awaiting Processing', color: 'bg-yellow-500' };
+      case 'generating-title':
+        return { progress: 50, text: 'Stage 2: Generating Title', color: 'bg-blue-500' };
+      case 'ready':
+        return { progress: 75, text: 'Stage 3: Ready for Upload', color: 'bg-green-500' };
+      case 'uploaded':
+        return { progress: 100, text: 'Stage 4: Uploaded to Knowledge Base', color: 'bg-green-600' };
+      default:
+        return { progress: 0, text: 'Unknown Stage', color: 'bg-gray-500' };
+    }
+  };
+
+  const statusInfo = getStatusProgress();
 
   return (
     <Card>
@@ -108,6 +128,27 @@ export const VideoFileCard = ({
                 >
                   <X className="h-4 w-4" />
                 </Button>
+              </div>
+            </div>
+
+            {/* Status Progress Bar */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700">{statusInfo.text}</span>
+                <span className="text-xs text-gray-500">{statusInfo.progress}%</span>
+              </div>
+              <div className="relative">
+                <Progress value={statusInfo.progress} className="h-2" />
+                <div 
+                  className={`absolute top-0 left-0 h-2 rounded-full transition-all duration-300 ${statusInfo.color}`}
+                  style={{ width: `${statusInfo.progress}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-xs text-gray-400">
+                <span className={video.status === 'pending' ? 'font-medium text-yellow-600' : ''}>Pending</span>
+                <span className={video.status === 'generating-title' ? 'font-medium text-blue-600' : ''}>Processing</span>
+                <span className={video.status === 'ready' ? 'font-medium text-green-600' : ''}>Ready</span>
+                <span className={video.status === 'uploaded' ? 'font-medium text-green-700' : ''}>Uploaded</span>
               </div>
             </div>
 
