@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +8,7 @@ import { Send, MessageCircle, User, Bot, Loader2, Crown, ArrowLeft, Lock, Zap, S
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginDialog } from '@/components/LoginDialog';
+import { Footer } from '@/components/Footer';
 
 interface Message {
   id: string;
@@ -365,6 +365,8 @@ const AskRichie = () => {
             </Card>
           </div>
         </div>
+        
+        <Footer />
       </div>
     );
   }
@@ -482,6 +484,8 @@ const AskRichie = () => {
             </div>
           </div>
         </div>
+        
+        <Footer />
       </div>
     );
   }
@@ -693,6 +697,8 @@ const AskRichie = () => {
           </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };
