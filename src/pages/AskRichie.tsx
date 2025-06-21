@@ -447,7 +447,7 @@ const AskRichie = () => {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Richie Matthews" />
+                    <AvatarImage src="/lovable-uploads/d68927c6-c7f4-4dd4-8d17-979d51a48dad.png" alt="Richie Matthews" />
                     <AvatarFallback>RM</AvatarFallback>
                   </Avatar>
                   <div className="text-right">
@@ -565,7 +565,7 @@ const AskRichie = () => {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Richie Matthews" />
+                  <AvatarImage src="/lovable-uploads/d68927c6-c7f4-4dd4-8d17-979d51a48dad.png" alt="Richie Matthews" />
                   <AvatarFallback>RM</AvatarFallback>
                 </Avatar>
                 <div className="text-right">
@@ -606,7 +606,7 @@ const AskRichie = () => {
             <CardHeader className="pb-4">
               <CardTitle className="text-cyan-300 flex items-center gap-2">
                 <Avatar className="h-6 w-6">
-                  <AvatarImage src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Richie Matthews" />
+                  <AvatarImage src="/lovable-uploads/d68927c6-c7f4-4dd4-8d17-979d51a48dad.png" alt="Richie Matthews" />
                   <AvatarFallback>RM</AvatarFallback>
                 </Avatar>
                 Richie's AI Assistant
@@ -627,7 +627,7 @@ const AskRichie = () => {
                     {message.type === 'assistant' && (
                       <div className="flex-shrink-0">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Richie Matthews" />
+                          <AvatarImage src="/lovable-uploads/d68927c6-c7f4-4dd4-8d17-979d51a48dad.png" alt="Richie Matthews" />
                           <AvatarFallback>RM</AvatarFallback>
                         </Avatar>
                       </div>
@@ -662,7 +662,7 @@ const AskRichie = () => {
                   <div className="flex gap-3 justify-start">
                     <div className="flex-shrink-0">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src="https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Richie Matthews" />
+                        <AvatarImage src="/lovable-uploads/d68927c6-c7f4-4dd4-8d17-979d51a48dad.png" alt="Richie Matthews" />
                         <AvatarFallback>RM</AvatarFallback>
                       </Avatar>
                     </div>
