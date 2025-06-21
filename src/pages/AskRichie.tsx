@@ -168,7 +168,7 @@ const AskRichie = () => {
   // If user is not logged in, show login/pricing page
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden flex flex-col">
         {/* Subtle background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl"></div>
@@ -215,7 +215,7 @@ const AskRichie = () => {
           </div>
         </header>
 
-        <div className="relative z-10">
+        <div className="relative z-10 flex-1">
           <div className="container mx-auto px-4 py-16">
             {/* Hero Section */}
             <div className="text-center mb-16">
@@ -347,7 +347,7 @@ const AskRichie = () => {
   // If user is logged in but hasn't selected a plan, show plan selection
   if (!selectedPlan) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden flex flex-col">
         {/* Subtle background elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl"></div>
@@ -394,7 +394,7 @@ const AskRichie = () => {
           </div>
         </header>
 
-        <div className="relative z-10">
+        <div className="relative z-10 flex-1">
           <div className="container mx-auto px-4 py-16">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">Choose Your Plan</h2>
@@ -468,7 +468,7 @@ const AskRichie = () => {
   const remainingQuestions = Math.max(0, currentPlan.questions - questionCount);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden flex flex-col">
       {/* Subtle background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl"></div>
@@ -528,7 +528,7 @@ const AskRichie = () => {
         </div>
       </header>
 
-      <div className="relative z-10">
+      <div className="relative z-10 flex-1">
         <div className="container mx-auto px-4 py-6">
           {/* Chat Container */}
           <Card className="h-[calc(100vh-200px)] bg-slate-800/80 backdrop-blur-lg border-cyan-500/30">
