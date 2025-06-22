@@ -286,7 +286,7 @@ export const BulkTranscriptUpload = ({ onTranscriptsAdded, commonTopics }: BulkT
                 </Button>
               </div>
             </div>
-          </div>
+          </CardContent>
         </Card>
       )}
 
