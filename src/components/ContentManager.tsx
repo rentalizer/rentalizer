@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -261,16 +260,16 @@ export const ContentManager = () => {
         </CardHeader>
       </Card>
 
-      <Tabs defaultValue="bulk-transcripts" className="space-y-4">
+      <Tabs defaultValue="bulk-upload" className="space-y-4">
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="bulk-transcripts">Bulk Transcripts</TabsTrigger>
-          <TabsTrigger value="youtube">YouTube Links</TabsTrigger>
+          <TabsTrigger value="bulk-upload">Bulk Upload</TabsTrigger>
+          <TabsTrigger value="youtube">YouTube Extraction</TabsTrigger>
           <TabsTrigger value="manual">Manual Upload</TabsTrigger>
           <TabsTrigger value="manage">Manage Content</TabsTrigger>
           <TabsTrigger value="test-chat">Test Chat</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="bulk-transcripts" className="space-y-4">
+        <TabsContent value="bulk-upload" className="space-y-4">
           <BulkTranscriptUpload 
             onTranscriptsAdded={handleTranscriptsAdded}
             commonTopics={commonTopics}
