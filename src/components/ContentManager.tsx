@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -76,8 +77,9 @@ export const ContentManager = () => {
     try {
       const extractedVideos = await youtubeTranscriptService.extractFromUrl(youtubeUrl);
       
-      const videoContent: VideoContent[] = extractedVideos.map(video => ({
-        id: video.id,
+      // Generate unique IDs to prevent duplicates
+      const videoContent: VideoContent[] = extractedVideos.map((video, index) => ({
+        id: `${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`,
         title: video.title,
         url: video.url,
         transcript: '',
@@ -86,14 +88,15 @@ export const ContentManager = () => {
         duration: video.duration
       }));
 
-      setVideos([...videos, ...videoContent]);
+      // Clear existing videos and add new ones to prevent duplicates
+      setVideos(videoContent);
       
       const urlType = youtubeUrl.includes('/@') || youtubeUrl.includes('/channel/') ? 'channel' :
                      youtubeUrl.includes('list=') ? 'playlist' : 'video';
       
       toast({
         title: "YouTube Content Loaded",
-        description: `Found ${videoContent.length} video${videoContent.length > 1 ? 's' : ''} from ${urlType}`,
+        description: `Found ${videoContent.length} video${videoContent.length > 1 ? 's' : ''} from ${urlType}. Note: YouTube API integration required for real transcript extraction.`,
       });
     } catch (error) {
       console.error('Error extracting YouTube content:', error);
@@ -141,8 +144,8 @@ export const ContentManager = () => {
       ));
 
       toast({
-        title: "Real Transcript Extracted",
-        description: "Video transcript has been processed from YouTube",
+        title: "Transcript Processing Complete",
+        description: "Note: This is a simulated transcript. Real YouTube API integration needed for actual content.",
       });
     } catch (error) {
       setVideos(videos.map(v => 
@@ -151,7 +154,7 @@ export const ContentManager = () => {
       
       toast({
         title: "Processing Failed",
-        description: "Failed to extract transcript from YouTube video",
+        description: "YouTube API integration required for real transcript extraction",
         variant: "destructive"
       });
     }
@@ -170,7 +173,7 @@ export const ContentManager = () => {
     const finalTitle = `Content ${Date.now().toString().substring(0, 8)}`;
 
     const newVideo: VideoContent = {
-      id: Date.now().toString(),
+      id: `manual_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       title: finalTitle,
       url: 'manual-upload',
       transcript: manualTranscript,
@@ -227,6 +230,14 @@ export const ContentManager = () => {
     });
   };
 
+  const clearAllVideos = () => {
+    setVideos([]);
+    toast({
+      title: "All Videos Cleared",
+      description: "All videos have been removed from the knowledge base",
+    });
+  };
+
   const handleTranscriptsAdded = (newTranscripts: any[]) => {
     console.log('Adding transcripts to knowledge base:', newTranscripts);
     addVideos(newTranscripts);
@@ -251,10 +262,16 @@ export const ContentManager = () => {
               <Progress value={progressPercentage} className="w-48 mt-1" />
             </div>
             {videos.length > 0 && (
-              <Button onClick={exportKnowledgeBase} variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export Knowledge Base
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={exportKnowledgeBase} variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Knowledge Base
+                </Button>
+                <Button onClick={clearAllVideos} variant="outline" size="sm">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Clear All
+                </Button>
+              </div>
             )}
           </div>
         </CardHeader>
@@ -299,10 +316,10 @@ export const ContentManager = () => {
                   {isProcessing ? 'Loading...' : 'Extract Videos'}
                 </Button>
               </div>
-              <div className="bg-blue-50 p-3 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  <strong>Supported URLs:</strong> Channel URLs (@RichieMatthews), playlist URLs, or individual video URLs. 
-                  The system will automatically detect the type and extract the appropriate content.
+              <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  <strong>Note:</strong> This is a demo system. Real YouTube transcript extraction requires YouTube Data API v3 integration. 
+                  Currently showing simulated content for demonstration purposes.
                 </p>
               </div>
             </CardContent>
@@ -311,7 +328,7 @@ export const ContentManager = () => {
           {videos.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Extracted Videos</CardTitle>
+                <CardTitle>Extracted Videos ({videos.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -337,13 +354,13 @@ export const ContentManager = () => {
                             onClick={() => processVideoTranscript(video.id)}
                           >
                             <Play className="h-4 w-4 mr-1" />
-                            Process Real Transcript
+                            Process Transcript
                           </Button>
                         )}
                         {video.status === 'processing' && (
                           <Badge variant="outline">
                             <Clock className="h-3 w-3 mr-1" />
-                            Extracting...
+                            Processing...
                           </Badge>
                         )}
                         {video.status === 'completed' && (
@@ -355,9 +372,16 @@ export const ContentManager = () => {
                         {video.status === 'error' && (
                           <Badge variant="destructive">
                             <AlertCircle className="h-3 w-3 mr-1" />
-                            Error
+                            API Required
                           </Badge>
                         )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteVideo(video.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -409,17 +433,6 @@ export const ContentManager = () => {
                   <p className="text-gray-500 mb-4">
                     No processed content yet. Add transcripts or YouTube links to get started.
                   </p>
-                  <div className="bg-yellow-50 p-4 rounded-lg">
-                    <p className="text-sm text-yellow-800">
-                      <strong>Debug Info:</strong> Total videos in context: {videos.length}
-                    </p>
-                    <p className="text-xs text-yellow-700 mt-1">
-                      Videos by status: {JSON.stringify(videos.reduce((acc, v) => {
-                        acc[v.status] = (acc[v.status] || 0) + 1;
-                        return acc;
-                      }, {} as Record<string, number>))}
-                    </p>
-                  </div>
                 </div>
               ) : (
                 <div className="space-y-4">
