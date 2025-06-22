@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +22,8 @@ import {
   Database,
   Play,
   Trash2,
-  MessageSquare
+  MessageSquare,
+  RefreshCw
 } from 'lucide-react';
 
 interface VideoContent {
@@ -43,6 +43,20 @@ export const ContentManager = () => {
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [manualTranscript, setManualTranscript] = useState('');
+  const [debugInfo, setDebugInfo] = useState('');
+
+  // Debug effect to show what's happening
+  useEffect(() => {
+    const info = `
+DEBUG INFO:
+- Videos in context: ${videos.length}
+- Completed videos: ${videos.filter(v => v.status === 'completed').length}
+- Videos with transcripts: ${videos.filter(v => v.transcript && v.transcript.length > 0).length}
+- LocalStorage check: ${localStorage.getItem('richie-knowledge-base-videos') ? 'HAS DATA' : 'NO DATA'}
+    `;
+    setDebugInfo(info);
+    console.log('🔍 CONTENT MANAGER DEBUG:', info);
+  }, [videos]);
 
   const commonTopics = [
     'Property Selection',
@@ -58,6 +72,28 @@ export const ContentManager = () => {
     'Pricing Strategy',
     'Q&A Session'
   ];
+
+  const forceRefresh = () => {
+    console.log('🔄 FORCE REFRESH TRIGGERED');
+    // Force reload from localStorage
+    const stored = localStorage.getItem('richie-knowledge-base-videos');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        const videos = parsed.map((video: any) => ({
+          ...video,
+          processedAt: video.processedAt ? new Date(video.processedAt) : undefined
+        }));
+        setVideos(videos);
+        toast({
+          title: "Refreshed",
+          description: `Loaded ${videos.length} videos from storage`,
+        });
+      } catch (error) {
+        console.error('Error parsing stored data:', error);
+      }
+    }
+  };
 
   const extractFromYouTube = async () => {
     if (!youtubeUrl.includes('youtube.com') && !youtubeUrl.includes('youtu.be')) {
@@ -76,7 +112,6 @@ export const ContentManager = () => {
       const extractedVideos = await youtubeTranscriptService.extractFromUrl(youtubeUrl);
       console.log('Extracted videos:', extractedVideos);
       
-      // Create VideoContent objects for each extracted video
       const videoContent: VideoContent[] = extractedVideos.map(video => ({
         id: video.id,
         title: video.title,
@@ -88,8 +123,6 @@ export const ContentManager = () => {
       }));
 
       console.log('Created video content:', videoContent);
-      
-      // Replace existing videos with new ones
       setVideos(videoContent);
       
       toast({
@@ -97,7 +130,7 @@ export const ContentManager = () => {
         description: `Successfully loaded ${videoContent.length} video${videoContent.length > 1 ? 's' : ''}. Click "Process" on each video to extract transcripts.`,
       });
       
-      setYoutubeUrl(''); // Clear the input
+      setYoutubeUrl('');
     } catch (error) {
       console.error('Error extracting YouTube content:', error);
       toast({
@@ -113,7 +146,6 @@ export const ContentManager = () => {
   const processVideoTranscript = async (videoId: string) => {
     console.log('Processing transcript for video:', videoId);
     
-    // Update the specific video status to processing
     const updatedVideos = videos.map(v => 
       v.id === videoId ? { ...v, status: 'processing' as const } : v
     );
@@ -123,7 +155,6 @@ export const ContentManager = () => {
       const transcript = await youtubeTranscriptService.extractTranscript(videoId);
       console.log('Extracted transcript length:', transcript.length);
       
-      // Update the specific video with completed status and transcript
       const completedVideos = videos.map(v => 
         v.id === videoId ? { 
           ...v, 
@@ -141,7 +172,6 @@ export const ContentManager = () => {
       });
     } catch (error) {
       console.error('Error processing transcript:', error);
-      // Update the specific video with error status
       const errorVideos = videos.map(v => 
         v.id === videoId ? { ...v, status: 'error' as const } : v
       );
@@ -226,6 +256,7 @@ export const ContentManager = () => {
 
   const clearAllVideos = () => {
     setVideos([]);
+    localStorage.removeItem('richie-knowledge-base-videos');
     toast({
       title: "All Content Cleared",
       description: "All videos have been removed",
@@ -233,6 +264,7 @@ export const ContentManager = () => {
   };
 
   const handleTranscriptsAdded = (newTranscripts: any[]) => {
+    console.log('📥 HANDLING TRANSCRIPTS ADDED:', newTranscripts.length);
     addVideos(newTranscripts);
   };
 
@@ -254,20 +286,36 @@ export const ContentManager = () => {
               </p>
               <Progress value={progressPercentage} className="w-48 mt-1" />
             </div>
-            {videos.length > 0 && (
-              <div className="flex gap-2">
-                <Button onClick={exportKnowledgeBase} variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-                <Button onClick={clearAllVideos} variant="outline" size="sm">
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Clear All
-                </Button>
-              </div>
-            )}
+            <div className="flex gap-2">
+              <Button onClick={forceRefresh} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+              {videos.length > 0 && (
+                <>
+                  <Button onClick={exportKnowledgeBase} variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Export
+                  </Button>
+                  <Button onClick={clearAllVideos} variant="outline" size="sm">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Clear All
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </CardHeader>
+      </Card>
+
+      {/* DEBUG INFO */}
+      <Card className="bg-yellow-50 border-yellow-200">
+        <CardHeader>
+          <CardTitle className="text-sm text-yellow-800">Debug Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <pre className="text-xs text-yellow-700 whitespace-pre-wrap">{debugInfo}</pre>
+        </CardContent>
       </Card>
 
       <Tabs defaultValue="bulk-upload" className="space-y-4">
@@ -344,6 +392,11 @@ export const ContentManager = () => {
                               {topic}
                             </Badge>
                           ))}
+                          {video.transcript && (
+                            <Badge variant="outline" className="text-xs bg-green-50">
+                              {video.transcript.length} chars
+                            </Badge>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-2 ml-4">
@@ -446,6 +499,9 @@ export const ContentManager = () => {
                                 {topic}
                               </Badge>
                             ))}
+                            <Badge variant="outline" className="text-xs">
+                              {video.transcript.length} characters
+                            </Badge>
                           </div>
                           <p className="text-sm text-gray-600 line-clamp-3">
                             {video.transcript.substring(0, 200)}...
