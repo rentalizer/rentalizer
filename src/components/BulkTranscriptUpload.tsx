@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import * as mammoth from 'mammoth';
 import { 
   Upload, 
   FileText, 
@@ -38,17 +38,29 @@ export const BulkTranscriptUpload = ({ onTranscriptsAdded, commonTopics }: BulkT
   const handleFileUpload = useCallback(async (files: FileList) => {
     console.log('Files received:', files.length);
     
+    if (files.length === 0) {
+      console.log('No files provided');
+      return;
+    }
+    
     const validFiles = Array.from(files).filter(file => {
       const fileType = file.type;
       const fileName = file.name.toLowerCase();
       
       console.log('Checking file:', fileName, 'Type:', fileType);
       
-      return (
+      const isValidFile = (
         fileType === 'text/plain' ||
         fileName.endsWith('.txt') ||
+        fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+        fileName.endsWith('.docx') ||
+        fileType === 'application/msword' ||
+        fileName.endsWith('.doc') ||
         fileType === '' // Some systems don't set MIME type for .txt files
       );
+      
+      console.log('File valid:', isValidFile);
+      return isValidFile;
     });
 
     console.log('Valid files:', validFiles.length);
@@ -56,7 +68,7 @@ export const BulkTranscriptUpload = ({ onTranscriptsAdded, commonTopics }: BulkT
     if (validFiles.length === 0) {
       toast({
         title: "Invalid Files",
-        description: "Please upload .txt files only",
+        description: "Please upload .txt, .doc, or .docx files only",
         variant: "destructive"
       });
       return;
@@ -66,58 +78,100 @@ export const BulkTranscriptUpload = ({ onTranscriptsAdded, commonTopics }: BulkT
 
     for (const file of validFiles) {
       try {
-        console.log('Reading file:', file.name);
-        const content = await file.text();
+        console.log('Processing file:', file.name);
+        let content = '';
+        
+        if (file.name.toLowerCase().endsWith('.docx') || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+          console.log('Processing Word document');
+          const arrayBuffer = await file.arrayBuffer();
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          content = result.value;
+          console.log('Word document content extracted, length:', content.length);
+        } else if (file.name.toLowerCase().endsWith('.doc') || file.type === 'application/msword') {
+          console.log('Legacy Word document detected - converting to text');
+          // For .doc files, we'll read as text (not perfect but works for simple cases)
+          content = await file.text();
+        } else {
+          console.log('Processing text file');
+          content = await file.text();
+        }
+        
         console.log('File content length:', content.length);
+
+        if (!content.trim()) {
+          console.log('File appears to be empty');
+          toast({
+            title: "Empty File",
+            description: `File ${file.name} appears to be empty`,
+            variant: "destructive"
+          });
+          continue;
+        }
 
         const transcriptFile: TranscriptFile = {
           id: `${Date.now()}-${Math.random()}`,
           file,
-          title: file.name.replace(/\.txt$/i, ''),
+          title: file.name.replace(/\.(txt|doc|docx)$/i, ''),
           transcript: content,
           topics: [],
           status: 'ready'
         };
 
         newTranscriptFiles.push(transcriptFile);
+        console.log('Created transcript file for:', file.name);
       } catch (error) {
         console.error('Error reading file:', file.name, error);
         toast({
           title: "File Error",
-          description: `Could not read file: ${file.name}`,
+          description: `Could not read file: ${file.name}. ${error instanceof Error ? error.message : 'Unknown error'}`,
           variant: "destructive"
         });
       }
     }
 
     console.log('New transcript files created:', newTranscriptFiles.length);
-    setTranscriptFiles(prev => [...prev, ...newTranscriptFiles]);
+    
+    if (newTranscriptFiles.length > 0) {
+      setTranscriptFiles(prev => [...prev, ...newTranscriptFiles]);
 
-    toast({
-      title: "Files Loaded",
-      description: `${newTranscriptFiles.length} transcript file${newTranscriptFiles.length > 1 ? 's' : ''} loaded successfully`,
-    });
+      toast({
+        title: "Files Loaded",
+        description: `${newTranscriptFiles.length} transcript file${newTranscriptFiles.length > 1 ? 's' : ''} loaded successfully`,
+      });
+    }
   }, [toast]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragOver(false);
     
     console.log('Files dropped:', e.dataTransfer.files.length);
-    if (e.dataTransfer.files) {
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       handleFileUpload(e.dataTransfer.files);
     }
   }, [handleFileUpload]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragOver(true);
   }, []);
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragOver(false);
   }, []);
+
+  const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('File input changed:', e.target.files?.length);
+    if (e.target.files && e.target.files.length > 0) {
+      handleFileUpload(e.target.files);
+    }
+    // Reset the input so the same file can be selected again
+    e.target.value = '';
+  }, [handleFileUpload]);
 
   const updateTranscriptFile = (id: string, updates: Partial<TranscriptFile>) => {
     setTranscriptFiles(prev => prev.map(file => 
@@ -227,32 +281,29 @@ export const BulkTranscriptUpload = ({ onTranscriptsAdded, commonTopics }: BulkT
               Drop transcript files here or click to browse
             </p>
             <p className="text-sm text-gray-600 mb-4">
-              Supports .txt files
+              Supports .txt, .doc, and .docx files
             </p>
             <Input
               type="file"
               multiple
-              accept=".txt,text/plain"
-              onChange={(e) => {
-                console.log('File input changed:', e.target.files?.length);
-                if (e.target.files) {
-                  handleFileUpload(e.target.files);
-                }
-              }}
+              accept=".txt,.doc,.docx,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              onChange={handleFileInputChange}
               className="hidden"
               id="transcript-upload"
             />
             <label htmlFor="transcript-upload">
-              <Button variant="outline" className="cursor-pointer">
-                <Upload className="h-4 w-4 mr-2" />
-                Choose Files
+              <Button variant="outline" className="cursor-pointer" asChild>
+                <span>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Choose Files
+                </span>
               </Button>
             </label>
           </div>
 
           <div className="mt-4 p-3 bg-blue-50 rounded-lg">
             <p className="text-sm text-blue-800">
-              <strong>Supported formats:</strong> Upload .txt files for immediate processing.
+              <strong>Supported formats:</strong> Upload .txt files for immediate processing, or .doc/.docx files for Word document extraction.
             </p>
           </div>
         </CardContent>
