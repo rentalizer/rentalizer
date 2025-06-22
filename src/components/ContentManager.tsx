@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -72,10 +71,13 @@ export const ContentManager = () => {
     setIsProcessing(true);
     
     try {
+      console.log('Extracting from YouTube URL:', youtubeUrl);
       const extractedVideos = await youtubeTranscriptService.extractFromUrl(youtubeUrl);
+      console.log('Extracted videos:', extractedVideos);
       
-      const videoContent: VideoContent[] = extractedVideos.map((video, index) => ({
-        id: `${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`,
+      // Create VideoContent objects for each extracted video
+      const videoContent: VideoContent[] = extractedVideos.map(video => ({
+        id: video.id,
         title: video.title,
         url: video.url,
         transcript: '',
@@ -84,17 +86,22 @@ export const ContentManager = () => {
         duration: video.duration
       }));
 
+      console.log('Created video content:', videoContent);
+      
+      // Replace existing videos with new ones
       setVideos(videoContent);
       
       toast({
         title: "YouTube Content Loaded",
-        description: `Found ${videoContent.length} video(s). Note: Real YouTube API integration required for actual transcript extraction.`,
+        description: `Successfully loaded ${videoContent.length} video${videoContent.length > 1 ? 's' : ''}. Click "Process" on each video to extract transcripts.`,
       });
+      
+      setYoutubeUrl(''); // Clear the input
     } catch (error) {
       console.error('Error extracting YouTube content:', error);
       toast({
         title: "Error",
-        description: "Failed to extract YouTube content",
+        description: error instanceof Error ? error.message : "Failed to extract YouTube content",
         variant: "destructive"
       });
     } finally {
@@ -103,17 +110,17 @@ export const ContentManager = () => {
   };
 
   const processVideoTranscript = async (videoId: string) => {
-    setVideos(videos.map(v => 
+    console.log('Processing transcript for video:', videoId);
+    
+    setVideos(prev => prev.map(v => 
       v.id === videoId ? { ...v, status: 'processing' } : v
     ));
 
     try {
-      const video = videos.find(v => v.id === videoId);
-      if (!video) throw new Error('Video not found');
-
       const transcript = await youtubeTranscriptService.extractTranscript(videoId);
+      console.log('Extracted transcript length:', transcript.length);
       
-      setVideos(videos.map(v => 
+      setVideos(prev => prev.map(v => 
         v.id === videoId ? { 
           ...v, 
           status: 'completed',
@@ -125,16 +132,17 @@ export const ContentManager = () => {
 
       toast({
         title: "Processing Complete",
-        description: "Note: This is simulated content. Real YouTube API required.",
+        description: "Transcript extracted and ready for chat",
       });
     } catch (error) {
-      setVideos(videos.map(v => 
+      console.error('Error processing transcript:', error);
+      setVideos(prev => prev.map(v => 
         v.id === videoId ? { ...v, status: 'error' } : v
       ));
       
       toast({
         title: "Processing Failed",
-        description: "YouTube API integration required",
+        description: "Failed to extract transcript",
         variant: "destructive"
       });
     }
@@ -201,7 +209,7 @@ export const ContentManager = () => {
   };
 
   const deleteVideo = (videoId: string) => {
-    setVideos(videos.filter(v => v.id !== videoId));
+    setVideos(prev => prev.filter(v => v.id !== videoId));
     toast({
       title: "Content Removed",
       description: "Video removed from knowledge base",
@@ -280,49 +288,57 @@ export const ContentManager = () => {
             <CardContent className="space-y-4">
               <div className="flex gap-2">
                 <Input
-                  placeholder="Paste YouTube URL"
+                  placeholder="Paste YouTube channel, playlist, or video URL"
                   value={youtubeUrl}
                   onChange={(e) => setYoutubeUrl(e.target.value)}
                   className="flex-1"
                 />
                 <Button 
                   onClick={extractFromYouTube}
-                  disabled={isProcessing}
+                  disabled={isProcessing || !youtubeUrl.trim()}
                 >
-                  {isProcessing ? 'Loading...' : 'Extract'}
+                  {isProcessing ? 'Extracting...' : 'Extract Videos'}
                 </Button>
               </div>
-              <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
-                <p className="text-sm text-yellow-800">
-                  <strong>Note:</strong> Demo system. Real YouTube API integration required.
+              <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Supports:</strong> Individual videos, channel URLs, and playlist URLs. 
+                  For channels and playlists, this will extract up to 50 videos.
                 </p>
               </div>
+              {videos.length > 0 && (
+                <div className="bg-green-50 border border-green-200 p-3 rounded-lg">
+                  <p className="text-sm text-green-800">
+                    <strong>Found {videos.length} videos!</strong> Click "Process" on each video below to extract transcripts.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {videos.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Videos ({videos.length})</CardTitle>
+                <CardTitle>Extracted Videos ({videos.length})</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  {videos.map((video, index) => (
-                    <div key={`${video.id}-${index}`} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-medium">{video.title}</h4>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {videos.map((video) => (
+                    <div key={video.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium truncate">{video.title}</h4>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge variant="outline" className="text-xs">
                             {video.duration || '0:00'}
                           </Badge>
-                          {video.topics.map((topic, topicIndex) => (
-                            <Badge key={`${topic}-${topicIndex}`} variant="secondary" className="text-xs">
+                          {video.topics.map((topic) => (
+                            <Badge key={topic} variant="secondary" className="text-xs">
                               {topic}
                             </Badge>
                           ))}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 ml-4">
                         {video.status === 'pending' && (
                           <Button 
                             size="sm" 
@@ -411,14 +427,14 @@ export const ContentManager = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {videos.filter(v => v.status === 'completed').map((video, index) => (
-                    <div key={`completed-${video.id}-${index}`} className="border rounded-lg p-4">
+                  {videos.filter(v => v.status === 'completed').map((video) => (
+                    <div key={video.id} className="border rounded-lg p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <h4 className="font-medium mb-2">{video.title}</h4>
                           <div className="flex flex-wrap gap-1 mb-2">
-                            {video.topics.map((topic, topicIndex) => (
-                              <Badge key={`manage-${topic}-${topicIndex}`} variant="secondary" className="text-xs">
+                            {video.topics.map((topic) => (
+                              <Badge key={topic} variant="secondary" className="text-xs">
                                 {topic}
                               </Badge>
                             ))}
