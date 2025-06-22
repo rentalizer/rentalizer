@@ -36,24 +36,27 @@ export const BulkTranscriptUpload = ({ onTranscriptsAdded, commonTopics }: BulkT
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleFileUpload = useCallback(async (files: FileList) => {
+    console.log('Files received:', files.length);
+    
     const validFiles = Array.from(files).filter(file => {
       const fileType = file.type;
       const fileName = file.name.toLowerCase();
       
+      console.log('Checking file:', fileName, 'Type:', fileType);
+      
       return (
         fileType === 'text/plain' ||
-        fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
-        fileType === 'application/msword' ||
         fileName.endsWith('.txt') ||
-        fileName.endsWith('.doc') ||
-        fileName.endsWith('.docx')
+        fileType === '' // Some systems don't set MIME type for .txt files
       );
     });
+
+    console.log('Valid files:', validFiles.length);
 
     if (validFiles.length === 0) {
       toast({
         title: "Invalid Files",
-        description: "Please upload .txt, .doc, or .docx files only",
+        description: "Please upload .txt files only",
         variant: "destructive"
       });
       return;
@@ -63,20 +66,14 @@ export const BulkTranscriptUpload = ({ onTranscriptsAdded, commonTopics }: BulkT
 
     for (const file of validFiles) {
       try {
-        let content = '';
-        
-        if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-          content = await file.text();
-        } else {
-          // For Word documents, we'll simulate content extraction
-          // In a real implementation, you'd use a library like mammoth.js
-          content = `[Content from ${file.name}]\n\nThis is simulated content from a Word document. In a real implementation, you would use a library like mammoth.js to extract the actual text content from .doc and .docx files.\n\nThe file contains transcript content that would be processed and added to the knowledge base.`;
-        }
+        console.log('Reading file:', file.name);
+        const content = await file.text();
+        console.log('File content length:', content.length);
 
         const transcriptFile: TranscriptFile = {
           id: `${Date.now()}-${Math.random()}`,
           file,
-          title: file.name.replace(/\.(txt|doc|docx)$/i, ''),
+          title: file.name.replace(/\.txt$/i, ''),
           transcript: content,
           topics: [],
           status: 'ready'
@@ -93,6 +90,7 @@ export const BulkTranscriptUpload = ({ onTranscriptsAdded, commonTopics }: BulkT
       }
     }
 
+    console.log('New transcript files created:', newTranscriptFiles.length);
     setTranscriptFiles(prev => [...prev, ...newTranscriptFiles]);
 
     toast({
@@ -105,6 +103,7 @@ export const BulkTranscriptUpload = ({ onTranscriptsAdded, commonTopics }: BulkT
     e.preventDefault();
     setIsDragOver(false);
     
+    console.log('Files dropped:', e.dataTransfer.files.length);
     if (e.dataTransfer.files) {
       handleFileUpload(e.dataTransfer.files);
     }
@@ -160,6 +159,8 @@ export const BulkTranscriptUpload = ({ onTranscriptsAdded, commonTopics }: BulkT
   const uploadTranscripts = () => {
     const readyFiles = transcriptFiles.filter(f => f.status === 'ready');
     
+    console.log('Uploading transcripts:', readyFiles.length);
+    
     if (readyFiles.length === 0) {
       toast({
         title: "No Files Ready",
@@ -179,6 +180,7 @@ export const BulkTranscriptUpload = ({ onTranscriptsAdded, commonTopics }: BulkT
       processedAt: new Date()
     }));
 
+    console.log('Calling onTranscriptsAdded with:', transcriptContent);
     onTranscriptsAdded(transcriptContent);
 
     // Mark files as uploaded
@@ -225,13 +227,18 @@ export const BulkTranscriptUpload = ({ onTranscriptsAdded, commonTopics }: BulkT
               Drop transcript files here or click to browse
             </p>
             <p className="text-sm text-gray-600 mb-4">
-              Supports .txt, .doc, and .docx files
+              Supports .txt files
             </p>
             <Input
               type="file"
               multiple
-              accept=".txt,.doc,.docx,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-              onChange={(e) => e.target.files && handleFileUpload(e.target.files)}
+              accept=".txt,text/plain"
+              onChange={(e) => {
+                console.log('File input changed:', e.target.files?.length);
+                if (e.target.files) {
+                  handleFileUpload(e.target.files);
+                }
+              }}
               className="hidden"
               id="transcript-upload"
             />
@@ -245,8 +252,7 @@ export const BulkTranscriptUpload = ({ onTranscriptsAdded, commonTopics }: BulkT
 
           <div className="mt-4 p-3 bg-blue-50 rounded-lg">
             <p className="text-sm text-blue-800">
-              <strong>Supported formats:</strong> Upload .txt files for immediate processing, or .doc/.docx files 
-              (Note: Word document content extraction is simulated in this demo).
+              <strong>Supported formats:</strong> Upload .txt files for immediate processing.
             </p>
           </div>
         </CardContent>
