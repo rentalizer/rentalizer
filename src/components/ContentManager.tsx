@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -112,23 +113,27 @@ export const ContentManager = () => {
   const processVideoTranscript = async (videoId: string) => {
     console.log('Processing transcript for video:', videoId);
     
-    setVideos(prev => prev.map(v => 
-      v.id === videoId ? { ...v, status: 'processing' } : v
-    ));
+    // Update the specific video status to processing
+    const updatedVideos = videos.map(v => 
+      v.id === videoId ? { ...v, status: 'processing' as const } : v
+    );
+    setVideos(updatedVideos);
 
     try {
       const transcript = await youtubeTranscriptService.extractTranscript(videoId);
       console.log('Extracted transcript length:', transcript.length);
       
-      setVideos(prev => prev.map(v => 
+      // Update the specific video with completed status and transcript
+      const completedVideos = videos.map(v => 
         v.id === videoId ? { 
           ...v, 
-          status: 'completed',
+          status: 'completed' as const,
           transcript: transcript,
           topics: ['Q&A Session'],
           processedAt: new Date()
         } : v
-      ));
+      );
+      setVideos(completedVideos);
 
       toast({
         title: "Processing Complete",
@@ -136,9 +141,11 @@ export const ContentManager = () => {
       });
     } catch (error) {
       console.error('Error processing transcript:', error);
-      setVideos(prev => prev.map(v => 
-        v.id === videoId ? { ...v, status: 'error' } : v
-      ));
+      // Update the specific video with error status
+      const errorVideos = videos.map(v => 
+        v.id === videoId ? { ...v, status: 'error' as const } : v
+      );
+      setVideos(errorVideos);
       
       toast({
         title: "Processing Failed",
@@ -209,7 +216,8 @@ export const ContentManager = () => {
   };
 
   const deleteVideo = (videoId: string) => {
-    setVideos(prev => prev.filter(v => v.id !== videoId));
+    const filteredVideos = videos.filter(v => v.id !== videoId);
+    setVideos(filteredVideos);
     toast({
       title: "Content Removed",
       description: "Video removed from knowledge base",
