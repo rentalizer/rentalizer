@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, User, Filter, CheckCircle, Clock, ArrowRight, Check } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 
 const students = [
   {
@@ -82,7 +83,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Welcome to Accelerator Pro! • Course enrollment confirmed at 2:50 PM PST',
         serverId: 'srv-us-west-1-prod-001',
-        documentDownloaded: 'Accelerator Pro Welcome Package.pdf'
+        documentDownloaded: 'Accelerator Pro Welcome Package.pdf',
+        downloadProgress: 100
       },
       {
         id: 2,
@@ -91,7 +93,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'First Login • Logged in immediately after purchase at 2:52 PM PST',
         serverId: 'srv-us-west-1-prod-001',
-        documentDownloaded: 'Account Setup Guide.pdf'
+        documentDownloaded: 'Account Setup Guide.pdf',
+        downloadProgress: 100
       },
       {
         id: 3,
@@ -100,7 +103,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Complete Video Library Access • 2:55 PM PST',
         serverId: 'srv-us-west-1-prod-002',
-        documentDownloaded: 'Video Library Index.pdf'
+        documentDownloaded: 'Video Library Index.pdf',
+        downloadProgress: 100
       },
       {
         id: 4,
@@ -109,7 +113,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Module 1 - Business Formation Videos • 2:57 PM PST',
         serverId: 'srv-us-west-1-prod-002',
-        documentDownloaded: 'Module 1 Business Formation Videos.zip'
+        documentDownloaded: 'Module 1 Business Formation Videos.zip',
+        downloadProgress: 100
       },
       {
         id: 5,
@@ -118,7 +123,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Module 2 - Market Selection Videos • 3:02 PM PST',
         serverId: 'srv-us-west-1-prod-002',
-        documentDownloaded: 'Module 2 Market Selection Videos.zip'
+        documentDownloaded: 'Module 2 Market Selection Videos.zip',
+        downloadProgress: 100
       },
       {
         id: 6,
@@ -127,7 +133,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Module 3 - Property Acquisition Videos • 3:08 PM PST',
         serverId: 'srv-us-west-1-prod-002',
-        documentDownloaded: 'Module 3 Property Acquisition Videos.zip'
+        documentDownloaded: 'Module 3 Property Acquisition Videos.zip',
+        downloadProgress: 100
       },
       {
         id: 7,
@@ -136,7 +143,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Module 4 - Property Management Videos • 3:15 PM PST',
         serverId: 'srv-us-west-1-prod-002',
-        documentDownloaded: 'Module 4 Property Management Videos.zip'
+        documentDownloaded: 'Module 4 Property Management Videos.zip',
+        downloadProgress: 100
       },
       {
         id: 8,
@@ -145,7 +153,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Accessed: RentalizerCalc Software • First software usage at 3:22 PM PST',
         serverId: 'srv-us-west-1-calc-001',
-        documentDownloaded: 'RentalizerCalc User Manual.pdf'
+        documentDownloaded: 'RentalizerCalc User Manual.pdf',
+        downloadProgress: 100
       },
       {
         id: 9,
@@ -154,7 +163,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Q1 2025 Market Analysis Report • 3:28 PM PST',
         serverId: 'srv-us-west-1-reports-001',
-        documentDownloaded: 'Q1 2025 Market Analysis Report.pdf'
+        documentDownloaded: 'Q1 2025 Market Analysis Report.pdf',
+        downloadProgress: 100
       },
       {
         id: 10,
@@ -163,7 +173,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: National Rental Market Trends Report • 3:32 PM PST',
         serverId: 'srv-us-west-1-reports-001',
-        documentDownloaded: 'National Rental Market Trends 2025.pdf'
+        documentDownloaded: 'National Rental Market Trends 2025.pdf',
+        downloadProgress: 100
       },
       {
         id: 11,
@@ -172,7 +183,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Short-Term Rental Performance Metrics • 3:38 PM PST',
         serverId: 'srv-us-west-1-reports-002',
-        documentDownloaded: 'STR Performance Metrics May 2025.pdf'
+        documentDownloaded: 'STR Performance Metrics May 2025.pdf',
+        downloadProgress: 100
       },
       {
         id: 12,
@@ -181,7 +193,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Legal Compliance Checklist • 3:45 PM PST',
         serverId: 'srv-us-west-1-prod-003',
-        documentDownloaded: 'STR Legal Compliance Checklist.pdf'
+        documentDownloaded: 'STR Legal Compliance Checklist.pdf',
+        downloadProgress: 100
       },
       {
         id: 13,
@@ -190,7 +203,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Property Analysis Templates • 3:52 PM PST',
         serverId: 'srv-us-west-1-prod-003',
-        documentDownloaded: 'Property Analysis Templates.xlsx'
+        documentDownloaded: 'Property Analysis Templates.xlsx',
+        downloadProgress: 100
       },
       {
         id: 14,
@@ -199,7 +213,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Automation & Scaling Guide • 4:05 PM PST',
         serverId: 'srv-us-west-1-prod-003',
-        documentDownloaded: 'Automation & Scaling Guide.pdf'
+        documentDownloaded: 'Automation & Scaling Guide.pdf',
+        downloadProgress: 100
       },
       {
         id: 15,
@@ -208,7 +223,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Guest Communication Templates • 4:12 PM PST',
         serverId: 'srv-us-west-1-prod-004',
-        documentDownloaded: 'Guest Communication Templates.docx'
+        documentDownloaded: 'Guest Communication Templates.docx',
+        downloadProgress: 100
       },
       {
         id: 16,
@@ -217,7 +233,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Financial Modeling Spreadsheets • 4:18 PM PST',
         serverId: 'srv-us-west-1-prod-004',
-        documentDownloaded: 'Financial Modeling Spreadsheets.xlsx'
+        documentDownloaded: 'Financial Modeling Spreadsheets.xlsx',
+        downloadProgress: 100
       },
       {
         id: 17,
@@ -226,7 +243,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Market Research Tools & Resources • 4:25 PM PST',
         serverId: 'srv-us-west-1-reports-003',
-        documentDownloaded: 'Market Research Tools & Resources.pdf'
+        documentDownloaded: 'Market Research Tools & Resources.pdf',
+        downloadProgress: 100
       },
       {
         id: 18,
@@ -235,7 +253,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Second Software Session • Advanced calculator usage at 4:35 PM PST',
         serverId: 'srv-us-west-1-calc-002',
-        documentDownloaded: 'Advanced Calculator Features Guide.pdf'
+        documentDownloaded: 'Advanced Calculator Features Guide.pdf',
+        downloadProgress: 100
       },
       {
         id: 19,
@@ -244,7 +263,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Complete Resource Library • 4:45 PM PST',
         serverId: 'srv-us-west-1-prod-005',
-        documentDownloaded: 'Complete Resource Library Index.pdf'
+        documentDownloaded: 'Complete Resource Library Index.pdf',
+        downloadProgress: 100
       },
       {
         id: 20,
@@ -253,7 +273,8 @@ const getActivities = (student: any) => {
         date: '2025-05-23',
         details: 'Downloaded: Bonus Materials & Case Studies • 4:58 PM PST',
         serverId: 'srv-us-west-1-prod-005',
-        documentDownloaded: 'Bonus Materials & Case Studies.zip'
+        documentDownloaded: 'Bonus Materials & Case Studies.zip',
+        downloadProgress: 100
       }
     ];
   }
@@ -266,7 +287,8 @@ const getActivities = (student: any) => {
       date: '2024-09-28',
       details: 'Module 4: Manage Properties • Final assessment completed',
       serverId: 'srv-us-east-1-prod-001',
-      documentDownloaded: 'Automation Templates & Scaling Checklist.pdf'
+      documentDownloaded: 'Automation Templates & Scaling Checklist.pdf',
+      downloadProgress: 100
     },
     {
       id: 2,
@@ -275,7 +297,8 @@ const getActivities = (student: any) => {
       date: '2024-09-27',
       details: 'Module 4: Manage Properties • 98% completion score',
       serverId: 'srv-us-west-2-prod-003',
-      documentDownloaded: 'Housekeeper Hiring Guide.pdf'
+      documentDownloaded: 'Housekeeper Hiring Guide.pdf',
+      downloadProgress: 100
     },
     {
       id: 3,
@@ -284,7 +307,8 @@ const getActivities = (student: any) => {
       date: '2024-09-26',
       details: 'Module 4: Manage Properties • Practical exercise submitted',
       serverId: 'srv-us-central-1-prod-002',
-      documentDownloaded: 'VA Hiring & Training Manual.pdf'
+      documentDownloaded: 'VA Hiring & Training Manual.pdf',
+      downloadProgress: 100
     },
     {
       id: 4,
@@ -293,7 +317,8 @@ const getActivities = (student: any) => {
       date: '2024-09-25',
       details: 'Module 4: Manage Properties • Case study analysis',
       serverId: 'srv-us-east-1-prod-001',
-      documentDownloaded: 'Remote Hosting Strategies.pdf'
+      documentDownloaded: 'Remote Hosting Strategies.pdf',
+      downloadProgress: 100
     },
     {
       id: 5,
@@ -302,7 +327,8 @@ const getActivities = (student: any) => {
       date: '2024-09-24',
       details: 'Module 4: Manage Properties • Strategy workshop attended',
       serverId: 'srv-us-west-2-prod-003',
-      documentDownloaded: 'Mid-Term Rental Strategy Guide.pdf'
+      documentDownloaded: 'Mid-Term Rental Strategy Guide.pdf',
+      downloadProgress: 100
     },
     {
       id: 6,
@@ -311,7 +337,8 @@ const getActivities = (student: any) => {
       date: '2024-09-23',
       details: 'Module 4: Manage Properties • Optimization checklist completed',
       serverId: 'srv-eu-west-1-prod-001',
-      documentDownloaded: 'Property Optimization Checklist.pdf'
+      documentDownloaded: 'Property Optimization Checklist.pdf',
+      downloadProgress: 100
     },
     {
       id: 7,
@@ -320,7 +347,8 @@ const getActivities = (student: any) => {
       date: '2024-09-22',
       details: 'Module 4: Manage Properties • Photography portfolio submitted',
       serverId: 'srv-us-central-1-prod-002',
-      documentDownloaded: 'Design & Photography Guide.pdf'
+      documentDownloaded: 'Design & Photography Guide.pdf',
+      downloadProgress: 100
     },
     {
       id: 8,
@@ -329,7 +357,8 @@ const getActivities = (student: any) => {
       date: '2024-09-21',
       details: 'Module introduction and overview completed',
       serverId: 'srv-us-east-1-prod-001',
-      documentDownloaded: 'Module 4 Overview & Roadmap.pdf'
+      documentDownloaded: 'Module 4 Overview & Roadmap.pdf',
+      downloadProgress: 100
     },
     {
       id: 9,
@@ -338,7 +367,8 @@ const getActivities = (student: any) => {
       date: '2024-09-20',
       details: 'Module 3: Acquire Properties • Business expansion plan created',
       serverId: 'srv-us-west-2-prod-003',
-      documentDownloaded: 'Growth Planning Template.pdf'
+      documentDownloaded: 'Growth Planning Template.pdf',
+      downloadProgress: 100
     },
     {
       id: 10,
@@ -347,7 +377,8 @@ const getActivities = (student: any) => {
       date: '2024-09-19',
       details: 'Module 3: Acquire Properties • Negotiation strategies mastered',
       serverId: 'srv-us-central-1-prod-002',
-      documentDownloaded: 'Rent Concessions Negotiation Guide.pdf'
+      documentDownloaded: 'Rent Concessions Negotiation Guide.pdf',
+      downloadProgress: 100
     },
     {
       id: 11,
@@ -356,7 +387,8 @@ const getActivities = (student: any) => {
       date: '2024-09-18',
       details: 'Module 3: Acquire Properties • Application process optimized',
       serverId: 'srv-us-east-1-prod-001',
-      documentDownloaded: 'Rental Application Checklist.pdf'
+      documentDownloaded: 'Rental Application Checklist.pdf',
+      downloadProgress: 100
     },
     {
       id: 12,
@@ -365,7 +397,8 @@ const getActivities = (student: any) => {
       date: '2024-09-13',
       details: 'Module 3: Acquire Properties • Advanced acquisition strategies',
       serverId: 'srv-us-west-2-prod-003',
-      documentDownloaded: 'Advanced Acquisition Strategies.pdf'
+      documentDownloaded: 'Advanced Acquisition Strategies.pdf',
+      downloadProgress: 100
     },
     {
       id: 13,
@@ -374,7 +407,8 @@ const getActivities = (student: any) => {
       date: '2024-09-10',
       details: 'Module 3: Acquire Properties • Basic acquisition fundamentals',
       serverId: 'srv-eu-west-1-prod-001',
-      documentDownloaded: 'Property Acquisition Fundamentals.pdf'
+      documentDownloaded: 'Property Acquisition Fundamentals.pdf',
+      downloadProgress: 100
     },
     {
       id: 14,
@@ -383,7 +417,8 @@ const getActivities = (student: any) => {
       date: '2024-09-07',
       details: 'Module 3: Acquire Properties • Overview and strategy session',
       serverId: 'srv-us-central-1-prod-002',
-      documentDownloaded: 'Property Acquisition Overview.pdf'
+      documentDownloaded: 'Property Acquisition Overview.pdf',
+      downloadProgress: 100
     },
     {
       id: 15,
@@ -392,7 +427,8 @@ const getActivities = (student: any) => {
       date: '2024-09-02',
       details: 'Module introduction completed with 95% score',
       serverId: 'srv-us-east-1-prod-001',
-      documentDownloaded: 'Module 3 Introduction Guide.pdf'
+      documentDownloaded: 'Module 3 Introduction Guide.pdf',
+      downloadProgress: 100
     },
     {
       id: 16,
@@ -401,7 +437,8 @@ const getActivities = (student: any) => {
       date: '2024-08-28',
       details: 'Module 2: Select Markets • Competitive landscape analysis',
       serverId: 'srv-us-west-2-prod-003',
-      documentDownloaded: 'Competitor Analysis Toolkit.pdf'
+      documentDownloaded: 'Competitor Analysis Toolkit.pdf',
+      downloadProgress: 100
     },
     {
       id: 17,
@@ -410,7 +447,8 @@ const getActivities = (student: any) => {
       date: '2024-08-23',
       details: 'Module 2: Select Markets • Legal compliance workshop',
       serverId: 'srv-us-central-1-prod-002',
-      documentDownloaded: 'STR Legal Compliance Guide.pdf'
+      documentDownloaded: 'STR Legal Compliance Guide.pdf',
+      downloadProgress: 100
     },
     {
       id: 18,
@@ -419,7 +457,8 @@ const getActivities = (student: any) => {
       date: '2024-08-18',
       details: 'Module 2: Select Markets • Financial modeling exercise',
       serverId: 'srv-us-east-1-prod-001',
-      documentDownloaded: 'Cash Flow Analysis Template.pdf'
+      documentDownloaded: 'Cash Flow Analysis Template.pdf',
+      downloadProgress: 100
     },
     {
       id: 19,
@@ -428,7 +467,8 @@ const getActivities = (student: any) => {
       date: '2024-08-13',
       details: 'Module 2: Select Markets • Initial market analysis',
       serverId: 'srv-us-west-2-prod-003',
-      documentDownloaded: 'Market Research Methodology.pdf'
+      documentDownloaded: 'Market Research Methodology.pdf',
+      downloadProgress: 100
     },
     {
       id: 20,
@@ -437,7 +477,8 @@ const getActivities = (student: any) => {
       date: '2024-08-07',
       details: 'Module overview and market selection fundamentals',
       serverId: 'srv-eu-west-1-prod-001',
-      documentDownloaded: 'Module 2 Market Selection Guide.pdf'
+      documentDownloaded: 'Module 2 Market Selection Guide.pdf',
+      downloadProgress: 100
     },
     {
       id: 21,
@@ -446,7 +487,8 @@ const getActivities = (student: any) => {
       date: '2024-08-05',
       details: 'Module 1: Business Formation • Website launched successfully',
       serverId: 'srv-us-central-1-prod-002',
-      documentDownloaded: 'DIY Website Development Kit.pdf'
+      documentDownloaded: 'DIY Website Development Kit.pdf',
+      downloadProgress: 100
     },
     {
       id: 22,
@@ -455,7 +497,8 @@ const getActivities = (student: any) => {
       date: '2024-08-03',
       details: 'Module 1: Business Formation • Legal entity established',
       serverId: 'srv-us-east-1-prod-001',
-      documentDownloaded: 'Business Formation Legal Guide.pdf'
+      documentDownloaded: 'Business Formation Legal Guide.pdf',
+      downloadProgress: 100
     },
     {
       id: 23,
@@ -464,7 +507,8 @@ const getActivities = (student: any) => {
       date: '2024-08-02',
       details: 'Course introduction and business fundamentals',
       serverId: 'srv-us-west-2-prod-003',
-      documentDownloaded: 'Module 1 Business Fundamentals.pdf'
+      documentDownloaded: 'Module 1 Business Fundamentals.pdf',
+      downloadProgress: 100
     },
     {
       id: 24,
@@ -473,7 +517,8 @@ const getActivities = (student: any) => {
       date: '2024-08-01',
       details: 'Welcome to the program! • Course enrollment confirmed',
       serverId: 'srv-us-east-1-prod-001',
-      documentDownloaded: 'Course Welcome Package.pdf'
+      documentDownloaded: 'Course Welcome Package.pdf',
+      downloadProgress: 100
     }
   ];
 };
@@ -657,6 +702,19 @@ const ClientPortalLog = () => {
                                 <span className="text-slate-300">{activity.documentDownloaded}</span>
                               </div>
                             </div>
+                            
+                            {/* Download Progress Bar */}
+                            <div className="mb-3">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs text-slate-400">Download Progress:</span>
+                                <span className="text-xs text-green-400 font-medium">{activity.downloadProgress}%</span>
+                              </div>
+                              <Progress 
+                                value={activity.downloadProgress} 
+                                className="h-2 bg-slate-700"
+                              />
+                            </div>
+                            
                             <div className="flex items-center gap-3">
                               <Badge 
                                 variant="outline" 
