@@ -154,7 +154,7 @@ const getActivities = (student: any) => {
         details: 'Accessed: RentalizerCalc Software • First software usage at 3:22 PM PST',
         serverId: 'srv-us-west-1-calc-001',
         documentDownloaded: 'RentalizerCalc User Manual.pdf',
-        downloadProgress: 100
+        downloadProgress: 67
       },
       {
         id: 9,
@@ -274,7 +274,7 @@ const getActivities = (student: any) => {
         details: 'Downloaded: Bonus Materials & Case Studies • 4:58 PM PST',
         serverId: 'srv-us-west-1-prod-005',
         documentDownloaded: 'Bonus Materials & Case Studies.zip',
-        downloadProgress: 100
+        downloadProgress: 59
       }
     ];
   }
