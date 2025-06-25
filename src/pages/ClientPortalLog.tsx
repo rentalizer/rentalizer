@@ -77,6 +77,16 @@ const getActivities = (student: any) => {
     // Thomas Mausser's activity - all on May 23, 2025 after 2:50 PM PST signup
     return [
       {
+        id: 0,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Started • Added on May 23, 2025 02:50 PM PST',
+        serverId: 'srv-us-west-1-admin-001',
+        documentDownloaded: 'Account Created',
+        downloadProgress: 100
+      },
+      {
         id: 1,
         type: 'module',
         status: 'completed',
