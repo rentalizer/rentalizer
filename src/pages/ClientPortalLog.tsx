@@ -67,7 +67,7 @@ const students = [
     email: 'thomasmausser228@gmail.com',
     avatar: 'TM',
     level: 'Accelerator Pro',
-    progress: 15,
+    progress: 100,
     joinedDate: '2025-05-23'
   }
 ];
@@ -570,8 +570,9 @@ const ClientPortalLog = () => {
           </Button>
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-slate-100">
-              Student Portal Activity Log
+              Arbitrage Accelerator
             </h1>
+            <p className="text-slate-300 text-sm mt-1">Student Portal Activity Log</p>
           </div>
         </div>
 
