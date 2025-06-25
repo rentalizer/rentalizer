@@ -26,6 +26,7 @@ import AnimationDraft from "./pages/AnimationDraft";
 import AskRichie from "./pages/AskRichie";
 import ContentManager from "./pages/ContentManager";
 import ClientPortalLog from "./pages/ClientPortalLog";
+import ClientPortalLog1 from "./pages/ClientPortalLog1";
 import ClientPortalLogApp from "./pages/ClientPortalLogApp";
 import CustomerInterface from "./pages/CustomerInterface";
 import NotFound from "./pages/NotFound";
@@ -61,6 +62,7 @@ const App = () => (
             <Route path="/ask-richie" element={<AskRichie />} />
             <Route path="/content-manager" element={<ContentManager />} />
             <Route path="/client-portal-log" element={<ClientPortalLog />} />
+            <Route path="/client-portal-log1" element={<ClientPortalLog1 />} />
             <Route path="/client-portal-log-app" element={<ClientPortalLogApp />} />
             <Route path="/customer" element={<CustomerInterface />} />
             <Route path="*" element={<NotFound />} />
