@@ -59,227 +59,424 @@ const students = [
     level: 'Advanced',
     progress: 100,
     joinedDate: '2024-08-01'
+  },
+  {
+    id: '7',
+    name: 'Thomas Mausser',
+    email: 'thomasmausser228@gmail.com',
+    avatar: 'TM',
+    level: 'Accelerator Pro',
+    progress: 15,
+    joinedDate: '2025-05-23'
   }
 ];
 
-const getActivities = (student: any) => [
-  {
-    id: 1,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-28',
-    details: 'Module 4: Manage Properties • Final assessment completed',
-    serverId: 'srv-us-east-1-prod-001',
-    documentDownloaded: 'Automation Templates & Scaling Checklist.pdf'
-  },
-  {
-    id: 2,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-27',
-    details: 'Module 4: Manage Properties • 98% completion score',
-    serverId: 'srv-us-west-2-prod-003',
-    documentDownloaded: 'Housekeeper Hiring Guide.pdf'
-  },
-  {
-    id: 3,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-26',
-    details: 'Module 4: Manage Properties • Practical exercise submitted',
-    serverId: 'srv-us-central-1-prod-002',
-    documentDownloaded: 'VA Hiring & Training Manual.pdf'
-  },
-  {
-    id: 4,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-25',
-    details: 'Module 4: Manage Properties • Case study analysis',
-    serverId: 'srv-us-east-1-prod-001',
-    documentDownloaded: 'Remote Hosting Strategies.pdf'
-  },
-  {
-    id: 5,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-24',
-    details: 'Module 4: Manage Properties • Strategy workshop attended',
-    serverId: 'srv-us-west-2-prod-003',
-    documentDownloaded: 'Mid-Term Rental Strategy Guide.pdf'
-  },
-  {
-    id: 6,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-23',
-    details: 'Module 4: Manage Properties • Optimization checklist completed',
-    serverId: 'srv-eu-west-1-prod-001',
-    documentDownloaded: 'Property Optimization Checklist.pdf'
-  },
-  {
-    id: 7,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-22',
-    details: 'Module 4: Manage Properties • Photography portfolio submitted',
-    serverId: 'srv-us-central-1-prod-002',
-    documentDownloaded: 'Design & Photography Guide.pdf'
-  },
-  {
-    id: 8,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-21',
-    details: 'Module introduction and overview completed',
-    serverId: 'srv-us-east-1-prod-001',
-    documentDownloaded: 'Module 4 Overview & Roadmap.pdf'
-  },
-  {
-    id: 9,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-20',
-    details: 'Module 3: Acquire Properties • Business expansion plan created',
-    serverId: 'srv-us-west-2-prod-003',
-    documentDownloaded: 'Growth Planning Template.pdf'
-  },
-  {
-    id: 10,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-19',
-    details: 'Module 3: Acquire Properties • Negotiation strategies mastered',
-    serverId: 'srv-us-central-1-prod-002',
-    documentDownloaded: 'Rent Concessions Negotiation Guide.pdf'
-  },
-  {
-    id: 11,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-18',
-    details: 'Module 3: Acquire Properties • Application process optimized',
-    serverId: 'srv-us-east-1-prod-001',
-    documentDownloaded: 'Rental Application Checklist.pdf'
-  },
-  {
-    id: 12,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-13',
-    details: 'Module 3: Acquire Properties • Advanced acquisition strategies',
-    serverId: 'srv-us-west-2-prod-003',
-    documentDownloaded: 'Advanced Acquisition Strategies.pdf'
-  },
-  {
-    id: 13,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-10',
-    details: 'Module 3: Acquire Properties • Basic acquisition fundamentals',
-    serverId: 'srv-eu-west-1-prod-001',
-    documentDownloaded: 'Property Acquisition Fundamentals.pdf'
-  },
-  {
-    id: 14,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-07',
-    details: 'Module 3: Acquire Properties • Overview and strategy session',
-    serverId: 'srv-us-central-1-prod-002',
-    documentDownloaded: 'Property Acquisition Overview.pdf'
-  },
-  {
-    id: 15,
-    type: 'module',
-    status: 'completed',
-    date: '2024-09-02',
-    details: 'Module introduction completed with 95% score',
-    serverId: 'srv-us-east-1-prod-001',
-    documentDownloaded: 'Module 3 Introduction Guide.pdf'
-  },
-  {
-    id: 16,
-    type: 'module',
-    status: 'completed',
-    date: '2024-08-28',
-    details: 'Module 2: Select Markets • Competitive landscape analysis',
-    serverId: 'srv-us-west-2-prod-003',
-    documentDownloaded: 'Competitor Analysis Toolkit.pdf'
-  },
-  {
-    id: 17,
-    type: 'module',
-    status: 'completed',
-    date: '2024-08-23',
-    details: 'Module 2: Select Markets • Legal compliance workshop',
-    serverId: 'srv-us-central-1-prod-002',
-    documentDownloaded: 'STR Legal Compliance Guide.pdf'
-  },
-  {
-    id: 18,
-    type: 'module',
-    status: 'completed',
-    date: '2024-08-18',
-    details: 'Module 2: Select Markets • Financial modeling exercise',
-    serverId: 'srv-us-east-1-prod-001',
-    documentDownloaded: 'Cash Flow Analysis Template.pdf'
-  },
-  {
-    id: 19,
-    type: 'module',
-    status: 'completed',
-    date: '2024-08-13',
-    details: 'Module 2: Select Markets • Initial market analysis',
-    serverId: 'srv-us-west-2-prod-003',
-    documentDownloaded: 'Market Research Methodology.pdf'
-  },
-  {
-    id: 20,
-    type: 'module',
-    status: 'completed',
-    date: '2024-08-07',
-    details: 'Module overview and market selection fundamentals',
-    serverId: 'srv-eu-west-1-prod-001',
-    documentDownloaded: 'Module 2 Market Selection Guide.pdf'
-  },
-  {
-    id: 21,
-    type: 'module',
-    status: 'completed',
-    date: '2024-08-05',
-    details: 'Module 1: Business Formation • Website launched successfully',
-    serverId: 'srv-us-central-1-prod-002',
-    documentDownloaded: 'DIY Website Development Kit.pdf'
-  },
-  {
-    id: 22,
-    type: 'module',
-    status: 'completed',
-    date: '2024-08-03',
-    details: 'Module 1: Business Formation • Legal entity established',
-    serverId: 'srv-us-east-1-prod-001',
-    documentDownloaded: 'Business Formation Legal Guide.pdf'
-  },
-  {
-    id: 23,
-    type: 'module',
-    status: 'completed',
-    date: '2024-08-02',
-    details: 'Course introduction and business fundamentals',
-    serverId: 'srv-us-west-2-prod-003',
-    documentDownloaded: 'Module 1 Business Fundamentals.pdf'
-  },
-  {
-    id: 24,
-    type: 'module',
-    status: 'completed',
-    date: '2024-08-01',
-    details: 'Welcome to the program! • Course enrollment confirmed',
-    serverId: 'srv-us-east-1-prod-001',
-    documentDownloaded: 'Course Welcome Package.pdf'
+const getActivities = (student: any) => {
+  if (student.id === '7') {
+    // Thomas Mausser's activity - all on May 23, 2025 after 2:50 PM PST signup
+    return [
+      {
+        id: 1,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Welcome to Accelerator Pro! • Course enrollment confirmed at 2:50 PM PST',
+        serverId: 'srv-us-west-1-prod-001',
+        documentDownloaded: 'Accelerator Pro Welcome Package.pdf'
+      },
+      {
+        id: 2,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'First Login • Logged in immediately after purchase at 2:52 PM PST',
+        serverId: 'srv-us-west-1-prod-001',
+        documentDownloaded: 'Account Setup Guide.pdf'
+      },
+      {
+        id: 3,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Complete Video Library Access • 2:55 PM PST',
+        serverId: 'srv-us-west-1-prod-002',
+        documentDownloaded: 'Video Library Index.pdf'
+      },
+      {
+        id: 4,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Module 1 - Business Formation Videos • 2:57 PM PST',
+        serverId: 'srv-us-west-1-prod-002',
+        documentDownloaded: 'Module 1 Business Formation Videos.zip'
+      },
+      {
+        id: 5,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Module 2 - Market Selection Videos • 3:02 PM PST',
+        serverId: 'srv-us-west-1-prod-002',
+        documentDownloaded: 'Module 2 Market Selection Videos.zip'
+      },
+      {
+        id: 6,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Module 3 - Property Acquisition Videos • 3:08 PM PST',
+        serverId: 'srv-us-west-1-prod-002',
+        documentDownloaded: 'Module 3 Property Acquisition Videos.zip'
+      },
+      {
+        id: 7,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Module 4 - Property Management Videos • 3:15 PM PST',
+        serverId: 'srv-us-west-1-prod-002',
+        documentDownloaded: 'Module 4 Property Management Videos.zip'
+      },
+      {
+        id: 8,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Accessed: RentalizerCalc Software • First software usage at 3:22 PM PST',
+        serverId: 'srv-us-west-1-calc-001',
+        documentDownloaded: 'RentalizerCalc User Manual.pdf'
+      },
+      {
+        id: 9,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Q1 2025 Market Analysis Report • 3:28 PM PST',
+        serverId: 'srv-us-west-1-reports-001',
+        documentDownloaded: 'Q1 2025 Market Analysis Report.pdf'
+      },
+      {
+        id: 10,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: National Rental Market Trends Report • 3:32 PM PST',
+        serverId: 'srv-us-west-1-reports-001',
+        documentDownloaded: 'National Rental Market Trends 2025.pdf'
+      },
+      {
+        id: 11,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Short-Term Rental Performance Metrics • 3:38 PM PST',
+        serverId: 'srv-us-west-1-reports-002',
+        documentDownloaded: 'STR Performance Metrics May 2025.pdf'
+      },
+      {
+        id: 12,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Legal Compliance Checklist • 3:45 PM PST',
+        serverId: 'srv-us-west-1-prod-003',
+        documentDownloaded: 'STR Legal Compliance Checklist.pdf'
+      },
+      {
+        id: 13,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Property Analysis Templates • 3:52 PM PST',
+        serverId: 'srv-us-west-1-prod-003',
+        documentDownloaded: 'Property Analysis Templates.xlsx'
+      },
+      {
+        id: 14,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Automation & Scaling Guide • 4:05 PM PST',
+        serverId: 'srv-us-west-1-prod-003',
+        documentDownloaded: 'Automation & Scaling Guide.pdf'
+      },
+      {
+        id: 15,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Guest Communication Templates • 4:12 PM PST',
+        serverId: 'srv-us-west-1-prod-004',
+        documentDownloaded: 'Guest Communication Templates.docx'
+      },
+      {
+        id: 16,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Financial Modeling Spreadsheets • 4:18 PM PST',
+        serverId: 'srv-us-west-1-prod-004',
+        documentDownloaded: 'Financial Modeling Spreadsheets.xlsx'
+      },
+      {
+        id: 17,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Market Research Tools & Resources • 4:25 PM PST',
+        serverId: 'srv-us-west-1-reports-003',
+        documentDownloaded: 'Market Research Tools & Resources.pdf'
+      },
+      {
+        id: 18,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Second Software Session • Advanced calculator usage at 4:35 PM PST',
+        serverId: 'srv-us-west-1-calc-002',
+        documentDownloaded: 'Advanced Calculator Features Guide.pdf'
+      },
+      {
+        id: 19,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Complete Resource Library • 4:45 PM PST',
+        serverId: 'srv-us-west-1-prod-005',
+        documentDownloaded: 'Complete Resource Library Index.pdf'
+      },
+      {
+        id: 20,
+        type: 'module',
+        status: 'completed',
+        date: '2025-05-23',
+        details: 'Downloaded: Bonus Materials & Case Studies • 4:58 PM PST',
+        serverId: 'srv-us-west-1-prod-005',
+        documentDownloaded: 'Bonus Materials & Case Studies.zip'
+      }
+    ];
   }
-];
+
+  return [
+    {
+      id: 1,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-28',
+      details: 'Module 4: Manage Properties • Final assessment completed',
+      serverId: 'srv-us-east-1-prod-001',
+      documentDownloaded: 'Automation Templates & Scaling Checklist.pdf'
+    },
+    {
+      id: 2,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-27',
+      details: 'Module 4: Manage Properties • 98% completion score',
+      serverId: 'srv-us-west-2-prod-003',
+      documentDownloaded: 'Housekeeper Hiring Guide.pdf'
+    },
+    {
+      id: 3,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-26',
+      details: 'Module 4: Manage Properties • Practical exercise submitted',
+      serverId: 'srv-us-central-1-prod-002',
+      documentDownloaded: 'VA Hiring & Training Manual.pdf'
+    },
+    {
+      id: 4,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-25',
+      details: 'Module 4: Manage Properties • Case study analysis',
+      serverId: 'srv-us-east-1-prod-001',
+      documentDownloaded: 'Remote Hosting Strategies.pdf'
+    },
+    {
+      id: 5,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-24',
+      details: 'Module 4: Manage Properties • Strategy workshop attended',
+      serverId: 'srv-us-west-2-prod-003',
+      documentDownloaded: 'Mid-Term Rental Strategy Guide.pdf'
+    },
+    {
+      id: 6,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-23',
+      details: 'Module 4: Manage Properties • Optimization checklist completed',
+      serverId: 'srv-eu-west-1-prod-001',
+      documentDownloaded: 'Property Optimization Checklist.pdf'
+    },
+    {
+      id: 7,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-22',
+      details: 'Module 4: Manage Properties • Photography portfolio submitted',
+      serverId: 'srv-us-central-1-prod-002',
+      documentDownloaded: 'Design & Photography Guide.pdf'
+    },
+    {
+      id: 8,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-21',
+      details: 'Module introduction and overview completed',
+      serverId: 'srv-us-east-1-prod-001',
+      documentDownloaded: 'Module 4 Overview & Roadmap.pdf'
+    },
+    {
+      id: 9,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-20',
+      details: 'Module 3: Acquire Properties • Business expansion plan created',
+      serverId: 'srv-us-west-2-prod-003',
+      documentDownloaded: 'Growth Planning Template.pdf'
+    },
+    {
+      id: 10,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-19',
+      details: 'Module 3: Acquire Properties • Negotiation strategies mastered',
+      serverId: 'srv-us-central-1-prod-002',
+      documentDownloaded: 'Rent Concessions Negotiation Guide.pdf'
+    },
+    {
+      id: 11,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-18',
+      details: 'Module 3: Acquire Properties • Application process optimized',
+      serverId: 'srv-us-east-1-prod-001',
+      documentDownloaded: 'Rental Application Checklist.pdf'
+    },
+    {
+      id: 12,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-13',
+      details: 'Module 3: Acquire Properties • Advanced acquisition strategies',
+      serverId: 'srv-us-west-2-prod-003',
+      documentDownloaded: 'Advanced Acquisition Strategies.pdf'
+    },
+    {
+      id: 13,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-10',
+      details: 'Module 3: Acquire Properties • Basic acquisition fundamentals',
+      serverId: 'srv-eu-west-1-prod-001',
+      documentDownloaded: 'Property Acquisition Fundamentals.pdf'
+    },
+    {
+      id: 14,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-07',
+      details: 'Module 3: Acquire Properties • Overview and strategy session',
+      serverId: 'srv-us-central-1-prod-002',
+      documentDownloaded: 'Property Acquisition Overview.pdf'
+    },
+    {
+      id: 15,
+      type: 'module',
+      status: 'completed',
+      date: '2024-09-02',
+      details: 'Module introduction completed with 95% score',
+      serverId: 'srv-us-east-1-prod-001',
+      documentDownloaded: 'Module 3 Introduction Guide.pdf'
+    },
+    {
+      id: 16,
+      type: 'module',
+      status: 'completed',
+      date: '2024-08-28',
+      details: 'Module 2: Select Markets • Competitive landscape analysis',
+      serverId: 'srv-us-west-2-prod-003',
+      documentDownloaded: 'Competitor Analysis Toolkit.pdf'
+    },
+    {
+      id: 17,
+      type: 'module',
+      status: 'completed',
+      date: '2024-08-23',
+      details: 'Module 2: Select Markets • Legal compliance workshop',
+      serverId: 'srv-us-central-1-prod-002',
+      documentDownloaded: 'STR Legal Compliance Guide.pdf'
+    },
+    {
+      id: 18,
+      type: 'module',
+      status: 'completed',
+      date: '2024-08-18',
+      details: 'Module 2: Select Markets • Financial modeling exercise',
+      serverId: 'srv-us-east-1-prod-001',
+      documentDownloaded: 'Cash Flow Analysis Template.pdf'
+    },
+    {
+      id: 19,
+      type: 'module',
+      status: 'completed',
+      date: '2024-08-13',
+      details: 'Module 2: Select Markets • Initial market analysis',
+      serverId: 'srv-us-west-2-prod-003',
+      documentDownloaded: 'Market Research Methodology.pdf'
+    },
+    {
+      id: 20,
+      type: 'module',
+      status: 'completed',
+      date: '2024-08-07',
+      details: 'Module overview and market selection fundamentals',
+      serverId: 'srv-eu-west-1-prod-001',
+      documentDownloaded: 'Module 2 Market Selection Guide.pdf'
+    },
+    {
+      id: 21,
+      type: 'module',
+      status: 'completed',
+      date: '2024-08-05',
+      details: 'Module 1: Business Formation • Website launched successfully',
+      serverId: 'srv-us-central-1-prod-002',
+      documentDownloaded: 'DIY Website Development Kit.pdf'
+    },
+    {
+      id: 22,
+      type: 'module',
+      status: 'completed',
+      date: '2024-08-03',
+      details: 'Module 1: Business Formation • Legal entity established',
+      serverId: 'srv-us-east-1-prod-001',
+      documentDownloaded: 'Business Formation Legal Guide.pdf'
+    },
+    {
+      id: 23,
+      type: 'module',
+      status: 'completed',
+      date: '2024-08-02',
+      details: 'Course introduction and business fundamentals',
+      serverId: 'srv-us-west-2-prod-003',
+      documentDownloaded: 'Module 1 Business Fundamentals.pdf'
+    },
+    {
+      id: 24,
+      type: 'module',
+      status: 'completed',
+      date: '2024-08-01',
+      details: 'Welcome to the program! • Course enrollment confirmed',
+      serverId: 'srv-us-east-1-prod-001',
+      documentDownloaded: 'Course Welcome Package.pdf'
+    }
+  ];
+};
 
 const typeColors = {
   module: 'blue',
@@ -299,7 +496,7 @@ const statusIcons = {
 };
 
 const ClientPortalLog = () => {
-  const [selectedStudent, setSelectedStudent] = useState(students[5]); // Default to Lindsay Sherman
+  const [selectedStudent, setSelectedStudent] = useState(students[6]); // Default to Thomas Mausser
   const [filter, setFilter] = useState('all');
   
   const activities = getActivities(selectedStudent);
@@ -380,7 +577,7 @@ const ClientPortalLog = () => {
                   <div className="flex items-center gap-2">
                     <span className="text-slate-400">({selectedStudent.email})</span>
                     <Badge variant="outline" className="border-blue-500 text-blue-300 bg-blue-900/30">
-                      Active
+                      {selectedStudent.id === '7' ? 'Accelerator Pro' : 'Active'}
                     </Badge>
                   </div>
                 </div>
@@ -393,6 +590,12 @@ const ClientPortalLog = () => {
                     <span className="text-slate-400">Progress:</span>
                     <span className="text-slate-200">{selectedStudent.progress}%</span>
                   </div>
+                  {selectedStudent.id === '7' && (
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-400">Revenue:</span>
+                      <span className="text-green-300">$5,000.00</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>
