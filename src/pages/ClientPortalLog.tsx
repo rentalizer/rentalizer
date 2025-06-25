@@ -81,7 +81,7 @@ const getActivities = (student: any) => {
         type: 'module',
         status: 'completed',
         date: '2025-05-23',
-        details: 'Started • Added on May 23, 2025 02:50 PM PST',
+        details: 'Started • Added on May 23, 2025 at 02:50 PM PST',
         serverId: 'srv-us-west-1-admin-001',
         documentDownloaded: 'Account Created',
         downloadProgress: 100
