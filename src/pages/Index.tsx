@@ -9,11 +9,27 @@ import { LoginDialog } from '@/components/LoginDialog';
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-  const { user, isSubscribed } = useAuth();
+  const { user, isSubscribed, isLoading } = useAuth();
   const navigate = useNavigate();
+
+  // Add console logs to debug authentication state
+  console.log('Index component - isLoading:', isLoading, 'user:', !!user, 'user email:', user?.email);
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
+          <div className="text-cyan-300 text-xl">Loading...</div>
+        </div>
+      </div>
+    );
+  }
 
   // Show login prompt for non-authenticated users
   if (!user) {
+    console.log('Showing login screen because user is null');
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -51,6 +67,8 @@ const Index = () => {
       </div>
     );
   }
+
+  console.log('Showing main dashboard for authenticated user:', user.email);
 
   // Main dashboard for authenticated users
   return (
