@@ -40,7 +40,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
                 value={Math.floor(data.firstMonthRent) || ''}
                 onChange={(e) => updateData({ firstMonthRent: parseInt(e.target.value) || 0 })}
                 placeholder="0"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100 text-sm"
               />
             </div>
           </div>
@@ -54,7 +54,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
                 value={Math.floor(data.securityDeposit) || ''}
                 onChange={(e) => updateData({ securityDeposit: parseInt(e.target.value) || 0 })}
                 placeholder="0"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100 text-sm"
               />
             </div>
           </div>
@@ -72,7 +72,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
                 value={Math.floor(data.squareFootage) || ''}
                 onChange={(e) => updateData({ squareFootage: parseInt(e.target.value) || 0 })}
                 placeholder=""
-                className="bg-gray-800/50 border-gray-600 text-gray-100"
+                className="bg-gray-800/50 border-gray-600 text-gray-100 text-sm"
               />
             </div>
 
@@ -84,7 +84,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
                   type="number"
                   value="8"
                   readOnly
-                  className="pl-10 bg-gray-700/50 border-gray-600 text-gray-300"
+                  className="pl-10 bg-gray-700/50 border-gray-600 text-gray-300 text-sm"
                 />
               </div>
             </div>
@@ -100,7 +100,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
                 value={Math.floor(data.furnishingsCost) || ''}
                 onChange={(e) => updateData({ furnishingsCost: parseInt(e.target.value) || 0 })}
                 placeholder="0"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100 text-sm"
               />
             </div>
           </div>

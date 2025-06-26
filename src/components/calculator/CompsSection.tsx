@@ -50,7 +50,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
             value={data.address}
             onChange={(e) => updateData({ address: e.target.value })}
             placeholder="123 Main St, City, State"
-            className="bg-gray-800/50 border-gray-600 text-gray-100"
+            className="bg-gray-800/50 border-gray-600 text-gray-100 text-sm"
           />
         </div>
 
@@ -61,7 +61,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
               value={data.bedrooms?.toString() || "2"} 
               onValueChange={(value) => updateData({ bedrooms: parseInt(value) })}
             >
-              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100">
+              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100 text-sm">
                 <SelectValue placeholder="Select bedrooms" />
               </SelectTrigger>
               <SelectContent>
@@ -78,7 +78,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
               value={Math.floor(data.bathrooms)?.toString() || "1"} 
               onValueChange={(value) => updateData({ bathrooms: parseInt(value) })}
             >
-              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100">
+              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100 text-sm">
                 <SelectValue placeholder="Select bathrooms" />
               </SelectTrigger>
               <SelectContent>
@@ -117,7 +117,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
               value={Math.floor(data.averageComparable) || ''}
               onChange={(e) => updateData({ averageComparable: parseInt(e.target.value) || 0 })}
               placeholder="4250"
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100 text-sm"
             />
           </div>
         </div>
