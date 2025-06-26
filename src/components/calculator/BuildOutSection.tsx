@@ -33,8 +33,8 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
               <Input
                 type="number"
                 value={data.firstMonthRent || ''}
-                onChange={(e) => updateData({ firstMonthRent: parseFloat(e.target.value) || 0 })}
-                placeholder="0"
+                onChange={(e) => updateData({ firstMonthRent: Math.round(parseFloat(e.target.value)) || 0 })}
+                placeholder=""
                 className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -47,8 +47,8 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
               <Input
                 type="number"
                 value={data.securityDeposit || ''}
-                onChange={(e) => updateData({ securityDeposit: parseFloat(e.target.value) || 0 })}
-                placeholder="0"
+                onChange={(e) => updateData({ securityDeposit: Math.round(parseFloat(e.target.value)) || 0 })}
+                placeholder=""
                 className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -57,29 +57,32 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
 
         {/* Furnishings Calculator */}
         <div className="space-y-4 p-4 bg-gray-800/20 rounded-lg border border-gray-600/50">
-          <Label className="text-cyan-300 font-medium">Furnishings Calculator</Label>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-gray-200 text-sm">Property Size ($8 PSF)</Label>
+          <div className="grid grid-cols-3 gap-2 items-end">
+            <div className="space-y-2 col-span-1">
+              <Label className="text-gray-200 text-xs">Property Size</Label>
+              <Label className="text-gray-200 text-xs">($8 PSF)</Label>
               <Input
                 type="number"
                 value={data.squareFootage || ''}
-                onChange={(e) => updateData({ squareFootage: parseFloat(e.target.value) || 0 })}
+                onChange={(e) => updateData({ squareFootage: Math.round(parseFloat(e.target.value)) || 0 })}
                 placeholder=""
                 className="bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
+            
+            <div className="flex items-center justify-center text-gray-300 text-sm">
+              or
+            </div>
 
-            <div className="space-y-2">
-              <Label className="text-gray-200 text-sm">Furnishings Cost</Label>
+            <div className="space-y-2 col-span-1">
+              <Label className="text-gray-200 text-xs">Furnishings Cost</Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   type="number"
                   value={data.furnishingsCost || ''}
-                  onChange={(e) => updateData({ furnishingsCost: parseFloat(e.target.value) || 0 })}
-                  placeholder="0"
+                  onChange={(e) => updateData({ furnishingsCost: Math.round(parseFloat(e.target.value)) || 0 })}
+                  placeholder=""
                   className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
                 />
               </div>
@@ -89,7 +92,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
           <div className="p-3 bg-cyan-600/20 rounded border border-cyan-500/30">
             <div className="text-cyan-300 font-medium text-sm">Calculated Cost</div>
             <div className="text-cyan-400 font-bold text-lg">
-              ${calculatedFurnishings.toLocaleString()}
+              ${Math.round(calculatedFurnishings).toLocaleString()}
             </div>
           </div>
         </div>
@@ -101,7 +104,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-cyan-400" />
               <span className="text-2xl font-bold text-cyan-400">
-                ${cashToLaunch.toLocaleString()}
+                ${Math.round(cashToLaunch).toLocaleString()}
               </span>
             </div>
           </div>

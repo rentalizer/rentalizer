@@ -46,7 +46,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
           <Input
             value={data.address}
             onChange={(e) => updateData({ address: e.target.value })}
-            placeholder="123 Main St, City, State"
+            placeholder=""
             className="bg-gray-800/50 border-gray-600 text-gray-100"
           />
         </div>
@@ -72,7 +72,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
           <div className="space-y-2">
             <Label className="text-gray-200">Bathrooms</Label>
             <Select 
-              value={data.bathrooms?.toString() || "1"} 
+              value={data.bathrooms?.toString() || "2"} 
               onValueChange={(value) => updateData({ bathrooms: parseFloat(value) })}
             >
               <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100">
@@ -114,7 +114,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
             <Input
               type="number"
               value={data.averageComparable || ''}
-              onChange={(e) => updateData({ averageComparable: parseFloat(e.target.value) || 0 })}
+              onChange={(e) => updateData({ averageComparable: Math.round(parseFloat(e.target.value)) || 0 })}
               placeholder="4250"
               className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
             />
@@ -128,7 +128,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
               <div className="flex items-center gap-2">
                 <DollarSign className="h-5 w-5 text-cyan-400" />
                 <span className="text-2xl font-bold text-cyan-400">
-                  {data.averageComparable.toLocaleString()}
+                  {Math.round(data.averageComparable).toLocaleString()}
                 </span>
               </div>
             </div>
