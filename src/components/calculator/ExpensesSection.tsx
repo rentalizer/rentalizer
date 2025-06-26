@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -127,14 +128,14 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={data.rent || ''}
                 onChange={(e) => updateData({ rent: parseFloat(e.target.value) || 0 })}
-                placeholder="1975"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <Label className="text-gray-200 text-xs">Service Fees (2.9%)</Label>
+            <Label className="text-gray-200 text-xs">Svc Fees (2.9%)</Label>
             <div className="relative">
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
@@ -154,7 +155,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={data.maintenance || ''}
                 onChange={(e) => updateData({ maintenance: parseFloat(e.target.value) || 0 })}
-                placeholder="0"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -168,7 +169,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={data.power || ''}
                 onChange={(e) => updateData({ power: parseFloat(e.target.value) || 0 })}
-                placeholder="190"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -182,7 +183,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={data.waterSewer || ''}
                 onChange={(e) => updateData({ waterSewer: parseFloat(e.target.value) || 0 })}
-                placeholder="0"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -196,7 +197,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={data.internet || ''}
                 onChange={(e) => updateData({ internet: parseFloat(e.target.value) || 0 })}
-                placeholder="70"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -210,7 +211,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={data.taxLicense || ''}
                 onChange={(e) => updateData({ taxLicense: parseFloat(e.target.value) || 0 })}
-                placeholder="29"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -224,7 +225,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={data.insurance || ''}
                 onChange={(e) => updateData({ insurance: parseFloat(e.target.value) || 0 })}
-                placeholder="15"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -238,7 +239,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={data.software || ''}
                 onChange={(e) => updateData({ software: parseFloat(e.target.value) || 0 })}
-                placeholder="70"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -252,7 +253,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={data.miscellaneous || ''}
                 onChange={(e) => updateData({ miscellaneous: parseFloat(e.target.value) || 0 })}
-                placeholder="0"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -266,7 +267,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={data.furnitureRental || ''}
                 onChange={(e) => updateData({ furnitureRental: parseFloat(e.target.value) || 0 })}
-                placeholder="750"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
