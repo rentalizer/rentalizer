@@ -35,9 +35,9 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-white">
+        <CardTitle className="flex items-center gap-2 text-white text-lg">
           <Building2 className="h-5 w-5 text-cyan-400" />
-          Property Details & Comps
+          Property Comps
         </CardTitle>
         <p className="text-sm text-gray-300">
           Enter property details and search for comparable STR revenue
