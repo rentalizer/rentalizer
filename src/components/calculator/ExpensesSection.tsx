@@ -84,9 +84,6 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <Receipt className="h-4 w-4 text-cyan-400" />
               Monthly Expenses
             </CardTitle>
-            <p className="text-xs text-gray-300">
-              All monthly operating costs for your STR property
-            </p>
           </div>
           <Button
             onClick={fetchAutoExpenses}
@@ -116,8 +113,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={data.rent || ''}
-                onChange={(e) => updateData({ rent: parseFloat(e.target.value) || 0 })}
+                value={Math.floor(data.rent) || ''}
+                onChange={(e) => updateData({ rent: parseInt(e.target.value) || 0 })}
                 placeholder="1975"
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
@@ -130,7 +127,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={Math.round(serviceFeeCalculated)}
+                value={Math.floor(serviceFeeCalculated)}
                 readOnly
                 className="pl-7 h-8 text-sm bg-gray-700/50 border-gray-600 text-gray-300"
               />
@@ -143,8 +140,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={data.maintenance || ''}
-                onChange={(e) => updateData({ maintenance: parseFloat(e.target.value) || 0 })}
+                value={Math.floor(data.maintenance) || ''}
+                onChange={(e) => updateData({ maintenance: parseInt(e.target.value) || 0 })}
                 placeholder="0"
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
@@ -157,8 +154,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={data.power || ''}
-                onChange={(e) => updateData({ power: parseFloat(e.target.value) || 0 })}
+                value={Math.floor(data.power) || ''}
+                onChange={(e) => updateData({ power: parseInt(e.target.value) || 0 })}
                 placeholder="190"
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
@@ -171,8 +168,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={data.waterSewer || ''}
-                onChange={(e) => updateData({ waterSewer: parseFloat(e.target.value) || 0 })}
+                value={Math.floor(data.waterSewer) || ''}
+                onChange={(e) => updateData({ waterSewer: parseInt(e.target.value) || 0 })}
                 placeholder="0"
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
@@ -185,8 +182,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={data.internet || ''}
-                onChange={(e) => updateData({ internet: parseFloat(e.target.value) || 0 })}
+                value={Math.floor(data.internet) || ''}
+                onChange={(e) => updateData({ internet: parseInt(e.target.value) || 0 })}
                 placeholder="70"
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
@@ -199,8 +196,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={data.taxLicense || ''}
-                onChange={(e) => updateData({ taxLicense: parseFloat(e.target.value) || 0 })}
+                value={Math.floor(data.taxLicense) || ''}
+                onChange={(e) => updateData({ taxLicense: parseInt(e.target.value) || 0 })}
                 placeholder="29"
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
@@ -213,8 +210,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={data.insurance || ''}
-                onChange={(e) => updateData({ insurance: parseFloat(e.target.value) || 0 })}
+                value={Math.floor(data.insurance) || ''}
+                onChange={(e) => updateData({ insurance: parseInt(e.target.value) || 0 })}
                 placeholder="15"
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
@@ -227,8 +224,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={data.software || ''}
-                onChange={(e) => updateData({ software: parseFloat(e.target.value) || 0 })}
+                value={Math.floor(data.software) || ''}
+                onChange={(e) => updateData({ software: parseInt(e.target.value) || 0 })}
                 placeholder="70"
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
@@ -241,8 +238,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={data.miscellaneous || ''}
-                onChange={(e) => updateData({ miscellaneous: parseFloat(e.target.value) || 0 })}
+                value={Math.floor(data.miscellaneous) || ''}
+                onChange={(e) => updateData({ miscellaneous: parseInt(e.target.value) || 0 })}
                 placeholder="0"
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
@@ -255,8 +252,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={data.furnitureRental || ''}
-                onChange={(e) => updateData({ furnitureRental: parseFloat(e.target.value) || 0 })}
+                value={Math.floor(data.furnitureRental) || ''}
+                onChange={(e) => updateData({ furnitureRental: parseInt(e.target.value) || 0 })}
                 placeholder="750"
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
@@ -268,7 +265,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           <div className="flex items-center justify-between">
             <Label className="text-blue-300 font-medium text-sm">Total Monthly Expenses</Label>
             <span className="text-xl font-bold text-blue-400">
-              ${monthlyExpenses.toLocaleString()}
+              ${Math.floor(monthlyExpenses).toLocaleString()}
             </span>
           </div>
         </div>
