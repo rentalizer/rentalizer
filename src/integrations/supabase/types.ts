@@ -9,6 +9,57 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      agent_activity: {
+        Row: {
+          activity_type: string
+          created_at: string
+          description: string
+          details: Json | null
+          id: string
+          status: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          description: string
+          details?: Json | null
+          id?: string
+          status?: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          description?: string
+          details?: Json | null
+          id?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      agent_config: {
+        Row: {
+          config_key: string
+          config_value: string
+          description: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          config_key: string
+          config_value: string
+          description?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          config_key?: string
+          config_value?: string
+          description?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -33,6 +84,84 @@ export type Database = {
           message?: string
           name?: string
           status?: string | null
+        }
+        Relationships: []
+      }
+      members: {
+        Row: {
+          created_at: string
+          email: string | null
+          first_name: string | null
+          id: string
+          joined_at: string
+          last_activity: string | null
+          last_name: string | null
+          membership_status: string
+          phone_number: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          joined_at?: string
+          last_activity?: string | null
+          last_name?: string | null
+          membership_status?: string
+          phone_number: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          joined_at?: string
+          last_activity?: string | null
+          last_name?: string | null
+          membership_status?: string
+          phone_number?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sms_requests: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          expires_at: string | null
+          id: string
+          link_generated: string | null
+          message_content: string | null
+          phone_number: string
+          processed_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string | null
+          id?: string
+          link_generated?: string | null
+          message_content?: string | null
+          phone_number: string
+          processed_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          expires_at?: string | null
+          id?: string
+          link_generated?: string | null
+          message_content?: string | null
+          phone_number?: string
+          processed_at?: string | null
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -101,7 +230,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_submit_contact_message: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_authenticated: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

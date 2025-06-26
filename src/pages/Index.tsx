@@ -76,9 +76,9 @@ const Index = () => {
             </div>
             <p className="text-lg text-white font-medium mb-8">By Richie Matthews</p>
             
-            {/* Updated Tagline - Even smaller font */}
+            {/* Updated Tagline */}
             <p className="text-xs sm:text-xs md:text-xs lg:text-sm text-white mb-12 max-w-7xl mx-auto leading-relaxed font-semibold">
-              All-in-One Platform to Launch and Scale a Rental Arbitrage Business
+              Start Your Rental Arbitrage Journey With Our AI-Powered System
             </p>
           </div>
 
