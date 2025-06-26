@@ -39,9 +39,6 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
           <Building2 className="h-5 w-5 text-cyan-400" />
           Property Comps
         </CardTitle>
-        <p className="text-sm text-gray-300">
-          Enter property details and search for comparable STR revenue
-        </p>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
@@ -50,7 +47,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
             value={data.address}
             onChange={(e) => updateData({ address: e.target.value })}
             placeholder="123 Main St, City, State"
-            className="bg-gray-800/50 border-gray-600 text-gray-100 text-sm"
+            className="bg-gray-800/50 border-gray-600 text-gray-100 text-xs"
           />
         </div>
 
@@ -61,7 +58,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
               value={data.bedrooms?.toString() || "2"} 
               onValueChange={(value) => updateData({ bedrooms: parseInt(value) })}
             >
-              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100 text-sm">
+              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100 text-xs">
                 <SelectValue placeholder="Select bedrooms" />
               </SelectTrigger>
               <SelectContent>
@@ -78,7 +75,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
               value={Math.floor(data.bathrooms)?.toString() || "1"} 
               onValueChange={(value) => updateData({ bathrooms: parseInt(value) })}
             >
-              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100 text-sm">
+              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100 text-xs">
                 <SelectValue placeholder="Select bathrooms" />
               </SelectTrigger>
               <SelectContent>
@@ -117,7 +114,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
               value={Math.floor(data.averageComparable) || ''}
               onChange={(e) => updateData({ averageComparable: parseInt(e.target.value) || 0 })}
               placeholder="4250"
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100 text-sm"
+              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100 text-xs"
             />
           </div>
         </div>
