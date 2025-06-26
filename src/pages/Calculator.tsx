@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,7 @@ import { ExpensesSection } from '@/components/calculator/ExpensesSection';
 import { NetProfitSection } from '@/components/calculator/NetProfitSection';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
+import { WelcomeSection } from '@/components/WelcomeSection';
 
 export interface CalculatorData {
   // Comps
@@ -52,7 +52,7 @@ const Calculator = () => {
     address: '',
     bedrooms: 2,
     bathrooms: 2,
-    averageComparable: 0,
+    averageComparable: 4250,
     firstMonthRent: 0,
     securityDeposit: 0,
     furnishingsCost: 0,
@@ -97,6 +97,11 @@ const Calculator = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <TopNavBar />
+      
+      {/* Top Banner */}
+      <div className="bg-gradient-to-r from-slate-700/90 via-slate-600/90 to-slate-700/90 border-b border-slate-500/30 backdrop-blur-lg">
+        <WelcomeSection />
+      </div>
       
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
@@ -147,7 +152,10 @@ const Calculator = () => {
         </div>
       </div>
 
-      <Footer />
+      {/* Bottom Banner */}
+      <div className="bg-gradient-to-r from-slate-700/90 via-slate-600/90 to-slate-700/90 border-t border-slate-500/30 backdrop-blur-lg">
+        <Footer showLinks={false} />
+      </div>
     </div>
   );
 };
