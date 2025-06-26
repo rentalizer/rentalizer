@@ -66,7 +66,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-gray-200 text-sm">Square Footage (8 PSF)</Label>
+              <Label className="text-gray-200 text-sm">Footage (8 PSF)</Label>
               <Input
                 type="number"
                 value={Math.floor(data.squareFootage) || ''}
@@ -77,7 +77,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
             </div>
 
             <div className="space-y-2">
-              <Label className="text-gray-200 text-sm">Furnishings Cost</Label>
+              <Label className="text-gray-200 text-sm">Furnishings</Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
@@ -98,14 +98,6 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
                 ${calculatedFurnishings.toLocaleString()}
               </div>
             </div>
-            <Button 
-              onClick={applyCalculatedFurnishings}
-              size="sm"
-              className="bg-cyan-600 hover:bg-cyan-700 text-white"
-            >
-              <CalculatorIcon className="h-3 w-3 mr-1" />
-              Apply
-            </Button>
           </div>
         </div>
 
