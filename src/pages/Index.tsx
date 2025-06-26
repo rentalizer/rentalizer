@@ -8,8 +8,11 @@ import { Footer } from '@/components/Footer';
 const Index = () => {
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #0f1419 0%, #1a2332 50%, #0f1419 100%)' }}>
-      {/* Header with lighter background */}
-      <header className="flex justify-between items-center p-6" style={{ backgroundColor: '#1e2a3a' }}>
+      {/* Header with crisper, lighter background and fine border */}
+      <header className="flex justify-between items-center p-6 border-b border-slate-600/30" style={{ 
+        backgroundColor: '#2a3441',
+        borderBottom: '1px solid rgba(148, 163, 184, 0.2)'
+      }}>
         <div className="flex items-center gap-2">
           <BarChart3 className="h-8 w-8 text-cyan-400" />
         </div>
