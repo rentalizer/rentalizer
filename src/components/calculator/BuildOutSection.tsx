@@ -3,8 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Hammer, DollarSign, Calculator as CalculatorIcon } from 'lucide-react';
+import { Hammer, DollarSign } from 'lucide-react';
 import { CalculatorData } from '@/pages/Calculator';
 
 interface BuildOutSectionProps {
@@ -16,14 +15,10 @@ interface BuildOutSectionProps {
 export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateData, cashToLaunch }) => {
   const calculatedFurnishings = data.squareFootage * data.furnishingsPSF;
 
-  const applyCalculatedFurnishings = () => {
-    updateData({ furnishingsCost: calculatedFurnishings });
-  };
-
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-white">
+        <CardTitle className="flex items-center gap-2 text-white text-lg">
           <Hammer className="h-5 w-5 text-cyan-400" />
           Build Out Costs
         </CardTitle>
@@ -116,21 +111,11 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-3 bg-cyan-600/20 rounded border border-cyan-500/30">
-            <div>
-              <div className="text-cyan-300 font-medium text-sm">Calculated Cost</div>
-              <div className="text-cyan-400 font-bold text-lg">
-                ${calculatedFurnishings.toLocaleString()}
-              </div>
+          <div className="p-3 bg-cyan-600/20 rounded border border-cyan-500/30">
+            <div className="text-cyan-300 font-medium text-sm">Calculated Cost</div>
+            <div className="text-cyan-400 font-bold text-lg">
+              ${calculatedFurnishings.toLocaleString()}
             </div>
-            <Button 
-              onClick={applyCalculatedFurnishings}
-              size="sm"
-              className="bg-cyan-600 hover:bg-cyan-700 text-white"
-            >
-              <CalculatorIcon className="h-3 w-3 mr-1" />
-              Apply
-            </Button>
           </div>
         </div>
 
