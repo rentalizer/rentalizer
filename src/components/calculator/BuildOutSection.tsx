@@ -77,7 +77,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
             </div>
 
             <div className="space-y-2">
-              <Label className="text-gray-200 text-sm">Price per Sq Ft ($8)</Label>
+              <Label className="text-gray-200 text-sm">Price PSF ($8)</Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
@@ -87,6 +87,21 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
                   className="pl-10 bg-gray-700/50 border-gray-600 text-gray-300"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Furnishings Cost Input */}
+          <div className="space-y-2">
+            <Label className="text-gray-200">Furnishings Cost</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                type="number"
+                value={Math.floor(data.furnishingsCost) || ''}
+                onChange={(e) => updateData({ furnishingsCost: parseInt(e.target.value) || 0 })}
+                placeholder="0"
+                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+              />
             </div>
           </div>
 
@@ -105,21 +120,6 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
               <CalculatorIcon className="h-3 w-3 mr-1" />
               Apply
             </Button>
-          </div>
-        </div>
-
-        {/* Manual Furnishings Input */}
-        <div className="space-y-2">
-          <Label className="text-gray-200">Furnishings Cost</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              type="number"
-              value={Math.floor(data.furnishingsCost) || ''}
-              onChange={(e) => updateData({ furnishingsCost: parseInt(e.target.value) || 0 })}
-              placeholder="0"
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
-            />
           </div>
         </div>
 
