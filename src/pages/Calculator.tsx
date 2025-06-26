@@ -78,7 +78,7 @@ const Calculator = () => {
                          data.software + data.miscellaneous + data.furnitureRental);
   const monthlyRevenue = Math.round(data.averageComparable);
   const netProfitMonthly = Math.round(monthlyRevenue - monthlyExpenses);
-  const paybackMonths = cashToLaunch > 0 ? Math.round(cashToLaunch / netProfitMonthly) : 0;
+  const paybackMonths = (cashToLaunch > 0 && netProfitMonthly > 0) ? Math.round(cashToLaunch / netProfitMonthly) : 0;
   const cashOnCashReturn = cashToLaunch > 0 ? Math.round((netProfitMonthly * 12 / cashToLaunch) * 100) : 0;
 
   // Update service fees when average comparable changes
