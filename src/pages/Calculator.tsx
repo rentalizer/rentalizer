@@ -112,7 +112,7 @@ const Calculator = () => {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
             <CalculatorIcon className="h-10 w-10 text-cyan-400" />
-            Rentalizer.AI/Calc
+            RentalizerCalc
           </h1>
           <p className="text-xl text-gray-300">
             Calculate Rental Property Profitability And ROI
