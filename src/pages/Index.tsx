@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { BarChart3, MapPin, Building, Users, Headphones } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Footer } from '@/components/Footer';
-import { TopNavBar } from '@/components/TopNavBar';
 import { LoginDialog } from '@/components/LoginDialog';
 import { useNavigate } from 'react-router-dom';
 
@@ -56,8 +55,6 @@ const Index = () => {
   // Main dashboard for authenticated users
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-      <TopNavBar />
-
       {/* Subtle background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl"></div>
@@ -87,7 +84,7 @@ const Index = () => {
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => navigate('/markets')}
+                onClick={() => navigate('/market-analysis')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
@@ -104,7 +101,7 @@ const Index = () => {
                 </CardContent>
               </Card>
               <Button
-                onClick={() => navigate('/markets')}
+                onClick={() => navigate('/market-analysis')}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
               >
                 <MapPin className="h-4 w-4 mr-2" />
@@ -115,7 +112,7 @@ const Index = () => {
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => navigate('/properties')}
+                onClick={() => navigate('/acquisitions')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
@@ -132,7 +129,7 @@ const Index = () => {
                 </CardContent>
               </Card>
               <Button
-                onClick={() => navigate('/properties')}
+                onClick={() => navigate('/acquisitions')}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
               >
                 <Building className="h-4 w-4 mr-2" />
@@ -143,7 +140,7 @@ const Index = () => {
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => navigate('/front-desk')}
+                onClick={() => navigate('/pms')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
@@ -160,7 +157,7 @@ const Index = () => {
                 </CardContent>
               </Card>
               <Button
-                onClick={() => navigate('/front-desk')}
+                onClick={() => navigate('/pms')}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
               >
                 <Headphones className="h-4 w-4 mr-2" />
