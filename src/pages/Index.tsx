@@ -1,283 +1,173 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, MapPin, Building, Users, Calculator, Calendar, Star, Play } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { BarChart3, Calculator, Building, Users, Target, Calendar, Star } from 'lucide-react';
 import { Footer } from '@/components/Footer';
-import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-  const navigate = useNavigate();
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <div className="text-2xl font-bold text-blue-600">hospitable</div>
-            </div>
-
-            {/* Navigation Links */}
-            <div className="hidden md:flex items-center space-x-8">
-              <div className="flex items-center text-gray-700 hover:text-blue-600 font-medium cursor-pointer">
-                Product
-              </div>
-              <div className="flex items-center text-gray-700 hover:text-blue-600 font-medium cursor-pointer">
-                Resources
-              </div>
-              <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">
-                Pricing
-              </a>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="text-gray-700 hover:text-blue-600">
-                Log in
-              </Button>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                Start free trial
-              </Button>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Header */}
+      <header className="flex justify-between items-center p-6">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="h-8 w-8 text-cyan-400" />
         </div>
-      </nav>
+        <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
+          Login
+        </Button>
+      </header>
 
       {/* Hero Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Column - Text Content */}
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                  Automate your
-                  <span className="text-blue-600"> short-term rental</span>
-                </h1>
-                <p className="text-xl text-gray-600 leading-relaxed">
-                  The all-in-one platform that automates messaging, pricing, and operations
-                  for Airbnb and vacation rental hosts.
-                </p>
-              </div>
+      <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+        <div className="flex items-center gap-3 mb-6">
+          <BarChart3 className="h-12 w-12 text-cyan-400" />
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+            RENTALIZER
+          </h1>
+        </div>
+        
+        <p className="text-slate-300 mb-8">By Richie Matthews</p>
+        
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-8 max-w-4xl leading-tight">
+          All-in-One AI Platform to Launch and Scale a Rental Arbitrage Business
+        </h2>
+        
+        <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-lg mb-16">
+          <Calendar className="mr-2 h-4 w-4" />
+          Book Demo
+        </Button>
 
-              {/* Trust Indicators */}
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center space-x-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <span className="text-gray-600">4.8/5 from 1,000+ reviews</span>
+        {/* Feature Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl w-full mb-16">
+          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                <Target className="h-8 w-8 text-white" />
               </div>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg">
-                  Start free trial
-                </Button>
-                <Button variant="outline" size="lg" className="px-8 py-4 text-lg">
-                  <Play className="mr-2 h-5 w-5" />
-                  Watch demo
-                </Button>
-              </div>
-
-              {/* Social Proof */}
-              <p className="text-sm text-gray-500">
-                No credit card required • 14-day free trial • Cancel anytime
+              <h3 className="text-xl font-semibold text-cyan-400 mb-2">Market Intelligence</h3>
+              <p className="text-sm text-slate-300 mb-4">
+                The First-Of-Its-Kind AI Tool To Find The Best Rental Arbitrage Markets
               </p>
-            </div>
-
-            {/* Right Column - Dashboard Preview */}
-            <div className="relative">
-              <div className="bg-white rounded-lg shadow-2xl p-6">
-                <div className="bg-gray-100 rounded-lg h-80 flex items-center justify-center">
-                  <img 
-                    src="https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=500&h=300&fit=crop" 
-                    alt="Dashboard Preview" 
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                </div>
+              <div className="flex justify-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
+                <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                <div className="w-2 h-2 rounded-full bg-purple-400"></div>
               </div>
-              {/* Floating Cards */}
-              <div className="absolute -top-4 -right-4 bg-white rounded-lg shadow-lg p-4 border">
-                <div className="text-sm font-semibold text-green-600">+23% Revenue</div>
-                <div className="text-xs text-gray-500">This month</div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+                <Calculator className="h-8 w-8 text-white" />
               </div>
-              <div className="absolute -bottom-4 -left-4 bg-white rounded-lg shadow-lg p-4 border">
-                <div className="text-sm font-semibold text-blue-600">Auto-messaging</div>
-                <div className="text-xs text-gray-500">Active</div>
+              <h3 className="text-xl font-semibold text-blue-400 mb-2">Acquisition CRM & Calculator</h3>
+              <p className="text-sm text-slate-300 mb-4">
+                Property Outreach, Close Deals, Profit Calculator, Manage Relationships
+              </p>
+              <div className="flex justify-center gap-1">
+                <div className="w-8 h-1 rounded-full bg-purple-400"></div>
+                <div className="w-8 h-1 rounded-full bg-blue-400"></div>
+                <div className="w-8 h-1 rounded-full bg-cyan-400"></div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                <Building className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-cyan-400 mb-2">PMS</h3>
+              <p className="text-sm text-slate-300 mb-4">
+                Streamline Property Management And Automate Operations
+              </p>
+              <div className="flex justify-center gap-1">
+                <div className="w-12 h-1 rounded-full bg-cyan-400"></div>
+                <div className="w-8 h-1 rounded-full bg-blue-400"></div>
+                <div className="w-16 h-1 rounded-full bg-purple-400"></div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+                <Users className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-purple-400 mb-2">Community</h3>
+              <p className="text-sm text-slate-300 mb-4">
+                Join Our Network Of Rental Arbitrage Entrepreneurs
+              </p>
+              <div className="flex justify-center gap-1">
+                <div className="w-3 h-3 rounded-full bg-purple-400"></div>
+                <div className="w-3 h-3 rounded-full bg-blue-400"></div>
+                <div className="w-3 h-3 rounded-full bg-cyan-400"></div>
+                <div className="w-3 h-3 rounded-full bg-indigo-400"></div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Everything you need to automate your rental
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From guest messaging to pricing optimization, Hospitable handles it all so you can focus on growing your business.
-            </p>
-          </div>
+        {/* Description */}
+        <p className="text-slate-300 max-w-4xl text-center mb-16 leading-relaxed">
+          RENTALIZER.AI Combines AI POWERED Market Analysis, Deal Sourcing, And Automation Tools With A 
+          Built-In CRM And A Thriving Community—Everything You Need To Launch And Scale Your Rental 
+          Arbitrage Business.
+        </p>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-blue-100 flex items-center justify-center">
-                  <Users className="h-8 w-8 text-blue-600" />
-                </div>
-                <CardTitle className="text-gray-900 text-xl">
-                  Guest Communication
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-gray-600">
-                  Automated messaging that feels personal. Handle check-ins, questions, and reviews effortlessly.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-green-100 flex items-center justify-center">
-                  <Calculator className="h-8 w-8 text-green-600" />
-                </div>
-                <CardTitle className="text-gray-900 text-xl">
-                  Dynamic Pricing
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-gray-600">
-                  Maximize revenue with AI-powered pricing that adjusts based on demand, events, and competition.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="text-center pb-4">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-purple-100 flex items-center justify-center">
-                  <Building className="h-8 w-8 text-purple-600" />
-                </div>
-                <CardTitle className="text-gray-900 text-xl">
-                  Multi-Platform
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-gray-600">
-                  Manage all your listings across Airbnb, Vrbo, Booking.com and more from one dashboard.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Trusted by thousands of hosts
-            </h2>
-            <p className="text-xl text-gray-600">
-              See how Hospitable is helping hosts automate and grow their rental business.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-gray-600 mb-4">
-                  "Hospitable has saved me 10+ hours per week. The automated messaging is incredible and my guests love the experience."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
-                  <div>
-                    <p className="font-semibold text-gray-900">Sarah Johnson</p>
-                    <p className="text-sm text-gray-500">12 properties</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-gray-600 mb-4">
-                  "The pricing optimization alone has increased my revenue by 23%. I can't imagine managing my rentals without it."
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
-                  <div>
-                    <p className="font-semibold text-gray-900">Mike Chen</p>
-                    <p className="text-sm text-gray-500">8 properties</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-gray-600 mb-4">
-                  "Finally, a platform that actually works. Setup was easy and the support team is amazing. Highly recommended!"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
-                  <div>
-                    <p className="font-semibold text-gray-900">Lisa Rodriguez</p>
-                    <p className="text-sm text-gray-500">5 properties</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-blue-600">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-white mb-4">
-            Ready to automate your rental business?
+        {/* Testimonials Section */}
+        <div className="w-full max-w-7xl">
+          <h2 className="text-3xl font-bold text-cyan-400 text-center mb-12">
+            Real Users Who've Unlocked Rental Income With Rentalizer
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Join thousands of hosts who are saving time and making more money with Hospitable.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg">
-              Start free trial
-            </Button>
-            <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg">
-              <Play className="mr-2 h-5 w-5" />
-              Watch demo
-            </Button>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-slate-300 mb-4 text-sm">
+                  "Rentalizer has everything that you need in one program to get you set up and to be able to have a successful Airbnb business. Rentalizer helped me acquire 5 properties within 1 month of starting the program, each with only $200 deposits and 3 weeks free rent."
+                </p>
+                <p className="font-semibold text-white">Bishoi Mikhail</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-slate-300 mb-4 text-sm">
+                  "If you are thinking about getting into the short term rental business, Rentalizer's blueprint and all the templates available is definitely something that gives more confidence moving forward. If you have any question whether to join Rentalizer's program, I think you'll find it very beneficial."
+                </p>
+                <p className="font-semibold text-white">Bobby Han</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-slate-300 mb-4 text-sm">
+                  "Rentalizer's program is amazing. Rentalizer helped us close the largest apartment company in our area. We now have 6 properties. I recommend the mentorship. You won't be disappointed."
+                </p>
+                <p className="font-semibold text-white">Shante Davis</p>
+              </CardContent>
+            </Card>
           </div>
-          <p className="text-sm text-blue-200 mt-4">
-            No credit card required • 14-day free trial • Cancel anytime
-          </p>
         </div>
-      </section>
+      </div>
 
       <Footer showLinks={false} />
     </div>
