@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, MapPin, Building, Users, Headphones } from 'lucide-react';
+import { BarChart3, MapPin, Building, Users, Headphones, Calculator } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Footer } from '@/components/Footer';
 import { LoginDialog } from '@/components/LoginDialog';
@@ -79,8 +79,8 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Features Grid - Updated to 4 cards instead of 5 */}
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          {/* Features Grid - 5 cards in a row */}
+          <div className="grid md:grid-cols-5 gap-8 mb-8">
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
@@ -106,6 +106,34 @@ const Index = () => {
               >
                 <MapPin className="h-4 w-4 mr-2" />
                 Market Intelligence
+              </Button>
+            </div>
+
+            <div className="flex flex-col">
+              <Card 
+                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
+                onClick={() => navigate('/calculator')}
+              >
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
+                    <Calculator className="h-8 w-8 text-blue-400" />
+                  </div>
+                  <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
+                    Calculator
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <p className="text-slate-400 text-sm">
+                    Calculate Property ROI & Profitability
+                  </p>
+                </CardContent>
+              </Card>
+              <Button
+                onClick={() => navigate('/calculator')}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
+              >
+                <Calculator className="h-4 w-4 mr-2" />
+                Calculator
               </Button>
             </div>
 
