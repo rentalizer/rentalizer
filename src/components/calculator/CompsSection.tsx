@@ -39,9 +39,6 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
           <Building2 className="h-5 w-5 text-cyan-400" />
           Property Comps
         </CardTitle>
-        <p className="text-sm text-gray-300">
-          Enter property details and search for comparable STR revenue
-        </p>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

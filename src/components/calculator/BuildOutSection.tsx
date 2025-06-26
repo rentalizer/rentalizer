@@ -22,9 +22,6 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
           <Hammer className="h-5 w-5 text-cyan-400" />
           Build Out Costs
         </CardTitle>
-        <p className="text-sm text-gray-300">
-          Initial costs required to launch your STR property
-        </p>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Basic Costs */}
@@ -85,28 +82,6 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
                   placeholder="8"
                   className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
                 />
-              </div>
-            </div>
-          </div>
-
-          {/* Quality Tiers */}
-          <div className="grid grid-cols-3 gap-2 text-xs">
-            <div className="p-2 bg-gray-800/30 rounded text-center">
-              <div className="text-gray-300">Low ($6)</div>
-              <div className="text-cyan-400 font-medium">
-                ${(data.squareFootage * 6).toLocaleString()}
-              </div>
-            </div>
-            <div className="p-2 bg-gray-800/30 rounded text-center">
-              <div className="text-gray-300">Med ($7)</div>
-              <div className="text-cyan-400 font-medium">
-                ${(data.squareFootage * 7).toLocaleString()}
-              </div>
-            </div>
-            <div className="p-2 bg-gray-800/30 rounded text-center">
-              <div className="text-gray-300">High ($8)</div>
-              <div className="text-cyan-400 font-medium">
-                ${(data.squareFootage * 8).toLocaleString()}
               </div>
             </div>
           </div>

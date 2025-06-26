@@ -84,9 +84,6 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <Receipt className="h-4 w-4 text-cyan-400" />
               Monthly Expenses
             </CardTitle>
-            <p className="text-xs text-gray-300">
-              All monthly operating costs for your STR property
-            </p>
           </div>
           <Button
             onClick={fetchAutoExpenses}
