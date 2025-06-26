@@ -66,7 +66,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-gray-200 text-sm">Square Footage</Label>
+              <Label className="text-gray-200 text-sm">Square Footage (8 PSF)</Label>
               <Input
                 type="number"
                 value={Math.floor(data.squareFootage) || ''}
@@ -77,31 +77,17 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
             </div>
 
             <div className="space-y-2">
-              <Label className="text-gray-200 text-sm">Price PSF ($8)</Label>
+              <Label className="text-gray-200 text-sm">Furnishings Cost</Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   type="number"
-                  value="8"
-                  readOnly
-                  className="pl-10 bg-gray-700/50 border-gray-600 text-gray-300 text-xs"
+                  value={Math.floor(data.furnishingsCost) || ''}
+                  onChange={(e) => updateData({ furnishingsCost: parseInt(e.target.value) || 0 })}
+                  placeholder="0"
+                  className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100 text-xs"
                 />
               </div>
-            </div>
-          </div>
-
-          {/* Furnishings Cost Input - moved up */}
-          <div className="space-y-2">
-            <Label className="text-gray-200">Add Furnishings Cost</Label>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                type="number"
-                value={Math.floor(data.furnishingsCost) || ''}
-                onChange={(e) => updateData({ furnishingsCost: parseInt(e.target.value) || 0 })}
-                placeholder="0"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100 text-xs"
-              />
             </div>
           </div>
 
