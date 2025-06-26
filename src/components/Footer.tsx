@@ -1,8 +1,6 @@
 
 import React from 'react';
 import { BarChart3 } from 'lucide-react';
-import { ContactChat } from './ContactChat';
-import { Link } from 'react-router-dom';
 
 interface FooterProps {
   showLinks?: boolean;
@@ -22,21 +20,6 @@ export const Footer = ({ showLinks = true }: FooterProps) => {
               </h3>
             </div>
           </div>
-
-          {/* Support Links - only show if showLinks is true */}
-          {showLinks && (
-            <div className="mb-8">
-              <div className="flex justify-center gap-6">
-                <ContactChat />
-                <Link to="/privacy-policy" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
-                  Privacy Policy
-                </Link>
-                <Link to="/terms-of-service" className="text-gray-300 hover:text-cyan-300 transition-colors text-sm">
-                  Terms of Service
-                </Link>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Copyright and Powered by */}
