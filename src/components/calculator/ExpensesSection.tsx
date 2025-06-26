@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,7 @@ import { Receipt, DollarSign, Search, Loader2 } from 'lucide-react';
 import { CalculatorData } from '@/pages/Calculator';
 import { fetchMarketExpenses } from '@/services/expenseService';
 import { useToast } from '@/hooks/use-toast';
+import { DatePickerPopover } from './DatePickerPopover';
 
 interface ExpensesSectionProps {
   data: CalculatorData;
@@ -75,6 +75,14 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
     }
   };
 
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      console.log('Selected date:', date);
+      // Here you can add any logic based on the selected date
+      fetchAutoExpenses();
+    }
+  };
+
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-3">
@@ -85,24 +93,28 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               Monthly Expenses
             </CardTitle>
           </div>
-          <Button
-            onClick={fetchAutoExpenses}
-            disabled={isLoadingExpenses || !data.address.trim()}
-            size="sm"
-            className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs"
-          >
-            {isLoadingExpenses ? (
-              <>
-                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                Searching...
-              </>
-            ) : (
-              <>
-                <Search className="h-3 w-3 mr-1" />
-                Auto-Fill
-              </>
-            )}
-          </Button>
+          <DatePickerPopover
+            onDateSelect={handleDateSelect}
+            trigger={
+              <Button
+                disabled={isLoadingExpenses || !data.address.trim()}
+                size="sm"
+                className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs"
+              >
+                {isLoadingExpenses ? (
+                  <>
+                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                    Searching...
+                  </>
+                ) : (
+                  <>
+                    <Search className="h-3 w-3 mr-1" />
+                    Auto-Fill
+                  </>
+                )}
+              </Button>
+            }
+          />
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
