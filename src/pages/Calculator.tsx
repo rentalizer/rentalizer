@@ -7,6 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { TopNavBar } from '@/components/TopNavBar';
+import { LoginDialog } from '@/components/LoginDialog';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
 import { ExpensesSection } from '@/components/calculator/ExpensesSection';
@@ -46,6 +49,7 @@ export interface CalculatorData {
 const Calculator = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isLoading } = useAuth();
   
   const initialData: CalculatorData = {
     address: '',
@@ -104,8 +108,70 @@ const Calculator = () => {
     });
   };
 
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <TopNavBar />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
+            <div className="text-cyan-300 text-xl">Loading...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login prompt if user is not authenticated
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <TopNavBar />
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-md mx-auto text-center space-y-6">
+            <div className="text-center">
+              <CalculatorIcon className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
+              <h1 className="text-3xl font-bold text-white mb-2">
+                RentalizerCalc
+              </h1>
+              <p className="text-gray-300 mb-6">
+                Sign in to access the rental property calculator
+              </p>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-cyan-500/20">
+              <p className="text-gray-300 mb-4">
+                Please sign in to use the calculator and analyze rental property profitability.
+              </p>
+              
+              <LoginDialog 
+                trigger={
+                  <Button className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white">
+                    Sign In to Continue
+                  </Button>
+                }
+              />
+            </div>
+            
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="text-gray-400 hover:text-gray-300"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <TopNavBar />
+      
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
