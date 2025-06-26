@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home } from 'lucide-react';
+import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
@@ -47,7 +47,7 @@ const Calculator = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const [data, setData] = useState<CalculatorData>({
+  const initialData: CalculatorData = {
     address: '',
     bedrooms: 2,
     bathrooms: 2,
@@ -68,7 +68,9 @@ const Calculator = () => {
     furnitureRental: 0,
     squareFootage: 0,
     furnishingsPSF: 8,
-  });
+  };
+  
+  const [data, setData] = useState<CalculatorData>(initialData);
 
   // Calculate derived values - all rounded to whole numbers
   const cashToLaunch = Math.round(data.firstMonthRent + data.securityDeposit + data.furnishingsCost);
@@ -103,13 +105,21 @@ const Calculator = () => {
     setData(prev => ({ ...prev, ...roundedUpdates }));
   };
 
+  const clearAllData = () => {
+    setData(initialData);
+    toast({
+      title: "Calculator Cleared",
+      description: "All data has been reset. You can start over with a fresh calculation.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <TopNavBar />
       
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center justify-between gap-4 mb-8">
           <Button
             variant="ghost"
             onClick={() => navigate('/')}
@@ -117,6 +127,15 @@ const Calculator = () => {
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Home
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={clearAllData}
+            className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Clear All
           </Button>
         </div>
 
