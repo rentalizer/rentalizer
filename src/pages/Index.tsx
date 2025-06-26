@@ -2,36 +2,12 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, MapPin, Building, Users, Headphones, Calculator } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { BarChart3, MapPin, Building, Users, Calculator, Calendar } from 'lucide-react';
 import { Footer } from '@/components/Footer';
-import { LoginDialog } from '@/components/LoginDialog';
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-  const { user, isLoading } = useAuth();
   const navigate = useNavigate();
-
-  const handleFeatureClick = (path: string) => {
-    if (user) {
-      navigate(path);
-    } else {
-      // Show login dialog for non-authenticated users
-      // The LoginDialog component will handle this
-    }
-  };
-
-  // Show loading while checking authentication
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
-          <div className="text-cyan-300 text-xl">Loading...</div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
@@ -43,7 +19,7 @@ const Index = () => {
 
       <div className="relative z-10">
         <div className="container mx-auto px-4 py-16">
-          {/* Main Content */}
+          {/* Header */}
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-4 mb-6">
               <BarChart3 className="h-16 w-16 text-cyan-400 neon-text" />
@@ -53,210 +29,170 @@ const Index = () => {
             </div>
             <p className="text-lg text-white font-medium mb-8">By Richie Matthews</p>
             
-            <p className="text-xs sm:text-xs md:text-xs lg:text-sm text-white mb-12 max-w-7xl mx-auto leading-relaxed font-semibold">
-              All-in-One Platform to Launch and Scale a Rental Arbitrage Business
-            </p>
+            <h2 className="text-2xl md:text-3xl text-white mb-8 font-semibold">
+              Start Your Rental Arbitrage Journey With Our AI-Powered System
+            </h2>
 
-            {/* Authentication Status */}
-            {!user && (
-              <div className="mb-8">
-                <div className="bg-slate-800/50 border border-cyan-500/20 rounded-lg p-4 max-w-md mx-auto">
-                  <p className="text-cyan-300 mb-4">Sign in to access all features</p>
-                  <LoginDialog trigger={
-                    <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white">
-                      Sign In / Sign Up
-                    </Button>
-                  } />
-                </div>
-              </div>
-            )}
+            <Button 
+              size="lg"
+              className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-8 py-4 text-lg mb-16"
+              onClick={() => navigate('/demo')}
+            >
+              <Calendar className="h-5 w-5 mr-2" />
+              Book Demo
+            </Button>
           </div>
 
-          {/* Features Grid - 5 cards in a row */}
-          <div className="grid md:grid-cols-5 gap-8 mb-8">
-            <div className="flex flex-col">
-              <Card 
-                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => handleFeatureClick('/market-analysis')}
-              >
-                <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
-                    <MapPin className="h-8 w-8 text-blue-400" />
-                  </div>
-                  <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
-                    Market Intelligence
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <p className="text-slate-400 text-sm">
-                    Find The Best Rental Arbitrage Markets
-                  </p>
-                </CardContent>
-              </Card>
-              {user ? (
-                <Button
-                  onClick={() => navigate('/market-analysis')}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
-                >
-                  <MapPin className="h-4 w-4 mr-2" />
+          {/* Features Grid - 4 cards */}
+          <div className="grid md:grid-cols-4 gap-8 mb-16">
+            <Card className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer">
+              <CardHeader className="text-center pb-4">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
+                  <MapPin className="h-8 w-8 text-blue-400" />
+                </div>
+                <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
                   Market Intelligence
-                </Button>
-              ) : (
-                <LoginDialog trigger={
-                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    Market Intelligence
-                  </Button>
-                } />
-              )}
-            </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-slate-400 text-sm mb-4">
+                  The First-Of-Its-Kind AI Tool To Find The Best Rental Arbitrage Markets
+                </p>
+                <div className="flex justify-center space-x-1">
+                  <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
+                  <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                  <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="flex flex-col">
-              <Card 
-                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => handleFeatureClick('/calculator')}
-              >
-                <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
-                    <Calculator className="h-8 w-8 text-blue-400" />
-                  </div>
-                  <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
-                    Calculator
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <p className="text-slate-400 text-sm">
-                    Calculate Property ROI & Profitability
-                  </p>
-                </CardContent>
-              </Card>
-              {user ? (
-                <Button
-                  onClick={() => navigate('/calculator')}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
-                >
-                  <Calculator className="h-4 w-4 mr-2" />
-                  Calculator
-                </Button>
-              ) : (
-                <LoginDialog trigger={
-                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white">
-                    <Calculator className="h-4 w-4 mr-2" />
-                    Calculator
-                  </Button>
-                } />
-              )}
-            </div>
+            <Card className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer">
+              <CardHeader className="text-center pb-4">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
+                  <Calculator className="h-8 w-8 text-blue-400" />
+                </div>
+                <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
+                  Acquisition CRM & Calculator
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-slate-400 text-sm mb-4">
+                  Property Outreach, Close Deals, Profit Calculator, Manage Relationships
+                </p>
+                <div className="flex justify-center space-x-1">
+                  <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+                  <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
+                  <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="flex flex-col">
-              <Card 
-                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => handleFeatureClick('/acquisitions')}
-              >
-                <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
-                    <Building className="h-8 w-8 text-blue-400" />
-                  </div>
-                  <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
-                    Acquisition CRM
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <p className="text-slate-400 text-sm">
-                    Contact Landlords & Close Deals
-                  </p>
-                </CardContent>
-              </Card>
-              {user ? (
-                <Button
-                  onClick={() => navigate('/acquisitions')}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
-                >
-                  <Building className="h-4 w-4 mr-2" />
-                  Acquisition CRM
-                </Button>
-              ) : (
-                <LoginDialog trigger={
-                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white">
-                    <Building className="h-4 w-4 mr-2" />
-                    Acquisition CRM
-                  </Button>
-                } />
-              )}
-            </div>
+            <Card className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer">
+              <CardHeader className="text-center pb-4">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
+                  <Building className="h-8 w-8 text-blue-400" />
+                </div>
+                <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
+                  PMS
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-slate-400 text-sm mb-4">
+                  Streamline Property Management And Automate Operations
+                </p>
+                <div className="flex justify-center space-x-1">
+                  <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
+                  <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
+                  <div className="w-2 h-2 rounded-full bg-cyan-400"></div>
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="flex flex-col">
-              <Card 
-                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => handleFeatureClick('/pms')}
-              >
-                <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
-                    <Headphones className="h-8 w-8 text-blue-400" />
-                  </div>
-                  <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
-                    Front Desk
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <p className="text-slate-400 text-sm">
-                    Property Management & Automations
-                  </p>
-                </CardContent>
-              </Card>
-              {user ? (
-                <Button
-                  onClick={() => navigate('/pms')}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
-                >
-                  <Headphones className="h-4 w-4 mr-2" />
-                  Front Desk
-                </Button>
-              ) : (
-                <LoginDialog trigger={
-                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white">
-                    <Headphones className="h-4 w-4 mr-2" />
-                    Front Desk
-                  </Button>
-                } />
-              )}
-            </div>
-
-            <div className="flex flex-col">
-              <Card 
-                className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => handleFeatureClick('/community')}
-              >
-                <CardHeader className="text-center pb-4">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
-                    <Users className="h-8 w-8 text-blue-400" />
-                  </div>
-                  <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
-                    Community
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <p className="text-slate-400 text-sm">
-                    Connect With Other Rental Arbitrage Investors
-                  </p>
-                </CardContent>
-              </Card>
-              {user ? (
-                <Button
-                  onClick={() => navigate('/community')}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
-                >
-                  <Users className="h-4 w-4 mr-2" />
+            <Card className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer">
+              <CardHeader className="text-center pb-4">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
+                  <Users className="h-8 w-8 text-blue-400" />
+                </div>
+                <CardTitle className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent text-lg">
                   Community
-                </Button>
-              ) : (
-                <LoginDialog trigger={
-                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white">
-                    <Users className="h-4 w-4 mr-2" />
-                    Community
-                  </Button>
-                } />
-              )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center">
+                <p className="text-slate-400 text-sm mb-4">
+                  Join Our Network Of Rental Arbitrage Entrepreneurs
+                </p>
+                <div className="flex justify-center space-x-1">
+                  <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                  <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                  <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                  <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Description Section */}
+          <div className="text-center mb-16">
+            <p className="text-white text-lg max-w-4xl mx-auto leading-relaxed">
+              RENTALIZER.AI Combines AI Powered Market Analysis, Deal Sourcing, And Automation Tools With A 
+              Built-In CRM And A Thriving Community—Everything You Need To Launch And Scale Your Rental 
+              Arbitrage Business
+            </p>
+          </div>
+
+          {/* Testimonials Section */}
+          <div className="text-center mb-16">
+            <h3 className="text-2xl md:text-3xl bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent font-bold mb-12">
+              Real Users Who've Unlocked Rental Income With Rentalizer
+            </h3>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg">
+                <CardContent className="p-6 text-center">
+                  <p className="text-slate-300 text-sm mb-4 italic">
+                    "Rentalizer has everything that you need in one program to get you set up and to be able to have a successful 
+                    Airbnb business. Rentalizer helped me acquire 5 properties within 1 month of starting the program, each with only 
+                    $200 deposits and 3 weeks free rent."
+                  </p>
+                  <div className="flex justify-center mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="w-4 h-4 text-yellow-400">⭐</div>
+                    ))}
+                  </div>
+                  <p className="text-cyan-300 font-semibold">Bishol Mikhail</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg">
+                <CardContent className="p-6 text-center">
+                  <p className="text-slate-300 text-sm mb-4 italic">
+                    "If you are thinking about getting into the short term rental business, Rentalizer's blueprint and all the templates 
+                    available is definitely something that gives you great confidence moving forward. If you have any question 
+                    whether to join Rentalizer's program, I think you'll find it very beneficial."
+                  </p>
+                  <div className="flex justify-center mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="w-4 h-4 text-yellow-400">⭐</div>
+                    ))}
+                  </div>
+                  <p className="text-cyan-300 font-semibold">Bobby Han</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-slate-800/50 border-cyan-500/20 backdrop-blur-lg">
+                <CardContent className="p-6 text-center">
+                  <p className="text-slate-300 text-sm mb-4 italic">
+                    "Rentalizer's program is amazing. Rentalizer helped us close the largest apartment company in our area. We now 
+                    have 6 properties. I recommend the mentorship. You won't be disappointed."
+                  </p>
+                  <div className="flex justify-center mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="w-4 h-4 text-yellow-400">⭐</div>
+                    ))}
+                  </div>
+                  <p className="text-cyan-300 font-semibold">Shante Davis</p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
