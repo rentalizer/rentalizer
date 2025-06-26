@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -260,7 +259,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-1">
-            <Label className="text-gray-200 text-xs">Furniture Rental</Label>
+            <Label className="text-gray-200 text-xs">P Furniture Rental</Label>
             <div className="relative">
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
