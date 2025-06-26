@@ -108,11 +108,6 @@ const Calculator = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <TopNavBar />
       
-      {/* Top Banner */}
-      <div className="bg-gradient-to-r from-slate-700/90 via-slate-600/90 to-slate-700/90 border-b border-slate-500/30 backdrop-blur-lg">
-        <WelcomeSection />
-      </div>
-      
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
