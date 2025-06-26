@@ -15,6 +15,15 @@ const Index = () => {
   // Add console logs to debug authentication state
   console.log('Index component - isLoading:', isLoading, 'user:', !!user, 'user email:', user?.email);
 
+  const handleFeatureClick = (path: string) => {
+    if (user) {
+      navigate(path);
+    } else {
+      // Show login dialog for non-authenticated users
+      // The LoginDialog component will handle this
+    }
+  };
+
   // Show loading while checking authentication
   if (isLoading) {
     return (
@@ -27,50 +36,9 @@ const Index = () => {
     );
   }
 
-  // Show login prompt for non-authenticated users
-  if (!user) {
-    console.log('Showing login screen because user is null');
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500/5 blur-3xl"></div>
-        </div>
+  console.log('Showing main dashboard - authenticated:', !!user);
 
-        <div className="relative z-10">
-          <div className="container mx-auto px-4 py-16">
-            <div className="text-center mb-16">
-              <div className="flex items-center justify-center gap-4 mb-6">
-                <BarChart3 className="h-16 w-16 text-cyan-400 neon-text" />
-                <h1 className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                  RENTALIZER
-                </h1>
-              </div>
-              <p className="text-lg text-white font-medium mb-8">By Richie Matthews</p>
-              
-              <div className="bg-slate-800/50 border border-cyan-500/20 rounded-lg p-8 max-w-md mx-auto">
-                <h2 className="text-2xl font-bold text-cyan-300 mb-4">Login Required</h2>
-                <p className="text-gray-300 mb-6">
-                  Please log in to access your Rentalizer dashboard.
-                </p>
-                <LoginDialog trigger={
-                  <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white">
-                    Login
-                  </Button>
-                } />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <Footer />
-      </div>
-    );
-  }
-
-  console.log('Showing main dashboard for authenticated user:', user.email);
-
-  // Main dashboard for authenticated users
+  // Main dashboard for all users
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
       {/* Subtle background elements */}
@@ -95,6 +63,20 @@ const Index = () => {
             <p className="text-xs sm:text-xs md:text-xs lg:text-sm text-white mb-12 max-w-7xl mx-auto leading-relaxed font-semibold">
               All-in-One Platform to Launch and Scale a Rental Arbitrage Business
             </p>
+
+            {/* Authentication Status */}
+            {!user && (
+              <div className="mb-8">
+                <div className="bg-slate-800/50 border border-cyan-500/20 rounded-lg p-4 max-w-md mx-auto">
+                  <p className="text-cyan-300 mb-4">Sign in to access all features</p>
+                  <LoginDialog trigger={
+                    <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white">
+                      Sign In / Sign Up
+                    </Button>
+                  } />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Features Grid - 5 cards in a row */}
@@ -102,7 +84,7 @@ const Index = () => {
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => navigate('/market-analysis')}
+                onClick={() => handleFeatureClick('/market-analysis')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
@@ -118,19 +100,28 @@ const Index = () => {
                   </p>
                 </CardContent>
               </Card>
-              <Button
-                onClick={() => navigate('/market-analysis')}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
-              >
-                <MapPin className="h-4 w-4 mr-2" />
-                Market Intelligence
-              </Button>
+              {user ? (
+                <Button
+                  onClick={() => navigate('/market-analysis')}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
+                >
+                  <MapPin className="h-4 w-4 mr-2" />
+                  Market Intelligence
+                </Button>
+              ) : (
+                <LoginDialog trigger={
+                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Market Intelligence
+                  </Button>
+                } />
+              )}
             </div>
 
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => navigate('/calculator')}
+                onClick={() => handleFeatureClick('/calculator')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
@@ -146,19 +137,28 @@ const Index = () => {
                   </p>
                 </CardContent>
               </Card>
-              <Button
-                onClick={() => navigate('/calculator')}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
-              >
-                <Calculator className="h-4 w-4 mr-2" />
-                Calculator
-              </Button>
+              {user ? (
+                <Button
+                  onClick={() => navigate('/calculator')}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
+                >
+                  <Calculator className="h-4 w-4 mr-2" />
+                  Calculator
+                </Button>
+              ) : (
+                <LoginDialog trigger={
+                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white">
+                    <Calculator className="h-4 w-4 mr-2" />
+                    Calculator
+                  </Button>
+                } />
+              )}
             </div>
 
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => navigate('/acquisitions')}
+                onClick={() => handleFeatureClick('/acquisitions')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
@@ -174,19 +174,28 @@ const Index = () => {
                   </p>
                 </CardContent>
               </Card>
-              <Button
-                onClick={() => navigate('/acquisitions')}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
-              >
-                <Building className="h-4 w-4 mr-2" />
-                Acquisition CRM
-              </Button>
+              {user ? (
+                <Button
+                  onClick={() => navigate('/acquisitions')}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
+                >
+                  <Building className="h-4 w-4 mr-2" />
+                  Acquisition CRM
+                </Button>
+              ) : (
+                <LoginDialog trigger={
+                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white">
+                    <Building className="h-4 w-4 mr-2" />
+                    Acquisition CRM
+                  </Button>
+                } />
+              )}
             </div>
 
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => navigate('/pms')}
+                onClick={() => handleFeatureClick('/pms')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
@@ -202,19 +211,28 @@ const Index = () => {
                   </p>
                 </CardContent>
               </Card>
-              <Button
-                onClick={() => navigate('/pms')}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
-              >
-                <Headphones className="h-4 w-4 mr-2" />
-                Front Desk
-              </Button>
+              {user ? (
+                <Button
+                  onClick={() => navigate('/pms')}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
+                >
+                  <Headphones className="h-4 w-4 mr-2" />
+                  Front Desk
+                </Button>
+              ) : (
+                <LoginDialog trigger={
+                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white">
+                    <Headphones className="h-4 w-4 mr-2" />
+                    Front Desk
+                  </Button>
+                } />
+              )}
             </div>
 
             <div className="flex flex-col">
               <Card 
                 className="bg-slate-800/50 border-blue-500/20 backdrop-blur-lg hover:border-purple-400/40 transition-all duration-300 group cursor-pointer mb-4 flex-1"
-                onClick={() => navigate('/community')}
+                onClick={() => handleFeatureClick('/community')}
               >
                 <CardHeader className="text-center pb-4">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-blue-500/20 group-hover:to-purple-500/20 transition-colors">
@@ -230,13 +248,22 @@ const Index = () => {
                   </p>
                 </CardContent>
               </Card>
-              <Button
-                onClick={() => navigate('/community')}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
-              >
-                <Users className="h-4 w-4 mr-2" />
-                Community
-              </Button>
+              {user ? (
+                <Button
+                  onClick={() => navigate('/community')}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Community
+                </Button>
+              ) : (
+                <LoginDialog trigger={
+                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white">
+                    <Users className="h-4 w-4 mr-2" />
+                    Community
+                  </Button>
+                } />
+              )}
             </div>
           </div>
         </div>
