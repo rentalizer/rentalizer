@@ -25,6 +25,19 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
   const [isLoadingExpenses, setIsLoadingExpenses] = useState(false);
   const { toast } = useToast();
 
+  // Calculate service fees as 2.9% of rent
+  const calculateServiceFees = (rentValue: number) => {
+    return Math.round(rentValue * 0.029);
+  };
+
+  const handleRentChange = (rentValue: number) => {
+    const newServiceFees = calculateServiceFees(rentValue);
+    updateData({ 
+      rent: rentValue,
+      serviceFees: newServiceFees
+    });
+  };
+
   const fetchAutoExpenses = async () => {
     if (!data.address.trim()) {
       toast({
@@ -122,13 +135,13 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           <div className="space-y-1">
             <Label className="text-gray-200 text-xs">Rent</Label>
             <div className="relative">
-              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
+              <DollarSign className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.rent || ''}
-                onChange={(e) => updateData({ rent: parseFloat(e.target.value) || 0 })}
+                onChange={(e) => handleRentChange(parseFloat(e.target.value) || 0)}
                 placeholder=""
-                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 h-12 text-base bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
@@ -136,12 +149,12 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           <div className="space-y-1">
             <Label className="text-gray-200 text-xs">Svc Fees (2.9%)</Label>
             <div className="relative">
-              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
+              <DollarSign className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={Math.round(serviceFeeCalculated)}
+                value={data.serviceFees || calculateServiceFees(data.rent || 0)}
                 readOnly
-                className="pl-7 h-8 text-sm bg-gray-700/50 border-gray-600 text-gray-300"
+                className="pl-8 h-12 text-base bg-gray-700/50 border-gray-600 text-gray-300"
               />
             </div>
           </div>
@@ -149,13 +162,13 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           <div className="space-y-1">
             <Label className="text-gray-200 text-xs">Maintenance</Label>
             <div className="relative">
-              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
+              <DollarSign className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.maintenance || ''}
                 onChange={(e) => updateData({ maintenance: parseFloat(e.target.value) || 0 })}
                 placeholder=""
-                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 h-12 text-base bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
@@ -163,13 +176,13 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           <div className="space-y-1">
             <Label className="text-gray-200 text-xs">Power/Electricity</Label>
             <div className="relative">
-              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
+              <DollarSign className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.power || ''}
                 onChange={(e) => updateData({ power: parseFloat(e.target.value) || 0 })}
                 placeholder=""
-                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 h-12 text-base bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
@@ -177,13 +190,13 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           <div className="space-y-1">
             <Label className="text-gray-200 text-xs">Water/Sewer</Label>
             <div className="relative">
-              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
+              <DollarSign className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.waterSewer || ''}
                 onChange={(e) => updateData({ waterSewer: parseFloat(e.target.value) || 0 })}
                 placeholder=""
-                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 h-12 text-base bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
@@ -191,13 +204,13 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           <div className="space-y-1">
             <Label className="text-gray-200 text-xs">Internet</Label>
             <div className="relative">
-              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
+              <DollarSign className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.internet || ''}
                 onChange={(e) => updateData({ internet: parseFloat(e.target.value) || 0 })}
                 placeholder=""
-                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 h-12 text-base bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
@@ -205,13 +218,13 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           <div className="space-y-1">
             <Label className="text-gray-200 text-xs">License</Label>
             <div className="relative">
-              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
+              <DollarSign className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.taxLicense || ''}
                 onChange={(e) => updateData({ taxLicense: parseFloat(e.target.value) || 0 })}
                 placeholder=""
-                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 h-12 text-base bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
@@ -219,13 +232,13 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           <div className="space-y-1">
             <Label className="text-gray-200 text-xs">Insurance</Label>
             <div className="relative">
-              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
+              <DollarSign className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.insurance || ''}
                 onChange={(e) => updateData({ insurance: parseFloat(e.target.value) || 0 })}
                 placeholder=""
-                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 h-12 text-base bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
@@ -233,13 +246,13 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           <div className="space-y-1">
             <Label className="text-gray-200 text-xs">Software</Label>
             <div className="relative">
-              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
+              <DollarSign className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.software || ''}
                 onChange={(e) => updateData({ software: parseFloat(e.target.value) || 0 })}
                 placeholder=""
-                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 h-12 text-base bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
@@ -247,13 +260,13 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           <div className="space-y-1">
             <Label className="text-gray-200 text-xs">Miscellaneous</Label>
             <div className="relative">
-              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
+              <DollarSign className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.miscellaneous || ''}
                 onChange={(e) => updateData({ miscellaneous: parseFloat(e.target.value) || 0 })}
                 placeholder=""
-                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 h-12 text-base bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
@@ -261,13 +274,13 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           <div className="space-y-1">
             <Label className="text-gray-200 text-xs">P Furniture Rental</Label>
             <div className="relative">
-              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
+              <DollarSign className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.furnitureRental || ''}
                 onChange={(e) => updateData({ furnitureRental: parseFloat(e.target.value) || 0 })}
                 placeholder=""
-                className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 h-12 text-base bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
