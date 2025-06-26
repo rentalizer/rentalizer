@@ -116,8 +116,8 @@ const Calculator = () => {
           </p>
         </div>
 
-        {/* Calculator Input Sections - 3x1 Grid Layout */}
-        <div className="grid lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-8">
+        {/* Calculator Input Sections - 4x1 Grid Layout */}
+        <div className="grid lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {/* 1st - Build Out Costs */}
           <BuildOutSection data={data} updateData={updateData} cashToLaunch={cashToLaunch} />
           
@@ -131,10 +131,8 @@ const Calculator = () => {
           
           {/* 3rd - Comps */}
           <CompsSection data={data} updateData={updateData} />
-        </div>
 
-        {/* Calculator Display - Bottom Section */}
-        <div className="max-w-4xl mx-auto">
+          {/* 4th - Analysis Results */}
           <NetProfitSection 
             monthlyRevenue={monthlyRevenue}
             netProfitMonthly={netProfitMonthly}
