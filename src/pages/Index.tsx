@@ -7,7 +7,7 @@ import { Footer } from '@/components/Footer';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #0a1929 0%, #1e3a5f 50%, #0a1929 100%)' }}>
       {/* Header */}
       <header className="flex justify-between items-center p-6">
         <div className="flex items-center gap-2">
