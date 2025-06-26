@@ -7,9 +7,9 @@ import { Footer } from '@/components/Footer';
 
 const Index = () => {
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #0a1929 0%, #1e3a5f 50%, #0a1929 100%)' }}>
-      {/* Header */}
-      <header className="flex justify-between items-center p-6">
+    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #0f1419 0%, #1a2332 50%, #0f1419 100%)' }}>
+      {/* Header with lighter background */}
+      <header className="flex justify-between items-center p-6" style={{ backgroundColor: '#1e2a3a' }}>
         <div className="flex items-center gap-2">
           <BarChart3 className="h-8 w-8 text-cyan-400" />
         </div>
@@ -19,28 +19,28 @@ const Index = () => {
       </header>
 
       {/* Hero Section */}
-      <div className="flex flex-col items-center justify-center px-6 py-8 text-center">
-        <div className="flex items-center gap-3 mb-4">
-          <BarChart3 className="h-16 w-16 text-cyan-400" />
-          <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+      <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+        <div className="flex items-center gap-3 mb-6">
+          <BarChart3 className="h-16 w-16 text-cyan-400" style={{ filter: 'drop-shadow(0 0 20px rgba(6, 182, 212, 0.6))' }} />
+          <h1 className="text-7xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 bg-clip-text text-transparent">
             RENTALIZER
           </h1>
         </div>
         
-        <p className="text-slate-300 mb-6 text-lg">By Richie Matthews</p>
+        <p className="text-slate-300 mb-8 text-lg font-medium">By Richie Matthews</p>
         
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-8 max-w-4xl leading-tight">
+        <h2 className="text-3xl md:text-4xl font-bold text-white mb-12 max-w-4xl leading-tight">
           Start Your Rental Arbitrage Journey With Our AI-Powered System
         </h2>
         
-        <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-3 rounded-lg mb-12">
-          <Calendar className="mr-2 h-4 w-4" />
+        <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white px-8 py-4 rounded-lg mb-16 text-lg font-semibold">
+          <Calendar className="mr-2 h-5 w-5" />
           Book Demo
         </Button>
 
         {/* Feature Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl w-full mb-12">
-          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl w-full mb-16">
+          <Card className="bg-slate-800/30 border-slate-600/50 backdrop-blur-sm">
             <CardContent className="p-6 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
                 <Target className="h-8 w-8 text-white" />
@@ -57,7 +57,7 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+          <Card className="bg-slate-800/30 border-slate-600/50 backdrop-blur-sm">
             <CardContent className="p-6 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
                 <Calculator className="h-8 w-8 text-white" />
@@ -74,7 +74,7 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+          <Card className="bg-slate-800/30 border-slate-600/50 backdrop-blur-sm">
             <CardContent className="p-6 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
                 <Building className="h-8 w-8 text-white" />
@@ -91,7 +91,7 @@ const Index = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+          <Card className="bg-slate-800/30 border-slate-600/50 backdrop-blur-sm">
             <CardContent className="p-6 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
                 <Users className="h-8 w-8 text-white" />
@@ -124,7 +124,7 @@ const Index = () => {
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <Card className="bg-slate-800/30 border-slate-600/50 backdrop-blur-sm">
               <CardContent className="p-6">
                 <div className="flex items-center mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -138,7 +138,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <Card className="bg-slate-800/30 border-slate-600/50 backdrop-blur-sm">
               <CardContent className="p-6">
                 <div className="flex items-center mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -152,7 +152,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+            <Card className="bg-slate-800/30 border-slate-600/50 backdrop-blur-sm">
               <CardContent className="p-6">
                 <div className="flex items-center mb-4">
                   {[...Array(5)].map((_, i) => (
