@@ -22,10 +22,6 @@ export const FurnishingsSection: React.FC<FurnishingsSectionProps> = ({
     updateData({ furnishingsCost: calculatedFurnishings });
   };
 
-  const applyMonthlyFurnitureRental = () => {
-    updateData({ furnitureRental: data.monthlyFurnitureRental });
-  };
-
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
@@ -63,30 +59,6 @@ export const FurnishingsSection: React.FC<FurnishingsSectionProps> = ({
               />
             </div>
           </div>
-        </div>
-
-        {/* Monthly Furniture Rental Field */}
-        <div className="space-y-2">
-          <Label className="text-gray-200">Monthly Furniture Rental (Optional)</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              type="number"
-              value={data.monthlyFurnitureRental || ''}
-              onChange={(e) => updateData({ monthlyFurnitureRental: parseFloat(e.target.value) || 0 })}
-              placeholder="0"
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
-            />
-          </div>
-          {data.monthlyFurnitureRental > 0 && (
-            <Button 
-              onClick={applyMonthlyFurnitureRental}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-            >
-              <CalculatorIcon className="h-4 w-4 mr-2" />
-              Apply to Monthly Expenses
-            </Button>
-          )}
         </div>
 
         {/* Furnishing Tiers */}

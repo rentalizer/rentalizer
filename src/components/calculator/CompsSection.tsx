@@ -35,10 +35,13 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-white text-lg">
+        <CardTitle className="flex items-center gap-2 text-white">
           <Building2 className="h-5 w-5 text-cyan-400" />
-          Property Comps
+          Property Details & Comps
         </CardTitle>
+        <p className="text-sm text-gray-300">
+          Enter property details and search for comparable STR revenue
+        </p>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
@@ -47,7 +50,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
             value={data.address}
             onChange={(e) => updateData({ address: e.target.value })}
             placeholder="123 Main St, City, State"
-            className="bg-gray-800/50 border-gray-600 text-gray-100 text-xs"
+            className="bg-gray-800/50 border-gray-600 text-gray-100"
           />
         </div>
 
@@ -58,7 +61,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
               value={data.bedrooms?.toString() || "2"} 
               onValueChange={(value) => updateData({ bedrooms: parseInt(value) })}
             >
-              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100 text-xs">
+              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100">
                 <SelectValue placeholder="Select bedrooms" />
               </SelectTrigger>
               <SelectContent>
@@ -72,15 +75,17 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
           <div className="space-y-2">
             <Label className="text-gray-200">Bathrooms</Label>
             <Select 
-              value={Math.floor(data.bathrooms)?.toString() || "1"} 
-              onValueChange={(value) => updateData({ bathrooms: parseInt(value) })}
+              value={data.bathrooms?.toString() || "1"} 
+              onValueChange={(value) => updateData({ bathrooms: parseFloat(value) })}
             >
-              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100 text-xs">
+              <SelectTrigger className="bg-gray-800/50 border-gray-600 text-gray-100">
                 <SelectValue placeholder="Select bathrooms" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="1">1 Bathroom</SelectItem>
+                <SelectItem value="1.5">1.5 Bathrooms</SelectItem>
                 <SelectItem value="2">2 Bathrooms</SelectItem>
+                <SelectItem value="2.5">2.5 Bathrooms</SelectItem>
                 <SelectItem value="3">3 Bathrooms</SelectItem>
               </SelectContent>
             </Select>
@@ -111,10 +116,10 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
             <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
               type="number"
-              value={Math.floor(data.averageComparable) || ''}
-              onChange={(e) => updateData({ averageComparable: parseInt(e.target.value) || 0 })}
+              value={data.averageComparable || ''}
+              onChange={(e) => updateData({ averageComparable: parseFloat(e.target.value) || 0 })}
               placeholder="4250"
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100 text-xs"
+              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
             />
           </div>
         </div>
@@ -126,7 +131,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
               <div className="flex items-center gap-2">
                 <DollarSign className="h-5 w-5 text-cyan-400" />
                 <span className="text-2xl font-bold text-cyan-400">
-                  {Math.floor(data.averageComparable).toLocaleString()}
+                  {data.averageComparable.toLocaleString()}
                 </span>
               </div>
             </div>

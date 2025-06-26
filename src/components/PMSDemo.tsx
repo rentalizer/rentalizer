@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,11 +17,7 @@ import {
   CheckCircle,
   AlertCircle,
   Users,
-  BarChart3,
-  Crown,
-  Zap,
-  MapPin,
-  Calculator
+  BarChart3
 } from 'lucide-react';
 
 interface PMSDemoProps {
@@ -33,15 +30,13 @@ export const PMSDemo = ({ currentStep, isRunning }: PMSDemoProps) => {
 
   // Change tabs based on the current step
   useEffect(() => {
-    if (isRunning && currentStep >= 12 && currentStep <= 18) {
+    if (isRunning && currentStep >= 12 && currentStep <= 16) {
       const tabSequence = {
         12: 'dashboard',  // Listing Creation
         13: 'calendar',   // Calendar Sync  
         14: 'messages',   // Guest Messaging
         15: 'automation', // Check-in Automation
-        16: 'platforms',  // Performance Tracking
-        17: 'platforms',  // Performance Analytics
-        18: 'pricing'     // Pricing Plans
+        16: 'platforms'   // Performance Tracking
       };
       
       const newTab = tabSequence[currentStep];
@@ -77,9 +72,7 @@ export const PMSDemo = ({ currentStep, isRunning }: PMSDemoProps) => {
       13: "Unified Calendar Management", 
       14: "Automated Guest Messaging",
       15: "Smart Check-in Automation",
-      16: "Performance Analytics Dashboard",
-      17: "Revenue & Performance Analytics",
-      18: "Subscription Plans & Pricing"
+      16: "Performance Analytics Dashboard"
     };
     return titles[currentStep] || "Property Management System";
   };
@@ -101,7 +94,7 @@ export const PMSDemo = ({ currentStep, isRunning }: PMSDemoProps) => {
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-gray-700/50">
+          <TabsList className="grid w-full grid-cols-5 bg-gray-700/50">
             <TabsTrigger value="dashboard" className={getTabColor('dashboard')}>
               <Home className="h-4 w-4 mr-2" />
               Dashboard
@@ -121,10 +114,6 @@ export const PMSDemo = ({ currentStep, isRunning }: PMSDemoProps) => {
             <TabsTrigger value="platforms" className={getTabColor('platforms')}>
               <BarChart3 className="h-4 w-4 mr-2" />
               Analytics
-            </TabsTrigger>
-            <TabsTrigger value="pricing" className={getTabColor('pricing')}>
-              <DollarSign className="h-4 w-4 mr-2" />
-              Pricing
             </TabsTrigger>
           </TabsList>
 
@@ -358,129 +347,6 @@ export const PMSDemo = ({ currentStep, isRunning }: PMSDemoProps) => {
                   <span className="text-gray-300">Revenue growth:</span>
                   <span className="text-cyan-400">+18.5%</span>
                 </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* New Pricing Tab */}
-          <TabsContent value="pricing" className="space-y-4">
-            <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-lg p-8 text-white">
-              {/* Header */}
-              <div className="text-center mb-8">
-                <div className="flex items-center justify-center gap-4 mb-4">
-                  <BarChart3 className="h-8 w-8 text-cyan-400" />
-                  <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    RENTALIZER
-                  </h2>
-                </div>
-                <p className="text-cyan-300/80 font-medium mb-6">By Richie Matthews</p>
-                <h3 className="text-2xl font-bold text-white mb-4">Choose Your Plan</h3>
-                <p className="text-gray-300 text-lg">
-                  Start Your Rental Arbitrage Journey With Our AI-Powered System
-                </p>
-              </div>
-
-              {/* Billing Toggle */}
-              <div className="flex justify-center mb-8">
-                <div className="bg-slate-800/50 p-1 rounded-lg flex">
-                  <button className="px-6 py-3 rounded-md bg-cyan-600 text-white font-medium">
-                    Monthly
-                  </button>
-                  <button className="px-6 py-3 rounded-md text-gray-400 font-medium relative">
-                    Yearly
-                    <Badge className="absolute -top-2 -right-2 bg-green-500 text-white text-xs">
-                      Save 50%
-                    </Badge>
-                  </button>
-                </div>
-              </div>
-
-              {/* Pricing Cards */}
-              <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                {/* Market Insights + Calculator Plan */}
-                <div className="bg-slate-800/60 border-2 border-cyan-500/40 rounded-xl p-6">
-                  <div className="text-center mb-6">
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                      <Zap className="h-6 w-6 text-cyan-400" />
-                      <h4 className="text-xl font-bold text-cyan-300">Market Insights + Calculator</h4>
-                    </div>
-                    <div className="mb-4">
-                      <span className="text-4xl font-bold text-white">$1,950</span>
-                      <span className="text-gray-400">/month</span>
-                    </div>
-                    <p className="text-gray-400">Perfect for getting started</p>
-                  </div>
-                  
-                  <div className="space-y-3 mb-6">
-                    {[
-                      'Market Intelligence Tool',
-                      'Property Calculator', 
-                      'Live Airbnb Revenue Data',
-                      'ROI & Cash Flow Analysis'
-                    ].map((feature, index) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-                        <span className="text-gray-300">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <Button className="w-full bg-cyan-600 hover:bg-cyan-500 text-white py-3 rounded-lg font-medium text-lg">
-                    Get Started
-                  </Button>
-                </div>
-
-                {/* All-In-One System Plan */}
-                <div className="bg-slate-800/60 border-2 border-purple-500/40 rounded-xl p-6 relative">
-                  <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-1 rounded-full">
-                    Most Popular
-                  </Badge>
-                  
-                  <div className="text-center mb-6 mt-2">
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                      <Crown className="h-6 w-6 text-purple-400" />
-                      <h4 className="text-xl font-bold text-purple-300">All-In-One System</h4>
-                    </div>
-                    <div className="mb-4">
-                      <span className="text-4xl font-bold text-white">$2,950</span>
-                      <span className="text-gray-400">/month</span>
-                    </div>
-                    <p className="text-gray-400">Complete rental arbitrage solution</p>
-                  </div>
-                  
-                  <div className="space-y-3 mb-6">
-                    <div className="text-cyan-300 font-medium text-sm mb-3">Everything in Market Insights + Calculator, plus:</div>
-                    {[
-                      'Acquisitions Agent',
-                      'Front Desk Management',
-                      'AI-Powered Outreach',
-                      'Automated Guest Management',
-                      'Priority Support'
-                    ].map((feature, index) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
-                        <span className="text-gray-300">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white py-3 rounded-lg font-medium text-lg">
-                    Get Started
-                  </Button>
-                </div>
-              </div>
-
-              {/* Social Proof */}
-              <div className="text-center mt-8 p-6 bg-slate-800/30 rounded-lg border border-gray-600/30">
-                <div className="flex justify-center items-center gap-2 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                  ))}
-                  <span className="text-gray-300 ml-2 font-medium">4.9/5 Average Rating</span>
-                </div>
-                <h4 className="text-xl font-bold text-cyan-300">
-                  Join 2,000+ Successful Rental Arbitrage Investors
-                </h4>
               </div>
             </div>
           </TabsContent>

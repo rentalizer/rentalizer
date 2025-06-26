@@ -1,218 +1,297 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Key, Save, CheckCircle, Eye, EyeOff } from 'lucide-react';
+import { Key, Eye, EyeOff, Search, Copy, AlertCircle, Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ApiKeyInputProps {
-  onApiKeysChange: (keys: { rapidApiKey?: string; openaiApiKey?: string }) => void;
+  onApiKeysChange: (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => void;
 }
 
 export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
-  const { toast } = useToast();
-  const [rapidApiKey, setRapidApiKey] = useState<string>('');
-  const [openaiApiKey, setOpenaiApiKey] = useState<string>('');
-  const [isSaving, setIsSaving] = useState(false);
+  const [airdnaKey, setAirdnaKey] = useState('');
+  const [openaiKey, setOpenaiKey] = useState('');
   const [showKeys, setShowKeys] = useState(false);
+  const [showStoredKeys, setShowStoredKeys] = useState(false);
+  const [foundKeys, setFoundKeys] = useState<{[key: string]: string}>({});
+  const { toast } = useToast();
 
-  useEffect(() => {
-    // Load saved API keys from localStorage
-    const savedRapidApiKey = localStorage.getItem('rapidapi_key') || 
-                            localStorage.getItem('professional_data_key') || 
-                            localStorage.getItem('airdna_api_key') || '';
-    const savedOpenaiApiKey = localStorage.getItem('openai_api_key') || 
-                             localStorage.getItem('OPENAI_API_KEY') || '';
+  const getKeyStatus = (key: string) => {
+    if (!key) return 'missing';
+    if (key.length < 10) return 'invalid';
+    return 'active';
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active': return <Check className="h-3 w-3 text-green-500" />;
+      case 'invalid': return <AlertCircle className="h-3 w-3 text-yellow-500" />;
+      case 'missing': return <X className="h-3 w-3 text-red-500" />;
+      default: return <X className="h-3 w-3 text-gray-500" />;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active': return <Badge className="bg-green-600 text-white text-xs px-1.5 py-0.5">Active</Badge>;
+      case 'invalid': return <Badge className="bg-yellow-600 text-white text-xs px-1.5 py-0.5">Invalid</Badge>;
+      case 'missing': return <Badge className="bg-red-600 text-white text-xs px-1.5 py-0.5">Missing</Badge>;
+      default: return <Badge className="bg-gray-600 text-white text-xs px-1.5 py-0.5">Unknown</Badge>;
+    }
+  };
+
+  const handleSaveKeys = () => {
+    if (airdnaKey) localStorage.setItem('airdna_api_key', airdnaKey);
+    if (openaiKey) localStorage.setItem('openai_api_key', openaiKey);
     
-    console.log('🔍 Loading API Keys from localStorage:', {
-      rapidApiKey: savedRapidApiKey ? `${savedRapidApiKey.substring(0, 8)}... (${savedRapidApiKey.length} chars)` : 'Not found',
-      openaiApiKey: savedOpenaiApiKey ? `${savedOpenaiApiKey.substring(0, 8)}... (${savedOpenaiApiKey.length} chars)` : 'Not found'
-    });
-    
-    setRapidApiKey(savedRapidApiKey);
-    setOpenaiApiKey(savedOpenaiApiKey);
-    
-    // Notify parent of existing keys
     onApiKeysChange({
-      rapidApiKey: savedRapidApiKey || undefined,
-      openaiApiKey: savedOpenaiApiKey || undefined
+      airdnaApiKey: airdnaKey || undefined,
+      openaiApiKey: openaiKey || undefined
     });
-  }, [onApiKeysChange]);
 
-  const handleSaveKeys = async () => {
-    setIsSaving(true);
+    toast({
+      title: "✅ API Keys Saved",
+      description: "Your API keys have been saved successfully.",
+    });
+  };
+
+  const handleClearKeys = () => {
+    setAirdnaKey('');
+    setOpenaiKey('');
+    localStorage.removeItem('airdna_api_key');
+    localStorage.removeItem('openai_api_key');
     
+    onApiKeysChange({
+      airdnaApiKey: undefined,
+      openaiApiKey: undefined
+    });
+
+    toast({
+      title: "🗑️ API Keys Cleared",
+      description: "Your API keys have been cleared.",
+    });
+  };
+
+  const findAllStoredKeys = () => {
+    console.log('🔍 SEARCHING FOR ALL API KEYS...');
+    
+    const allKeys: {[key: string]: string} = {};
+    
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) {
+        const value = localStorage.getItem(key);
+        if (value) {
+          allKeys[key] = value;
+        }
+      }
+    }
+    
+    console.log('🗂️ ALL STORED KEYS FOUND:', allKeys);
+    
+    setFoundKeys(allKeys);
+    setShowStoredKeys(!showStoredKeys);
+    
+    const keyCount = Object.keys(allKeys).length;
+    toast({
+      title: `🔍 Found ${keyCount} Total Keys`,
+      description: "All stored keys are now displayed below. Check browser console for full details.",
+    });
+  };
+
+  const copyToClipboard = async (text: string, keyName: string) => {
     try {
-      // Validate API keys before saving
-      if (rapidApiKey && rapidApiKey.length < 10) {
-        throw new Error('RapidAPI key appears to be invalid (too short)');
-      }
-      if (openaiApiKey && openaiApiKey.length < 20) {
-        throw new Error('OpenAI API key appears to be invalid (too short)');
-      }
-      
-      // Save to localStorage with multiple keys for compatibility
-      if (rapidApiKey) {
-        localStorage.setItem('rapidapi_key', rapidApiKey);
-        localStorage.setItem('professional_data_key', rapidApiKey);
-        localStorage.setItem('airdna_api_key', rapidApiKey);
-      }
-      if (openaiApiKey) {
-        localStorage.setItem('openai_api_key', openaiApiKey);
-        localStorage.setItem('OPENAI_API_KEY', openaiApiKey);
-      }
-      
-      // Notify parent component
-      onApiKeysChange({
-        rapidApiKey: rapidApiKey || undefined,
-        openaiApiKey: openaiApiKey || undefined
-      });
-      
+      await navigator.clipboard.writeText(text);
       toast({
-        title: "API Keys Saved",
-        description: "Your API keys have been saved locally and encrypted.",
+        title: "✅ Copied!",
+        description: `${keyName} copied to clipboard`,
       });
-      
     } catch (error) {
-      console.error('Error saving API keys:', error);
+      console.error('Copy failed:', error);
       toast({
-        title: "Save Failed",
-        description: error instanceof Error ? error.message : "Failed to save API keys. Please try again.",
+        title: "❌ Copy Failed",
+        description: "Could not copy to clipboard",
         variant: "destructive",
       });
-    } finally {
-      setIsSaving(false);
     }
   };
 
-  const handleToggleShowKeys = () => {
-    setShowKeys(!showKeys);
+  React.useEffect(() => {
+    const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '';
+    const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
     
-    if (!showKeys) {
-      // Log the keys when showing them (with partial masking for security)
-      console.log('🔑 Current API Keys:', {
-        'STR Earnings API': rapidApiKey ? `${rapidApiKey.substring(0, 8)}...` : 'Not set',
-        'Rental Rates API': openaiApiKey ? `${openaiApiKey.substring(0, 8)}...` : 'Not set'
-      });
-      
-      toast({
-        title: "API Keys Revealed",
-        description: "API keys are now visible in the input fields.",
+    setAirdnaKey(savedAirDNAKey);
+    setOpenaiKey(savedOpenaiKey);
+    
+    if (savedAirDNAKey || savedOpenaiKey) {
+      onApiKeysChange({
+        airdnaApiKey: savedAirDNAKey || undefined,
+        openaiApiKey: savedOpenaiKey || undefined
       });
     }
-  };
-
-  const isRapidApiKeyValid = rapidApiKey.length > 10;
-  const isOpenaiKeyValid = openaiApiKey.length > 20;
+  }, []);
 
   return (
-    <Card className="max-w-2xl mx-auto shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
-      <CardHeader className="pb-4 border-b border-gray-700/50">
-        <CardTitle className="flex items-center gap-2 text-cyan-300">
-          <Key className="h-5 w-5 text-cyan-400" />
-          API Configuration
+    <Card className="shadow-xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg max-w-xl mx-auto">
+      <CardHeader className="pb-2 border-b border-gray-700/50">
+        <CardTitle className="flex items-center justify-between text-cyan-300 text-sm">
+          <div className="flex items-center gap-2">
+            <Key className="h-4 w-4 text-cyan-400" />
+            API Configuration
+          </div>
+          <Button
+            onClick={findAllStoredKeys}
+            size="sm"
+            className="bg-yellow-600 hover:bg-yellow-500 text-white text-xs px-2 py-1 h-6"
+          >
+            <Search className="h-3 w-3 mr-1" />
+            Find All Keys
+          </Button>
         </CardTitle>
-        <p className="text-sm text-gray-400">
-          Configure your API keys for Airbnb data scraping and AI features. Keys are stored locally and encrypted.
-        </p>
       </CardHeader>
-      <CardContent className="pt-6 space-y-4">
-        <div className="space-y-4">
-          {/* RapidAPI Key */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label htmlFor="rapidapi-key" className="text-sm font-medium text-gray-300">
-                STR Earnings API Key
-              </label>
-              {isRapidApiKeyValid && (
-                <Badge variant="outline" className="border-green-500/30 text-green-300">
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  Valid
-                </Badge>
-              )}
+      <CardContent className="pt-3 pb-3">
+        <div className="space-y-3">
+          {/* Show Found Keys Section */}
+          {showStoredKeys && (
+            <div className="bg-gray-800/60 p-3 rounded-lg border border-yellow-500/30">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle className="h-4 w-4 text-yellow-400" />
+                <h4 className="font-medium text-yellow-300 text-sm">All Stored Keys Found:</h4>
+              </div>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {Object.keys(foundKeys).length > 0 ? (
+                  Object.entries(foundKeys).map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between p-2 bg-gray-700/50 rounded">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-medium text-gray-200">{key}</div>
+                        <div className="text-xs font-mono text-gray-400 truncate">
+                          {showKeys ? value : `${value.substring(0, 10)}...`}
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => copyToClipboard(value, key)}
+                        className="h-6 w-6 p-0 text-gray-400 hover:text-white"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-gray-400 text-xs">No keys found in storage</div>
+                )}
+              </div>
             </div>
-            <Input
-              id="rapidapi-key"
-              type={showKeys ? "text" : "password"}
-              value={rapidApiKey}
-              onChange={(e) => setRapidApiKey(e.target.value)}
-              placeholder="Enter your RapidAPI key (required for STR data)"
-              className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400"
-            />
-            <p className="text-xs text-gray-500">
-              Get your key from RapidAPI Airbnb Scraper subscription
-            </p>
+          )}
+
+          {/* API Key Inputs with Status - Compact */}
+          <div className="grid grid-cols-1 gap-3">
+            {/* STR Revenue API Key */}
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-cyan-300">STR Revenue API</label>
+              <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
+                {getStatusIcon(getKeyStatus(airdnaKey))}
+                <div className="flex-1 min-w-0">
+                  <Input
+                    id="airdna-key"
+                    type={showKeys ? "text" : "password"}
+                    value={airdnaKey}
+                    onChange={(e) => setAirdnaKey(e.target.value)}
+                    placeholder="Enter your STR Revenue API key"
+                    className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                  />
+                </div>
+                <div className="flex items-center gap-1">
+                  {airdnaKey && showKeys && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => copyToClipboard(airdnaKey, 'STR Revenue API')}
+                      className="h-5 w-5 p-0 text-gray-400 hover:text-white"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  )}
+                  {getStatusBadge(getKeyStatus(airdnaKey))}
+                </div>
+              </div>
+            </div>
+
+            {/* Rental Rates API Key */}
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-cyan-300">Rental Rates API</label>
+              <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
+                {getStatusIcon(getKeyStatus(openaiKey))}
+                <div className="flex-1 min-w-0">
+                  <Input
+                    id="openai-key"
+                    type={showKeys ? "text" : "password"}
+                    value={openaiKey}
+                    onChange={(e) => setOpenaiKey(e.target.value)}
+                    placeholder="Enter your Rental Rates API key"
+                    className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                  />
+                </div>
+                <div className="flex items-center gap-1">
+                  {openaiKey && showKeys && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => copyToClipboard(openaiKey, 'Rental Rates API')}
+                      className="h-5 w-5 p-0 text-gray-400 hover:text-white"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  )}
+                  {getStatusBadge(getKeyStatus(openaiKey))}
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* OpenAI Key */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label htmlFor="openai-key" className="text-sm font-medium text-gray-300">
-                OpenAI API Key
-              </label>
-              {isOpenaiKeyValid && (
-                <Badge variant="outline" className="border-green-500/30 text-green-300">
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  Valid
-                </Badge>
-              )}
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowKeys(!showKeys)}
+              className="flex items-center gap-1 border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 text-xs px-2 py-1 h-6"
+            >
+              {showKeys ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+              {showKeys ? 'Hide' : 'Show'} Keys
+            </Button>
+
+            <div className="flex gap-2">
+              <Button
+                onClick={handleClearKeys}
+                variant="outline"
+                size="sm"
+                className="border-red-500/30 text-red-300 hover:bg-red-500/10 text-xs px-2 py-1 h-6"
+              >
+                Clear All
+              </Button>
+              
+              <Button
+                onClick={handleSaveKeys}
+                size="sm"
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white shadow-xl hover:shadow-cyan-500/25 transition-all duration-300 text-xs px-3 py-1 h-6"
+              >
+                Save Config
+              </Button>
             </div>
-            <Input
-              id="openai-key"
-              type={showKeys ? "text" : "password"}
-              value={openaiApiKey}
-              onChange={(e) => setOpenaiApiKey(e.target.value)}
-              placeholder="Enter your OpenAI API key (required for AI features)"
-              className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400"
-            />
-            <p className="text-xs text-gray-500">
-              Required for AI-powered market insights and recommendations
-            </p>
           </div>
-        </div>
 
-        <div className="flex gap-2">
-          <Button
-            onClick={handleSaveKeys}
-            disabled={isSaving || (!rapidApiKey && !openaiApiKey)}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500"
-          >
-            {isSaving ? (
-              <>
-                <Save className="h-4 w-4 mr-2 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="h-4 w-4 mr-2" />
-                Save API Keys
-              </>
-            )}
-          </Button>
-          
-          <Button
-            onClick={handleToggleShowKeys}
-            variant="outline"
-            className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
-          >
-            {showKeys ? (
-              <>
-                <EyeOff className="h-4 w-4 mr-2" />
-                Hide Keys
-              </>
-            ) : (
-              <>
-                <Eye className="h-4 w-4 mr-2" />
-                Show Keys
-              </>
-            )}
-          </Button>
-        </div>
-
-        <div className="mt-4 p-3 bg-yellow-600/20 rounded-lg border border-yellow-500/30">
-          <div className="text-sm text-yellow-300">
-            <strong>Security Notice:</strong> API keys are stored locally in your browser. Never share these keys or commit them to version control.
+          <div className="mt-2 p-2 bg-blue-600/20 rounded-lg border border-blue-500/30">
+            <div className="text-xs text-blue-300">
+              <strong>Environment:</strong> {window.location.hostname === 'localhost' ? 'Preview/Development' : 'Production'}
+            </div>
+            <div className="text-xs text-blue-400 mt-1">
+              Click "Find All Keys" to search for all stored API keys in your browser
+            </div>
           </div>
         </div>
       </CardContent>

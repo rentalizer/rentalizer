@@ -7,16 +7,9 @@ import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
 import { SimulatedMarketIntelligence } from '@/components/SimulatedMarketIntelligence';
-import { ApiKeyInput } from '@/components/ApiKeyInput';
-import { SwaggerUpload } from '@/components/SwaggerUpload';
 
 const MarketAnalysis = () => {
   const navigate = useNavigate();
-
-  const handleApiKeysChange = (keys: { rapidApiKey?: string; openaiApiKey?: string }) => {
-    // API keys are automatically saved to localStorage by the ApiKeyInput component
-    console.log('API keys updated for market analysis:', keys);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
@@ -70,16 +63,6 @@ const MarketAnalysis = () => {
 
           {/* Simulated Market Intelligence Component */}
           <SimulatedMarketIntelligence />
-
-          {/* API Key Configuration Section */}
-          <div className="mt-8">
-            <ApiKeyInput onApiKeysChange={handleApiKeysChange} />
-          </div>
-
-          {/* Swagger Upload Section - Moved to bottom */}
-          <div className="mt-8">
-            <SwaggerUpload />
-          </div>
         </div>
       </div>
 

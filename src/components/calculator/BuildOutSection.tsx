@@ -14,7 +14,7 @@ interface BuildOutSectionProps {
 }
 
 export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateData, cashToLaunch }) => {
-  const calculatedFurnishings = Math.floor(data.squareFootage * 8); // Default to $8 per sq ft
+  const calculatedFurnishings = data.squareFootage * data.furnishingsPSF;
 
   const applyCalculatedFurnishings = () => {
     updateData({ furnishingsCost: calculatedFurnishings });
@@ -23,10 +23,13 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-white text-lg">
+        <CardTitle className="flex items-center gap-2 text-white">
           <Hammer className="h-5 w-5 text-cyan-400" />
           Build Out Costs
         </CardTitle>
+        <p className="text-sm text-gray-300">
+          Initial costs required to launch your STR property
+        </p>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Basic Costs */}
@@ -37,10 +40,10 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={Math.floor(data.firstMonthRent) || ''}
-                onChange={(e) => updateData({ firstMonthRent: parseInt(e.target.value) || 0 })}
+                value={data.firstMonthRent || ''}
+                onChange={(e) => updateData({ firstMonthRent: parseFloat(e.target.value) || 0 })}
                 placeholder="0"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100 text-xs"
+                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
@@ -51,10 +54,10 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={Math.floor(data.securityDeposit) || ''}
-                onChange={(e) => updateData({ securityDeposit: parseInt(e.target.value) || 0 })}
+                value={data.securityDeposit || ''}
+                onChange={(e) => updateData({ securityDeposit: parseFloat(e.target.value) || 0 })}
                 placeholder="0"
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100 text-xs"
+                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
           </div>
@@ -66,27 +69,49 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-gray-200 text-sm">Footage (8 PSF)</Label>
+              <Label className="text-gray-200 text-sm">Square Footage</Label>
               <Input
                 type="number"
-                value={Math.floor(data.squareFootage) || ''}
-                onChange={(e) => updateData({ squareFootage: parseInt(e.target.value) || 0 })}
+                value={data.squareFootage || ''}
+                onChange={(e) => updateData({ squareFootage: parseFloat(e.target.value) || 0 })}
                 placeholder=""
-                className="bg-gray-800/50 border-gray-600 text-gray-100 text-xs"
+                className="bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-gray-200 text-sm">Furnishings</Label>
+              <Label className="text-gray-200 text-sm">Price per Sq Ft</Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   type="number"
-                  value={Math.floor(data.furnishingsCost) || ''}
-                  onChange={(e) => updateData({ furnishingsCost: parseInt(e.target.value) || 0 })}
-                  placeholder="0"
-                  className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100 text-xs"
+                  value={data.furnishingsPSF || ''}
+                  onChange={(e) => updateData({ furnishingsPSF: parseFloat(e.target.value) || 0 })}
+                  placeholder="8"
+                  className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Quality Tiers */}
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <div className="p-2 bg-gray-800/30 rounded text-center">
+              <div className="text-gray-300">Low ($6)</div>
+              <div className="text-cyan-400 font-medium">
+                ${(data.squareFootage * 6).toLocaleString()}
+              </div>
+            </div>
+            <div className="p-2 bg-gray-800/30 rounded text-center">
+              <div className="text-gray-300">Med ($7)</div>
+              <div className="text-cyan-400 font-medium">
+                ${(data.squareFootage * 7).toLocaleString()}
+              </div>
+            </div>
+            <div className="p-2 bg-gray-800/30 rounded text-center">
+              <div className="text-gray-300">High ($8)</div>
+              <div className="text-cyan-400 font-medium">
+                ${(data.squareFootage * 8).toLocaleString()}
               </div>
             </div>
           </div>
@@ -98,6 +123,29 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
                 ${calculatedFurnishings.toLocaleString()}
               </div>
             </div>
+            <Button 
+              onClick={applyCalculatedFurnishings}
+              size="sm"
+              className="bg-cyan-600 hover:bg-cyan-700 text-white"
+            >
+              <CalculatorIcon className="h-3 w-3 mr-1" />
+              Apply
+            </Button>
+          </div>
+        </div>
+
+        {/* Manual Furnishings Input */}
+        <div className="space-y-2">
+          <Label className="text-gray-200">Furnishings Cost</Label>
+          <div className="relative">
+            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              type="number"
+              value={data.furnishingsCost || ''}
+              onChange={(e) => updateData({ furnishingsCost: parseFloat(e.target.value) || 0 })}
+              placeholder="0"
+              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+            />
           </div>
         </div>
 
@@ -108,7 +156,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-cyan-400" />
               <span className="text-2xl font-bold text-cyan-400">
-                ${Math.floor(cashToLaunch).toLocaleString()}
+                ${cashToLaunch.toLocaleString()}
               </span>
             </div>
           </div>

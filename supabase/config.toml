@@ -1,27 +1,28 @@
 
 project_id = "bmemylmcbmrieheutktb"
 
-[api]
-enabled = true
-port = 54321
-schemas = ["public", "storage", "graphql_public"]
-extra_search_path = ["public", "extensions"]
-max_rows = 1000
-
 [auth]
-enabled = true
-port = 54324
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["https://lovable.dev"]
-jwt_expiry = 3600
-refresh_token_rotation_enabled = true
-refresh_token_reuse_interval = 10
-enable_signup = true
+# Use the production domain
+site_url = "https://rentalizer.ai"
+additional_redirect_urls = [
+  "https://rentalizer.ai/reset-password",
+  "https://rentalizer.ai/**",
+  "https://inspiring-genie-a1691.lovable.app",
+  "https://inspiring-genie-a1691.lovable.app/reset-password",
+  "https://inspiring-genie-a1691.lovable.app/**",
+  "http://localhost:3000",
+  "http://localhost:3000/reset-password",
+  "http://localhost:3000/**"
+]
 
 [auth.email]
-enable_signup = true
-double_confirm_changes = true
-enable_confirmations = false
+# Enable email confirmations in production
+enable_confirmations = true
 
-[functions.mashvisor-api]
-verify_jwt = false
+[local_development]
+# Keep localhost for local development
+site_url = "http://localhost:3000"
+additional_redirect_urls = [
+  "http://localhost:3000/reset-password",
+  "http://localhost:3000/**"
+]

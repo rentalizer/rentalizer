@@ -99,7 +99,7 @@ export const ContactChat = () => {
         <DialogHeader>
           <DialogTitle className="text-cyan-300 flex items-center gap-2">
             <MessageCircle className="h-5 w-5" />
-            Contact Us
+            Contact iStay USA LLC
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">

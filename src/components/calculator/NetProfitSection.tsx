@@ -24,7 +24,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-white text-lg">
+        <CardTitle className="flex items-center gap-2 text-white">
           <TrendingUp className="h-5 w-5 text-cyan-400" />
           Analysis Results
         </CardTitle>
@@ -37,7 +37,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-blue-400" />
               <span className="text-lg font-bold text-blue-400">
-                ${Math.floor(monthlyRevenue).toLocaleString()}
+                ${monthlyRevenue.toLocaleString()}
               </span>
             </div>
           </div>
@@ -50,7 +50,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
             <div className="flex items-center gap-2">
               <DollarSign className={`h-4 w-4 ${profitColor}`} />
               <span className={`text-lg font-bold ${profitColor}`}>
-                ${Math.floor(Math.abs(netProfitMonthly)).toLocaleString()}
+                ${Math.abs(netProfitMonthly).toLocaleString()}
               </span>
             </div>
           </div>
@@ -63,7 +63,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-cyan-400" />
               <span className="text-lg font-bold text-cyan-400">
-                {paybackMonths > 0 && isFinite(paybackMonths) ? Math.floor(paybackMonths) : '∞'}
+                {paybackMonths > 0 && isFinite(paybackMonths) ? paybackMonths.toFixed(1) : '∞'}
               </span>
             </div>
           </div>
@@ -76,7 +76,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
             <div className="flex items-center gap-2">
               <Percent className="h-4 w-4 text-blue-400" />
               <span className="text-lg font-bold text-blue-400">
-                {isFinite(cashOnCashReturn) ? Math.floor(cashOnCashReturn) : '0'}%
+                {isFinite(cashOnCashReturn) ? cashOnCashReturn.toFixed(2) : '0.00'}%
               </span>
             </div>
           </div>

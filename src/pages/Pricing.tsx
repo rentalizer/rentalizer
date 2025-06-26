@@ -87,7 +87,7 @@ const Pricing = () => {
             <p className="text-lg text-cyan-300/80 font-medium mb-8">By Richie Matthews</p>
             <h2 className="text-3xl font-bold text-white mb-4">Choose Your Plan</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Start Your Rental Arbitrage Journey With Our AI-Powered System
+              Start your rental arbitrage journey with our AI-powered system
             </p>
           </div>
 

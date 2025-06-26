@@ -1,15 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home, RotateCcw } from 'lucide-react';
+import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
-import { TopNavBar } from '@/components/TopNavBar';
-import { LoginDialog } from '@/components/LoginDialog';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
 import { ExpensesSection } from '@/components/calculator/ExpensesSection';
@@ -43,15 +39,13 @@ export interface CalculatorData {
   // Furnishings Calculator
   squareFootage: number;
   furnishingsPSF: number;
-  monthlyFurnitureRental: number;
 }
 
 const Calculator = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, isLoading } = useAuth();
   
-  const initialData: CalculatorData = {
+  const [data, setData] = useState<CalculatorData>({
     address: '',
     bedrooms: 2,
     bathrooms: 1,
@@ -72,10 +66,7 @@ const Calculator = () => {
     furnitureRental: 0,
     squareFootage: 0,
     furnishingsPSF: 8,
-    monthlyFurnitureRental: 0,
-  };
-
-  const [data, setData] = useState<CalculatorData>(initialData);
+  });
 
   // Calculate derived values
   const cashToLaunch = data.firstMonthRent + data.securityDeposit + data.furnishingsCost;
@@ -100,81 +91,11 @@ const Calculator = () => {
     setData(prev => ({ ...prev, ...updates }));
   };
 
-  const clearAll = () => {
-    setData(initialData);
-    toast({
-      title: "Calculator Cleared",
-      description: "All fields have been reset to default values.",
-    });
-  };
-
-  // Show loading while checking authentication
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <TopNavBar />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center space-y-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
-            <div className="text-cyan-300 text-xl">Loading...</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show login prompt if user is not authenticated
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <TopNavBar />
-        <div className="container mx-auto px-4 py-16">
-          <div className="max-w-md mx-auto text-center space-y-6">
-            <div className="text-center">
-              <CalculatorIcon className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
-              <h1 className="text-3xl font-bold text-white mb-2">
-                RentalizerCalc
-              </h1>
-              <p className="text-gray-300 mb-6">
-                Sign in to access the rental property calculator
-              </p>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-cyan-500/20">
-              <p className="text-gray-300 mb-4">
-                Please sign in to use the calculator and analyze rental property profitability.
-              </p>
-              
-              <LoginDialog 
-                trigger={
-                  <Button className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white">
-                    Sign In to Continue
-                  </Button>
-                }
-              />
-            </div>
-            
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="text-gray-400 hover:text-gray-300"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <TopNavBar />
-      
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4 mb-8">
           <Button
             variant="ghost"
             onClick={() => navigate('/')}
@@ -183,29 +104,20 @@ const Calculator = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Home
           </Button>
-          
-          <Button
-            variant="outline"
-            onClick={clearAll}
-            className="text-gray-300 border-gray-600 hover:bg-gray-700"
-          >
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Clear All
-          </Button>
         </div>
 
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
             <CalculatorIcon className="h-10 w-10 text-cyan-400" />
-            RentalizerCalc
+            STR Calculator
           </h1>
           <p className="text-xl text-gray-300">
-            Calculate Rental Property Profitability And ROI
+            Calculate Property Profitability And ROI For Short-Term Rentals
           </p>
         </div>
 
-        {/* Calculator Input Sections - 4x1 Grid Layout */}
-        <div className="grid lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+        {/* Calculator Input Sections - 3x1 Grid Layout */}
+        <div className="grid lg:grid-cols-3 gap-6 max-w-7xl mx-auto mb-8">
           {/* 1st - Build Out Costs */}
           <BuildOutSection data={data} updateData={updateData} cashToLaunch={cashToLaunch} />
           
@@ -219,8 +131,10 @@ const Calculator = () => {
           
           {/* 3rd - Comps */}
           <CompsSection data={data} updateData={updateData} />
+        </div>
 
-          {/* 4th - Analysis Results */}
+        {/* Calculator Display - Bottom Section */}
+        <div className="max-w-4xl mx-auto">
           <NetProfitSection 
             monthlyRevenue={monthlyRevenue}
             netProfitMonthly={netProfitMonthly}

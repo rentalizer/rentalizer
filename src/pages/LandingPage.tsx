@@ -226,10 +226,10 @@ const LandingPage = () => {
             </div>
             <p className="text-lg text-white font-medium mb-8">By Richie Matthews</p>
             
-            {/* Updated Tagline - Smaller text to fit on one line */}
+            {/* Updated Tagline */}
             <div className="mb-12 px-4">
-              <p className="text-xl md:text-2xl lg:text-3xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
-                Start Your Rental Arbitrage Journey With Our AI-Powered System
+              <p className="text-2xl md:text-3xl lg:text-4xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
+                All-in-One AI Platform to Launch and Scale a Rental Arbitrage Business
               </p>
             </div>
 
@@ -369,7 +369,7 @@ const LandingPage = () => {
           {/* Description Section */}
           <div className="text-center mb-16">
             <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              RENTALIZER.AI Combines AI Powered Market Analysis, Deal Sourcing, And Automation Tools With A Built-In CRM And A Thriving Community—Everything You Need To Launch And Scale Your Rental Arbitrage Business
+              RENTALIZER.AI Combines AI POWERED Market Analysis, Deal Sourcing, And Automation Tools With A Built-In CRM And A Thriving Community—Everything You Need To Launch And Scale Your Rental Arbitrage Business.
             </p>
           </div>
 
@@ -377,7 +377,7 @@ const LandingPage = () => {
           <div className="max-w-7xl mx-auto mb-20">
             <div className="text-center mb-12">
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 whitespace-nowrap">
-                Rentalizer Users Who've Unlocked Rental Income With Rentalizer
+                Real Users Who've Unlocked Rental Income With Rentalizer
               </h2>
             </div>
 
