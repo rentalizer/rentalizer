@@ -12,7 +12,7 @@ import { ExpensesSection } from '@/components/calculator/ExpensesSection';
 import { NetProfitSection } from '@/components/calculator/NetProfitSection';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
-import { WelcomeSection } from '@/components/WelcomeSection';
+import { ThinAnimatedBanner } from '@/components/draft/ThinAnimatedBanner';
 
 export interface CalculatorData {
   // Comps
@@ -107,6 +107,9 @@ const Calculator = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <TopNavBar />
+      
+      {/* Animated Banner */}
+      <ThinAnimatedBanner />
       
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
