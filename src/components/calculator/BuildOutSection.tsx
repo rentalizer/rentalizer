@@ -13,7 +13,7 @@ interface BuildOutSectionProps {
 }
 
 export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateData, cashToLaunch }) => {
-  const calculatedFurnishings = data.squareFootage * data.furnishingsPSF;
+  const calculatedFurnishings = data.squareFootage * 8; // Fixed at $8 PSF
 
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
@@ -61,7 +61,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-gray-200 text-sm">Square Footage</Label>
+              <Label className="text-gray-200 text-sm">Property Size ($8 PSF)</Label>
               <Input
                 type="number"
                 value={data.squareFootage || ''}
@@ -72,14 +72,14 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
             </div>
 
             <div className="space-y-2">
-              <Label className="text-gray-200 text-sm">Price per Sq Ft</Label>
+              <Label className="text-gray-200 text-sm">Furnishings Cost</Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   type="number"
-                  value={data.furnishingsPSF || ''}
-                  onChange={(e) => updateData({ furnishingsPSF: parseFloat(e.target.value) || 0 })}
-                  placeholder="8"
+                  value={data.furnishingsCost || ''}
+                  onChange={(e) => updateData({ furnishingsCost: parseFloat(e.target.value) || 0 })}
+                  placeholder="0"
                   className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
                 />
               </div>
@@ -91,21 +91,6 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
             <div className="text-cyan-400 font-bold text-lg">
               ${calculatedFurnishings.toLocaleString()}
             </div>
-          </div>
-        </div>
-
-        {/* Manual Furnishings Input */}
-        <div className="space-y-2">
-          <Label className="text-gray-200">Furnishings Cost</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              type="number"
-              value={data.furnishingsCost || ''}
-              onChange={(e) => updateData({ furnishingsCost: parseFloat(e.target.value) || 0 })}
-              placeholder="0"
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
-            />
           </div>
         </div>
 

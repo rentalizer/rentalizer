@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,8 @@ import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
 import { ExpensesSection } from '@/components/calculator/ExpensesSection';
 import { NetProfitSection } from '@/components/calculator/NetProfitSection';
+import { TopNavBar } from '@/components/TopNavBar';
+import { Footer } from '@/components/Footer';
 
 export interface CalculatorData {
   // Comps
@@ -93,6 +96,8 @@ const Calculator = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <TopNavBar />
+      
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -141,6 +146,8 @@ const Calculator = () => {
           />
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 };
