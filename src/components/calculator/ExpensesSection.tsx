@@ -115,7 +115,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={Math.floor(data.rent) || ''}
                 onChange={(e) => updateData({ rent: parseInt(e.target.value) || 0 })}
-                placeholder="1975"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -142,7 +142,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={Math.floor(data.maintenance) || ''}
                 onChange={(e) => updateData({ maintenance: parseInt(e.target.value) || 0 })}
-                placeholder="0"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -156,7 +156,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={Math.floor(data.power) || ''}
                 onChange={(e) => updateData({ power: parseInt(e.target.value) || 0 })}
-                placeholder="190"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -170,7 +170,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={Math.floor(data.waterSewer) || ''}
                 onChange={(e) => updateData({ waterSewer: parseInt(e.target.value) || 0 })}
-                placeholder="0"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -184,7 +184,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={Math.floor(data.internet) || ''}
                 onChange={(e) => updateData({ internet: parseInt(e.target.value) || 0 })}
-                placeholder="70"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -198,7 +198,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={Math.floor(data.taxLicense) || ''}
                 onChange={(e) => updateData({ taxLicense: parseInt(e.target.value) || 0 })}
-                placeholder="29"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -212,7 +212,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={Math.floor(data.insurance) || ''}
                 onChange={(e) => updateData({ insurance: parseInt(e.target.value) || 0 })}
-                placeholder="15"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -226,7 +226,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={Math.floor(data.software) || ''}
                 onChange={(e) => updateData({ software: parseInt(e.target.value) || 0 })}
-                placeholder="70"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -240,7 +240,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={Math.floor(data.miscellaneous) || ''}
                 onChange={(e) => updateData({ miscellaneous: parseInt(e.target.value) || 0 })}
-                placeholder="0"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -254,7 +254,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 type="number"
                 value={Math.floor(data.furnitureRental) || ''}
                 onChange={(e) => updateData({ furnitureRental: parseInt(e.target.value) || 0 })}
-                placeholder="750"
+                placeholder=""
                 className="pl-7 h-8 text-sm bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
