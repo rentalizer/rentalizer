@@ -37,7 +37,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-blue-400" />
               <span className="text-lg font-bold text-blue-400">
-                ${monthlyRevenue.toLocaleString()}
+                ${Math.round(monthlyRevenue).toLocaleString()}
               </span>
             </div>
           </div>
@@ -50,7 +50,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
             <div className="flex items-center gap-2">
               <DollarSign className={`h-4 w-4 ${profitColor}`} />
               <span className={`text-lg font-bold ${profitColor}`}>
-                ${Math.abs(netProfitMonthly).toLocaleString()}
+                ${Math.round(Math.abs(netProfitMonthly)).toLocaleString()}
               </span>
             </div>
           </div>
@@ -63,7 +63,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-cyan-400" />
               <span className="text-lg font-bold text-cyan-400">
-                {paybackMonths > 0 && isFinite(paybackMonths) ? paybackMonths.toFixed(1) : '∞'}
+                {paybackMonths > 0 && isFinite(paybackMonths) ? Math.round(paybackMonths) : '∞'}
               </span>
             </div>
           </div>
@@ -76,7 +76,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
             <div className="flex items-center gap-2">
               <Percent className="h-4 w-4 text-blue-400" />
               <span className="text-lg font-bold text-blue-400">
-                {isFinite(cashOnCashReturn) ? cashOnCashReturn.toFixed(2) : '0.00'}%
+                {isFinite(cashOnCashReturn) ? Math.round(cashOnCashReturn) : '0'}%
               </span>
             </div>
           </div>

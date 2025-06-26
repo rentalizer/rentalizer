@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -71,27 +72,37 @@ const Calculator = () => {
     furnishingsPSF: 8,
   });
 
-  // Calculate derived values
-  const cashToLaunch = data.firstMonthRent + data.securityDeposit + data.furnishingsCost;
-  const serviceFeeCalculated = data.averageComparable * 0.029; // 2.9%
-  const monthlyExpenses = data.rent + serviceFeeCalculated + data.maintenance + data.power + 
+  // Calculate derived values - all rounded to whole numbers
+  const cashToLaunch = Math.round(data.firstMonthRent + data.securityDeposit + data.furnishingsCost);
+  const serviceFeeCalculated = Math.round(data.averageComparable * 0.029); // 2.9%
+  const monthlyExpenses = Math.round(data.rent + serviceFeeCalculated + data.maintenance + data.power + 
                          data.waterSewer + data.internet + data.taxLicense + data.insurance + 
-                         data.software + data.miscellaneous + data.furnitureRental;
-  const monthlyRevenue = data.averageComparable;
-  const netProfitMonthly = monthlyRevenue - monthlyExpenses;
-  const paybackMonths = cashToLaunch > 0 ? cashToLaunch / netProfitMonthly : 0;
-  const cashOnCashReturn = cashToLaunch > 0 ? (netProfitMonthly * 12 / cashToLaunch) * 100 : 0;
+                         data.software + data.miscellaneous + data.furnitureRental);
+  const monthlyRevenue = Math.round(data.averageComparable);
+  const netProfitMonthly = Math.round(monthlyRevenue - monthlyExpenses);
+  const paybackMonths = cashToLaunch > 0 ? Math.round(cashToLaunch / netProfitMonthly) : 0;
+  const cashOnCashReturn = cashToLaunch > 0 ? Math.round((netProfitMonthly * 12 / cashToLaunch) * 100) : 0;
 
   // Update service fees when average comparable changes
   useEffect(() => {
     setData(prev => ({
       ...prev,
-      serviceFees: prev.averageComparable * 0.029
+      serviceFees: Math.round(prev.averageComparable * 0.029)
     }));
   }, [data.averageComparable]);
 
   const updateData = (updates: Partial<CalculatorData>) => {
-    setData(prev => ({ ...prev, ...updates }));
+    // Round all numerical values to remove decimals
+    const roundedUpdates = Object.entries(updates).reduce((acc, [key, value]) => {
+      if (typeof value === 'number') {
+        acc[key] = Math.round(value);
+      } else {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as any);
+    
+    setData(prev => ({ ...prev, ...roundedUpdates }));
   };
 
   return (
