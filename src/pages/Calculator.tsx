@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -163,10 +162,7 @@ const Calculator = () => {
         </div>
       </div>
 
-      {/* Bottom Banner */}
-      <div className="bg-gradient-to-r from-slate-700/90 via-slate-600/90 to-slate-700/90 border-t border-slate-500/30 backdrop-blur-lg">
-        <Footer showLinks={false} />
-      </div>
+      <Footer />
     </div>
   );
 };
