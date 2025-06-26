@@ -11,6 +11,39 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+      {/* Floating Background Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Floating Icons */}
+        <div className="absolute top-20 left-16 opacity-20">
+          <MapPin className="h-8 w-8 text-cyan-400 animate-bounce" style={{ animationDelay: '0s', animationDuration: '3s' }} />
+        </div>
+        <div className="absolute top-32 right-20 opacity-20">
+          <Building className="h-6 w-6 text-purple-400 animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }} />
+        </div>
+        <div className="absolute bottom-40 left-20 opacity-20">
+          <Calculator className="h-7 w-7 text-blue-400 animate-bounce" style={{ animationDelay: '2s', animationDuration: '3.5s' }} />
+        </div>
+        <div className="absolute bottom-60 right-16 opacity-20">
+          <Users className="h-5 w-5 text-green-400 animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '4.5s' }} />
+        </div>
+
+        {/* Geometric Shapes */}
+        <div className="absolute top-40 left-1/4 w-3 h-3 bg-cyan-400/30 rotate-45 animate-pulse"></div>
+        <div className="absolute top-60 right-1/3 w-4 h-4 bg-purple-400/30 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-80 left-1/3 w-2 h-2 bg-blue-400/30 animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-80 right-1/4 w-5 h-5 bg-green-400/20 rotate-12 animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+
+        {/* Floating Lines */}
+        <div className="absolute top-48 left-32 w-16 h-0.5 bg-gradient-to-r from-cyan-400/20 to-transparent animate-pulse"></div>
+        <div className="absolute bottom-72 right-32 w-12 h-0.5 bg-gradient-to-l from-purple-400/20 to-transparent animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+        <div className="absolute top-96 right-48 w-20 h-0.5 bg-gradient-to-r from-blue-400/20 to-transparent animate-pulse" style={{ animationDelay: '0.8s' }}></div>
+
+        {/* Additional floating elements */}
+        <div className="absolute top-24 left-1/2 w-1 h-1 bg-cyan-300/40 rounded-full animate-ping" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-32 left-1/4 w-1 h-1 bg-purple-300/40 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-72 right-1/5 w-1 h-1 bg-blue-300/40 rounded-full animate-ping" style={{ animationDelay: '3s' }}></div>
+      </div>
+
       {/* Top Login Button */}
       <div className="absolute top-4 right-4 z-50">
         <Button 
