@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Building2, DollarSign, Plus, X } from 'lucide-react';
+import { Building2, DollarSign, Plus, X, Zap } from 'lucide-react';
 import { CalculatorData } from '@/pages/Calculator';
 
 interface CompsSectionProps {
@@ -16,6 +15,12 @@ interface CompsSectionProps {
 export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) => {
   const [propertyValues, setPropertyValues] = useState<number[]>([]);
   const [newPropertyValue, setNewPropertyValue] = useState<string>('');
+
+  const autoFillComps = () => {
+    // Auto-fill with typical market values based on bedroom count
+    const baseRevenue = data.bedrooms === 1 ? 3200 : data.bedrooms === 2 ? 4250 : 5500;
+    updateData({ averageComparable: baseRevenue });
+  };
 
   const addPropertyValue = () => {
     const value = parseFloat(newPropertyValue);
@@ -46,9 +51,19 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-white text-lg">
-          <Building2 className="h-5 w-5 text-cyan-400" />
-          Property Comps
+        <CardTitle className="flex items-center justify-between text-white text-lg">
+          <div className="flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-cyan-400" />
+            Property Comps
+          </div>
+          <Button
+            onClick={autoFillComps}
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 h-7"
+          >
+            <Zap className="h-3 w-3 mr-1" />
+            Auto
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Receipt, DollarSign, Wand2, Zap } from 'lucide-react';
+import { Receipt, DollarSign, Wand2 } from 'lucide-react';
 import { CalculatorData } from '@/pages/Calculator';
 
 interface ExpensesSectionProps {
@@ -37,24 +36,6 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
     updateData(averageExpenses);
   };
 
-  const autoCalculate = () => {
-    // Auto calculation logic - you can customize this
-    const autoCalculatedExpenses = {
-      rent: Math.round(data.averageComparable * 0.60), // 60% of revenue
-      maintenance: 175,
-      power: 140,
-      waterSewer: 90,
-      internet: 85,
-      taxLicense: 50,
-      insurance: 95,
-      software: 65,
-      miscellaneous: 125,
-      furnitureRental: 250
-    };
-    
-    updateData(autoCalculatedExpenses);
-  };
-
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
@@ -63,24 +44,14 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
             <Receipt className="h-5 w-5 text-cyan-400" />
             Monthly Expenses
           </div>
-          <div className="flex gap-2">
-            <Button
-              onClick={autoFillExpenses}
-              size="sm"
-              className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs px-3 py-1 h-7"
-            >
-              <Wand2 className="h-3 w-3 mr-1" />
-              Auto-Fill
-            </Button>
-            <Button
-              onClick={autoCalculate}
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 h-7"
-            >
-              <Zap className="h-3 w-3 mr-1" />
-              Auto
-            </Button>
-          </div>
+          <Button
+            onClick={autoFillExpenses}
+            size="sm"
+            className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs px-3 py-1 h-7"
+          >
+            <Wand2 className="h-3 w-3 mr-1" />
+            Auto-Fill
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

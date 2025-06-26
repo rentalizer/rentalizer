@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -52,7 +51,7 @@ const Calculator = () => {
     address: '',
     bedrooms: 2,
     bathrooms: 2,
-    averageComparable: 4250,
+    averageComparable: 0,
     firstMonthRent: 0,
     securityDeposit: 0,
     furnishingsCost: 0,
