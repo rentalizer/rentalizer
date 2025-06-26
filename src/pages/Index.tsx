@@ -14,9 +14,9 @@ const Index = () => {
         borderBottom: '1px solid rgba(148, 163, 184, 0.2)'
       }}>
         <div className="flex items-center gap-2">
-          <BarChart3 className="h-8 w-8 text-cyan-400" />
+          <BarChart3 className="h-8 w-8 text-cyan-400" style={{ filter: 'drop-shadow(0 0 20px rgba(6, 182, 212, 0.6))' }} />
         </div>
-        <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
+        <Button variant="outline" className="border-cyan-400/50 text-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-300 text-sm">
           Login
         </Button>
       </header>
