@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,7 @@ export interface CalculatorData {
   // Furnishings Calculator
   squareFootage: number;
   furnishingsPSF: number;
+  monthlyFurnitureRental: number;
 }
 
 const Calculator = () => {
@@ -66,6 +68,7 @@ const Calculator = () => {
     furnitureRental: 0,
     squareFootage: 0,
     furnishingsPSF: 8,
+    monthlyFurnitureRental: 0,
   });
 
   // Calculate derived values
@@ -109,10 +112,10 @@ const Calculator = () => {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
             <CalculatorIcon className="h-10 w-10 text-cyan-400" />
-            STR Calculator
+            Rentalizer.AI/Calc
           </h1>
           <p className="text-xl text-gray-300">
-            Calculate Property Profitability And ROI For Short-Term Rentals
+            Calculate Rental Property Profitability And ROI
           </p>
         </div>
 
