@@ -20,9 +20,6 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
   const isProfit = netProfitMonthly > 0;
   const profitColor = isProfit ? 'text-cyan-400' : 'text-blue-400';
   const profitBgColor = isProfit ? 'from-cyan-600/20 to-blue-600/20 border-cyan-500/30' : 'from-blue-600/20 to-slate-600/20 border-blue-500/30';
-  
-  // Convert payback from months to weeks
-  const paybackWeeks = paybackMonths * 4.33; // Average weeks per month
 
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
@@ -59,14 +56,14 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
           </div>
         </div>
 
-        {/* Payback Period in Weeks */}
+        {/* Payback Period in Months */}
         <div className="p-3 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-cyan-300 font-medium text-sm">Payback Weeks</Label>
+            <Label className="text-cyan-300 font-medium text-sm">Payback Months</Label>
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-cyan-400" />
               <span className="text-lg font-bold text-cyan-400">
-                {paybackWeeks > 0 && isFinite(paybackWeeks) ? Math.round(paybackWeeks) : '∞'}
+                {paybackMonths > 0 && isFinite(paybackMonths) ? Math.round(paybackMonths) : '∞'}
               </span>
             </div>
           </div>
