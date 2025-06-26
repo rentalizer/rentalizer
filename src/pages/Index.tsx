@@ -9,11 +9,8 @@ import { LoginDialog } from '@/components/LoginDialog';
 import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-  const { user, isSubscribed, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const navigate = useNavigate();
-
-  // Add console logs to debug authentication state
-  console.log('Index component - isLoading:', isLoading, 'user:', !!user, 'user email:', user?.email);
 
   const handleFeatureClick = (path: string) => {
     if (user) {
@@ -36,9 +33,6 @@ const Index = () => {
     );
   }
 
-  console.log('Showing main dashboard - authenticated:', !!user);
-
-  // Main dashboard for all users
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
       {/* Subtle background elements */}
@@ -49,7 +43,7 @@ const Index = () => {
 
       <div className="relative z-10">
         <div className="container mx-auto px-4 py-16">
-          {/* Main Content - Matching Home Page Layout */}
+          {/* Main Content */}
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-4 mb-6">
               <BarChart3 className="h-16 w-16 text-cyan-400 neon-text" />
@@ -59,7 +53,6 @@ const Index = () => {
             </div>
             <p className="text-lg text-white font-medium mb-8">By Richie Matthews</p>
             
-            {/* Updated Tagline - Even smaller font */}
             <p className="text-xs sm:text-xs md:text-xs lg:text-sm text-white mb-12 max-w-7xl mx-auto leading-relaxed font-semibold">
               All-in-One Platform to Launch and Scale a Rental Arbitrage Business
             </p>
@@ -269,7 +262,6 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Footer with reduced top margin */}
       <Footer />
     </div>
   );
