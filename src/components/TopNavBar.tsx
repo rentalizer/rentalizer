@@ -14,7 +14,7 @@ export const TopNavBar = () => {
         {/* Left side - Logo moved to the right */}
         <div className="flex items-center gap-3 ml-8">
           <BarChart3 className="h-8 w-8 text-cyan-400" style={{
-            filter: 'drop-shadow(0 0 8px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 16px rgba(6, 182, 212, 0.6)) drop-shadow(0 0 24px rgba(6, 182, 212, 0.4)) drop-shadow(0 0 32px rgba(6, 182, 212, 0.3))'
+            filter: 'drop-shadow(0 0 6px rgba(6, 182, 212, 1)) drop-shadow(0 0 12px rgba(6, 182, 212, 0.9)) drop-shadow(0 0 18px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 24px rgba(6, 182, 212, 0.7)) drop-shadow(0 0 30px rgba(6, 182, 212, 0.6)) drop-shadow(0 0 36px rgba(6, 182, 212, 0.5))'
           }} />
         </div>
 
