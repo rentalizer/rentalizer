@@ -11,7 +11,7 @@ import { MessageThreads } from '@/components/community/MessageThreads';
 import { GroupDiscussions } from '@/components/community/GroupDiscussions';
 import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
 import { VideoLibrary } from '@/components/community/VideoLibrary';
-import { ContactChat } from '@/components/ContactChat';
+import { DirectMessages } from '@/components/community/DirectMessages';
 
 const Community = () => {
   const [activeTab, setActiveTab] = useState('community');
@@ -75,22 +75,7 @@ const Community = () => {
           </TabsContent>
 
           <TabsContent value="dm" className="mt-8">
-            <div className="max-w-2xl mx-auto">
-              <Card className="bg-slate-800/50 border-cyan-500/20">
-                <CardHeader>
-                  <CardTitle className="text-cyan-300 flex items-center gap-2">
-                    <MessageCircle className="h-5 w-5" />
-                    Direct Messages
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-center py-12">
-                  <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-300 mb-2">Direct Messages</h3>
-                  <p className="text-gray-400 mb-6">Send private messages to community members and administrators</p>
-                  <ContactChat />
-                </CardContent>
-              </Card>
-            </div>
+            <DirectMessages />
           </TabsContent>
         </Tabs>
       </div>
