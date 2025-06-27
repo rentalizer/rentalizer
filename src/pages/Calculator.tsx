@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -133,18 +134,9 @@ const Calculator = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Home
           </Button>
-          
-          <Button
-            variant="outline"
-            onClick={clearAllData}
-            className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
-          >
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Clear All
-          </Button>
         </div>
 
-        <div className="text-center mb-8 bg-slate-700/90 backdrop-blur-lg rounded-lg p-8 border border-gray-500/50">
+        <div className="text-center mb-8 bg-slate-700/90 backdrop-blur-lg rounded-lg p-8 border border-gray-500/50 relative">
           <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
             <CalculatorIcon className="h-10 w-10 text-cyan-400" />
             RentalizerCalc
@@ -152,6 +144,16 @@ const Calculator = () => {
           <p className="text-xl text-gray-300">
             Calculate STR Property Profitability & ROI
           </p>
+          
+          {/* Clear All button positioned in top right of header */}
+          <Button
+            variant="outline"
+            onClick={clearAllData}
+            className="absolute top-4 right-4 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Clear All
+          </Button>
         </div>
 
         {/* Calculator Input Sections - 4x1 Grid Layout */}
