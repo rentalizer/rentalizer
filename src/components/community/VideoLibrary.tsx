@@ -34,7 +34,7 @@ export const VideoLibrary = () => {
       duration: '45:30',
       views: 1234,
       uploadDate: '2024-12-15',
-      category: 'Education',
+      category: 'Market Research',
       instructor: 'Richie Matthews',
       tags: ['market-research', 'fundamentals', 'data'],
       featured: true
@@ -47,7 +47,7 @@ export const VideoLibrary = () => {
       duration: '60:00',
       views: 892,
       uploadDate: '2024-12-10',
-      category: 'Live Training',
+      category: 'Property Acquisitions',
       instructor: 'Richie Matthews',
       tags: ['live', 'acquisition', 'strategies'],
       isLive: true
@@ -60,7 +60,7 @@ export const VideoLibrary = () => {
       duration: '32:15',
       views: 756,
       uploadDate: '2024-12-08',
-      category: 'Operations',
+      category: 'Property Management',
       instructor: 'Sarah Johnson',
       tags: ['furnishing', 'budget', 'cost-effective']
     },
@@ -72,7 +72,7 @@ export const VideoLibrary = () => {
       duration: '38:45',
       views: 623,
       uploadDate: '2024-12-05',
-      category: 'Legal',
+      category: 'Property Acquisitions',
       instructor: 'Mike Chen',
       tags: ['legal', 'contracts', 'regulations'],
       featured: true
@@ -85,7 +85,7 @@ export const VideoLibrary = () => {
       duration: '41:20',
       views: 934,
       uploadDate: '2024-12-03',
-      category: 'Technology',
+      category: 'Automations',
       instructor: 'Lisa Rodriguez',
       tags: ['automation', 'tools', 'efficiency']
     },
@@ -97,7 +97,7 @@ export const VideoLibrary = () => {
       duration: '29:10',
       views: 567,
       uploadDate: '2024-11-28',
-      category: 'Operations',
+      category: 'Property Management',
       instructor: 'David Kim',
       tags: ['communication', 'service', 'guests']
     },
@@ -109,7 +109,7 @@ export const VideoLibrary = () => {
       duration: '52:30',
       views: 1089,
       uploadDate: '2024-11-25',
-      category: 'Business',
+      category: 'Property Acquisitions',
       instructor: 'Emily Davis',
       tags: ['scaling', 'portfolio', 'growth']
     },
@@ -121,22 +121,20 @@ export const VideoLibrary = () => {
       duration: '55:00',
       views: 445,
       uploadDate: '2024-11-20',
-      category: 'Live Training',
+      category: 'Market Research',
       instructor: 'Richie Matthews',
       tags: ['live', 'market-analysis', 'qa']
     }
   ];
 
-  const categories = ['all', 'Education', 'Live Training', 'Operations', 'Legal', 'Technology', 'Business'];
+  const categories = ['all', 'Market Research', 'Property Acquisitions', 'Automations', 'Property Management'];
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      'Education': 'bg-blue-500/20 border-blue-500/30 text-blue-300',
-      'Live Training': 'bg-red-500/20 border-red-500/30 text-red-300',
-      'Operations': 'bg-green-500/20 border-green-500/30 text-green-300',
-      'Legal': 'bg-purple-500/20 border-purple-500/30 text-purple-300',
-      'Technology': 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300',
-      'Business': 'bg-orange-500/20 border-orange-500/30 text-orange-300'
+      'Market Research': 'bg-blue-500/20 border-blue-500/30 text-blue-300',
+      'Property Acquisitions': 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300',
+      'Automations': 'bg-purple-500/20 border-purple-500/30 text-purple-300',
+      'Property Management': 'bg-slate-500/20 border-slate-500/30 text-slate-300'
     };
     return colors[category as keyof typeof colors] || 'bg-gray-500/20 border-gray-500/30 text-gray-300';
   };
@@ -198,7 +196,7 @@ export const VideoLibrary = () => {
       {/* Videos Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredVideos.map(video => (
-          <Card key={video.id} className={`bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors cursor-pointer ${video.featured ? 'ring-1 ring-yellow-400/30' : ''}`}>
+          <Card key={video.id} className={`bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors cursor-pointer ${video.featured ? 'ring-1 ring-cyan-400/30' : ''}`}>
             <div className="relative">
               {/* Thumbnail */}
               <div className="aspect-video bg-slate-700 rounded-t-lg relative overflow-hidden">
@@ -213,7 +211,7 @@ export const VideoLibrary = () => {
                 
                 {/* Live indicator */}
                 {video.isLive && (
-                  <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+                  <div className="absolute top-2 left-2 bg-cyan-500 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
                     <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                     LIVE
                   </div>
@@ -221,7 +219,7 @@ export const VideoLibrary = () => {
 
                 {/* Featured indicator */}
                 {video.featured && (
-                  <div className="absolute top-2 right-2 bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 text-xs px-2 py-1 rounded flex items-center gap-1">
+                  <div className="absolute top-2 right-2 bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-xs px-2 py-1 rounded flex items-center gap-1">
                     <Star className="h-3 w-3" />
                     Featured
                   </div>
