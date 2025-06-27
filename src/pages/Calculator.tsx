@@ -80,7 +80,12 @@ const Calculator = () => {
                          data.software + data.miscellaneous + data.furnitureRental);
   const monthlyRevenue = Math.round(data.averageComparable);
   const netProfitMonthly = Math.round(monthlyRevenue - monthlyExpenses);
-  const paybackMonths = (cashToLaunch > 0 && netProfitMonthly > 0) ? Math.round(cashToLaunch / netProfitMonthly) : 0;
+  
+  // Improved payback months calculation
+  const paybackMonths = (cashToLaunch > 0 && netProfitMonthly > 0) 
+    ? Math.round(cashToLaunch / netProfitMonthly) 
+    : null; // Return null instead of 0 for better handling
+    
   const cashOnCashReturn = cashToLaunch > 0 ? Math.round((netProfitMonthly * 12 / cashToLaunch) * 100) : 0;
 
   // Update service fees when rent changes

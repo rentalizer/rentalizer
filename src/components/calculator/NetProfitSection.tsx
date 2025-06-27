@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -7,7 +6,7 @@ import { TrendingUp, DollarSign, Calendar, Percent } from 'lucide-react';
 interface NetProfitSectionProps {
   monthlyRevenue: number;
   netProfitMonthly: number;
-  paybackMonths: number;
+  paybackMonths: number | null;
   cashOnCashReturn: number;
 }
 
@@ -20,6 +19,14 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
   const isProfit = netProfitMonthly > 0;
   const profitColor = isProfit ? 'text-cyan-400' : 'text-blue-400';
   const profitBgColor = isProfit ? 'from-cyan-600/20 to-blue-600/20 border-cyan-500/30' : 'from-blue-600/20 to-slate-600/20 border-blue-500/30';
+
+  // Format payback months display
+  const formatPaybackMonths = () => {
+    if (paybackMonths === null || paybackMonths <= 0) {
+      return 'N/A';
+    }
+    return Math.round(paybackMonths).toString();
+  };
 
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
@@ -56,14 +63,14 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
           </div>
         </div>
 
-        {/* Payback Period in Months */}
+        {/* Payback Period */}
         <div className="p-3 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
           <div className="flex items-center justify-between">
             <Label className="text-cyan-300 font-medium text-sm">Payback Months</Label>
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-cyan-400" />
               <span className="text-lg font-bold text-cyan-400">
-                {paybackMonths > 0 && isFinite(paybackMonths) ? Math.round(paybackMonths) : '∞'}
+                {formatPaybackMonths()}
               </span>
             </div>
           </div>
