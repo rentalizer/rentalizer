@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Video, Plus, Search, Play, Clock, Eye, Calendar, Star, X } from 'lucide-react';
+import { Video, Search, Play, Clock, Eye, Calendar, Star, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface VideoItem {
@@ -60,7 +61,7 @@ export const VideoLibrary = () => {
       duration: '42:15',
       views: 1234,
       uploadDate: '2024-12-15',
-      category: 'Automations',
+      category: 'Operations',
       tags: ['virtual-assistant', 'hiring', 'automation', 'team-building'],
       videoUrl: 'https://www.loom.com/share/e1d50c6ae34d4c5882aa7587269c47aa?sid=5f9e60c2-8e27-480e-b003-ec358df9a5c5'
     },
@@ -133,7 +134,7 @@ export const VideoLibrary = () => {
       duration: '36:40',
       views: 1432,
       uploadDate: '2024-12-01',
-      category: 'Business Strategy',
+      category: 'Business Formation',
       tags: ['growth', 'planning', 'strategy', 'scaling'],
       videoUrl: 'https://www.loom.com/share/9054327d9dad4a94aaa206ae1ad74346?sid=82f8ce47-1769-4c00-899c-8de49194fc41'
     },
@@ -145,7 +146,7 @@ export const VideoLibrary = () => {
       duration: '41:25',
       views: 1798,
       uploadDate: '2024-11-28',
-      category: 'Financial Analysis',
+      category: 'Business Formation',
       tags: ['cashflow', 'analysis', 'finance', 'optimization'],
       videoUrl: 'https://www.loom.com/share/f3ef7729fb084b72ac0ac548b89ceb93?sid=75a145f2-4aad-4f7e-9066-2c1876abd228'
     },
@@ -205,7 +206,7 @@ export const VideoLibrary = () => {
       duration: '41:10',
       views: 987,
       uploadDate: '2024-11-15',
-      category: 'Business Strategy',
+      category: 'Operations',
       tags: ['operations', 'management', 'business-processes', 'efficiency'],
       videoUrl: 'https://www.loom.com/share/97a740ea55484c369e47d3a2a64ed776?sid=60924369-0c23-4bed-b228-8c6aed7855b7'
     },
@@ -229,7 +230,7 @@ export const VideoLibrary = () => {
       duration: '38:25',
       views: 1134,
       uploadDate: '2024-11-10',
-      category: 'Legal & Compliance',
+      category: 'Property Management',
       tags: ['str-ordinances', 'regulations', 'compliance', 'legal'],
       videoUrl: 'https://www.loom.com/share/a9103ef043e64eab9b8432ced535d475?sid=26a2af0e-b588-49d2-bef0-b2b1809baa87'
     },
@@ -265,7 +266,7 @@ export const VideoLibrary = () => {
       duration: '39:50',
       views: 1267,
       uploadDate: '2024-11-02',
-      category: 'Business Strategy',
+      category: 'Business Formation',
       tags: ['business-formation', 'legal-structure', 'incorporation', 'startup'],
       videoUrl: 'https://www.loom.com/share/e21ff8e94a404aa68110e44f9994a6b3?sid=a02b7adb-87a6-4b9c-bd17-e7579ab8369f'
     },
@@ -301,23 +302,21 @@ export const VideoLibrary = () => {
       duration: '48:30',
       views: 1654,
       uploadDate: '2024-10-25',
-      category: 'Automations',
+      category: 'Operations',
       tags: ['automation', 'operations', 'efficiency', 'systems'],
       videoUrl: 'https://www.loom.com/share/dc6e283fcb0b491eb4b4127f74ae6c60?sid=26009eef-da26-49d4-a819-6637d1e6cf8d'
     }
   ];
 
-  const categories = ['all', 'Market Research', 'Property Acquisitions', 'Automations', 'Property Management', 'Business Strategy', 'Financial Analysis', 'Legal & Compliance'];
+  const categories = ['all', 'Market Research', 'Property Acquisitions', 'Operations', 'Property Management', 'Business Formation'];
 
   const getCategoryColor = (category: string) => {
     const colors = {
       'Market Research': 'bg-blue-500/20 border-blue-500/30 text-blue-300',
       'Property Acquisitions': 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300',
-      'Automations': 'bg-purple-500/20 border-purple-500/30 text-purple-300',
+      'Operations': 'bg-purple-500/20 border-purple-500/30 text-purple-300',
       'Property Management': 'bg-slate-500/20 border-slate-500/30 text-slate-300',
-      'Business Strategy': 'bg-green-500/20 border-green-500/30 text-green-300',
-      'Financial Analysis': 'bg-orange-500/20 border-orange-500/30 text-orange-300',
-      'Legal & Compliance': 'bg-red-500/20 border-red-500/30 text-red-300'
+      'Business Formation': 'bg-green-500/20 border-green-500/30 text-green-300'
     };
     return colors[category as keyof typeof colors] || 'bg-gray-500/20 border-gray-500/30 text-gray-300';
   };
@@ -346,15 +345,11 @@ export const VideoLibrary = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-cyan-300">Video Library</h2>
+          <h2 className="text-2xl font-bold text-cyan-300">Training Videos</h2>
           <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
             {videos.length} videos
           </Badge>
         </div>
-        <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-          <Plus className="h-4 w-4 mr-2" />
-          Upload Video
-        </Button>
       </div>
 
       {/* Search and Filters */}
@@ -462,7 +457,7 @@ export const VideoLibrary = () => {
                       variant="outline" 
                       className="border-purple-500/30 text-purple-300 text-xs"
                     >
-                      #{tag}
+                      {tag}
                     </Badge>
                   ))}
                 </div>

@@ -42,6 +42,10 @@ const Community = () => {
               <Calendar className="h-4 w-4 mr-2" />
               Calendar
             </TabsTrigger>
+            <TabsTrigger value="videos" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+              <Video className="h-4 w-4 mr-2" />
+              Training Videos
+            </TabsTrigger>
             <TabsTrigger value="messages" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <MessageSquare className="h-4 w-4 mr-2" />
               Messages
@@ -53,10 +57,6 @@ const Community = () => {
             <TabsTrigger value="documents" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Book className="h-4 w-4 mr-2" />
               Documents
-            </TabsTrigger>
-            <TabsTrigger value="videos" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-              <Video className="h-4 w-4 mr-2" />
-              Videos
             </TabsTrigger>
           </TabsList>
 
@@ -241,6 +241,10 @@ const Community = () => {
             <CommunityCalendar />
           </TabsContent>
 
+          <TabsContent value="videos" className="mt-8">
+            <VideoLibrary />
+          </TabsContent>
+
           <TabsContent value="messages" className="mt-8">
             <MessageThreads />
           </TabsContent>
@@ -251,10 +255,6 @@ const Community = () => {
 
           <TabsContent value="documents" className="mt-8">
             <DocumentsLibrary />
-          </TabsContent>
-
-          <TabsContent value="videos" className="mt-8">
-            <VideoLibrary />
           </TabsContent>
         </Tabs>
       </div>
