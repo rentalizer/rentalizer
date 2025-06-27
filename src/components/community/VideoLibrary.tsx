@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,6 +18,7 @@ interface VideoItem {
   tags: string[];
   featured?: boolean;
   isLive?: boolean;
+  videoUrl?: string;
 }
 
 export const VideoLibrary = () => {
@@ -41,16 +41,16 @@ export const VideoLibrary = () => {
     },
     {
       id: '2',
-      title: 'Weekly Live Training - Property Acquisition',
-      description: 'Live training session covering advanced property acquisition strategies',
+      title: 'Property Acquisitions Overview',
+      description: 'Comprehensive overview of property acquisition strategies and best practices',
       thumbnail: '/placeholder-thumbnail.jpg',
       duration: '60:00',
       views: 892,
       uploadDate: '2024-12-10',
       category: 'Property Acquisitions',
       instructor: 'Richie Matthews',
-      tags: ['live', 'acquisition', 'strategies'],
-      isLive: true
+      tags: ['acquisition', 'overview', 'strategies'],
+      videoUrl: 'https://www.loom.com/share/b6b52e6d8bfa4490b3de0481f60cee53?sid=654b6d6f-fadd-40c0-a045-387102be0884'
     },
     {
       id: '3',
@@ -147,6 +147,12 @@ export const VideoLibrary = () => {
     return matchesSearch && matchesCategory;
   });
 
+  const handleVideoClick = (video: VideoItem) => {
+    if (video.videoUrl) {
+      window.open(video.videoUrl, '_blank');
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -196,7 +202,11 @@ export const VideoLibrary = () => {
       {/* Videos Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredVideos.map(video => (
-          <Card key={video.id} className={`bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors cursor-pointer ${video.featured ? 'ring-1 ring-cyan-400/30' : ''}`}>
+          <Card 
+            key={video.id} 
+            className={`bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors cursor-pointer ${video.featured ? 'ring-1 ring-cyan-400/30' : ''}`}
+            onClick={() => handleVideoClick(video)}
+          >
             <div className="relative">
               {/* Thumbnail */}
               <div className="aspect-video bg-slate-700 rounded-t-lg relative overflow-hidden">
