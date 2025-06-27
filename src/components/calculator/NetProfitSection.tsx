@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -31,6 +32,14 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
       return paybackMonths.toFixed(2);
     }
     return paybackMonths.toFixed(1);
+  };
+
+  // Format cash on cash return with commas
+  const formatCashOnCashReturn = () => {
+    if (!isFinite(cashOnCashReturn)) {
+      return '0';
+    }
+    return Math.round(cashOnCashReturn).toLocaleString();
   };
 
   return (
@@ -88,7 +97,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
             <div className="flex items-center gap-2">
               <Percent className="h-4 w-4 text-blue-400" />
               <span className="text-lg font-bold text-blue-400">
-                {isFinite(cashOnCashReturn) ? Math.round(cashOnCashReturn) : '0'}%
+                {formatCashOnCashReturn()}%
               </span>
             </div>
           </div>
@@ -97,3 +106,4 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
     </Card>
   );
 };
+
