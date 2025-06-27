@@ -9,12 +9,12 @@ export const TopNavBar = () => {
   const { user, signOut } = useAuth();
 
   return (
-    <div className="w-full bg-slate-800 border-b border-gray-700/50 px-6 py-4">
+    <div className="w-full bg-slate-900 border-b border-gray-700/50 px-6 py-4">
       <div className="flex items-center justify-between">
         {/* Left side - Logo moved to the right */}
         <div className="flex items-center gap-3 ml-8">
           <BarChart3 className="h-8 w-8 text-cyan-400" style={{
-            filter: 'drop-shadow(0 0 8px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 16px rgba(6, 182, 212, 0.6)) drop-shadow(0 0 24px rgba(6, 182, 212, 0.4))'
+            filter: 'drop-shadow(0 0 8px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 16px rgba(6, 182, 212, 0.6)) drop-shadow(0 0 24px rgba(6, 182, 212, 0.4)) drop-shadow(0 0 32px rgba(6, 182, 212, 0.3))'
           }} />
         </div>
 
