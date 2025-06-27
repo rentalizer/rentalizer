@@ -11,12 +11,11 @@ export const TopNavBar = () => {
   return (
     <div className="w-full bg-slate-900 border-b border-gray-700/50 px-6 py-4">
       <div className="flex items-center justify-between">
-        {/* Left side - Logo and text to match other pages */}
-        <div className="flex items-center gap-3">
+        {/* Left side - Logo moved to the right */}
+        <div className="flex items-center gap-3 ml-8">
           <BarChart3 className="h-8 w-8 text-cyan-400" style={{
             filter: 'drop-shadow(0 0 6px rgba(6, 182, 212, 1)) drop-shadow(0 0 12px rgba(6, 182, 212, 0.9)) drop-shadow(0 0 18px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 24px rgba(6, 182, 212, 0.7)) drop-shadow(0 0 30px rgba(6, 182, 212, 0.6)) drop-shadow(0 0 36px rgba(6, 182, 212, 0.5))'
           }} />
-          <span className="text-2xl font-bold text-white neon-text">Rentalizer</span>
         </div>
 
         {/* Right side - Login or User info */}
