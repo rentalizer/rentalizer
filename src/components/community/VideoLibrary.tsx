@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -405,7 +406,7 @@ export const VideoLibrary = () => {
       {/* Header - Centered */}
       <div className="text-center">
         <div className="flex items-center justify-center gap-4 mb-4">
-          <h2 className="text-3xl font-bold text-cyan-300">Training Videos</h2>
+          <h2 className="text-3xl font-bold text-cyan-300">Training</h2>
           <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
             {videos.length} videos
           </Badge>
