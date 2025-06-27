@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,7 +19,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-white text-lg">
+        <CardTitle className="flex items-center justify-center gap-2 text-white text-lg">
           <Hammer className="h-5 w-5 text-cyan-400" />
           Build Out Costs
         </CardTitle>
@@ -27,7 +28,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
         {/* Basic Costs */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-gray-200">First Month's Rent</Label>
+            <Label className="text-gray-200 text-center block">First Month's Rent</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -41,7 +42,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200">Security Deposit</Label>
+            <Label className="text-gray-200 text-center block">Security Deposit</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -59,8 +60,8 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
         <div className="space-y-4 p-4 bg-gray-800/20 rounded-lg border border-gray-600/50">
           <div className="grid grid-cols-3 gap-2 items-end">
             <div className="space-y-2 col-span-1">
-              <Label className="text-gray-200 text-xs">Property Size</Label>
-              <Label className="text-gray-200 text-xs">($8 PSF)</Label>
+              <Label className="text-gray-200 text-xs text-center block">Property Size</Label>
+              <Label className="text-gray-200 text-xs text-center block">($8 PSF)</Label>
               <Input
                 type="number"
                 value={data.squareFootage || ''}
@@ -75,7 +76,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
             </div>
 
             <div className="space-y-2 col-span-1">
-              <Label className="text-gray-200 text-xs">Furnishings Cost</Label>
+              <Label className="text-gray-200 text-xs text-center block">Furnishings Cost</Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
@@ -90,8 +91,8 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
           </div>
 
           <div className="p-3 bg-cyan-600/20 rounded border border-cyan-500/30">
-            <div className="text-cyan-300 font-medium text-sm">Calculated Cost</div>
-            <div className="text-cyan-400 font-bold text-lg">
+            <div className="text-cyan-300 font-medium text-sm text-center">Calculated Cost</div>
+            <div className="text-cyan-400 font-bold text-lg text-center">
               ${Math.round(calculatedFurnishings).toLocaleString()}
             </div>
           </div>
@@ -113,3 +114,4 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({ data, updateDa
     </Card>
   );
 };
+

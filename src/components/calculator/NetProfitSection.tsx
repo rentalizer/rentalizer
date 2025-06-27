@@ -45,7 +45,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-white text-lg">
+        <CardTitle className="flex items-center justify-center gap-2 text-white text-lg">
           <TrendingUp className="h-5 w-5 text-cyan-400" />
           Analysis Results
         </CardTitle>

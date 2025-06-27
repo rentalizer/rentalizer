@@ -124,16 +124,6 @@ const Calculator = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <TopNavBar />
       
-      {/* Clear All button positioned at top-right of entire page */}
-      <Button
-        variant="outline"
-        onClick={clearAllData}
-        className="fixed top-20 right-4 z-50 border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400"
-      >
-        <RotateCcw className="h-4 w-4 mr-2" />
-        Clear All
-      </Button>
-      
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between gap-4 mb-8">
@@ -147,14 +137,24 @@ const Calculator = () => {
           </Button>
         </div>
 
-        <div className="text-center mb-8 bg-slate-700/90 backdrop-blur-lg rounded-lg p-8 border border-gray-500/50">
+        <div className="text-center mb-6 bg-slate-700/90 backdrop-blur-lg rounded-lg p-8 border border-gray-500/50">
           <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
             <CalculatorIcon className="h-10 w-10 text-cyan-400" />
             RentalizerCalc
           </h1>
-          <p className="text-xl text-gray-300">
+          <p className="text-xl text-gray-300 mb-6">
             Calculate STR Property Profitability & ROI
           </p>
+          
+          {/* Clear All button centered below subtitle */}
+          <Button
+            variant="outline"
+            onClick={clearAllData}
+            className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Clear All
+          </Button>
         </div>
 
         {/* Calculator Input Sections - 4x1 Grid Layout */}

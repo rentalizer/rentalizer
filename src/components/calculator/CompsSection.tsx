@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -51,15 +52,13 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center justify-between text-white text-lg">
-          <div className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-cyan-400" />
-            Property Comps
-          </div>
+        <CardTitle className="flex items-center justify-center gap-2 text-white text-lg">
+          <Building2 className="h-5 w-5 text-cyan-400" />
+          Property Comps
           <Button
             onClick={autoFillComps}
             size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 h-7"
+            className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 h-7 ml-2"
           >
             <Zap className="h-3 w-3 mr-1" />
             Auto
@@ -69,7 +68,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-gray-200">Bedrooms</Label>
+            <Label className="text-gray-200 text-center block">Bedrooms</Label>
             <Select 
               value={data.bedrooms?.toString() || "2"} 
               onValueChange={(value) => updateData({ bedrooms: parseInt(value) })}
@@ -86,7 +85,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200">Bathrooms</Label>
+            <Label className="text-gray-200 text-center block">Bathrooms</Label>
             <Select 
               value={data.bathrooms?.toString() || "2"} 
               onValueChange={(value) => updateData({ bathrooms: parseFloat(value) })}
@@ -106,7 +105,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
         </div>
 
         <div className="space-y-3">
-          <Label className="text-gray-200">Add Property Values</Label>
+          <Label className="text-gray-200 text-center block">Add Property Values</Label>
           
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -131,7 +130,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
 
           {propertyValues.length > 0 && (
             <div className="space-y-2">
-              <Label className="text-gray-200 text-sm">Property Values ({propertyValues.length})</Label>
+              <Label className="text-gray-200 text-sm text-center block">Property Values ({propertyValues.length})</Label>
               <div className="max-h-32 overflow-y-auto space-y-1">
                 {propertyValues.map((value, index) => (
                   <div key={index} className="flex items-center justify-between bg-gray-800/30 rounded p-2">
@@ -152,7 +151,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
         </div>
 
         <div className="space-y-2">
-          <Label className="text-gray-200">Average Comparable Revenue</Label>
+          <Label className="text-gray-200 text-center block">Average Comparable Revenue</Label>
           <div className="relative">
             <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
@@ -182,3 +181,4 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
     </Card>
   );
 };
+

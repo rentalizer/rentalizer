@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -39,15 +40,13 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center justify-between text-white text-lg">
-          <div className="flex items-center gap-2">
-            <Receipt className="h-5 w-5 text-cyan-400" />
-            Monthly Expenses
-          </div>
+        <CardTitle className="flex items-center justify-center gap-2 text-white text-lg">
+          <Receipt className="h-5 w-5 text-cyan-400" />
+          Monthly Expenses
           <Button
             onClick={autoFillExpenses}
             size="sm"
-            className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs px-3 py-1 h-7"
+            className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs px-3 py-1 h-7 ml-2"
           >
             <Wand2 className="h-3 w-3 mr-1" />
             Auto-Fill
@@ -57,7 +56,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-gray-200">Rent</Label>
+            <Label className="text-gray-200 text-center block">Rent</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -71,7 +70,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200">Svc Fees (2.9%)</Label>
+            <Label className="text-gray-200 text-center block">Svc Fees (2.9%)</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -84,7 +83,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200">Maintenance</Label>
+            <Label className="text-gray-200 text-center block">Maintenance</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -98,7 +97,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200">Power/Electricity</Label>
+            <Label className="text-gray-200 text-center block">Power/Electricity</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -112,7 +111,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200">Water/Sewer</Label>
+            <Label className="text-gray-200 text-center block">Water/Sewer</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -126,7 +125,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200">Internet</Label>
+            <Label className="text-gray-200 text-center block">Internet</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -140,7 +139,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200">License</Label>
+            <Label className="text-gray-200 text-center block">License</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -154,7 +153,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200">Insurance</Label>
+            <Label className="text-gray-200 text-center block">Insurance</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -168,7 +167,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200">Software</Label>
+            <Label className="text-gray-200 text-center block">Software</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -182,7 +181,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200">Miscellaneous</Label>
+            <Label className="text-gray-200 text-center block">Miscellaneous</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -196,7 +195,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200">P Furniture Rental</Label>
+            <Label className="text-gray-200 text-center block">P Furniture Rental</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -225,3 +224,4 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
     </Card>
   );
 };
+
