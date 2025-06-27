@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -447,19 +446,6 @@ export const VideoLibrary = () => {
                     <Eye className="h-3 w-3" />
                     {video.views.toLocaleString()}
                   </div>
-                </div>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1">
-                  {video.tags.slice(0, 3).map(tag => (
-                    <Badge 
-                      key={tag} 
-                      variant="outline" 
-                      className="border-purple-500/30 text-purple-300 text-xs"
-                    >
-                      {tag}
-                    </Badge>
-                  ))}
                 </div>
               </div>
             </CardContent>
