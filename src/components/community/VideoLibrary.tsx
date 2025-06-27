@@ -33,7 +33,7 @@ export const VideoLibrary = () => {
       id: '0',
       title: 'Competitor Analysis',
       description: 'Learn how to analyze competitors and identify market opportunities',
-      thumbnail: '/placeholder-thumbnail.jpg',
+      thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop',
       duration: '35:20',
       views: 1567,
       uploadDate: '2024-12-20',
@@ -42,105 +42,6 @@ export const VideoLibrary = () => {
       tags: ['competitor-analysis', 'market-research', 'strategy'],
       featured: true,
       videoUrl: 'https://www.loom.com/share/00d9db5904784d0091b6dbeedfb61830?sid=47d7bb0b-f3eb-421b-b3f5-6aab2661f864'
-    },
-    {
-      id: '1',
-      title: 'Market Research Fundamentals',
-      description: 'Learn how to identify profitable rental arbitrage markets using data-driven approaches',
-      thumbnail: '/placeholder-thumbnail.jpg',
-      duration: '45:30',
-      views: 1234,
-      uploadDate: '2024-12-15',
-      category: 'Market Research',
-      instructor: 'Richie Matthews',
-      tags: ['market-research', 'fundamentals', 'data'],
-      featured: true
-    },
-    {
-      id: '2',
-      title: 'Property Acquisitions Overview',
-      description: 'Comprehensive overview of property acquisition strategies and best practices',
-      thumbnail: '/placeholder-thumbnail.jpg',
-      duration: '60:00',
-      views: 892,
-      uploadDate: '2024-12-10',
-      category: 'Property Acquisitions',
-      instructor: 'Richie Matthews',
-      tags: ['acquisition', 'overview', 'strategies'],
-      videoUrl: 'https://www.loom.com/share/b6b52e6d8bfa4490b3de0481f60cee53?sid=654b6d6f-fadd-40c0-a045-387102be0884'
-    },
-    {
-      id: '3',
-      title: 'Furnishing Properties on a Budget',
-      description: 'Complete guide to furnishing rental properties cost-effectively',
-      thumbnail: '/placeholder-thumbnail.jpg',
-      duration: '32:15',
-      views: 756,
-      uploadDate: '2024-12-08',
-      category: 'Property Management',
-      instructor: 'Sarah Johnson',
-      tags: ['furnishing', 'budget', 'cost-effective']
-    },
-    {
-      id: '4',
-      title: 'Legal Aspects of Rental Arbitrage',
-      description: 'Understanding contracts, regulations, and legal considerations',
-      thumbnail: '/placeholder-thumbnail.jpg',
-      duration: '38:45',
-      views: 623,
-      uploadDate: '2024-12-05',
-      category: 'Property Acquisitions',
-      instructor: 'Mike Chen',
-      tags: ['legal', 'contracts', 'regulations'],
-      featured: true
-    },
-    {
-      id: '5',
-      title: 'Automation Tools for Property Management',
-      description: 'Setting up automated systems for efficient property management',
-      thumbnail: '/placeholder-thumbnail.jpg',
-      duration: '41:20',
-      views: 934,
-      uploadDate: '2024-12-03',
-      category: 'Automations',
-      instructor: 'Lisa Rodriguez',
-      tags: ['automation', 'tools', 'efficiency']
-    },
-    {
-      id: '6',
-      title: 'Guest Communication Mastery',
-      description: 'Best practices for professional guest communication and service',
-      thumbnail: '/placeholder-thumbnail.jpg',
-      duration: '29:10',
-      views: 567,
-      uploadDate: '2024-11-28',
-      category: 'Property Management',
-      instructor: 'David Kim',
-      tags: ['communication', 'service', 'guests']
-    },
-    {
-      id: '7',
-      title: 'Scaling Your Portfolio',
-      description: 'Strategies for growing from 1 to 10+ properties',
-      thumbnail: '/placeholder-thumbnail.jpg',
-      duration: '52:30',
-      views: 1089,
-      uploadDate: '2024-11-25',
-      category: 'Property Acquisitions',
-      instructor: 'Emily Davis',
-      tags: ['scaling', 'portfolio', 'growth']
-    },
-    {
-      id: '8',
-      title: 'Weekly Live Training - Market Analysis',
-      description: 'Live Q&A session on market analysis techniques',
-      thumbnail: '/placeholder-thumbnail.jpg',
-      duration: '55:00',
-      views: 445,
-      uploadDate: '2024-11-20',
-      category: 'Market Research',
-      instructor: 'Richie Matthews',
-      tags: ['live', 'market-analysis', 'qa']
     }
   ];
 
@@ -232,7 +133,15 @@ export const VideoLibrary = () => {
             <div className="relative">
               {/* Thumbnail */}
               <div className="aspect-video bg-slate-700 rounded-t-lg relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center">
+                <img
+                  src={video.thumbnail}
+                  alt={video.title}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgdmlld0JveD0iMCAwIDQwMCAyMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjMzM0MTU1Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjExMi41IiByPSIzMCIgZmlsbD0iIzk0QTNCOCIvPgo8cG9seWdvbiBwb2ludHM9IjE5MCwxMDAuNSAyMTAsOTAuNSAyMTAsMTM0LjUgMTkwLDEyNC41IiBmaWxsPSIjMzM0MTU1Ii8+Cjwvc3ZnPgo=';
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/20 hover:bg-black/10 transition-colors flex items-center justify-center">
                   <Play className="h-12 w-12 text-white opacity-80" />
                 </div>
                 
@@ -295,7 +204,6 @@ export const VideoLibrary = () => {
 
                 {/* Footer */}
                 <div className="flex items-center justify-between text-xs text-gray-400 pt-3 border-t border-gray-700">
-                  <span>By {video.instructor}</span>
                   <div className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
                     {new Date(video.uploadDate).toLocaleDateString()}
@@ -349,7 +257,6 @@ export const VideoLibrary = () => {
             <div className="space-y-2 text-gray-300">
               <p className="text-sm">{selectedVideo.description}</p>
               <div className="flex items-center gap-4 text-xs text-gray-400">
-                <span>By {selectedVideo.instructor}</span>
                 <span>{selectedVideo.duration}</span>
                 <span>{selectedVideo.views.toLocaleString()} views</span>
                 <span>{new Date(selectedVideo.uploadDate).toLocaleDateString()}</span>
