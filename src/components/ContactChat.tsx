@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -90,10 +89,13 @@ export const ContactChat = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <button className="text-gray-300 hover:text-cyan-300 transition-colors text-sm flex items-center gap-2">
-          <MessageCircle className="h-4 w-4" />
+        <Button 
+          variant="outline" 
+          className="w-full border-cyan-500/30 text-cyan-300 hover:bg-cyan-600/10"
+        >
+          <MessageCircle className="h-4 w-4 mr-2" />
           Contact Us
-        </button>
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md bg-gray-900 border border-gray-700">
         <DialogHeader>

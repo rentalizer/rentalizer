@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -93,7 +94,9 @@ const Community = () => {
                       <Plus className="h-4 w-4 mr-2" />
                       Start Discussion
                     </Button>
-                    <ContactChat />
+                    <div className="w-full">
+                      <ContactChat />
+                    </div>
                     <Button 
                       variant="outline" 
                       className="w-full border-cyan-500/30 text-cyan-300"
