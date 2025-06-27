@@ -1,9 +1,12 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Plus, Clock, Users, Video } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ChevronLeft, ChevronRight, Plus, Clock, Users, Video, ExternalLink } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Event {
   id: string;
@@ -13,27 +16,39 @@ interface Event {
   type: 'training' | 'webinar' | 'discussion' | 'workshop';
   attendees?: number;
   isRecurring?: boolean;
+  zoomLink?: string;
+  meetingId?: string;
+  passcode?: string;
 }
 
 export const CommunityCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const { user } = useAuth();
 
-  // Sample events including weekly trainings
-  const events: Event[] = [
+  // Check if user is admin (you can adjust this logic based on your admin system)
+  const isAdmin = user?.email?.includes('admin') || user?.email?.includes('support');
+
+  // Updated events with Thursday training and zoom links
+  const [events, setEvents] = useState<Event[]>([
     {
       id: '1',
       title: 'Weekly Live Training',
-      date: new Date(2025, 5, 3), // June 3rd
-      time: '5:00 PM PST',
+      date: new Date(2025, 5, 5), // June 5th (Thursday)
+      time: '4:00 PM PST / 7:00 PM ET',
       type: 'training',
       attendees: 45,
-      isRecurring: true
+      isRecurring: true,
+      zoomLink: 'https://us06web.zoom.us/j/84255424839?pwd=3RsbkFbegOF7wwUisPYGNX3Ts1KWHJ.1',
+      meetingId: '842 5542 4839',
+      passcode: '803338'
     },
     {
       id: '2',
       title: 'Market Research Deep Dive',
-      date: new Date(2025, 5, 5),
+      date: new Date(2025, 5, 6),
       time: '4:00 PM PST',
       type: 'webinar',
       attendees: 32
@@ -41,16 +56,19 @@ export const CommunityCalendar = () => {
     {
       id: '3',
       title: 'Weekly Live Training',
-      date: new Date(2025, 5, 10),
-      time: '5:00 PM PST',
+      date: new Date(2025, 5, 12), // June 12th (Thursday)
+      time: '4:00 PM PST / 7:00 PM ET',
       type: 'training',
       attendees: 38,
-      isRecurring: true
+      isRecurring: true,
+      zoomLink: 'https://us06web.zoom.us/j/84255424839?pwd=3RsbkFbegOF7wwUisPYGNX3Ts1KWHJ.1',
+      meetingId: '842 5542 4839',
+      passcode: '803338'
     },
     {
       id: '4',
       title: 'Competitor Analysis Workshop',
-      date: new Date(2025, 5, 12),
+      date: new Date(2025, 5, 13),
       time: '4:00 PM PST',
       type: 'workshop',
       attendees: 28
@@ -58,16 +76,19 @@ export const CommunityCalendar = () => {
     {
       id: '5',
       title: 'Weekly Live Training',
-      date: new Date(2025, 5, 17),
-      time: '5:00 PM PST',
+      date: new Date(2025, 5, 19), // June 19th (Thursday)
+      time: '4:00 PM PST / 7:00 PM ET',
       type: 'training',
       attendees: 41,
-      isRecurring: true
+      isRecurring: true,
+      zoomLink: 'https://us06web.zoom.us/j/84255424839?pwd=3RsbkFbegOF7wwUisPYGNX3Ts1KWHJ.1',
+      meetingId: '842 5542 4839',
+      passcode: '803338'
     },
     {
       id: '6',
       title: 'Hosting Revenue Optimization',
-      date: new Date(2025, 5, 19),
+      date: new Date(2025, 5, 20),
       time: '4:00 PM PST',
       type: 'webinar',
       attendees: 35
@@ -75,21 +96,37 @@ export const CommunityCalendar = () => {
     {
       id: '7',
       title: 'Weekly Live Training',
-      date: new Date(2025, 5, 24),
-      time: '5:00 PM PST',
+      date: new Date(2025, 5, 26), // June 26th (Thursday)
+      time: '4:00 PM PST / 7:00 PM ET',
       type: 'training',
       attendees: 42,
-      isRecurring: true
+      isRecurring: true,
+      zoomLink: 'https://us06web.zoom.us/j/84255424839?pwd=3RsbkFbegOF7wwUisPYGNX3Ts1KWHJ.1',
+      meetingId: '842 5542 4839',
+      passcode: '803338'
     },
     {
       id: '8',
       title: 'Property Listing Strategies',
-      date: new Date(2025, 5, 26),
+      date: new Date(2025, 5, 27),
       time: '4:00 PM PST',
       type: 'workshop',
       attendees: 29
     }
-  ];
+  ]);
+
+  const handleEditEvent = (event: Event) => {
+    setSelectedEvent(event);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateEvent = (updatedEvent: Event) => {
+    setEvents(events.map(event => 
+      event.id === updatedEvent.id ? updatedEvent : event
+    ));
+    setIsEditDialogOpen(false);
+    setSelectedEvent(null);
+  };
 
   const getEventTypeColor = (type: string) => {
     switch (type) {
@@ -152,10 +189,13 @@ export const CommunityCalendar = () => {
             <CardTitle className="text-cyan-300 flex items-center gap-2">
               Events Calendar
             </CardTitle>
-            <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Event
-            </Button>
+            {/* Only show Add Event button for admins */}
+            {isAdmin && (
+              <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Event
+              </Button>
+            )}
           </CardHeader>
           <CardContent>
             {/* Month Navigation */}
@@ -245,11 +285,23 @@ export const CommunityCalendar = () => {
                   <div key={event.id} className="p-4 bg-slate-700/30 rounded-lg border border-gray-600">
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-medium text-white">{event.title}</h4>
-                      {event.isRecurring && (
-                        <Badge variant="outline" className="border-cyan-500/30 text-cyan-300 text-xs">
-                          Weekly
-                        </Badge>
-                      )}
+                      <div className="flex gap-2">
+                        {event.isRecurring && (
+                          <Badge variant="outline" className="border-cyan-500/30 text-cyan-300 text-xs">
+                            Weekly
+                          </Badge>
+                        )}
+                        {isAdmin && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEditEvent(event)}
+                            className="h-6 px-2 text-xs border-cyan-500/30 text-cyan-300"
+                          >
+                            Edit
+                          </Button>
+                        )}
+                      </div>
                     </div>
                     
                     <div className="space-y-2">
@@ -271,14 +323,36 @@ export const CommunityCalendar = () => {
                           {event.attendees} attending
                         </div>
                       )}
+
+                      {event.zoomLink && (
+                        <div className="mt-3 p-3 bg-slate-600/30 rounded-lg">
+                          <div className="text-xs text-gray-400 mb-2">Zoom Meeting Details:</div>
+                          <div className="text-xs text-gray-300 mb-1">
+                            Meeting ID: {event.meetingId}
+                          </div>
+                          <div className="text-xs text-gray-300 mb-2">
+                            Passcode: {event.passcode}
+                          </div>
+                          <Button
+                            size="sm"
+                            onClick={() => window.open(event.zoomLink, '_blank')}
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Join Zoom Meeting
+                          </Button>
+                        </div>
+                      )}
                     </div>
                     
-                    <Button 
-                      size="sm" 
-                      className="w-full mt-3 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
-                    >
-                      Join Event
-                    </Button>
+                    {!event.zoomLink && (
+                      <Button 
+                        size="sm" 
+                        className="w-full mt-3 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
+                      >
+                        Join Event
+                      </Button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -290,6 +364,84 @@ export const CommunityCalendar = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Admin Edit Event Dialog */}
+      {isAdmin && (
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="bg-slate-800 border-cyan-500/20">
+            <DialogHeader>
+              <DialogTitle className="text-cyan-300">Edit Event</DialogTitle>
+            </DialogHeader>
+            {selectedEvent && (
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="title" className="text-gray-300">Event Title</Label>
+                  <Input
+                    id="title"
+                    value={selectedEvent.title}
+                    onChange={(e) => setSelectedEvent({...selectedEvent, title: e.target.value})}
+                    className="bg-slate-700 border-gray-600 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="time" className="text-gray-300">Time</Label>
+                  <Input
+                    id="time"
+                    value={selectedEvent.time}
+                    onChange={(e) => setSelectedEvent({...selectedEvent, time: e.target.value})}
+                    className="bg-slate-700 border-gray-600 text-white"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="zoomLink" className="text-gray-300">Zoom Link</Label>
+                  <Input
+                    id="zoomLink"
+                    value={selectedEvent.zoomLink || ''}
+                    onChange={(e) => setSelectedEvent({...selectedEvent, zoomLink: e.target.value})}
+                    className="bg-slate-700 border-gray-600 text-white"
+                    placeholder="https://zoom.us/j/..."
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="meetingId" className="text-gray-300">Meeting ID</Label>
+                  <Input
+                    id="meetingId"
+                    value={selectedEvent.meetingId || ''}
+                    onChange={(e) => setSelectedEvent({...selectedEvent, meetingId: e.target.value})}
+                    className="bg-slate-700 border-gray-600 text-white"
+                    placeholder="123 456 789"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="passcode" className="text-gray-300">Passcode</Label>
+                  <Input
+                    id="passcode"
+                    value={selectedEvent.passcode || ''}
+                    onChange={(e) => setSelectedEvent({...selectedEvent, passcode: e.target.value})}
+                    className="bg-slate-700 border-gray-600 text-white"
+                    placeholder="Enter passcode"
+                  />
+                </div>
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    onClick={() => handleUpdateEvent(selectedEvent)}
+                    className="flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
+                  >
+                    Save Changes
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsEditDialogOpen(false)}
+                    className="border-gray-600 text-gray-300"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
