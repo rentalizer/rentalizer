@@ -13,7 +13,9 @@ export const TopNavBar = () => {
       <div className="flex items-center justify-between">
         {/* Left side - Logo moved to the right */}
         <div className="flex items-center gap-3 ml-8">
-          <BarChart3 className="h-8 w-8 text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+          <BarChart3 className="h-8 w-8 text-cyan-400" style={{
+            filter: 'drop-shadow(0 0 8px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 16px rgba(6, 182, 212, 0.6)) drop-shadow(0 0 24px rgba(6, 182, 212, 0.4))'
+          }} />
         </div>
 
         {/* Right side - Login or User info */}
