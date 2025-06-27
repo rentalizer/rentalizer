@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, MessageCircle } from 'lucide-react';
+import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, MessageCircle, UserCheck } from 'lucide-react';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { CommunityCalendar } from '@/components/community/CommunityCalendar';
@@ -12,6 +12,7 @@ import { GroupDiscussions } from '@/components/community/GroupDiscussions';
 import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
 import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { DirectMessages } from '@/components/community/DirectMessages';
+import Members from '@/components/community/Members';
 
 const Community = () => {
   const [activeTab, setActiveTab] = useState('community');
@@ -33,10 +34,14 @@ const Community = () => {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 bg-slate-800/50 border border-cyan-500/20">
+          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50 border border-cyan-500/20">
             <TabsTrigger value="community" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <MessageSquare className="h-4 w-4 mr-2" />
               Community
+            </TabsTrigger>
+            <TabsTrigger value="members" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+              <UserCheck className="h-4 w-4 mr-2" />
+              Members
             </TabsTrigger>
             <TabsTrigger value="calendar" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Calendar className="h-4 w-4 mr-2" />
@@ -59,6 +64,11 @@ const Community = () => {
           {/* Community Tab (formerly Discussion) */}
           <TabsContent value="community" className="mt-8">
             <MessageThreads />
+          </TabsContent>
+
+          {/* Members Tab */}
+          <TabsContent value="members" className="mt-8">
+            <Members />
           </TabsContent>
 
           {/* Other Tabs */}
