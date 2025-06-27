@@ -37,45 +37,23 @@ export const GroupDiscussions = () => {
       isHot: true
     },
     {
-      id: '2',
-      title: 'Automation Tools for Property Management',
-      author: 'Emily Davis',
-      avatar: 'ED',
-      category: 'Technology',
-      participants: 19,
-      messages: 89,
-      lastActivity: '1h ago',
-      tags: ['automation', 'tools', 'management']
-    },
-    {
       id: '3',
-      title: 'Legal Considerations for Subleasing',
+      title: 'LLC Formation for Rental Business',
       author: 'Robert Wilson',
       avatar: 'RW',
-      category: 'Legal',
+      category: 'Business Formation',
       participants: 34,
       messages: 203,
       lastActivity: '2h ago',
-      tags: ['legal', 'subleasing', 'contracts'],
+      tags: ['llc', 'business', 'formation'],
       isHot: true
-    },
-    {
-      id: '4',
-      title: 'Interior Design on a Budget',
-      author: 'Maria Garcia',
-      avatar: 'MG',
-      category: 'Design',
-      participants: 45,
-      messages: 267,
-      lastActivity: '3h ago',
-      tags: ['design', 'budget', 'interior']
     },
     {
       id: '5',
       title: 'Scaling Your Portfolio: Growth Strategies',
       author: 'Alex Thompson',
       avatar: 'AT',
-      category: 'Business',
+      category: 'Business Formation',
       participants: 52,
       messages: 334,
       lastActivity: '4h ago',
@@ -94,7 +72,7 @@ export const GroupDiscussions = () => {
     }
   ];
 
-  const categories = ['all', 'Market Research', 'Technology', 'Legal', 'Design', 'Business', 'Operations'];
+  const categories = ['all', 'Market Research', 'Business Formation', 'Operations'];
 
   const filteredDiscussions = discussions.filter(discussion => {
     const matchesSearch = discussion.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -106,10 +84,7 @@ export const GroupDiscussions = () => {
   const getCategoryColor = (category: string) => {
     const colors = {
       'Market Research': 'bg-blue-500/20 border-blue-500/30 text-blue-300',
-      'Technology': 'bg-green-500/20 border-green-500/30 text-green-300',
-      'Legal': 'bg-red-500/20 border-red-500/30 text-red-300',
-      'Design': 'bg-purple-500/20 border-purple-500/30 text-purple-300',
-      'Business': 'bg-orange-500/20 border-orange-500/30 text-orange-300',
+      'Business Formation': 'bg-orange-500/20 border-orange-500/30 text-orange-300',
       'Operations': 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300'
     };
     return colors[category as keyof typeof colors] || 'bg-gray-500/20 border-gray-500/30 text-gray-300';
