@@ -3,7 +3,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Building2, DollarSign } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Building2, DollarSign, Calculator as CalculatorIcon } from 'lucide-react';
 import { CalculatorData } from '@/pages/Calculator';
 
 interface BuildOutSectionProps {
@@ -17,6 +18,12 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
   updateData,
   cashToLaunch
 }) => {
+  const calculatedFurnishings = Math.round(data.squareFootage * data.furnishingsPSF);
+
+  const applyCalculatedFurnishings = () => {
+    updateData({ furnishingsCost: calculatedFurnishings });
+  };
+
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
@@ -80,6 +87,61 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
               className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
             />
           </div>
+        </div>
+
+        {/* Property Size Calculator Section */}
+        <div className="mt-4 p-4 bg-gray-800/30 rounded-lg border border-gray-600/50">
+          <Label className="text-gray-200 text-center block mb-3">Property Size ($8 PSF)</Label>
+          
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="space-y-2">
+              <Label className="text-gray-300 text-sm">Square Footage</Label>
+              <Input
+                type="number"
+                value={data.squareFootage || ''}
+                onChange={(e) => updateData({ squareFootage: Math.round(parseFloat(e.target.value)) || 0 })}
+                placeholder="850"
+                className="bg-gray-800/50 border-gray-600 text-gray-100"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-gray-300 text-sm">Price per Sq Ft</Label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  type="number"
+                  value={data.furnishingsPSF || ''}
+                  onChange={(e) => updateData({ furnishingsPSF: Math.round(parseFloat(e.target.value)) || 0 })}
+                  placeholder="8"
+                  className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mb-3">
+            <span className="text-gray-300">or</span>
+          </div>
+
+          <div className="flex items-center justify-between mb-3">
+            <Label className="text-gray-300">Calculated Cost</Label>
+            <div className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4 text-cyan-400" />
+              <span className="text-lg font-bold text-cyan-400">
+                {calculatedFurnishings.toLocaleString()}
+              </span>
+            </div>
+          </div>
+
+          <Button 
+            onClick={applyCalculatedFurnishings}
+            className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
+            size="sm"
+          >
+            <CalculatorIcon className="h-4 w-4 mr-2" />
+            Apply to Furnishings Cost
+          </Button>
         </div>
 
         <div className="mt-6 p-4 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
