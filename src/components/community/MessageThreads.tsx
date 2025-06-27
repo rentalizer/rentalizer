@@ -141,16 +141,6 @@ export const MessageThreads = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-cyan-300">Message Threads</h2>
-          <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
-            {messages.length} threads
-          </Badge>
-        </div>
-      </div>
-
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
