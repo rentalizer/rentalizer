@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, Search, Pin, Reply, Heart, Send, ChevronDown, ChevronUp } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
   id: string;
@@ -24,8 +24,9 @@ export const MessageThreads = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [newComment, setNewComment] = useState('');
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
+  const { toast } = useToast();
 
-  const messages: Message[] = [
+  const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       author: 'Richie Matthews',
@@ -82,7 +83,7 @@ export const MessageThreads = () => {
       likes: 22,
       tags: ['landlords', 'negotiation', 'help']
     }
-  ];
+  ]);
 
   // Sort messages to show pinned messages first
   const sortedMessages = [...messages].sort((a, b) => {
@@ -99,8 +100,27 @@ export const MessageThreads = () => {
 
   const handleSubmitComment = () => {
     if (newComment.trim()) {
-      console.log('New comment:', newComment);
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        author: 'You',
+        avatar: 'YU',
+        title: newComment.length > 50 ? newComment.substring(0, 50) + '...' : newComment,
+        content: newComment,
+        timestamp: 'now',
+        replies: 0,
+        likes: 0,
+        tags: ['discussion']
+      };
+
+      setMessages(prevMessages => [newMessage, ...prevMessages]);
       setNewComment('');
+      
+      toast({
+        title: "Comment posted!",
+        description: "Your comment has been added to the community.",
+      });
+
+      console.log('New comment posted:', newComment);
     }
   };
 
