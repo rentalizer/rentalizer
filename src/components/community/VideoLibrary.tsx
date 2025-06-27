@@ -268,6 +268,42 @@ export const VideoLibrary = () => {
       category: 'Business Strategy',
       tags: ['business-formation', 'legal-structure', 'incorporation', 'startup'],
       videoUrl: 'https://www.loom.com/share/e21ff8e94a404aa68110e44f9994a6b3?sid=a02b7adb-87a6-4b9c-bd17-e7579ab8369f'
+    },
+    {
+      id: '21',
+      title: 'Property Acquisition - Tools & Process',
+      description: 'Comprehensive guide to tools and processes for successful property acquisitions',
+      thumbnail: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=450&fit=crop',
+      duration: '44:20',
+      views: 1876,
+      uploadDate: '2024-10-30',
+      category: 'Property Acquisitions',
+      tags: ['acquisition-tools', 'process', 'workflow', 'systems'],
+      videoUrl: 'https://www.loom.com/share/d8e2fc55f0a74a0ab916b8b96ae9f205?sid=6ed031f1-46ee-4793-96ea-50a4533629b2'
+    },
+    {
+      id: '22',
+      title: 'Property Acquisition - Negotiating',
+      description: 'Master negotiation techniques for better property acquisition deals',
+      thumbnail: 'https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=800&h=450&fit=crop',
+      duration: '37:15',
+      views: 1432,
+      uploadDate: '2024-10-28',
+      category: 'Property Acquisitions',
+      tags: ['negotiation', 'deal-making', 'acquisition-strategy', 'communication'],
+      videoUrl: 'https://www.loom.com/share/b1c026f04f1e4f578805227ad6602779?sid=b0db134e-7aac-4b34-a1b9-97fe84704fad'
+    },
+    {
+      id: '23',
+      title: 'Automate Operations',
+      description: 'Learn how to automate your rental arbitrage operations for maximum efficiency',
+      thumbnail: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=800&h=450&fit=crop',
+      duration: '48:30',
+      views: 1654,
+      uploadDate: '2024-10-25',
+      category: 'Automations',
+      tags: ['automation', 'operations', 'efficiency', 'systems'],
+      videoUrl: 'https://www.loom.com/share/dc6e283fcb0b491eb4b4127f74ae6c60?sid=26009eef-da26-49d4-a819-6637d1e6cf8d'
     }
   ];
 
