@@ -9,15 +9,15 @@ export const TopNavBar = () => {
   const { user, signOut } = useAuth();
 
   return (
-    <div className="w-full bg-slate-800/95 backdrop-blur-sm border-b border-cyan-500/20 px-6 py-3">
+    <div className="w-full bg-slate-800 border-b border-gray-700/50 px-6 py-4">
       <div className="flex items-center justify-between">
-        {/* Left side - Logo only */}
-        <div className="flex items-center gap-3">
-          <BarChart3 className="h-8 w-8 text-cyan-400" />
+        {/* Left side - Logo moved to the right */}
+        <div className="flex items-center gap-3 ml-8">
+          <BarChart3 className="h-8 w-8 text-cyan-400 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
         </div>
 
-        {/* Right side - User info and actions */}
-        {user && (
+        {/* Right side - Login or User info */}
+        {user ? (
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20">
               <User className="h-4 w-4 text-cyan-400" />
@@ -36,6 +36,14 @@ export const TopNavBar = () => {
               Sign Out
             </Button>
           </div>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium"
+          >
+            Login
+          </Button>
         )}
       </div>
     </div>
