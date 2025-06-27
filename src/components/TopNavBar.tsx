@@ -9,7 +9,7 @@ export const TopNavBar = () => {
 
   return (
     <div className="w-full bg-slate-700/90 backdrop-blur-lg border-b border-gray-500/50">
-      <div className="container mx-auto px-20 py-4">
+      <div className="container mx-auto px-32 py-4">
         <div className="flex items-center justify-between">
           {/* Left side - Logo only */}
           <div className="flex items-center gap-3">
