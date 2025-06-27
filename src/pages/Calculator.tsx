@@ -74,7 +74,7 @@ const Calculator = () => {
 
   // Calculate derived values - all rounded to whole numbers
   const cashToLaunch = Math.round(data.firstMonthRent + data.securityDeposit + data.furnishingsCost);
-  const serviceFeeCalculated = Math.round(data.averageComparable * 0.029); // 2.9%
+  const serviceFeeCalculated = Math.round(data.rent * 0.029); // 2.9% of rent, not average comparable
   const monthlyExpenses = Math.round(data.rent + serviceFeeCalculated + data.maintenance + data.power + 
                          data.waterSewer + data.internet + data.taxLicense + data.insurance + 
                          data.software + data.miscellaneous + data.furnitureRental);
@@ -83,13 +83,13 @@ const Calculator = () => {
   const paybackMonths = (cashToLaunch > 0 && netProfitMonthly > 0) ? Math.round(cashToLaunch / netProfitMonthly) : 0;
   const cashOnCashReturn = cashToLaunch > 0 ? Math.round((netProfitMonthly * 12 / cashToLaunch) * 100) : 0;
 
-  // Update service fees when average comparable changes
+  // Update service fees when rent changes
   useEffect(() => {
     setData(prev => ({
       ...prev,
-      serviceFees: Math.round(prev.averageComparable * 0.029)
+      serviceFees: Math.round(prev.rent * 0.029)
     }));
-  }, [data.averageComparable]);
+  }, [data.rent]);
 
   const updateData = (updates: Partial<CalculatorData>) => {
     // Round all numerical values to remove decimals
