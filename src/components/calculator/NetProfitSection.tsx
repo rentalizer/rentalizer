@@ -42,10 +42,10 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Monthly Revenue */}
+        {/* Monthly Revenue Estimate */}
         <div className="p-4 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-cyan-300 font-medium">Monthly Revenue</Label>
+            <Label className="text-cyan-300 font-medium">Monthly Revenue Estimate</Label>
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-cyan-400" />
               <span className="text-2xl font-bold text-cyan-400">
