@@ -43,12 +43,12 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Monthly Revenue Estimate */}
-        <div className="p-4 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
+        <div className="p-4 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-lg border border-blue-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-cyan-300 font-medium">Monthly Revenue Estimate</Label>
+            <Label className="text-blue-300 font-medium">Monthly Revenue Estimate</Label>
             <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-cyan-400" />
-              <span className="text-2xl font-bold text-cyan-400">
+              <DollarSign className="h-5 w-5 text-blue-400" />
+              <span className="text-2xl font-bold text-blue-400">
                 {Math.round(monthlyRevenue).toLocaleString()}
               </span>
             </div>
@@ -56,12 +56,12 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
         </div>
 
         {/* Net Monthly Profit */}
-        <div className="p-4 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
+        <div className="p-4 bg-gradient-to-r from-emerald-600/20 to-green-600/20 rounded-lg border border-emerald-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-cyan-300 font-medium">Net Monthly Profit</Label>
+            <Label className="text-emerald-300 font-medium">Net Monthly Profit</Label>
             <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-cyan-400" />
-              <span className={`text-2xl font-bold ${netProfitMonthly >= 0 ? 'text-cyan-400' : 'text-red-400'}`}>
+              <DollarSign className="h-5 w-5 text-emerald-400" />
+              <span className={`text-2xl font-bold ${netProfitMonthly >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                 {netProfitMonthly >= 0 ? '' : '-'}${Math.abs(netProfitMonthly).toLocaleString()}
               </span>
             </div>
@@ -69,12 +69,12 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
         </div>
 
         {/* Payback Period */}
-        <div className="p-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-lg border border-purple-500/30">
+        <div className="p-4 bg-gradient-to-r from-teal-600/20 to-cyan-600/20 rounded-lg border border-teal-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-purple-300 font-medium">Payback Period</Label>
+            <Label className="text-teal-300 font-medium">Payback Period</Label>
             <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-purple-400" />
-              <span className="text-2xl font-bold text-purple-400">
+              <Calendar className="h-5 w-5 text-teal-400" />
+              <span className="text-2xl font-bold text-teal-400">
                 {formatPaybackPeriod(paybackMonths)}
               </span>
             </div>
@@ -82,12 +82,12 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
         </div>
 
         {/* Cash on Cash Return */}
-        <div className="p-4 bg-gradient-to-r from-orange-600/20 to-red-600/20 rounded-lg border border-orange-500/30">
+        <div className="p-4 bg-gradient-to-r from-slate-600/20 to-gray-600/20 rounded-lg border border-slate-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-orange-300 font-medium">Cash on Cash Return</Label>
+            <Label className="text-slate-300 font-medium">Cash on Cash Return</Label>
             <div className="flex items-center gap-2">
-              <Percent className="h-5 w-5 text-orange-400" />
-              <span className="text-2xl font-bold text-orange-400">
+              <Percent className="h-5 w-5 text-slate-400" />
+              <span className="text-2xl font-bold text-slate-400">
                 {cashOnCashReturn}%
               </span>
             </div>
