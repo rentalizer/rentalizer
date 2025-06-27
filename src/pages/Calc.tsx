@@ -74,11 +74,11 @@ const Calc = () => {
   const [data, setData] = useState<CalculatorData>(initialData);
 
   // Calculate derived values - all rounded to whole numbers except paybackMonths
-  const cashToLaunch = Math.round(data.firstMonthRent + data.securityDeposit + data.furnishingsCost);
+  const cashToLaunch = Math.round(data.firstMonthRent + data.securityDeposit + data.miscellaneous + data.furnishingsCost);
   const serviceFeeCalculated = Math.round(data.rent * 0.029); // 2.9% of rent, not average comparable
   const monthlyExpenses = Math.round(data.rent + serviceFeeCalculated + data.maintenance + data.power + 
                          data.waterSewer + data.internet + data.taxLicense + data.insurance + 
-                         data.software + data.miscellaneous + data.furnitureRental);
+                         data.software + data.furnitureRental);
   const monthlyRevenue = Math.round(data.averageComparable);
   const netProfitMonthly = Math.round(monthlyRevenue - monthlyExpenses);
   

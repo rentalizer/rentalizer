@@ -32,7 +32,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
             <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
               type="number"
-              value={data.firstMonthRent === 0 ? '' : data.firstMonthRent}
+              value={data.firstMonthRent || ''}
               onChange={(e) => updateData({ firstMonthRent: Math.round(parseFloat(e.target.value)) || 0 })}
               placeholder=""
               className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
@@ -46,8 +46,22 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
             <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
               type="number"
-              value={data.securityDeposit === 0 ? '' : data.securityDeposit}
+              value={data.securityDeposit || ''}
               onChange={(e) => updateData({ securityDeposit: Math.round(parseFloat(e.target.value)) || 0 })}
+              placeholder=""
+              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-gray-200 text-center block">Miscellaneous</Label>
+          <div className="relative">
+            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              type="number"
+              value={data.miscellaneous || ''}
+              onChange={(e) => updateData({ miscellaneous: Math.round(parseFloat(e.target.value)) || 0 })}
               placeholder=""
               className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
             />
@@ -60,7 +74,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
             <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
               type="number"
-              value={data.furnishingsCost === 0 ? '' : data.furnishingsCost}
+              value={data.furnishingsCost || ''}
               onChange={(e) => updateData({ furnishingsCost: Math.round(parseFloat(e.target.value)) || 0 })}
               placeholder=""
               className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
