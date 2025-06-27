@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -94,14 +95,14 @@ export const ContactChat = () => {
           className="w-full border-cyan-500/30 text-cyan-300 hover:bg-cyan-600/10"
         >
           <MessageCircle className="h-4 w-4 mr-2" />
-          Contact Us
+          Direct Message Us
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md bg-gray-900 border border-gray-700">
         <DialogHeader>
           <DialogTitle className="text-cyan-300 flex items-center gap-2">
             <MessageCircle className="h-5 w-5" />
-            Contact iStay USA LLC
+            Direct Message iStay USA LLC
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
