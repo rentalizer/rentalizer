@@ -56,12 +56,12 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
         </div>
 
         {/* Net Monthly Profit */}
-        <div className="p-4 bg-gradient-to-r from-emerald-600/20 to-green-600/20 rounded-lg border border-emerald-500/30">
+        <div className="p-4 bg-gradient-to-r from-purple-600/20 to-violet-600/20 rounded-lg border border-purple-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-emerald-300 font-medium">Net Monthly Profit</Label>
+            <Label className="text-purple-300 font-medium">Net Monthly Profit</Label>
             <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-emerald-400" />
-              <span className={`text-2xl font-bold ${netProfitMonthly >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+              <DollarSign className="h-5 w-5 text-purple-400" />
+              <span className={`text-2xl font-bold ${netProfitMonthly >= 0 ? 'text-purple-400' : 'text-red-400'}`}>
                 {netProfitMonthly >= 0 ? '' : '-'}${Math.abs(netProfitMonthly).toLocaleString()}
               </span>
             </div>
