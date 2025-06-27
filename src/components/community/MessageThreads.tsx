@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,8 +28,8 @@ export const MessageThreads = () => {
       id: '1',
       author: 'Richie Matthews',
       avatar: 'RM',
-      title: 'Welcome to the Community!',
-      content: 'Welcome everyone to our Rental Arbitrage University community! This is your space to connect, share experiences, and learn from each other...',
+      title: 'Welcome aboard!',
+      content: 'We\'re thrilled to have you join our vibrant community of rental entrepreneurs! 🎉 Whether you\'re a seasoned host or just starting out, you\'re in the right place to learn, connect, and grow together.\n\nHere\'s a quick guide to get you started on your adventure with us:\n\n1. Introduce Yourself: Take a moment to introduce yourself to the community by sharing a short welcome message and a bit of your story. Your unique experiences and insights will inspire others and help us get to know you better!\n\n2. Start the MasterCourse: Dive right into our exclusive course designed to equip you with the essential knowledge and skills you need to succeed in the world of rental hosting. You\'ll discover actionable strategies, insider tips, and proven techniques to elevate your hosting game and maximize your earnings.\n\n3. Share Valuable Contents: Share your valuable insights, experiences, and tips with the community to help others along their hosting journey. Whether it\'s a hosting hack, or an inspiring success story, your contributions will enrich our community and unlock new levels and badges for you!\n\n4. Engage and Ask Questions: Don\'t hesitate to ask questions, seek advice, or share your challenges with the community. Our friendly members and experienced moderators are here to support you every step of the way. Stay active, participate in discussions, and keep an eye out for updates and announcements from the community owners.\n\nRemember, this community is a place where we celebrate each other\'s successes, learn from our experiences, and support one another on our entrepreneurial endeavors. Together, we\'ll create a thriving community of empowered Airbnb hosts who are making a positive impact in the world of hospitality.\n\nWelcome aboard, and let\'s embark on this exciting journey together! 🚀🏡',
       timestamp: '2h ago',
       replies: 23,
       likes: 45,
@@ -83,7 +82,14 @@ export const MessageThreads = () => {
     }
   ];
 
-  const filteredMessages = messages.filter(message =>
+  // Sort messages to show pinned messages first
+  const sortedMessages = [...messages].sort((a, b) => {
+    if (a.isPinned && !b.isPinned) return -1;
+    if (!a.isPinned && b.isPinned) return 1;
+    return 0;
+  });
+
+  const filteredMessages = sortedMessages.filter(message =>
     message.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     message.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
     message.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -176,7 +182,7 @@ export const MessageThreads = () => {
                     )}
                   </div>
 
-                  <p className="text-gray-300 mb-3 line-clamp-2">{message.content}</p>
+                  <p className="text-gray-300 mb-3 whitespace-pre-wrap">{message.content}</p>
 
                   {/* Tags */}
                   <div className="flex flex-wrap gap-2 mb-3">
