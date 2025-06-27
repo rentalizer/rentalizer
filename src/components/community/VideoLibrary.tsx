@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,6 +20,7 @@ interface VideoItem {
   isLive?: boolean;
   videoUrl?: string;
   handouts?: { name: string; url: string; }[];
+  order?: number;
 }
 
 export const VideoLibrary = () => {
@@ -37,10 +37,11 @@ export const VideoLibrary = () => {
       duration: '35:20',
       views: 1567,
       uploadDate: '2024-12-20',
-      category: 'Market Research',
+      category: 'Markets',
       tags: ['competitor-analysis', 'market-research', 'strategy'],
       featured: true,
-      videoUrl: 'https://www.loom.com/share/00d9db5904784d0091b6dbeedfb61830?sid=47d7bb0b-f3eb-421b-b3f5-6aab2661f864'
+      videoUrl: 'https://www.loom.com/share/00d9db5904784d0091b6dbeedfb61830?sid=47d7bb0b-f3eb-421b-b3f5-6aab2661f864',
+      order: 1
     },
     {
       id: '2',
@@ -50,9 +51,10 @@ export const VideoLibrary = () => {
       duration: '28:45',
       views: 892,
       uploadDate: '2024-12-18',
-      category: 'Market Research',
+      category: 'Markets',
       tags: ['market-research', 'analysis', 'data'],
-      videoUrl: 'https://www.loom.com/share/3c9e26b352564afe8ce7073477386fec?sid=626edf09-2ab2-4c05-9762-04a719f353a6'
+      videoUrl: 'https://www.loom.com/share/3c9e26b352564afe8ce7073477386fec?sid=626edf09-2ab2-4c05-9762-04a719f353a6',
+      order: 2
     },
     {
       id: '3',
@@ -64,7 +66,8 @@ export const VideoLibrary = () => {
       uploadDate: '2024-12-15',
       category: 'Operations',
       tags: ['virtual-assistant', 'hiring', 'automation', 'team-building'],
-      videoUrl: 'https://www.loom.com/share/e1d50c6ae34d4c5882aa7587269c47aa?sid=5f9e60c2-8e27-480e-b003-ec358df9a5c5'
+      videoUrl: 'https://www.loom.com/share/e1d50c6ae34d4c5882aa7587269c47aa?sid=5f9e60c2-8e27-480e-b003-ec358df9a5c5',
+      order: 1
     },
     {
       id: '4',
@@ -74,9 +77,10 @@ export const VideoLibrary = () => {
       duration: '31:30',
       views: 743,
       uploadDate: '2024-12-12',
-      category: 'Property Management',
+      category: 'Operations',
       tags: ['housekeeper', 'property-management', 'maintenance', 'staff'],
-      videoUrl: 'https://www.loom.com/share/98d389450eb948a3ab0a62fc875050e8?sid=14ec2526-9ae3-45c8-a998-90727383338e'
+      videoUrl: 'https://www.loom.com/share/98d389450eb948a3ab0a62fc875050e8?sid=14ec2526-9ae3-45c8-a998-90727383338e',
+      order: 2
     },
     {
       id: '5',
@@ -86,9 +90,10 @@ export const VideoLibrary = () => {
       duration: '25:12',
       views: 1456,
       uploadDate: '2024-12-10',
-      category: 'Property Management',
+      category: 'Operations',
       tags: ['listing-optimization', 'marketing', 'tenant-acquisition'],
-      videoUrl: 'https://www.loom.com/share/e323b3ad4da842ea9227e2865249afa8?sid=e8705a4d-366b-4217-a8a2-b9cf54cc777d'
+      videoUrl: 'https://www.loom.com/share/e323b3ad4da842ea9227e2865249afa8?sid=e8705a4d-366b-4217-a8a2-b9cf54cc777d',
+      order: 3
     },
     {
       id: '6',
@@ -98,10 +103,11 @@ export const VideoLibrary = () => {
       duration: '38:45',
       views: 2103,
       uploadDate: '2024-12-08',
-      category: 'Property Acquisitions',
+      category: 'Acquisition',
       tags: ['acquisitions', 'deal-analysis', 'investment-strategy'],
       featured: true,
-      videoUrl: 'https://www.loom.com/share/b6b52e6d8bfa4490b3de0481f60cee53?sid=0a9940f7-883a-4fe0-bb19-edd901ae37a3'
+      videoUrl: 'https://www.loom.com/share/b6b52e6d8bfa4490b3de0481f60cee53?sid=0a9940f7-883a-4fe0-bb19-edd901ae37a3',
+      order: 1
     },
     {
       id: '7',
@@ -111,9 +117,10 @@ export const VideoLibrary = () => {
       duration: '45:30',
       views: 1876,
       uploadDate: '2024-12-05',
-      category: 'Property Acquisitions',
+      category: 'Acquisition',
       tags: ['acquisitions', 'investment', 'real-estate', 'fundamentals'],
-      videoUrl: 'https://www.loom.com/share/83d2f2b331ed4b44a7194b47c2cfc1eb?sid=b882724d-77f8-4f9a-abc0-d2709ea6b9f4'
+      videoUrl: 'https://www.loom.com/share/83d2f2b331ed4b44a7194b47c2cfc1eb?sid=b882724d-77f8-4f9a-abc0-d2709ea6b9f4',
+      order: 2
     },
     {
       id: '8',
@@ -123,9 +130,10 @@ export const VideoLibrary = () => {
       duration: '52:15',
       views: 1654,
       uploadDate: '2024-12-03',
-      category: 'Property Acquisitions',
+      category: 'Acquisition',
       tags: ['acquisitions', 'advanced', 'deal-structuring', 'finance'],
-      videoUrl: 'https://www.loom.com/share/1a40e1be66f94774aa5ca19f2d6efe66?sid=dce96b7a-0d08-4ff3-a88e-e24e5478e8b0'
+      videoUrl: 'https://www.loom.com/share/1a40e1be66f94774aa5ca19f2d6efe66?sid=dce96b7a-0d08-4ff3-a88e-e24e5478e8b0',
+      order: 3
     },
     {
       id: '9',
@@ -137,7 +145,8 @@ export const VideoLibrary = () => {
       uploadDate: '2024-12-01',
       category: 'Business Formation',
       tags: ['growth', 'planning', 'strategy', 'scaling'],
-      videoUrl: 'https://www.loom.com/share/9054327d9dad4a94aaa206ae1ad74346?sid=82f8ce47-1769-4c00-899c-8de49194fc41'
+      videoUrl: 'https://www.loom.com/share/9054327d9dad4a94aaa206ae1ad74346?sid=82f8ce47-1769-4c00-899c-8de49194fc41',
+      order: 1
     },
     {
       id: '10',
@@ -149,7 +158,8 @@ export const VideoLibrary = () => {
       uploadDate: '2024-11-28',
       category: 'Business Formation',
       tags: ['cashflow', 'analysis', 'finance', 'optimization'],
-      videoUrl: 'https://www.loom.com/share/f3ef7729fb084b72ac0ac548b89ceb93?sid=75a145f2-4aad-4f7e-9066-2c1876abd228'
+      videoUrl: 'https://www.loom.com/share/f3ef7729fb084b72ac0ac548b89ceb93?sid=75a145f2-4aad-4f7e-9066-2c1876abd228',
+      order: 2
     },
     {
       id: '11',
@@ -159,9 +169,10 @@ export const VideoLibrary = () => {
       duration: '29:35',
       views: 967,
       uploadDate: '2024-11-25',
-      category: 'Property Management',
+      category: 'Operations',
       tags: ['remote-hosting', 'property-management', 'automation', 'systems'],
-      videoUrl: 'https://www.loom.com/share/bdeeb06bce7a45379822f91455676839?sid=159d9d8f-c518-45ed-8908-73e52a1fc656'
+      videoUrl: 'https://www.loom.com/share/bdeeb06bce7a45379822f91455676839?sid=159d9d8f-c518-45ed-8908-73e52a1fc656',
+      order: 4
     },
     {
       id: '12',
@@ -171,9 +182,10 @@ export const VideoLibrary = () => {
       duration: '33:20',
       views: 1205,
       uploadDate: '2024-11-22',
-      category: 'Property Management',
+      category: 'Operations',
       tags: ['rental-application', 'tenant-screening', 'process', 'documentation'],
-      videoUrl: 'https://www.loom.com/share/7320471e7d2948b6baa646d901518797?sid=40a32dce-1bfa-4adc-aa28-d09ad53759ab'
+      videoUrl: 'https://www.loom.com/share/7320471e7d2948b6baa646d901518797?sid=40a32dce-1bfa-4adc-aa28-d09ad53759ab',
+      order: 5
     },
     {
       id: '13',
@@ -183,9 +195,10 @@ export const VideoLibrary = () => {
       duration: '47:15',
       views: 834,
       uploadDate: '2024-11-20',
-      category: 'Market Research',
+      category: 'Markets',
       tags: ['market-research', 'advanced', 'data-analysis', 'techniques'],
-      videoUrl: 'https://www.loom.com/share/b32d86ef3a1041ed8974a65685b2c730?sid=4d1bf7ab-c93b-421f-a0d1-766ab3e670a1'
+      videoUrl: 'https://www.loom.com/share/b32d86ef3a1041ed8974a65685b2c730?sid=4d1bf7ab-c93b-421f-a0d1-766ab3e670a1',
+      order: 3
     },
     {
       id: '14',
@@ -195,9 +208,10 @@ export const VideoLibrary = () => {
       duration: '32:50',
       views: 1543,
       uploadDate: '2024-11-18',
-      category: 'Market Research',
+      category: 'Markets',
       tags: ['market-research', 'fundamentals', 'basics', 'introduction'],
-      videoUrl: 'https://www.loom.com/share/c8a80aa7e1a14893b5961fedd90a9367?sid=6aad2485-7e26-476f-b6e0-b3077a4795bc'
+      videoUrl: 'https://www.loom.com/share/c8a80aa7e1a14893b5961fedd90a9367?sid=6aad2485-7e26-476f-b6e0-b3077a4795bc',
+      order: 1
     },
     {
       id: '15',
@@ -209,7 +223,8 @@ export const VideoLibrary = () => {
       uploadDate: '2024-11-15',
       category: 'Operations',
       tags: ['operations', 'management', 'business-processes', 'efficiency'],
-      videoUrl: 'https://www.loom.com/share/97a740ea55484c369e47d3a2a64ed776?sid=60924369-0c23-4bed-b228-8c6aed7855b7'
+      videoUrl: 'https://www.loom.com/share/97a740ea55484c369e47d3a2a64ed776?sid=60924369-0c23-4bed-b228-8c6aed7855b7',
+      order: 6
     },
     {
       id: '16',
@@ -219,9 +234,10 @@ export const VideoLibrary = () => {
       duration: '26:45',
       views: 721,
       uploadDate: '2024-11-12',
-      category: 'Property Management',
+      category: 'Operations',
       tags: ['mid-term-rentals', 'listing', 'marketing', 'specialized'],
-      videoUrl: 'https://www.loom.com/share/64de8f993a974132b629bf8e37cc647c?sid=6b2a48de-ea9b-410f-804a-ddb2a7399346'
+      videoUrl: 'https://www.loom.com/share/64de8f993a974132b629bf8e37cc647c?sid=6b2a48de-ea9b-410f-804a-ddb2a7399346',
+      order: 7
     },
     {
       id: '17',
@@ -231,9 +247,10 @@ export const VideoLibrary = () => {
       duration: '38:25',
       views: 1134,
       uploadDate: '2024-11-10',
-      category: 'Property Management',
+      category: 'Operations',
       tags: ['str-ordinances', 'regulations', 'compliance', 'legal'],
-      videoUrl: 'https://www.loom.com/share/a9103ef043e64eab9b8432ced535d475?sid=26a2af0e-b588-49d2-bef0-b2b1809baa87'
+      videoUrl: 'https://www.loom.com/share/a9103ef043e64eab9b8432ced535d475?sid=26a2af0e-b588-49d2-bef0-b2b1809baa87',
+      order: 8
     },
     {
       id: '18',
@@ -243,9 +260,10 @@ export const VideoLibrary = () => {
       duration: '34:15',
       views: 1389,
       uploadDate: '2024-11-08',
-      category: 'Property Management',
+      category: 'Operations',
       tags: ['listing-optimization', 'advanced', 'bookings', 'conversion'],
-      videoUrl: 'https://www.loom.com/share/f5ec35e9d58c4b849dff862b871f10f7?sid=a0efd2aa-9b8f-4423-bc96-bdd593ff4f0a'
+      videoUrl: 'https://www.loom.com/share/f5ec35e9d58c4b849dff862b871f10f7?sid=a0efd2aa-9b8f-4423-bc96-bdd593ff4f0a',
+      order: 9
     },
     {
       id: '19',
@@ -255,9 +273,10 @@ export const VideoLibrary = () => {
       duration: '43:30',
       views: 956,
       uploadDate: '2024-11-05',
-      category: 'Property Management',
+      category: 'Operations',
       tags: ['budgeting', 'design', 'renovation', 'cost-control'],
-      videoUrl: 'https://www.loom.com/share/75054572e7d54180844b137ff5f61a5e?sid=802e6f04-4bcc-4376-b254-7dec00c84d0e'
+      videoUrl: 'https://www.loom.com/share/75054572e7d54180844b137ff5f61a5e?sid=802e6f04-4bcc-4376-b254-7dec00c84d0e',
+      order: 10
     },
     {
       id: '20',
@@ -269,7 +288,8 @@ export const VideoLibrary = () => {
       uploadDate: '2024-11-02',
       category: 'Business Formation',
       tags: ['business-formation', 'legal-structure', 'incorporation', 'startup'],
-      videoUrl: 'https://www.loom.com/share/e21ff8e94a404aa68110e44f9994a6b3?sid=a02b7adb-87a6-4b9c-bd17-e7579ab8369f'
+      videoUrl: 'https://www.loom.com/share/e21ff8e94a404aa68110e44f9994a6b3?sid=a02b7adb-87a6-4b9c-bd17-e7579ab8369f',
+      order: 3
     },
     {
       id: '21',
@@ -279,9 +299,10 @@ export const VideoLibrary = () => {
       duration: '44:20',
       views: 1876,
       uploadDate: '2024-10-30',
-      category: 'Property Acquisitions',
+      category: 'Acquisition',
       tags: ['acquisition-tools', 'process', 'workflow', 'systems'],
-      videoUrl: 'https://www.loom.com/share/d8e2fc55f0a74a0ab916b8b96ae9f205?sid=6ed031f1-46ee-4793-96ea-50a4533629b2'
+      videoUrl: 'https://www.loom.com/share/d8e2fc55f0a74a0ab916b8b96ae9f205?sid=6ed031f1-46ee-4793-96ea-50a4533629b2',
+      order: 4
     },
     {
       id: '22',
@@ -291,9 +312,10 @@ export const VideoLibrary = () => {
       duration: '37:15',
       views: 1432,
       uploadDate: '2024-10-28',
-      category: 'Property Acquisitions',
+      category: 'Acquisition',
       tags: ['negotiation', 'deal-making', 'acquisition-strategy', 'communication'],
-      videoUrl: 'https://www.loom.com/share/b1c026f04f1e4f578805227ad6602779?sid=b0db134e-7aac-4b34-a1b9-97fe84704fad'
+      videoUrl: 'https://www.loom.com/share/b1c026f04f1e4f578805227ad6602779?sid=b0db134e-7aac-4b34-a1b9-97fe84704fad',
+      order: 5
     },
     {
       id: '23',
@@ -305,7 +327,8 @@ export const VideoLibrary = () => {
       uploadDate: '2024-10-25',
       category: 'Operations',
       tags: ['automation', 'operations', 'efficiency', 'systems'],
-      videoUrl: 'https://www.loom.com/share/dc6e283fcb0b491eb4b4127f74ae6c60?sid=26009eef-da26-49d4-a819-6637d1e6cf8d'
+      videoUrl: 'https://www.loom.com/share/dc6e283fcb0b491eb4b4127f74ae6c60?sid=26009eef-da26-49d4-a819-6637d1e6cf8d',
+      order: 11
     },
     {
       id: '24',
@@ -315,26 +338,36 @@ export const VideoLibrary = () => {
       duration: '22:30',
       views: 456,
       uploadDate: '2024-12-27',
-      category: 'Property Management',
+      category: 'Operations',
       tags: ['checklist', 'listing', 'optimization', 'process'],
       videoUrl: 'https://www.loom.com/share/44afb75c4fe841db80f03d425c273393',
       handouts: [
         { name: 'Property Listing Checklist.pdf', url: '/handouts/property-listing-checklist.pdf' }
-      ]
+      ],
+      order: 12
     }
   ];
 
-  const categories = ['all', 'Market Research', 'Property Acquisitions', 'Operations', 'Property Management', 'Business Formation'];
+  const categories = ['all', 'Business Formation', 'Markets', 'Acquisition', 'Operations'];
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      'Market Research': 'bg-blue-500/20 border-blue-500/30 text-blue-300',
-      'Property Acquisitions': 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300',
-      'Operations': 'bg-purple-500/20 border-purple-500/30 text-purple-300',
-      'Property Management': 'bg-slate-500/20 border-slate-500/30 text-slate-300',
-      'Business Formation': 'bg-green-500/20 border-green-500/30 text-green-300'
+      'Business Formation': 'bg-green-500/20 border-green-500/30 text-green-300',
+      'Markets': 'bg-blue-500/20 border-blue-500/30 text-blue-300',
+      'Acquisition': 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300',
+      'Operations': 'bg-purple-500/20 border-purple-500/30 text-purple-300'
     };
     return colors[category as keyof typeof colors] || 'bg-gray-500/20 border-gray-500/30 text-gray-300';
+  };
+
+  const getCategoryStep = (category: string) => {
+    const steps = {
+      'Business Formation': '1',
+      'Markets': '2',
+      'Acquisition': '3',
+      'Operations': '4'
+    };
+    return steps[category as keyof typeof steps];
   };
 
   const filteredVideos = videos.filter(video => {
@@ -343,6 +376,17 @@ export const VideoLibrary = () => {
                          video.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === 'all' || video.category === selectedCategory;
     return matchesSearch && matchesCategory;
+  }).sort((a, b) => {
+    // Sort by category order first, then by video order within category
+    const categoryOrder = { 'Business Formation': 1, 'Markets': 2, 'Acquisition': 3, 'Operations': 4 };
+    const aCategoryOrder = categoryOrder[a.category as keyof typeof categoryOrder] || 5;
+    const bCategoryOrder = categoryOrder[b.category as keyof typeof categoryOrder] || 5;
+    
+    if (aCategoryOrder !== bCategoryOrder) {
+      return aCategoryOrder - bCategoryOrder;
+    }
+    
+    return (a.order || 0) - (b.order || 0);
   });
 
   const handleVideoClick = (video: VideoItem) => {
@@ -358,19 +402,20 @@ export const VideoLibrary = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-cyan-300">Training Videos</h2>
+      {/* Header - Centered */}
+      <div className="text-center">
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <h2 className="text-3xl font-bold text-cyan-300">Training Videos</h2>
           <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
             {videos.length} videos
           </Badge>
         </div>
+        <p className="text-gray-400 mb-6">Follow the structured learning path: Business Formation → Markets → Acquisition → Operations</p>
       </div>
 
-      {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
+      {/* Search */}
+      <div className="max-w-md mx-auto">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search videos..."
@@ -379,23 +424,41 @@ export const VideoLibrary = () => {
             className="pl-10 bg-slate-800/50 border-cyan-500/20 text-white placeholder-gray-400"
           />
         </div>
-        <div className="flex gap-2 overflow-x-auto">
-          {categories.map(category => (
-            <Button
-              key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCategory(category)}
-              className={
-                selectedCategory === category
-                  ? "bg-cyan-600 hover:bg-cyan-700 whitespace-nowrap"
-                  : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 whitespace-nowrap"
-              }
-            >
-              {category === 'all' ? 'All Categories' : category}
-            </Button>
-          ))}
-        </div>
+      </div>
+
+      {/* Category Filters - 4 Columns */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Button
+          variant={selectedCategory === 'all' ? "default" : "outline"}
+          onClick={() => setSelectedCategory('all')}
+          className={
+            selectedCategory === 'all'
+              ? "bg-cyan-600 hover:bg-cyan-700 h-20 flex flex-col"
+              : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 h-20 flex flex-col"
+          }
+        >
+          <span className="text-lg font-bold">All</span>
+          <span className="text-xs">Categories</span>
+        </Button>
+        
+        {categories.slice(1).map(category => (
+          <Button
+            key={category}
+            variant={selectedCategory === category ? "default" : "outline"}
+            onClick={() => setSelectedCategory(category)}
+            className={
+              selectedCategory === category
+                ? "bg-gradient-to-br from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 h-20 flex flex-col"
+                : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 h-20 flex flex-col"
+            }
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-bold">{getCategoryStep(category)}</span>
+              <span className="text-sm font-medium">{category}</span>
+            </div>
+            <span className="text-xs opacity-75">Step {getCategoryStep(category)}</span>
+          </Button>
+        ))}
       </div>
 
       {/* Videos Grid */}
@@ -426,13 +489,10 @@ export const VideoLibrary = () => {
                   {video.duration}
                 </div>
                 
-                {/* Live indicator */}
-                {video.isLive && (
-                  <div className="absolute top-2 left-2 bg-cyan-500 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
-                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                    LIVE
-                  </div>
-                )}
+                {/* Category Step */}
+                <div className="absolute top-2 left-2 bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-xs px-2 py-1 rounded flex items-center gap-1">
+                  <span className="font-bold">{getCategoryStep(video.category)}</span>
+                </div>
 
                 {/* Featured indicator */}
                 {video.featured && (
