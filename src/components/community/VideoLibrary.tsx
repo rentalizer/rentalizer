@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Video, Search, Play, Clock, Eye, Calendar, Star, X } from 'lucide-react';
+import { Video, Search, Play, Clock, Eye, Calendar, Star, X, FileText, Download } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface VideoItem {
@@ -19,6 +20,7 @@ interface VideoItem {
   featured?: boolean;
   isLive?: boolean;
   videoUrl?: string;
+  handouts?: { name: string; url: string; }[];
 }
 
 export const VideoLibrary = () => {
@@ -304,6 +306,21 @@ export const VideoLibrary = () => {
       category: 'Operations',
       tags: ['automation', 'operations', 'efficiency', 'systems'],
       videoUrl: 'https://www.loom.com/share/dc6e283fcb0b491eb4b4127f74ae6c60?sid=26009eef-da26-49d4-a819-6637d1e6cf8d'
+    },
+    {
+      id: '24',
+      title: 'Property Listing Checklist',
+      description: 'Complete checklist for optimizing your property listings',
+      thumbnail: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=450&fit=crop',
+      duration: '22:30',
+      views: 456,
+      uploadDate: '2024-12-27',
+      category: 'Property Management',
+      tags: ['checklist', 'listing', 'optimization', 'process'],
+      videoUrl: 'https://www.loom.com/share/44afb75c4fe841db80f03d425c273393',
+      handouts: [
+        { name: 'Property Listing Checklist.pdf', url: '/handouts/property-listing-checklist.pdf' }
+      ]
     }
   ];
 
@@ -434,9 +451,6 @@ export const VideoLibrary = () => {
                   {video.title}
                 </h3>
 
-                {/* Description */}
-                <p className="text-gray-300 text-sm line-clamp-2">{video.description}</p>
-
                 {/* Meta info */}
                 <div className="flex items-center justify-between">
                   <Badge className={getCategoryColor(video.category)}>
@@ -447,6 +461,14 @@ export const VideoLibrary = () => {
                     {video.views.toLocaleString()}
                   </div>
                 </div>
+
+                {/* Handouts indicator */}
+                {video.handouts && video.handouts.length > 0 && (
+                  <div className="flex items-center gap-1 text-xs text-cyan-300">
+                    <FileText className="h-3 w-3" />
+                    {video.handouts.length} handout{video.handouts.length > 1 ? 's' : ''}
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -492,12 +514,40 @@ export const VideoLibrary = () => {
           )}
           
           {selectedVideo && (
-            <div className="space-y-2 text-gray-300">
-              <p className="text-sm">{selectedVideo.description}</p>
+            <div className="space-y-4 text-gray-300">
               <div className="flex items-center gap-4 text-xs text-gray-400">
                 <span>{selectedVideo.duration}</span>
                 <span>{selectedVideo.views.toLocaleString()} views</span>
               </div>
+              
+              {/* Handouts Section */}
+              {selectedVideo.handouts && selectedVideo.handouts.length > 0 && (
+                <div className="border-t border-cyan-500/20 pt-4">
+                  <h4 className="text-cyan-300 font-medium mb-3 flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Handouts
+                  </h4>
+                  <div className="space-y-2">
+                    {selectedVideo.handouts.map((handout, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-cyan-300" />
+                          <span className="text-white">{handout.name}</span>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+                          onClick={() => window.open(handout.url, '_blank')}
+                        >
+                          <Download className="h-3 w-3 mr-1" />
+                          Download
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
