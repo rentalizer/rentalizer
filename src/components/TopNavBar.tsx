@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BarChart3, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,7 @@ export const TopNavBar = () => {
   const { user, signOut } = useAuth();
 
   return (
-    <div className="w-full bg-slate-800 border-b border-gray-700/50">
+    <div className="w-full bg-slate-900 border-b border-slate-700">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Left side - Logo only */}
