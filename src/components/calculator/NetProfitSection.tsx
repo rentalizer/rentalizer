@@ -43,12 +43,12 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Monthly Revenue */}
-        <div className="p-4 bg-gradient-to-r from-green-600/20 to-emerald-600/20 rounded-lg border border-green-500/30">
+        <div className="p-4 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-green-300 font-medium">Monthly Revenue</Label>
+            <Label className="text-cyan-300 font-medium">Monthly Revenue</Label>
             <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-green-400" />
-              <span className="text-2xl font-bold text-green-400">
+              <DollarSign className="h-5 w-5 text-cyan-400" />
+              <span className="text-2xl font-bold text-cyan-400">
                 {Math.round(monthlyRevenue).toLocaleString()}
               </span>
             </div>
