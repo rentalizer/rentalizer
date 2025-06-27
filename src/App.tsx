@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import LandingPage from "./pages/LandingPage";
 import Demo from "./pages/Demo";
 import Calculator from "./pages/Calculator";
+import Calc from "./pages/Calc";
 import MarketAnalysis from "./pages/MarketAnalysis";
 import ResetPassword from "./pages/ResetPassword";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -34,6 +35,7 @@ const AppRoutes = () => (
     <Route path="/pricing" element={<Pricing />} />
     <Route path="/markets" element={<MarketAnalysis />} />
     <Route path="/calculator" element={<Calculator />} />
+    <Route path="/calc" element={<Calc />} />
     <Route path="/properties" element={<AcquisitionsAgent />} />
     <Route path="/community" element={<Community />} />
     <Route path="/pms" element={<PMS />} />
