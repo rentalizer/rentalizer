@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, MessageCircle, UserCheck } from 'lucide-react';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
-import { CommunityCalendar } from '@/components/community/CommunityCalendar';
+import CommunityCalendar from '@/components/community/CommunityCalendar';
 import { MessageThreads } from '@/components/community/MessageThreads';
 import { GroupDiscussions } from '@/components/community/GroupDiscussions';
 import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
