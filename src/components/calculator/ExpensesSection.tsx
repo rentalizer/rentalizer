@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -40,9 +39,9 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center justify-center gap-2 text-white text-lg">
+        <CardTitle className="flex items-center justify-center gap-2 text-white text-lg text-center">
           <Receipt className="h-5 w-5 text-cyan-400" />
-          Monthly Expenses
+          <span className="whitespace-nowrap">Monthly Expenses</span>
           <Button
             onClick={autoFillExpenses}
             size="sm"
@@ -195,7 +194,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">P Furniture Rental</Label>
+            <Label className="text-gray-200 text-center block">Furniture Rental</Label>
             <div className="relative">
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
@@ -224,4 +223,3 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
     </Card>
   );
 };
-
