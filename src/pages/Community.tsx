@@ -11,6 +11,7 @@ import { MessageThreads } from '@/components/community/MessageThreads';
 import { GroupDiscussions } from '@/components/community/GroupDiscussions';
 import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
 import { VideoLibrary } from '@/components/community/VideoLibrary';
+import { ContactChat } from '@/components/ContactChat';
 
 const Community = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -40,7 +41,7 @@ const Community = () => {
               <div className="text-sm text-gray-400">Discussions</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-400">89</div>
+              <div className="text-2xl font-bold text-blue-400">89</div>
               <div className="text-sm text-gray-400">Resources</div>
             </div>
           </div>
@@ -92,11 +93,12 @@ const Community = () => {
                       <Plus className="h-4 w-4 mr-2" />
                       Start Discussion
                     </Button>
-                    <Button variant="outline" className="w-full border-cyan-500/30 text-cyan-300">
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      Send Message
-                    </Button>
-                    <Button variant="outline" className="w-full border-cyan-500/30 text-cyan-300">
+                    <ContactChat />
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-cyan-500/30 text-cyan-300"
+                      onClick={() => setActiveTab('calendar')}
+                    >
                       <Calendar className="h-4 w-4 mr-2" />
                       View Calendar
                     </Button>
