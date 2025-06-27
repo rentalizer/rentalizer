@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, Search, Pin, Reply, Heart, Send, ChevronDown, ChevronUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { MentionInput } from './MentionInput';
 
 interface Message {
   id: string;
@@ -162,15 +162,16 @@ export const MessageThreads = () => {
         />
       </div>
 
-      {/* Comment Input Field */}
+      {/* Comment Input Field with Mention Support */}
       <Card className="bg-slate-800/50 border-cyan-500/20">
         <CardContent className="p-4">
           <div className="space-y-3">
-            <Textarea
-              placeholder="Share your thoughts with the community..."
+            <MentionInput
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 min-h-[100px]"
+              onChange={setNewComment}
+              placeholder="Share your thoughts with the community... (Use @ to mention users)"
+              className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+              minHeight="100px"
             />
             <div className="flex justify-end">
               <Button 
