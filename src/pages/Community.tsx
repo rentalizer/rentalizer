@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,7 +29,6 @@ const Community = () => {
               Rental Arbitrage University
             </h1>
           </div>
-          <p className="text-xl text-gray-300 mb-6">Connect, Learn, and Grow Together</p>
           
           {/* Community Stats */}
           <div className="flex justify-center gap-6 mb-8">
@@ -140,46 +140,106 @@ const Community = () => {
                     <div className="space-y-4">
                       <div className="flex items-start gap-3 p-4 bg-slate-700/30 rounded-lg">
                         <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
-                          JD
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium text-white">John Doe</span>
-                            <span className="text-sm text-gray-400">started a discussion</span>
-                            <span className="text-xs text-gray-500">2h ago</span>
-                          </div>
-                          <div className="text-cyan-300 font-medium mb-2">Best Markets for Rental Arbitrage in 2025</div>
-                          <div className="text-sm text-gray-300">Looking for recommendations on emerging markets...</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3 p-4 bg-slate-700/30 rounded-lg">
-                        <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-                          SM
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium text-white">Sarah Miller</span>
-                            <span className="text-sm text-gray-400">shared a document</span>
-                            <span className="text-xs text-gray-500">4h ago</span>
-                          </div>
-                          <div className="text-cyan-300 font-medium mb-2">Cash Flow Analysis Template</div>
-                          <div className="text-sm text-gray-300">Updated template with new metrics...</div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3 p-4 bg-slate-700/30 rounded-lg">
-                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
                           RM
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-medium text-white">Richie Matthews</span>
-                            <span className="text-sm text-gray-400">posted a video</span>
-                            <span className="text-xs text-gray-500">1d ago</span>
+                            <span className="text-sm text-gray-400">shared a video</span>
+                            <span className="text-xs text-gray-500">30m ago</span>
                           </div>
-                          <div className="text-cyan-300 font-medium mb-2">Property Acquisition Strategies</div>
-                          <div className="text-sm text-gray-300">Deep dive into negotiation tactics...</div>
+                          <div className="text-cyan-300 font-medium mb-2">Advanced Rental Arbitrage Strategies for 2025</div>
+                          <div className="text-sm text-gray-300">New training video covering market analysis and deal structuring...</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3 p-4 bg-slate-700/30 rounded-lg">
+                        <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                          AR
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-white">Alex Rodriguez</span>
+                            <span className="text-sm text-gray-400">asked a question</span>
+                            <span className="text-xs text-gray-500">1h ago</span>
+                          </div>
+                          <div className="text-cyan-300 font-medium mb-2">How to negotiate with landlords on lease terms?</div>
+                          <div className="text-sm text-gray-300">Looking for advice on getting better terms for rental arbitrage deals...</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3 p-4 bg-slate-700/30 rounded-lg">
+                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
+                          TM
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-white">Team Member</span>
+                            <span className="text-sm text-gray-400">posted content</span>
+                            <span className="text-xs text-gray-500">2h ago</span>
+                          </div>
+                          <div className="text-cyan-300 font-medium mb-2">Updated Cash Flow Calculator Template</div>
+                          <div className="text-sm text-gray-300">New Excel template with automated calculations and market data integration...</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3 p-4 bg-slate-700/30 rounded-lg">
+                        <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold">
+                          MJ
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-white">Maria Johnson</span>
+                            <span className="text-sm text-gray-400">asked a question</span>
+                            <span className="text-xs text-gray-500">3h ago</span>
+                          </div>
+                          <div className="text-cyan-300 font-medium mb-2">Best furniture sourcing strategies for multiple properties?</div>
+                          <div className="text-sm text-gray-300">Managing 5 properties now and looking for bulk purchasing options...</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3 p-4 bg-slate-700/30 rounded-lg">
+                        <div className="w-10 h-10 bg-gradient-to-r from-teal-500 to-green-500 rounded-full flex items-center justify-center text-white font-bold">
+                          DK
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-white">David Kim</span>
+                            <span className="text-sm text-gray-400">shared success story</span>
+                            <span className="text-xs text-gray-500">4h ago</span>
+                          </div>
+                          <div className="text-cyan-300 font-medium mb-2">First month: $3,200 profit from Phoenix property</div>
+                          <div className="text-sm text-gray-300">Breakdown of numbers and lessons learned from my first deal...</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3 p-4 bg-slate-700/30 rounded-lg">
+                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                          RM
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-white">Richie Matthews</span>
+                            <span className="text-sm text-gray-400">shared a document</span>
+                            <span className="text-xs text-gray-500">6h ago</span>
+                          </div>
+                          <div className="text-cyan-300 font-medium mb-2">2025 Market Outlook Report</div>
+                          <div className="text-sm text-gray-300">Comprehensive analysis of emerging markets and opportunities...</div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3 p-4 bg-slate-700/30 rounded-lg">
+                        <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                          SL
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-medium text-white">Sarah Lee</span>
+                            <span className="text-sm text-gray-400">asked a question</span>
+                            <span className="text-xs text-gray-500">8h ago</span>
+                          </div>
+                          <div className="text-cyan-300 font-medium mb-2">Insurance requirements for rental arbitrage?</div>
+                          <div className="text-sm text-gray-300">What type of insurance coverage do I need for my first property...</div>
                         </div>
                       </div>
                     </div>

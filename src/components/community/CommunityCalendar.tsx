@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar } from '@/components/ui/calendar';
 import { ChevronLeft, ChevronRight, Plus, Clock, Users, Video } from 'lucide-react';
 
 interface Event {
@@ -120,14 +119,37 @@ export const CommunityCalendar = () => {
 
   const selectedDateEvents = selectedDate ? getEventsForDate(selectedDate) : [];
 
+  // Get the first day of the month and calculate calendar grid
+  const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+  const lastDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+  const startingDayOfWeek = (firstDayOfMonth.getDay() + 6) % 7; // Convert Sunday=0 to Monday=0
+  const daysInMonth = lastDayOfMonth.getDate();
+
+  const calendarDays = [];
+  // Add previous month's days
+  for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), -i);
+    calendarDays.push({ date, isCurrentMonth: false });
+  }
+  // Add current month's days
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    calendarDays.push({ date, isCurrentMonth: true });
+  }
+  // Add next month's days to fill the grid
+  const remainingCells = 42 - calendarDays.length;
+  for (let day = 1; day <= remainingCells; day++) {
+    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, day);
+    calendarDays.push({ date, isCurrentMonth: false });
+  }
+
   return (
-    <div className="grid lg:grid-cols-3 gap-8">
+    <div className="grid lg:grid-cols-4 gap-8">
       {/* Calendar */}
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-3">
         <Card className="bg-slate-800/50 border-cyan-500/20">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-cyan-300 flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
               Events Calendar
             </CardTitle>
             <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
@@ -159,38 +181,42 @@ export const CommunityCalendar = () => {
               </Button>
             </div>
 
-            {/* Calendar Grid */}
+            {/* Day Headers */}
             <div className="grid grid-cols-7 gap-2 mb-4">
-              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+              {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(day => (
                 <div key={day} className="text-center text-sm font-medium text-gray-400 p-2">
                   {day}
                 </div>
               ))}
             </div>
 
+            {/* Calendar Grid */}
             <div className="grid grid-cols-7 gap-2">
-              {Array.from({ length: 35 }, (_, i) => {
-                const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), i - 6);
+              {calendarDays.map((calendarDay, index) => {
+                const { date, isCurrentMonth } = calendarDay;
                 const hasEvents = getEventsForDate(date).length > 0;
                 const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString();
-                const isCurrentMonth = date.getMonth() === currentMonth.getMonth();
+                const isToday = date.toDateString() === new Date().toDateString();
                 
                 return (
                   <button
-                    key={i}
+                    key={index}
                     onClick={() => setSelectedDate(date)}
                     className={`
-                      h-12 p-1 text-sm rounded-lg border transition-colors relative
+                      h-16 p-2 text-sm rounded-lg border transition-colors relative flex flex-col items-center justify-center
                       ${isSelected 
                         ? 'bg-cyan-600/30 border-cyan-500 text-cyan-300' 
                         : 'border-gray-700 hover:border-cyan-500/50 hover:bg-slate-700/50'
                       }
                       ${isCurrentMonth ? 'text-white' : 'text-gray-500'}
+                      ${isToday && !isSelected ? 'bg-slate-700/50 border-cyan-400/50' : ''}
                     `}
                   >
-                    {date.getDate()}
+                    <span className="font-medium">{date.getDate()}</span>
                     {hasEvents && (
-                      <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-cyan-400 rounded-full"></div>
+                      <div className="flex gap-1 mt-1">
+                        <div className="w-1 h-1 bg-cyan-400 rounded-full"></div>
+                      </div>
                     )}
                   </button>
                 );
@@ -258,8 +284,7 @@ export const CommunityCalendar = () => {
               </div>
             ) : (
               <div className="text-center text-gray-400 py-8">
-                <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No events scheduled for this date</p>
+                <div className="text-lg font-medium mb-2">No events scheduled for this date</div>
               </div>
             )}
           </CardContent>
