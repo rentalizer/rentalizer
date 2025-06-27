@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus } from 'lucide-react';
+import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, MessageCircle } from 'lucide-react';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { CommunityCalendar } from '@/components/community/CommunityCalendar';
@@ -44,19 +44,19 @@ const Community = () => {
             </TabsTrigger>
             <TabsTrigger value="videos" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Video className="h-4 w-4 mr-2" />
-              Training Videos
-            </TabsTrigger>
-            <TabsTrigger value="messages" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Messages
-            </TabsTrigger>
-            <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-              <Users className="h-4 w-4 mr-2" />
-              Discussions
+              Training
             </TabsTrigger>
             <TabsTrigger value="documents" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Book className="h-4 w-4 mr-2" />
               Documents
+            </TabsTrigger>
+            <TabsTrigger value="discussion" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Discussion
+            </TabsTrigger>
+            <TabsTrigger value="dm" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+              <MessageCircle className="h-4 w-4 mr-2" />
+              DM
             </TabsTrigger>
           </TabsList>
 
@@ -245,16 +245,31 @@ const Community = () => {
             <VideoLibrary />
           </TabsContent>
 
-          <TabsContent value="messages" className="mt-8">
+          <TabsContent value="documents" className="mt-8">
+            <DocumentsLibrary />
+          </TabsContent>
+
+          <TabsContent value="discussion" className="mt-8">
             <MessageThreads />
           </TabsContent>
 
-          <TabsContent value="discussions" className="mt-8">
-            <GroupDiscussions />
-          </TabsContent>
-
-          <TabsContent value="documents" className="mt-8">
-            <DocumentsLibrary />
+          <TabsContent value="dm" className="mt-8">
+            <div className="max-w-2xl mx-auto">
+              <Card className="bg-slate-800/50 border-cyan-500/20">
+                <CardHeader>
+                  <CardTitle className="text-cyan-300 flex items-center gap-2">
+                    <MessageCircle className="h-5 w-5" />
+                    Direct Messages
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center py-12">
+                  <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-300 mb-2">Direct Messages</h3>
+                  <p className="text-gray-400 mb-6">Send private messages to community members and administrators</p>
+                  <ContactChat />
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
