@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { MessageCircle, Send, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -10,7 +9,6 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const ContactChat = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -18,10 +16,10 @@ export const ContactChat = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !message) {
+    if (!message) {
       toast({
         title: "Missing Information",
-        description: "Please fill in your name and message",
+        description: "Please enter your message",
         variant: "destructive",
       });
       return;
@@ -34,7 +32,7 @@ export const ContactChat = () => {
       const { error } = await supabase
         .from('contact_messages')
         .insert({
-          name: name.trim(),
+          name: 'Member', // Default name since they're logged in
           email: '', // No email needed for DM format
           message: message.trim(),
         });
@@ -53,7 +51,7 @@ export const ContactChat = () => {
       try {
         await supabase.functions.invoke('send-contact-notification', {
           body: {
-            name: name.trim(),
+            name: 'Member',
             email: '',
             message: message.trim(),
           },
@@ -69,7 +67,6 @@ export const ContactChat = () => {
       });
 
       // Reset form and close dialog
-      setName('');
       setMessage('');
       setIsOpen(false);
 
@@ -106,22 +103,6 @@ export const ContactChat = () => {
         
         {/* DM Format Interface */}
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
-            <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-              {name ? name.charAt(0).toUpperCase() : 'Y'}
-            </div>
-            <div className="flex-1">
-              <Input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Your name"
-                className="bg-transparent border-none p-0 text-white placeholder-gray-400 focus-visible:ring-0"
-                disabled={isSubmitting}
-              />
-            </div>
-          </div>
-
           <div className="bg-slate-800/30 rounded-lg p-4 min-h-[120px]">
             <Textarea
               value={message}
