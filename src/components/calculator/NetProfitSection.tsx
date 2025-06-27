@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -20,12 +21,16 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
   const profitColor = isProfit ? 'text-cyan-400' : 'text-blue-400';
   const profitBgColor = isProfit ? 'from-cyan-600/20 to-blue-600/20 border-cyan-500/30' : 'from-blue-600/20 to-slate-600/20 border-blue-500/30';
 
-  // Format payback months display
+  // Format payback months display with decimals
   const formatPaybackMonths = () => {
     if (paybackMonths === null || paybackMonths <= 0) {
       return 'N/A';
     }
-    return Math.round(paybackMonths).toString();
+    // Show decimal if under 1 month, otherwise show 1 decimal place for all
+    if (paybackMonths < 1) {
+      return paybackMonths.toFixed(2);
+    }
+    return paybackMonths.toFixed(1);
   };
 
   return (
