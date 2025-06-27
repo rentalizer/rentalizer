@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Video, Plus, Search, Play, Clock, Eye, Calendar, Star } from 'lucide-react';
+import { Video, Plus, Search, Play, Clock, Eye, Calendar, Star, X } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface VideoItem {
   id: string;
@@ -24,6 +25,7 @@ interface VideoItem {
 export const VideoLibrary = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
 
   const videos: VideoItem[] = [
     {
@@ -149,8 +151,13 @@ export const VideoLibrary = () => {
 
   const handleVideoClick = (video: VideoItem) => {
     if (video.videoUrl) {
-      window.open(video.videoUrl, '_blank');
+      setSelectedVideo(video);
     }
+  };
+
+  const getEmbedUrl = (loomUrl: string) => {
+    const videoId = loomUrl.split('/share/')[1]?.split('?')[0];
+    return `https://www.loom.com/embed/${videoId}`;
   };
 
   return (
@@ -294,6 +301,48 @@ export const VideoLibrary = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Video Player Dialog */}
+      <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
+        <DialogContent className="max-w-4xl bg-slate-900 border border-cyan-500/20">
+          <DialogHeader>
+            <DialogTitle className="text-cyan-300 flex items-center justify-between">
+              {selectedVideo?.title}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedVideo(null)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedVideo?.videoUrl && (
+            <div className="aspect-video w-full">
+              <iframe
+                src={getEmbedUrl(selectedVideo.videoUrl)}
+                frameBorder="0"
+                allowFullScreen
+                className="w-full h-full rounded-lg"
+              />
+            </div>
+          )}
+          
+          {selectedVideo && (
+            <div className="space-y-2 text-gray-300">
+              <p className="text-sm">{selectedVideo.description}</p>
+              <div className="flex items-center gap-4 text-xs text-gray-400">
+                <span>By {selectedVideo.instructor}</span>
+                <span>{selectedVideo.duration}</span>
+                <span>{selectedVideo.views.toLocaleString()} views</span>
+                <span>{new Date(selectedVideo.uploadDate).toLocaleDateString()}</span>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
