@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -101,17 +100,67 @@ export const VideoLibrary = () => {
       tags: ['acquisitions', 'deal-analysis', 'investment-strategy'],
       featured: true,
       videoUrl: 'https://www.loom.com/share/b6b52e6d8bfa4490b3de0481f60cee53?sid=0a9940f7-883a-4fe0-bb19-edd901ae37a3'
+    },
+    {
+      id: '7',
+      title: 'Property Acquisitions I',
+      description: 'First part of the comprehensive property acquisitions training series',
+      thumbnail: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=450&fit=crop',
+      duration: '45:30',
+      views: 1876,
+      uploadDate: '2024-12-05',
+      category: 'Property Acquisitions',
+      tags: ['acquisitions', 'investment', 'real-estate', 'fundamentals'],
+      videoUrl: 'https://www.loom.com/share/83d2f2b331ed4b44a7194b47c2cfc1eb?sid=b882724d-77f8-4f9a-abc0-d2709ea6b9f4'
+    },
+    {
+      id: '8',
+      title: 'Property Acquisitions II',
+      description: 'Advanced property acquisitions strategies and deal structuring techniques',
+      thumbnail: 'https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=800&h=450&fit=crop',
+      duration: '52:15',
+      views: 1654,
+      uploadDate: '2024-12-03',
+      category: 'Property Acquisitions',
+      tags: ['acquisitions', 'advanced', 'deal-structuring', 'finance'],
+      videoUrl: 'https://www.loom.com/share/1a40e1be66f94774aa5ca19f2d6efe66?sid=dce96b7a-0d08-4ff3-a88e-e24e5478e8b0'
+    },
+    {
+      id: '9',
+      title: 'Growth Planning',
+      description: 'Strategic planning for scaling your real estate investment business',
+      thumbnail: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=450&fit=crop',
+      duration: '36:40',
+      views: 1432,
+      uploadDate: '2024-12-01',
+      category: 'Business Strategy',
+      tags: ['growth', 'planning', 'strategy', 'scaling'],
+      videoUrl: 'https://www.loom.com/share/9054327d9dad4a94aaa206ae1ad74346?sid=82f8ce47-1769-4c00-899c-8de49194fc41'
+    },
+    {
+      id: '10',
+      title: 'Cashflow Analysis',
+      description: 'Complete guide to analyzing and optimizing property cash flows',
+      thumbnail: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=800&h=450&fit=crop',
+      duration: '41:25',
+      views: 1798,
+      uploadDate: '2024-11-28',
+      category: 'Financial Analysis',
+      tags: ['cashflow', 'analysis', 'finance', 'optimization'],
+      videoUrl: 'https://www.loom.com/share/f3ef7729fb084b72ac0ac548b89ceb93?sid=75a145f2-4aad-4f7e-9066-2c1876abd228'
     }
   ];
 
-  const categories = ['all', 'Market Research', 'Property Acquisitions', 'Automations', 'Property Management'];
+  const categories = ['all', 'Market Research', 'Property Acquisitions', 'Automations', 'Property Management', 'Business Strategy', 'Financial Analysis'];
 
   const getCategoryColor = (category: string) => {
     const colors = {
       'Market Research': 'bg-blue-500/20 border-blue-500/30 text-blue-300',
       'Property Acquisitions': 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300',
       'Automations': 'bg-purple-500/20 border-purple-500/30 text-purple-300',
-      'Property Management': 'bg-slate-500/20 border-slate-500/30 text-slate-300'
+      'Property Management': 'bg-slate-500/20 border-slate-500/30 text-slate-300',
+      'Business Strategy': 'bg-green-500/20 border-green-500/30 text-green-300',
+      'Financial Analysis': 'bg-orange-500/20 border-orange-500/30 text-orange-300'
     };
     return colors[category as keyof typeof colors] || 'bg-gray-500/20 border-gray-500/30 text-gray-300';
   };
