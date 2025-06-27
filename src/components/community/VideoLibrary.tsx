@@ -16,7 +16,6 @@ interface VideoItem {
   views: number;
   uploadDate: string;
   category: string;
-  instructor: string;
   tags: string[];
   featured?: boolean;
   isLive?: boolean;
@@ -30,7 +29,7 @@ export const VideoLibrary = () => {
 
   const videos: VideoItem[] = [
     {
-      id: '0',
+      id: '1',
       title: 'Competitor Analysis',
       description: 'Learn how to analyze competitors and identify market opportunities',
       thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop',
@@ -38,10 +37,70 @@ export const VideoLibrary = () => {
       views: 1567,
       uploadDate: '2024-12-20',
       category: 'Market Research',
-      instructor: 'Richie Matthews',
       tags: ['competitor-analysis', 'market-research', 'strategy'],
       featured: true,
       videoUrl: 'https://www.loom.com/share/00d9db5904784d0091b6dbeedfb61830?sid=47d7bb0b-f3eb-421b-b3f5-6aab2661f864'
+    },
+    {
+      id: '2',
+      title: 'Market Research Overview',
+      description: 'Comprehensive guide to conducting effective market research for real estate investments',
+      thumbnail: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop',
+      duration: '28:45',
+      views: 892,
+      uploadDate: '2024-12-18',
+      category: 'Market Research',
+      tags: ['market-research', 'analysis', 'data'],
+      videoUrl: 'https://www.loom.com/share/3c9e26b352564afe8ce7073477386fec?sid=626edf09-2ab2-4c05-9762-04a719f353a6'
+    },
+    {
+      id: '3',
+      title: 'Hiring Your VA',
+      description: 'Step-by-step guide to finding and hiring the perfect virtual assistant for your business',
+      thumbnail: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=800&h=450&fit=crop',
+      duration: '42:15',
+      views: 1234,
+      uploadDate: '2024-12-15',
+      category: 'Automations',
+      tags: ['virtual-assistant', 'hiring', 'automation', 'team-building'],
+      videoUrl: 'https://www.loom.com/share/e1d50c6ae34d4c5882aa7587269c47aa?sid=5f9e60c2-8e27-480e-b003-ec358df9a5c5'
+    },
+    {
+      id: '4',
+      title: 'Hiring Your Housekeeper',
+      description: 'Complete process for finding and managing housekeepers for your rental properties',
+      thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=450&fit=crop',
+      duration: '31:30',
+      views: 743,
+      uploadDate: '2024-12-12',
+      category: 'Property Management',
+      tags: ['housekeeper', 'property-management', 'maintenance', 'staff'],
+      videoUrl: 'https://www.loom.com/share/98d389450eb948a3ab0a62fc875050e8?sid=14ec2526-9ae3-45c8-a998-90727383338e'
+    },
+    {
+      id: '5',
+      title: 'Property Listing Optimization',
+      description: 'Optimize your property listings to attract more qualified tenants and maximize occupancy',
+      thumbnail: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=450&fit=crop',
+      duration: '25:12',
+      views: 1456,
+      uploadDate: '2024-12-10',
+      category: 'Property Management',
+      tags: ['listing-optimization', 'marketing', 'tenant-acquisition'],
+      videoUrl: 'https://www.loom.com/share/e323b3ad4da842ea9227e2865249afa8?sid=e8705a4d-366b-4217-a8a2-b9cf54cc777d'
+    },
+    {
+      id: '6',
+      title: 'Property Acquisitions Overview',
+      description: 'Master the fundamentals of property acquisitions and deal analysis',
+      thumbnail: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=450&fit=crop',
+      duration: '38:45',
+      views: 2103,
+      uploadDate: '2024-12-08',
+      category: 'Property Acquisitions',
+      tags: ['acquisitions', 'deal-analysis', 'investment-strategy'],
+      featured: true,
+      videoUrl: 'https://www.loom.com/share/b6b52e6d8bfa4490b3de0481f60cee53?sid=0a9940f7-883a-4fe0-bb19-edd901ae37a3'
     }
   ];
 
