@@ -426,15 +426,15 @@ export const VideoLibrary = () => {
         </div>
       </div>
 
-      {/* Category Filters - 4 Columns */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Category Filters - Single Row */}
+      <div className="flex flex-wrap justify-center gap-4">
         <Button
           variant={selectedCategory === 'all' ? "default" : "outline"}
           onClick={() => setSelectedCategory('all')}
           className={
             selectedCategory === 'all'
-              ? "bg-cyan-600 hover:bg-cyan-700 h-20 flex flex-col"
-              : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 h-20 flex flex-col"
+              ? "bg-cyan-600 hover:bg-cyan-700 h-16 px-6 flex flex-col"
+              : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 h-16 px-6 flex flex-col"
           }
         >
           <span className="text-lg font-bold">All</span>
@@ -448,12 +448,12 @@ export const VideoLibrary = () => {
             onClick={() => setSelectedCategory(category)}
             className={
               selectedCategory === category
-                ? "bg-gradient-to-br from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 h-20 flex flex-col"
-                : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 h-20 flex flex-col"
+                ? "bg-gradient-to-br from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 h-16 px-6 flex flex-col whitespace-nowrap"
+                : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 h-16 px-6 flex flex-col whitespace-nowrap"
             }
           >
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold">{getCategoryStep(category)}</span>
+              <span className="text-xl font-bold">{getCategoryStep(category)}</span>
               <span className="text-sm font-medium">{category}</span>
             </div>
             <span className="text-xs opacity-75">Step {getCategoryStep(category)}</span>
