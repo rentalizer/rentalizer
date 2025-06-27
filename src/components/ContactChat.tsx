@@ -11,7 +11,6 @@ import { supabase } from '@/integrations/supabase/client';
 export const ContactChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -19,10 +18,10 @@ export const ContactChat = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !email || !message) {
+    if (!name || !message) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all fields",
+        description: "Please fill in your name and message",
         variant: "destructive",
       });
       return;
@@ -36,7 +35,7 @@ export const ContactChat = () => {
         .from('contact_messages')
         .insert({
           name: name.trim(),
-          email: email.trim(),
+          email: '', // No email needed for DM format
           message: message.trim(),
         });
 
@@ -50,28 +49,27 @@ export const ContactChat = () => {
         return;
       }
 
-      // Call edge function to send email notification
+      // Call edge function to send notification
       try {
         await supabase.functions.invoke('send-contact-notification', {
           body: {
             name: name.trim(),
-            email: email.trim(),
+            email: '',
             message: message.trim(),
           },
         });
       } catch (emailError) {
-        console.error('Error sending email notification:', emailError);
+        console.error('Error sending notification:', emailError);
         // Don't show error to user since message was saved successfully
       }
 
       toast({
         title: "Message Sent!",
-        description: "Thank you for contacting us. We'll get back to you soon.",
+        description: "Your message has been delivered. We'll get back to you soon.",
       });
 
       // Reset form and close dialog
       setName('');
-      setEmail('');
       setMessage('');
       setIsOpen(false);
 
@@ -102,53 +100,40 @@ export const ContactChat = () => {
         <DialogHeader>
           <DialogTitle className="text-cyan-300 flex items-center gap-2">
             <MessageCircle className="h-5 w-5" />
-            Direct Message iStay USA LLC
+            Send Direct Message
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
-              Name
-            </label>
-            <Input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
-              disabled={isSubmitting}
-            />
+        
+        {/* DM Format Interface */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+            <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+              {name ? name.charAt(0).toUpperCase() : 'Y'}
+            </div>
+            <div className="flex-1">
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name"
+                className="bg-transparent border-none p-0 text-white placeholder-gray-400 focus-visible:ring-0"
+                disabled={isSubmitting}
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
-              disabled={isSubmitting}
-            />
-          </div>
-          <div>
-            <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-1">
-              Message
-            </label>
+
+          <div className="bg-slate-800/30 rounded-lg p-4 min-h-[120px]">
             <Textarea
-              id="message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="How can we help you?"
+              placeholder="Type your message here..."
               rows={4}
-              className="bg-gray-800 border-gray-600 text-white placeholder-gray-400"
+              className="bg-transparent border-none resize-none text-white placeholder-gray-400 focus-visible:ring-0 p-0"
               disabled={isSubmitting}
             />
           </div>
-          <div className="flex gap-3">
+
+          <div className="flex gap-3 pt-2">
             <Button
               type="button"
               variant="outline"
@@ -159,7 +144,7 @@ export const ContactChat = () => {
               Cancel
             </Button>
             <Button
-              type="submit"
+              onClick={handleSubmit}
               className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white"
               disabled={isSubmitting}
             >
@@ -176,7 +161,7 @@ export const ContactChat = () => {
               )}
             </Button>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );
