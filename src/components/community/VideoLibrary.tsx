@@ -148,10 +148,130 @@ export const VideoLibrary = () => {
       category: 'Financial Analysis',
       tags: ['cashflow', 'analysis', 'finance', 'optimization'],
       videoUrl: 'https://www.loom.com/share/f3ef7729fb084b72ac0ac548b89ceb93?sid=75a145f2-4aad-4f7e-9066-2c1876abd228'
+    },
+    {
+      id: '11',
+      title: 'Hosting Remotely',
+      description: 'Master remote hosting strategies for managing properties from anywhere',
+      thumbnail: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop',
+      duration: '29:35',
+      views: 967,
+      uploadDate: '2024-11-25',
+      category: 'Property Management',
+      tags: ['remote-hosting', 'property-management', 'automation', 'systems'],
+      videoUrl: 'https://www.loom.com/share/bdeeb06bce7a45379822f91455676839?sid=159d9d8f-c518-45ed-8908-73e52a1fc656'
+    },
+    {
+      id: '12',
+      title: 'Rental Application',
+      description: 'Complete guide to rental application processes and tenant screening',
+      thumbnail: 'https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=800&h=450&fit=crop',
+      duration: '33:20',
+      views: 1205,
+      uploadDate: '2024-11-22',
+      category: 'Property Management',
+      tags: ['rental-application', 'tenant-screening', 'process', 'documentation'],
+      videoUrl: 'https://www.loom.com/share/7320471e7d2948b6baa646d901518797?sid=40a32dce-1bfa-4adc-aa28-d09ad53759ab'
+    },
+    {
+      id: '13',
+      title: 'Market Research III',
+      description: 'Advanced market research techniques and data analysis methods',
+      thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=450&fit=crop',
+      duration: '47:15',
+      views: 834,
+      uploadDate: '2024-11-20',
+      category: 'Market Research',
+      tags: ['market-research', 'advanced', 'data-analysis', 'techniques'],
+      videoUrl: 'https://www.loom.com/share/b32d86ef3a1041ed8974a65685b2c730?sid=4d1bf7ab-c93b-421f-a0d1-766ab3e670a1'
+    },
+    {
+      id: '14',
+      title: 'Market Research I',
+      description: 'Introduction to market research fundamentals and basic techniques',
+      thumbnail: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=450&fit=crop',
+      duration: '32:50',
+      views: 1543,
+      uploadDate: '2024-11-18',
+      category: 'Market Research',
+      tags: ['market-research', 'fundamentals', 'basics', 'introduction'],
+      videoUrl: 'https://www.loom.com/share/c8a80aa7e1a14893b5961fedd90a9367?sid=6aad2485-7e26-476f-b6e0-b3077a4795bc'
+    },
+    {
+      id: '15',
+      title: 'Operations I',
+      description: 'Essential operations management for rental arbitrage businesses',
+      thumbnail: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&h=450&fit=crop',
+      duration: '41:10',
+      views: 987,
+      uploadDate: '2024-11-15',
+      category: 'Business Strategy',
+      tags: ['operations', 'management', 'business-processes', 'efficiency'],
+      videoUrl: 'https://www.loom.com/share/97a740ea55484c369e47d3a2a64ed776?sid=60924369-0c23-4bed-b228-8c6aed7855b7'
+    },
+    {
+      id: '16',
+      title: 'Property Listing - Mid Term Rentals',
+      description: 'Specialized strategies for marketing and listing mid-term rental properties',
+      thumbnail: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=450&fit=crop',
+      duration: '26:45',
+      views: 721,
+      uploadDate: '2024-11-12',
+      category: 'Property Management',
+      tags: ['mid-term-rentals', 'listing', 'marketing', 'specialized'],
+      videoUrl: 'https://www.loom.com/share/64de8f993a974132b629bf8e37cc647c?sid=6b2a48de-ea9b-410f-804a-ddb2a7399346'
+    },
+    {
+      id: '17',
+      title: 'STR Ordinances',
+      description: 'Understanding short-term rental regulations and compliance requirements',
+      thumbnail: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&h=450&fit=crop',
+      duration: '38:25',
+      views: 1134,
+      uploadDate: '2024-11-10',
+      category: 'Legal & Compliance',
+      tags: ['str-ordinances', 'regulations', 'compliance', 'legal'],
+      videoUrl: 'https://www.loom.com/share/a9103ef043e64eab9b8432ced535d475?sid=26a2af0e-b588-49d2-bef0-b2b1809baa87'
+    },
+    {
+      id: '18',
+      title: 'Property Listing Optimization',
+      description: 'Advanced techniques for optimizing property listings and increasing bookings',
+      thumbnail: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=450&fit=crop',
+      duration: '34:15',
+      views: 1389,
+      uploadDate: '2024-11-08',
+      category: 'Property Management',
+      tags: ['listing-optimization', 'advanced', 'bookings', 'conversion'],
+      videoUrl: 'https://www.loom.com/share/f5ec35e9d58c4b849dff862b871f10f7?sid=a0efd2aa-9b8f-4423-bc96-bdd593ff4f0a'
+    },
+    {
+      id: '19',
+      title: 'Property Budgeting + Design',
+      description: 'Complete guide to budgeting and design strategies for rental properties',
+      thumbnail: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=450&fit=crop',
+      duration: '43:30',
+      views: 956,
+      uploadDate: '2024-11-05',
+      category: 'Property Management',
+      tags: ['budgeting', 'design', 'renovation', 'cost-control'],
+      videoUrl: 'https://www.loom.com/share/75054572e7d54180844b137ff5f61a5e?sid=802e6f04-4bcc-4376-b254-7dec00c84d0e'
+    },
+    {
+      id: '20',
+      title: 'Business Formation',
+      description: 'Essential guide to forming and structuring your rental arbitrage business',
+      thumbnail: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&h=450&fit=crop',
+      duration: '39:50',
+      views: 1267,
+      uploadDate: '2024-11-02',
+      category: 'Business Strategy',
+      tags: ['business-formation', 'legal-structure', 'incorporation', 'startup'],
+      videoUrl: 'https://www.loom.com/share/e21ff8e94a404aa68110e44f9994a6b3?sid=a02b7adb-87a6-4b9c-bd17-e7579ab8369f'
     }
   ];
 
-  const categories = ['all', 'Market Research', 'Property Acquisitions', 'Automations', 'Property Management', 'Business Strategy', 'Financial Analysis'];
+  const categories = ['all', 'Market Research', 'Property Acquisitions', 'Automations', 'Property Management', 'Business Strategy', 'Financial Analysis', 'Legal & Compliance'];
 
   const getCategoryColor = (category: string) => {
     const colors = {
@@ -160,7 +280,8 @@ export const VideoLibrary = () => {
       'Automations': 'bg-purple-500/20 border-purple-500/30 text-purple-300',
       'Property Management': 'bg-slate-500/20 border-slate-500/30 text-slate-300',
       'Business Strategy': 'bg-green-500/20 border-green-500/30 text-green-300',
-      'Financial Analysis': 'bg-orange-500/20 border-orange-500/30 text-orange-300'
+      'Financial Analysis': 'bg-orange-500/20 border-orange-500/30 text-orange-300',
+      'Legal & Compliance': 'bg-red-500/20 border-red-500/30 text-red-300'
     };
     return colors[category as keyof typeof colors] || 'bg-gray-500/20 border-gray-500/30 text-gray-300';
   };
@@ -309,14 +430,6 @@ export const VideoLibrary = () => {
                     </Badge>
                   ))}
                 </div>
-
-                {/* Footer */}
-                <div className="flex items-center justify-between text-xs text-gray-400 pt-3 border-t border-gray-700">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {new Date(video.uploadDate).toLocaleDateString()}
-                  </div>
-                </div>
               </div>
             </CardContent>
           </Card>
@@ -367,7 +480,6 @@ export const VideoLibrary = () => {
               <div className="flex items-center gap-4 text-xs text-gray-400">
                 <span>{selectedVideo.duration}</span>
                 <span>{selectedVideo.views.toLocaleString()} views</span>
-                <span>{new Date(selectedVideo.uploadDate).toLocaleDateString()}</span>
               </div>
             </div>
           )}
