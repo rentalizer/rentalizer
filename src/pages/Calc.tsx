@@ -7,10 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { CompsSection } from '@/components/calculator/CompsSection';
-import { BuildOutSection } from '@/components/calculator/BuildOutSection';
-import { ExpensesSection } from '@/components/calculator/ExpensesSection';
-import { NetProfitSection } from '@/components/calculator/NetProfitSection';
+import { CompsSection } from '@/components/calc/CompsSection';
+import { BuildOutSection } from '@/components/calc/BuildOutSection';
+import { ExpensesSection } from '@/components/calc/ExpensesSection';
+import { NetProfitSection } from '@/components/calc/NetProfitSection';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 
