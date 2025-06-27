@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, Search, Pin, Reply, Heart, Send } from 'lucide-react';
+import { MessageSquare, Search, Pin, Reply, Heart, Send, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -22,6 +23,7 @@ interface Message {
 export const MessageThreads = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [newComment, setNewComment] = useState('');
+  const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
 
   const messages: Message[] = [
     {
@@ -97,10 +99,24 @@ export const MessageThreads = () => {
 
   const handleSubmitComment = () => {
     if (newComment.trim()) {
-      // Here you would typically send the comment to your backend
       console.log('New comment:', newComment);
       setNewComment('');
     }
+  };
+
+  const toggleExpanded = (messageId: string) => {
+    const newExpanded = new Set(expandedPosts);
+    if (newExpanded.has(messageId)) {
+      newExpanded.delete(messageId);
+    } else {
+      newExpanded.add(messageId);
+    }
+    setExpandedPosts(newExpanded);
+  };
+
+  const truncateContent = (content: string, maxLength: number = 150) => {
+    if (content.length <= maxLength) return content;
+    return content.substring(0, maxLength) + '...';
   };
 
   return (
@@ -150,77 +166,100 @@ export const MessageThreads = () => {
         </CardContent>
       </Card>
 
-      {/* Message Threads */}
+      {/* Message Threads - Uniform Size */}
       <div className="space-y-4">
-        {filteredMessages.map(message => (
-          <Card key={message.id} className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                {/* Avatar */}
-                <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                  {message.avatar}
-                </div>
+        {filteredMessages.map(message => {
+          const isExpanded = expandedPosts.has(message.id);
+          const displayContent = isExpanded ? message.content : truncateContent(message.content);
+          
+          return (
+            <Card 
+              key={message.id} 
+              className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors cursor-pointer"
+              onClick={() => toggleExpanded(message.id)}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  {/* Avatar */}
+                  <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                    {message.avatar}
+                  </div>
 
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      {message.isPinned && <Pin className="h-4 w-4 text-yellow-400" />}
-                      <h3 className="font-semibold text-white hover:text-cyan-300 cursor-pointer">
-                        {message.title}
-                      </h3>
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        {message.isPinned && <Pin className="h-4 w-4 text-yellow-400" />}
+                        <h3 className="font-semibold text-white hover:text-cyan-300">
+                          {message.title}
+                        </h3>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-400 flex-shrink-0">{message.timestamp}</span>
+                        {isExpanded ? (
+                          <ChevronUp className="h-4 w-4 text-gray-400" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 text-gray-400" />
+                        )}
+                      </div>
                     </div>
-                    <span className="text-sm text-gray-400 flex-shrink-0">{message.timestamp}</span>
-                  </div>
 
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-sm text-cyan-300">{message.author}</span>
-                    {message.isPinned && (
-                      <Badge variant="outline" className="border-yellow-500/30 text-yellow-300 text-xs">
-                        Pinned
-                      </Badge>
-                    )}
-                  </div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-sm text-cyan-300">{message.author}</span>
+                      {message.isPinned && (
+                        <Badge variant="outline" className="border-yellow-500/30 text-yellow-300 text-xs">
+                          Pinned
+                        </Badge>
+                      )}
+                    </div>
 
-                  <p className="text-gray-300 mb-3 whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-gray-300 mb-3 whitespace-pre-wrap">
+                      {displayContent}
+                      {!isExpanded && message.content.length > 150 && (
+                        <span className="text-cyan-400 ml-2 font-medium">Click to read more</span>
+                      )}
+                    </p>
 
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {message.tags.map(tag => (
-                      <Badge 
-                        key={tag} 
-                        variant="outline" 
-                        className="border-purple-500/30 text-purple-300 text-xs"
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {message.tags.map(tag => (
+                        <Badge 
+                          key={tag} 
+                          variant="outline" 
+                          className="border-purple-500/30 text-purple-300 text-xs"
+                        >
+                          #{tag}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-4">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-gray-400 hover:text-cyan-300 h-8 px-2"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        #{tag}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-4">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-gray-400 hover:text-cyan-300 h-8 px-2"
-                    >
-                      <Reply className="h-4 w-4 mr-1" />
-                      {message.replies} replies
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-gray-400 hover:text-red-300 h-8 px-2"
-                    >
-                      <Heart className="h-4 w-4 mr-1" />
-                      {message.likes}
-                    </Button>
+                        <Reply className="h-4 w-4 mr-1" />
+                        {message.replies} replies
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-gray-400 hover:text-red-300 h-8 px-2"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Heart className="h-4 w-4 mr-1" />
+                        {message.likes}
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {filteredMessages.length === 0 && (
