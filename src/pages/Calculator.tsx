@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,6 +38,10 @@ export interface CalculatorData {
   software: number;
   miscellaneous: number;
   furnitureRental: number;
+  
+  // Furnishings Calculator
+  squareFootage: number;
+  furnishingsPSF: number;
 }
 
 const Calculator = () => {
@@ -62,6 +67,8 @@ const Calculator = () => {
     software: 0,
     miscellaneous: 0,
     furnitureRental: 0,
+    squareFootage: 0,
+    furnishingsPSF: 8,
   };
   
   const [data, setData] = useState<CalculatorData>(initialData);
