@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, Plus, Search, Pin, Reply, Heart } from 'lucide-react';
+import { MessageSquare, Search, Pin, Reply, Heart, Send } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -21,6 +22,7 @@ interface Message {
 
 export const MessageThreads = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [newComment, setNewComment] = useState('');
 
   const messages: Message[] = [
     {
@@ -87,6 +89,14 @@ export const MessageThreads = () => {
     message.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  const handleSubmitComment = () => {
+    if (newComment.trim()) {
+      // Here you would typically send the comment to your backend
+      console.log('New comment:', newComment);
+      setNewComment('');
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -97,10 +107,6 @@ export const MessageThreads = () => {
             {messages.length} threads
           </Badge>
         </div>
-        <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-          <Plus className="h-4 w-4 mr-2" />
-          New Thread
-        </Button>
       </div>
 
       {/* Search */}
@@ -113,6 +119,30 @@ export const MessageThreads = () => {
           className="pl-10 bg-slate-800/50 border-cyan-500/20 text-white placeholder-gray-400"
         />
       </div>
+
+      {/* Comment Input Field */}
+      <Card className="bg-slate-800/50 border-cyan-500/20">
+        <CardContent className="p-4">
+          <div className="space-y-3">
+            <Textarea
+              placeholder="Share your thoughts with the community..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 min-h-[100px]"
+            />
+            <div className="flex justify-end">
+              <Button 
+                onClick={handleSubmitComment}
+                disabled={!newComment.trim()}
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
+              >
+                <Send className="h-4 w-4 mr-2" />
+                Post Comment
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Message Threads */}
       <div className="space-y-4">
@@ -192,7 +222,7 @@ export const MessageThreads = () => {
           <CardContent className="text-center py-12">
             <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-300 mb-2">No threads found</h3>
-            <p className="text-gray-400">Try adjusting your search terms or start a new thread</p>
+            <p className="text-gray-400">Try adjusting your search terms or start a new discussion</p>
           </CardContent>
         </Card>
       )}
