@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,20 @@ export const VideoLibrary = () => {
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
 
   const videos: VideoItem[] = [
+    {
+      id: '0',
+      title: 'Competitor Analysis',
+      description: 'Learn how to analyze competitors and identify market opportunities',
+      thumbnail: '/placeholder-thumbnail.jpg',
+      duration: '35:20',
+      views: 1567,
+      uploadDate: '2024-12-20',
+      category: 'Market Research',
+      instructor: 'Richie Matthews',
+      tags: ['competitor-analysis', 'market-research', 'strategy'],
+      featured: true,
+      videoUrl: 'https://www.loom.com/share/00d9db5904784d0091b6dbeedfb61830?sid=47d7bb0b-f3eb-421b-b3f5-6aab2661f864'
+    },
     {
       id: '1',
       title: 'Market Research Fundamentals',
