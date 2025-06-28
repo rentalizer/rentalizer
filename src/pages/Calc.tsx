@@ -199,7 +199,7 @@ const Calc = () => {
           {/* 3rd - Property Comps */}
           <CompsSection data={data} updateData={updateData} />
 
-          {/* 4th - Analysis Results */}
+          {/* 4th - Analysis Results (moved closer to Property Comps) */}
           <NetProfitSection 
             monthlyRevenue={monthlyRevenue}
             netProfitMonthly={netProfitMonthly}
