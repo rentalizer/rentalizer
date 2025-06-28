@@ -114,7 +114,28 @@ const Calculator = () => {
   };
 
   const clearAllData = () => {
-    setData(initialData);
+    setData({
+      address: '',
+      bedrooms: 2,
+      bathrooms: 2,
+      averageComparable: 0,
+      firstMonthRent: 0,
+      securityDeposit: 0,
+      furnishingsCost: 0,
+      rent: 0,
+      serviceFees: 0,
+      maintenance: 0,
+      power: 0,
+      waterSewer: 0,
+      internet: 0,
+      taxLicense: 0,
+      insurance: 0,
+      software: 0,
+      miscellaneous: 0,
+      furnitureRental: 0,
+      squareFootage: 0,
+      furnishingsPSF: 8,
+    });
     toast({
       title: "Calculator Cleared",
       description: "All data has been reset. You can start over with a fresh calculation.",
@@ -163,7 +184,7 @@ const Calculator = () => {
             RentalizerCalc
           </h1>
           <p className="text-xl text-gray-300 mb-6 sm:text-lg">
-            Calculate STR Profitability & ROI
+            Analyze Property STR Profitability
           </p>
           
           {/* Action buttons */}
