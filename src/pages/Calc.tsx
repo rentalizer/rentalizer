@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -106,7 +105,7 @@ const Calc = () => {
   const serviceFeeCalculated = Math.round(data.rent * 0.029); // 2.9% of rent, not average comparable
   const monthlyExpenses = Math.round(data.rent + serviceFeeCalculated + data.maintenance + data.power + 
                          data.waterSewer + data.internet + data.taxLicense + data.insurance + 
-                         data.software + data.furnitureRental);
+                         data.software + data.miscellaneous + data.furnitureRental);
   const monthlyRevenue = Math.round(data.averageComparable);
   const netProfitMonthly = Math.round(monthlyRevenue - monthlyExpenses);
   

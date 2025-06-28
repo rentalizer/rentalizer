@@ -153,6 +153,20 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
         </div>
 
+        <div className="space-y-2">
+          <Label className="text-gray-200 text-center block">Miscellaneous</Label>
+          <div className="relative">
+            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              type="number"
+              value={data.miscellaneous || ''}
+              onChange={(e) => updateData({ miscellaneous: Math.round(parseFloat(e.target.value)) || 0 })}
+              placeholder=""
+              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+            />
+          </div>
+        </div>
+
         <div className="mt-6 p-4 bg-gradient-to-r from-orange-600/20 to-red-600/20 rounded-lg border border-orange-500/30">
           <div className="flex items-center justify-between">
             <Label className="text-orange-300 font-medium">Monthly Expenses</Label>
