@@ -51,8 +51,8 @@ const Calculator = () => {
   
   const initialData: CalculatorData = {
     address: '',
-    bedrooms: 2,
-    bathrooms: 2,
+    bedrooms: 0,
+    bathrooms: 0,
     averageComparable: 0,
     firstMonthRent: 0,
     securityDeposit: 0,
@@ -69,7 +69,7 @@ const Calculator = () => {
     miscellaneous: 0,
     furnitureRental: 0,
     squareFootage: 0,
-    furnishingsPSF: 8,
+    furnishingsPSF: 0,
   };
   
   const [data, setData] = useState<CalculatorData>(initialData);
