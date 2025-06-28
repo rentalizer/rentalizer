@@ -155,31 +155,17 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block text-sm">Miscellaneous</Label>
+            <Label className="text-gray-200 text-center block text-sm">Furnishings Rental</Label>
             <div className="relative">
               <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={data.miscellaneous || ''}
-                onChange={(e) => updateData({ miscellaneous: Math.round(parseFloat(e.target.value)) || 0 })}
+                value={data.furnitureRental || ''}
+                onChange={(e) => updateData({ furnitureRental: Math.round(parseFloat(e.target.value)) || 0 })}
                 placeholder=""
                 className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
               />
             </div>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-gray-200 text-center block text-sm">Furnishings Rental</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-            <Input
-              type="number"
-              value={data.furnitureRental || ''}
-              onChange={(e) => updateData({ furnitureRental: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder=""
-              className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
-            />
           </div>
         </div>
 
