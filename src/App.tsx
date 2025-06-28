@@ -11,6 +11,7 @@ import LandingPage from "./pages/LandingPage";
 import Demo from "./pages/Demo";
 import Calculator from "./pages/Calculator";
 import Calc from "./pages/Calc";
+import Login from "./pages/Login";
 import MarketAnalysis from "./pages/MarketAnalysis";
 import ResetPassword from "./pages/ResetPassword";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -30,6 +31,7 @@ const queryClient = new QueryClient();
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<LandingPage />} />
+    <Route path="/login" element={<Login />} />
     <Route path="/dashboard" element={<Index />} />
     <Route path="/demo" element={<Demo />} />
     <Route path="/pricing" element={<Pricing />} />

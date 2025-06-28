@@ -1,12 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home, RotateCcw } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { CompsSection } from '@/components/calc/CompsSection';
 import { BuildOutSection } from '@/components/calc/BuildOutSection';
 import { ExpensesSection } from '@/components/calc/ExpensesSection';
@@ -47,7 +47,32 @@ export interface CalculatorData {
 const Calc = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isLoading } = useAuth();
   
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !user) {
+      navigate('/login?redirect=/calc');
+    }
+  }, [user, isLoading, navigate]);
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="text-cyan-300 text-xl">Loading...</div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (!user) {
+    return null;
+  }
+
   const initialData: CalculatorData = {
     address: '',
     bedrooms: 2,
