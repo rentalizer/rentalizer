@@ -1,9 +1,9 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Building2, DollarSign, Calculator as CalculatorIcon } from 'lucide-react';
+import { Building2, DollarSign } from 'lucide-react';
 import { CalculatorData } from '@/pages/Calc';
 
 interface BuildOutSectionProps {
@@ -19,21 +19,17 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
 }) => {
   const calculatedFurnishings = Math.round(data.squareFootage * data.furnishingsPSF);
 
-  const applyCalculatedFurnishings = () => {
-    updateData({ furnishingsCost: calculatedFurnishings });
-  };
-
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center justify-center gap-2 text-white text-lg text-center">
           <Building2 className="h-5 w-5 text-cyan-400" />
-          Build Out Costs
+          Cash To Launch
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label className="text-gray-200 text-center block">First Month Rent</Label>
+          <Label className="text-gray-200 text-center block">1st Months Rent</Label>
           <div className="relative">
             <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
@@ -47,7 +43,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label className="text-gray-200 text-center block">Security Deposit</Label>
+          <Label className="text-gray-200 text-center block">Deposit</Label>
           <div className="relative">
             <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
@@ -74,46 +70,18 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
           </div>
         </div>
 
-        <div className="space-y-2">
-          <Label className="text-gray-200 text-center block">Furnishings Cost</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              type="number"
-              value={data.furnishingsCost || ''}
-              onChange={(e) => updateData({ furnishingsCost: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder=""
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-gray-200 text-center block">Furniture Rental</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              type="number"
-              value={data.furnitureRental || ''}
-              onChange={(e) => updateData({ furnitureRental: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder=""
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
-            />
-          </div>
-        </div>
-
-        {/* Property Size Calculator Section */}
+        {/* Buy Furnishings Section */}
         <div className="mt-4 p-4 bg-gray-800/30 rounded-lg border border-gray-600/50">
-          <Label className="text-gray-200 text-center block mb-3">Property Size ($8 PSF)</Label>
+          <Label className="text-gray-200 text-center block mb-3">Buy Furnishings</Label>
           
-          <div className="grid grid-cols-2 gap-3 mb-3">
+          <div className="grid grid-cols-2 gap-2 mb-3">
             <div className="space-y-2">
               <Label className="text-gray-300 text-sm">Square Footage</Label>
               <Input
                 type="number"
                 value={data.squareFootage || ''}
                 onChange={(e) => updateData({ squareFootage: Math.round(parseFloat(e.target.value)) || 0 })}
-                placeholder="850"
+                placeholder=""
                 className="bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -133,12 +101,8 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
             </div>
           </div>
 
-          <div className="text-center mb-3">
-            <span className="text-gray-300">or</span>
-          </div>
-
           <div className="flex items-center justify-between mb-3">
-            <Label className="text-gray-300">Calculated Cost</Label>
+            <Label className="text-gray-300">Furnishings Cost</Label>
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-cyan-400" />
               <span className="text-lg font-bold text-cyan-400">
@@ -146,20 +110,29 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
               </span>
             </div>
           </div>
+        </div>
 
-          <Button 
-            onClick={applyCalculatedFurnishings}
-            className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
-            size="sm"
-          >
-            <CalculatorIcon className="h-4 w-4 mr-2" />
-            Apply to Furnishings Cost
-          </Button>
+        <div className="text-center">
+          <span className="text-gray-300">or</span>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-gray-200 text-center block">Furnishings Rental</Label>
+          <div className="relative">
+            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              type="number"
+              value={data.furnitureRental || ''}
+              onChange={(e) => updateData({ furnitureRental: Math.round(parseFloat(e.target.value)) || 0 })}
+              placeholder=""
+              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+            />
+          </div>
         </div>
 
         <div className="mt-6 p-4 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-cyan-300 font-medium">Cash to Launch</Label>
+            <Label className="text-cyan-300 font-medium">Cash To Launch</Label>
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-cyan-400" />
               <span className="text-2xl font-bold text-cyan-400">
