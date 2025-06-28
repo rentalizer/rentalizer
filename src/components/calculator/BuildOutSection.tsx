@@ -28,59 +28,61 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label className="text-gray-200 text-center block">First Month Rent</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              type="number"
-              value={data.firstMonthRent || ''}
-              onChange={(e) => updateData({ firstMonthRent: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder=""
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
-            />
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">First Month Rent</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="number"
+                value={data.firstMonthRent || ''}
+                onChange={(e) => updateData({ firstMonthRent: Math.round(parseFloat(e.target.value)) || 0 })}
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <Label className="text-gray-200 text-center block">Security Deposit</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              type="number"
-              value={data.securityDeposit || ''}
-              onChange={(e) => updateData({ securityDeposit: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder=""
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
-            />
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Security Deposit</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="number"
+                value={data.securityDeposit || ''}
+                onChange={(e) => updateData({ securityDeposit: Math.round(parseFloat(e.target.value)) || 0 })}
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <Label className="text-gray-200 text-center block">Miscellaneous</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              type="number"
-              value={data.miscellaneous || ''}
-              onChange={(e) => updateData({ miscellaneous: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder=""
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
-            />
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Miscellaneous</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="number"
+                value={data.miscellaneous || ''}
+                onChange={(e) => updateData({ miscellaneous: Math.round(parseFloat(e.target.value)) || 0 })}
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <Label className="text-gray-200 text-center block">Furniture Rental</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              type="number"
-              value={data.furnitureRental || ''}
-              onChange={(e) => updateData({ furnitureRental: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder=""
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
-            />
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Furniture Rental</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="number"
+                value={data.furnitureRental || ''}
+                onChange={(e) => updateData({ furnitureRental: Math.round(parseFloat(e.target.value)) || 0 })}
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
+              />
+            </div>
           </div>
         </div>
 
@@ -100,20 +102,20 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
                 value={data.squareFootage || ''}
                 onChange={(e) => updateData({ squareFootage: Math.round(parseFloat(e.target.value)) || 0 })}
                 placeholder=""
-                className="bg-gray-800/50 border-gray-600 text-gray-100"
+                className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
               />
             </div>
 
             <div className="space-y-2">
               <Label className="text-gray-300 text-sm">Price per Sq Ft</Label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
                 <Input
                   type="number"
                   value={data.furnishingsPSF || ''}
                   onChange={(e) => updateData({ furnishingsPSF: Math.round(parseFloat(e.target.value)) || 0 })}
                   placeholder="8"
-                  className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                  className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
                 />
               </div>
             </div>
