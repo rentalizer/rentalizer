@@ -70,29 +70,11 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
               />
             </div>
           </div>
-
-          <div className="space-y-2">
-            <Label className="text-gray-200 text-center block text-sm">Furnishings Rental</Label>
-            <div className="relative">
-              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-              <Input
-                type="number"
-                value={data.furnitureRental || ''}
-                onChange={(e) => updateData({ furnitureRental: Math.round(parseFloat(e.target.value)) || 0 })}
-                placeholder=""
-                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
-              />
-            </div>
-          </div>
         </div>
 
-        <div className="text-center mb-3">
-          <span className="text-gray-300">or</span>
-        </div>
-
-        {/* Property Size Calculator Section */}
+        {/* Buy Furnishings Section */}
         <div className="mt-4 p-4 bg-gray-800/30 rounded-lg border border-gray-600/50">
-          <Label className="text-gray-200 text-center block mb-3">Property Size ($8 PSF)</Label>
+          <Label className="text-gray-200 text-center block mb-3">Buy Furnishings</Label>
           
           <div className="grid grid-cols-2 gap-2 mb-3">
             <div className="space-y-2">
@@ -129,6 +111,24 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
                 {calculatedFurnishings.toLocaleString()}
               </span>
             </div>
+          </div>
+        </div>
+
+        <div className="text-center mb-3">
+          <span className="text-gray-300">or</span>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-gray-200 text-center block text-sm">Furnishings Rental</Label>
+          <div className="relative">
+            <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+            <Input
+              type="number"
+              value={data.furnitureRental || ''}
+              onChange={(e) => updateData({ furnitureRental: Math.round(parseFloat(e.target.value)) || 0 })}
+              placeholder=""
+              className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+            />
           </div>
         </div>
 
