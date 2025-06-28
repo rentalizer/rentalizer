@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -60,7 +61,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label className="text-gray-200 text-center block text-sm">Property Values</Label>
+          <Label className="text-gray-200 text-center block text-sm">Comparable Properties</Label>
           <Button
             variant="outline"
             className="w-full border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400 h-9 text-sm"
@@ -94,7 +95,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
 
         <div className="mt-6 p-4 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-lg border border-blue-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-blue-300 font-medium">Avg Monthly Revenue</Label>
+            <Label className="text-blue-300 font-medium">Average Comparable Property</Label>
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-blue-400" />
               <span className="text-2xl font-bold text-blue-400">
