@@ -120,28 +120,13 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
           </div>
 
           <div className="flex items-center justify-between mb-3">
-            <Label className="text-gray-300">Calculated Cost</Label>
+            <Label className="text-gray-300">Furnishing Cost</Label>
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-cyan-400" />
               <span className="text-lg font-bold text-cyan-400">
                 {calculatedFurnishings.toLocaleString()}
               </span>
             </div>
-          </div>
-        </div>
-
-        {/* Furnishings Cost moved below Property Size area */}
-        <div className="space-y-2">
-          <Label className="text-gray-200 text-center block">Furnishings Cost</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              type="number"
-              value={data.furnishingsCost || ''}
-              onChange={(e) => updateData({ furnishingsCost: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder=""
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
-            />
           </div>
         </div>
 

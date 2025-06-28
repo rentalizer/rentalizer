@@ -1,9 +1,9 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Receipt, DollarSign, Wand2 } from 'lucide-react';
+import { Receipt, DollarSign } from 'lucide-react';
 import { CalculatorData } from '@/pages/Calculator';
 
 interface ExpensesSectionProps {
@@ -19,37 +19,12 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
   serviceFeeCalculated,
   monthlyExpenses
 }) => {
-  const autoFillExpenses = () => {
-    const averageExpenses = {
-      rent: Math.round(data.averageComparable * 0.65), // 65% of revenue
-      maintenance: 150,
-      power: 120,
-      waterSewer: 80,
-      internet: 75,
-      taxLicense: 45,
-      insurance: 85,
-      software: 50,
-      miscellaneous: 100,
-      furnitureRental: 200
-    };
-    
-    updateData(averageExpenses);
-  };
-
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center justify-center gap-2 text-white text-lg text-center">
           <Receipt className="h-5 w-5 text-cyan-400" />
-          <span className="whitespace-nowrap">Monthly Expenses</span>
-          <Button
-            onClick={autoFillExpenses}
-            size="sm"
-            className="bg-cyan-600 hover:bg-cyan-700 text-white text-xs px-3 py-1 h-7 ml-2"
-          >
-            <Wand2 className="h-3 w-3 mr-1" />
-            Auto-Fill
-          </Button>
+          Monthly Expenses
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
