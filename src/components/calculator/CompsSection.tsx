@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Home, DollarSign, Plus, X } from 'lucide-react';
+import { MapPin, DollarSign, Plus, X } from 'lucide-react';
 import { CalculatorData } from '@/pages/Calculator';
 
 interface CompsSectionProps {
@@ -51,7 +51,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md h-full">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center justify-center gap-2 text-white text-lg text-center">
-          <Home className="h-5 w-5 text-cyan-400" />
+          <MapPin className="h-5 w-5 text-cyan-400" />
           Property Comps
         </CardTitle>
       </CardHeader>
