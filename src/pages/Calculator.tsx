@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -161,8 +162,8 @@ const Calculator = () => {
             <CalculatorIcon className="h-10 w-10 text-cyan-400" />
             RentalizerCalc
           </h1>
-          <p className="text-xl text-gray-300 mb-6">
-            Calculate STR Property Profitability & ROI
+          <p className="text-xl text-gray-300 mb-6 sm:text-lg">
+            Calculate STR Profitability & ROI
           </p>
           
           {/* Action buttons */}
@@ -187,8 +188,8 @@ const Calculator = () => {
           </div>
         </div>
 
-        {/* Calculator Input Sections - 4x1 Grid Layout */}
-        <div className="grid lg:grid-cols-4 gap-6 max-w-full mx-auto mb-8">
+        {/* Calculator Input Sections - 4x1 Grid Layout on desktop, centered stack on mobile */}
+        <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-6 max-w-full mx-auto mb-8 place-items-center">
           {/* 1st - Build Out Costs */}
           <BuildOutSection data={data} updateData={updateData} cashToLaunch={cashToLaunch} />
           
