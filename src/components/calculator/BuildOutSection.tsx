@@ -84,6 +84,10 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
           </div>
         </div>
 
+        <div className="text-center mb-3">
+          <span className="text-gray-300">or</span>
+        </div>
+
         {/* Property Size Calculator Section */}
         <div className="mt-4 p-4 bg-gray-800/30 rounded-lg border border-gray-600/50">
           <Label className="text-gray-200 text-center block mb-3">Property Size ($8 PSF)</Label>
@@ -95,7 +99,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
                 type="number"
                 value={data.squareFootage || ''}
                 onChange={(e) => updateData({ squareFootage: Math.round(parseFloat(e.target.value)) || 0 })}
-                placeholder="850"
+                placeholder=""
                 className="bg-gray-800/50 border-gray-600 text-gray-100"
               />
             </div>
@@ -115,12 +119,8 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
             </div>
           </div>
 
-          <div className="text-center mb-3">
-            <span className="text-gray-300">or</span>
-          </div>
-
           <div className="flex items-center justify-between mb-3">
-            <Label className="text-gray-300">Furnishing Cost</Label>
+            <Label className="text-gray-300">Furnishings Cost</Label>
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-cyan-400" />
               <span className="text-lg font-bold text-cyan-400">
