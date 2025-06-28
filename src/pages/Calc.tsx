@@ -184,7 +184,7 @@ const Calc = () => {
         </div>
 
         {/* Calculator Input Sections - 4x1 Grid Layout */}
-        <div className="grid lg:grid-cols-4 gap-4 max-w-full mx-auto mb-8">
+        <div className="grid lg:grid-cols-4 gap-2 max-w-full mx-auto mb-8">
           {/* 1st - Build Out Costs */}
           <BuildOutSection data={data} updateData={updateData} cashToLaunch={cashToLaunch} />
           
