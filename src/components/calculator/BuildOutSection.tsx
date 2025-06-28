@@ -37,7 +37,6 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
                 type="number"
                 value={data.firstMonthRent || ''}
                 onChange={(e) => updateData({ firstMonthRent: Math.round(parseFloat(e.target.value)) || 0 })}
-                placeholder="2000"
                 className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
               />
             </div>
@@ -51,7 +50,6 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
                 type="number"
                 value={data.securityDeposit || ''}
                 onChange={(e) => updateData({ securityDeposit: Math.round(parseFloat(e.target.value)) || 0 })}
-                placeholder="2000"
                 className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
               />
             </div>
@@ -65,7 +63,6 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
                 type="number"
                 value={data.miscellaneous || ''}
                 onChange={(e) => updateData({ miscellaneous: Math.round(parseFloat(e.target.value)) || 0 })}
-                placeholder="500"
                 className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
               />
             </div>
@@ -83,7 +80,6 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
                 type="number"
                 value={data.squareFootage || ''}
                 onChange={(e) => updateData({ squareFootage: Math.round(parseFloat(e.target.value)) || 0 })}
-                placeholder="800"
                 className="bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
               />
             </div>
@@ -96,7 +92,6 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
                   type="number"
                   value={data.furnishingsPSF || ''}
                   onChange={(e) => updateData({ furnishingsPSF: Math.round(parseFloat(e.target.value)) || 0 })}
-                  placeholder="8"
                   className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
                 />
               </div>
@@ -126,7 +121,6 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
               type="number"
               value={data.furnitureRental || ''}
               onChange={(e) => updateData({ furnitureRental: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder="300"
               className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
             />
           </div>
