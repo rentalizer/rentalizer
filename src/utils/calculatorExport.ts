@@ -47,7 +47,7 @@ export const exportCalculatorToCSV = (
     cashOnCashReturn: number;
     calculatedFurnishings: number;
   },
-  filename: string = 'str-calculator-analysis'
+  filename: string = 'RentalizerCalc-Analysis'
 ) => {
   console.log('=== CALCULATOR CSV EXPORT DEBUG START ===');
   console.log('Exporting calculator data:', data);
