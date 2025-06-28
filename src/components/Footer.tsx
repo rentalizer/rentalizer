@@ -14,7 +14,7 @@ export const Footer = ({ showLinks = true }: FooterProps) => {
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4 justify-center">
               <img 
-                src="/lovable-uploads/0776c07d-f4e4-4ca6-8376-0f5ad36cd715.png" 
+                src="/lovable-uploads/f01a7927-4318-452b-8513-c35042097178.png" 
                 alt="Rentalizer Logo" 
                 className="h-16 w-16"
               />
