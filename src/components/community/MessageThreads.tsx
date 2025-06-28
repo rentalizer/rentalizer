@@ -1,11 +1,10 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, Search, Pin, Reply, Heart, Send, ChevronDown, ChevronUp } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { MentionInput } from './MentionInput';
+import { MessageSquare, Plus, Search, Pin, Reply, Heart } from 'lucide-react';
 
 interface Message {
   id: string;
@@ -22,17 +21,14 @@ interface Message {
 
 export const MessageThreads = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [newComment, setNewComment] = useState('');
-  const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
-  const { toast } = useToast();
 
-  const [messages, setMessages] = useState<Message[]>([
+  const messages: Message[] = [
     {
       id: '1',
       author: 'Richie Matthews',
       avatar: 'RM',
-      title: 'Welcome aboard!',
-      content: 'We\'re thrilled to have you join our vibrant community of rental entrepreneurs! 🎉 Whether you\'re a seasoned host or just starting out, you\'re in the right place to learn, connect, and grow together.\n\nHere\'s a quick guide to get you started on your adventure with us:\n\n1. Introduce Yourself: Take a moment to introduce yourself to the community by sharing a short welcome message and a bit of your story. Your unique experiences and insights will inspire others and help us get to know you better!\n\n2. Start the MasterCourse: Dive right into our exclusive course designed to equip you with the essential knowledge and skills you need to succeed in the world of rental hosting. You\'ll discover actionable strategies, insider tips, and proven techniques to elevate your hosting game and maximize your earnings.\n\n3. Share Valuable Contents: Share your valuable insights, experiences, and tips with the community to help others along their hosting journey. Whether it\'s a hosting hack, or an inspiring success story, your contributions will enrich our community and unlock new levels and badges for you!\n\n4. Engage and Ask Questions: Don\'t hesitate to ask questions, seek advice, or share your challenges with the community. Our friendly members and experienced moderators are here to support you every step of the way. Stay active, participate in discussions, and keep an eye out for updates and announcements from the community owners.\n\nRemember, this community is a place where we celebrate each other\'s successes, learn from our experiences, and support one another on our entrepreneurial endeavors. Together, we\'ll create a thriving community of empowered Airbnb hosts who are making a positive impact in the world of hospitality.\n\nWelcome aboard, and let\'s embark on this exciting journey together! 🚀🏡',
+      title: 'Welcome to the Community!',
+      content: 'Welcome everyone to our Rental Arbitrage University community! This is your space to connect, share experiences, and learn from each other...',
       timestamp: '2h ago',
       replies: 23,
       likes: 45,
@@ -83,64 +79,30 @@ export const MessageThreads = () => {
       likes: 22,
       tags: ['landlords', 'negotiation', 'help']
     }
-  ]);
+  ];
 
-  // Sort messages to show pinned messages first
-  const sortedMessages = [...messages].sort((a, b) => {
-    if (a.isPinned && !b.isPinned) return -1;
-    if (!a.isPinned && b.isPinned) return 1;
-    return 0;
-  });
-
-  const filteredMessages = sortedMessages.filter(message =>
+  const filteredMessages = messages.filter(message =>
     message.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     message.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
     message.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const handleSubmitComment = () => {
-    if (newComment.trim()) {
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        author: 'You',
-        avatar: 'YU',
-        title: newComment.length > 50 ? newComment.substring(0, 50) + '...' : newComment,
-        content: newComment,
-        timestamp: 'now',
-        replies: 0,
-        likes: 0,
-        tags: ['discussion']
-      };
-
-      setMessages(prevMessages => [newMessage, ...prevMessages]);
-      setNewComment('');
-      
-      toast({
-        title: "Comment posted!",
-        description: "Your comment has been added to the community.",
-      });
-
-      console.log('New comment posted:', newComment);
-    }
-  };
-
-  const toggleExpanded = (messageId: string) => {
-    const newExpanded = new Set(expandedPosts);
-    if (newExpanded.has(messageId)) {
-      newExpanded.delete(messageId);
-    } else {
-      newExpanded.add(messageId);
-    }
-    setExpandedPosts(newExpanded);
-  };
-
-  const truncateContent = (content: string, maxLength: number = 150) => {
-    if (content.length <= maxLength) return content;
-    return content.substring(0, maxLength) + '...';
-  };
-
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl font-bold text-cyan-300">Message Threads</h2>
+          <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
+            {messages.length} threads
+          </Badge>
+        </div>
+        <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
+          <Plus className="h-4 w-4 mr-2" />
+          New Thread
+        </Button>
+      </div>
+
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -152,125 +114,77 @@ export const MessageThreads = () => {
         />
       </div>
 
-      {/* Comment Input Field with Mention Support */}
-      <Card className="bg-slate-800/50 border-cyan-500/20">
-        <CardContent className="p-4">
-          <div className="space-y-3">
-            <MentionInput
-              value={newComment}
-              onChange={setNewComment}
-              placeholder="Share your thoughts with the community... (Use @ to mention users)"
-              className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
-              minHeight="100px"
-            />
-            <div className="flex justify-end">
-              <Button 
-                onClick={handleSubmitComment}
-                disabled={!newComment.trim()}
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
-              >
-                <Send className="h-4 w-4 mr-2" />
-                Post Comment
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Message Threads - Uniform Size */}
+      {/* Message Threads */}
       <div className="space-y-4">
-        {filteredMessages.map(message => {
-          const isExpanded = expandedPosts.has(message.id);
-          const displayContent = isExpanded ? message.content : truncateContent(message.content);
-          
-          return (
-            <Card 
-              key={message.id} 
-              className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors cursor-pointer"
-              onClick={() => toggleExpanded(message.id)}
-            >
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  {/* Avatar */}
-                  <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                    {message.avatar}
+        {filteredMessages.map(message => (
+          <Card key={message.id} className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                {/* Avatar */}
+                <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                  {message.avatar}
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      {message.isPinned && <Pin className="h-4 w-4 text-yellow-400" />}
+                      <h3 className="font-semibold text-white hover:text-cyan-300 cursor-pointer">
+                        {message.title}
+                      </h3>
+                    </div>
+                    <span className="text-sm text-gray-400 flex-shrink-0">{message.timestamp}</span>
                   </div>
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        {message.isPinned && <Pin className="h-4 w-4 text-yellow-400" />}
-                        <h3 className="font-semibold text-white hover:text-cyan-300">
-                          {message.title}
-                        </h3>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-400 flex-shrink-0">{message.timestamp}</span>
-                        {isExpanded ? (
-                          <ChevronUp className="h-4 w-4 text-gray-400" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4 text-gray-400" />
-                        )}
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-sm text-cyan-300">{message.author}</span>
+                    {message.isPinned && (
+                      <Badge variant="outline" className="border-yellow-500/30 text-yellow-300 text-xs">
+                        Pinned
+                      </Badge>
+                    )}
+                  </div>
 
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="text-sm text-cyan-300">{message.author}</span>
-                      {message.isPinned && (
-                        <Badge variant="outline" className="border-yellow-500/30 text-yellow-300 text-xs">
-                          Pinned
-                        </Badge>
-                      )}
-                    </div>
+                  <p className="text-gray-300 mb-3 line-clamp-2">{message.content}</p>
 
-                    <p className="text-gray-300 mb-3 whitespace-pre-wrap">
-                      {displayContent}
-                      {!isExpanded && message.content.length > 150 && (
-                        <span className="text-cyan-400 ml-2 font-medium">Click to read more</span>
-                      )}
-                    </p>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {message.tags.map(tag => (
-                        <Badge 
-                          key={tag} 
-                          variant="outline" 
-                          className="border-purple-500/30 text-purple-300 text-xs"
-                        >
-                          #{tag}
-                        </Badge>
-                      ))}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-4">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-gray-400 hover:text-cyan-300 h-8 px-2"
-                        onClick={(e) => e.stopPropagation()}
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {message.tags.map(tag => (
+                      <Badge 
+                        key={tag} 
+                        variant="outline" 
+                        className="border-purple-500/30 text-purple-300 text-xs"
                       >
-                        <Reply className="h-4 w-4 mr-1" />
-                        {message.replies} replies
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-gray-400 hover:text-red-300 h-8 px-2"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <Heart className="h-4 w-4 mr-1" />
-                        {message.likes}
-                      </Button>
-                    </div>
+                        #{tag}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-4">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-gray-400 hover:text-cyan-300 h-8 px-2"
+                    >
+                      <Reply className="h-4 w-4 mr-1" />
+                      {message.replies} replies
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-gray-400 hover:text-red-300 h-8 px-2"
+                    >
+                      <Heart className="h-4 w-4 mr-1" />
+                      {message.likes}
+                    </Button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {filteredMessages.length === 0 && (
@@ -278,7 +192,7 @@ export const MessageThreads = () => {
           <CardContent className="text-center py-12">
             <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-300 mb-2">No threads found</h3>
-            <p className="text-gray-400">Try adjusting your search terms or start a new discussion</p>
+            <p className="text-gray-400">Try adjusting your search terms or start a new thread</p>
           </CardContent>
         </Card>
       )}

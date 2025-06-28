@@ -1,12 +1,21 @@
 
 import React from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Footer } from '@/components/Footer';
 import { TopNavBar } from '@/components/TopNavBar';
+import { LoginPrompt } from '@/components/LoginPrompt';
 import { WelcomeSection } from '@/components/WelcomeSection';
 import { FeaturesGrid } from '@/components/FeaturesGrid';
 
 const Index = () => {
-  // Main dashboard for all users (no authentication required)
+  const { user } = useAuth();
+
+  // Show login prompt for non-authenticated users
+  if (!user) {
+    return <LoginPrompt />;
+  }
+
+  // Main dashboard for authenticated users
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
       <TopNavBar />
