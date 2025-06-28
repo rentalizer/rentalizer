@@ -13,11 +13,6 @@ export const Footer = ({ showLinks = true }: FooterProps) => {
           {/* Logo */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4 justify-center">
-              <img 
-                src="/lovable-uploads/27446a86-7a38-4fbf-9e31-d209f852fca3.png" 
-                alt="Rentalizer Logo" 
-                className="h-16 w-16"
-              />
               <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 RENTALIZER
               </h3>
