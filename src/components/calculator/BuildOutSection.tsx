@@ -30,7 +30,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block text-sm">First Month Rent</Label>
+            <Label className="text-gray-200 text-center block text-sm">1st Months Rent</Label>
             <div className="relative">
               <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
