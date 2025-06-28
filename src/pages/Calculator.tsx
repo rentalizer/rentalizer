@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home, RotateCcw } from 'lucide-react';
+import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home, RotateCcw, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
@@ -13,6 +12,7 @@ import { ExpensesSection } from '@/components/calculator/ExpensesSection';
 import { NetProfitSection } from '@/components/calculator/NetProfitSection';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
+import { exportCalculatorToCSV } from '@/utils/calculatorExport';
 
 export interface CalculatorData {
   // Comps
@@ -120,6 +120,25 @@ const Calculator = () => {
     });
   };
 
+  const downloadData = () => {
+    const calculatedValues = {
+      cashToLaunch,
+      monthlyExpenses,
+      monthlyRevenue,
+      netProfitMonthly,
+      paybackMonths,
+      cashOnCashReturn,
+      calculatedFurnishings
+    };
+    
+    exportCalculatorToCSV(data, calculatedValues);
+    
+    toast({
+      title: "Data Downloaded",
+      description: "Your calculator data has been exported to a CSV file.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <TopNavBar />
@@ -146,15 +165,26 @@ const Calculator = () => {
             Calculate STR Property Profitability & ROI
           </p>
           
-          {/* Clear All button centered below subtitle */}
-          <Button
-            variant="outline"
-            onClick={clearAllData}
-            className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400"
-          >
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Clear All
-          </Button>
+          {/* Action buttons */}
+          <div className="flex items-center justify-center gap-4">
+            <Button
+              variant="outline"
+              onClick={clearAllData}
+              className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400"
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Clear All
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={downloadData}
+              className="border-green-500/30 text-green-400 hover:bg-green-500/10 hover:text-green-300 hover:border-green-400"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download Data
+            </Button>
+          </div>
         </div>
 
         {/* Calculator Input Sections - 4x1 Grid Layout */}
