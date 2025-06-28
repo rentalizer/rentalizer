@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -67,8 +66,8 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
             <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
               type="number"
-              value={data.miscellaneous || ''}
-              onChange={(e) => updateData({ miscellaneous: Math.round(parseFloat(e.target.value)) || 0 })}
+              value={data.buildOutMiscellaneous || ''}
+              onChange={(e) => updateData({ buildOutMiscellaneous: Math.round(parseFloat(e.target.value)) || 0 })}
               placeholder=""
               className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
             />

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,6 +26,7 @@ export interface CalculatorData {
   firstMonthRent: number;
   securityDeposit: number;
   furnishingsCost: number;
+  buildOutMiscellaneous: number;
   
   // Expenses
   rent: number;
@@ -81,6 +83,7 @@ const Calc = () => {
     firstMonthRent: 0,
     securityDeposit: 0,
     furnishingsCost: 0,
+    buildOutMiscellaneous: 0,
     rent: 0,
     serviceFees: 0,
     maintenance: 0,
@@ -99,7 +102,7 @@ const Calc = () => {
   const [data, setData] = useState<CalculatorData>(initialData);
 
   // Calculate derived values - all rounded to whole numbers except paybackMonths
-  const cashToLaunch = Math.round(data.firstMonthRent + data.securityDeposit + data.miscellaneous + data.furnishingsCost);
+  const cashToLaunch = Math.round(data.firstMonthRent + data.securityDeposit + data.buildOutMiscellaneous + data.furnishingsCost);
   const serviceFeeCalculated = Math.round(data.rent * 0.029); // 2.9% of rent, not average comparable
   const monthlyExpenses = Math.round(data.rent + serviceFeeCalculated + data.maintenance + data.power + 
                          data.waterSewer + data.internet + data.taxLicense + data.insurance + 
