@@ -163,7 +163,7 @@ const Calculator = () => {
             RentalizerCalc
           </h1>
           <p className="text-xl text-gray-300 mb-6 sm:text-lg">
-            Analyze Property STR Profitability
+            Analyze STR Profitability
           </p>
           
           {/* Action buttons */}
