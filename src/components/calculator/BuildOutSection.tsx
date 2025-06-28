@@ -28,23 +28,23 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label className="text-gray-200 text-center block text-sm">1st Months Rent</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
-            <Input
-              type="number"
-              value={data.firstMonthRent || ''}
-              onChange={(e) => updateData({ firstMonthRent: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder=""
-              className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block text-sm">Deposit</Label>
+            <Label className="text-gray-200 text-center block text-xs">1st Months Rent</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
+              <Input
+                type="number"
+                value={data.firstMonthRent || ''}
+                onChange={(e) => updateData({ firstMonthRent: Math.round(parseFloat(e.target.value)) || 0 })}
+                placeholder=""
+                className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-xs">Deposit</Label>
             <div className="relative">
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
@@ -58,7 +58,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block text-sm">Misc</Label>
+            <Label className="text-gray-200 text-center block text-xs">Misc</Label>
             <div className="relative">
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
