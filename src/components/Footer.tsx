@@ -14,7 +14,7 @@ export const Footer = ({ showLinks = true }: FooterProps) => {
           {/* Logo */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4 justify-center">
-              <BarChart3 className="h-8 w-8 text-cyan-400" />
+              <BarChart3 className="h-8 w-8 text-cyan-400 neon-text" />
               <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 RENTALIZER
               </h3>
