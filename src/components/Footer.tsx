@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { BarChart3 } from 'lucide-react';
 
 interface FooterProps {
   showLinks?: boolean;
@@ -14,7 +13,11 @@ export const Footer = ({ showLinks = true }: FooterProps) => {
           {/* Logo */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4 justify-center">
-              <BarChart3 className="h-8 w-8 text-cyan-400" />
+              <img 
+                src="/lovable-uploads/0776c07d-f4e4-4ca6-8376-0f5ad36cd715.png" 
+                alt="Rentalizer Logo" 
+                className="h-8 w-8"
+              />
               <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 RENTALIZER
               </h3>
