@@ -28,156 +28,156 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">Rent</Label>
+            <Label className="text-gray-200 text-center block text-sm">Rent</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.rent || ''}
                 onChange={(e) => updateData({ rent: Math.round(parseFloat(e.target.value)) || 0 })}
                 placeholder=""
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">Svc Fees (2.9%)</Label>
+            <Label className="text-gray-200 text-center block text-sm">Svc Fees (2.9%)</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={serviceFeeCalculated}
                 readOnly
-                className="pl-10 bg-gray-700/50 border-gray-600 text-gray-300"
+                className="pl-8 bg-gray-700/50 border-gray-600 text-gray-300 h-9 text-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">Maintenance</Label>
+            <Label className="text-gray-200 text-center block text-sm">Maintenance</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.maintenance || ''}
                 onChange={(e) => updateData({ maintenance: Math.round(parseFloat(e.target.value)) || 0 })}
                 placeholder=""
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">Power/Electricity</Label>
+            <Label className="text-gray-200 text-center block text-sm">Power/Electricity</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.power || ''}
                 onChange={(e) => updateData({ power: Math.round(parseFloat(e.target.value)) || 0 })}
                 placeholder=""
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">Water/Sewer</Label>
+            <Label className="text-gray-200 text-center block text-sm">Water/Sewer</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.waterSewer || ''}
                 onChange={(e) => updateData({ waterSewer: Math.round(parseFloat(e.target.value)) || 0 })}
                 placeholder=""
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">Internet</Label>
+            <Label className="text-gray-200 text-center block text-sm">Internet</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.internet || ''}
                 onChange={(e) => updateData({ internet: Math.round(parseFloat(e.target.value)) || 0 })}
                 placeholder=""
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">License</Label>
+            <Label className="text-gray-200 text-center block text-sm">License</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.taxLicense || ''}
                 onChange={(e) => updateData({ taxLicense: Math.round(parseFloat(e.target.value)) || 0 })}
                 placeholder=""
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">Insurance</Label>
+            <Label className="text-gray-200 text-center block text-sm">Insurance</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.insurance || ''}
                 onChange={(e) => updateData({ insurance: Math.round(parseFloat(e.target.value)) || 0 })}
                 placeholder=""
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">Software</Label>
+            <Label className="text-gray-200 text-center block text-sm">Software</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.software || ''}
                 onChange={(e) => updateData({ software: Math.round(parseFloat(e.target.value)) || 0 })}
                 placeholder=""
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">Miscellaneous</Label>
+            <Label className="text-gray-200 text-center block text-sm">Miscellaneous</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.miscellaneous || ''}
                 onChange={(e) => updateData({ miscellaneous: Math.round(parseFloat(e.target.value)) || 0 })}
                 placeholder=""
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">Furniture Rental</Label>
+            <Label className="text-gray-200 text-center block text-sm">Furniture Rental</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
                 value={data.furnitureRental || ''}
                 onChange={(e) => updateData({ furnitureRental: Math.round(parseFloat(e.target.value)) || 0 })}
                 placeholder=""
-                className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
               />
             </div>
           </div>
