@@ -3,8 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Building2, DollarSign, Calculator as CalculatorIcon } from 'lucide-react';
+import { Building2, DollarSign } from 'lucide-react';
 import { CalculatorData } from '@/pages/Calculator';
 
 interface BuildOutSectionProps {
@@ -19,10 +18,6 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
   cashToLaunch
 }) => {
   const calculatedFurnishings = Math.round(data.squareFootage * data.furnishingsPSF);
-
-  const applyCalculatedFurnishings = () => {
-    updateData({ furnishingsCost: calculatedFurnishings });
-  };
 
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
@@ -69,20 +64,6 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
               type="number"
               value={data.miscellaneous || ''}
               onChange={(e) => updateData({ miscellaneous: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder=""
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-gray-200 text-center block">Furnishings Cost</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              type="number"
-              value={data.furnishingsCost || ''}
-              onChange={(e) => updateData({ furnishingsCost: Math.round(parseFloat(e.target.value)) || 0 })}
               placeholder=""
               className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
             />
@@ -147,15 +128,21 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
               </span>
             </div>
           </div>
+        </div>
 
-          <Button 
-            onClick={applyCalculatedFurnishings}
-            className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
-            size="sm"
-          >
-            <CalculatorIcon className="h-4 w-4 mr-2" />
-            Apply to Furnishings Cost
-          </Button>
+        {/* Furnishings Cost moved below Property Size area */}
+        <div className="space-y-2">
+          <Label className="text-gray-200 text-center block">Furnishings Cost</Label>
+          <div className="relative">
+            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              type="number"
+              value={data.furnishingsCost || ''}
+              onChange={(e) => updateData({ furnishingsCost: Math.round(parseFloat(e.target.value)) || 0 })}
+              placeholder=""
+              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
+            />
+          </div>
         </div>
 
         <div className="mt-6 p-4 bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg border border-cyan-500/30">
