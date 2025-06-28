@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -31,7 +30,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
       <CardContent className="space-y-4">
         <div className="grid grid-cols-3 gap-2">
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block text-xs">1st Month</Label>
+            <Label className="text-gray-200 text-center block text-xs">First Mo</Label>
             <div className="relative">
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
@@ -148,4 +147,3 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
     </Card>
   );
 };
-
