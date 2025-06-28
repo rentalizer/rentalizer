@@ -14,7 +14,7 @@ interface CompsSectionProps {
 
 export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) => {
   return (
-    <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
+    <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md h-full">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center justify-center gap-2 text-white text-lg text-center">
           <MapPin className="h-5 w-5 text-cyan-400" />
@@ -29,18 +29,18 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
             value={data.address}
             onChange={(e) => updateData({ address: e.target.value })}
             placeholder="Enter property address"
-            className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
+            className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           <div className="space-y-2">
             <Label className="text-gray-200 text-center block text-sm">Bedrooms</Label>
             <Input
               type="number"
               value={data.bedrooms || ''}
               onChange={(e) => updateData({ bedrooms: parseInt(e.target.value) || 0 })}
-              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm text-center"
+              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm text-center w-full"
             />
           </div>
 
@@ -50,7 +50,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
               type="number"
               value={data.bathrooms || ''}
               onChange={(e) => updateData({ bathrooms: parseInt(e.target.value) || 0 })}
-              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm text-center"
+              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm text-center w-full"
             />
           </div>
         </div>
@@ -78,7 +78,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({ data, updateData }) 
             value={data.averageComparable || ''}
             onChange={(e) => updateData({ averageComparable: Math.round(parseFloat(e.target.value)) || 0 })}
             placeholder="0"
-            className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm text-center"
+            className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm text-center w-full"
           />
         </div>
       </CardContent>
