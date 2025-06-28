@@ -17,6 +17,9 @@ export const Footer = ({ showLinks = true }: FooterProps) => {
                 src="/lovable-uploads/f01a7927-4318-452b-8513-c35042097178.png" 
                 alt="Rentalizer Logo" 
                 className="h-16 w-16"
+                style={{
+                  filter: 'drop-shadow(0 0 6px rgba(6, 182, 212, 1)) drop-shadow(0 0 12px rgba(6, 182, 212, 0.9)) drop-shadow(0 0 18px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 24px rgba(6, 182, 212, 0.7)) drop-shadow(0 0 30px rgba(6, 182, 212, 0.6)) drop-shadow(0 0 36px rgba(6, 182, 212, 0.5))'
+                }}
               />
               <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 RENTALIZER
