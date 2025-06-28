@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -102,9 +101,6 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
                 {Math.round(data.averageComparable).toLocaleString()}
               </span>
             </div>
-          </div>
-          <div className="text-center mt-2">
-            <span className="text-xs text-blue-300/70">Auto-calculated from property values above</span>
           </div>
         </div>
       </CardContent>
