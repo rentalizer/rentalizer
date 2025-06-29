@@ -45,7 +45,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
         {/* Average Comparable Property */}
         <div className="p-4 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-lg border border-blue-500/30">
           <div className="flex items-center justify-between">
-            <Label className="text-blue-300 font-medium">Monthly Revenue </Label>
+            <Label className="text-blue-300 font-medium">Monthly Revenue</Label>
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-blue-400" />
               <span className="text-2xl font-bold text-blue-400">
@@ -62,7 +62,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-purple-400" />
               <span className={`text-2xl font-bold ${netProfitMonthly >= 0 ? 'text-purple-400' : 'text-red-400'}`}>
-                {netProfitMonthly >= 0 ? '' : '-'}${Math.abs(netProfitMonthly).toLocaleString()}
+                {netProfitMonthly >= 0 ? '' : '-'}{Math.abs(netProfitMonthly).toLocaleString()}
               </span>
             </div>
           </div>
