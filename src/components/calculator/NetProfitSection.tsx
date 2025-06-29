@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { TrendingUp, DollarSign, Calendar, Percent, ArrowUp, ArrowDown } from 'lucide-react';
+import { TrendingUp, DollarSign, Calendar, Percent } from 'lucide-react';
 
 interface NetProfitSectionProps {
   monthlyRevenue: number;
@@ -25,10 +25,10 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
     } else {
       const years = Math.floor(months / 12);
       const remainingMonths = months % 12;
-      if (remainingMonths < 1) {
+      if (remainingMonths === 0) {
         return `${years} year${years > 1 ? 's' : ''}`;
       } else {
-        return `${years}y ${remainingMonths.toFixed(0)}m`;
+        return `${years}y ${remainingMonths.toFixed(1)}m`;
       }
     }
   };
@@ -41,60 +41,56 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
           Analysis Results
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {/* Monthly Revenue */}
-        <div className="p-3 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-lg border border-blue-500/30">
+      <CardContent className="space-y-6">
+        {/* Average Comparable Property */}
+        <div className="p-4 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-lg border border-blue-500/30">
           <div className="flex items-center justify-between">
+            <Label className="text-blue-300 font-medium">Monthly Revenue </Label>
             <div className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-blue-400" />
-              <Label className="text-blue-300 text-sm font-medium">Monthly Revenue</Label>
+              <DollarSign className="h-5 w-5 text-blue-400" />
+              <span className="text-2xl font-bold text-blue-400">
+                {Math.round(monthlyRevenue).toLocaleString()}
+              </span>
             </div>
-            <span className="text-lg font-bold text-blue-400">
-              ${monthlyRevenue.toLocaleString()}
-            </span>
           </div>
         </div>
 
-        {/* Net Profit */}
-        <div className="p-3 bg-gradient-to-r from-green-600/20 to-emerald-600/20 rounded-lg border border-green-500/30">
+        {/* Net Monthly Profit */}
+        <div className="p-4 bg-gradient-to-r from-purple-600/20 to-violet-600/20 rounded-lg border border-purple-500/30">
           <div className="flex items-center justify-between">
+            <Label className="text-purple-300 font-medium">Net Monthly Profit</Label>
             <div className="flex items-center gap-2">
-              {netProfitMonthly >= 0 ? (
-                <ArrowUp className="h-4 w-4 text-green-400" />
-              ) : (
-                <ArrowDown className="h-4 w-4 text-red-400" />
-              )}
-              <Label className="text-green-300 text-sm font-medium">Net Profit</Label>
+              <DollarSign className="h-5 w-5 text-purple-400" />
+              <span className={`text-2xl font-bold ${netProfitMonthly >= 0 ? 'text-purple-400' : 'text-red-400'}`}>
+                {netProfitMonthly >= 0 ? '' : '-'}${Math.abs(netProfitMonthly).toLocaleString()}
+              </span>
             </div>
-            <span className={`text-lg font-bold ${netProfitMonthly >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              ${Math.abs(netProfitMonthly).toLocaleString()}
-            </span>
           </div>
         </div>
 
         {/* Payback Period */}
-        <div className="p-3 bg-gradient-to-r from-cyan-600/20 to-teal-600/20 rounded-lg border border-cyan-500/30">
+        <div className="p-4 bg-gradient-to-r from-teal-600/20 to-cyan-600/20 rounded-lg border border-teal-500/30">
           <div className="flex items-center justify-between">
+            <Label className="text-teal-300 font-medium">Payback Period</Label>
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-cyan-400" />
-              <Label className="text-cyan-300 text-sm font-medium">Payback</Label>
+              <Calendar className="h-5 w-5 text-teal-400" />
+              <span className="text-2xl font-bold text-teal-400">
+                {formatPaybackPeriod(paybackMonths)}
+              </span>
             </div>
-            <span className="text-lg font-bold text-cyan-400">
-              {formatPaybackPeriod(paybackMonths)}
-            </span>
           </div>
         </div>
 
         {/* Cash on Cash Return */}
-        <div className="p-3 bg-gradient-to-r from-purple-600/20 to-violet-600/20 rounded-lg border border-purple-500/30">
+        <div className="p-4 bg-gradient-to-r from-slate-600/20 to-gray-600/20 rounded-lg border border-slate-500/30">
           <div className="flex items-center justify-between">
+            <Label className="text-slate-300 font-medium">Cash on Cash Return</Label>
             <div className="flex items-center gap-2">
-              <Percent className="h-4 w-4 text-purple-400" />
-              <Label className="text-purple-300 text-sm font-medium">CoC Return</Label>
+              <Percent className="h-5 w-5 text-slate-400" />
+              <span className="text-2xl font-bold text-slate-400">
+                {cashOnCashReturn}%
+              </span>
             </div>
-            <span className={`text-lg font-bold ${cashOnCashReturn >= 0 ? 'text-purple-400' : 'text-red-400'}`}>
-              {cashOnCashReturn}%
-            </span>
           </div>
         </div>
       </CardContent>
