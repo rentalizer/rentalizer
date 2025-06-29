@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -74,7 +75,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
           
           <div className="grid grid-cols-2 gap-2 mb-3">
             <div className="space-y-2">
-              <Label className="text-gray-300 text-sm">Square Footage</Label>
+              <Label className="text-gray-300 text-sm">Property Size (SQF)</Label>
               <Input
                 type="number"
                 value={data.squareFootage || ''}
@@ -84,7 +85,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label className="text-gray-300 text-sm">Price per Sq Ft</Label>
+              <Label className="text-gray-300 text-sm">Price (PSF)</Label>
               <div className="relative">
                 <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
                 <Input
