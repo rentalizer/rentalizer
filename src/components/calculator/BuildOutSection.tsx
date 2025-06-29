@@ -17,7 +17,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
   updateData,
   cashToLaunch
 }) => {
-  const calculatedFurnishings = Math.round(data.squareFootage * data.furnishingsPSF);
+  const calculatedFurnishings = Math.round(data.squareFootage * (data.furnishingsPSF || 8));
 
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md h-full">
@@ -90,8 +90,8 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
                 <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
                 <Input
                   type="number"
-                  value={data.furnishingsPSF || ''}
-                  onChange={(e) => updateData({ furnishingsPSF: Math.round(parseFloat(e.target.value)) || 0 })}
+                  value={data.furnishingsPSF || 8}
+                  onChange={(e) => updateData({ furnishingsPSF: Math.round(parseFloat(e.target.value)) || 8 })}
                   className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
                 />
               </div>
