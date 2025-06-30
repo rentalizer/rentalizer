@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -229,7 +230,7 @@ const LandingPage = () => {
             {/* Updated Tagline */}
             <div className="mb-12 px-4">
               <p className="text-2xl md:text-3xl lg:text-4xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
-                All-in-One AI Platform to Launch and Scale a Rental Arbitrage Business
+                The AI Platform to Launch and Scale Your Rental Income
               </p>
             </div>
 
