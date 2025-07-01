@@ -7,6 +7,7 @@ import { TopNavBar } from '@/components/TopNavBar';
 import { LoginPrompt } from '@/components/LoginPrompt';
 import { WelcomeSection } from '@/components/WelcomeSection';
 import { FeaturesGrid } from '@/components/FeaturesGrid';
+import { AdminEditMode } from '@/components/AdminEditMode';
 
 const Index = () => {
   const { user } = useAuth();
@@ -35,6 +36,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
       <TopNavBar />
+      <AdminEditMode />
 
       {/* Subtle background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
