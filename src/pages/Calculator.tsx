@@ -167,7 +167,6 @@ const Calculator = () => {
                     value={data.address}
                     onChange={(e) => updateData({ address: e.target.value })}
                     disabled={!editMode}
-                    className="bg-slate-700/50 border-gray-600 text-gray-100"
                   />
                 </div>
                 <div>
@@ -181,7 +180,6 @@ const Calculator = () => {
                     value={data.rent}
                     onChange={(e) => updateData({ rent: parseFloat(e.target.value) || 0 })}
                     disabled={!editMode}
-                    className="bg-slate-700/50 border-gray-600 text-gray-100"
                   />
                 </div>
 
