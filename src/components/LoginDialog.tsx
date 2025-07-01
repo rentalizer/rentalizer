@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -28,7 +28,28 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
+
+  // Load Calendly script when component mounts
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://assets.calendly.com/assets/external/widget.js';
+    script.async = true;
+    document.head.appendChild(script);
+
+    const link = document.createElement('link');
+    link.href = 'https://assets.calendly.com/assets/external/widget.css';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,15 +119,20 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
     }
   };
 
-  const handleSignUpClick = () => {
-    console.log('📅 Sign up clicked, showing calendar');
-    setShowPasswordReset(false); // Make sure password reset is hidden
-    setShowCalendar(true);
+  const handleBookDemo = () => {
+    console.log('📅 Book Demo clicked - opening Calendly popup');
+    // @ts-ignore
+    if (window.Calendly) {
+      // @ts-ignore
+      window.Calendly.initPopupWidget({
+        url: 'https://calendly.com/richies-schedule/scale'
+      });
+    }
+    setIsOpen(false); // Close the dialog after opening Calendly
   };
 
   const resetForm = () => {
     setShowPasswordReset(false);
-    setShowCalendar(false);
     setEmail('');
     setPassword('');
   };
@@ -130,12 +156,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
       <DialogContent className="sm:max-w-md bg-gray-900/95 border border-cyan-500/20 backdrop-blur-lg">
         <DialogHeader>
           <DialogTitle className="text-cyan-300 flex items-center gap-2">
-            {showCalendar ? (
-              <>
-                <Calendar className="h-5 w-5" />
-                Schedule a Demo
-              </>
-            ) : showPasswordReset ? (
+            {showPasswordReset ? (
               <>
                 <Mail className="h-5 w-5" />
                 Reset Password
@@ -148,45 +169,14 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
             )}
           </DialogTitle>
           <DialogDescription className="text-gray-400">
-            {showCalendar
-              ? "Book a demo to learn more about Rentalizer's features"
-              : showPasswordReset 
-                ? "Reset your password to regain access to your account"
-                : "Sign in to access your subscription and professional market data"
+            {showPasswordReset 
+              ? "Reset your password to regain access to your account"
+              : "Sign in to access your subscription and professional market data"
             }
           </DialogDescription>
         </DialogHeader>
         
-        {showCalendar ? (
-          <div className="pt-4">
-            <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-4 mb-4">
-              <p className="text-cyan-200 text-sm mb-2">
-                📅 Schedule a personalized demo to see how Rentalizer can help you analyze STR investments.
-              </p>
-            </div>
-            <div className="h-96 w-full bg-gray-800/50 rounded-lg flex items-center justify-center border border-gray-600">
-              <iframe
-                src="https://calendar.google.com/calendar/embed?src=your-calendar-id"
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                scrolling="no"
-                className="rounded-lg"
-                title="Schedule Demo"
-              />
-            </div>
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowCalendar(false)}
-                className="border-gray-600 text-gray-300 hover:bg-gray-800"
-              >
-                Back to Sign In
-              </Button>
-            </div>
-          </div>
-        ) : showPasswordReset ? (
+        {showPasswordReset ? (
           <ForgotPasswordForm 
             onBack={() => setShowPasswordReset(false)}
             initialEmail={email}
@@ -273,12 +263,12 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
               <Button
                 type="button"
                 variant="ghost"
-                onClick={handleSignUpClick}
+                onClick={handleBookDemo}
                 disabled={isSubmitting}
                 className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
               >
                 <UserPlus className="h-4 w-4 mr-2" />
-                Need an account? Sign up
+                Need an account? Book a Demo
               </Button>
             </div>
           </form>
