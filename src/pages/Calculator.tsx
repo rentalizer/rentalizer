@@ -1,10 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home, RotateCcw, Download } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
@@ -47,6 +49,38 @@ export interface CalculatorData {
 const Calculator = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isLoading } = useAuth();
+  
+  // Check if we're in development environment
+  const isDevelopment = () => {
+    return window.location.hostname.includes('lovable.app') || 
+           window.location.hostname.includes('localhost') ||
+           window.location.hostname.includes('127.0.0.1');
+  };
+
+  // Redirect to login if not authenticated (except in development)
+  useEffect(() => {
+    if (!isLoading && !isDevelopment() && !user) {
+      navigate('/login?redirect=' + encodeURIComponent('/calculator'));
+    }
+  }, [user, isLoading, navigate]);
+
+  // Show loading while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="text-cyan-300 text-xl">Loading...</div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated and not in development
+  if (!user && !isDevelopment()) {
+    return null;
+  }
   
   const initialData: CalculatorData = {
     address: '',

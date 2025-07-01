@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
@@ -32,6 +33,21 @@ export const useAuth = () => {
   }
   return context;
 };
+
+// Check if we're in development environment (Lovable editor)
+const isDevelopment = () => {
+  return window.location.hostname.includes('lovable.app') || 
+         window.location.hostname.includes('localhost') ||
+         window.location.hostname.includes('127.0.0.1');
+};
+
+// Create a mock user for development
+const createMockUser = (): User => ({
+  id: 'dev-user-id',
+  email: 'dev@example.com',
+  subscription_status: 'active',
+  subscription_tier: 'Premium'
+});
 
 const sendNewUserNotification = async (userEmail: string, userId: string) => {
   try {
@@ -174,6 +190,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     console.log('🔄 AuthProvider initializing...');
+    
+    // If in development, set mock user and skip auth
+    if (isDevelopment()) {
+      console.log('🔧 Development mode detected, using mock user');
+      setUser(createMockUser());
+      setIsLoading(false);
+      return;
+    }
     
     const initTimeout = setTimeout(() => {
       console.log('⏰ Auth initialization timeout, setting loading to false');
@@ -356,7 +380,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user, 'isSubscribed:', isSubscribed, 'tier:', user?.subscription_tier);
+  console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user, 'isSubscribed:', isSubscribed, 'tier:', user?.subscription_tier, 'isDev:', isDevelopment());
 
   if (isLoading) {
     return (

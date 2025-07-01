@@ -1,6 +1,7 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Footer } from '@/components/Footer';
 import { TopNavBar } from '@/components/TopNavBar';
 import { LoginPrompt } from '@/components/LoginPrompt';
@@ -9,9 +10,24 @@ import { FeaturesGrid } from '@/components/FeaturesGrid';
 
 const Index = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // Check if we're in development environment
+  const isDevelopment = () => {
+    return window.location.hostname.includes('lovable.app') || 
+           window.location.hostname.includes('localhost') ||
+           window.location.hostname.includes('127.0.0.1');
+  };
+
+  // Redirect to login if not authenticated (except in development or on home page)
+  useEffect(() => {
+    if (!isDevelopment() && !user && window.location.pathname !== '/') {
+      navigate('/login?redirect=' + encodeURIComponent(window.location.pathname));
+    }
+  }, [user, navigate]);
 
   // Show login prompt for non-authenticated users
-  if (!user) {
+  if (!user && !isDevelopment()) {
     return <LoginPrompt />;
   }
 
