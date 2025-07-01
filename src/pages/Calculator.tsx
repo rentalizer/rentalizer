@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -160,7 +159,7 @@ const Calculator = () => {
         <div className="text-center mb-6 bg-slate-700/90 backdrop-blur-lg rounded-lg p-8 border border-gray-500/50">
           <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
             <CalculatorIcon className="h-10 w-10 text-cyan-400" />
-            RentalizerCalc
+            Rental Calculator
           </h1>
           <p className="text-xl text-gray-300 mb-6 sm:text-lg">
             Analyze STR Profitability
