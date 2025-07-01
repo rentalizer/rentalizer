@@ -141,4 +141,14 @@ const Calculator = () => {
   );
 };
 
+// Simplified calculator for basic functionality
+export interface CalculatorData {
+  propertyAddress: string;
+  rent: number | '';
+  comps: any[];
+  expenses: any[];
+  furnishings: any[];
+  buildOut: any[];
+}
+
 export default Calculator;
