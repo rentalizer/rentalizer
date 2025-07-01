@@ -100,6 +100,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
 
   const handleSignUpClick = () => {
     console.log('📅 Sign up clicked, showing calendar');
+    setShowPasswordReset(false); // Make sure password reset is hidden
     setShowCalendar(true);
   };
 
@@ -129,15 +130,15 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
       <DialogContent className="sm:max-w-md bg-gray-900/95 border border-cyan-500/20 backdrop-blur-lg">
         <DialogHeader>
           <DialogTitle className="text-cyan-300 flex items-center gap-2">
-            {showPasswordReset ? (
-              <>
-                <Mail className="h-5 w-5" />
-                Reset Password
-              </>
-            ) : showCalendar ? (
+            {showCalendar ? (
               <>
                 <Calendar className="h-5 w-5" />
                 Schedule a Demo
+              </>
+            ) : showPasswordReset ? (
+              <>
+                <Mail className="h-5 w-5" />
+                Reset Password
               </>
             ) : (
               <>
@@ -147,21 +148,16 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
             )}
           </DialogTitle>
           <DialogDescription className="text-gray-400">
-            {showPasswordReset 
-              ? "Reset your password to regain access to your account"
-              : showCalendar
-                ? "Book a demo to learn more about Rentalizer's features"
+            {showCalendar
+              ? "Book a demo to learn more about Rentalizer's features"
+              : showPasswordReset 
+                ? "Reset your password to regain access to your account"
                 : "Sign in to access your subscription and professional market data"
             }
           </DialogDescription>
         </DialogHeader>
         
-        {showPasswordReset ? (
-          <ForgotPasswordForm 
-            onBack={() => setShowPasswordReset(false)}
-            initialEmail={email}
-          />
-        ) : showCalendar ? (
+        {showCalendar ? (
           <div className="pt-4">
             <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-4 mb-4">
               <p className="text-cyan-200 text-sm mb-2">
@@ -190,6 +186,11 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
               </Button>
             </div>
           </div>
+        ) : showPasswordReset ? (
+          <ForgotPasswordForm 
+            onBack={() => setShowPasswordReset(false)}
+            initialEmail={email}
+          />
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 pt-4">
             <div className="space-y-2">
