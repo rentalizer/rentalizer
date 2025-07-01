@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { LogIn, User, Lock, UserPlus, Mail } from 'lucide-react';
+import { LogIn, User, Lock, UserPlus, Mail, Calendar } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { ForgotPasswordForm } from './ForgotPasswordForm';
@@ -21,19 +21,19 @@ interface LoginDialogProps {
 }
 
 export const LoginDialog = ({ trigger }: LoginDialogProps) => {
-  const { signIn, signUp } = useAuth();
+  const { signIn } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('🔄 Form submitted:', { email, isSignUp, isSubmitting });
+    console.log('🔄 Form submitted:', { email, isSubmitting });
     
     if (isSubmitting) {
       console.log('⚠️ Already submitting, ignoring');
@@ -62,21 +62,12 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
     console.log('🚀 Starting authentication process...');
     
     try {
-      if (isSignUp) {
-        console.log('📝 Attempting sign up...');
-        await signUp(email, password);
-        toast({
-          title: "✅ Account Created",
-          description: "Welcome to Rentalizer! You now have trial access.",
-        });
-      } else {
-        console.log('🔑 Attempting sign in...');
-        await signIn(email, password);
-        toast({
-          title: "✅ Signed In",
-          description: "Welcome back to Rentalizer!",
-        });
-      }
+      console.log('🔑 Attempting sign in...');
+      await signIn(email, password);
+      toast({
+        title: "✅ Signed In",
+        description: "Welcome back to Rentalizer!",
+      });
       
       console.log('✅ Authentication successful, closing dialog');
       setIsOpen(false);
@@ -90,8 +81,6 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
       
       if (error.message?.includes('Invalid login credentials')) {
         errorMessage = "Invalid email or password. Please check and try again.";
-      } else if (error.message?.includes('User already registered')) {
-        errorMessage = "An account with this email already exists. Try signing in instead.";
       } else if (error.message?.includes('timeout')) {
         errorMessage = "Connection timeout. Please check your internet and try again.";
       } else if (error.message) {
@@ -109,9 +98,13 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
     }
   };
 
+  const handleCreateAccount = () => {
+    setShowCalendar(true);
+  };
+
   const resetForm = () => {
     setShowPasswordReset(false);
-    setIsSignUp(false);
+    setShowCalendar(false);
     setEmail('');
     setPassword('');
   };
@@ -140,10 +133,10 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
                 <Mail className="h-5 w-5" />
                 Reset Password
               </>
-            ) : isSignUp ? (
+            ) : showCalendar ? (
               <>
-                <UserPlus className="h-5 w-5" />
-                Sign Up for Rentalizer
+                <Calendar className="h-5 w-5" />
+                Schedule a Demo
               </>
             ) : (
               <>
@@ -155,8 +148,8 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
           <DialogDescription className="text-gray-400">
             {showPasswordReset 
               ? "Reset your password to regain access to your account"
-              : isSignUp 
-                ? "Create your account to access professional STR market analysis"
+              : showCalendar
+                ? "Book a demo to learn more about Rentalizer's features"
                 : "Sign in to access your subscription and professional market data"
             }
           </DialogDescription>
@@ -167,6 +160,35 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
             onBack={() => setShowPasswordReset(false)}
             initialEmail={email}
           />
+        ) : showCalendar ? (
+          <div className="pt-4">
+            <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-4 mb-4">
+              <p className="text-cyan-200 text-sm mb-2">
+                📅 Schedule a personalized demo to see how Rentalizer can help you analyze STR investments.
+              </p>
+            </div>
+            <div className="h-96 w-full bg-gray-800/50 rounded-lg flex items-center justify-center border border-gray-600">
+              <iframe
+                src="https://calendar.google.com/calendar/embed?src=your-calendar-id"
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                scrolling="no"
+                className="rounded-lg"
+                title="Schedule Demo"
+              />
+            </div>
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowCalendar(false)}
+                className="border-gray-600 text-gray-300 hover:bg-gray-800"
+              >
+                Back to Sign In
+              </Button>
+            </div>
+          </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 pt-4">
             <div className="space-y-2">
@@ -196,7 +218,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={isSignUp ? "Create a password (min 6 characters)" : "Enter your password"}
+                placeholder="Enter your password"
                 required
                 minLength={6}
                 disabled={isSubmitting}
@@ -204,27 +226,17 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
               />
             </div>
 
-            {!isSignUp && (
-              <div className="text-right">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setShowPasswordReset(true)}
-                  disabled={isSubmitting}
-                  className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 text-sm p-0 h-auto"
-                >
-                  Forgot your password?
-                </Button>
-              </div>
-            )}
-
-            {isSignUp && (
-              <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-3">
-                <p className="text-xs text-cyan-200">
-                  💎 New accounts get trial access. Use email with "premium" for demo subscription.
-                </p>
-              </div>
-            )}
+            <div className="text-right">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setShowPasswordReset(true)}
+                disabled={isSubmitting}
+                className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 text-sm p-0 h-auto"
+              >
+                Forgot your password?
+              </Button>
+            </div>
             
             <div className="flex gap-3 pt-4">
               <Button
@@ -235,12 +247,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
                 {isSubmitting ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    {isSignUp ? 'Creating Account...' : 'Signing In...'}
-                  </>
-                ) : isSignUp ? (
-                  <>
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Sign Up
+                    Signing In...
                   </>
                 ) : (
                   <>
@@ -264,14 +271,12 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
               <Button
                 type="button"
                 variant="ghost"
-                onClick={() => setIsSignUp(!isSignUp)}
+                onClick={handleCreateAccount}
                 disabled={isSubmitting}
                 className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
               >
-                {isSignUp 
-                  ? "Already have an account? Sign in" 
-                  : "Need an account? Sign up"
-                }
+                <UserPlus className="h-4 w-4 mr-2" />
+                Create an Account
               </Button>
             </div>
           </form>
