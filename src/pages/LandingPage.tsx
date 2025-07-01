@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -289,24 +290,28 @@ const LandingPage = () => {
               <BarChart3 className="h-8 w-8 text-cyan-400 neon-text" />
             </div>
 
-            {/* Navigation */}
-            <nav className="flex items-center gap-6">
-              {/* Edit Mode Toggle */}
+            {/* Navigation - Made more prominent */}
+            <nav className="flex items-center gap-4">
+              {/* Edit Mode Toggle - Made more visible */}
               <Button
                 onClick={() => setEditMode(!editMode)}
                 variant={editMode ? "default" : "outline"}
-                size="sm"
-                className={editMode ? "bg-cyan-600 hover:bg-cyan-700" : "border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"}
+                size="lg"
+                className={editMode ? 
+                  "bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-6 py-3" : 
+                  "border-2 border-cyan-500 hover:bg-cyan-500/20 text-cyan-300 hover:text-white font-semibold px-6 py-3"
+                }
               >
-                <Edit2 className="h-4 w-4 mr-2" />
-                {editMode ? 'Exit Edit' : 'Edit Mode'}
+                <Edit2 className="h-5 w-5 mr-2" />
+                {editMode ? 'Exit Edit Mode' : 'Edit Mode'}
               </Button>
               
               <LoginDialog 
                 trigger={
                   <Button 
                     variant="outline"
-                    className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"
+                    size="lg"
+                    className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 px-6 py-3"
                   >
                     <LogIn className="h-4 w-4 mr-2" />
                     Login
@@ -318,11 +323,14 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Edit Mode Banner */}
+      {/* Edit Mode Banner - Made more prominent */}
       {editMode && (
-        <div className="relative z-20 bg-cyan-600/90 text-white text-center py-2 text-sm">
-          <span className="mr-2">✏️ Edit Mode Active</span>
-          Click on any text to edit it directly
+        <div className="relative z-20 bg-gradient-to-r from-cyan-600 via-purple-600 to-cyan-600 text-white text-center py-3 text-base font-semibold shadow-lg">
+          <div className="flex items-center justify-center gap-2">
+            <Edit2 className="h-5 w-5 animate-pulse" />
+            <span>✨ Edit Mode Active - Click on any text to edit it directly ✨</span>
+            <Edit2 className="h-5 w-5 animate-pulse" />
+          </div>
         </div>
       )}
 
