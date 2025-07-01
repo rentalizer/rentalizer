@@ -1,20 +1,16 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar, Star, Edit2 } from 'lucide-react';
+import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar, Star } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [editMode, setEditMode] = useState(false);
-  const [editingField, setEditingField] = useState<string | null>(null);
-  const [tempText, setTempText] = useState('');
 
-  // Editable text states
-  const [texts, setTexts] = useState({
+  // Static text content (no longer editable)
+  const texts = {
     mainTitle: 'RENTALIZER',
     byLine: 'By Richie Matthews',
     tagline: 'The AI Platform to Launch and Scale Your Rental Income',
@@ -29,84 +25,6 @@ const LandingPage = () => {
     feature3Description: 'Streamline Property Management And Automate Operations',
     feature4Title: 'Community',
     feature4Description: 'Join Our Network Of Rental Arbitrage Entrepreneurs'
-  });
-
-  const handleEdit = (field: string, currentText: string) => {
-    setEditingField(field);
-    setTempText(currentText);
-  };
-
-  const handleSaveEdit = () => {
-    if (editingField) {
-      setTexts(prev => ({
-        ...prev,
-        [editingField]: tempText
-      }));
-      setEditingField(null);
-      setTempText('');
-    }
-  };
-
-  const handleCancelEdit = () => {
-    setEditingField(null);
-    setTempText('');
-  };
-
-  const EditableText = ({ 
-    field, 
-    children, 
-    className = '', 
-    multiline = false 
-  }: { 
-    field: string; 
-    children: React.ReactNode; 
-    className?: string; 
-    multiline?: boolean;
-  }) => {
-    const isEditing = editingField === field;
-    
-    if (isEditing) {
-      return (
-        <div className="relative">
-          {multiline ? (
-            <textarea
-              value={tempText}
-              onChange={(e) => setTempText(e.target.value)}
-              className={`${className} bg-slate-700 border border-cyan-400 rounded p-2 min-h-[100px] w-full`}
-              autoFocus
-            />
-          ) : (
-            <input
-              type="text"
-              value={tempText}
-              onChange={(e) => setTempText(e.target.value)}
-              className={`${className} bg-slate-700 border border-cyan-400 rounded p-2 w-full`}
-              autoFocus
-            />
-          )}
-          <div className="flex gap-2 mt-2">
-            <Button size="sm" onClick={handleSaveEdit} className="bg-green-600 hover:bg-green-700">
-              Save
-            </Button>
-            <Button size="sm" variant="outline" onClick={handleCancelEdit}>
-              Cancel
-            </Button>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div 
-        className={`${className} ${editMode ? 'cursor-pointer hover:bg-slate-800/50 rounded p-1 border-2 border-transparent hover:border-cyan-400/50' : ''} relative group`}
-        onClick={() => editMode && handleEdit(field, texts[field as keyof typeof texts])}
-      >
-        {children}
-        {editMode && (
-          <Edit2 className="absolute -top-2 -right-2 h-4 w-4 text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-        )}
-      </div>
-    );
   };
 
   const handleBookDemo = () => {
@@ -290,22 +208,8 @@ const LandingPage = () => {
               <BarChart3 className="h-8 w-8 text-cyan-400 neon-text" />
             </div>
 
-            {/* Navigation - Made more prominent */}
+            {/* Navigation */}
             <nav className="flex items-center gap-4">
-              {/* Edit Mode Toggle - Made more visible */}
-              <Button
-                onClick={() => setEditMode(!editMode)}
-                variant={editMode ? "default" : "outline"}
-                size="lg"
-                className={editMode ? 
-                  "bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-6 py-3" : 
-                  "border-2 border-cyan-500 hover:bg-cyan-500/20 text-cyan-300 hover:text-white font-semibold px-6 py-3"
-                }
-              >
-                <Edit2 className="h-5 w-5 mr-2" />
-                {editMode ? 'Exit Edit Mode' : 'Edit Mode'}
-              </Button>
-              
               <LoginDialog 
                 trigger={
                   <Button 
@@ -323,17 +227,6 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Edit Mode Banner - Made more prominent */}
-      {editMode && (
-        <div className="relative z-20 bg-gradient-to-r from-cyan-600 via-purple-600 to-cyan-600 text-white text-center py-3 text-base font-semibold shadow-lg">
-          <div className="flex items-center justify-center gap-2">
-            <Edit2 className="h-5 w-5 animate-pulse" />
-            <span>✨ Edit Mode Active - Click on any text to edit it directly ✨</span>
-            <Edit2 className="h-5 w-5 animate-pulse" />
-          </div>
-        </div>
-      )}
-
       {/* Subtle background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/5 blur-3xl"></div>
@@ -346,20 +239,20 @@ const LandingPage = () => {
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-4 mb-6">
               <BarChart3 className="h-16 w-16 text-cyan-400 neon-text" />
-              <EditableText field="mainTitle" className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <div className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 {texts.mainTitle}
-              </EditableText>
+              </div>
             </div>
             
-            <EditableText field="byLine" className="text-lg text-white font-medium mb-8">
+            <div className="text-lg text-white font-medium mb-8">
               {texts.byLine}
-            </EditableText>
+            </div>
             
             {/* Updated Tagline */}
             <div className="mb-12 px-4">
-              <EditableText field="tagline" className="text-2xl md:text-3xl lg:text-4xl text-white max-w-5xl mx-auto leading-relaxed font-semibold" multiline>
+              <div className="text-2xl md:text-3xl lg:text-4xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
                 {texts.tagline}
-              </EditableText>
+              </div>
             </div>
 
             {/* Single Button Layout */}
@@ -370,9 +263,9 @@ const LandingPage = () => {
                 className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-6 text-xl font-semibold min-w-[200px]"
               >
                 <Calendar className="h-6 w-6 mr-3" />
-                <EditableText field="buttonText" className="inline">
+                <span className="inline">
                   {texts.buttonText}
-                </EditableText>
+                </span>
               </Button>
             </div>
           </div>
@@ -391,14 +284,14 @@ const LandingPage = () => {
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
-                    <EditableText field="feature1Title" className="text-xl font-bold text-cyan-300">
+                    <div className="text-xl font-bold text-cyan-300">
                       {texts.feature1Title}
-                    </EditableText>
+                    </div>
                   </CardHeader>
                   <CardContent className="text-center">
-                    <EditableText field="feature1Description" className="text-gray-300 text-sm leading-relaxed" multiline>
+                    <div className="text-gray-300 text-sm leading-relaxed">
                       {texts.feature1Description}
-                    </EditableText>
+                    </div>
                     <div className="mt-4 flex justify-center space-x-2">
                       <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
                       <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-100"></div>
@@ -419,14 +312,14 @@ const LandingPage = () => {
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
-                    <EditableText field="feature2Title" className="text-xl font-bold text-purple-300">
+                    <div className="text-xl font-bold text-purple-300">
                       {texts.feature2Title}
-                    </EditableText>
+                    </div>
                   </CardHeader>
                   <CardContent className="text-center">
-                    <EditableText field="feature2Description" className="text-gray-300 text-sm leading-relaxed" multiline>
+                    <div className="text-gray-300 text-sm leading-relaxed">
                       {texts.feature2Description}
-                    </EditableText>
+                    </div>
                     <div className="mt-4 flex justify-center space-x-1">
                       <div className="w-8 h-1 bg-purple-400 rounded animate-pulse"></div>
                       <div className="w-6 h-1 bg-cyan-400 rounded animate-pulse delay-200"></div>
@@ -447,14 +340,14 @@ const LandingPage = () => {
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
-                    <EditableText field="feature3Title" className="text-xl font-bold text-cyan-300">
+                    <div className="text-xl font-bold text-cyan-300">
                       {texts.feature3Title}
-                    </EditableText>
+                    </div>
                   </CardHeader>
                   <CardContent className="text-center">
-                    <EditableText field="feature3Description" className="text-gray-300 text-sm leading-relaxed" multiline>
+                    <div className="text-gray-300 text-sm leading-relaxed">
                       {texts.feature3Description}
-                    </EditableText>
+                    </div>
                     <div className="mt-4 grid grid-cols-3 gap-1">
                       {[...Array(6)].map((_, i) => (
                         <div key={i} className={`h-2 bg-cyan-400/50 rounded animate-pulse`} style={{animationDelay: `${i * 100}ms`}}></div>
@@ -475,14 +368,14 @@ const LandingPage = () => {
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
-                    <EditableText field="feature4Title" className="text-xl font-bold text-purple-300">
+                    <div className="text-xl font-bold text-purple-300">
                       {texts.feature4Title}
-                    </EditableText>
+                    </div>
                   </CardHeader>
                   <CardContent className="text-center">
-                    <EditableText field="feature4Description" className="text-gray-300 text-sm leading-relaxed" multiline>
+                    <div className="text-gray-300 text-sm leading-relaxed">
                       {texts.feature4Description}
-                    </EditableText>
+                    </div>
                     <div className="mt-4 flex justify-center">
                       <div className="flex -space-x-2">
                         {[...Array(4)].map((_, i) => (
@@ -507,17 +400,17 @@ const LandingPage = () => {
 
           {/* Description Section */}
           <div className="text-center mb-16">
-            <EditableText field="description" className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed" multiline>
+            <div className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
               {texts.description}
-            </EditableText>
+            </div>
           </div>
 
           {/* Testimonials Section */}
           <div className="max-w-7xl mx-auto mb-20">
             <div className="text-center mb-12">
-              <EditableText field="testimonialsTitle" className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 whitespace-nowrap" multiline>
+              <div className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 whitespace-nowrap">
                 {texts.testimonialsTitle}
-              </EditableText>
+              </div>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
