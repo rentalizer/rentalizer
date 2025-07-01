@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
@@ -37,8 +36,11 @@ export const useAuth = () => {
 // Check if we're in development environment (Lovable editor)
 const isDevelopment = () => {
   return window.location.hostname.includes('lovable.app') || 
+         window.location.hostname.includes('lovableproject.com') ||
          window.location.hostname.includes('localhost') ||
-         window.location.hostname.includes('127.0.0.1');
+         window.location.hostname.includes('127.0.0.1') ||
+         window.location.port === '5173' ||
+         window.location.port === '3000';
 };
 
 // Create a mock user for development
@@ -189,7 +191,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    console.log('🔄 AuthProvider initializing...');
+    console.log('🔄 AuthProvider initializing...', 'isDev:', isDevelopment());
     
     // If in development, set mock user and skip auth
     if (isDevelopment()) {
