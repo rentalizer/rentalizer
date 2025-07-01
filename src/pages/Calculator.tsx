@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,100 +18,37 @@ import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { AdminEditMode } from '@/components/AdminEditMode';
 import { AccessGate } from '@/components/AccessGate';
-import { exportCalculatorToCSV } from '@/utils/calculatorExport';
-
-export interface CalculatorData {
-  // Property Information
-  address: string;
-  bedrooms: number;
-  bathrooms: number;
-  squareFootage: number;
-  
-  // Revenue & Expenses
-  averageComparable: number;
-  rent: number;
-  serviceFees: number;
-  maintenance: number;
-  power: number;
-  waterSewer: number;
-  internet: number;
-  taxLicense: number;
-  insurance: number;
-  software: number;
-  furnitureRental: number;
-  
-  // Build Out Costs
-  firstMonthRent: number;
-  securityDeposit: number;
-  miscellaneous: number;
-  furnishingsCost: number;
-  
-  // Furnishings Calculator
-  furnishingsPSF: number;
-}
+import { CompsSection } from '@/components/calculator/CompsSection';
+import { ExpensesSection } from '@/components/calculator/ExpensesSection';
+import { FurnishingsSection } from '@/components/calculator/FurnishingsSection';
+import { BuildOutSection } from '@/components/calculator/BuildOutSection';
+import { NetProfitSection } from '@/components/calculator/NetProfitSection';
+import { exportToExcel } from '@/utils/calculatorExport';
 
 const Calculator = () => {
+  const [propertyAddress, setPropertyAddress] = useState('');
+  const [rent, setRent] = useState<number | ''>('');
+  const [comps, setComps] = useState<any[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
+  const [furnishings, setFurnishings] = useState<any[]>([]);
+  const [buildOut, setBuildOut] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
-
-  const initialData: CalculatorData = {
-    address: '',
-    bedrooms: 2,
-    bathrooms: 2,
-    squareFootage: 850,
-    averageComparable: 0,
-    rent: 0,
-    serviceFees: 0,
-    maintenance: 0,
-    power: 0,
-    waterSewer: 0,
-    internet: 0,
-    taxLicense: 0,
-    insurance: 0,
-    software: 0,
-    furnitureRental: 0,
-    firstMonthRent: 0,
-    securityDeposit: 0,
-    miscellaneous: 0,
-    furnishingsCost: 0,
-    furnishingsPSF: 8,
-  };
-
-  const [data, setData] = useState<CalculatorData>(initialData);
-
-  // Calculate derived values
-  const serviceFeeCalculated = Math.round(data.averageComparable * 0.029);
-  const monthlyExpenses = Math.round(data.rent + serviceFeeCalculated + data.maintenance + data.power + 
-                         data.waterSewer + data.internet + data.taxLicense + data.insurance + 
-                         data.software + data.furnitureRental);
-  const calculatedFurnishings = Math.round(data.squareFootage * (data.furnishingsPSF || 8));
-  const cashToLaunch = Math.round(data.firstMonthRent + data.securityDeposit + data.miscellaneous + calculatedFurnishings);
-  const monthlyRevenue = Math.round(data.averageComparable);
-  const netProfitMonthly = Math.round(monthlyRevenue - monthlyExpenses);
-  const paybackMonths = (cashToLaunch > 0 && netProfitMonthly > 0) 
-    ? cashToLaunch / netProfitMonthly 
-    : null;
-  const cashOnCashReturn = cashToLaunch > 0 ? Math.round((netProfitMonthly * 12 / cashToLaunch) * 100) : 0;
-
-  const updateData = (updates: Partial<CalculatorData>) => {
-    setData(prev => ({ ...prev, ...updates }));
-  };
 
   const handleExport = async () => {
     setLoading(true);
     try {
-      const calculatedValues = {
-        cashToLaunch,
-        monthlyExpenses,
-        monthlyRevenue,
-        netProfitMonthly,
-        paybackMonths,
-        cashOnCashReturn,
-        calculatedFurnishings,
+      const data = {
+        propertyAddress,
+        rent,
+        comps,
+        expenses,
+        furnishings,
+        buildOut,
       };
-      exportCalculatorToCSV(data, calculatedValues, 'calculator_data');
+      await exportToExcel(data, 'calculator_data.xlsx');
     } catch (error) {
-      console.error("Error exporting to CSV:", error);
+      console.error("Error exporting to Excel:", error);
     } finally {
       setLoading(false);
     }
@@ -150,7 +86,7 @@ const Calculator = () => {
                 ) : (
                   <>
                     <Download className="mr-2 h-4 w-4" />
-                    <span>Export to CSV</span>
+                    <span>Export to Excel</span>
                   </>
                 )}
               </Button>
@@ -164,8 +100,8 @@ const Calculator = () => {
                   <Input
                     id="propertyAddress"
                     placeholder="123 Main St, Anytown"
-                    value={data.address}
-                    onChange={(e) => updateData({ address: e.target.value })}
+                    value={propertyAddress}
+                    onChange={(e) => setPropertyAddress(e.target.value)}
                     disabled={!editMode}
                   />
                 </div>
@@ -177,44 +113,23 @@ const Calculator = () => {
                     id="rent"
                     type="number"
                     placeholder="Enter monthly rent"
-                    value={data.rent}
-                    onChange={(e) => updateData({ rent: parseFloat(e.target.value) || 0 })}
+                    value={rent}
+                    onChange={(e) => setRent(e.target.value === '' ? '' : parseFloat(e.target.value))}
                     disabled={!editMode}
                   />
                 </div>
 
-                {/* Simple display sections for now */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <Card className="bg-slate-700/50">
-                    <CardContent className="p-4">
-                      <div className="text-sm text-gray-300 mb-1">Monthly Revenue</div>
-                      <div className="text-2xl font-bold text-cyan-400">${monthlyRevenue.toLocaleString()}</div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="bg-slate-700/50">
-                    <CardContent className="p-4">
-                      <div className="text-sm text-gray-300 mb-1">Monthly Expenses</div>
-                      <div className="text-2xl font-bold text-purple-400">${monthlyExpenses.toLocaleString()}</div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="bg-slate-700/50">
-                    <CardContent className="p-4">
-                      <div className="text-sm text-gray-300 mb-1">Net Profit</div>
-                      <div className={`text-2xl font-bold ${netProfitMonthly >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        ${Math.abs(netProfitMonthly).toLocaleString()}
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="bg-slate-700/50">
-                    <CardContent className="p-4">
-                      <div className="text-sm text-gray-300 mb-1">Cash to Launch</div>
-                      <div className="text-2xl font-bold text-yellow-400">${cashToLaunch.toLocaleString()}</div>
-                    </CardContent>
-                  </Card>
-                </div>
+                <CompsSection comps={comps} setComps={setComps} editMode={editMode} />
+                <ExpensesSection expenses={expenses} setExpenses={setExpenses} editMode={editMode} />
+                <FurnishingsSection furnishings={furnishings} setFurnishings={setFurnishings} editMode={editMode} />
+                <BuildOutSection buildOut={buildOut} setBuildOut={setBuildOut} editMode={editMode} />
+                <NetProfitSection 
+                  rent={rent}
+                  comps={comps}
+                  expenses={expenses}
+                  furnishings={furnishings}
+                  buildOut={buildOut}
+                />
               </div>
             </CardContent>
           </Card>
