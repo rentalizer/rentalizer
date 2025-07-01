@@ -98,7 +98,8 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
     }
   };
 
-  const handleCreateAccount = () => {
+  const handleSignUpClick = () => {
+    console.log('📅 Sign up clicked, showing calendar');
     setShowCalendar(true);
   };
 
@@ -271,12 +272,12 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
               <Button
                 type="button"
                 variant="ghost"
-                onClick={handleCreateAccount}
+                onClick={handleSignUpClick}
                 disabled={isSubmitting}
                 className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
               >
                 <UserPlus className="h-4 w-4 mr-2" />
-                Create an Account
+                Need an account? Sign up
               </Button>
             </div>
           </form>
