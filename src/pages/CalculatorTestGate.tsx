@@ -187,7 +187,7 @@ const CalculatorTestGate = () => {
                     <p className="text-gray-400 text-sm">
                       {isSignUp 
                         ? 'Create your account with a promo code to get Pro access'
-                        : 'Sign in to access your Pro subscription'
+                        : 'Welcome back to Rentalizer'
                       }
                     </p>
                   </div>
@@ -250,7 +250,7 @@ const CalculatorTestGate = () => {
                           variant="ghost"
                           className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 text-sm p-0 h-auto"
                         >
-                          Forgot your password?
+                          Forgot Your Password?
                         </Button>
                       </div>
                     )}
@@ -300,7 +300,7 @@ const CalculatorTestGate = () => {
                         ) : (
                           <>
                             <UserPlus className="h-4 w-4 mr-2" />
-                            Need an account? Sign Up
+                            Sign Up
                           </>
                         )}
                       </Button>
