@@ -26,7 +26,7 @@ export const TopNavBar = () => {
                 <User className="h-4 w-4 text-cyan-400" />
                 <span className="text-cyan-300">{user.email}</span>
                 <Badge variant="outline" className="bg-green-900/30 border-green-500/30 text-green-300 text-xs px-2 py-0">
-                  Trial
+                  Pro
                 </Badge>
               </div>
               <Button
