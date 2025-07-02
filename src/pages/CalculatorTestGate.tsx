@@ -11,6 +11,7 @@ import { ExpensesSection } from '@/components/calculator/ExpensesSection';
 import { NetProfitSection } from '@/components/calculator/NetProfitSection';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
+import { supabase } from '@/integrations/supabase/client';
 
 const CalculatorTestGate = () => {
   const navigate = useNavigate();
@@ -122,21 +123,91 @@ const CalculatorTestGate = () => {
     
     setIsSubmitting(true);
     
-    // Simulate loading
-    setTimeout(() => {
+    try {
       if (isSignUp) {
-        toast({
-          title: "Account Created (Demo)",
-          description: "This is just a preview. Account would be created with Pro access.",
+        console.log('📝 Starting sign up for:', email);
+        
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/calculator-test`
+          }
         });
-      } else {
+
+        if (error) {
+          console.error('❌ Sign up error:', error.message);
+          throw new Error(error.message);
+        }
+
+        // Create user profile with Pro status for valid promo code users
+        if (data.user) {
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: data.user.id,
+              email: data.user.email,
+              subscription_status: 'active'  // Pro status for promo code users
+            });
+
+          if (profileError) {
+            console.error('Error creating profile:', profileError);
+          }
+        }
+
         toast({
-          title: "Signed In (Demo)",
-          description: "This is just a preview. User would be signed in.",
+          title: "Account Created",
+          description: "Welcome to Rentalizer! You now have Pro access. Please check your email to verify your account.",
+        });
+        
+        // Reset form
+        setEmail('');
+        setPassword('');
+        setPromoCode('');
+        
+      } else {
+        // Sign in
+        console.log('🔑 Starting sign in for:', email);
+        
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (error) {
+          console.error('❌ Sign in error:', error.message);
+          throw new Error(error.message);
+        }
+
+        toast({
+          title: "Signed In",
+          description: "Welcome back!",
         });
       }
+      
+    } catch (error: any) {
+      console.error('Authentication error:', error);
+      
+      let errorMessage = "Please check your credentials and try again.";
+      
+      if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = "Invalid email or password. Please check and try again.";
+      } else if (error.message?.includes('User already registered')) {
+        errorMessage = "An account with this email already exists. Please sign in instead.";
+      } else if (error.message?.includes('Email not confirmed')) {
+        errorMessage = "Please check your email and confirm your account before signing in.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        title: "Authentication Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 2000);
+    }
   };
 
   return (
