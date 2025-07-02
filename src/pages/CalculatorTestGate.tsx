@@ -161,10 +161,10 @@ const CalculatorTestGate = () => {
           <div className="text-center mb-6 bg-transparent rounded-lg p-8">
             <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
               <CalculatorIcon className="h-10 w-10 text-cyan-400" />
-              Rental Calculator (GATE TEST)
+              Rental Calculator
             </h1>
             <p className="text-xl text-gray-300 mb-6 sm:text-lg">
-              Analyze STR Profitability - Authentication Gate Preview
+              Analyze STR Profitability
             </p>
             
             {/* Action buttons */}
@@ -226,7 +226,7 @@ const CalculatorTestGate = () => {
                     </div>
                     <p className="text-gray-400 text-sm">
                       {isSignUp 
-                        ? 'Create your account with a promo code to get Pro access'
+                        ? 'Create your account'
                         : 'Access your account'
                       }
                     </p>
