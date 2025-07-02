@@ -240,6 +240,11 @@ const Calculator = () => {
           title: "Signed In",
           description: "Welcome back!",
         });
+        
+        // Reset form
+        setEmail('');
+        setPassword('');
+        setPromoCode('');
       }
       
     } catch (error: any) {
