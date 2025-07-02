@@ -44,6 +44,13 @@ const CalculatorTestGate = () => {
     furnishingsPSF: 0,
   };
 
+  const handleBookDemo = () => {
+    toast({
+      title: "Demo Booking (Preview)",
+      description: "This would open calendar booking for users without valid promo codes.",
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -68,11 +75,8 @@ const CalculatorTestGate = () => {
     }
 
     if (isSignUp && promoCode !== 'T6MEM') {
-      toast({
-        title: "Invalid Promo Code",
-        description: "Please enter a valid promo code to sign up.",
-        variant: "destructive",
-      });
+      // Instead of showing error, redirect to demo booking
+      handleBookDemo();
       return;
     }
     
@@ -194,16 +198,15 @@ const CalculatorTestGate = () => {
                         <User className="h-4 w-4" />
                         Email
                       </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your email"
-                        required
-                        disabled={isSubmitting}
-                        className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
-                      />
+                        <Input
+                          id="email"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                          disabled={isSubmitting}
+                          className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                        />
                     </div>
                     
                     <div className="space-y-2">
@@ -211,17 +214,16 @@ const CalculatorTestGate = () => {
                         <Lock className="h-4 w-4" />
                         Password
                       </Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter your password"
-                        required
-                        minLength={6}
-                        disabled={isSubmitting}
-                        className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
-                      />
+                        <Input
+                          id="password"
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                          minLength={6}
+                          disabled={isSubmitting}
+                          className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                        />
                     </div>
 
                     {isSignUp && (
@@ -235,14 +237,9 @@ const CalculatorTestGate = () => {
                           type="text"
                           value={promoCode}
                           onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                          placeholder="Enter promo code (T6MEM)"
-                          required
                           disabled={isSubmitting}
                           className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
                         />
-                        <p className="text-xs text-gray-400 mt-1">
-                          Enter "T6MEM" to get Pro access
-                        </p>
                       </div>
                     )}
 
@@ -308,16 +305,25 @@ const CalculatorTestGate = () => {
                         )}
                       </Button>
                     </div>
+
+                    {isSignUp && (
+                      <div className="text-center pt-2 border-t border-gray-700">
+                        <p className="text-xs text-gray-400 mb-2 mt-3">
+                          Don't have a promo code?
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleBookDemo}
+                          disabled={isSubmitting}
+                          className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10 hover:text-purple-200 text-sm"
+                        >
+                          Book a Demo Instead
+                        </Button>
+                      </div>
+                    )}
                   </form>
 
-                  {/* Demo info */}
-                  <div className="border-t border-gray-700 pt-4">
-                    <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-3">
-                      <p className="text-cyan-200 text-xs text-center">
-                        🚀 Demo Mode: This is just a preview of the authentication gate with promo code functionality
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
