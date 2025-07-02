@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,11 +44,51 @@ const CalculatorTestGate = () => {
     furnishingsPSF: 0,
   };
 
+  // Load Calendly script when component mounts
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://assets.calendly.com/assets/external/widget.js';
+    script.async = true;
+    document.head.appendChild(script);
+
+    const link = document.createElement('link');
+    link.href = 'https://assets.calendly.com/assets/external/widget.css';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
+    };
+  }, []);
+
   const handleBookDemo = () => {
-    toast({
-      title: "Demo Booking (Preview)",
-      description: "This would open calendar booking for users without valid promo codes.",
-    });
+    // @ts-ignore
+    if (window.Calendly) {
+      // @ts-ignore
+      window.Calendly.initPopupWidget({
+        url: 'https://calendly.com/richies-schedule/scale'
+      });
+    } else {
+      toast({
+        title: "Loading Calendar",
+        description: "Please wait while we load the calendar widget...",
+      });
+      // Retry after a short delay
+      setTimeout(() => {
+        // @ts-ignore
+        if (window.Calendly) {
+          // @ts-ignore
+          window.Calendly.initPopupWidget({
+            url: 'https://calendly.com/richies-schedule/scale'
+          });
+        }
+      }, 1000);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -187,7 +227,7 @@ const CalculatorTestGate = () => {
                     <p className="text-gray-400 text-sm">
                       {isSignUp 
                         ? 'Create your account with a promo code to get Pro access'
-                        : 'Welcome back to Rentalizer'
+                        : 'Access your account'
                       }
                     </p>
                   </div>
