@@ -101,52 +101,57 @@ const Calculator = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative">
         <TopNavBar />
         
-        {/* Background Calculator Preview - Blurred */}
-        <div className="blur-[1px] opacity-40 pointer-events-none">
-          <div className="container mx-auto px-4 py-8">
-            {/* Header */}
-            <div className="flex items-center justify-between gap-4 mb-8">
+        {/* Header Section - Clear and visible */}
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-between gap-4 mb-8">
+            <Button
+              variant="ghost"
+              className="text-gray-400 hover:text-gray-300"
+              disabled
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Button>
+          </div>
+
+          <div className="text-center mb-6 bg-transparent rounded-lg p-8">
+            <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
+              <CalculatorIcon className="h-10 w-10 text-cyan-400" />
+              Rental Calculator
+            </h1>
+            <p className="text-xl text-gray-300 mb-6 sm:text-lg">
+              Analyze STR Profitability
+            </p>
+            
+            {/* Action buttons */}
+            <div className="flex items-center justify-center gap-4">
               <Button
-                variant="ghost"
-                className="text-gray-400 hover:text-gray-300"
+                variant="outline"
                 disabled
+                className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400"
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Home
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Clear All
+              </Button>
+              
+              <Button
+                variant="outline"
+                disabled
+                className="border-green-500/30 text-green-400 hover:bg-green-500/10 hover:text-green-300 hover:border-green-400"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download Data
               </Button>
             </div>
-
-            <div className="text-center mb-6 bg-transparent rounded-lg p-8">
-              <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
-                <CalculatorIcon className="h-10 w-10 text-cyan-400" />
-                Rental Calculator
-              </h1>
-              <p className="text-xl text-gray-300 mb-6 sm:text-lg">
-                Analyze STR Profitability
-              </p>
-              
-              {/* Action buttons */}
-              <div className="flex items-center justify-center gap-4">
-                <Button
-                  variant="outline"
-                  disabled
-                  className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400"
-                >
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  Clear All
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  disabled
-                  className="border-green-500/30 text-green-400 hover:bg-green-500/10 hover:text-green-300 hover:border-green-400"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Download Data
-                </Button>
-              </div>
-            </div>
-
+          </div>
+        </div>
+        
+        {/* Background Calculator Sections - Blurred */}
+        <div className="blur-[1px] opacity-40 pointer-events-none absolute top-0 left-0 w-full h-full">
+          <div className="container mx-auto px-4 py-8">
+            {/* Spacer to position calculator sections correctly */}
+            <div className="h-80"></div>
+            
             {/* Calculator Input Sections - 4x1 Grid Layout on desktop, centered stack on mobile */}
             <div className="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-6 max-w-full mx-auto mb-8 place-items-center">
               {/* Mock calculator sections */}
