@@ -335,7 +335,7 @@ const CalculatorTestGate = () => {
                         {isSignUp ? (
                           <>
                             <LogIn className="h-4 w-4 mr-2" />
-                            Already have an account? Sign In
+                            Already Have An Account? Sign In
                           </>
                         ) : (
                           <>
@@ -349,7 +349,7 @@ const CalculatorTestGate = () => {
                     {isSignUp && (
                       <div className="text-center pt-2 border-t border-gray-700">
                         <p className="text-xs text-gray-400 mb-2 mt-3">
-                          Don't have a promo code?
+                          Don't Have A Promo Code?
                         </p>
                         <Button
                           type="button"
