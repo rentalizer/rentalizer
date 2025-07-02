@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home, RotateCcw, Download } from 'lucide-react';
+import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home, RotateCcw, Download, LogIn } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
@@ -90,36 +90,35 @@ const Calculator = () => {
             </Button>
           </div>
 
-          {/* Login Gate Content */}
-          <div className="max-w-md mx-auto text-center space-y-6">
-            <div className="bg-slate-700/90 backdrop-blur-lg rounded-lg p-8 border border-gray-500/50">
-              <CalculatorIcon className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
-              <h1 className="text-3xl font-bold text-white mb-4">
-                Profit Calculator Access Required
-              </h1>
-              <p className="text-gray-300 mb-6">
-                Calculate your rental arbitrage profits with our advanced calculator tool.
-              </p>
-              
-              <div className="space-y-4 text-center">
-                <h2 className="text-xl font-semibold text-cyan-300">
-                  Market Insights + Calculator Required
-                </h2>
-                <p className="text-gray-400">
-                  Upgrade your subscription to access this module
+          {/* Login Dialog Content */}
+          <div className="max-w-md mx-auto">
+            <div className="bg-gray-900/95 border border-cyan-500/20 backdrop-blur-lg rounded-lg p-8">
+              <div className="text-center space-y-6">
+                <div className="flex items-center gap-2 text-cyan-300 justify-center">
+                  <LogIn className="h-5 w-5" />
+                  <h1 className="text-xl font-semibold">Sign In to Rentalizer</h1>
+                </div>
+                
+                <p className="text-gray-400 text-sm">
+                  Sign in to access your subscription and professional market data
                 </p>
                 
                 <LoginDialog 
                   trigger={
                     <Button className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white">
-                      Upgrade to Market Insights + Calculator
+                      Sign In
                     </Button>
                   }
                 />
                 
-                <p className="text-sm text-gray-500 mt-4">
-                  This module is currently in development and will be available soon for subscribers.
-                </p>
+                <div className="text-center">
+                  <Button
+                    variant="ghost"
+                    className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
+                  >
+                    Need an account? Book a Demo
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
