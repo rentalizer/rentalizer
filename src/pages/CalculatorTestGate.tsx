@@ -135,9 +135,25 @@ const CalculatorTestGate = () => {
           }
         });
 
+        console.log('📧 Sign up response:', { data, error });
+
         if (error) {
           console.error('❌ Sign up error:', error.message);
           throw new Error(error.message);
+        }
+
+        if (data.user && !data.session) {
+          console.log('📬 User created but email confirmation required');
+          toast({
+            title: "Account Created",
+            description: "Please check your email (including spam folder) to verify your account. You may need to wait a few minutes.",
+          });
+        } else if (data.session) {
+          console.log('✅ User created and automatically signed in');
+          toast({
+            title: "Account Created",
+            description: "Welcome to Rentalizer! You now have Pro access.",
+          });
         }
 
         // Create user profile with Pro status for valid promo code users
@@ -152,13 +168,10 @@ const CalculatorTestGate = () => {
 
           if (profileError) {
             console.error('Error creating profile:', profileError);
+          } else {
+            console.log('✅ User profile created with Pro status');
           }
         }
-
-        toast({
-          title: "Account Created",
-          description: "Welcome to Rentalizer! You now have Pro access. Please check your email to verify your account.",
-        });
         
         // Reset form
         setEmail('');
