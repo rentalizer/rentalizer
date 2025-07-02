@@ -49,7 +49,7 @@ export interface CalculatorData {
 const Calculator = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, signIn } = useAuth();
   
   // State for the auth overlay form
   const [email, setEmail] = useState('');
@@ -223,18 +223,10 @@ const Calculator = () => {
         setPromoCode('');
         
       } else {
-        // Sign in
+        // Sign in using auth context
         console.log('🔑 Starting sign in for:', email);
         
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          console.error('❌ Sign in error:', error.message);
-          throw new Error(error.message);
-        }
+        await signIn(email, password);
 
         toast({
           title: "Signed In",
