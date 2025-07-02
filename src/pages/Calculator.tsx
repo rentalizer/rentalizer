@@ -74,10 +74,10 @@ const Calculator = () => {
   // Show login gate if not authenticated and not in development
   if (!user && !isDevelopment()) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
         <TopNavBar />
         
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 flex-1 flex flex-col justify-center">
           {/* Header */}
           <div className="flex items-center justify-between gap-4 mb-8">
             <Button
@@ -272,7 +272,7 @@ const Calculator = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
       <TopNavBar />
       
       <div className="container mx-auto px-4 py-8">
