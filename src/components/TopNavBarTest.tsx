@@ -7,15 +7,9 @@ import { useAuth } from '@/contexts/AuthContext';
 export const TopNavBarTest = () => {
   const { user, signOut } = useAuth();
   
-  // Check if we're in development environment
-  const isDevelopment = () => {
-    return window.location.hostname.includes('lovable.app') || 
-           window.location.hostname.includes('localhost') ||
-           window.location.hostname.includes('127.0.0.1');
-  };
-
   // Only show user info if it's a real authenticated user (not development mock)
-  const showUserInfo = user && (!isDevelopment() || (user.email !== 'dev@example.com'));
+  // Hide development mock user completely
+  const showUserInfo = user && user.email !== 'dev@example.com';
 
   return (
     <div className="w-full bg-slate-700/90 backdrop-blur-lg border-b border-gray-500/50">
