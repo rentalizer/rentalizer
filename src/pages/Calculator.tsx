@@ -15,6 +15,7 @@ import { NetProfitSection } from '@/components/calculator/NetProfitSection';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { exportCalculatorToCSV } from '@/utils/calculatorExport';
+import { LoginDialog } from '@/components/LoginDialog';
 
 export interface CalculatorData {
   // Comps
@@ -58,13 +59,6 @@ const Calculator = () => {
            window.location.hostname.includes('127.0.0.1');
   };
 
-  // Redirect to login if not authenticated (except in development)
-  useEffect(() => {
-    if (!isLoading && !isDevelopment() && !user) {
-      navigate('/login?redirect=' + encodeURIComponent('/calculator'));
-    }
-  }, [user, isLoading, navigate]);
-
   // Show loading while checking auth
   if (isLoading) {
     return (
@@ -77,9 +71,63 @@ const Calculator = () => {
     );
   }
 
-  // Don't render if not authenticated and not in development
+  // Show login gate if not authenticated and not in development
   if (!user && !isDevelopment()) {
-    return null;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <TopNavBar />
+        
+        <div className="container mx-auto px-4 py-8">
+          {/* Header */}
+          <div className="flex items-center justify-between gap-4 mb-8">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="text-gray-400 hover:text-gray-300"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Button>
+          </div>
+
+          {/* Login Gate Content */}
+          <div className="max-w-md mx-auto text-center space-y-6">
+            <div className="bg-slate-700/90 backdrop-blur-lg rounded-lg p-8 border border-gray-500/50">
+              <CalculatorIcon className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
+              <h1 className="text-3xl font-bold text-white mb-4">
+                Profit Calculator Access Required
+              </h1>
+              <p className="text-gray-300 mb-6">
+                Calculate your rental arbitrage profits with our advanced calculator tool.
+              </p>
+              
+              <div className="space-y-4 text-center">
+                <h2 className="text-xl font-semibold text-cyan-300">
+                  Market Insights + Calculator Required
+                </h2>
+                <p className="text-gray-400">
+                  Upgrade your subscription to access this module
+                </p>
+                
+                <LoginDialog 
+                  trigger={
+                    <Button className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white">
+                      Upgrade to Market Insights + Calculator
+                    </Button>
+                  }
+                />
+                
+                <p className="text-sm text-gray-500 mt-4">
+                  This module is currently in development and will be available soon for subscribers.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Footer />
+      </div>
+    );
   }
   
   const initialData: CalculatorData = {
