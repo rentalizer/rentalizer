@@ -1,4 +1,3 @@
-
 import { CalculatorData } from '@/pages/Calculator';
 
 interface CalculatorExportData {
@@ -123,7 +122,6 @@ export const exportCalculatorToCSV = (
     ['Build Out Costs', 'Security Deposit', exportData.securityDeposit.toString()],
     ['Build Out Costs', 'Miscellaneous', exportData.miscellaneous.toString()],
     ['Build Out Costs', 'Calculated Furnishings', exportData.calculatedFurnishings.toString()],
-    ['Build Out Costs', 'Furniture Rental', exportData.furnitureRental.toString()],
     ['', '', ''], // Empty row for spacing
     
     // Analysis Results
@@ -157,3 +155,6 @@ export const exportCalculatorToCSV = (
   // Clean up the URL
   URL.revokeObjectURL(url);
 };
+
+// Keep the existing exportToExcel function for compatibility
+export const exportToExcel = exportCalculatorToCSV;

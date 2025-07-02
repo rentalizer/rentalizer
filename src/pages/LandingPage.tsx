@@ -13,7 +13,7 @@ const LandingPage = () => {
   const texts = {
     mainTitle: 'RENTALIZER',
     byLine: 'By Richie Matthews',
-    tagline: 'Launch & Scale Your Rental Income--Powered By AI',
+    tagline: 'The AI Platform to Launch and Scale Your Rental Income',
     description: 'RENTALIZER.AI Combines AI POWERED Market Analysis, Deal Sourcing, And Automation Tools With A Built-In CRM And A Thriving Community—Everything You Need To Launch And Scale Your Rental Arbitrage Business.',
     testimonialsTitle: 'Real Users Who\'ve Unlocked Rental Income With Rentalizer',
     buttonText: 'Book Demo',
