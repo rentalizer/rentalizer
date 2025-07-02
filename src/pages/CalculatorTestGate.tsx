@@ -272,7 +272,7 @@ const CalculatorTestGate = () => {
   }
 
   // Show calculator if user is authenticated  
-  if (user && !isDevelopment()) {
+  if (user) {
     return <AuthenticatedCalculator />;
   }
 
