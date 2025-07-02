@@ -6,6 +6,16 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export const TopNavBarTest = () => {
   const { user, signOut } = useAuth();
+  
+  // Check if we're in development environment
+  const isDevelopment = () => {
+    return window.location.hostname.includes('lovable.app') || 
+           window.location.hostname.includes('localhost') ||
+           window.location.hostname.includes('127.0.0.1');
+  };
+
+  // Only show user info if it's a real authenticated user (not development mock)
+  const showUserInfo = user && (!isDevelopment() || (user.email !== 'dev@example.com'));
 
   return (
     <div className="w-full bg-slate-700/90 backdrop-blur-lg border-b border-gray-500/50">
@@ -19,7 +29,7 @@ export const TopNavBarTest = () => {
           </div>
 
           {/* Right side - Login or User info */}
-          {user ? (
+          {showUserInfo ? (
             <div className="flex items-center gap-4 mr-48">
               <div className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20">
                 <User className="h-4 w-4 text-cyan-400" />
