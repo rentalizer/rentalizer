@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home, RotateCcw, Download, LogIn } from 'lucide-react';
+import { Calculator as CalculatorIcon, ArrowLeft, DollarSign, Home, RotateCcw, Download, LogIn, User, Lock, UserPlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
@@ -90,35 +90,86 @@ const Calculator = () => {
             </Button>
           </div>
 
-          {/* Login Dialog Content */}
+          {/* Login Form Content */}
           <div className="max-w-md mx-auto">
             <div className="bg-gray-900/95 border border-cyan-500/20 backdrop-blur-lg rounded-lg p-8">
-              <div className="text-center space-y-6">
-                <div className="flex items-center gap-2 text-cyan-300 justify-center">
-                  <LogIn className="h-5 w-5" />
-                  <h1 className="text-xl font-semibold">Sign In to Rentalizer</h1>
+              <div className="space-y-6">
+                <div className="text-center">
+                  <div className="flex items-center gap-2 text-cyan-300 justify-center mb-2">
+                    <LogIn className="h-5 w-5" />
+                    <h1 className="text-xl font-semibold">Sign In to Rentalizer</h1>
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    Sign in to access your subscription and professional market data
+                  </p>
                 </div>
                 
-                <p className="text-gray-400 text-sm">
-                  Sign in to access your subscription and professional market data
-                </p>
-                
-                <LoginDialog 
-                  trigger={
-                    <Button className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white">
+                <form className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-gray-300 flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-gray-300 flex items-center gap-2">
+                      <Lock className="h-4 w-4" />
+                      Password
+                    </Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Enter your password"
+                      className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                    />
+                  </div>
+
+                  <div className="text-right">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 text-sm p-0 h-auto"
+                    >
+                      Forgot your password?
+                    </Button>
+                  </div>
+                  
+                  <div className="flex gap-3 pt-4">
+                    <Button
+                      type="submit"
+                      className="flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+                    >
+                      <LogIn className="h-4 w-4 mr-2" />
                       Sign In
                     </Button>
-                  }
-                />
-                
-                <div className="text-center">
-                  <Button
-                    variant="ghost"
-                    className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
-                  >
-                    Need an account? Book a Demo
-                  </Button>
-                </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => navigate('/')}
+                      className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+
+                  <div className="text-center pt-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
+                    >
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Need an account? Book a Demo
+                    </Button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
