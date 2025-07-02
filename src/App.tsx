@@ -26,6 +26,7 @@ import AcquisitionsAgent from "./pages/AcquisitionsAgent";
 import Community from "./pages/Community";
 import PMS from "./pages/PMS";
 import CalculatorTest from "./pages/CalculatorTest";
+import CalculatorTestGate from "./pages/CalculatorTestGate";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const AppRoutes = () => (
     <Route path="/markets" element={<MarketAnalysis />} />
     <Route path="/calculator" element={<Calculator />} />
     <Route path="/calculator-test" element={<CalculatorTest />} />
+    <Route path="/calculator-test-gate" element={<CalculatorTestGate />} />
     <Route path="/calc" element={<Calc />} />
     <Route path="/properties" element={<AcquisitionsAgent />} />
     <Route path="/community" element={<Community />} />
