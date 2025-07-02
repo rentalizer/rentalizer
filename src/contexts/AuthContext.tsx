@@ -193,8 +193,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     console.log('🔄 AuthProvider initializing...', 'isDev:', isDevelopment());
     
-    // If in development, set mock user and skip auth
-    if (isDevelopment()) {
+    // Don't use mock user on test pages - they should use real auth
+    const isTestPage = window.location.pathname.includes('/calculator-test');
+    
+    // If in development and NOT on a test page, set mock user and skip auth
+    if (isDevelopment() && !isTestPage) {
       console.log('🔧 Development mode detected, using mock user');
       setUser(createMockUser());
       setIsLoading(false);
