@@ -52,12 +52,12 @@ const mockActivityData: ActivityEntry[] = [
   },
   {
     id: 'tw4',
-    type: 'feedback',
+    type: 'module',
     title: 'Module 3: Market Analysis Techniques',
-    description: 'Instructor feedback received on market analysis',
+    description: 'Advanced analysis methods completed',
     date: '2025-06-28',
     serverID: 'srv-us-west-1-prod-805',
-    pdfFile: 'Market Analysis Feedback Report.pdf',
+    pdfFile: 'Advanced Analysis Methods Guide.pdf',
     completed: true
   },
   {
@@ -289,7 +289,7 @@ export const StudentPortalActivityLog = () => {
   
   const currentStudent = mockStudents.find(s => s.id === selectedStudent) || mockStudents[0];
   
-  const filterTabs = ['All Activity', 'Module', 'Feedback', 'Achievement'];
+  const filterTabs = ['All Activity', 'Module', 'Achievement'];
   
   const filteredActivities = mockActivityData.filter(activity => {
     // Filter by student - only show Tiffany's activities when she's selected
@@ -417,7 +417,6 @@ export const StudentPortalActivityLog = () => {
                       <div className="flex items-center gap-4 text-sm">
                         <Badge variant="outline" className={
                           activity.type === 'achievement' ? "border-purple-500/30 text-purple-300 bg-purple-500/10" :
-                          activity.type === 'feedback' ? "border-green-500/30 text-green-300 bg-green-500/10" :
                           "border-blue-500/30 text-blue-300 bg-blue-500/10"
                         }>
                           {activity.type}
