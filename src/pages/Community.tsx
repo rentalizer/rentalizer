@@ -26,7 +26,7 @@ const Community = () => {
           <div className="flex items-center justify-center gap-3 mb-4">
             <Users className="h-12 w-12 text-cyan-400" />
             <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Student Dashboard
+              Training & Community Hub
             </h1>
           </div>
         </div>
