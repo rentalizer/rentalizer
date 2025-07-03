@@ -3,7 +3,17 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Plus, Clock, Users, Video } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ChevronLeft, ChevronRight, Plus, Clock, Users, Video, CalendarIcon, Upload } from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface Event {
   id: string;
@@ -13,14 +23,32 @@ interface Event {
   type: 'training' | 'webinar' | 'discussion' | 'workshop';
   attendees?: number;
   isRecurring?: boolean;
+  description?: string;
+  location?: string;
+  duration?: string;
 }
 
 export const CommunityCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [isAddEventOpen, setIsAddEventOpen] = useState(false);
+  
+  // Form state for adding new events
+  const [newEvent, setNewEvent] = useState({
+    title: '',
+    date: new Date(),
+    time: '',
+    duration: '1 hour',
+    location: 'Zoom',
+    zoomLink: '',
+    description: '',
+    isRecurring: false,
+    remindMembers: false,
+    attendees: 'All members'
+  });
 
   // Sample events including weekly trainings
-  const events: Event[] = [
+  const [events, setEvents] = useState<Event[]>([
     {
       id: '1',
       title: 'Weekly Live Training',
@@ -89,7 +117,7 @@ export const CommunityCalendar = () => {
       type: 'workshop',
       attendees: 29
     }
-  ];
+  ]);
 
   const getEventTypeColor = (type: string) => {
     switch (type) {
@@ -143,6 +171,37 @@ export const CommunityCalendar = () => {
     calendarDays.push({ date, isCurrentMonth: false });
   }
 
+  const handleAddEvent = () => {
+    const event: Event = {
+      id: Date.now().toString(),
+      title: newEvent.title,
+      date: newEvent.date,
+      time: newEvent.time,
+      type: 'workshop', // Default type, could be dynamic
+      description: newEvent.description,
+      location: newEvent.location,
+      duration: newEvent.duration,
+      isRecurring: newEvent.isRecurring
+    };
+    
+    setEvents([...events, event]);
+    setIsAddEventOpen(false);
+    
+    // Reset form
+    setNewEvent({
+      title: '',
+      date: new Date(),
+      time: '',
+      duration: '1 hour',
+      location: 'Zoom',
+      zoomLink: '',
+      description: '',
+      isRecurring: false,
+      remindMembers: false,
+      attendees: 'All members'
+    });
+  };
+
   return (
     <div className="grid lg:grid-cols-4 gap-8">
       {/* Calendar */}
@@ -152,10 +211,212 @@ export const CommunityCalendar = () => {
             <CardTitle className="text-cyan-300 flex items-center gap-2">
               Events Calendar
             </CardTitle>
-            <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Event
-            </Button>
+            
+            {/* Add Event Dialog */}
+            <Dialog open={isAddEventOpen} onOpenChange={setIsAddEventOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Event
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="text-white text-xl">Add event</DialogTitle>
+                  <p className="text-gray-400 text-sm">
+                    Need ideas? Try one of these fun formats: 
+                    <span className="text-blue-400 hover:underline cursor-pointer"> coffee hour</span>,
+                    <span className="text-blue-400 hover:underline cursor-pointer"> Q&A</span>,
+                    <span className="text-blue-400 hover:underline cursor-pointer"> co-working session</span>, or
+                    <span className="text-blue-400 hover:underline cursor-pointer"> happy hour</span>
+                  </p>
+                </DialogHeader>
+                
+                <div className="space-y-6 mt-6">
+                  {/* Title */}
+                  <div className="space-y-2">
+                    <Label htmlFor="title" className="text-white">Title</Label>
+                    <Input
+                      id="title"
+                      value={newEvent.title}
+                      onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                      className="bg-slate-700 border-gray-600 text-white"
+                      placeholder="Event title"
+                    />
+                    <div className="text-right text-sm text-gray-400">
+                      {newEvent.title.length} / 30
+                    </div>
+                  </div>
+
+                  {/* Date, Time, Duration */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-white">Date</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal bg-slate-700 border-gray-600 text-white",
+                              !newEvent.date && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {newEvent.date ? format(newEvent.date, "PPP") : <span>Pick a date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0 bg-slate-800 border-gray-700" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={newEvent.date}
+                            onSelect={(date) => date && setNewEvent({...newEvent, date})}
+                            initialFocus
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-white">Time</Label>
+                      <Select value={newEvent.time} onValueChange={(value) => setNewEvent({...newEvent, time: value})}>
+                        <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                          <SelectValue placeholder="Select time" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-gray-700">
+                          {Array.from({length: 24}, (_, i) => (
+                            <SelectItem key={i} value={`${i.toString().padStart(2, '0')}:00`}>
+                              {i === 0 ? '12:00 AM' : i < 12 ? `${i}:00 AM` : i === 12 ? '12:00 PM' : `${i-12}:00 PM`}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-white">Duration</Label>
+                      <Select value={newEvent.duration} onValueChange={(value) => setNewEvent({...newEvent, duration: value})}>
+                        <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-gray-700">
+                          <SelectItem value="30 minutes">30 minutes</SelectItem>
+                          <SelectItem value="1 hour">1 hour</SelectItem>
+                          <SelectItem value="1.5 hours">1.5 hours</SelectItem>
+                          <SelectItem value="2 hours">2 hours</SelectItem>
+                          <SelectItem value="3 hours">3 hours</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Recurring Event */}
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="recurring"
+                      checked={newEvent.isRecurring}
+                      onCheckedChange={(checked) => setNewEvent({...newEvent, isRecurring: checked as boolean})}
+                    />
+                    <Label htmlFor="recurring" className="text-white">Recurring event</Label>
+                  </div>
+
+                  {/* Location */}
+                  <div className="space-y-4">
+                    <Label className="text-white">Location</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Select value={newEvent.location} onValueChange={(value) => setNewEvent({...newEvent, location: value})}>
+                        <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-gray-700">
+                          <SelectItem value="Zoom">🔵 Zoom</SelectItem>
+                          <SelectItem value="Google Meet">📹 Google Meet</SelectItem>
+                          <SelectItem value="Microsoft Teams">🟣 Microsoft Teams</SelectItem>
+                          <SelectItem value="In Person">📍 In Person</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      {newEvent.location === 'Zoom' && (
+                        <Input
+                          placeholder="Zoom link"
+                          value={newEvent.zoomLink}
+                          onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
+                          className="bg-slate-700 border-gray-600 text-white"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <div className="space-y-2">
+                    <Label htmlFor="description" className="text-white">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={newEvent.description}
+                      onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                      className="bg-slate-700 border-gray-600 text-white h-24"
+                      placeholder="Event description..."
+                    />
+                    <div className="text-right text-sm text-gray-400">
+                      {newEvent.description.length} / 300
+                    </div>
+                  </div>
+
+                  {/* Who can attend */}
+                  <div className="space-y-2">
+                    <Label className="text-white">Who can attend this event</Label>
+                    <Select value={newEvent.attendees} onValueChange={(value) => setNewEvent({...newEvent, attendees: value})}>
+                      <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-gray-700">
+                        <SelectItem value="All members">All members</SelectItem>
+                        <SelectItem value="Premium members">Premium members only</SelectItem>
+                        <SelectItem value="Invited only">Invited members only</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Upload cover image */}
+                  <div className="space-y-2">
+                    <Label className="text-white">Upload cover image</Label>
+                    <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
+                      <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-blue-400 text-sm cursor-pointer hover:underline">Upload cover image</p>
+                      <p className="text-gray-400 text-xs mt-1">1460 x 752 px</p>
+                    </div>
+                  </div>
+
+                  {/* Remind members */}
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="remind"
+                      checked={newEvent.remindMembers}
+                      onCheckedChange={(checked) => setNewEvent({...newEvent, remindMembers: checked as boolean})}
+                    />
+                    <Label htmlFor="remind" className="text-white">Remind members by email 1 day before</Label>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex justify-end gap-3 pt-4">
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => setIsAddEventOpen(false)}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      CANCEL
+                    </Button>
+                    <Button 
+                      onClick={handleAddEvent}
+                      disabled={!newEvent.title || !newEvent.time}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      ADD
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </CardHeader>
           <CardContent>
             {/* Month Navigation */}
