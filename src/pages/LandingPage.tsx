@@ -250,7 +250,7 @@ const LandingPage = () => {
             
             {/* Updated Tagline */}
             <div className="mb-12 px-4">
-              <div className="text-2xl md:text-3xl lg:text-4xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
+              <div className="text-lg md:text-xl lg:text-2xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
                 All-In-One Platform To Launch & Scale Your Rental Income Stream—<br />
                 Powered By AI
               </div>
