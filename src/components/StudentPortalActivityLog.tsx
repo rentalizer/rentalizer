@@ -22,32 +22,152 @@ const mockActivityData: ActivityEntry[] = [
   // Tiffany Worthy - Arbitrage Accelerator Program
   {
     id: 'tw1',
+    type: 'module',
+    title: 'Module 4: Advanced Arbitrage Strategies',
+    description: 'Final assessment completed with 94% score',
+    date: '2025-07-02',
+    serverID: 'srv-us-west-1-prod-805',
+    pdfFile: 'Advanced Arbitrage Mastery Checklist.pdf',
+    completed: true
+  },
+  {
+    id: 'tw2',
+    type: 'assignment',
+    title: 'Module 4: Advanced Arbitrage Strategies',
+    description: 'Portfolio optimization exercise submitted',
+    date: '2025-07-01',
+    serverID: 'srv-us-central-2-prod-806',
+    pdfFile: 'Portfolio Optimization Template.pdf',
+    completed: true
+  },
+  {
+    id: 'tw3',
+    type: 'module',
+    title: 'Module 4: Advanced Arbitrage Strategies',
+    description: 'Risk management workshop attended',
+    date: '2025-06-30',
+    serverID: 'srv-us-east-2-prod-804',
+    pdfFile: 'Risk Management Strategies Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'tw4',
+    type: 'feedback',
+    title: 'Module 3: Market Analysis Techniques',
+    description: 'Instructor feedback received on market analysis',
+    date: '2025-06-28',
+    serverID: 'srv-us-west-1-prod-805',
+    pdfFile: 'Market Analysis Feedback Report.pdf',
+    completed: true
+  },
+  {
+    id: 'tw5',
+    type: 'module',
+    title: 'Module 3: Market Analysis Techniques',
+    description: 'Competitive analysis case study completed',
+    date: '2025-06-25',
+    serverID: 'srv-us-central-2-prod-806',
+    pdfFile: 'Competitive Analysis Framework.pdf',
+    completed: true
+  },
+  {
+    id: 'tw6',
+    type: 'assignment',
+    title: 'Module 3: Market Analysis Techniques',
+    description: 'Data visualization project submitted',
+    date: '2025-06-22',
+    serverID: 'srv-us-east-2-prod-804',
+    pdfFile: 'Data Visualization Toolkit.pdf',
+    completed: true
+  },
+  {
+    id: 'tw7',
+    type: 'module',
+    title: 'Module 2: Property Sourcing Automation',
+    description: 'Automation scripts deployment successful',
+    date: '2025-06-18',
+    serverID: 'srv-us-west-1-prod-805',
+    pdfFile: 'Automation Scripts Package.pdf',
+    completed: true
+  },
+  {
+    id: 'tw8',
+    type: 'module',
+    title: 'Module 2: Property Sourcing Automation',
+    description: 'API integration workshop completed',
+    date: '2025-06-15',
+    serverID: 'srv-us-central-2-prod-806',
+    pdfFile: 'API Integration Manual.pdf',
+    completed: true
+  },
+  {
+    id: 'tw9',
+    type: 'achievement',
+    title: 'Module 2: Property Sourcing Automation',
+    description: 'Certification earned with distinction',
+    date: '2025-06-12',
+    serverID: 'srv-us-east-2-prod-804',
+    pdfFile: 'Automation Certification.pdf',
+    completed: true
+  },
+  {
+    id: 'tw10',
+    type: 'assignment',
+    title: 'Module 1: Arbitrage Fundamentals',
+    description: 'Financial modeling spreadsheet submitted',
+    date: '2025-06-08',
+    serverID: 'srv-us-west-1-prod-805',
+    pdfFile: 'Financial Modeling Template.pdf',
+    completed: true
+  },
+  {
+    id: 'tw11',
+    type: 'module',
+    title: 'Module 1: Arbitrage Fundamentals',
+    description: 'Legal compliance training completed',
+    date: '2025-06-05',
+    serverID: 'srv-us-central-2-prod-806',
+    pdfFile: 'Legal Compliance Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'tw12',
+    type: 'module',
+    title: 'Module 1: Arbitrage Fundamentals',
+    description: 'Market research methodology mastered',
+    date: '2025-05-28',
+    serverID: 'srv-us-east-2-prod-804',
+    pdfFile: 'Market Research Methodology.pdf',
+    completed: true
+  },
+  {
+    id: 'tw13',
+    type: 'assignment',
+    title: 'Module 1: Arbitrage Fundamentals',
+    description: 'Market research worksheet submitted',
+    date: '2025-05-25',
+    serverID: 'srv-us-west-1-prod-805',
+    pdfFile: 'Market Research Template.pdf',
+    completed: true
+  },
+  {
+    id: 'tw14',
+    type: 'module',
+    title: 'Module 1: Arbitrage Fundamentals',
+    description: 'Introduction video watched and quiz passed',
+    date: '2025-05-22',
+    serverID: 'srv-us-central-2-prod-806',
+    pdfFile: 'Arbitrage Basics Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'tw15',
     type: 'achievement',
     title: 'Arbitrage Accelerator Program',
     description: 'Successfully enrolled and payment confirmed',
     date: '2025-05-21',
     serverID: 'srv-us-west-1-prod-805',
     pdfFile: 'Arbitrage Accelerator Welcome Package.pdf',
-    completed: true
-  },
-  {
-    id: 'tw2',
-    type: 'module',
-    title: 'Module 1: Arbitrage Fundamentals',
-    description: 'Introduction video watched',
-    date: '2025-05-21',
-    serverID: 'srv-us-west-1-prod-805',
-    pdfFile: 'Arbitrage Basics Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'tw3',
-    type: 'assignment',
-    title: 'Module 1: Arbitrage Fundamentals',
-    description: 'Market research worksheet submitted',
-    date: '2025-05-21',
-    serverID: 'srv-us-west-1-prod-805',
-    pdfFile: 'Market Research Template.pdf',
     completed: true
   },
   
@@ -156,7 +276,7 @@ const mockActivityData: ActivityEntry[] = [
 
 const mockStudents = [
   { id: '1', name: 'Lindsay Sherman', email: 'dutchess0085@gmail.com', progress: 100 },
-  { id: '2', name: 'Tiffany Worthy', email: 'tiffany1990worthy@yahoo.com', progress: 15 },
+  { id: '2', name: 'Tiffany Worthy', email: 'tiffany1990worthy@yahoo.com', progress: 78 },
   { id: '3', name: 'Alex Johnson', email: 'alex.johnson@email.com', progress: 85 },
   { id: '4', name: 'Sarah Wilson', email: 'sarah.wilson@email.com', progress: 72 },
   { id: '5', name: 'Mike Davis', email: 'mike.davis@email.com', progress: 90 },
