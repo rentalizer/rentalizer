@@ -32,12 +32,12 @@ const mockActivityData: ActivityEntry[] = [
   },
   {
     id: 'tw2',
-    type: 'assignment',
+    type: 'module',
     title: 'Module 4: Advanced Arbitrage Strategies',
-    description: 'Portfolio optimization exercise submitted',
+    description: 'Risk management strategies implemented',
     date: '2025-07-01',
     serverID: 'srv-us-central-2-prod-806',
-    pdfFile: 'Portfolio Optimization Template.pdf',
+    pdfFile: 'Risk Management Implementation Guide.pdf',
     completed: true
   },
   {
@@ -72,12 +72,12 @@ const mockActivityData: ActivityEntry[] = [
   },
   {
     id: 'tw6',
-    type: 'assignment',
+    type: 'module',
     title: 'Module 3: Market Analysis Techniques',
-    description: 'Data visualization project submitted',
+    description: 'Data visualization techniques mastered',
     date: '2025-06-22',
     serverID: 'srv-us-east-2-prod-804',
-    pdfFile: 'Data Visualization Toolkit.pdf',
+    pdfFile: 'Data Visualization Mastery Guide.pdf',
     completed: true
   },
   {
@@ -112,12 +112,12 @@ const mockActivityData: ActivityEntry[] = [
   },
   {
     id: 'tw10',
-    type: 'assignment',
+    type: 'module',
     title: 'Module 1: Arbitrage Fundamentals',
-    description: 'Financial modeling spreadsheet submitted',
+    description: 'Financial modeling techniques completed',
     date: '2025-06-08',
     serverID: 'srv-us-west-1-prod-805',
-    pdfFile: 'Financial Modeling Template.pdf',
+    pdfFile: 'Financial Modeling Mastery Guide.pdf',
     completed: true
   },
   {
@@ -142,12 +142,12 @@ const mockActivityData: ActivityEntry[] = [
   },
   {
     id: 'tw13',
-    type: 'assignment',
+    type: 'module',
     title: 'Module 1: Arbitrage Fundamentals',
-    description: 'Market research worksheet submitted',
+    description: 'Market research techniques completed',
     date: '2025-05-25',
     serverID: 'srv-us-west-1-prod-805',
-    pdfFile: 'Market Research Template.pdf',
+    pdfFile: 'Market Research Mastery Guide.pdf',
     completed: true
   },
   {
@@ -289,7 +289,7 @@ export const StudentPortalActivityLog = () => {
   
   const currentStudent = mockStudents.find(s => s.id === selectedStudent) || mockStudents[0];
   
-  const filterTabs = ['All Activity', 'Module', 'Assignment', 'Feedback', 'Achievement'];
+  const filterTabs = ['All Activity', 'Module', 'Feedback', 'Achievement'];
   
   const filteredActivities = mockActivityData.filter(activity => {
     // Filter by student - only show Tiffany's activities when she's selected
@@ -417,7 +417,6 @@ export const StudentPortalActivityLog = () => {
                       <div className="flex items-center gap-4 text-sm">
                         <Badge variant="outline" className={
                           activity.type === 'achievement' ? "border-purple-500/30 text-purple-300 bg-purple-500/10" :
-                          activity.type === 'assignment' ? "border-orange-500/30 text-orange-300 bg-orange-500/10" :
                           activity.type === 'feedback' ? "border-green-500/30 text-green-300 bg-green-500/10" :
                           "border-blue-500/30 text-blue-300 bg-blue-500/10"
                         }>
