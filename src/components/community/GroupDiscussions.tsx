@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Users, Plus, Search, MessageCircle, Heart, Pin, TrendingUp, Calendar, Filter } from 'lucide-react';
+import { Users, Plus, Search, MessageCircle, Heart, Pin, TrendingUp, Calendar, Filter, Image, Video, Smile, Paperclip, AtSign } from 'lucide-react';
 
 interface Discussion {
   id: string;
@@ -24,69 +25,121 @@ interface Discussion {
 export const GroupDiscussions = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
+  const [newPost, setNewPost] = useState('');
+  const [showAttachments, setShowAttachments] = useState(false);
+  const [discussionsList, setDiscussionsList] = useState<Discussion[]>([]);
+  
+  // Mock current user
+  const currentUser = {
+    name: 'John Smith',
+    avatar: 'JS'
+  };
 
-  const discussions: Discussion[] = [
-    {
-      id: '1',
-      title: 'Welcome aboard!',
-      content: "We're thrilled to have you join our vibrant community of rental entrepreneurs! 🎉 Whether you're a seasoned host or just starting out, you're in the right place to learn, connect, and grow together. Here's a...",
-      author: 'Richie Matthews',
-      avatar: 'RM',
-      category: 'General',
-      likes: 40,
-      comments: 59,
-      timeAgo: 'Feb 24',
-      isPinned: true
-    },
-    {
-      id: '2',
-      title: 'Market Analysis Question',
-      content: 'When doing market analysis on AirDNA, are we still adjusting the performance price tiers to Midscale/upscale? or are we not bothering with that anymore? I didn\'t see it on the Marketing Research...',
-      author: 'The Dan Rogul',
-      avatar: 'DR',
-      category: 'General',
-      likes: 0,
-      comments: 0,
-      timeAgo: '1h'
-    },
-    {
-      id: '3',
-      title: 'Hello from Virginia',
-      content: 'Hello everyone! I just joined today. I\'m from the Virginia area (DMV). I\'m truly excited to be part of the Rental Arbitrage University and look forward to learning, collaborating, and growing our businesses...',
-      author: 'Lincoln Khan',
-      avatar: 'LK',
-      category: 'General',
-      likes: 0,
-      comments: 0,
-      timeAgo: '3h'
-    },
-    {
-      id: '4',
-      title: 'Best Furniture Sourcing Strategies',
-      content: 'Managing 5 properties now and looking for bulk purchasing options. What are your go-to sources for affordable, durable furniture that guests love?',
-      author: 'Maria Johnson',
-      avatar: 'MJ',
-      category: 'Resource Library',
-      likes: 15,
-      comments: 23,
-      timeAgo: '1d'
-    },
-    {
-      id: '5',
-      title: 'First month: $3,200 profit from Phoenix property',
-      content: 'Breakdown of numbers and lessons learned from my first deal. Happy to share the details and answer any questions!',
-      author: 'David Kim',
-      avatar: 'DK',
-      category: 'Success Stories',
-      likes: 67,
-      comments: 34,
-      timeAgo: '2d'
+  // Initialize discussions with state
+  React.useEffect(() => {
+    if (discussionsList.length === 0) {
+      setDiscussionsList([
+        {
+          id: '1',
+          title: 'Welcome aboard!',
+          content: "We're thrilled to have you join our vibrant community of rental entrepreneurs! 🎉 Whether you're a seasoned host or just starting out, you're in the right place to learn, connect, and grow together. Here's a...",
+          author: 'Richie Matthews',
+          avatar: 'RM',
+          category: 'General',
+          likes: 40,
+          comments: 59,
+          timeAgo: 'Feb 24',
+          isPinned: true
+        },
+        {
+          id: '2',
+          title: 'Market Analysis Question',
+          content: 'When doing market analysis on AirDNA, are we still adjusting the performance price tiers to Midscale/upscale? or are we not bothering with that anymore? I didn\'t see it on the Marketing Research...',
+          author: 'The Dan Rogul',
+          avatar: 'DR',
+          category: 'General',
+          likes: 0,
+          comments: 0,
+          timeAgo: '1h'
+        },
+        {
+          id: '3',
+          title: 'Hello from Virginia',
+          content: 'Hello everyone! I just joined today. I\'m from the Virginia area (DMV). I\'m truly excited to be part of the Rental Arbitrage University and look forward to learning, collaborating, and growing our businesses...',
+          author: 'Lincoln Khan',
+          avatar: 'LK',
+          category: 'General',
+          likes: 0,
+          comments: 0,
+          timeAgo: '3h'
+        },
+        {
+          id: '4',
+          title: 'Best Furniture Sourcing Strategies',
+          content: 'Managing 5 properties now and looking for bulk purchasing options. What are your go-to sources for affordable, durable furniture that guests love?',
+          author: 'Maria Johnson',
+          avatar: 'MJ',
+          category: 'Resource Library',
+          likes: 15,
+          comments: 23,
+          timeAgo: '1d'
+        },
+        {
+          id: '5',
+          title: 'First month: $3,200 profit from Phoenix property',
+          content: 'Breakdown of numbers and lessons learned from my first deal. Happy to share the details and answer any questions!',
+          author: 'David Kim',
+          avatar: 'DK',
+          category: 'Success Stories',
+          likes: 67,
+          comments: 34,
+          timeAgo: '2d'
+        }
+      ]);
     }
-  ];
+  }, [discussionsList.length]);
+
+  // Functions to handle likes and comments
+  const handleLike = (discussionId: string) => {
+    setDiscussionsList(prev => prev.map(discussion => 
+      discussion.id === discussionId
+        ? { 
+            ...discussion, 
+            isLiked: !discussion.isLiked,
+            likes: discussion.isLiked ? discussion.likes - 1 : discussion.likes + 1
+          }
+        : discussion
+    ));
+  };
+
+  const handleComment = (discussionId: string) => {
+    // This would open a comment dialog or navigate to the discussion detail
+    console.log('Opening comments for discussion:', discussionId);
+  };
+
+  const handleSubmitPost = () => {
+    if (newPost.trim()) {
+      const newDiscussion: Discussion = {
+        id: String(discussionsList.length + 1),
+        title: newPost.length > 50 ? newPost.substring(0, 50) + '...' : newPost,
+        content: newPost,
+        author: currentUser.name,
+        avatar: currentUser.avatar,
+        category: 'General',
+        likes: 0,
+        comments: 0,
+        timeAgo: 'now',
+        isLiked: false
+      };
+      setDiscussionsList(prev => [newDiscussion, ...prev]);
+      setNewPost('');
+      setShowAttachments(false);
+    }
+  };
 
   const filters = ['All', 'General discussion', 'Resource Library', 'Success Stories', 'Share Your Wins', 'More...'];
 
-  const filteredDiscussions = discussions.filter(discussion => {
+  const filteredDiscussions = discussionsList.filter(discussion => {
     const matchesSearch = discussion.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          discussion.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          discussion.author.toLowerCase().includes(searchTerm.toLowerCase());
@@ -101,14 +154,70 @@ export const GroupDiscussions = () => {
       {/* Header with Post Input */}
       <Card className="bg-slate-800/50 border-cyan-500/20">
         <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-              YOU
+          <div className="space-y-4">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                {currentUser.avatar}
+              </div>
+              <div className="flex-1">
+                <Textarea
+                  placeholder="Write something..."
+                  value={newPost}
+                  onChange={(e) => setNewPost(e.target.value)}
+                  className="min-h-[100px] bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 resize-none"
+                />
+                
+                {/* Attachment Options */}
+                <div className="flex items-center justify-between mt-3">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-400 hover:text-cyan-300"
+                      onClick={() => setShowAttachments(!showAttachments)}
+                    >
+                      <Paperclip className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-400 hover:text-cyan-300"
+                    >
+                      <Image className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-400 hover:text-cyan-300"
+                    >
+                      <Video className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-400 hover:text-cyan-300"
+                    >
+                      <Smile className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-400 hover:text-cyan-300"
+                    >
+                      <AtSign className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <Button
+                    onClick={handleSubmitPost}
+                    disabled={!newPost.trim()}
+                    className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                  >
+                    Post
+                  </Button>
+                </div>
+              </div>
             </div>
-            <Input
-              placeholder="Write something"
-              className="flex-1 bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 h-12"
-            />
           </div>
         </CardContent>
       </Card>
@@ -193,13 +302,19 @@ export const GroupDiscussions = () => {
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className={`flex items-center gap-2 hover:bg-red-500/10 ${discussion.isLiked ? 'text-red-400' : 'text-gray-400'}`}
+                      onClick={() => handleLike(discussion.id)}
+                      className={`flex items-center gap-2 hover:bg-red-500/10 transition-colors ${discussion.isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'}`}
                     >
                       <Heart className={`h-4 w-4 ${discussion.isLiked ? 'fill-current' : ''}`} />
                       {discussion.likes}
                     </Button>
                     
-                    <Button variant="ghost" size="sm" className="flex items-center gap-2 text-gray-400 hover:bg-blue-500/10 hover:text-blue-300">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleComment(discussion.id)}
+                      className="flex items-center gap-2 text-gray-400 hover:bg-blue-500/10 hover:text-blue-300 transition-colors"
+                    >
                       <MessageCircle className="h-4 w-4" />
                       {discussion.comments}
                     </Button>
