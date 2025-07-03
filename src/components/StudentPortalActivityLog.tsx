@@ -194,7 +194,7 @@ export const StudentPortalActivityLog = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-2xl font-bold text-white">Student Portal Activity Log</h1>
+          <h1 className="text-2xl font-bold text-white">Server Activity Log</h1>
         </div>
 
         {/* Student Selection */}
