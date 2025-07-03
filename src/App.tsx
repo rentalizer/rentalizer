@@ -27,6 +27,7 @@ import Community from "./pages/Community";
 import PMS from "./pages/PMS";
 import CalculatorTest from "./pages/CalculatorTest";
 import CalculatorTestGate from "./pages/CalculatorTestGate";
+import StudentLog from "./pages/StudentLog";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const AppRoutes = () => (
     <Route path="/properties" element={<AcquisitionsAgent />} />
     <Route path="/community" element={<Community />} />
     <Route path="/pms" element={<PMS />} />
+    <Route path="/student_log" element={<StudentLog />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
     <Route path="/terms-of-service" element={<TermsOfService />} />
