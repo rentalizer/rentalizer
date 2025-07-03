@@ -19,6 +19,39 @@ interface ActivityEntry {
 }
 
 const mockActivityData: ActivityEntry[] = [
+  // Tiffany Worthy - Arbitrage Accelerator Program
+  {
+    id: 'tw1',
+    type: 'achievement',
+    title: 'Arbitrage Accelerator Program',
+    description: 'Successfully enrolled and payment confirmed',
+    date: '2025-05-21',
+    serverID: 'srv-us-west-1-prod-805',
+    pdfFile: 'Arbitrage Accelerator Welcome Package.pdf',
+    completed: true
+  },
+  {
+    id: 'tw2',
+    type: 'module',
+    title: 'Module 1: Arbitrage Fundamentals',
+    description: 'Introduction video watched',
+    date: '2025-05-21',
+    serverID: 'srv-us-west-1-prod-805',
+    pdfFile: 'Arbitrage Basics Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'tw3',
+    type: 'assignment',
+    title: 'Module 1: Arbitrage Fundamentals',
+    description: 'Market research worksheet submitted',
+    date: '2025-05-21',
+    serverID: 'srv-us-west-1-prod-805',
+    pdfFile: 'Market Research Template.pdf',
+    completed: true
+  },
+  
+  // Lindsay Sherman - Original entries
   {
     id: '1',
     type: 'module',
@@ -123,9 +156,10 @@ const mockActivityData: ActivityEntry[] = [
 
 const mockStudents = [
   { id: '1', name: 'Lindsay Sherman', email: 'dutchess0085@gmail.com', progress: 100 },
-  { id: '2', name: 'Alex Johnson', email: 'alex.johnson@email.com', progress: 85 },
-  { id: '3', name: 'Sarah Wilson', email: 'sarah.wilson@email.com', progress: 72 },
-  { id: '4', name: 'Mike Davis', email: 'mike.davis@email.com', progress: 90 },
+  { id: '2', name: 'Tiffany Worthy', email: 'tiffany1990worthy@yahoo.com', progress: 15 },
+  { id: '3', name: 'Alex Johnson', email: 'alex.johnson@email.com', progress: 85 },
+  { id: '4', name: 'Sarah Wilson', email: 'sarah.wilson@email.com', progress: 72 },
+  { id: '5', name: 'Mike Davis', email: 'mike.davis@email.com', progress: 90 },
 ];
 
 export const StudentPortalActivityLog = () => {
@@ -138,6 +172,11 @@ export const StudentPortalActivityLog = () => {
   const filterTabs = ['All Activity', 'Module', 'Assignment', 'Feedback', 'Achievement'];
   
   const filteredActivities = mockActivityData.filter(activity => {
+    // Filter by student - only show Tiffany's activities when she's selected
+    if (selectedStudent === '2' && !activity.id.startsWith('tw')) return false;
+    if (selectedStudent !== '2' && activity.id.startsWith('tw')) return false;
+    
+    // Filter by activity type
     if (activeFilter === 'All Activity') return true;
     return activity.type.toLowerCase() === activeFilter.toLowerCase();
   });
@@ -215,7 +254,7 @@ export const StudentPortalActivityLog = () => {
               </div>
               
               <div className="text-right text-sm">
-                <div className="text-gray-400">Started: <span className="text-white">2024-08-01</span></div>
+                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '2' ? '2025-05-21' : '2024-08-01'}</span></div>
                 <div className="text-gray-400">Progress: <span className="text-white">{currentStudent.progress}%</span></div>
               </div>
             </div>
@@ -256,8 +295,13 @@ export const StudentPortalActivityLog = () => {
                         <span className="text-gray-300">{activity.description}</span>
                       </div>
                       <div className="flex items-center gap-4 text-sm">
-                        <Badge variant="outline" className="border-blue-500/30 text-blue-300 bg-blue-500/10">
-                          module
+                        <Badge variant="outline" className={
+                          activity.type === 'achievement' ? "border-purple-500/30 text-purple-300 bg-purple-500/10" :
+                          activity.type === 'assignment' ? "border-orange-500/30 text-orange-300 bg-orange-500/10" :
+                          activity.type === 'feedback' ? "border-green-500/30 text-green-300 bg-green-500/10" :
+                          "border-blue-500/30 text-blue-300 bg-blue-500/10"
+                        }>
+                          {activity.type}
                         </Badge>
                         <span className="text-gray-400">{activity.date}</span>
                         <span className="text-gray-500">Server ID:</span>
