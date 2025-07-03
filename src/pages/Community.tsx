@@ -63,34 +63,8 @@ const Community = () => {
           {/* Dashboard Tab */}
           <TabsContent value="dashboard" className="mt-8">
             <div className="grid lg:grid-cols-3 gap-8">
-              {/* Left Column - Quick Actions */}
+              {/* Left Column - Upcoming Events */}
               <div className="lg:col-span-1">
-                <Card className="bg-slate-800/50 border-cyan-500/20 mb-6">
-                  <CardHeader>
-                    <CardTitle className="text-cyan-300 flex items-center gap-2">
-                      <Bell className="h-5 w-5" />
-                      Quick Actions
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Button className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Start Discussion
-                    </Button>
-                    <div className="w-full">
-                      <ContactChat />
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-cyan-500/30 text-cyan-300"
-                      onClick={() => setActiveTab('calendar')}
-                    >
-                      <Calendar className="h-4 w-4 mr-2" />
-                      View Calendar
-                    </Button>
-                  </CardContent>
-                </Card>
-
                 {/* Upcoming Events */}
                 <Card className="bg-slate-800/50 border-cyan-500/20">
                   <CardHeader>
@@ -117,7 +91,7 @@ const Community = () => {
                 </Card>
               </div>
 
-              {/* Middle Column - Recent Activity */}
+              {/* Right Column - Recent Activity */}
               <div className="lg:col-span-2">
                 <Card className="bg-slate-800/50 border-cyan-500/20">
                   <CardHeader>
