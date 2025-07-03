@@ -349,7 +349,7 @@ export const StudentPortalActivityLog = () => {
               </div>
               
               <div className="text-right">
-                <p className="text-gray-300 text-sm mb-1">Current Progress</p>
+                <p className="text-gray-300 text-sm mb-1">Content Download Progress</p>
                 <div className="text-3xl font-bold text-white">{currentStudent.progress}%</div>
               </div>
             </div>
