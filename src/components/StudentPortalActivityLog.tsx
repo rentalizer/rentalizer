@@ -276,7 +276,7 @@ const mockActivityData: ActivityEntry[] = [
 
 const mockStudents = [
   { id: '1', name: 'Lindsay Sherman', email: 'dutchess0085@gmail.com', progress: 100 },
-  { id: '2', name: 'Tiffany Worthy', email: 'tiffany1990worthy@yahoo.com', progress: 78 },
+  { id: '2', name: 'Tiffany Worthy', email: 'tiffany1990worthy@yahoo.com', progress: 100 },
   { id: '3', name: 'Alex Johnson', email: 'alex.johnson@email.com', progress: 85 },
   { id: '4', name: 'Sarah Wilson', email: 'sarah.wilson@email.com', progress: 72 },
   { id: '5', name: 'Mike Davis', email: 'mike.davis@email.com', progress: 90 },
