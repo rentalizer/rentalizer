@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText } from 'lucide-react';
+import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator } from 'lucide-react';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { CommunityCalendar } from '@/components/community/CommunityCalendar';
@@ -34,7 +34,7 @@ const Community = () => {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 bg-slate-800/50 border border-cyan-500/20 gap-1 justify-items-stretch">
+          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50 border border-cyan-500/20 gap-1 justify-items-stretch">
             <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
               <Users className="h-4 w-4 mr-2" />
               Discussions
@@ -51,9 +51,13 @@ const Community = () => {
               <MessageSquare className="h-4 w-4 mr-2" />
               Chat
             </TabsTrigger>
+            <TabsTrigger value="calculator" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
+              <Calculator className="h-4 w-4 mr-2" />
+              Calculator
+            </TabsTrigger>
             <TabsTrigger value="documents" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
               <FileText className="h-4 w-4 mr-2" />
-              Business Doc
+              Business Docs
             </TabsTrigger>
             <TabsTrigger value="leaderboard" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
               <Users className="h-4 w-4 mr-2" />
@@ -75,6 +79,18 @@ const Community = () => {
 
           <TabsContent value="messages" className="mt-8">
             <MessageThreads />
+          </TabsContent>
+
+          <TabsContent value="calculator" className="mt-8">
+            <div className="text-center">
+              <Button 
+                onClick={() => window.location.href = '/calculator'}
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+              >
+                <Calculator className="h-4 w-4 mr-2" />
+                Open Calculator
+              </Button>
+            </div>
           </TabsContent>
 
 
