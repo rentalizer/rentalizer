@@ -513,7 +513,7 @@ export const GroupDiscussions = () => {
       </Card>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2">
+      <div className="flex items-center justify-center gap-3 overflow-x-auto pb-2">
         {filters.map((filter) => (
           <Button
             key={filter}
@@ -529,7 +529,7 @@ export const GroupDiscussions = () => {
             {filter}
           </Button>
         ))}
-        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-300">
+        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-300 ml-2">
           <Filter className="h-4 w-4" />
         </Button>
       </div>
@@ -870,21 +870,17 @@ export const GroupDiscussions = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {/* Top 5 members */}
+              {/* Top 5 members - excluding admins */}
               <div className="space-y-3">
                 <div className="flex items-center gap-3 p-2 rounded-lg bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20">
                   <div className="flex items-center justify-center w-6 h-6">
                     <Badge className="bg-yellow-500 text-black font-bold text-xs w-6 h-6 rounded-full flex items-center justify-center p-0">1</Badge>
                   </div>
                   <Avatar className="w-8 h-8">
-                    <AvatarImage src="/lovable-uploads/4cae85e1-7ac3-4a4b-989d-c4cb8ecca460.png" alt="Richie Matthews" />
-                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold text-sm">RM</AvatarFallback>
+                    <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-sm">JD</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1">
-                      <span className="text-white font-medium text-sm truncate">Richie Matthews</span>
-                      <Badge className="bg-red-600/20 text-red-300 border-red-500/30 text-xs">Admin</Badge>
-                    </div>
+                    <span className="text-white font-medium text-sm truncate">Judith Dreher</span>
                     <div className="text-yellow-400 font-semibold text-sm">+9 pts</div>
                   </div>
                 </div>
@@ -897,7 +893,7 @@ export const GroupDiscussions = () => {
                     <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-sm">JD</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <span className="text-white font-medium text-sm truncate">Judith Dreher</span>
+                    <span className="text-white font-medium text-sm truncate">Lynn Lueders</span>
                     <div className="text-cyan-400 font-semibold text-sm">+7 pts</div>
                   </div>
                 </div>
@@ -910,8 +906,8 @@ export const GroupDiscussions = () => {
                     <AvatarFallback className="bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold text-sm">LL</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <span className="text-white font-medium text-sm truncate">Lynn Lueders</span>
-                    <div className="text-cyan-400 font-semibold text-sm">+6 pts</div>
+                    <span className="text-white font-medium text-sm truncate">Mc Calhoun</span>
+                    <div className="text-cyan-400 font-semibold text-sm">+4 pts</div>
                   </div>
                 </div>
 
