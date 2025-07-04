@@ -521,9 +521,15 @@ export const GroupDiscussions = () => {
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 {/* User Avatar */}
-                <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                  {discussion.avatar}
-                </div>
+                <Avatar className="w-12 h-12 flex-shrink-0">
+                  {getUserAvatar() ? (
+                    <AvatarImage src={getUserAvatar()!} alt={discussion.author} />
+                  ) : (
+                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
+                      {discussion.avatar}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
 
                 {/* Post Content */}
                 <div className="flex-1 min-w-0">
