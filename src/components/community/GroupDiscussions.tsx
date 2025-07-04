@@ -39,6 +39,8 @@ export const GroupDiscussions = () => {
   const [selectedDiscussion, setSelectedDiscussion] = useState<Discussion | null>(null);
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<{[key: string]: {id: string; author: string; avatar: string; content: string; timeAgo: string;}[]}>({});
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -187,10 +189,12 @@ export const GroupDiscussions = () => {
     }
   };
 
-  const handleSubmitPost = () => {
-    if (newPost.trim()) {
+  const handleSubmitPost = async () => {
+    if (newPost.trim() && !isSubmitting) {
+      setIsSubmitting(true);
+      
       const newDiscussion: Discussion = {
-        id: String(discussionsList.length + 1),
+        id: String(Date.now()),
         title: newPost.length > 50 ? newPost.substring(0, 50) + '...' : newPost,
         content: newPost,
         author: currentUser.name,
@@ -202,11 +206,14 @@ export const GroupDiscussions = () => {
         isLiked: false,
         attachments: attachments.length > 0 ? attachments : undefined
       };
+      
       setDiscussionsList(prev => [newDiscussion, ...prev]);
       setNewPost('');
       setAttachments([]);
       setShowAttachments(false);
       setShowEmojiPicker(false);
+      
+      setTimeout(() => setIsSubmitting(false), 1000);
     }
   };
 
@@ -326,10 +333,10 @@ export const GroupDiscussions = () => {
                   
                   <Button
                     onClick={handleSubmitPost}
-                    disabled={!newPost.trim()}
-                    className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                    disabled={!newPost.trim() || isSubmitting}
+                    className="bg-cyan-600 hover:bg-cyan-700 text-white disabled:opacity-50"
                   >
-                    Post
+                    {isSubmitting ? 'Posting...' : 'Post'}
                   </Button>
                 </div>
                 
@@ -455,16 +462,20 @@ export const GroupDiscussions = () => {
                     <div className="mb-4 space-y-2">
                       {discussion.attachments.map((attachment, index) => (
                         <div key={index} className="inline-flex items-center gap-2 bg-slate-700/50 p-2 rounded mr-2">
-                          {attachment.type === 'image' && (
-                            <div className="flex items-center gap-2">
-                              <Image className="h-4 w-4 text-cyan-400" />
-                              <img 
-                                src={attachment.url} 
-                                alt={attachment.name}
-                                className="h-20 w-20 object-cover rounded"
-                              />
-                            </div>
-                          )}
+                           {attachment.type === 'image' && (
+                             <div className="flex items-center gap-2">
+                               <Image className="h-4 w-4 text-cyan-400" />
+                               <img 
+                                 src={attachment.url} 
+                                 alt={attachment.name}
+                                 className="h-20 w-20 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+                                 onClick={(e) => {
+                                   e.stopPropagation();
+                                   setSelectedImage(attachment.url);
+                                 }}
+                               />
+                             </div>
+                           )}
                           {attachment.type === 'video' && (
                             <div className="flex items-center gap-2">
                               <Video className="h-4 w-4 text-cyan-400" />
@@ -592,6 +603,29 @@ export const GroupDiscussions = () => {
             <p className="text-gray-400">Try adjusting your search terms or filters</p>
           </CardContent>
         </Card>
+      )}
+
+      {/* Image Expansion Modal */}
+      {selectedImage && (
+        <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+          <DialogContent className="bg-slate-900/95 border-gray-700 max-w-4xl p-2">
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedImage(null)}
+                className="absolute top-2 right-2 z-10 text-white hover:bg-slate-800/50 rounded-full p-2"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+              <img
+                src={selectedImage}
+                alt="Expanded view"
+                className="w-full h-auto max-h-[80vh] object-contain rounded-lg animate-scale-in"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
