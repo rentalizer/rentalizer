@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download } from 'lucide-react';
+import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
@@ -192,13 +192,17 @@ const Community = () => {
             </TabsTrigger>
             
             {/* Document icon */}
-            <div className="flex items-center justify-center px-1">
+            <div className="flex items-center justify-center px-0.5">
               <FileText className="h-5 w-5 text-cyan-400/70" />
             </div>
             
             <TabsTrigger value="documents" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
               <FileText className="h-4 w-4 mr-2" />
               Business Docs
+            </TabsTrigger>
+            <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
+              <Bot className="h-4 w-4 mr-2" />
+              Ask Richie
             </TabsTrigger>
             <TabsTrigger value="leaderboard" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
               <Medal className="h-4 w-4 mr-2" />
@@ -293,6 +297,29 @@ const Community = () => {
 
           <TabsContent value="documents" className="mt-8">
             <DocumentsLibrary />
+          </TabsContent>
+
+          <TabsContent value="askrichie" className="mt-8">
+            <div className="text-center space-y-6">
+              <div className="bg-slate-800/50 border border-cyan-500/20 rounded-lg p-8">
+                <Bot className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-white mb-4">Ask Richie AI</h3>
+                <p className="text-gray-300 mb-6">
+                  Get instant answers to your rental investment questions from our AI assistant.
+                </p>
+                <div className="space-y-4">
+                  <div className="text-left bg-slate-700/50 rounded-lg p-4">
+                    <p className="text-sm text-gray-400 mb-2">Coming Soon:</p>
+                    <ul className="text-cyan-300 space-y-1 text-sm">
+                      <li>• Market analysis insights</li>
+                      <li>• Investment strategy recommendations</li>
+                      <li>• Property evaluation assistance</li>
+                      <li>• Real-time Q&A support</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="leaderboard" className="mt-8">
