@@ -51,6 +51,7 @@ export const GroupDiscussions = () => {
   const [editingPost, setEditingPost] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
   const [showProfileSetup, setShowProfileSetup] = useState(false);
+  const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -209,6 +210,21 @@ export const GroupDiscussions = () => {
     setEditContent('');
   };
 
+  // Pin toggle handler
+  const handleTogglePin = (discussionId: string) => {
+    setDiscussionsList(prev => prev.map(discussion => 
+      discussion.id === discussionId
+        ? { ...discussion, isPinned: !discussion.isPinned }
+        : discussion
+    ));
+  };
+
+  // Get truncated content for preview
+  const getTruncatedContent = (content: string, maxLength: number = 150) => {
+    if (content.length <= maxLength) return content;
+    return content.substring(0, maxLength) + '...';
+  };
+
   const handleSubmitPost = async () => {
     if (newPost.trim() && !isSubmitting) {
       setIsSubmitting(true);
@@ -268,15 +284,22 @@ export const GroupDiscussions = () => {
 
   const filters = ['All', 'General discussion', 'Resource Library', 'Success Stories', 'Share Your Wins', 'More...'];
 
-  const filteredDiscussions = discussionsList.filter(discussion => {
-    const matchesSearch = discussion.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         discussion.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         discussion.author.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = selectedFilter === 'All' || 
-                         (selectedFilter === 'General discussion' && discussion.category === 'General') ||
-                         (selectedFilter === discussion.category);
-    return matchesSearch && matchesFilter;
-  });
+  const filteredDiscussions = discussionsList
+    .filter(discussion => {
+      const matchesSearch = discussion.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           discussion.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           discussion.author.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesFilter = selectedFilter === 'All' || 
+                           (selectedFilter === 'General discussion' && discussion.category === 'General') ||
+                           (selectedFilter === discussion.category);
+      return matchesSearch && matchesFilter;
+    })
+    .sort((a, b) => {
+      // Sort pinned posts to top
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return 0;
+    });
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -506,9 +529,21 @@ export const GroupDiscussions = () => {
                       </Badge>
                     )}
                     
-                    {/* Edit and Delete buttons - only show for current user's posts */}
+                    {/* Pin and Edit/Delete buttons - only show for current user's posts */}
                     {discussion.author === getUserName() && (
                       <div className="flex items-center gap-1 ml-auto">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTogglePin(discussion.id);
+                          }}
+                          className={`p-1 ${discussion.isPinned ? 'text-yellow-400 hover:text-yellow-300' : 'text-gray-400 hover:text-yellow-400'}`}
+                          title={discussion.isPinned ? 'Unpin post' : 'Pin post'}
+                        >
+                          <Pin className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -569,8 +604,17 @@ export const GroupDiscussions = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="text-gray-300 mb-4 leading-relaxed whitespace-pre-wrap">
-                      {discussion.content}
+                    <div 
+                      className="text-gray-300 mb-4 leading-relaxed whitespace-pre-wrap cursor-pointer hover:text-gray-200 transition-colors"
+                      onClick={() => setExpandedPost(expandedPost === discussion.id ? null : discussion.id)}
+                    >
+                      {expandedPost === discussion.id ? discussion.content : getTruncatedContent(discussion.content)}
+                      {discussion.content.length > 150 && expandedPost !== discussion.id && (
+                        <span className="text-cyan-400 ml-2 font-medium">Read more</span>
+                      )}
+                      {expandedPost === discussion.id && discussion.content.length > 150 && (
+                        <span className="text-cyan-400 ml-2 font-medium">Show less</span>
+                      )}
                     </div>
                   )}
 
