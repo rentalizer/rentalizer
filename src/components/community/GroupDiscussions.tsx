@@ -354,7 +354,18 @@ export const GroupDiscussions = () => {
                   </AvatarFallback>
                 )}
               </Avatar>
-              <div className="flex-1 space-y-3">
+              <div className="flex-1 space-y-4">
+                {/* Title Input */}
+                <div>
+                  <label className="text-gray-400 text-sm font-medium mb-2 block">Title</label>
+                  <Input
+                    placeholder="Write something..."
+                    value={postTitle}
+                    onChange={(e) => setPostTitle(e.target.value)}
+                    className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+                  />
+                </div>
+
                 {/* Category Selector */}
                 <div>
                   <label className="text-gray-400 text-sm font-medium mb-2 block">Category</label>
@@ -376,7 +387,7 @@ export const GroupDiscussions = () => {
                   placeholder="Write something..."
                   value={newPost}
                   onChange={(e) => setNewPost(e.target.value)}
-                  className="min-h-[100px] bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 resize-none"
+                  className="min-h-[120px] bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 resize-none"
                 />
                 
                 {/* Attachment Options */}
