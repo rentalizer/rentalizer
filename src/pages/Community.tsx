@@ -217,7 +217,12 @@ const Community = () => {
           </TabsContent>
 
           {/* Calculator Dialog - outside of tabs content */}
-          <Dialog open={calculatorOpen} onOpenChange={setCalculatorOpen}>
+          <Dialog open={calculatorOpen} onOpenChange={(open) => {
+            setCalculatorOpen(open);
+            if (!open) {
+              setActiveTab('discussions');
+            }
+          }}>
             <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-slate-900 border-cyan-500/20">
               <DialogHeader>
                 <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">
