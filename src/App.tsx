@@ -24,6 +24,7 @@ import Test5 from "./pages/Test5";
 import Pricing from "./pages/Pricing";
 import AcquisitionsAgent from "./pages/AcquisitionsAgent";
 import Community from "./pages/Community";
+import CommunityGate from "./pages/CommunityGate";
 import FullLeaderboard from "./pages/FullLeaderboard";
 import PMS from "./pages/PMS";
 import CalculatorTest from "./pages/CalculatorTest";
@@ -45,7 +46,7 @@ const AppRoutes = () => (
     <Route path="/calculator-test-gate" element={<CalculatorTestGate />} />
     <Route path="/calc" element={<Calc />} />
     <Route path="/properties" element={<AcquisitionsAgent />} />
-    <Route path="/community" element={<Community />} />
+    <Route path="/community" element={<CommunityGate />} />
     <Route path="/leaderboard" element={<FullLeaderboard />} />
     <Route path="/pms" element={<PMS />} />
     <Route path="/student_log" element={<StudentLog />} />
