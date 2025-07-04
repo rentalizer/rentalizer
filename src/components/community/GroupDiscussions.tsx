@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Users, Plus, Search, MessageCircle, Heart, Pin, TrendingUp, Calendar, Filter, Image, Video, Smile, Paperclip, AtSign, X, Trash2, Send } from 'lucide-react';
+import { Users, Plus, Search, MessageCircle, Heart, Pin, TrendingUp, Calendar, Filter, Image, Video, Smile, Paperclip, AtSign, X, Trash2, Send, Edit } from 'lucide-react';
 
 interface Discussion {
   id: string;
@@ -41,6 +41,8 @@ export const GroupDiscussions = () => {
   const [comments, setComments] = useState<{[key: string]: {id: string; author: string; avatar: string; content: string; timeAgo: string;}[]}>({});
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingPost, setEditingPost] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -187,6 +189,33 @@ export const GroupDiscussions = () => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       setDiscussionsList(prev => prev.filter(discussion => discussion.id !== discussionId));
     }
+  };
+
+  // Edit post handlers
+  const handleEditPost = (discussion: Discussion) => {
+    setEditingPost(discussion.id);
+    setEditContent(discussion.content);
+  };
+
+  const handleSaveEdit = (discussionId: string) => {
+    if (editContent.trim()) {
+      setDiscussionsList(prev => prev.map(discussion => 
+        discussion.id === discussionId
+          ? { 
+              ...discussion, 
+              content: editContent,
+              title: editContent.length > 50 ? editContent.substring(0, 50) + '...' : editContent
+            }
+          : discussion
+      ));
+      setEditingPost(null);
+      setEditContent('');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPost(null);
+    setEditContent('');
   };
 
   const handleSubmitPost = async () => {
@@ -431,19 +460,32 @@ export const GroupDiscussions = () => {
                       </Badge>
                     )}
                     
-                    {/* Delete button - only show for current user's posts */}
+                    {/* Edit and Delete buttons - only show for current user's posts */}
                     {discussion.author === currentUser.name && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeletePost(discussion.id);
-                        }}
-                        className="text-gray-400 hover:text-red-400 ml-auto p-1"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex items-center gap-1 ml-auto">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditPost(discussion);
+                          }}
+                          className="text-gray-400 hover:text-blue-400 p-1"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeletePost(discussion.id);
+                          }}
+                          className="text-gray-400 hover:text-red-400 p-1"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     )}
                   </div>
 
@@ -452,10 +494,39 @@ export const GroupDiscussions = () => {
                     {discussion.title}
                   </h3>
 
-                  {/* Post Content Preview */}
-                  <p className="text-gray-300 mb-4 leading-relaxed">
-                    {discussion.content}
-                  </p>
+                  {/* Post Content Preview or Edit Mode */}
+                  {editingPost === discussion.id ? (
+                    <div className="mb-4 space-y-3">
+                      <Textarea
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                        className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 min-h-[100px]"
+                        placeholder="Edit your post..."
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handleSaveEdit(discussion.id)}
+                          disabled={!editContent.trim()}
+                          className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                          size="sm"
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          onClick={handleCancelEdit}
+                          variant="outline"
+                          className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                          size="sm"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-gray-300 mb-4 leading-relaxed">
+                      {discussion.content}
+                    </p>
+                  )}
 
                   {/* Attachments Display */}
                   {discussion.attachments && discussion.attachments.length > 0 && (
