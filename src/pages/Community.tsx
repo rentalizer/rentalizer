@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus } from 'lucide-react';
+import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText } from 'lucide-react';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { CommunityCalendar } from '@/components/community/CommunityCalendar';
@@ -45,14 +45,14 @@ const Community = () => {
             </TabsTrigger>
             <TabsTrigger value="videos" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Video className="h-4 w-4 mr-2" />
-              Training Videos & Documents
+              Training
             </TabsTrigger>
             <TabsTrigger value="messages" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <MessageSquare className="h-4 w-4 mr-2" />
               Chat
             </TabsTrigger>
             <TabsTrigger value="documents" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-              <Book className="h-4 w-4 mr-2" />
+              <FileText className="h-4 w-4 mr-2" />
               Business Documents
             </TabsTrigger>
             <TabsTrigger value="leaderboard" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
