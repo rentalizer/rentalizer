@@ -892,7 +892,7 @@ export const GroupDiscussions = () => {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <span className="text-white font-medium text-sm truncate">Judith Dreher</span>
-                    <div className="text-yellow-400 font-semibold text-sm">+9 pts</div>
+                    <div className="text-gray-400 font-semibold text-sm">+9 pts</div>
                   </div>
                 </div>
 
@@ -905,7 +905,7 @@ export const GroupDiscussions = () => {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <span className="text-white font-medium text-sm truncate">Lynn Lueders</span>
-                    <div className="text-cyan-400 font-semibold text-sm">+7 pts</div>
+                    <div className="text-gray-400 font-semibold text-sm">+7 pts</div>
                   </div>
                 </div>
 
@@ -918,7 +918,7 @@ export const GroupDiscussions = () => {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <span className="text-white font-medium text-sm truncate">Mc Calhoun</span>
-                    <div className="text-cyan-400 font-semibold text-sm">+4 pts</div>
+                    <div className="text-gray-400 font-semibold text-sm">+4 pts</div>
                   </div>
                 </div>
 
@@ -931,7 +931,7 @@ export const GroupDiscussions = () => {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <span className="text-white font-medium text-sm truncate">Edward Badal</span>
-                    <div className="text-cyan-400 font-semibold text-sm">+6 pts</div>
+                    <div className="text-gray-400 font-semibold text-sm">+6 pts</div>
                   </div>
                 </div>
 
@@ -944,7 +944,7 @@ export const GroupDiscussions = () => {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <span className="text-white font-medium text-sm truncate">Lonnie Castillon</span>
-                    <div className="text-cyan-400 font-semibold text-sm">+6 pts</div>
+                    <div className="text-gray-400 font-semibold text-sm">+6 pts</div>
                   </div>
                 </div>
               </div>
@@ -953,6 +953,7 @@ export const GroupDiscussions = () => {
                 <Button 
                   variant="ghost" 
                   className="w-full text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 text-sm"
+                  onClick={() => window.location.href = '/leaderboard'}
                 >
                   See all leaderboards
                 </Button>
