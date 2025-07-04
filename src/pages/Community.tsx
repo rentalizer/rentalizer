@@ -162,7 +162,7 @@ const Community = () => {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50 border border-cyan-500/20 gap-1 justify-items-stretch">
+          <TabsList className="grid w-full grid-cols-8 bg-slate-800/50 border border-cyan-500/20 gap-1 justify-items-stretch">
             <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
               <Users className="h-4 w-4 mr-2" />
               Discussions
@@ -194,11 +194,6 @@ const Community = () => {
               <Bot className="h-4 w-4 mr-2" />
               Ask Richie
             </TabsTrigger>
-            
-            {/* Document icon */}
-            <div className="flex items-center justify-center px-0.5">
-              <FileText className="h-5 w-5 text-cyan-400/70" />
-            </div>
             
             <TabsTrigger value="documents" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
               <FileText className="h-4 w-4 mr-2" />
