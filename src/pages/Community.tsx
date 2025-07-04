@@ -192,7 +192,7 @@ const Community = () => {
             </TabsTrigger>
             
             {/* Document icon */}
-            <div className="flex items-center justify-center px-3">
+            <div className="flex items-center justify-center px-1">
               <FileText className="h-5 w-5 text-cyan-400/70" />
             </div>
             
