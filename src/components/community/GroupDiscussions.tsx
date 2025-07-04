@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Users, Plus, Search, MessageCircle, Heart, Pin, TrendingUp, Calendar, Filter, Image, Video, Smile, Paperclip, AtSign, X, Trash2, Send, Edit } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileSetup } from '@/components/ProfileSetup';
+import { useAdminRole } from '@/hooks/useAdminRole';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -34,6 +35,7 @@ interface Discussion {
 
 export const GroupDiscussions = () => {
   const { user, profile } = useAuth();
+  const { isAdmin } = useAdminRole();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
@@ -80,18 +82,39 @@ export const GroupDiscussions = () => {
   };
 
   const getUserName = () => {
-    return profile?.display_name || user?.email?.split('@')[0] || 'Anonymous User';
+    const name = profile?.display_name || user?.email?.split('@')[0] || 'Anonymous User';
+    return isAdmin ? `${name} (Admin)` : name;
   };
 
   const getUserInitials = () => {
-    const name = getUserName();
+    const name = profile?.display_name || user?.email?.split('@')[0] || 'Anonymous User';
     return getInitials(name);
   };
 
-  // Initialize discussions with empty state
+  // Persist discussions in localStorage to prevent deletion
+  const DISCUSSIONS_KEY = 'community_discussions';
+  
+  const loadDiscussions = () => {
+    try {
+      const saved = localStorage.getItem(DISCUSSIONS_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  };
+  
+  const saveDiscussions = (discussions: Discussion[]) => {
+    try {
+      localStorage.setItem(DISCUSSIONS_KEY, JSON.stringify(discussions));
+    } catch (error) {
+      console.error('Failed to save discussions:', error);
+    }
+  };
+
+  // Initialize discussions with saved data
   React.useEffect(() => {
-    // Start with empty discussions list
-    setDiscussionsList([]);
+    const savedDiscussions = loadDiscussions();
+    setDiscussionsList(savedDiscussions);
   }, []);
 
   // Functions to handle likes and comments
@@ -246,7 +269,9 @@ export const GroupDiscussions = () => {
         attachments: attachments.length > 0 ? attachments : undefined
       };
       
-      setDiscussionsList(prev => [newDiscussion, ...prev]);
+      const updatedDiscussions = [newDiscussion, ...discussionsList];
+      setDiscussionsList(updatedDiscussions);
+      saveDiscussions(updatedDiscussions);
       
       // Send email notification for new post
       try {

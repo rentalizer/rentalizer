@@ -55,7 +55,7 @@ const isDevelopment = () => {
 // Create a mock user for development
 const createMockUser = (): User => ({
   id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479', // Valid UUID format
-  email: 'dev@example.com',
+  email: 'richie@istayusa.com',
   subscription_status: 'active',
   subscription_tier: 'Premium'
 });
@@ -224,7 +224,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // If in development and NOT on a test page, set mock user and skip auth
     if (isDevelopment() && !isTestPage) {
       console.log('🔧 Development mode detected, using mock user');
-      setUser(createMockUser());
+      const mockUser = createMockUser();
+      setUser(mockUser);
+      
+      // Create mock profile for development
+      const mockProfile = {
+        id: mockUser.id,
+        user_id: mockUser.id,
+        display_name: 'Richie Matthews',
+        avatar_url: '/lovable-uploads/7f34eb9c-8203-4a0e-9138-da167c04b7a7.png',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      setProfile(mockProfile);
       setIsLoading(false);
       return;
     }
