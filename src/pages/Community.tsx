@@ -3,7 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { CompsSection } from '@/components/calculator/CompsSection';
+import { BuildOutSection } from '@/components/calculator/BuildOutSection';
+import { ExpensesSection } from '@/components/calculator/ExpensesSection';
+import { NetProfitSection } from '@/components/calculator/NetProfitSection';
+import { exportCalculatorToCSV } from '@/utils/calculatorExport';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { CommunityCalendar } from '@/components/community/CommunityCalendar';
@@ -14,8 +21,119 @@ import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { CommunityLeaderboard } from '@/components/community/CommunityLeaderboard';
 import { ContactChat } from '@/components/ContactChat';
 
+export interface CalculatorData {
+  // Comps
+  address: string;
+  bedrooms: number;
+  bathrooms: number;
+  averageComparable: number;
+  
+  // Build Out
+  firstMonthRent: number;
+  securityDeposit: number;
+  furnishingsCost: number;
+  
+  // Expenses
+  rent: number;
+  serviceFees: number;
+  maintenance: number;
+  power: number;
+  waterSewer: number;
+  internet: number;
+  taxLicense: number;
+  insurance: number;
+  software: number;
+  miscellaneous: number;
+  furnitureRental: number;
+  
+  // Furnishings Calculator
+  squareFootage: number;
+  furnishingsPSF: number;
+}
+
 const Community = () => {
   const [activeTab, setActiveTab] = useState('discussions');
+  const { toast } = useToast();
+  
+  // Calculator state
+  const initialData: CalculatorData = {
+    address: '',
+    bedrooms: 0,
+    bathrooms: 0,
+    averageComparable: 0,
+    firstMonthRent: 0,
+    securityDeposit: 0,
+    furnishingsCost: 0,
+    rent: 0,
+    serviceFees: 0,
+    maintenance: 0,
+    power: 0,
+    waterSewer: 0,
+    internet: 0,
+    taxLicense: 0,
+    insurance: 0,
+    software: 0,
+    miscellaneous: 0,
+    furnitureRental: 0,
+    squareFootage: 0,
+    furnishingsPSF: 0,
+  };
+  
+  const [calculatorData, setCalculatorData] = useState<CalculatorData>(initialData);
+  
+  // Calculate derived values
+  const calculatedFurnishings = Math.round(calculatorData.squareFootage * calculatorData.furnishingsPSF);
+  const cashToLaunch = Math.round(calculatorData.firstMonthRent + calculatorData.securityDeposit + calculatorData.miscellaneous + calculatedFurnishings + calculatorData.furnitureRental);
+  const serviceFeeCalculated = Math.round(calculatorData.rent * 0.029);
+  const monthlyExpenses = Math.round(calculatorData.rent + serviceFeeCalculated + calculatorData.maintenance + calculatorData.power + 
+                         calculatorData.waterSewer + calculatorData.internet + calculatorData.taxLicense + calculatorData.insurance + 
+                         calculatorData.software + calculatorData.furnitureRental);
+  const monthlyRevenue = Math.round(calculatorData.averageComparable);
+  const netProfitMonthly = Math.round(monthlyRevenue - monthlyExpenses);
+  const paybackMonths = (cashToLaunch > 0 && netProfitMonthly > 0) 
+    ? cashToLaunch / netProfitMonthly
+    : null;
+  const cashOnCashReturn = cashToLaunch > 0 ? Math.round((netProfitMonthly * 12 / cashToLaunch) * 100) : 0;
+
+  const updateCalculatorData = (updates: Partial<CalculatorData>) => {
+    const roundedUpdates = Object.entries(updates).reduce((acc, [key, value]) => {
+      if (typeof value === 'number') {
+        acc[key] = Math.round(value);
+      } else {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as any);
+    
+    setCalculatorData(prev => ({ ...prev, ...roundedUpdates }));
+  };
+
+  const clearCalculatorData = () => {
+    setCalculatorData({ ...initialData });
+    toast({
+      title: "Calculator Cleared",
+      description: "All data has been reset.",
+    });
+  };
+
+  const downloadCalculatorData = () => {
+    const calculatedValues = {
+      cashToLaunch,
+      monthlyExpenses,
+      monthlyRevenue,
+      netProfitMonthly,
+      paybackMonths,
+      cashOnCashReturn,
+      calculatedFurnishings
+    };
+    
+    exportCalculatorToCSV(calculatorData, calculatedValues);
+    
+    toast({
+      title: "Data Downloaded",
+      description: "Your calculator data has been exported to a CSV file.",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center">
@@ -82,15 +200,78 @@ const Community = () => {
           </TabsContent>
 
           <TabsContent value="calculator" className="mt-8">
-            <div className="text-center">
-              <Button 
-                onClick={() => window.location.href = '/calculator'}
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
-              >
-                <Calculator className="h-4 w-4 mr-2" />
-                Open Calculator
-              </Button>
-            </div>
+            <Dialog>
+              <div className="text-center">
+                <DialogTrigger asChild>
+                  <Button 
+                    className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+                  >
+                    <Calculator className="h-4 w-4 mr-2" />
+                    Open Calculator
+                  </Button>
+                </DialogTrigger>
+              </div>
+              
+              <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-slate-900 border-cyan-500/20">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">
+                    <Calculator className="h-6 w-6 text-cyan-400" />
+                    Rental Calculator
+                  </DialogTitle>
+                </DialogHeader>
+                
+                <div className="space-y-6">
+                  {/* Action buttons */}
+                  <div className="flex items-center justify-center gap-4">
+                    <Button
+                      variant="outline"
+                      onClick={clearCalculatorData}
+                      className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400"
+                    >
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Clear All
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      onClick={downloadCalculatorData}
+                      className="border-green-500/30 text-green-400 hover:bg-green-500/10 hover:text-green-300 hover:border-green-400"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download Data
+                    </Button>
+                  </div>
+
+                  {/* Calculator Sections */}
+                  <div className="grid lg:grid-cols-2 grid-cols-1 gap-6">
+                    <BuildOutSection 
+                      data={calculatorData} 
+                      updateData={updateCalculatorData} 
+                      cashToLaunch={cashToLaunch} 
+                    />
+                    
+                    <ExpensesSection 
+                      data={calculatorData} 
+                      updateData={updateCalculatorData} 
+                      serviceFeeCalculated={serviceFeeCalculated}
+                      monthlyExpenses={monthlyExpenses}
+                    />
+                    
+                    <CompsSection 
+                      data={calculatorData} 
+                      updateData={updateCalculatorData} 
+                    />
+
+                    <NetProfitSection 
+                      monthlyRevenue={monthlyRevenue}
+                      netProfitMonthly={netProfitMonthly}
+                      paybackMonths={paybackMonths}
+                      cashOnCashReturn={cashOnCashReturn}
+                    />
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </TabsContent>
 
 
