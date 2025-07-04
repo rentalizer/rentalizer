@@ -232,7 +232,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         id: mockUser.id,
         user_id: mockUser.id,
         display_name: 'Richie Matthews',
-        avatar_url: '/lovable-uploads/7f34eb9c-8203-4a0e-9138-da167c04b7a7.png',
+        avatar_url: '/lovable-uploads/4cae85e1-7ac3-4a4b-989d-c4cb8ecca460.png',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
