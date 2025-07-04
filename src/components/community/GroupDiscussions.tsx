@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Users, Plus, Search, MessageCircle, Heart, Pin, TrendingUp, Calendar, Filter, Image, Video, Smile, Paperclip, AtSign, X, Trash2, Send, Edit } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileSetup } from '@/components/ProfileSetup';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface Discussion {
   id: string;
@@ -32,6 +34,7 @@ interface Discussion {
 
 export const GroupDiscussions = () => {
   const { user, profile } = useAuth();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [newPost, setNewPost] = useState('');
@@ -83,69 +86,11 @@ export const GroupDiscussions = () => {
     return getInitials(name);
   };
 
-  // Initialize discussions with state
+  // Initialize discussions with empty state
   React.useEffect(() => {
-    if (discussionsList.length === 0) {
-      setDiscussionsList([
-        {
-          id: '1',
-          title: 'Welcome aboard!',
-          content: "We're thrilled to have you join our vibrant community of rental entrepreneurs! 🎉 Whether you're a seasoned host or just starting out, you're in the right place to learn, connect, and grow together. Here's a...",
-          author: 'Richie Matthews',
-          avatar: 'RM',
-          category: 'General',
-          likes: 40,
-          comments: 59,
-          timeAgo: 'Feb 24',
-          isPinned: true
-        },
-        {
-          id: '2',
-          title: 'Market Analysis Question',
-          content: 'When doing market analysis on AirDNA, are we still adjusting the performance price tiers to Midscale/upscale? or are we not bothering with that anymore? I didn\'t see it on the Marketing Research...',
-          author: 'The Dan Rogul',
-          avatar: 'DR',
-          category: 'General',
-          likes: 0,
-          comments: 0,
-          timeAgo: '1h'
-        },
-        {
-          id: '3',
-          title: 'Hello from Virginia',
-          content: 'Hello everyone! I just joined today. I\'m from the Virginia area (DMV). I\'m truly excited to be part of the Rental Arbitrage University and look forward to learning, collaborating, and growing our businesses...',
-          author: 'Lincoln Khan',
-          avatar: 'LK',
-          category: 'General',
-          likes: 0,
-          comments: 0,
-          timeAgo: '3h'
-        },
-        {
-          id: '4',
-          title: 'Best Furniture Sourcing Strategies',
-          content: 'Managing 5 properties now and looking for bulk purchasing options. What are your go-to sources for affordable, durable furniture that guests love?',
-          author: 'Maria Johnson',
-          avatar: 'MJ',
-          category: 'Resource Library',
-          likes: 15,
-          comments: 23,
-          timeAgo: '1d'
-        },
-        {
-          id: '5',
-          title: 'First month: $3,200 profit from Phoenix property',
-          content: 'Breakdown of numbers and lessons learned from my first deal. Happy to share the details and answer any questions!',
-          author: 'David Kim',
-          avatar: 'DK',
-          category: 'Success Stories',
-          likes: 67,
-          comments: 34,
-          timeAgo: '2d'
-        }
-      ]);
-    }
-  }, [discussionsList.length]);
+    // Start with empty discussions list
+    setDiscussionsList([]);
+  }, []);
 
   // Functions to handle likes and comments
   const handleLike = (discussionId: string) => {
@@ -165,7 +110,7 @@ export const GroupDiscussions = () => {
   };
 
   // Comment handlers
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (newComment.trim() && selectedDiscussion) {
       const comment = {
         id: String(Date.now()),
@@ -186,6 +131,21 @@ export const GroupDiscussions = () => {
           ? { ...d, comments: d.comments + 1 }
           : d
       ));
+      
+      // Send email notification for comment
+      try {
+        await supabase.functions.invoke('community-notification', {
+          body: {
+            type: 'comment',
+            authorName: getUserName(),
+            authorEmail: user?.email,
+            content: newComment,
+            postTitle: selectedDiscussion.title
+          }
+        });
+      } catch (error) {
+        console.error('Failed to send comment notification:', error);
+      }
       
       setNewComment('');
     }
@@ -267,6 +227,31 @@ export const GroupDiscussions = () => {
       };
       
       setDiscussionsList(prev => [newDiscussion, ...prev]);
+      
+      // Send email notification for new post
+      try {
+        await supabase.functions.invoke('community-notification', {
+          body: {
+            type: 'post',
+            authorName: getUserName(),
+            authorEmail: user?.email,
+            content: newPost
+          }
+        });
+        
+        toast({
+          title: "Post created!",
+          description: "Your post has been shared with the community"
+        });
+      } catch (error) {
+        console.error('Failed to send post notification:', error);
+        toast({
+          title: "Post created",
+          description: "Your post was created but notification failed to send",
+          variant: "destructive"
+        });
+      }
+      
       setNewPost('');
       setAttachments([]);
       setShowAttachments(false);
