@@ -1,12 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Users, Plus, Search, MessageCircle, Heart, Pin, TrendingUp, Calendar, Filter, Image, Video, Smile, Paperclip, AtSign } from 'lucide-react';
+import { Users, Plus, Search, MessageCircle, Heart, Pin, TrendingUp, Calendar, Filter, Image, Video, Smile, Paperclip, AtSign, X } from 'lucide-react';
 
 interface Discussion {
   id: string;
@@ -20,6 +20,11 @@ interface Discussion {
   timeAgo: string;
   isPinned?: boolean;
   isLiked?: boolean;
+  attachments?: {
+    type: 'image' | 'video' | 'file';
+    url: string;
+    name: string;
+  }[];
 }
 
 export const GroupDiscussions = () => {
@@ -27,7 +32,12 @@ export const GroupDiscussions = () => {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [newPost, setNewPost] = useState('');
   const [showAttachments, setShowAttachments] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [attachments, setAttachments] = useState<{type: 'image' | 'video' | 'file'; url: string; name: string;}[]>([]);
   const [discussionsList, setDiscussionsList] = useState<Discussion[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
   
   // Mock current user
   const currentUser = {
@@ -117,6 +127,29 @@ export const GroupDiscussions = () => {
     console.log('Opening comments for discussion:', discussionId);
   };
 
+  // File upload handlers
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video' | 'file') => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      const url = URL.createObjectURL(file);
+      setAttachments(prev => [...prev, { type, url, name: file.name }]);
+    }
+  };
+
+  const removeAttachment = (index: number) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Emoji handler
+  const handleEmojiSelect = (emoji: string) => {
+    setNewPost(prev => prev + emoji);
+    setShowEmojiPicker(false);
+  };
+
+  // Common emojis
+  const commonEmojis = ['😀', '😂', '🤔', '👍', '❤️', '🎉', '💡', '🔥', '💪', '🚀', '✨', '🎯'];
+
   const handleSubmitPost = () => {
     if (newPost.trim()) {
       const newDiscussion: Discussion = {
@@ -129,11 +162,14 @@ export const GroupDiscussions = () => {
         likes: 0,
         comments: 0,
         timeAgo: 'now',
-        isLiked: false
+        isLiked: false,
+        attachments: attachments.length > 0 ? attachments : undefined
       };
       setDiscussionsList(prev => [newDiscussion, ...prev]);
       setNewPost('');
+      setAttachments([]);
       setShowAttachments(false);
+      setShowEmojiPicker(false);
     }
   };
 
@@ -169,12 +205,12 @@ export const GroupDiscussions = () => {
                 
                 {/* Attachment Options */}
                 <div className="flex items-center justify-between mt-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 relative">
                     <Button
                       variant="ghost"
                       size="sm"
                       className="text-gray-400 hover:text-cyan-300"
-                      onClick={() => setShowAttachments(!showAttachments)}
+                      onClick={() => fileInputRef.current?.click()}
                     >
                       <Paperclip className="h-4 w-4" />
                     </Button>
@@ -182,6 +218,7 @@ export const GroupDiscussions = () => {
                       variant="ghost"
                       size="sm"
                       className="text-gray-400 hover:text-cyan-300"
+                      onClick={() => imageInputRef.current?.click()}
                     >
                       <Image className="h-4 w-4" />
                     </Button>
@@ -189,16 +226,35 @@ export const GroupDiscussions = () => {
                       variant="ghost"
                       size="sm"
                       className="text-gray-400 hover:text-cyan-300"
+                      onClick={() => videoInputRef.current?.click()}
                     >
                       <Video className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-400 hover:text-cyan-300"
-                    >
-                      <Smile className="h-4 w-4" />
-                    </Button>
+                    <div className="relative">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-400 hover:text-cyan-300"
+                        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                      >
+                        <Smile className="h-4 w-4" />
+                      </Button>
+                      
+                      {/* Emoji Picker */}
+                      {showEmojiPicker && (
+                        <div className="absolute bottom-full left-0 mb-2 bg-slate-700 border border-gray-600 rounded-lg p-3 grid grid-cols-6 gap-2 z-10">
+                          {commonEmojis.map((emoji, index) => (
+                            <button
+                              key={index}
+                              onClick={() => handleEmojiSelect(emoji)}
+                              className="text-lg hover:bg-slate-600 p-1 rounded transition-colors"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -206,6 +262,29 @@ export const GroupDiscussions = () => {
                     >
                       <AtSign className="h-4 w-4" />
                     </Button>
+                    
+                    {/* Hidden File Inputs */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      className="hidden"
+                      accept=".pdf,.doc,.docx,.txt"
+                      onChange={(e) => handleFileUpload(e, 'file')}
+                    />
+                    <input
+                      ref={imageInputRef}
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={(e) => handleFileUpload(e, 'image')}
+                    />
+                    <input
+                      ref={videoInputRef}
+                      type="file"
+                      className="hidden"
+                      accept="video/*"
+                      onChange={(e) => handleFileUpload(e, 'video')}
+                    />
                   </div>
                   
                   <Button
@@ -216,6 +295,28 @@ export const GroupDiscussions = () => {
                     Post
                   </Button>
                 </div>
+                
+                {/* Attachments Preview */}
+                {attachments.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {attachments.map((attachment, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-slate-600/50 p-2 rounded">
+                        {attachment.type === 'image' && <Image className="h-4 w-4 text-cyan-400" />}
+                        {attachment.type === 'video' && <Video className="h-4 w-4 text-cyan-400" />}
+                        {attachment.type === 'file' && <Paperclip className="h-4 w-4 text-cyan-400" />}
+                        <span className="text-sm text-gray-300 flex-1">{attachment.name}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeAttachment(index)}
+                          className="text-gray-400 hover:text-red-400 p-1"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -296,6 +397,42 @@ export const GroupDiscussions = () => {
                   <p className="text-gray-300 mb-4 leading-relaxed">
                     {discussion.content}
                   </p>
+
+                  {/* Attachments Display */}
+                  {discussion.attachments && discussion.attachments.length > 0 && (
+                    <div className="mb-4 space-y-2">
+                      {discussion.attachments.map((attachment, index) => (
+                        <div key={index} className="inline-flex items-center gap-2 bg-slate-700/50 p-2 rounded mr-2">
+                          {attachment.type === 'image' && (
+                            <div className="flex items-center gap-2">
+                              <Image className="h-4 w-4 text-cyan-400" />
+                              <img 
+                                src={attachment.url} 
+                                alt={attachment.name}
+                                className="h-20 w-20 object-cover rounded"
+                              />
+                            </div>
+                          )}
+                          {attachment.type === 'video' && (
+                            <div className="flex items-center gap-2">
+                              <Video className="h-4 w-4 text-cyan-400" />
+                              <video 
+                                src={attachment.url}
+                                className="h-20 w-32 object-cover rounded"
+                                controls
+                              />
+                            </div>
+                          )}
+                          {attachment.type === 'file' && (
+                            <div className="flex items-center gap-2">
+                              <Paperclip className="h-4 w-4 text-cyan-400" />
+                              <span className="text-sm text-gray-300">{attachment.name}</span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Engagement Stats */}
                   <div className="flex items-center gap-6">
