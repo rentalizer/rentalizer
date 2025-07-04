@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Users, Plus, Search, MessageCircle, Heart, Pin, TrendingUp, Calendar, Filter, Image, Video, Smile, Paperclip, AtSign, X, Trash2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Users, Plus, Search, MessageCircle, Heart, Pin, TrendingUp, Calendar, Filter, Image, Video, Smile, Paperclip, AtSign, X, Trash2, Send } from 'lucide-react';
 
 interface Discussion {
   id: string;
@@ -35,6 +36,9 @@ export const GroupDiscussions = () => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [attachments, setAttachments] = useState<{type: 'image' | 'video' | 'file'; url: string; name: string;}[]>([]);
   const [discussionsList, setDiscussionsList] = useState<Discussion[]>([]);
+  const [selectedDiscussion, setSelectedDiscussion] = useState<Discussion | null>(null);
+  const [newComment, setNewComment] = useState('');
+  const [comments, setComments] = useState<{[key: string]: {id: string; author: string; avatar: string; content: string; timeAgo: string;}[]}>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -122,9 +126,35 @@ export const GroupDiscussions = () => {
     ));
   };
 
-  const handleComment = (discussionId: string) => {
-    // This would open a comment dialog or navigate to the discussion detail
-    console.log('Opening comments for discussion:', discussionId);
+  const handleComment = (discussion: Discussion) => {
+    setSelectedDiscussion(discussion);
+  };
+
+  // Comment handlers
+  const handleAddComment = () => {
+    if (newComment.trim() && selectedDiscussion) {
+      const comment = {
+        id: String(Date.now()),
+        author: currentUser.name,
+        avatar: currentUser.avatar,
+        content: newComment,
+        timeAgo: 'now'
+      };
+      
+      setComments(prev => ({
+        ...prev,
+        [selectedDiscussion.id]: [...(prev[selectedDiscussion.id] || []), comment]
+      }));
+      
+      // Update discussion comment count
+      setDiscussionsList(prev => prev.map(d => 
+        d.id === selectedDiscussion.id 
+          ? { ...d, comments: d.comments + 1 }
+          : d
+      ));
+      
+      setNewComment('');
+    }
   };
 
   // File upload handlers
@@ -468,15 +498,66 @@ export const GroupDiscussions = () => {
                       {discussion.likes}
                     </Button>
                     
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleComment(discussion.id)}
-                      className="flex items-center gap-2 text-gray-400 hover:bg-blue-500/10 hover:text-blue-300 transition-colors"
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                      {discussion.comments}
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleComment(discussion)}
+                          className="flex items-center gap-2 text-gray-400 hover:bg-blue-500/10 hover:text-blue-300 transition-colors"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                          {discussion.comments}
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle className="text-white">Comments - {discussion.title}</DialogTitle>
+                        </DialogHeader>
+                        
+                        {/* Comments List */}
+                        <div className="space-y-4 max-h-96 overflow-y-auto">
+                          {comments[discussion.id]?.map((comment) => (
+                            <div key={comment.id} className="flex items-start gap-3">
+                              <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                                {comment.avatar}
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-cyan-300 font-medium text-sm">{comment.author}</span>
+                                  <span className="text-gray-400 text-xs">{comment.timeAgo}</span>
+                                </div>
+                                <p className="text-gray-300 text-sm">{comment.content}</p>
+                              </div>
+                            </div>
+                          )) || (
+                            <p className="text-gray-400 text-center py-8">No comments yet. Be the first to comment!</p>
+                          )}
+                        </div>
+                        
+                        {/* Add Comment */}
+                        <div className="flex items-start gap-3 mt-4 pt-4 border-t border-gray-700">
+                          <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                            {currentUser.avatar}
+                          </div>
+                          <div className="flex-1 flex gap-2">
+                            <Textarea
+                              placeholder="Write a comment..."
+                              value={newComment}
+                              onChange={(e) => setNewComment(e.target.value)}
+                              className="flex-1 bg-slate-700/50 border-gray-600 text-white placeholder-gray-400 min-h-[80px]"
+                            />
+                            <Button
+                              onClick={handleAddComment}
+                              disabled={!newComment.trim()}
+                              className="bg-cyan-600 hover:bg-cyan-700 text-white self-end"
+                            >
+                              <Send className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
 
                     {/* Avatar Stack for Commenters */}
                     {discussion.comments > 0 && (
