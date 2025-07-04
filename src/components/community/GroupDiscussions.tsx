@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Users, Plus, Search, MessageCircle, Heart, Pin, TrendingUp, Calendar, Filter, Image, Video, Smile, Paperclip, AtSign, X } from 'lucide-react';
+import { Users, Plus, Search, MessageCircle, Heart, Pin, TrendingUp, Calendar, Filter, Image, Video, Smile, Paperclip, AtSign, X, Trash2 } from 'lucide-react';
 
 interface Discussion {
   id: string;
@@ -149,6 +149,13 @@ export const GroupDiscussions = () => {
 
   // Common emojis
   const commonEmojis = ['😀', '😂', '🤔', '👍', '❤️', '🎉', '💡', '🔥', '💪', '🚀', '✨', '🎯'];
+
+  // Delete post handler
+  const handleDeletePost = (discussionId: string) => {
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      setDiscussionsList(prev => prev.filter(discussion => discussion.id !== discussionId));
+    }
+  };
 
   const handleSubmitPost = () => {
     if (newPost.trim()) {
@@ -385,6 +392,21 @@ export const GroupDiscussions = () => {
                       <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs ml-2">
                         Pinned
                       </Badge>
+                    )}
+                    
+                    {/* Delete button - only show for current user's posts */}
+                    {discussion.author === currentUser.name && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeletePost(discussion.id);
+                        }}
+                        className="text-gray-400 hover:text-red-400 ml-auto p-1"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     )}
                   </div>
 
