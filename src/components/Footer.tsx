@@ -27,14 +27,35 @@ export const Footer = ({ showLinks = true }: FooterProps) => {
           <div className="text-gray-400 text-sm mb-4 md:mb-0">
             © 2025 Rentalizer. All rights reserved.
           </div>
-          <div className="flex items-center gap-6 text-sm">
-            <span className="text-gray-400">Powered by</span>
-            <div className="flex items-center gap-4">
-              <span className="text-cyan-300 font-medium">AirDNA</span>
-              <span className="text-purple-300 font-medium">OpenAI</span>
-              <span className="text-blue-300 font-medium">Supabase</span>
-            </div>
-          </div>
+           <div className="flex items-center gap-2 text-sm">
+             <span className="text-gray-400">Powered by</span>
+             <a 
+               href="https://www.airdna.co" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
+             >
+               AirDNA
+             </a>
+             <span className="text-gray-600">•</span>
+             <a 
+               href="https://openai.com" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
+             >
+               OpenAI
+             </a>
+             <span className="text-gray-600">•</span>
+             <a 
+               href="https://supabase.com" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
+             >
+               Supabase
+             </a>
+           </div>
         </div>
       </div>
     </footer>
