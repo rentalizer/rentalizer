@@ -191,9 +191,9 @@ const Community = () => {
               Calculator
             </TabsTrigger>
             
-            {/* Visual separator */}
-            <div className="flex items-center justify-center px-2">
-              <div className="h-6 w-px bg-cyan-500/30"></div>
+            {/* Document icon */}
+            <div className="flex items-center justify-center px-3">
+              <FileText className="h-5 w-5 text-cyan-400/70" />
             </div>
             
             <TabsTrigger value="documents" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
