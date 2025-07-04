@@ -190,6 +190,10 @@ const Community = () => {
               <Calculator className="h-4 w-4 mr-2" />
               Calculator
             </TabsTrigger>
+            <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
+              <Bot className="h-4 w-4 mr-2" />
+              Ask Richie
+            </TabsTrigger>
             
             {/* Document icon */}
             <div className="flex items-center justify-center px-0.5">
@@ -199,14 +203,6 @@ const Community = () => {
             <TabsTrigger value="documents" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
               <FileText className="h-4 w-4 mr-2" />
               Business Docs
-            </TabsTrigger>
-            <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
-              <Bot className="h-4 w-4 mr-2" />
-              Ask Richie
-            </TabsTrigger>
-            <TabsTrigger value="leaderboard" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
-              <Medal className="h-4 w-4 mr-2" />
-              Leaderboard
             </TabsTrigger>
           </TabsList>
 
@@ -295,10 +291,6 @@ const Community = () => {
           </Dialog>
 
 
-          <TabsContent value="documents" className="mt-8">
-            <DocumentsLibrary />
-          </TabsContent>
-
           <TabsContent value="askrichie" className="mt-8">
             <div className="text-center space-y-6">
               <div className="bg-slate-800/50 border border-cyan-500/20 rounded-lg p-8">
@@ -322,8 +314,8 @@ const Community = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="leaderboard" className="mt-8">
-            <CommunityLeaderboard />
+          <TabsContent value="documents" className="mt-8">
+            <DocumentsLibrary />
           </TabsContent>
         </Tabs>
       </div>
