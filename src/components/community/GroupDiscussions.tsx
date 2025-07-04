@@ -38,6 +38,7 @@ export const GroupDiscussions = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [newPost, setNewPost] = useState('');
+  const [postTitle, setPostTitle] = useState('');
   const [showAttachments, setShowAttachments] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [attachments, setAttachments] = useState<{type: 'image' | 'video' | 'file'; url: string; name: string;}[]>([]);
@@ -212,9 +213,12 @@ export const GroupDiscussions = () => {
     if (newPost.trim() && !isSubmitting) {
       setIsSubmitting(true);
       
+      const postTitleToUse = postTitle.trim() || 
+        (newPost.length > 50 ? newPost.substring(0, 50) + '...' : newPost);
+      
       const newDiscussion: Discussion = {
         id: String(Date.now()),
-        title: newPost.length > 50 ? newPost.substring(0, 50) + '...' : newPost,
+        title: postTitleToUse,
         content: newPost,
         author: getUserName(),
         avatar: getUserInitials(),
@@ -253,6 +257,7 @@ export const GroupDiscussions = () => {
       }
       
       setNewPost('');
+      setPostTitle('');
       setAttachments([]);
       setShowAttachments(false);
       setShowEmojiPicker(false);
@@ -297,7 +302,19 @@ export const GroupDiscussions = () => {
                   </AvatarFallback>
                 )}
               </Avatar>
-              <div className="flex-1">
+              <div className="flex-1 space-y-3">
+                {/* Title Input */}
+                <div>
+                  <label className="text-gray-400 text-sm font-medium mb-2 block">Title</label>
+                  <Input
+                    placeholder="Give your post a title..."
+                    value={postTitle}
+                    onChange={(e) => setPostTitle(e.target.value)}
+                    className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+                  />
+                </div>
+                
+                {/* Content Input */}
                 <Textarea
                   placeholder="Write something..."
                   value={newPost}
