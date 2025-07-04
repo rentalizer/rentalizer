@@ -552,9 +552,9 @@ export const GroupDiscussions = () => {
                       </div>
                     </div>
                   ) : (
-                    <p className="text-gray-300 mb-4 leading-relaxed">
+                    <div className="text-gray-300 mb-4 leading-relaxed whitespace-pre-wrap">
                       {discussion.content}
-                    </p>
+                    </div>
                   )}
 
                   {/* Attachments Display */}
