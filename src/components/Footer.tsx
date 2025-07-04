@@ -8,8 +8,8 @@ interface FooterProps {
 
 export const Footer = ({ showLinks = true }: FooterProps) => {
   return (
-    <footer className="relative z-10 mt-16 border-t border-gray-500/50 bg-slate-700/90 backdrop-blur-lg">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+    <footer className="relative z-10 mt-16 border-t border-gray-500/50 bg-slate-700/90 backdrop-blur-lg w-full">
+      <div className="w-full px-6 py-12">
         <div className="text-center">
           {/* Logo */}
           <div className="mb-8">

@@ -82,11 +82,11 @@ export const CommunityLeaderboard = () => {
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return <Trophy className="h-5 w-5 text-yellow-400" />;
+        return <div className="w-6 h-6 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center text-white font-bold text-sm">1</div>;
       case 2:
-        return <Medal className="h-5 w-5 text-gray-300" />;
+        return <div className="w-6 h-6 rounded-full bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center text-white font-bold text-sm">2</div>;
       case 3:
-        return <Award className="h-5 w-5 text-amber-600" />;
+        return <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-600 to-amber-800 flex items-center justify-center text-white font-bold text-sm">3</div>;
       default:
         return <span className="text-gray-400 font-bold">{rank}</span>;
     }
