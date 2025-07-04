@@ -179,7 +179,14 @@ const Community = () => {
               <MessageSquare className="h-4 w-4 mr-2" />
               Chat
             </TabsTrigger>
-            <TabsTrigger value="calculator" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
+            <TabsTrigger 
+              value="calculator" 
+              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1"
+              onClick={(e) => {
+                e.preventDefault();
+                setCalculatorOpen(true);
+              }}
+            >
               <Calculator className="h-4 w-4 mr-2" />
               Calculator
             </TabsTrigger>
@@ -209,84 +216,68 @@ const Community = () => {
             <MessageThreads />
           </TabsContent>
 
-          <TabsContent value="calculator" className="mt-8">
-            <Dialog open={calculatorOpen} onOpenChange={setCalculatorOpen}>
-              <div className="text-center">
-                <DialogTrigger asChild>
-                  <Button 
-                    onClick={() => {
-                      console.log('Calculator button clicked');
-                      setCalculatorOpen(true);
-                    }}
-                    className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
-                  >
-                    <Calculator className="h-4 w-4 mr-2" />
-                    Open Calculator
-                  </Button>
-                </DialogTrigger>
-              </div>
+          {/* Calculator Dialog - outside of tabs content */}
+          <Dialog open={calculatorOpen} onOpenChange={setCalculatorOpen}>
+            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-slate-900 border-cyan-500/20">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">
+                  <Calculator className="h-6 w-6 text-cyan-400" />
+                  Rental Calculator
+                </DialogTitle>
+              </DialogHeader>
               
-              <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-slate-900 border-cyan-500/20">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">
-                    <Calculator className="h-6 w-6 text-cyan-400" />
-                    Rental Calculator
-                  </DialogTitle>
-                </DialogHeader>
-                
-                <div className="space-y-6">
-                  {/* Action buttons */}
-                  <div className="flex items-center justify-center gap-4">
-                    <Button
-                      variant="outline"
-                      onClick={clearCalculatorData}
-                      className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400"
-                    >
-                      <RotateCcw className="h-4 w-4 mr-2" />
-                      Clear All
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      onClick={downloadCalculatorData}
-                      className="border-green-500/30 text-green-400 hover:bg-green-500/10 hover:text-green-300 hover:border-green-400"
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download Data
-                    </Button>
-                  </div>
-
-                  {/* Calculator Sections */}
-                  <div className="grid lg:grid-cols-2 grid-cols-1 gap-6">
-                    <BuildOutSection 
-                      data={calculatorData} 
-                      updateData={updateCalculatorData} 
-                      cashToLaunch={cashToLaunch} 
-                    />
-                    
-                    <ExpensesSection 
-                      data={calculatorData} 
-                      updateData={updateCalculatorData} 
-                      serviceFeeCalculated={serviceFeeCalculated}
-                      monthlyExpenses={monthlyExpenses}
-                    />
-                    
-                    <CompsSection 
-                      data={calculatorData} 
-                      updateData={updateCalculatorData} 
-                    />
-
-                    <NetProfitSection 
-                      monthlyRevenue={monthlyRevenue}
-                      netProfitMonthly={netProfitMonthly}
-                      paybackMonths={paybackMonths}
-                      cashOnCashReturn={cashOnCashReturn}
-                    />
-                  </div>
+              <div className="space-y-6">
+                {/* Action buttons */}
+                <div className="flex items-center justify-center gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={clearCalculatorData}
+                    className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400"
+                  >
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Clear All
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    onClick={downloadCalculatorData}
+                    className="border-green-500/30 text-green-400 hover:bg-green-500/10 hover:text-green-300 hover:border-green-400"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download Data
+                  </Button>
                 </div>
-              </DialogContent>
-            </Dialog>
-          </TabsContent>
+
+                {/* Calculator Sections */}
+                <div className="grid lg:grid-cols-2 grid-cols-1 gap-6">
+                  <BuildOutSection 
+                    data={calculatorData} 
+                    updateData={updateCalculatorData} 
+                    cashToLaunch={cashToLaunch} 
+                  />
+                  
+                  <ExpensesSection 
+                    data={calculatorData} 
+                    updateData={updateCalculatorData} 
+                    serviceFeeCalculated={serviceFeeCalculated}
+                    monthlyExpenses={monthlyExpenses}
+                  />
+                  
+                  <CompsSection 
+                    data={calculatorData} 
+                    updateData={updateCalculatorData} 
+                  />
+
+                  <NetProfitSection 
+                    monthlyRevenue={monthlyRevenue}
+                    netProfitMonthly={netProfitMonthly}
+                    paybackMonths={paybackMonths}
+                    cashOnCashReturn={cashOnCashReturn}
+                  />
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
 
 
           <TabsContent value="documents" className="mt-8">
