@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Users, Plus, Search, MessageCircle, Heart, Pin, TrendingUp, Calendar, Filter, Image, Video, Smile, Paperclip, AtSign, X, Trash2, Send, Edit } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { ProfileSetup } from '@/components/ProfileSetup';
 
 interface Discussion {
   id: string;
@@ -29,6 +31,7 @@ interface Discussion {
 }
 
 export const GroupDiscussions = () => {
+  const { user, profile } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [newPost, setNewPost] = useState('');
@@ -43,14 +46,41 @@ export const GroupDiscussions = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingPost, setEditingPost] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   
-  // Mock current user
-  const currentUser = {
-    name: 'John Smith',
-    avatar: 'JS'
+  // Check if user needs to set up profile
+  useEffect(() => {
+    if (user && profile && (!profile.display_name || profile.display_name.trim() === '')) {
+      setShowProfileSetup(true);
+    }
+  }, [user, profile]);
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const getUserAvatar = () => {
+    if (profile?.avatar_url) {
+      return profile.avatar_url;
+    }
+    return null;
+  };
+
+  const getUserName = () => {
+    return profile?.display_name || user?.email?.split('@')[0] || 'Anonymous User';
+  };
+
+  const getUserInitials = () => {
+    const name = getUserName();
+    return getInitials(name);
   };
 
   // Initialize discussions with state
@@ -139,8 +169,8 @@ export const GroupDiscussions = () => {
     if (newComment.trim() && selectedDiscussion) {
       const comment = {
         id: String(Date.now()),
-        author: currentUser.name,
-        avatar: currentUser.avatar,
+        author: getUserName(),
+        avatar: getUserInitials(),
         content: newComment,
         timeAgo: 'now'
       };
@@ -226,8 +256,8 @@ export const GroupDiscussions = () => {
         id: String(Date.now()),
         title: newPost.length > 50 ? newPost.substring(0, 50) + '...' : newPost,
         content: newPost,
-        author: currentUser.name,
-        avatar: currentUser.avatar,
+        author: getUserName(),
+        avatar: getUserInitials(),
         category: 'General',
         likes: 0,
         comments: 0,
@@ -260,14 +290,28 @@ export const GroupDiscussions = () => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      {/* Profile Setup Modal */}
+      {showProfileSetup && (
+        <Dialog open={showProfileSetup} onOpenChange={setShowProfileSetup}>
+          <DialogContent className="bg-slate-900/95 border-gray-700 max-w-md">
+            <ProfileSetup onComplete={() => setShowProfileSetup(false)} />
+          </DialogContent>
+        </Dialog>
+      )}
       {/* Header with Post Input */}
       <Card className="bg-slate-800/50 border-cyan-500/20">
         <CardContent className="p-6">
           <div className="space-y-4">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                {currentUser.avatar}
-              </div>
+              <Avatar className="w-12 h-12 flex-shrink-0">
+                {getUserAvatar() ? (
+                  <AvatarImage src={getUserAvatar()!} alt="Your avatar" />
+                ) : (
+                  <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
+                    {getUserInitials()}
+                  </AvatarFallback>
+                )}
+              </Avatar>
               <div className="flex-1">
                 <Textarea
                   placeholder="Write something..."
@@ -461,7 +505,7 @@ export const GroupDiscussions = () => {
                     )}
                     
                     {/* Edit and Delete buttons - only show for current user's posts */}
-                    {discussion.author === currentUser.name && (
+                    {discussion.author === getUserName() && (
                       <div className="flex items-center gap-1 ml-auto">
                         <Button
                           variant="ghost"
@@ -616,9 +660,15 @@ export const GroupDiscussions = () => {
                         
                         {/* Add Comment */}
                         <div className="flex items-start gap-3 mt-4 pt-4 border-t border-gray-700">
-                          <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                            {currentUser.avatar}
-                          </div>
+                          <Avatar className="w-8 h-8 flex-shrink-0">
+                            {getUserAvatar() ? (
+                              <AvatarImage src={getUserAvatar()!} alt="Your avatar" />
+                            ) : (
+                              <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold text-sm">
+                                {getUserInitials()}
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
                           <div className="flex-1 flex gap-2">
                             <Textarea
                               placeholder="Write a comment..."

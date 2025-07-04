@@ -9,11 +9,19 @@ interface User {
   subscription_tier?: string | null;
 }
 
+interface Profile {
+  id: string;
+  user_id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+}
+
 interface AuthContextType {
   user: User | null;
+  profile: Profile | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, displayName?: string) => Promise<void>;
   signOut: () => Promise<void>;
   isSubscribed: boolean;
   hasEssentialsAccess: boolean;
@@ -21,6 +29,7 @@ interface AuthContextType {
   checkSubscription: () => Promise<void>;
   upgradeSubscription: () => Promise<void>;
   manageSubscription: () => Promise<void>;
+  updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -113,7 +122,23 @@ const createUserProfile = async (userId: string, email: string) => {
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+      
+      if (error) throw error;
+      setProfile(data);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
 
   const checkSubscription = async () => {
     try {
@@ -226,6 +251,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         setTimeout(() => {
           createUserProfile(session.user.id, session.user.email || '');
+          fetchProfile(session.user.id);
           checkSubscription();
         }, 0);
       } else {
@@ -314,12 +340,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('✅ Sign in successful for:', email);
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, displayName?: string) => {
     console.log('📝 Starting sign up for:', email);
     
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/`,
+        data: displayName ? { display_name: displayName } : undefined
+      }
     });
 
     if (error) {
@@ -334,6 +364,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         sendNewUserNotification(data.user!.email!, data.user!.id);
       }, 2000);
     }
+  };
+
+  const updateProfile = async (updates: Partial<Profile>) => {
+    if (!user) return { error: new Error('No user logged in') };
+    
+    const { error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('user_id', user.id);
+    
+    if (!error && profile) {
+      setProfile({ ...profile, ...updates });
+    }
+    
+    return { error };
   };
 
   const signOut = async () => {
@@ -353,6 +398,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const value = {
     user,
+    profile,
     isLoading,
     signIn,
     signUp,
@@ -362,6 +408,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     hasCompleteAccess,
     checkSubscription,
     upgradeSubscription: () => Promise.resolve(), // Placeholder since we handle this in components now
+    updateProfile,
     manageSubscription: async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
