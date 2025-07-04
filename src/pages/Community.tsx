@@ -53,6 +53,7 @@ export interface CalculatorData {
 
 const Community = () => {
   const [activeTab, setActiveTab] = useState('discussions');
+  const [calculatorOpen, setCalculatorOpen] = useState(false);
   const { toast } = useToast();
   
   // Calculator state
@@ -209,11 +210,14 @@ const Community = () => {
           </TabsContent>
 
           <TabsContent value="calculator" className="mt-8">
-            <Dialog>
+            <Dialog open={calculatorOpen} onOpenChange={setCalculatorOpen}>
               <div className="text-center">
                 <DialogTrigger asChild>
                   <Button 
-                    onClick={() => console.log('Calculator button clicked')}
+                    onClick={() => {
+                      console.log('Calculator button clicked');
+                      setCalculatorOpen(true);
+                    }}
                     className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
                   >
                     <Calculator className="h-4 w-4 mr-2" />
