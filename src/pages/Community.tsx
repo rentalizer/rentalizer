@@ -18,10 +18,10 @@ const Community = () => {
   const [activeTab, setActiveTab] = useState('discussions');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center">
       <TopNavBar />
       
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="w-full max-w-4xl px-4 py-8">
         {/* Community Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
