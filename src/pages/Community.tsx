@@ -164,19 +164,19 @@ const Community = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-8 bg-slate-800/50 border border-cyan-500/20 gap-1 justify-items-stretch">
             <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
-              <Users className="h-4 w-4 mr-2" />
+              <Users className="h-5 w-5 mr-2" />
               Discussions
             </TabsTrigger>
             <TabsTrigger value="calendar" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
-              <Calendar className="h-4 w-4 mr-2" />
+              <Calendar className="h-5 w-5 mr-2" />
               Calendar
             </TabsTrigger>
             <TabsTrigger value="videos" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
-              <Video className="h-4 w-4 mr-2" />
+              <Video className="h-5 w-5 mr-2" />
               Training
             </TabsTrigger>
             <TabsTrigger value="messages" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
-              <MessageSquare className="h-4 w-4 mr-2" />
+              <MessageSquare className="h-5 w-5 mr-2" />
               Chat
             </TabsTrigger>
             <TabsTrigger 
