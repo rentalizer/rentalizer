@@ -351,17 +351,6 @@ export const GroupDiscussions = () => {
                 )}
               </Avatar>
               <div className="flex-1 space-y-3">
-                {/* Title Input */}
-                <div>
-                  <label className="text-gray-400 text-sm font-medium mb-2 block">Title</label>
-                  <Input
-                    placeholder="Give your post a title..."
-                    value={postTitle}
-                    onChange={(e) => setPostTitle(e.target.value)}
-                    className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
-                  />
-                </div>
-                
                 {/* Content Input */}
                 <Textarea
                   placeholder="Write something..."
