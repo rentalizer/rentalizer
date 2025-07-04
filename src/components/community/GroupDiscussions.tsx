@@ -462,19 +462,16 @@ export const GroupDiscussions = () => {
                     <div className="mb-4 space-y-2">
                       {discussion.attachments.map((attachment, index) => (
                         <div key={index} className="inline-flex items-center gap-2 bg-slate-700/50 p-2 rounded mr-2">
-                           {attachment.type === 'image' && (
-                             <div className="flex items-center gap-2">
-                               <Image className="h-4 w-4 text-cyan-400" />
-                               <img 
-                                 src={attachment.url} 
-                                 alt={attachment.name}
-                                 className="h-20 w-20 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
-                                 onClick={(e) => {
-                                   e.stopPropagation();
-                                   setSelectedImage(attachment.url);
-                                 }}
-                               />
-                             </div>
+                          {attachment.type === 'image' && (
+                             <img 
+                               src={attachment.url} 
+                               alt={attachment.name}
+                               className="h-20 w-20 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+                               onClick={(e) => {
+                                 e.stopPropagation();
+                                 setSelectedImage(attachment.url);
+                               }}
+                             />
                            )}
                           {attachment.type === 'video' && (
                             <div className="flex items-center gap-2">
