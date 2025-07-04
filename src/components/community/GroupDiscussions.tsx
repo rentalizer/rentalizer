@@ -328,7 +328,10 @@ export const GroupDiscussions = () => {
     });
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="flex gap-6">
+      {/* Main Content */}
+      <div className="flex-1">
+        <div className="max-w-4xl space-y-6">
       {/* Profile Setup Modal */}
       {showProfileSetup && (
         <Dialog open={showProfileSetup} onOpenChange={setShowProfileSetup}>
@@ -828,6 +831,129 @@ export const GroupDiscussions = () => {
           </DialogContent>
         </Dialog>
       )}
+        </div>
+      </div>
+
+      {/* Right Sidebar - Leaderboard */}
+      <div className="hidden lg:block w-80 flex-shrink-0">
+        <div className="sticky top-6 space-y-6">
+          {/* Community Stats */}
+          <Card className="bg-slate-800/50 border-cyan-500/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
+                <Users className="h-5 w-5 text-cyan-400" />
+                Community Stats
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Total Members</span>
+                <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">187</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Online Now</span>
+                <Badge className="bg-green-600/20 text-green-300 border-green-500/30">12</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-400">Admins</span>
+                <Badge className="bg-red-600/20 text-red-300 border-red-500/30">3</Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 30-Day Leaderboard */}
+          <Card className="bg-slate-800/50 border-cyan-500/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-yellow-400" />
+                30-Day Leaderboard
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {/* Top 5 members */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-2 rounded-lg bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20">
+                  <div className="flex items-center justify-center w-6 h-6">
+                    <Badge className="bg-yellow-500 text-black font-bold text-xs w-6 h-6 rounded-full flex items-center justify-center p-0">1</Badge>
+                  </div>
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src="/lovable-uploads/4cae85e1-7ac3-4a4b-989d-c4cb8ecca460.png" alt="Richie Matthews" />
+                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold text-sm">RM</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1">
+                      <span className="text-white font-medium text-sm truncate">Richie Matthews</span>
+                      <Badge className="bg-red-600/20 text-red-300 border-red-500/30 text-xs">Admin</Badge>
+                    </div>
+                    <div className="text-yellow-400 font-semibold text-sm">+9 pts</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700/30">
+                  <div className="flex items-center justify-center w-6 h-6">
+                    <Badge className="bg-gray-400 text-black font-bold text-xs w-6 h-6 rounded-full flex items-center justify-center p-0">2</Badge>
+                  </div>
+                  <Avatar className="w-8 h-8">
+                    <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-sm">JD</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-white font-medium text-sm truncate">Judith Dreher</span>
+                    <div className="text-cyan-400 font-semibold text-sm">+7 pts</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700/30">
+                  <div className="flex items-center justify-center w-6 h-6">
+                    <Badge className="bg-amber-600 text-black font-bold text-xs w-6 h-6 rounded-full flex items-center justify-center p-0">3</Badge>
+                  </div>
+                  <Avatar className="w-8 h-8">
+                    <AvatarFallback className="bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold text-sm">LL</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-white font-medium text-sm truncate">Lynn Lueders</span>
+                    <div className="text-cyan-400 font-semibold text-sm">+6 pts</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700/30">
+                  <div className="flex items-center justify-center w-6 h-6">
+                    <span className="text-gray-400 font-bold text-sm">4</span>
+                  </div>
+                  <Avatar className="w-8 h-8">
+                    <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-sm">EB</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-white font-medium text-sm truncate">Edward Badal</span>
+                    <div className="text-cyan-400 font-semibold text-sm">+6 pts</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700/30">
+                  <div className="flex items-center justify-center w-6 h-6">
+                    <span className="text-gray-400 font-bold text-sm">5</span>
+                  </div>
+                  <Avatar className="w-8 h-8">
+                    <AvatarFallback className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-sm">LC</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-white font-medium text-sm truncate">Lonnie Castillon</span>
+                    <div className="text-cyan-400 font-semibold text-sm">+6 pts</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-gray-700">
+                <Button 
+                  variant="ghost" 
+                  className="w-full text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 text-sm"
+                >
+                  See all leaderboards
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };
