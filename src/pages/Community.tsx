@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -94,6 +94,15 @@ const Community = () => {
     ? cashToLaunch / netProfitMonthly
     : null;
   const cashOnCashReturn = cashToLaunch > 0 ? Math.round((netProfitMonthly * 12 / cashToLaunch) * 100) : 0;
+
+  
+  // Update service fees when rent changes
+  useEffect(() => {
+    setCalculatorData(prev => ({
+      ...prev,
+      serviceFees: Math.round(prev.rent * 0.029)
+    }));
+  }, [calculatorData.rent]);
 
   const updateCalculatorData = (updates: Partial<CalculatorData>) => {
     const roundedUpdates = Object.entries(updates).reduce((acc, [key, value]) => {
@@ -204,6 +213,7 @@ const Community = () => {
               <div className="text-center">
                 <DialogTrigger asChild>
                   <Button 
+                    onClick={() => console.log('Calculator button clicked')}
                     className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
                   >
                     <Calculator className="h-4 w-4 mr-2" />
