@@ -54,7 +54,7 @@ const isDevelopment = () => {
 
 // Create a mock user for development
 const createMockUser = (): User => ({
-  id: 'dev-user-id',
+  id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479', // Valid UUID format
   email: 'dev@example.com',
   subscription_status: 'active',
   subscription_tier: 'Premium'
