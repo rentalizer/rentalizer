@@ -187,16 +187,16 @@ const Community = () => {
                 setCalculatorOpen(true);
               }}
             >
-              <Calculator className="h-4 w-4 mr-2" />
+              <Calculator className="h-5 w-5 mr-2" />
               Calculator
             </TabsTrigger>
             <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
-              <Bot className="h-4 w-4 mr-2" />
+              <Bot className="h-5 w-5 mr-2" />
               Ask Richie
             </TabsTrigger>
             
             <TabsTrigger value="documents" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
-              <FileText className="h-4 w-4 mr-2" />
+              <FileText className="h-5 w-5 mr-2" />
               Business Docs
             </TabsTrigger>
           </TabsList>
