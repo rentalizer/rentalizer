@@ -162,26 +162,26 @@ const Community = () => {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-8 bg-slate-800/50 border border-cyan-500/20 gap-1 justify-items-stretch">
-            <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
+          <TabsList className="grid w-full grid-cols-7 bg-slate-800/50 border border-cyan-500/20 gap-1">
+            <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Users className="h-5 w-5 mr-2" />
               Discussions
             </TabsTrigger>
-            <TabsTrigger value="calendar" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
+            <TabsTrigger value="calendar" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Calendar className="h-5 w-5 mr-2" />
               Calendar
             </TabsTrigger>
-            <TabsTrigger value="videos" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
+            <TabsTrigger value="videos" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Video className="h-5 w-5 mr-2" />
               Training
             </TabsTrigger>
-            <TabsTrigger value="messages" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
+            <TabsTrigger value="messages" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <MessageSquare className="h-5 w-5 mr-2" />
               Chat
             </TabsTrigger>
             <TabsTrigger 
               value="calculator" 
-              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1"
+              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300"
               onClick={(e) => {
                 e.preventDefault();
                 setCalculatorOpen(true);
@@ -190,14 +190,13 @@ const Community = () => {
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
             </TabsTrigger>
-            <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
-              <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
-              Ask Richie
-            </TabsTrigger>
-            
-            <TabsTrigger value="documents" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1">
+            <TabsTrigger value="documents" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <FileText size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Business Docs
+            </TabsTrigger>
+            <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+              <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
+              Ask Richie
             </TabsTrigger>
           </TabsList>
 
