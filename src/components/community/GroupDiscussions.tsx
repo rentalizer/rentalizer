@@ -626,13 +626,9 @@ export const GroupDiscussions = () => {
               <div className="flex items-start gap-4">
                 {/* User Avatar */}
                 <Avatar className="w-12 h-12 flex-shrink-0">
-                  {getUserAvatar() ? (
-                    <AvatarImage src={getUserAvatar()!} alt={discussion.author} />
-                  ) : (
-                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
-                      {discussion.avatar}
-                    </AvatarFallback>
-                  )}
+                  <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
+                    {discussion.avatar}
+                  </AvatarFallback>
                 </Avatar>
 
                 {/* Post Content */}
@@ -653,8 +649,8 @@ export const GroupDiscussions = () => {
                       </Badge>
                     )}
                     
-                    {/* Pin and Edit/Delete buttons - only show for current user's posts */}
-                    {discussion.author === getUserName() && (
+                    {/* Pin and Edit/Delete buttons - show for current user's posts or admins */}
+                    {(discussion.author === getUserName() || isAdmin) && (
                       <div className="flex items-center gap-1 ml-auto">
                         <Button
                           variant="ghost"
