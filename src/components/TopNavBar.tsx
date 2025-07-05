@@ -4,9 +4,11 @@ import { BarChart3, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAdminRole } from '@/hooks/useAdminRole';
 
 export const TopNavBar = () => {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdminRole();
 
   return (
     <div className="w-full bg-slate-700/90 backdrop-blur-lg border-b border-gray-500/50">
@@ -26,7 +28,7 @@ export const TopNavBar = () => {
                 <User className="h-4 w-4 text-cyan-400" />
                 <span className="text-cyan-300">{user.email}</span>
                 <Badge variant="outline" className="bg-green-900/30 border-green-500/30 text-green-300 text-xs px-2 py-0">
-                  Pro
+                  {isAdmin ? 'Admin' : 'Pro'}
                 </Badge>
               </div>
               <Button

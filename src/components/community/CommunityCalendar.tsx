@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronLeft, ChevronRight, Plus, Clock, Users, Video, CalendarIcon, Upload } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useAdminRole } from '@/hooks/useAdminRole';
 
 interface Event {
   id: string;
@@ -32,6 +33,7 @@ export const CommunityCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
+  const { isAdmin } = useAdminRole();
   
   // Form state for adding new events
   const [newEvent, setNewEvent] = useState({
@@ -212,14 +214,15 @@ export const CommunityCalendar = () => {
               Events Calendar
             </CardTitle>
             
-            {/* Add Event Dialog */}
-            <Dialog open={isAddEventOpen} onOpenChange={setIsAddEventOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Event
-                </Button>
-              </DialogTrigger>
+            {/* Add Event Dialog - Only visible to admins */}
+            {isAdmin && (
+              <Dialog open={isAddEventOpen} onOpenChange={setIsAddEventOpen}>
+                <DialogTrigger asChild>
+                  <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Event
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="text-white text-xl">Add event</DialogTitle>
@@ -417,6 +420,7 @@ export const CommunityCalendar = () => {
                 </div>
               </DialogContent>
             </Dialog>
+            )}
           </CardHeader>
           <CardContent>
             {/* Month Navigation */}
