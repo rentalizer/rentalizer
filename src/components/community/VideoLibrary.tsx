@@ -50,11 +50,12 @@ interface SortableVideoCardProps {
   isAdmin: boolean;
   onEdit: (video: VideoItem) => void;
   onDelete: (videoId: string) => void;
+  onToggleFeatured: (videoId: string) => void;
   onClick: (video: VideoItem) => void;
   getCategoryColor: (category: string) => string;
 }
 
-const SortableVideoCard = ({ video, isAdmin, onEdit, onDelete, onClick, getCategoryColor }: SortableVideoCardProps) => {
+const SortableVideoCard = ({ video, isAdmin, onEdit, onDelete, onToggleFeatured, onClick, getCategoryColor }: SortableVideoCardProps) => {
   const {
     attributes,
     listeners,
@@ -97,6 +98,20 @@ const SortableVideoCard = ({ video, isAdmin, onEdit, onDelete, onClick, getCateg
               }}
             >
               <Trash2 className="h-3 w-3" />
+            </Button>
+            <Button
+              size="sm"
+              variant={video.featured ? "default" : "secondary"}
+              className={`h-8 w-8 p-0 ${video.featured 
+                ? 'bg-cyan-600/80 hover:bg-cyan-500 text-white' 
+                : 'bg-slate-700/80 hover:bg-slate-600'
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleFeatured(video.id);
+              }}
+            >
+              <Star className="h-3 w-3" />
             </Button>
             <div
               {...attributes}
@@ -524,7 +539,7 @@ export const VideoLibrary = () => {
 
   const [newHandout, setNewHandout] = useState({ name: '', url: '' });
 
-  const categories = ['all', 'Market Research', 'Property Acquisitions', 'Operations', 'Business Formation'];
+  const categories = ['all', 'Business Formation', 'Market Research', 'Property Acquisitions', 'Operations'];
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -735,6 +750,22 @@ export const VideoLibrary = () => {
     }
   };
 
+  const handleToggleFeatured = (videoId: string) => {
+    setVideos(videos.map(video => 
+      video.id === videoId 
+        ? { ...video, featured: !video.featured }
+        : video
+    ));
+    
+    const video = videos.find(v => v.id === videoId);
+    const newStatus = !video?.featured;
+    
+    toast({
+      title: newStatus ? "Video featured" : "Video unfeatured",
+      description: `Video has been ${newStatus ? 'added to' : 'removed from'} featured content.`,
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -939,6 +970,7 @@ export const VideoLibrary = () => {
                   isAdmin={isAdmin}
                   onEdit={handleEditVideo}
                   onDelete={handleDeleteVideo}
+                  onToggleFeatured={handleToggleFeatured}
                   onClick={handleVideoClick}
                   getCategoryColor={getCategoryColor}
                 />
@@ -955,6 +987,7 @@ export const VideoLibrary = () => {
               isAdmin={false}
               onEdit={() => {}}
               onDelete={() => {}}
+              onToggleFeatured={() => {}}
               onClick={handleVideoClick}
               getCategoryColor={getCategoryColor}
             />
