@@ -590,25 +590,181 @@ const LandingPage = () => {
 
                   <TabsContent value="calculator" className="mt-6">
                     <Card className="bg-slate-800/50 border-cyan-500/20">
-                      <CardContent className="p-8 text-center">
-                        <Calculator className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
-                        <h3 className="text-2xl font-bold text-white mb-4">Advanced Rental Calculator</h3>
-                        <p className="text-gray-300 mb-6">
-                          Calculate profitability, ROI, and cash flow for your rental arbitrage deals with our exclusive calculator.
-                        </p>
-                        <div className="text-left bg-slate-700/50 rounded-lg p-4 mb-6">
-                          <p className="text-sm text-gray-400 mb-2">Features include:</p>
-                          <ul className="text-cyan-300 space-y-1 text-sm">
-                            <li>• Market rent analysis integration</li>
-                            <li>• Seasonal occupancy adjustments</li>
-                            <li>• Expense tracking & projections</li>
-                            <li>• ROI & break-even calculations</li>
-                            <li>• Export to PDF reports</li>
-                          </ul>
+                      <CardContent className="p-6">
+                        <div className="text-center mb-6">
+                          <h3 className="text-xl font-bold text-white mb-2">Advanced Rental Calculator Demo</h3>
+                          <p className="text-gray-300 text-sm">Interactive calculator for rental arbitrage profitability analysis</p>
                         </div>
-                        <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-                          Access Calculator (Members Only)
-                        </Button>
+                        
+                        {/* Calculator Interface Demo */}
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                          {/* Property Comps Section */}
+                          <Card className="bg-slate-700/50 border-slate-600/30">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="flex items-center justify-center gap-2 text-white text-sm">
+                                <div className="h-4 w-4 bg-cyan-400 rounded"></div>
+                                Property Comps
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3 text-xs">
+                              <div>
+                                <p className="text-gray-300 mb-1">Address</p>
+                                <div className="bg-slate-600/50 rounded px-2 py-1 text-gray-200">123 Miami Beach Ave</div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <p className="text-gray-300 mb-1">Bedrooms</p>
+                                  <div className="bg-slate-600/50 rounded px-2 py-1 text-gray-200 text-center">2</div>
+                                </div>
+                                <div>
+                                  <p className="text-gray-300 mb-1">Bathrooms</p>
+                                  <div className="bg-slate-600/50 rounded px-2 py-1 text-gray-200 text-center">2</div>
+                                </div>
+                              </div>
+                              <div className="bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded p-2 border border-blue-500/30">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-blue-300 text-xs">Avg Monthly Revenue</span>
+                                  <span className="text-blue-400 font-bold">$3,250</span>
+                                </div>
+                                <div className="text-xs text-blue-300/70 mt-1">Based on 5 comparables</div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Build Out Section */}
+                          <Card className="bg-slate-700/50 border-slate-600/30">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="flex items-center justify-center gap-2 text-white text-sm">
+                                <div className="h-4 w-4 bg-purple-400 rounded"></div>
+                                Initial Investment
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2 text-xs">
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">First Month's Rent</span>
+                                <span className="text-white">$2,200</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Security Deposit</span>
+                                <span className="text-white">$2,200</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Furnishings</span>
+                                <span className="text-white">$8,500</span>
+                              </div>
+                              <div className="border-t border-slate-600 pt-2 mt-3">
+                                <div className="flex justify-between font-bold">
+                                  <span className="text-purple-300">Total Investment</span>
+                                  <span className="text-purple-400">$12,900</span>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Monthly Expenses Section */}
+                          <Card className="bg-slate-700/50 border-slate-600/30">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="flex items-center justify-center gap-2 text-white text-sm">
+                                <div className="h-4 w-4 bg-red-400 rounded"></div>
+                                Monthly Expenses
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-1 text-xs">
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Rent</span>
+                                <span className="text-white">$2,200</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Service Fees</span>
+                                <span className="text-white">$450</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Utilities</span>
+                                <span className="text-white">$280</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Insurance</span>
+                                <span className="text-white">$150</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Other</span>
+                                <span className="text-white">$220</span>
+                              </div>
+                              <div className="border-t border-slate-600 pt-2 mt-2">
+                                <div className="flex justify-between font-bold">
+                                  <span className="text-red-300">Total Expenses</span>
+                                  <span className="text-red-400">$3,300</span>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Profit Analysis Section */}
+                          <Card className="bg-slate-700/50 border-slate-600/30">
+                            <CardHeader className="pb-3">
+                              <CardTitle className="flex items-center justify-center gap-2 text-white text-sm">
+                                <div className="h-4 w-4 bg-green-400 rounded"></div>
+                                Profitability
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2 text-xs">
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Monthly Revenue</span>
+                                <span className="text-cyan-400">$3,250</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-300">Monthly Expenses</span>
+                                <span className="text-red-400">-$3,300</span>
+                              </div>
+                              <div className="border-t border-slate-600 pt-2">
+                                <div className="flex justify-between font-bold text-sm">
+                                  <span className="text-green-300">Net Monthly Profit</span>
+                                  <span className="text-green-400">-$50</span>
+                                </div>
+                              </div>
+                              <div className="bg-gradient-to-r from-green-600/20 to-emerald-600/20 rounded p-2 border border-green-500/30 mt-3">
+                                <div className="text-center">
+                                  <div className="text-green-300 text-xs">ROI</div>
+                                  <div className="text-green-400 font-bold text-sm">-0.5%</div>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        {/* Analysis Summary */}
+                        <div className="bg-slate-700/50 rounded-lg p-4 border border-slate-600/30">
+                          <h4 className="text-white font-semibold mb-3 text-center">Deal Analysis Summary</h4>
+                          <div className="grid md:grid-cols-3 gap-4 text-sm">
+                            <div className="text-center">
+                              <div className="text-gray-300">Break-Even Timeline</div>
+                              <div className="text-yellow-400 font-bold">Never (Loss)</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-gray-300">Annual Cash Flow</div>
+                              <div className="text-red-400 font-bold">-$600</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-gray-300">Recommendation</div>
+                              <div className="text-red-400 font-bold">❌ Pass</div>
+                            </div>
+                          </div>
+                          <div className="mt-4 p-3 bg-red-900/20 border border-red-500/30 rounded">
+                            <p className="text-red-300 text-xs text-center">
+                              <strong>Analysis:</strong> This property shows negative cash flow. Consider negotiating lower rent or finding properties with higher revenue potential.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Call to Action */}
+                        <div className="mt-6 text-center">
+                          <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
+                            Access Full Calculator (Members Only)
+                          </Button>
+                          <p className="text-gray-400 text-xs mt-2">
+                            Full version includes market data integration, advanced analytics, and export features
+                          </p>
+                        </div>
                       </CardContent>
                     </Card>
                   </TabsContent>
