@@ -111,10 +111,83 @@ export const GroupDiscussions = () => {
     }
   };
 
-  // Initialize discussions with saved data
+  // Demo discussions data
+  const getDemoDiscussions = (): Discussion[] => [
+    {
+      id: '1',
+      title: 'Welcome Aboard!',
+      content: "We're excited to have you join our community of rental entrepreneurs. Whether you're brand new or already hosting, you're in the right place to level up your game!",
+      author: 'Richie Matthews',
+      avatar: 'RM',
+      category: 'General discussion',
+      likes: 0,
+      comments: 0,
+      timeAgo: 'now',
+      isLiked: false,
+      isPinned: true
+    },
+    {
+      id: '2', 
+      title: 'Best markets for 2024?',
+      content: "Looking for advice on which markets are performing well this year. I'm considering expanding to new cities and would love to hear from anyone with recent experience.",
+      author: 'John Smith',
+      avatar: 'JS',
+      category: 'General discussion',
+      likes: 12,
+      comments: 8,
+      timeAgo: '4h ago',
+      isLiked: false
+    },
+    {
+      id: '3',
+      title: 'My first deal closed!',
+      content: "Just wanted to share that I finally closed on my first rental property! Thanks to everyone in this community for the support and advice. Can't wait to get it set up and start hosting.",
+      author: 'Maria Johnson', 
+      avatar: 'MJ',
+      category: 'Success Stories',
+      likes: 24,
+      comments: 15,
+      timeAgo: '6h ago',
+      isLiked: false
+    },
+    {
+      id: '4',
+      title: 'Property Acquisitions Workshop',
+      content: "Don't forget - our Property Acquisitions workshop is happening in 8 days! We'll be covering market analysis, deal evaluation, and negotiation strategies. Link to register in the calendar section.",
+      author: 'Community Team',
+      avatar: 'CT',
+      category: 'General discussion', 
+      likes: 18,
+      comments: 3,
+      timeAgo: '1d ago',
+      isLiked: false,
+      isPinned: true
+    },
+    {
+      id: '5',
+      title: 'Lease template feedback needed',
+      content: "I've been working on updating our standard lease templates. Would love to get some feedback from the community before we finalize them. Check the Resource Library for the draft versions.",
+      author: 'Legal Team',
+      avatar: 'LT', 
+      category: 'Resource Library',
+      likes: 7,
+      comments: 12,
+      timeAgo: '2d ago',
+      isLiked: false
+    }
+  ];
+
+  // Initialize discussions with demo data
   React.useEffect(() => {
     const savedDiscussions = loadDiscussions();
-    setDiscussionsList(savedDiscussions);
+    if (savedDiscussions.length === 0) {
+      // If no saved discussions, use demo data
+      const demoData = getDemoDiscussions();
+      setDiscussionsList(demoData);
+      saveDiscussions(demoData);
+    } else {
+      setDiscussionsList(savedDiscussions);
+    }
   }, []);
 
   // Functions to handle likes and comments
