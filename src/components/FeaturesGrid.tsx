@@ -1,11 +1,13 @@
 
 import React from 'react';
 import { MapPin, Building, Users, Headphones } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { FeatureCard } from '@/components/FeatureCard';
 
-export const FeaturesGrid = () => {
-  const navigate = useNavigate();
+interface FeaturesGridProps {
+  onFeatureClick?: (feature: string) => void;
+}
+
+export const FeaturesGrid = ({ onFeatureClick }: FeaturesGridProps) => {
 
   const features = [
     {
@@ -38,6 +40,15 @@ export const FeaturesGrid = () => {
     }
   ];
 
+  const handleClick = (feature: any) => {
+    if (onFeatureClick) {
+      onFeatureClick(feature.path.replace('/', ''));
+    } else {
+      // Default navigation behavior when no onFeatureClick is provided
+      window.location.href = feature.path;
+    }
+  };
+
   return (
     <div className="grid md:grid-cols-4 gap-8 mb-8">
       {features.map((feature) => (
@@ -47,7 +58,7 @@ export const FeaturesGrid = () => {
           title={feature.title}
           description={feature.description}
           buttonText={feature.buttonText}
-          onClick={() => navigate(feature.path)}
+          onClick={() => handleClick(feature)}
         />
       ))}
     </div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Footer } from '@/components/Footer';
 import { TopNavBar } from '@/components/TopNavBar';
 import { WelcomeSection } from '@/components/WelcomeSection';
-import { TestFeatureGrid } from '@/components/TestFeatureGrid';
+import { FeaturesGrid } from '@/components/FeaturesGrid';
 import { MarketIntelligenceDemo } from '@/components/MarketIntelligenceDemo';
 import { AcquisitionsCRMDemo } from '@/components/AcquisitionsCRMDemo';
 import { PMSDemo } from '@/components/PMSDemo';
@@ -37,7 +37,7 @@ const TestHome = () => {
           <WelcomeSection />
           
           {!activeDemo ? (
-            <TestFeatureGrid onFeatureClick={handleFeatureClick} />
+            <FeaturesGrid onFeatureClick={handleFeatureClick} />
           ) : (
             <div className="space-y-6">
               {/* Back to Features Button */}
@@ -51,7 +51,7 @@ const TestHome = () => {
               </div>
 
               {/* Demo Content */}
-              {activeDemo === 'market' && (
+              {activeDemo === 'markets' && (
                 <MarketIntelligenceDemo 
                   currentStep={currentStep} 
                   isRunning={true}
@@ -59,14 +59,14 @@ const TestHome = () => {
                 />
               )}
               
-              {activeDemo === 'acquisition' && (
+              {activeDemo === 'properties' && (
                 <AcquisitionsCRMDemo 
                   currentStep={currentStep + 3} // Start from step 4 in the overall flow
                   isRunning={true}
                 />
               )}
               
-              {activeDemo === 'pms' && (
+              {activeDemo === 'front-desk' && (
                 <PMSDemo 
                   currentStep={currentStep + 11} // Start from step 12 in the overall flow
                   isRunning={true}
