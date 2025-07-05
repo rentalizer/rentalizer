@@ -87,6 +87,112 @@ export type Database = {
         }
         Relationships: []
       }
+      discussion_comments: {
+        Row: {
+          author_name: string
+          content: string
+          created_at: string | null
+          discussion_id: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          author_name: string
+          content: string
+          created_at?: string | null
+          discussion_id?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          content?: string
+          created_at?: string | null
+          discussion_id?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discussion_comments_discussion_id_fkey"
+            columns: ["discussion_id"]
+            isOneToOne: false
+            referencedRelation: "discussions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discussion_likes: {
+        Row: {
+          created_at: string | null
+          discussion_id: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          discussion_id?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          discussion_id?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discussion_likes_discussion_id_fkey"
+            columns: ["discussion_id"]
+            isOneToOne: false
+            referencedRelation: "discussions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discussions: {
+        Row: {
+          author_avatar: string | null
+          author_name: string
+          category: string
+          comments_count: number | null
+          content: string
+          created_at: string | null
+          id: string
+          likes_count: number | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          author_avatar?: string | null
+          author_name: string
+          category?: string
+          comments_count?: number | null
+          content: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          author_avatar?: string | null
+          author_name?: string
+          category?: string
+          comments_count?: number | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          likes_count?: number | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       members: {
         Row: {
           created_at: string

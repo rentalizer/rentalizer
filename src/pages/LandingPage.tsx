@@ -12,9 +12,9 @@ const LandingPage = () => {
   // Static text content (no longer editable)
   const texts = {
     mainTitle: 'RENTALIZER',
-    byLine: 'By Richie Matthews',
-    tagline: 'All-In-One Platform To Launch & Scale Your Rental Income Stream—Powered By AI',
-    description: 'RENTALIZER.AI Combines AI POWERED Market Analysis, Deal Sourcing, And Automation Tools With A Built-In CRM And A Thriving Community—Everything You Need To Launch And Scale Your Rental Arbitrage Business.',
+    byLine: '',
+    tagline: 'All-In-One Platform To Launch, Automate, & Scale Rental Income—Powered By AI',
+    description: 'RENTALIZER Combines AI Powered Market Analysis, Deal Sourcing, Property Management Software, And Automation Tools With A Built-In CRM And Thriving Community—Everything You Need To Launch, Automate, And Scale Rental Arbitrage Income.',
     testimonialsTitle: 'Real Users Who\'ve Unlocked Rental Income With Rentalizer',
     buttonText: 'Book Demo',
     feature1Title: 'Market Intelligence',
@@ -251,7 +251,7 @@ const LandingPage = () => {
             {/* Updated Tagline */}
             <div className="mb-12 px-4">
               <div className="text-lg md:text-xl lg:text-2xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
-                All-In-One Platform To Launch & Scale Your Rental Income Stream—<br />
+                All-In-One Platform To Launch, Automate, & Scale Rental Income—<br />
                 Powered By AI
               </div>
             </div>

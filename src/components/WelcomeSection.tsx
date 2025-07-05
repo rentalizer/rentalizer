@@ -11,10 +11,8 @@ export const WelcomeSection = () => {
           RENTALIZER
         </h1>
       </div>
-      <p className="text-lg text-white font-medium mb-8">By Richie Matthews</p>
-      
       <p className="text-xs sm:text-xs md:text-xs lg:text-sm text-white mb-12 max-w-7xl mx-auto leading-relaxed font-semibold">
-        All-In-One Platform To Launch & Scale Your Rental Income Stream—<br />
+        All-In-One Platform To Launch, Automate, & Scale Rental Income—<br />
         Powered By AI
       </p>
     </div>
