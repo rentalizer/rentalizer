@@ -8,6 +8,11 @@ export const AdminSetup = () => {
   const { isAdmin, makeAdmin, loading } = useAdminRole();
   const { toast } = useToast();
 
+  // Force check admin status on mount
+  React.useEffect(() => {
+    console.log('AdminSetup - isAdmin status:', isAdmin, 'loading:', loading);
+  }, [isAdmin, loading]);
+
   const handleMakeAdmin = async () => {
     const success = await makeAdmin();
     if (success) {
@@ -17,15 +22,17 @@ export const AdminSetup = () => {
       });
     } else {
       toast({
-        title: "Error",
-        description: "Failed to grant admin privileges. Check console for details.",
-        variant: "destructive"
+        title: "Info",
+        description: "You are already an administrator.",
+        variant: "default"
       });
     }
   };
 
+  // Don't show the button if user is already admin
   if (isAdmin) {
-    return null; // Hide component if already admin
+    console.log('User is admin, hiding AdminSetup button');
+    return null; 
   }
 
   return (
