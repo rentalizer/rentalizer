@@ -132,7 +132,7 @@ const ProfileSetup = () => {
 
       toast({
         title: "Profile saved",
-        description: "Your profile has been successfully created",
+        description: firstName || lastName ? "Your profile has been successfully updated" : "Your profile has been successfully created",
       });
 
       navigate('/community');
@@ -168,9 +168,14 @@ const ProfileSetup = () => {
           <Card className="bg-slate-800/50 border-cyan-500/20">
             <CardHeader className="text-center">
               <User className="h-12 w-12 text-cyan-400 mx-auto mb-4" />
-              <CardTitle className="text-2xl text-white">Complete Your Profile</CardTitle>
+              <CardTitle className="text-2xl text-white">
+                {firstName || lastName ? 'Edit Your Profile' : 'Complete Your Profile'}
+              </CardTitle>
               <p className="text-gray-400">
-                Create your member profile to connect with the community
+                {firstName || lastName 
+                  ? 'Update your member profile information'
+                  : 'Create your member profile to connect with the community'
+                }
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -261,7 +266,7 @@ const ProfileSetup = () => {
                 className="w-full bg-cyan-600 hover:bg-cyan-700"
               >
                 <Save className="h-4 w-4 mr-2" />
-                {saving ? 'Saving...' : 'Save Profile'}
+                {saving ? 'Saving...' : (firstName || lastName ? 'Update Profile' : 'Save Profile')}
               </Button>
             </CardContent>
           </Card>
