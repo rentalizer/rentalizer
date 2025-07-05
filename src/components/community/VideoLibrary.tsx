@@ -518,10 +518,13 @@ export const VideoLibrary = () => {
     category: 'Market Research',
     videoUrl: '',
     tags: [],
-    featured: false
+    featured: false,
+    handouts: []
   });
 
-  const categories = ['all', 'Market Research', 'Property Acquisitions', 'Operations', 'Property Management', 'Business Formation'];
+  const [newHandout, setNewHandout] = useState({ name: '', url: '' });
+
+  const categories = ['all', 'Market Research', 'Property Acquisitions', 'Operations', 'Business Formation'];
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -685,6 +688,43 @@ export const VideoLibrary = () => {
     });
   };
 
+  const handleAddHandout = () => {
+    if (!newHandout.name || !newHandout.url) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in handout name and URL.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const currentHandouts = newVideo.handouts || [];
+    setNewVideo({
+      ...newVideo,
+      handouts: [...currentHandouts, { ...newHandout }]
+    });
+    setNewHandout({ name: '', url: '' });
+    
+    toast({
+      title: "Handout added",
+      description: "Document has been added to the video.",
+    });
+  };
+
+  const handleRemoveHandout = (index: number) => {
+    const currentHandouts = newVideo.handouts || [];
+    const updatedHandouts = currentHandouts.filter((_, i) => i !== index);
+    setNewVideo({
+      ...newVideo,
+      handouts: updatedHandouts
+    });
+    
+    toast({
+      title: "Handout removed",
+      description: "Document has been removed from the video.",
+    });
+  };
+
   const handleDeleteVideo = (videoId: string) => {
     if (confirm('Are you sure you want to delete this video?')) {
       setVideos(videos.filter(video => video.id !== videoId));
@@ -792,6 +832,56 @@ export const VideoLibrary = () => {
                     className="rounded"
                   />
                   <Label htmlFor="featured" className="text-gray-300">Featured</Label>
+                </div>
+
+                {/* Handouts Section */}
+                <div className="space-y-3">
+                  <Label className="text-gray-300">Supporting Documents</Label>
+                  
+                  {/* Current Handouts */}
+                  {newVideo.handouts && newVideo.handouts.length > 0 && (
+                    <div className="space-y-2">
+                      {newVideo.handouts.map((handout, index) => (
+                        <div key={index} className="flex items-center justify-between p-2 bg-slate-800/30 rounded">
+                          <span className="text-sm text-gray-300">{handout.name}</span>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleRemoveHandout(index)}
+                            className="h-6 w-6 p-0"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Add New Handout */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input
+                      placeholder="Document name"
+                      value={newHandout.name}
+                      onChange={(e) => setNewHandout({...newHandout, name: e.target.value})}
+                      className="bg-slate-800/50 border-cyan-500/20 text-white text-sm"
+                    />
+                    <Input
+                      placeholder="Document URL"
+                      value={newHandout.url}
+                      onChange={(e) => setNewHandout({...newHandout, url: e.target.value})}
+                      className="bg-slate-800/50 border-cyan-500/20 text-white text-sm"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={handleAddHandout}
+                    className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    Add Document
+                  </Button>
                 </div>
                 <div className="flex gap-2">
                   <Button onClick={handleAddVideo} className="flex-1 bg-cyan-600 hover:bg-cyan-700">
@@ -940,6 +1030,56 @@ export const VideoLibrary = () => {
                 className="rounded"
               />
               <Label htmlFor="edit-featured" className="text-gray-300">Featured</Label>
+            </div>
+
+            {/* Handouts Section */}
+            <div className="space-y-3">
+              <Label className="text-gray-300">Supporting Documents</Label>
+              
+              {/* Current Handouts */}
+              {newVideo.handouts && newVideo.handouts.length > 0 && (
+                <div className="space-y-2">
+                  {newVideo.handouts.map((handout, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-slate-800/30 rounded">
+                      <span className="text-sm text-gray-300">{handout.name}</span>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleRemoveHandout(index)}
+                        className="h-6 w-6 p-0"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Add New Handout */}
+              <div className="grid grid-cols-2 gap-2">
+                <Input
+                  placeholder="Document name"
+                  value={newHandout.name}
+                  onChange={(e) => setNewHandout({...newHandout, name: e.target.value})}
+                  className="bg-slate-800/50 border-cyan-500/20 text-white text-sm"
+                />
+                <Input
+                  placeholder="Document URL"
+                  value={newHandout.url}
+                  onChange={(e) => setNewHandout({...newHandout, url: e.target.value})}
+                  className="bg-slate-800/50 border-cyan-500/20 text-white text-sm"
+                />
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={handleAddHandout}
+                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                Add Document
+              </Button>
             </div>
             <div className="flex gap-2">
               <Button onClick={handleUpdateVideo} className="flex-1 bg-cyan-600 hover:bg-cyan-700">
