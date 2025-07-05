@@ -1,21 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar, Star } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar, Star, X, Video, FileText, Bot } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
-import { useNavigate } from 'react-router-dom';
+import { MarketIntelligenceDemo } from '@/components/MarketIntelligenceDemo';
+import { AcquisitionsCRMDemo } from '@/components/AcquisitionsCRMDemo';
+import { PMSDemo } from '@/components/PMSDemo';
+import { GroupDiscussions } from '@/components/community/GroupDiscussions';
+import { VideoLibrary } from '@/components/community/VideoLibrary';
+import { CommunityCalendar } from '@/components/community/CommunityCalendar';
+import { MessageThreads } from '@/components/community/MessageThreads';
+import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
 
 const LandingPage = () => {
-  const navigate = useNavigate();
+  const [activeDemo, setActiveDemo] = useState<string | null>(null);
+  const [currentStep, setCurrentStep] = useState(1);
 
-  // Static text content (no longer editable)
+  // Auto-progression through demo steps
+  useEffect(() => {
+    if (activeDemo) {
+      const stepRanges = {
+        'market': { start: 1, end: 3, duration: 3000 },
+        'acquisition': { start: 4, end: 11, duration: 2500 },
+        'pms': { start: 12, end: 16, duration: 2000 },
+        'community': { start: 17, end: 17, duration: 5000 }
+      };
+
+      const config = stepRanges[activeDemo];
+      if (config) {
+        const timer = setInterval(() => {
+          setCurrentStep(prevStep => {
+            if (prevStep >= config.end) {
+              return config.start; // Loop back to start
+            }
+            return prevStep + 1;
+          });
+        }, config.duration);
+
+        return () => clearInterval(timer);
+      }
+    }
+  }, [activeDemo]);
+
+  // Static text content from the actual landing page
   const texts = {
     mainTitle: 'RENTALIZER',
     byLine: '',
     tagline: 'All-In-One Platform To Launch, Automate, & Scale Rental Income—Powered By AI',
     description: 'RENTALIZER Combines AI Powered Market Analysis, Deal Sourcing, Property Management Software, And Automation Tools With A Built-In CRM And Thriving Community—Everything You Need To Launch, Automate, And Scale Rental Arbitrage Income',
-    testimonialsTitle: 'Some Recent Users Who\'ve Unlocked Rental Income With RENTALIZER',
     buttonText: 'Book Demo',
     feature1Title: 'Market Intelligence',
     feature1Description: 'The First-Of-Its-Kind AI Tool To Find The Best Rental Arbitrage Markets',
@@ -25,6 +60,25 @@ const LandingPage = () => {
     feature3Description: 'Streamline Property Management And Automate Operations',
     feature4Title: 'Community',
     feature4Description: 'Join Our Network Of Rental Arbitrage Entrepreneurs'
+  };
+
+  const handleFeatureClick = (feature: string) => {
+    setActiveDemo(feature);
+    // Reset to appropriate starting step for each demo
+    if (feature === 'market') {
+      setCurrentStep(1);
+    } else if (feature === 'acquisition') {
+      setCurrentStep(4);
+    } else if (feature === 'pms') {
+      setCurrentStep(12);
+    } else if (feature === 'community') {
+      setCurrentStep(17);
+    }
+  };
+
+  const handleCloseDemo = () => {
+    setActiveDemo(null);
+    setCurrentStep(1);
   };
 
   const handleBookDemo = () => {
@@ -37,105 +91,6 @@ const LandingPage = () => {
       });
     }
   };
-
-  const testimonials = [
-    {
-      name: "Bishoi Mikhail",
-      text: "Rentalizer has everything that you need in one program to get you set up and to be able to have a successful Airbnb business. Rentalizer helped me acquire 3 properties within 1 month of starting the program, each with only $200 deposits and 8 weeks free rent."
-    },
-    {
-      name: "Bobby Han",
-      text: "If you are thinking about getting into the short term rental business, Rentalizer's blueprint and all the templates available is definitely something that gives more confidence moving forward. If you have any question whether to join Rentalizer's program, I think you'll find it very beneficial."
-    },
-    {
-      name: "Shante Davis",
-      text: "Rentalizer's program is amazing. Rentalizer helped us close the largest apartment company in our area. We now have 6 properties. I recommend the mentorship. You won't be disappointed."
-    },
-    {
-      name: "Maria Sallie Forte-Charette",
-      text: "Thank you so much Rentalizer for sharing your knowledge and always promptly answering any questions, which helped me to close three new properties! I learned so much from our training and coaching."
-    },
-    {
-      name: "Elena Ashley",
-      text: "Rentalizer's program has meant the difference in my business from just being a hobby to moving it into an actual business."
-    },
-    {
-      name: "Liz Garcia",
-      text: "I just closed my first deal, thanks to Rentalizer's program!"
-    },
-    {
-      name: "Marcus Thompson",
-      text: "The AI market analysis tool is incredible. It helped me identify profitable markets I never would have considered before. I'm now managing 4 successful properties."
-    },
-    {
-      name: "Sarah Chen",
-      text: "Rentalizer's CRM made all the difference in my outreach. I went from getting ignored to closing deals within weeks. The templates and automation saved me hours every day."
-    },
-    {
-      name: "David Rodriguez",
-      text: "The community support is unmatched. Whenever I had questions, there was always someone ready to help. I've learned as much from other members as I have from the training materials."
-    },
-    {
-      name: "Jessica Williams",
-      text: "I was skeptical at first, but Rentalizer delivered on every promise. The profit calculator alone has saved me from making costly mistakes. Now I have 5 profitable properties."
-    },
-    {
-      name: "Michael Johnson",
-      text: "The mentorship and coaching calls were game-changers. Having access to experts who've been there before made the learning curve so much smoother. Highly recommend."
-    },
-    {
-      name: "Amanda Foster",
-      text: "Rentalizer turned my side hustle into a full-time income. The systematic approach and tools provided everything I needed to scale confidently. Best investment I've made."
-    },
-    {
-      name: "Christopher Lee",
-      text: "The market intelligence feature is a game-changer. It showed me exactly which neighborhoods to target and which to avoid. I closed 2 deals in my first month using their data."
-    },
-    {
-      name: "Rachel Martinez",
-      text: "Rentalizer's automation tools handle all my guest communications seamlessly. I can manage 8 properties without feeling overwhelmed. The time savings are incredible."
-    },
-    {
-      name: "Kevin Park",
-      text: "The profit calculator helped me negotiate better deals with landlords. I can show them exact projections and close deals faster. My conversion rate has tripled."
-    },
-    {
-      name: "Nicole Turner",
-      text: "I love how everything is integrated in one platform. From finding properties to managing guests, Rentalizer handles it all. No more juggling multiple tools."
-    },
-    {
-      name: "Brandon Walsh",
-      text: "The AI email templates are amazing. They helped me reach out to hundreds of landlords with personalized messages. I'm now managing 12 properties across 3 cities."
-    },
-    {
-      name: "Samantha Brooks",
-      text: "Rentalizer's training program is comprehensive and easy to follow. Even as a complete beginner, I was able to close my first deal within 6 weeks."
-    },
-    {
-      name: "Anthony Rivera",
-      text: "The community forum is incredibly valuable. I've connected with other investors and learned strategies I never would have discovered on my own."
-    },
-    {
-      name: "Lisa Thompson",
-      text: "The platform's analytics help me track performance across all my properties. I can see which markets are most profitable and adjust my strategy accordingly."
-    },
-    {
-      name: "Ryan Murphy",
-      text: "Rentalizer's support team is outstanding. They respond quickly and always provide helpful solutions. It's like having a personal consultant available 24/7."
-    },
-    {
-      name: "Jennifer Adams",
-      text: "The deal sourcing feature is incredible. It finds properties I would never have discovered on my own. I've expanded to 3 new markets using their recommendations."
-    },
-    {
-      name: "Daniel Kim",
-      text: "The automated messaging system has transformed my guest experience. Happy guests leave better reviews, which leads to more bookings. My occupancy rate is now 85%."
-    },
-    {
-      name: "Michelle Garcia",
-      text: "Rentalizer helped me transition from traditional real estate to rental arbitrage. The learning curve was smooth, and I'm now earning more than I ever did with buy-and-hold properties."
-    }
-  ];
 
   useEffect(() => {
     // Load Calendly script
@@ -163,42 +118,6 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-      {/* Custom CSS for sequential flash animation */}
-      <style>{`
-        @keyframes flash-sequence {
-          0%, 20% { 
-            opacity: 1; 
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.8), 0 0 40px rgba(168, 85, 247, 0.6);
-          }
-          25%, 100% { 
-            opacity: 0.7; 
-            transform: scale(1);
-            box-shadow: 0 0 10px rgba(6, 182, 212, 0.3), 0 0 20px rgba(168, 85, 247, 0.2);
-          }
-        }
-        
-        .flash-feature-1 {
-          animation: flash-sequence 8s infinite;
-          animation-delay: 0s;
-        }
-        
-        .flash-feature-2 {
-          animation: flash-sequence 8s infinite;
-          animation-delay: 2s;
-        }
-        
-        .flash-feature-3 {
-          animation: flash-sequence 8s infinite;
-          animation-delay: 4s;
-        }
-        
-        .flash-feature-4 {
-          animation: flash-sequence 8s infinite;
-          animation-delay: 6s;
-        }
-      `}</style>
-
       {/* Header */}
       <header className="relative z-20 w-full border-b border-gray-500/50 bg-slate-700/90 backdrop-blur-lg">
         <div className="container mx-auto px-6 py-4">
@@ -275,12 +194,12 @@ const LandingPage = () => {
           <div className="max-w-7xl mx-auto mb-20">
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {/* Feature 1: Market Intelligence */}
-              <div className="group relative">
+              <div className="group relative" onClick={() => handleFeatureClick('market')}>
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105">
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
                   <CardHeader className="text-center pb-4">
                     <div className="mx-auto mb-4 relative">
-                      <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center flash-feature-1 transition-all duration-300">
+                      <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center transition-all duration-300">
                         <Brain className="h-10 w-10 text-white" />
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -303,12 +222,12 @@ const LandingPage = () => {
               </div>
 
               {/* Feature 2: Acquisition CRM & Calculator */}
-              <div className="group relative">
+              <div className="group relative" onClick={() => handleFeatureClick('acquisition')}>
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105">
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
                   <CardHeader className="text-center pb-4">
                     <div className="mx-auto mb-4 relative">
-                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center flash-feature-2 transition-all duration-300">
+                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center transition-all duration-300">
                         <Calculator className="h-10 w-10 text-white" />
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -331,12 +250,12 @@ const LandingPage = () => {
               </div>
 
               {/* Feature 3: PMS */}
-              <div className="group relative">
+              <div className="group relative" onClick={() => handleFeatureClick('pms')}>
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105">
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
                   <CardHeader className="text-center pb-4">
                     <div className="mx-auto mb-4 relative">
-                      <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center flash-feature-3 transition-all duration-300">
+                      <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center transition-all duration-300">
                         <Target className="h-10 w-10 text-white" />
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -359,12 +278,12 @@ const LandingPage = () => {
               </div>
 
               {/* Feature 4: Community */}
-              <div className="group relative">
+              <div className="group relative" onClick={() => handleFeatureClick('community')}>
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105">
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
                   <CardHeader className="text-center pb-4">
                     <div className="mx-auto mb-4 relative">
-                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center flash-feature-4 transition-all duration-300">
+                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center transition-all duration-300">
                         <MessageSquare className="h-10 w-10 text-white" />
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -388,15 +307,6 @@ const LandingPage = () => {
                 </Card>
               </div>
             </div>
-
-            {/* Connecting Lines Animation */}
-            <div className="hidden lg:block relative mt-8">
-              <div className="absolute top-0 left-0 w-full h-px">
-                <div className="absolute left-1/4 top-0 w-1/4 h-px bg-gradient-to-r from-cyan-400/50 via-purple-400/50 to-transparent animate-pulse"></div>
-                <div className="absolute left-2/4 top-0 w-1/4 h-px bg-gradient-to-r from-purple-400/50 via-cyan-400/50 to-transparent animate-pulse delay-500"></div>
-                <div className="absolute left-3/4 top-0 w-1/4 h-px bg-gradient-to-r from-cyan-400/50 via-purple-400/50 to-transparent animate-pulse delay-1000"></div>
-              </div>
-            </div>
           </div>
 
           {/* Description Section */}
@@ -409,13 +319,23 @@ const LandingPage = () => {
           {/* Testimonials Section */}
           <div className="max-w-7xl mx-auto mb-20">
             <div className="text-center mb-12">
-              <div className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4 whitespace-nowrap">
-                {texts.testimonialsTitle}
+              <div className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+                Some Recent Users Who've Unlocked Rental Income With RENTALIZER
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {testimonials.map((testimonial, index) => (
+              {[
+                { name: "Bishoi Mikhail", text: "Rentalizer has everything that you need in one program to get you set up and to be able to have a successful Airbnb business. Rentalizer helped me acquire 3 properties within 1 month of starting the program, each with only $200 deposits and 8 weeks free rent." },
+                { name: "Bobby Han", text: "If you are thinking about getting into the short term rental business, Rentalizer's blueprint and all the templates available is definitely something that gives more confidence moving forward. If you have any question whether to join Rentalizer's program, I think you'll find it very beneficial." },
+                { name: "Shante Davis", text: "Rentalizer's program is amazing. Rentalizer helped us close the largest apartment company in our area. We now have 6 properties. I recommend the mentorship. You won't be disappointed." },
+                { name: "Maria Sallie Forte-Charette", text: "Thank you so much Rentalizer for sharing your knowledge and always promptly answering any questions, which helped me to close three new properties! I learned so much from our training and coaching." },
+                { name: "Elena Ashley", text: "Rentalizer's program has meant the difference in my business from just being a hobby to moving it into an actual business." },
+                { name: "Liz Garcia", text: "I just closed my first deal, thanks to Rentalizer's program!" },
+                { name: "Marcus Thompson", text: "The AI market analysis tool is incredible. It helped me identify profitable markets I never would have considered before. I'm now managing 4 successful properties." },
+                { name: "Sarah Chen", text: "Rentalizer's CRM made all the difference in my outreach. I went from getting ignored to closing deals within weeks. The templates and automation saved me hours every day." },
+                { name: "David Rodriguez", text: "The community support is unmatched. Whenever I had questions, there was always someone ready to help. I've learned as much from other members as I have from the training materials." }
+              ].map((testimonial, index) => (
                 <div key={index} className="group relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                   <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105">
@@ -444,6 +364,151 @@ const LandingPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Demo Modal */}
+      <Dialog open={!!activeDemo} onOpenChange={() => handleCloseDemo()}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="text-white text-xl">
+              {activeDemo === 'market' && 'Market Intelligence Demo'}
+              {activeDemo === 'acquisition' && 'Acquisition CRM Demo'}
+              {activeDemo === 'pms' && 'Property Management Demo'}
+              {activeDemo === 'community' && 'Community Demo'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Demo Content */}
+            {activeDemo === 'market' && (
+              <MarketIntelligenceDemo 
+                currentStep={currentStep} 
+                isRunning={true}
+                onStepChange={setCurrentStep}
+              />
+            )}
+            
+            {activeDemo === 'acquisition' && (
+              <AcquisitionsCRMDemo 
+                currentStep={currentStep}
+                isRunning={true}
+              />
+            )}
+            
+            {activeDemo === 'pms' && (
+              <PMSDemo 
+                currentStep={currentStep}
+                isRunning={true}
+              />
+            )}
+            
+            {activeDemo === 'community' && (
+              <div className="space-y-6">
+                {/* Community Header */}
+                <div className="text-center mb-8">
+                  <div className="flex items-center justify-center gap-3 mb-4">
+                    <Users className="h-8 w-8 text-cyan-400" />
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                      Training & Community Hub
+                    </h1>
+                  </div>
+                </div>
+
+                {/* Navigation Tabs */}
+                <Tabs defaultValue="discussions" className="w-full">
+                  <TabsList className="flex w-full bg-slate-800/50 border border-cyan-500/20 justify-evenly h-14 p-2">
+                    <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+                      <Users className="h-4 w-4 mr-2" />
+                      Discussions
+                    </TabsTrigger>
+                    <TabsTrigger value="calendar" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Calendar
+                    </TabsTrigger>
+                    <TabsTrigger value="training" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+                      <Video className="h-4 w-4 mr-2" />
+                      Training
+                    </TabsTrigger>
+                    <TabsTrigger value="chat" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      Chat
+                    </TabsTrigger>
+                    <TabsTrigger value="calculator" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+                      <Calculator className="h-4 w-4 mr-2" />
+                      Calculator
+                    </TabsTrigger>
+                    <TabsTrigger value="docs" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+                      <FileText className="h-4 w-4 mr-2" />
+                      Business Docs
+                    </TabsTrigger>
+                    <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+                      <Bot className="h-4 w-4 mr-2" />
+                      Ask Richie
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="discussions" className="mt-6">
+                    <GroupDiscussions />
+                  </TabsContent>
+                  
+                  <TabsContent value="calendar" className="mt-6">
+                    <CommunityCalendar />
+                  </TabsContent>
+
+                  <TabsContent value="training" className="mt-6">
+                    <VideoLibrary />
+                  </TabsContent>
+
+                  <TabsContent value="chat" className="mt-6">
+                    <MessageThreads />
+                  </TabsContent>
+
+                  <TabsContent value="calculator" className="mt-6">
+                    <Card className="bg-slate-800/50 border-cyan-500/20">
+                      <CardContent className="p-8 text-center">
+                        <Calculator className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
+                        <h3 className="text-2xl font-bold text-white mb-4">Rental Calculator</h3>
+                        <p className="text-gray-300 mb-6">
+                          Calculate profitability, ROI, and cash flow for your rental arbitrage deals.
+                        </p>
+                        <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
+                          Open Calculator
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  <TabsContent value="docs" className="mt-6">
+                    <DocumentsLibrary />
+                  </TabsContent>
+
+                  <TabsContent value="askrichie" className="mt-6">
+                    <Card className="bg-slate-800/50 border-cyan-500/20">
+                      <CardContent className="p-8 text-center">
+                        <Bot className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
+                        <h3 className="text-2xl font-bold text-white mb-4">Ask Richie AI</h3>
+                        <p className="text-gray-300 mb-6">
+                          Get instant answers to your rental investment questions from our AI assistant.
+                        </p>
+                        <div className="space-y-4">
+                          <div className="text-left bg-slate-700/50 rounded-lg p-4">
+                            <p className="text-sm text-gray-400 mb-2">Coming Soon:</p>
+                            <ul className="text-cyan-300 space-y-1 text-sm">
+                              <li>• Market analysis insights</li>
+                              <li>• Investment strategy recommendations</li>
+                              <li>• Property evaluation assistance</li>
+                              <li>• Real-time Q&A support</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Footer */}
       <Footer showLinks={false} />
