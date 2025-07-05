@@ -221,26 +221,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Don't use mock user on test pages - they should use real auth
     const isTestPage = window.location.pathname.includes('/calculator-test');
     
-    // If in development and NOT on a test page, set mock user and skip auth
-    if (isDevelopment() && !isTestPage) {
-      console.log('🔧 Development mode detected, using mock user');
-      const mockUser = createMockUser();
-      setUser(mockUser);
-      
-      // Create mock profile for development
-      const mockProfile = {
-        id: mockUser.id,
-        user_id: mockUser.id,
-        display_name: 'Richie Matthews',
-        avatar_url: '/lovable-uploads/4cae85e1-7ac3-4a4b-989d-c4cb8ecca460.png',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      setProfile(mockProfile);
-      setIsLoading(false);
-      return;
-    }
-    
     const initTimeout = setTimeout(() => {
       console.log('⏰ Auth initialization timeout, setting loading to false');
       setIsLoading(false);
