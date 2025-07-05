@@ -61,10 +61,26 @@ const ProfileSetup = () => {
       setUploading(true);
 
       if (!event.target.files || event.target.files.length === 0) {
-        throw new Error('You must select an image to upload.');
+        toast({
+          title: "No file selected",
+          description: "Please select an image to upload",
+          variant: "destructive",
+        });
+        return;
       }
 
       const file = event.target.files[0];
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const fileExt = file.name.split('.').pop();
       const filePath = `${user?.id}/avatar.${fileExt}`;
 
@@ -81,6 +97,11 @@ const ProfileSetup = () => {
         .getPublicUrl(filePath);
 
       setAvatarUrl(data.publicUrl);
+      
+      toast({
+        title: "Success",
+        description: "Profile photo uploaded successfully",
+      });
     } catch (error) {
       console.error('Error uploading avatar:', error);
       toast({
