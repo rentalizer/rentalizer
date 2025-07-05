@@ -21,6 +21,8 @@ import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { CommunityLeaderboard } from '@/components/community/CommunityLeaderboard';
 import { ContactChat } from '@/components/ContactChat';
 import { AdminSetup } from '@/components/AdminSetup';
+import { useAdminRole } from '@/hooks/useAdminRole';
+import { useNavigate } from 'react-router-dom';
 
 export interface CalculatorData {
   // Comps
@@ -56,6 +58,8 @@ const Community = () => {
   const [activeTab, setActiveTab] = useState('discussions');
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const { toast } = useToast();
+  const { isAdmin } = useAdminRole();
+  const navigate = useNavigate();
   
   // Calculator state
   const initialData: CalculatorData = {
@@ -199,6 +203,19 @@ const Community = () => {
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Ask Richie
             </TabsTrigger>
+            {isAdmin && (
+              <TabsTrigger 
+                value="members" 
+                className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/admin/members');
+                }}
+              >
+                <Users size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
+                Members
+              </TabsTrigger>
+            )}
           </TabsList>
 
           {/* Other Tabs */}
