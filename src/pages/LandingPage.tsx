@@ -423,12 +423,13 @@ const LandingPage = () => {
                   <div className="flex items-center justify-center gap-3 mb-4">
                     <Users className="h-8 w-8 text-cyan-400" />
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                      Training & Community Hub
+                      Training & Community Hub Demo
                     </h1>
                   </div>
+                  <p className="text-gray-300 mb-4">Preview of what members get access to</p>
                 </div>
 
-                {/* Navigation Tabs */}
+                {/* Demo Navigation Tabs */}
                 <Tabs defaultValue="discussions" className="w-full">
                   <TabsList className="flex w-full bg-slate-800/50 border border-cyan-500/20 justify-evenly h-14 p-2">
                     <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
@@ -462,58 +463,212 @@ const LandingPage = () => {
                   </TabsList>
 
                   <TabsContent value="discussions" className="mt-6">
-                    <GroupDiscussions />
+                    <Card className="bg-slate-800/50 border-cyan-500/20">
+                      <CardContent className="p-6">
+                        <div className="space-y-4">
+                          <div className="text-center mb-6">
+                            <h3 className="text-xl font-bold text-white mb-2">Community Discussions</h3>
+                            <p className="text-gray-300 text-sm">Connect with 500+ rental arbitrage entrepreneurs</p>
+                          </div>
+                          
+                          {/* Mock Discussion Posts */}
+                          {[
+                            { title: "Just closed my 5th property in Miami!", author: "Sarah M.", replies: 23, category: "Success Stories" },
+                            { title: "Best negotiation tactics for rent reductions?", author: "Mike R.", replies: 45, category: "Q&A" },
+                            { title: "Market Analysis: Austin vs Phoenix 2024", author: "David L.", replies: 67, category: "Market Intelligence" },
+                            { title: "Automation setup that saved me 20hrs/week", author: "Lisa K.", replies: 89, category: "Tips & Tricks" }
+                          ].map((post, index) => (
+                            <div key={index} className="bg-slate-700/50 rounded-lg p-4 border border-slate-600/30">
+                              <div className="flex justify-between items-start mb-2">
+                                <h4 className="text-cyan-300 font-medium text-sm">{post.title}</h4>
+                                <span className="text-xs text-purple-400 bg-purple-500/20 px-2 py-1 rounded">{post.category}</span>
+                              </div>
+                              <div className="flex justify-between text-xs text-gray-400">
+                                <span>by {post.author}</span>
+                                <span>{post.replies} replies</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
                   </TabsContent>
                   
                   <TabsContent value="calendar" className="mt-6">
-                    <CommunityCalendar />
+                    <Card className="bg-slate-800/50 border-cyan-500/20">
+                      <CardContent className="p-6">
+                        <div className="text-center mb-6">
+                          <h3 className="text-xl font-bold text-white mb-2">Live Events & Coaching</h3>
+                          <p className="text-gray-300 text-sm">Weekly group calls, workshops, and 1-on-1 sessions</p>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          {[
+                            { title: "Weekly Group Coaching Call", time: "Mon 8PM EST", type: "Recurring" },
+                            { title: "Market Analysis Workshop", time: "Wed 7PM EST", type: "Workshop" },
+                            { title: "Q&A with Richie", time: "Fri 6PM EST", type: "Live Session" },
+                            { title: "Guest Expert: Legal Strategies", time: "Sat 2PM EST", type: "Special Event" }
+                          ].map((event, index) => (
+                            <div key={index} className="bg-slate-700/50 rounded-lg p-3 border border-slate-600/30">
+                              <div className="flex justify-between items-center">
+                                <div>
+                                  <h4 className="text-cyan-300 font-medium text-sm">{event.title}</h4>
+                                  <p className="text-gray-400 text-xs">{event.time}</p>
+                                </div>
+                                <span className="text-xs text-green-400 bg-green-500/20 px-2 py-1 rounded">{event.type}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
                   </TabsContent>
 
                   <TabsContent value="training" className="mt-6">
-                    <VideoLibrary />
+                    <Card className="bg-slate-800/50 border-cyan-500/20">
+                      <CardContent className="p-6">
+                        <div className="text-center mb-6">
+                          <h3 className="text-xl font-bold text-white mb-2">Training Library</h3>
+                          <p className="text-gray-300 text-sm">50+ hours of step-by-step training content</p>
+                        </div>
+                        
+                        <div className="grid md:grid-cols-2 gap-4">
+                          {[
+                            { title: "Module 1: Market Research Fundamentals", duration: "45 min", progress: 100 },
+                            { title: "Module 2: Property Sourcing Strategies", duration: "62 min", progress: 75 },
+                            { title: "Module 3: Negotiation Masterclass", duration: "38 min", progress: 50 },
+                            { title: "Module 4: Automation & Systems", duration: "71 min", progress: 25 },
+                            { title: "Module 5: Scaling Your Portfolio", duration: "55 min", progress: 0 },
+                            { title: "Bonus: Legal & Tax Strategies", duration: "29 min", progress: 0 }
+                          ].map((module, index) => (
+                            <div key={index} className="bg-slate-700/50 rounded-lg p-3 border border-slate-600/30">
+                              <div className="flex items-center gap-3 mb-2">
+                                <Video className="h-4 w-4 text-cyan-400" />
+                                <div className="flex-1">
+                                  <h4 className="text-cyan-300 font-medium text-sm">{module.title}</h4>
+                                  <p className="text-gray-400 text-xs">{module.duration}</p>
+                                </div>
+                              </div>
+                              <div className="w-full bg-slate-600 rounded-full h-1">
+                                <div className="bg-cyan-400 h-1 rounded-full" style={{ width: `${module.progress}%` }}></div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
                   </TabsContent>
 
                   <TabsContent value="chat" className="mt-6">
-                    <MessageThreads />
+                    <Card className="bg-slate-800/50 border-cyan-500/20">
+                      <CardContent className="p-6">
+                        <div className="text-center mb-6">
+                          <h3 className="text-xl font-bold text-white mb-2">Member Chat</h3>
+                          <p className="text-gray-300 text-sm">Real-time conversations with fellow entrepreneurs</p>
+                        </div>
+                        
+                        <div className="space-y-3 max-h-64 overflow-y-auto">
+                          {[
+                            { name: "Alex K.", message: "Just got approved for my 3rd property! The scripts from Module 2 work perfectly 🎉", time: "2 min ago" },
+                            { name: "Maria S.", message: "Anyone know good property managers in Dallas area?", time: "5 min ago" },
+                            { name: "James L.", message: "That automation tool Richie mentioned saved me 15 hours this week", time: "8 min ago" },
+                            { name: "Sophie R.", message: "New member here! Excited to start my rental arbitrage journey", time: "12 min ago" },
+                            { name: "Tom W.", message: "Market analysis for Phoenix looks incredible right now", time: "15 min ago" }
+                          ].map((chat, index) => (
+                            <div key={index} className="bg-slate-700/50 rounded-lg p-3 border border-slate-600/30">
+                              <div className="flex justify-between items-start mb-1">
+                                <span className="text-cyan-300 font-medium text-sm">{chat.name}</span>
+                                <span className="text-xs text-gray-500">{chat.time}</span>
+                              </div>
+                              <p className="text-gray-300 text-sm">{chat.message}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
                   </TabsContent>
 
                   <TabsContent value="calculator" className="mt-6">
                     <Card className="bg-slate-800/50 border-cyan-500/20">
                       <CardContent className="p-8 text-center">
                         <Calculator className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
-                        <h3 className="text-2xl font-bold text-white mb-4">Rental Calculator</h3>
+                        <h3 className="text-2xl font-bold text-white mb-4">Advanced Rental Calculator</h3>
                         <p className="text-gray-300 mb-6">
-                          Calculate profitability, ROI, and cash flow for your rental arbitrage deals.
+                          Calculate profitability, ROI, and cash flow for your rental arbitrage deals with our exclusive calculator.
                         </p>
+                        <div className="text-left bg-slate-700/50 rounded-lg p-4 mb-6">
+                          <p className="text-sm text-gray-400 mb-2">Features include:</p>
+                          <ul className="text-cyan-300 space-y-1 text-sm">
+                            <li>• Market rent analysis integration</li>
+                            <li>• Seasonal occupancy adjustments</li>
+                            <li>• Expense tracking & projections</li>
+                            <li>• ROI & break-even calculations</li>
+                            <li>• Export to PDF reports</li>
+                          </ul>
+                        </div>
                         <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-                          Open Calculator
+                          Access Calculator (Members Only)
                         </Button>
                       </CardContent>
                     </Card>
                   </TabsContent>
 
                   <TabsContent value="docs" className="mt-6">
-                    <DocumentsLibrary />
+                    <Card className="bg-slate-800/50 border-cyan-500/20">
+                      <CardContent className="p-6">
+                        <div className="text-center mb-6">
+                          <h3 className="text-xl font-bold text-white mb-2">Business Documents Library</h3>
+                          <p className="text-gray-300 text-sm">Ready-to-use templates and legal documents</p>
+                        </div>
+                        
+                        <div className="grid md:grid-cols-2 gap-4">
+                          {[
+                            { name: "Lease Agreement Template", type: "PDF", category: "Legal" },
+                            { name: "Property Outreach Scripts", type: "DOC", category: "Communication" },
+                            { name: "Guest Welcome Guide", type: "PDF", category: "Operations" },
+                            { name: "Expense Tracking Spreadsheet", type: "XLS", category: "Finance" },
+                            { name: "Market Analysis Framework", type: "PDF", category: "Strategy" },
+                            { name: "Landlord Negotiation Scripts", type: "DOC", category: "Communication" }
+                          ].map((doc, index) => (
+                            <div key={index} className="bg-slate-700/50 rounded-lg p-3 border border-slate-600/30">
+                              <div className="flex items-center gap-3">
+                                <FileText className="h-4 w-4 text-cyan-400" />
+                                <div className="flex-1">
+                                  <h4 className="text-cyan-300 font-medium text-sm">{doc.name}</h4>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-400 text-xs">{doc.type}</span>
+                                    <span className="text-purple-400 text-xs">{doc.category}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
                   </TabsContent>
 
                   <TabsContent value="askrichie" className="mt-6">
                     <Card className="bg-slate-800/50 border-cyan-500/20">
                       <CardContent className="p-8 text-center">
                         <Bot className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
-                        <h3 className="text-2xl font-bold text-white mb-4">Ask Richie AI</h3>
+                        <h3 className="text-2xl font-bold text-white mb-4">Ask Richie AI Assistant</h3>
                         <p className="text-gray-300 mb-6">
-                          Get instant answers to your rental investment questions from our AI assistant.
+                          Get instant answers to your rental investment questions from our AI assistant trained on Richie's expertise.
                         </p>
                         <div className="space-y-4">
                           <div className="text-left bg-slate-700/50 rounded-lg p-4">
-                            <p className="text-sm text-gray-400 mb-2">Coming Soon:</p>
+                            <p className="text-sm text-gray-400 mb-2">Sample questions members ask:</p>
                             <ul className="text-cyan-300 space-y-1 text-sm">
-                              <li>• Market analysis insights</li>
-                              <li>• Investment strategy recommendations</li>
-                              <li>• Property evaluation assistance</li>
-                              <li>• Real-time Q&A support</li>
+                              <li>• "What's the best market for rental arbitrage in 2024?"</li>
+                              <li>• "How do I negotiate lower rent with landlords?"</li>
+                              <li>• "What occupancy rate should I expect in Miami?"</li>
+                              <li>• "How to automate guest communication?"</li>
                             </ul>
                           </div>
+                          <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
+                            Chat with Richie AI (Members Only)
+                          </Button>
                         </div>
                       </CardContent>
                     </Card>
