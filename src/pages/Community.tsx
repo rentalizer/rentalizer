@@ -20,6 +20,7 @@ import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
 import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { CommunityLeaderboard } from '@/components/community/CommunityLeaderboard';
 import { ContactChat } from '@/components/ContactChat';
+import { AdminSetup } from '@/components/AdminSetup';
 
 export interface CalculatorData {
   // Comps
@@ -314,6 +315,7 @@ const Community = () => {
         </Tabs>
       </div>
 
+      <AdminSetup />
       <Footer />
     </div>
   );
