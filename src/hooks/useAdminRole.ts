@@ -62,7 +62,19 @@ export const useAdminRole = () => {
       }
 
       console.log('Successfully made user admin');
-      setIsAdmin(true);
+      
+      // Force a re-check of admin status after successful creation
+      setTimeout(async () => {
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
+        
+        setIsAdmin(!!roleData);
+      }, 100);
+      
       return true;
     } catch (error) {
       console.error('Error making user admin:', error);
