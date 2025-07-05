@@ -82,7 +82,8 @@ const ProfileSetup = () => {
       }
 
       const fileExt = file.name.split('.').pop();
-      const filePath = `${user?.id}/avatar.${fileExt}`;
+      const timestamp = Date.now();
+      const filePath = `${user?.id}/avatar-${timestamp}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('avatars')
