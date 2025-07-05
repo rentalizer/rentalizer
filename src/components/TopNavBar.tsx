@@ -26,6 +26,15 @@ export const TopNavBar = () => {
           {/* Right side - Login or User info */}
           {user ? (
             <div className="flex items-center gap-4 mr-48">
+              <Button
+                onClick={() => navigate('/members')}
+                variant="outline"
+                size="sm"
+                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Members
+              </Button>
               {isAdmin && (
                 <Button
                   onClick={() => navigate('/admin/members')}
@@ -34,7 +43,7 @@ export const TopNavBar = () => {
                   className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10"
                 >
                   <Users className="h-4 w-4 mr-2" />
-                  Members
+                  Admin
                 </Button>
               )}
               <div className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20">

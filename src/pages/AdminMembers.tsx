@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Users, Crown, Mail, Calendar, Settings, Shield, MessageSquare } from 'lucide-react';
@@ -20,6 +21,8 @@ interface Member {
   email_confirmed_at: string | null;
   display_name: string | null;
   isAdmin: boolean;
+  profile_complete?: boolean;
+  avatar_url?: string | null;
 }
 
 const AdminMembers = () => {
@@ -49,10 +52,10 @@ const AdminMembers = () => {
         return;
       }
 
-      // Get display names from profiles table
+      // Get display names from profiles table  
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('user_id, display_name');
+        .select('user_id, display_name, first_name, last_name, avatar_url, profile_complete');
 
       // Get user roles
       const { data: userRoles } = await supabase
@@ -64,14 +67,20 @@ const AdminMembers = () => {
         const profile = profiles?.find(p => p.user_id === userProfile.id);
         const adminRole = userRoles?.find(r => r.user_id === userProfile.id && r.role === 'admin');
         
+        const displayName = profile?.first_name && profile?.last_name 
+          ? `${profile.first_name} ${profile.last_name}`
+          : profile?.display_name || userProfile.email.split('@')[0];
+        
         return {
           id: userProfile.id,
           email: userProfile.email,
           created_at: userProfile.created_at || '',
           last_sign_in_at: null, // We'll need to get this from auth.users if needed
           email_confirmed_at: userProfile.created_at || '',
-          display_name: profile?.display_name || userProfile.email.split('@')[0],
-          isAdmin: !!adminRole
+          display_name: displayName,
+          isAdmin: !!adminRole,
+          profile_complete: profile?.profile_complete || false,
+          avatar_url: profile?.avatar_url
         };
       }) || [];
 
@@ -277,12 +286,20 @@ const AdminMembers = () => {
                     <TableRow key={member.id} className="border-slate-700 hover:bg-slate-700/30">
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white font-semibold">
-                            {member.display_name?.charAt(0).toUpperCase() || member.email.charAt(0).toUpperCase()}
-                          </div>
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={member.avatar_url || ''} />
+                            <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-blue-500 text-white font-semibold">
+                              {member.display_name?.charAt(0).toUpperCase() || member.email.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
                           <div>
                             <p className="text-white font-medium">{member.display_name || 'User'}</p>
                             <p className="text-sm text-gray-400">@{member.email.split('@')[0]}</p>
+                            {member.profile_complete === false && (
+                              <Badge variant="outline" className="border-yellow-500/30 text-yellow-300 text-xs mt-1">
+                                Profile Incomplete
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       </TableCell>
