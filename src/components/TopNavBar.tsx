@@ -1,14 +1,16 @@
 
 import React from 'react';
-import { BarChart3, User, LogOut } from 'lucide-react';
+import { BarChart3, User, LogOut, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
+import { useNavigate } from 'react-router-dom';
 
 export const TopNavBar = () => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdminRole();
+  const navigate = useNavigate();
 
   return (
     <div className="w-full bg-slate-700/90 backdrop-blur-lg border-b border-gray-500/50">
@@ -24,6 +26,17 @@ export const TopNavBar = () => {
           {/* Right side - Login or User info */}
           {user ? (
             <div className="flex items-center gap-4 mr-48">
+              {isAdmin && (
+                <Button
+                  onClick={() => navigate('/admin/members')}
+                  variant="outline"
+                  size="sm"
+                  className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Members
+                </Button>
+              )}
               <div className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20">
                 <User className="h-4 w-4 text-cyan-400" />
                 <span className="text-cyan-300">{user.email}</span>

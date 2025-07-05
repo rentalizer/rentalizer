@@ -31,6 +31,7 @@ import CalculatorTest from "./pages/CalculatorTest";
 import CalculatorTestGate from "./pages/CalculatorTestGate";
 import StudentLog from "./pages/StudentLog";
 import TestHome from "./pages/TestHome";
+import AdminMembers from "./pages/AdminMembers";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const AppRoutes = () => (
     <Route path="/leaderboard" element={<FullLeaderboard />} />
     <Route path="/pms" element={<PMS />} />
     <Route path="/student_log" element={<StudentLog />} />
+    <Route path="/admin/members" element={<AdminMembers />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
     <Route path="/terms-of-service" element={<TermsOfService />} />
