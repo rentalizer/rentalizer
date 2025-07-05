@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar, Star } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar, Star, X } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { MarketIntelligenceDemo } from '@/components/MarketIntelligenceDemo';
@@ -113,215 +114,215 @@ const TestHome = () => {
 
       <div className="relative z-10">
         <div className="container mx-auto px-4 py-16">
-          {!activeDemo ? (
-            <>
-              {/* Main Content */}
-              <div className="text-center mb-16">
-                <div className="flex items-center justify-center gap-4 mb-6">
-                  <BarChart3 className="h-16 w-16 text-cyan-400 neon-text" />
-                  <div className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    {texts.mainTitle}
-                  </div>
-                </div>
-                
-                <div className="text-lg text-white font-medium mb-8">
-                  {texts.byLine}
-                </div>
-                
-                {/* Updated Tagline */}
-                <div className="mb-12 px-4">
-                  <div className="text-lg md:text-xl lg:text-2xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
-                    All-In-One Platform To Launch, Automate, & Scale Rental Income—<br />
-                    Powered By AI
-                  </div>
-                </div>
-
-                {/* Single Button Layout */}
-                <div className="flex justify-center items-center mb-16">
-                  <Button 
-                    size="lg"
-                    onClick={handleBookDemo}
-                    className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-6 text-xl font-semibold min-w-[200px]"
-                  >
-                    <Calendar className="h-6 w-6 mr-3" />
-                    <span className="inline">
-                      {texts.buttonText}
-                    </span>
-                  </Button>
-                </div>
+          {/* Main Content */}
+          <div className="text-center mb-16">
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <BarChart3 className="h-16 w-16 text-cyan-400 neon-text" />
+              <div className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                {texts.mainTitle}
               </div>
-
-              {/* Animated Features Section */}
-              <div className="max-w-7xl mx-auto mb-20">
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                  {/* Feature 1: Market Intelligence */}
-                  <div className="group relative" onClick={() => handleFeatureClick('market')}>
-                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                    <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
-                      <CardHeader className="text-center pb-4">
-                        <div className="mx-auto mb-4 relative">
-                          <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center transition-all duration-300">
-                            <Brain className="h-10 w-10 text-white" />
-                          </div>
-                          <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        </div>
-                        <div className="text-xl font-bold text-cyan-300">
-                          {texts.feature1Title}
-                        </div>
-                      </CardHeader>
-                      <CardContent className="text-center">
-                        <div className="text-gray-300 text-sm leading-relaxed">
-                          {texts.feature1Description}
-                        </div>
-                        <div className="mt-4 flex justify-center space-x-2">
-                          <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-100"></div>
-                          <div className="w-2 h-2 bg-cyan-300 rounded-full animate-bounce delay-200"></div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Feature 2: Acquisition CRM & Calculator */}
-                  <div className="group relative" onClick={() => handleFeatureClick('acquisition')}>
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                    <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
-                      <CardHeader className="text-center pb-4">
-                        <div className="mx-auto mb-4 relative">
-                          <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center transition-all duration-300">
-                            <Calculator className="h-10 w-10 text-white" />
-                          </div>
-                          <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        </div>
-                        <div className="text-xl font-bold text-purple-300">
-                          {texts.feature2Title}
-                        </div>
-                      </CardHeader>
-                      <CardContent className="text-center">
-                        <div className="text-gray-300 text-sm leading-relaxed">
-                          {texts.feature2Description}
-                        </div>
-                        <div className="mt-4 flex justify-center space-x-1">
-                          <div className="w-8 h-1 bg-purple-400 rounded animate-pulse"></div>
-                          <div className="w-6 h-1 bg-cyan-400 rounded animate-pulse delay-200"></div>
-                          <div className="w-10 h-1 bg-purple-300 rounded animate-pulse delay-400"></div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Feature 3: PMS */}
-                  <div className="group relative" onClick={() => handleFeatureClick('pms')}>
-                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                    <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
-                      <CardHeader className="text-center pb-4">
-                        <div className="mx-auto mb-4 relative">
-                          <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center transition-all duration-300">
-                            <Target className="h-10 w-10 text-white" />
-                          </div>
-                          <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        </div>
-                        <div className="text-xl font-bold text-cyan-300">
-                          {texts.feature3Title}
-                        </div>
-                      </CardHeader>
-                      <CardContent className="text-center">
-                        <div className="text-gray-300 text-sm leading-relaxed">
-                          {texts.feature3Description}
-                        </div>
-                        <div className="mt-4 grid grid-cols-3 gap-1">
-                          {[...Array(6)].map((_, i) => (
-                            <div key={i} className={`h-2 bg-cyan-400/50 rounded animate-pulse`} style={{animationDelay: `${i * 100}ms`}}></div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Feature 4: Community */}
-                  <div className="group relative" onClick={() => handleFeatureClick('community')}>
-                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                    <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
-                      <CardHeader className="text-center pb-4">
-                        <div className="mx-auto mb-4 relative">
-                          <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center transition-all duration-300">
-                            <MessageSquare className="h-10 w-10 text-white" />
-                          </div>
-                          <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        </div>
-                        <div className="text-xl font-bold text-purple-300">
-                          {texts.feature4Title}
-                        </div>
-                      </CardHeader>
-                      <CardContent className="text-center">
-                        <div className="text-gray-300 text-sm leading-relaxed">
-                          {texts.feature4Description}
-                        </div>
-                        <div className="mt-4 flex justify-center">
-                          <div className="flex -space-x-2">
-                            {[...Array(4)].map((_, i) => (
-                              <div key={i} className={`w-6 h-6 bg-gradient-to-br from-purple-400 to-cyan-400 rounded-full border-2 border-slate-800 animate-pulse`} style={{animationDelay: `${i * 150}ms`}}></div>
-                            ))}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              </div>
-
-              {/* Description Section */}
-              <div className="text-center mb-16">
-                <div className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-                  {texts.description}
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="space-y-6">
-              {/* Back to Features Button */}
-              <div className="text-center">
-                <button
-                  onClick={handleCloseDemo}
-                  className="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-lg transition-colors"
-                >
-                  ← Back to Features
-                </button>
-              </div>
-
-              {/* Demo Content */}
-              {activeDemo === 'market' && (
-                <MarketIntelligenceDemo 
-                  currentStep={currentStep} 
-                  isRunning={true}
-                  onStepChange={setCurrentStep}
-                />
-              )}
-              
-              {activeDemo === 'acquisition' && (
-                <AcquisitionsCRMDemo 
-                  currentStep={currentStep + 3} // Start from step 4 in the overall flow
-                  isRunning={true}
-                />
-              )}
-              
-              {activeDemo === 'pms' && (
-                <PMSDemo 
-                  currentStep={currentStep + 11} // Start from step 12 in the overall flow
-                  isRunning={true}
-                />
-              )}
-              
-              {activeDemo === 'community' && (
-                <CommunityDemo 
-                  currentStep={17}
-                  isRunning={true}
-                />
-              )}
             </div>
-          )}
+            
+            <div className="text-lg text-white font-medium mb-8">
+              {texts.byLine}
+            </div>
+            
+            {/* Updated Tagline */}
+            <div className="mb-12 px-4">
+              <div className="text-lg md:text-xl lg:text-2xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
+                All-In-One Platform To Launch, Automate, & Scale Rental Income—<br />
+                Powered By AI
+              </div>
+            </div>
+
+            {/* Single Button Layout */}
+            <div className="flex justify-center items-center mb-16">
+              <Button 
+                size="lg"
+                onClick={handleBookDemo}
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-6 text-xl font-semibold min-w-[200px]"
+              >
+                <Calendar className="h-6 w-6 mr-3" />
+                <span className="inline">
+                  {texts.buttonText}
+                </span>
+              </Button>
+            </div>
+          </div>
+
+          {/* Animated Features Section */}
+          <div className="max-w-7xl mx-auto mb-20">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {/* Feature 1: Market Intelligence */}
+              <div className="group relative" onClick={() => handleFeatureClick('market')}>
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
+                  <CardHeader className="text-center pb-4">
+                    <div className="mx-auto mb-4 relative">
+                      <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center transition-all duration-300">
+                        <Brain className="h-10 w-10 text-white" />
+                      </div>
+                      <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    </div>
+                    <div className="text-xl font-bold text-cyan-300">
+                      {texts.feature1Title}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <div className="text-gray-300 text-sm leading-relaxed">
+                      {texts.feature1Description}
+                    </div>
+                    <div className="mt-4 flex justify-center space-x-2">
+                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-100"></div>
+                      <div className="w-2 h-2 bg-cyan-300 rounded-full animate-bounce delay-200"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Feature 2: Acquisition CRM & Calculator */}
+              <div className="group relative" onClick={() => handleFeatureClick('acquisition')}>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
+                  <CardHeader className="text-center pb-4">
+                    <div className="mx-auto mb-4 relative">
+                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center transition-all duration-300">
+                        <Calculator className="h-10 w-10 text-white" />
+                      </div>
+                      <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    </div>
+                    <div className="text-xl font-bold text-purple-300">
+                      {texts.feature2Title}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <div className="text-gray-300 text-sm leading-relaxed">
+                      {texts.feature2Description}
+                    </div>
+                    <div className="mt-4 flex justify-center space-x-1">
+                      <div className="w-8 h-1 bg-purple-400 rounded animate-pulse"></div>
+                      <div className="w-6 h-1 bg-cyan-400 rounded animate-pulse delay-200"></div>
+                      <div className="w-10 h-1 bg-purple-300 rounded animate-pulse delay-400"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Feature 3: PMS */}
+              <div className="group relative" onClick={() => handleFeatureClick('pms')}>
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
+                  <CardHeader className="text-center pb-4">
+                    <div className="mx-auto mb-4 relative">
+                      <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center transition-all duration-300">
+                        <Target className="h-10 w-10 text-white" />
+                      </div>
+                      <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    </div>
+                    <div className="text-xl font-bold text-cyan-300">
+                      {texts.feature3Title}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <div className="text-gray-300 text-sm leading-relaxed">
+                      {texts.feature3Description}
+                    </div>
+                    <div className="mt-4 grid grid-cols-3 gap-1">
+                      {[...Array(6)].map((_, i) => (
+                        <div key={i} className={`h-2 bg-cyan-400/50 rounded animate-pulse`} style={{animationDelay: `${i * 100}ms`}}></div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Feature 4: Community */}
+              <div className="group relative" onClick={() => handleFeatureClick('community')}>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
+                  <CardHeader className="text-center pb-4">
+                    <div className="mx-auto mb-4 relative">
+                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center transition-all duration-300">
+                        <MessageSquare className="h-10 w-10 text-white" />
+                      </div>
+                      <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    </div>
+                    <div className="text-xl font-bold text-purple-300">
+                      {texts.feature4Title}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <div className="text-gray-300 text-sm leading-relaxed">
+                      {texts.feature4Description}
+                    </div>
+                    <div className="mt-4 flex justify-center">
+                      <div className="flex -space-x-2">
+                        {[...Array(4)].map((_, i) => (
+                          <div key={i} className={`w-6 h-6 bg-gradient-to-br from-purple-400 to-cyan-400 rounded-full border-2 border-slate-800 animate-pulse`} style={{animationDelay: `${i * 150}ms`}}></div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+
+          {/* Description Section */}
+          <div className="text-center mb-16">
+            <div className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+              {texts.description}
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Demo Modal */}
+      <Dialog open={!!activeDemo} onOpenChange={() => handleCloseDemo()}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="text-white text-xl">
+              {activeDemo === 'market' && 'Market Intelligence Demo'}
+              {activeDemo === 'acquisition' && 'Acquisition CRM Demo'}
+              {activeDemo === 'pms' && 'Property Management Demo'}
+              {activeDemo === 'community' && 'Community Demo'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Demo Content */}
+            {activeDemo === 'market' && (
+              <MarketIntelligenceDemo 
+                currentStep={currentStep} 
+                isRunning={true}
+                onStepChange={setCurrentStep}
+              />
+            )}
+            
+            {activeDemo === 'acquisition' && (
+              <AcquisitionsCRMDemo 
+                currentStep={currentStep + 3}
+                isRunning={true}
+              />
+            )}
+            
+            {activeDemo === 'pms' && (
+              <PMSDemo 
+                currentStep={currentStep + 11}
+                isRunning={true}
+              />
+            )}
+            
+            {activeDemo === 'community' && (
+              <CommunityDemo 
+                currentStep={17}
+                isRunning={true}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Footer */}
       <Footer showLinks={false} />
