@@ -39,17 +39,17 @@ const AdminMembers = () => {
     try {
       setLoading(true);
       
-      // Get all users from auth
-      const { data: authUsers, error: authError } = await supabase
+      // First get user profiles which contain the user IDs we need
+      const { data: userProfiles, error: profilesError } = await supabase
         .from('user_profiles')
         .select('*');
 
-      if (authError) {
-        console.error('Error fetching users:', authError);
+      if (profilesError) {
+        console.error('Error fetching user profiles:', profilesError);
         return;
       }
 
-      // Get profiles
+      // Get display names from profiles table
       const { data: profiles } = await supabase
         .from('profiles')
         .select('user_id, display_name');
@@ -60,17 +60,17 @@ const AdminMembers = () => {
         .select('user_id, role');
 
       // Combine the data
-      const membersData: Member[] = authUsers?.map(user => {
-        const profile = profiles?.find(p => p.user_id === user.id);
-        const adminRole = userRoles?.find(r => r.user_id === user.id && r.role === 'admin');
+      const membersData: Member[] = userProfiles?.map(userProfile => {
+        const profile = profiles?.find(p => p.user_id === userProfile.id);
+        const adminRole = userRoles?.find(r => r.user_id === userProfile.id && r.role === 'admin');
         
         return {
-          id: user.id,
-          email: user.email,
-          created_at: user.created_at || '',
-          last_sign_in_at: null, // We'll need to get this from a different source
-          email_confirmed_at: user.created_at || '',
-          display_name: profile?.display_name || user.email.split('@')[0],
+          id: userProfile.id,
+          email: userProfile.email,
+          created_at: userProfile.created_at || '',
+          last_sign_in_at: null, // We'll need to get this from auth.users if needed
+          email_confirmed_at: userProfile.created_at || '',
+          display_name: profile?.display_name || userProfile.email.split('@')[0],
           isAdmin: !!adminRole
         };
       }) || [];
