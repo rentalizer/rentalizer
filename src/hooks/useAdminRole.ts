@@ -45,15 +45,19 @@ export const useAdminRole = () => {
 
     try {
       console.log('Attempting to make user admin:', user.id);
-      const { error } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: user.id,
-          role: 'admin'
-        });
+      
+      // Call the database function that bypasses RLS
+      const { data, error } = await supabase.rpc('make_first_admin', {
+        target_user_id: user.id
+      });
 
       if (error) {
         console.error('Error making user admin:', error);
+        return false;
+      }
+
+      if (!data) {
+        console.log('Admin already exists or function returned false');
         return false;
       }
 
