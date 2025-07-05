@@ -30,12 +30,14 @@ import PMS from "./pages/PMS";
 import CalculatorTest from "./pages/CalculatorTest";
 import CalculatorTestGate from "./pages/CalculatorTestGate";
 import StudentLog from "./pages/StudentLog";
+import TestHome from "./pages/TestHome";
 
 const queryClient = new QueryClient();
 
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<LandingPage />} />
+    <Route path="/test-home" element={<TestHome />} />
     <Route path="/login" element={<Login />} />
     <Route path="/dashboard" element={<Index />} />
     <Route path="/demo" element={<Demo />} />
