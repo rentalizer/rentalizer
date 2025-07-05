@@ -44,6 +44,7 @@ export const useAdminRole = () => {
     if (!user) return;
 
     try {
+      console.log('Attempting to make user admin:', user.id);
       const { error } = await supabase
         .from('user_roles')
         .insert({
@@ -56,6 +57,7 @@ export const useAdminRole = () => {
         return;
       }
 
+      console.log('Successfully made user admin');
       setIsAdmin(true);
     } catch (error) {
       console.error('Error making user admin:', error);
