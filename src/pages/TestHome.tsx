@@ -33,7 +33,16 @@ const TestHome = () => {
 
   const handleFeatureClick = (feature: string) => {
     setActiveDemo(feature);
-    setCurrentStep(1);
+    // Reset to appropriate starting step for each demo
+    if (feature === 'market') {
+      setCurrentStep(1);
+    } else if (feature === 'acquisition') {
+      setCurrentStep(4);
+    } else if (feature === 'pms') {
+      setCurrentStep(12);
+    } else if (feature === 'community') {
+      setCurrentStep(17);
+    }
   };
 
   const handleCloseDemo = () => {
@@ -302,21 +311,21 @@ const TestHome = () => {
             
             {activeDemo === 'acquisition' && (
               <AcquisitionsCRMDemo 
-                currentStep={currentStep + 3}
+                currentStep={currentStep}
                 isRunning={true}
               />
             )}
             
             {activeDemo === 'pms' && (
               <PMSDemo 
-                currentStep={currentStep + 11}
+                currentStep={currentStep}
                 isRunning={true}
               />
             )}
             
             {activeDemo === 'community' && (
               <CommunityDemo 
-                currentStep={17}
+                currentStep={currentStep}
                 isRunning={true}
               />
             )}
