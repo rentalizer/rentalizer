@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,9 +12,7 @@ import {
   MapPin,
   Table2,
   Map,
-  ArrowRight,
-  Play,
-  Pause
+  ArrowRight
 } from 'lucide-react';
 
 interface MarketIntelligenceDemoProps {
@@ -24,8 +22,6 @@ interface MarketIntelligenceDemoProps {
 }
 
 export const MarketIntelligenceDemo = ({ currentStep, isRunning, onStepChange }: MarketIntelligenceDemoProps) => {
-  const [autoPlay, setAutoPlay] = useState(false);
-
   // Mock data for market analysis
   const mockMarketData = [
     { submarket: "Hillcrest", strRevenue: 7076, medianRent: 3800, multiple: 1.86 },
@@ -42,24 +38,6 @@ export const MarketIntelligenceDemo = ({ currentStep, isRunning, onStepChange }:
     { id: 3, title: "Location Analysis", description: "Identifies best neighborhoods", icon: MapPin }
   ];
 
-  useEffect(() => {
-    if (autoPlay) {
-      const timer = setInterval(() => {
-        onStepChange(currentStep >= 3 ? 1 : currentStep + 1);
-      }, 4000);
-      return () => clearInterval(timer);
-    }
-  }, [autoPlay, currentStep, onStepChange]);
-
-  const handlePlayPause = () => {
-    setAutoPlay(!autoPlay);
-  };
-
-  const handleStepClick = (stepId: number) => {
-    setAutoPlay(false);
-    onStepChange(stepId);
-  };
-
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -71,23 +49,12 @@ export const MarketIntelligenceDemo = ({ currentStep, isRunning, onStepChange }:
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-center gap-4 mb-6">
-            <Button 
-              onClick={handlePlayPause}
-              className={`px-6 py-2 ${autoPlay ? 'bg-red-600 hover:bg-red-700' : 'bg-cyan-600 hover:bg-cyan-700'}`}
-            >
-              {autoPlay ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
-              {autoPlay ? 'Pause Demo' : 'Auto Play Demo'}
-            </Button>
-          </div>
-
           {/* Progress Steps */}
           <div className="flex justify-center items-center gap-4 mb-6">
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center">
                 <div
-                  onClick={() => handleStepClick(step.id)}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 ${
+                  className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
                     currentStep >= step.id 
                       ? 'bg-cyan-500 text-white' 
                       : 'bg-slate-700 text-gray-400'

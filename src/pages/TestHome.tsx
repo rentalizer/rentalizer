@@ -14,6 +14,32 @@ const TestHome = () => {
   const [activeDemo, setActiveDemo] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
 
+  // Auto-progression through demo steps
+  useEffect(() => {
+    if (activeDemo) {
+      const stepRanges = {
+        'market': { start: 1, end: 3, duration: 3000 },
+        'acquisition': { start: 4, end: 11, duration: 2500 },
+        'pms': { start: 12, end: 16, duration: 2000 },
+        'community': { start: 17, end: 17, duration: 5000 }
+      };
+
+      const config = stepRanges[activeDemo];
+      if (config) {
+        const timer = setInterval(() => {
+          setCurrentStep(prevStep => {
+            if (prevStep >= config.end) {
+              return config.start; // Loop back to start
+            }
+            return prevStep + 1;
+          });
+        }, config.duration);
+
+        return () => clearInterval(timer);
+      }
+    }
+  }, [activeDemo]);
+
   // Static text content from the actual landing page
   const texts = {
     mainTitle: 'RENTALIZER',
