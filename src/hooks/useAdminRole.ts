@@ -41,7 +41,7 @@ export const useAdminRole = () => {
   }, [user]);
 
   const makeAdmin = async () => {
-    if (!user) return;
+    if (!user) return false;
 
     try {
       console.log('Attempting to make user admin:', user.id);
@@ -54,13 +54,15 @@ export const useAdminRole = () => {
 
       if (error) {
         console.error('Error making user admin:', error);
-        return;
+        return false;
       }
 
       console.log('Successfully made user admin');
       setIsAdmin(true);
+      return true;
     } catch (error) {
       console.error('Error making user admin:', error);
+      return false;
     }
   };
 

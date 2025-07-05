@@ -9,11 +9,19 @@ export const AdminSetup = () => {
   const { toast } = useToast();
 
   const handleMakeAdmin = async () => {
-    await makeAdmin();
-    toast({
-      title: "Admin Role Granted",
-      description: "You now have administrator privileges.",
-    });
+    const success = await makeAdmin();
+    if (success) {
+      toast({
+        title: "Admin Role Granted",
+        description: "You now have administrator privileges.",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to grant admin privileges. Check console for details.",
+        variant: "destructive"
+      });
+    }
   };
 
   if (isAdmin) {
