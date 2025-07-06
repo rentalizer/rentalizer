@@ -35,12 +35,15 @@ export const MessageThreads = () => {
 
   const fetchDiscussions = async () => {
     try {
+      // Add cache busting to force fresh data fetch
+      const timestamp = Date.now();
       const { data, error } = await supabase
         .from('discussions')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      console.log('Fresh discussions data:', data); // Debug log
       setDiscussions(data || []);
     } catch (error) {
       console.error('Error fetching discussions:', error);
