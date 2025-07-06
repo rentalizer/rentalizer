@@ -38,7 +38,7 @@ export const GroupDiscussions = () => {
   const { isAdmin } = useAdminRole();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('General discussion');
+  const [selectedCategory, setSelectedCategory] = useState('General');
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [newPost, setNewPost] = useState('');
   const [postTitle, setPostTitle] = useState('');
@@ -384,8 +384,8 @@ export const GroupDiscussions = () => {
     }
   };
 
-  const categories = ['General discussion', 'Resource Library', 'Success Stories', 'Share Your Wins'];
-  const filters = ['All', 'General discussion', 'Resource Library', 'Success Stories', 'Share Your Wins', 'More...'];
+  const categories = ['General', 'Resource Library', 'Success Stories'];
+  const filters = ['All', 'General', 'Resource Library', 'Success Stories'];
 
   const filteredDiscussions = discussionsList
     .filter(discussion => {
@@ -393,7 +393,7 @@ export const GroupDiscussions = () => {
                            discussion.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            discussion.author.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesFilter = selectedFilter === 'All' || 
-                           (selectedFilter === 'General discussion' && discussion.category === 'General discussion') ||
+                           (selectedFilter === 'General' && discussion.category === 'General') ||
                            (selectedFilter === discussion.category);
       return matchesSearch && matchesFilter;
     })
