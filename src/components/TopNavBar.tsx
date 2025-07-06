@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart3, User, LogOut, Users, TrendingUp, Building, Database } from 'lucide-react';
+import { BarChart3, User, LogOut, Users, TrendingUp, Building, HandHeart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,9 +30,9 @@ export const TopNavBar = () => {
       icon: Building
     },
     {
-      name: 'PMS',
+      name: 'Property Management',
       path: '/pms',
-      icon: Database
+      icon: HandHeart
     }
   ];
 
