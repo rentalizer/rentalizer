@@ -163,17 +163,11 @@ export const MessageThreads = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-cyan-300">Message Threads</h2>
-          <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
-            {discussions.length} threads
-          </Badge>
-        </div>
-        <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-          <Plus className="h-4 w-4 mr-2" />
-          New Thread
-        </Button>
+      <div className="flex items-center gap-4">
+        <h2 className="text-2xl font-bold text-cyan-300">Message Threads</h2>
+        <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
+          {discussions.length} threads
+        </Badge>
       </div>
 
       {/* Search */}
@@ -254,7 +248,7 @@ export const MessageThreads = () => {
           <CardContent className="text-center py-12">
             <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-300 mb-2">No threads found</h3>
-            <p className="text-gray-400">Try adjusting your search terms or start a new thread</p>
+            <p className="text-gray-400">Try adjusting your search terms</p>
           </CardContent>
         </Card>
       )}
