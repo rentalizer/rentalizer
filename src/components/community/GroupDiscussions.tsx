@@ -54,6 +54,15 @@ export const GroupDiscussions = () => {
   const [editContent, setEditContent] = useState('');
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
+  
+  // Real community stats
+  const [communityStats, setCommunityStats] = useState({
+    totalMembers: 0,
+    onlineUsers: 0,
+    adminCount: 0
+  });
+  const [onlinePresence, setOnlinePresence] = useState<Record<string, any>>({});
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -116,6 +125,73 @@ export const GroupDiscussions = () => {
     const savedDiscussions = loadDiscussions();
     setDiscussionsList(savedDiscussions);
   }, []);
+
+  // Fetch real community stats
+  useEffect(() => {
+    const fetchCommunityStats = async () => {
+      try {
+        // Count total profiles (members)
+        const { count: totalMembers } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true });
+
+        // Count admins
+        const { count: adminCount } = await supabase
+          .from('user_roles')
+          .select('*', { count: 'exact', head: true })
+          .eq('role', 'admin');
+
+        setCommunityStats(prev => ({
+          ...prev,
+          totalMembers: totalMembers || 0,
+          adminCount: adminCount || 0
+        }));
+      } catch (error) {
+        console.error('Error fetching community stats:', error);
+      }
+    };
+
+    fetchCommunityStats();
+
+    // Set up presence tracking
+    const channel = supabase.channel('community_presence');
+    
+    // Track current user presence
+    if (user) {
+      channel
+        .on('presence', { event: 'sync' }, () => {
+          const state = channel.presenceState();
+          const onlineCount = Object.keys(state).length;
+          setCommunityStats(prev => ({
+            ...prev,
+            onlineUsers: onlineCount
+          }));
+          setOnlinePresence(state);
+        })
+        .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+          console.log('User joined:', key, newPresences);
+        })
+        .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+          console.log('User left:', key, leftPresences);
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            // Track this user's presence
+            await channel.track({
+              user_id: user.id,
+              display_name: profile?.display_name || user.email?.split('@')[0] || 'Anonymous',
+              online_at: new Date().toISOString(),
+            });
+          }
+        });
+    }
+
+    return () => {
+      if (user) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [user, profile]);
 
   // Functions to handle likes and comments
   const handleLike = (discussionId: string) => {
@@ -855,15 +931,21 @@ export const GroupDiscussions = () => {
             <CardContent className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Total Members</span>
-                <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">187</Badge>
+                <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
+                  {communityStats.totalMembers}
+                </Badge>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Online Now</span>
-                <Badge className="bg-green-600/20 text-green-300 border-green-500/30">12</Badge>
+                <Badge className="bg-green-600/20 text-green-300 border-green-500/30">
+                  {communityStats.onlineUsers}
+                </Badge>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Admins</span>
-                <Badge className="bg-red-600/20 text-red-300 border-red-500/30">3</Badge>
+                <Badge className="bg-red-600/20 text-red-300 border-red-500/30">
+                  {communityStats.adminCount}
+                </Badge>
               </div>
             </CardContent>
           </Card>
