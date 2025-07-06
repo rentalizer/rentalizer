@@ -69,7 +69,7 @@ export const TopNavBar = () => {
                   }`}
                 >
                   {tab.emoji ? (
-                    <span className="text-base">{tab.emoji}</span>
+                    <span className="text-base grayscale brightness-75">{tab.emoji}</span>
                   ) : (
                     <Icon className="h-4 w-4" />
                   )}
