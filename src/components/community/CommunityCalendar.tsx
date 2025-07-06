@@ -15,6 +15,8 @@ import { ChevronLeft, ChevronRight, Plus, Clock, Users, Video, CalendarIcon, Upl
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useAdminRole } from '@/hooks/useAdminRole';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Event {
   id: string;
@@ -38,6 +40,7 @@ export const CommunityCalendar = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false);
   const { isAdmin } = useAdminRole();
+  const { user } = useAuth();
   
   // Form state for adding new events
   const [newEvent, setNewEvent] = useState({
@@ -53,77 +56,45 @@ export const CommunityCalendar = () => {
     attendees: 'All members'
   });
 
-  // Sample events including weekly trainings
-  const [events, setEvents] = useState<Event[]>([
-    {
-      id: '1',
-      title: 'Weekly Live Training',
-      date: new Date(2025, 5, 3), // June 3rd
-      time: '5:00 PM PST',
-      type: 'training',
-      attendees: 45,
-      isRecurring: true
-    },
-    {
-      id: '2',
-      title: 'Market Research Deep Dive',
-      date: new Date(2025, 5, 5),
-      time: '4:00 PM PST',
-      type: 'webinar',
-      attendees: 32
-    },
-    {
-      id: '3',
-      title: 'Weekly Live Training',
-      date: new Date(2025, 5, 10),
-      time: '5:00 PM PST',
-      type: 'training',
-      attendees: 38,
-      isRecurring: true
-    },
-    {
-      id: '4',
-      title: 'Competitor Analysis Workshop',
-      date: new Date(2025, 5, 12),
-      time: '4:00 PM PST',
-      type: 'workshop',
-      attendees: 28
-    },
-    {
-      id: '5',
-      title: 'Weekly Live Training',
-      date: new Date(2025, 5, 17),
-      time: '5:00 PM PST',
-      type: 'training',
-      attendees: 41,
-      isRecurring: true
-    },
-    {
-      id: '6',
-      title: 'Hosting Revenue Optimization',
-      date: new Date(2025, 5, 19),
-      time: '4:00 PM PST',
-      type: 'webinar',
-      attendees: 35
-    },
-    {
-      id: '7',
-      title: 'Weekly Live Training',
-      date: new Date(2025, 5, 24),
-      time: '5:00 PM PST',
-      type: 'training',
-      attendees: 42,
-      isRecurring: true
-    },
-    {
-      id: '8',
-      title: 'Property Listing Strategies',
-      date: new Date(2025, 5, 26),
-      time: '4:00 PM PST',
-      type: 'workshop',
-      attendees: 29
+  // State for events
+  const [events, setEvents] = useState<Event[]>([]);
+
+  // Fetch events from database
+  const fetchEvents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .order('event_date', { ascending: true });
+      
+      if (error) throw error;
+      
+      // Convert database events to frontend format
+      const formattedEvents = data?.map(event => ({
+        id: event.id,
+        title: event.title,
+        date: new Date(event.event_date),
+        time: event.event_time,
+        type: event.event_type as 'training' | 'webinar' | 'discussion' | 'workshop',
+        description: event.description,
+        location: event.location,
+        duration: event.duration,
+        zoomLink: event.zoom_link,
+        attendees: event.attendees,
+        isRecurring: event.is_recurring,
+        remindMembers: event.remind_members
+      })) || [];
+      
+      setEvents(formattedEvents);
+    } catch (error) {
+      console.error('Error fetching events:', error);
     }
-  ]);
+  };
+
+  // Load events on component mount
+  React.useEffect(() => {
+    fetchEvents();
+  }, []);
 
   const getEventTypeColor = (type: string) => {
     switch (type) {
