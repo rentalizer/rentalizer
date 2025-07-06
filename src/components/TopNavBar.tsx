@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart3, User, LogOut, Users, TrendingUp, Building, HandHeart } from 'lucide-react';
+import { BarChart3, User, LogOut, Users, TrendingUp, Building } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
@@ -32,7 +32,8 @@ export const TopNavBar = () => {
     {
       name: 'Property Management',
       path: '/pms',
-      icon: HandHeart
+      icon: null,
+      emoji: '🫶'
     }
   ];
 
@@ -67,7 +68,11 @@ export const TopNavBar = () => {
                       : 'text-gray-300 hover:bg-slate-600/50 hover:text-cyan-300'
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
+                  {tab.emoji ? (
+                    <span className="text-base">{tab.emoji}</span>
+                  ) : (
+                    <Icon className="h-4 w-4" />
+                  )}
                   <span className="font-medium text-sm">{tab.name}</span>
                 </Link>
               );
