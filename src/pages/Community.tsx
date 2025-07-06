@@ -184,14 +184,7 @@ const Community = () => {
               <MessageSquare className="h-5 w-5 mr-2" />
               Chat
             </TabsTrigger>
-            <TabsTrigger 
-              value="calculator" 
-              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300"
-              onClick={(e) => {
-                e.preventDefault();
-                setCalculatorOpen(true);
-              }}
-            >
+            <TabsTrigger value="calculator" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
             </TabsTrigger>
@@ -230,74 +223,65 @@ const Community = () => {
             <MessageThreads />
           </TabsContent>
 
-          {/* Calculator Dialog - outside of tabs content */}
-          <Dialog open={calculatorOpen} onOpenChange={(open) => {
-            setCalculatorOpen(open);
-            if (!open) {
-              setActiveTab('discussions');
-            }
-          }}>
-            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-slate-900 border-cyan-500/20">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-white flex items-center gap-3">
-                  <Calculator className="h-6 w-6 text-cyan-400" />
+          <TabsContent value="calculator" className="mt-8">
+            <div className="space-y-6">
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold text-cyan-300 mb-4 flex items-center justify-center gap-3">
+                  <Calculator className="h-8 w-8 text-cyan-400" />
                   Rental Calculator
-                </DialogTitle>
-              </DialogHeader>
-              
-              <div className="space-y-6">
-                {/* Action buttons */}
-                <div className="flex items-center justify-center gap-4">
-                  <Button
-                    variant="outline"
-                    onClick={clearCalculatorData}
-                    className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400"
-                  >
-                    <RotateCcw className="h-4 w-4 mr-2" />
-                    Clear All
-                  </Button>
-                  
-                  <Button
-                    variant="outline"
-                    onClick={downloadCalculatorData}
-                    className="border-green-500/30 text-green-400 hover:bg-green-500/10 hover:text-green-300 hover:border-green-400"
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Download Data
-                  </Button>
-                </div>
-
-                {/* Calculator Sections */}
-                <div className="grid lg:grid-cols-2 grid-cols-1 gap-6">
-                  <BuildOutSection 
-                    data={calculatorData} 
-                    updateData={updateCalculatorData} 
-                    cashToLaunch={cashToLaunch} 
-                  />
-                  
-                  <ExpensesSection 
-                    data={calculatorData} 
-                    updateData={updateCalculatorData} 
-                    serviceFeeCalculated={serviceFeeCalculated}
-                    monthlyExpenses={monthlyExpenses}
-                  />
-                  
-                  <CompsSection 
-                    data={calculatorData} 
-                    updateData={updateCalculatorData} 
-                  />
-
-                  <NetProfitSection 
-                    monthlyRevenue={monthlyRevenue}
-                    netProfitMonthly={netProfitMonthly}
-                    paybackMonths={paybackMonths}
-                    cashOnCashReturn={cashOnCashReturn}
-                  />
-                </div>
+                </h2>
               </div>
-            </DialogContent>
-          </Dialog>
+              
+              {/* Action buttons */}
+              <div className="flex items-center justify-center gap-4">
+                <Button
+                  variant="outline"
+                  onClick={clearCalculatorData}
+                  className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400"
+                >
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Clear All
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={downloadCalculatorData}
+                  className="border-green-500/30 text-green-400 hover:bg-green-500/10 hover:text-green-300 hover:border-green-400"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download Data
+                </Button>
+              </div>
 
+              {/* Calculator Sections */}
+              <div className="grid lg:grid-cols-2 grid-cols-1 gap-6">
+                <BuildOutSection 
+                  data={calculatorData} 
+                  updateData={updateCalculatorData} 
+                  cashToLaunch={cashToLaunch} 
+                />
+                
+                <ExpensesSection 
+                  data={calculatorData} 
+                  updateData={updateCalculatorData} 
+                  serviceFeeCalculated={serviceFeeCalculated}
+                  monthlyExpenses={monthlyExpenses}
+                />
+                
+                <CompsSection 
+                  data={calculatorData} 
+                  updateData={updateCalculatorData} 
+                />
+
+                <NetProfitSection 
+                  monthlyRevenue={monthlyRevenue}
+                  netProfitMonthly={netProfitMonthly}
+                  paybackMonths={paybackMonths}
+                  cashOnCashReturn={cashOnCashReturn}
+                />
+              </div>
+            </div>
+          </TabsContent>
 
           <TabsContent value="askrichie" className="mt-8">
             <div className="text-center space-y-6">
