@@ -323,6 +323,11 @@ const Community = () => {
           </TabsContent>
 
         </Tabs>
+
+        {/* Documents Library - Always Visible */}
+        <div className="mt-8">
+          <DocumentsLibrary />
+        </div>
       </div>
 
       <AdminSetup />
