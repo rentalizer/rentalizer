@@ -1,59 +1,53 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MessageSquare, Plus, Search, Pin, Reply, Heart, Trash2 } from 'lucide-react';
+import { MessageSquare, Search, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
 
-interface Discussion {
+interface DirectMessage {
   id: string;
-  author_name: string;
-  title: string;
-  content: string;
+  sender_id: string;
+  recipient_id: string;
+  sender_name: string;
+  message: string;
   created_at: string;
-  category: string;
-  comments_count: number;
-  likes_count: number;
-  user_id: string;
-  author_avatar?: string;
+  read_at: string | null;
 }
 
 export const MessageThreads = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [discussions, setDiscussions] = useState<Discussion[]>([]);
+  const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [likedDiscussions, setLikedDiscussions] = useState<Set<string>>(new Set());
+  const [profiles, setProfiles] = useState<{ [key: string]: { avatar_url: string | null; display_name: string | null; first_name: string | null; last_name: string | null } }>({});
   const { toast } = useToast();
   const { user } = useAuth();
   const { isAdmin } = useAdminRole();
 
   useEffect(() => {
-    fetchDiscussions();
-    fetchUserLikes();
+    fetchMessages();
   }, []);
 
-  const [profiles, setProfiles] = useState<{ [key: string]: { avatar_url: string | null; display_name: string | null; first_name: string | null; last_name: string | null } }>({});
-
-  const fetchDiscussions = async () => {
+  const fetchMessages = async () => {
     try {
-      // Fetch discussions
-      const { data: discussionsData, error: discussionsError } = await supabase
-        .from('discussions')
+      // Fetch direct messages
+      const { data: messagesData, error: messagesError } = await supabase
+        .from('direct_messages')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (discussionsError) throw discussionsError;
+      if (messagesError) throw messagesError;
       
-      // Get unique user IDs
-      const userIds = [...new Set(discussionsData?.map(d => d.user_id) || [])];
+      // Get unique user IDs from messages
+      const userIds = [...new Set(messagesData?.map(msg => msg.sender_id) || [])];
       
-      // Fetch profiles for these users
+      // Fetch profiles for these users if any exist
+      let profilesMap: { [key: string]: any } = {};
       if (userIds.length > 0) {
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
@@ -61,7 +55,7 @@ export const MessageThreads = () => {
           .in('user_id', userIds);
 
         if (!profilesError && profilesData) {
-          const profilesMap = profilesData.reduce((acc, profile) => {
+          profilesMap = profilesData.reduce((acc, profile) => {
             acc[profile.user_id] = profile;
             return acc;
           }, {} as { [key: string]: any });
@@ -69,13 +63,13 @@ export const MessageThreads = () => {
         }
       }
 
-      console.log('Fresh discussions data:', discussionsData);
-      setDiscussions(discussionsData || []);
+      console.log('Direct messages data:', messagesData);
+      setMessages(messagesData || []);
     } catch (error) {
-      console.error('Error fetching discussions:', error);
+      console.error('Error fetching messages:', error);
       toast({
         title: "Error",
-        description: "Failed to load discussions",
+        description: "Failed to load messages",
         variant: "destructive",
       });
     } finally {
@@ -83,106 +77,34 @@ export const MessageThreads = () => {
     }
   };
 
-  const deleteDiscussion = async (discussionId: string) => {
+  const deleteMessage = async (messageId: string) => {
     try {
       const { error } = await supabase
-        .from('discussions')
+        .from('direct_messages')
         .delete()
-        .eq('id', discussionId);
+        .eq('id', messageId);
 
       if (error) throw error;
 
       toast({
-        title: "Discussion Deleted",
-        description: "The discussion has been removed successfully.",
+        title: "Message Deleted",
+        description: "The message has been removed successfully.",
       });
 
-      // Refresh discussions
-      fetchDiscussions();
+      // Refresh messages
+      fetchMessages();
     } catch (error) {
-      console.error('Error deleting discussion:', error);
+      console.error('Error deleting message:', error);
       toast({
         title: "Error",
-        description: "Failed to delete discussion",
+        description: "Failed to delete message",
         variant: "destructive",
       });
     }
   };
 
-  const canDeleteDiscussion = (discussion: Discussion) => {
-    return isAdmin || (user && discussion.user_id === user.id);
-  };
-
-  const fetchUserLikes = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('discussion_likes')
-        .select('discussion_id')
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-      setLikedDiscussions(new Set(data?.map(like => like.discussion_id) || []));
-    } catch (error) {
-      console.error('Error fetching user likes:', error);
-    }
-  };
-
-  const toggleLike = async (discussionId: string) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Authentication Required",
-          description: "Please sign in to like discussions",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const isLiked = likedDiscussions.has(discussionId);
-      
-      if (isLiked) {
-        // Unlike
-        const { error } = await supabase
-          .from('discussion_likes')
-          .delete()
-          .eq('discussion_id', discussionId)
-          .eq('user_id', user.id);
-
-        if (error) throw error;
-        
-        setLikedDiscussions(prev => {
-          const newSet = new Set(prev);
-          newSet.delete(discussionId);
-          return newSet;
-        });
-      } else {
-        // Like
-        const { error } = await supabase
-          .from('discussion_likes')
-          .insert({
-            discussion_id: discussionId,
-            user_id: user.id
-          });
-
-        if (error) throw error;
-        
-        setLikedDiscussions(prev => new Set([...prev, discussionId]));
-      }
-
-      // Refresh discussions to get updated counts
-      fetchDiscussions();
-    } catch (error) {
-      console.error('Error toggling like:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update like",
-        variant: "destructive",
-      });
-    }
+  const canDeleteMessage = (message: DirectMessage) => {
+    return isAdmin || (user && message.sender_id === user.id);
   };
 
   const getInitials = (name: string) => {
@@ -199,10 +121,9 @@ export const MessageThreads = () => {
     return `${Math.floor(diffInMinutes / 1440)}d ago`;
   };
 
-  const filteredDiscussions = discussions.filter(discussion =>
-    discussion.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    discussion.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    discussion.category.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredMessages = messages.filter(message =>
+    message.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    message.sender_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -210,7 +131,7 @@ export const MessageThreads = () => {
       <div className="space-y-6">
         <div className="text-center py-12">
           <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-300 mb-2">Loading discussions...</h3>
+          <h3 className="text-lg font-medium text-gray-300 mb-2">Loading messages...</h3>
         </div>
       </div>
     );
@@ -220,9 +141,9 @@ export const MessageThreads = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <h2 className="text-2xl font-bold text-cyan-300">Message Threads</h2>
+        <h2 className="text-2xl font-bold text-cyan-300">Direct Messages</h2>
         <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
-          {discussions.length} threads
+          {messages.length} messages
         </Badge>
       </div>
 
@@ -230,27 +151,27 @@ export const MessageThreads = () => {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
-          placeholder="Search threads..."
+          placeholder="Search messages..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 bg-slate-800/50 border-cyan-500/20 text-white placeholder-gray-400"
         />
       </div>
 
-      {/* Message Threads */}
+      {/* Direct Messages */}
       <div className="space-y-4">
-        {filteredDiscussions.map(discussion => (
-          <Card key={discussion.id} className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors">
+        {filteredMessages.map(message => (
+          <Card key={message.id} className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 {/* Avatar */}
                 <Avatar className="w-12 h-12 flex-shrink-0">
                   <AvatarImage 
-                    src={profiles[discussion.user_id]?.avatar_url || ''} 
-                    alt={discussion.author_name}
+                    src={profiles[message.sender_id]?.avatar_url || ''} 
+                    alt={message.sender_name}
                   />
                   <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
-                    {getInitials(discussion.author_name)}
+                    {getInitials(message.sender_name)}
                   </AvatarFallback>
                 </Avatar>
 
@@ -258,53 +179,26 @@ export const MessageThreads = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-white hover:text-cyan-300 cursor-pointer">
-                        {discussion.title}
-                      </h3>
+                      <span className="text-sm text-cyan-300 font-medium">{message.sender_name}</span>
                     </div>
-                    <span className="text-sm text-gray-400 flex-shrink-0">{formatTimeAgo(discussion.created_at)}</span>
+                    <span className="text-sm text-gray-400 flex-shrink-0">{formatTimeAgo(message.created_at)}</span>
                   </div>
 
-                   <div className="flex items-center gap-2 mb-3">
-                     <span className="text-sm text-cyan-300">{discussion.author_name}</span>
-                   </div>
+                  <p className="text-gray-300 mb-3">{message.message}</p>
 
-                  <p className="text-gray-300 mb-3 line-clamp-2">{discussion.content}</p>
-
-                   {/* Actions */}
-                   <div className="flex items-center gap-4">
-                     <Button 
-                       variant="ghost" 
-                       size="sm" 
-                       className="text-gray-400 hover:text-cyan-300 h-8 px-2"
-                     >
-                       <Reply className="h-4 w-4 mr-1" />
-                       {discussion.comments_count || 0} replies
-                     </Button>
-                     <Button 
-                       variant="ghost" 
-                       size="sm" 
-                       onClick={() => toggleLike(discussion.id)}
-                       className={`h-8 px-2 ${
-                         likedDiscussions.has(discussion.id) 
-                           ? 'text-red-400 hover:text-red-300' 
-                           : 'text-gray-400 hover:text-red-300'
-                       }`}
-                     >
-                       <Heart className={`h-4 w-4 mr-1 ${likedDiscussions.has(discussion.id) ? 'fill-current' : ''}`} />
-                       {discussion.likes_count || 0}
-                     </Button>
-                     {canDeleteDiscussion(discussion) && (
-                       <Button 
-                         variant="ghost" 
-                         size="sm" 
-                         onClick={() => deleteDiscussion(discussion.id)}
-                         className="text-gray-400 hover:text-red-400 h-8 px-2 ml-auto"
-                       >
-                         <Trash2 className="h-4 w-4" />
-                       </Button>
-                     )}
-                   </div>
+                  {/* Actions */}
+                  <div className="flex items-center justify-end">
+                    {canDeleteMessage(message) && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => deleteMessage(message.id)}
+                        className="text-gray-400 hover:text-red-400 h-8 px-2"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -312,11 +206,11 @@ export const MessageThreads = () => {
         ))}
       </div>
 
-      {filteredDiscussions.length === 0 && (
+      {filteredMessages.length === 0 && (
         <Card className="bg-slate-800/50 border-cyan-500/20">
           <CardContent className="text-center py-12">
             <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-300 mb-2">No threads found</h3>
+            <h3 className="text-lg font-medium text-gray-300 mb-2">No messages found</h3>
             <p className="text-gray-400">Try adjusting your search terms</p>
           </CardContent>
         </Card>
