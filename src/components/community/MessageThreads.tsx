@@ -265,12 +265,9 @@ export const MessageThreads = () => {
                     <span className="text-sm text-gray-400 flex-shrink-0">{formatTimeAgo(discussion.created_at)}</span>
                   </div>
 
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-sm text-cyan-300">{discussion.author_name}</span>
-                    <Badge variant="outline" className="border-purple-500/30 text-purple-300 text-xs">
-                      {discussion.category}
-                    </Badge>
-                  </div>
+                   <div className="flex items-center gap-2 mb-3">
+                     <span className="text-sm text-cyan-300">{discussion.author_name}</span>
+                   </div>
 
                   <p className="text-gray-300 mb-3 line-clamp-2">{discussion.content}</p>
 
