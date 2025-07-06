@@ -162,6 +162,7 @@ export const GroupDiscussions = () => {
         .on('presence', { event: 'sync' }, () => {
           const state = channel.presenceState();
           const onlineCount = Object.keys(state).length;
+          console.log('Presence sync - Online users:', state);
           setCommunityStats(prev => ({
             ...prev,
             onlineUsers: onlineCount
@@ -941,6 +942,20 @@ export const GroupDiscussions = () => {
                   {communityStats.onlineUsers}
                 </Badge>
               </div>
+              {/* Show who is online */}
+              {Object.keys(onlinePresence).length > 0 && (
+                <div className="space-y-2">
+                  <span className="text-gray-400 text-sm">Online Members:</span>
+                  {Object.values(onlinePresence).map((presence: any) => 
+                    presence.map((user: any, index: number) => (
+                      <div key={`${user.user_id}-${index}`} className="flex items-center gap-2 text-sm">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span className="text-gray-300">{user.display_name}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Admins</span>
                 <Badge className="bg-red-600/20 text-red-300 border-red-500/30">
