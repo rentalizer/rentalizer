@@ -1,31 +1,82 @@
 
 import React from 'react';
-import { BarChart3, User, LogOut, Users } from 'lucide-react';
+import { BarChart3, User, LogOut, Users, TrendingUp, Building, Database } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 export const TopNavBar = () => {
   const { user, signOut } = useAuth();
   const { isAdmin } = useAdminRole();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const navigationTabs = [
+    {
+      name: 'Training & Community',
+      path: '/community',
+      icon: Users
+    },
+    {
+      name: 'Market Intelligence',
+      path: '/markets',
+      icon: TrendingUp
+    },
+    {
+      name: 'Acquisition CRM',
+      path: '/properties',
+      icon: Building
+    },
+    {
+      name: 'PMS',
+      path: '/pms',
+      icon: Database
+    }
+  ];
+
+  const isActiveTab = (path: string) => {
+    return location.pathname === path;
+  };
 
   return (
     <div className="w-full bg-slate-700/90 backdrop-blur-lg border-b border-gray-500/50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Left side - Logo only */}
-          <div className="flex items-center gap-3 ml-48">
+          {/* Left side - Logo */}
+          <div className="flex items-center gap-3">
             <BarChart3 className="h-8 w-8 text-cyan-400" style={{
               filter: 'drop-shadow(0 0 6px rgba(6, 182, 212, 1)) drop-shadow(0 0 12px rgba(6, 182, 212, 0.9)) drop-shadow(0 0 18px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 24px rgba(6, 182, 212, 0.7)) drop-shadow(0 0 30px rgba(6, 182, 212, 0.6)) drop-shadow(0 0 36px rgba(6, 182, 212, 0.5))'
             }} />
           </div>
 
+          {/* Center - Navigation Tabs */}
+          <div className="flex items-center gap-1">
+            {navigationTabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = isActiveTab(tab.path);
+              
+              return (
+                <Link
+                  key={tab.path}
+                  to={tab.path}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                    isActive
+                      ? 'bg-cyan-600/20 text-cyan-300 border border-cyan-500/30'
+                      : 'text-gray-300 hover:bg-slate-600/50 hover:text-cyan-300'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="font-medium text-sm">{tab.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+
           {/* Right side - Login or User info */}
           {user ? (
-            <div className="flex items-center gap-4 mr-48">
+            <div className="flex items-center gap-4">
               <div 
                 className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20 cursor-pointer hover:bg-gray-800/50 transition-colors"
                 onClick={() => navigate('/profile-setup')}
@@ -50,7 +101,7 @@ export const TopNavBar = () => {
             <Button
               variant="outline"
               size="sm"
-              className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium mr-48"
+              className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium"
             >
               Login
             </Button>

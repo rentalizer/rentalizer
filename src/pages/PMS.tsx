@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
+import { TopNavBar } from '@/components/TopNavBar';
 import { 
   Calendar,
   MessageCircle,
@@ -232,8 +233,10 @@ const PMS = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
-      <div className="container mx-auto max-w-7xl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <TopNavBar />
+      <div className="p-6">
+        <div className="container mx-auto max-w-7xl">
         {/* Enhanced Header */}
         <div className="mb-8">
           <div className="flex justify-between items-start">
@@ -742,6 +745,7 @@ const PMS = () => {
             </Card>
           </TabsContent>
         </Tabs>
+        </div>
       </div>
     </div>
   );
