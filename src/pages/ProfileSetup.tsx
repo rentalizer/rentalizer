@@ -140,13 +140,15 @@ const ProfileSetup = () => {
           avatar_url: avatarUrl,
           display_name: `${firstName.trim()} ${lastName.trim()}`,
           profile_complete: true
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) {
         console.error('Error saving profile:', error);
         toast({
           title: "Error",
-          description: "Failed to save profile",
+          description: `Failed to save profile: ${error.message}`,
           variant: "destructive",
         });
         return;
