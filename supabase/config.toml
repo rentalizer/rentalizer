@@ -29,3 +29,9 @@ additional_redirect_urls = [
 
 [functions.community-notification]
 verify_jwt = true
+
+[functions.send-event-reminder]
+verify_jwt = true
+
+[functions.check-event-reminders]
+verify_jwt = false

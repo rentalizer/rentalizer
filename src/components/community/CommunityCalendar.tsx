@@ -22,12 +22,13 @@ interface Event {
   date: Date;
   time: string;
   type: 'training' | 'webinar' | 'discussion' | 'workshop';
-  attendees?: number;
+  attendees?: number | string;
   isRecurring?: boolean;
   description?: string;
   location?: string;
   duration?: string;
   zoomLink?: string;
+  remindMembers?: boolean;
 }
 
 export const CommunityCalendar = () => {
@@ -187,7 +188,9 @@ export const CommunityCalendar = () => {
       location: newEvent.location,
       duration: newEvent.duration,
       isRecurring: newEvent.isRecurring,
-      zoomLink: newEvent.zoomLink
+      zoomLink: newEvent.zoomLink,
+      remindMembers: newEvent.remindMembers,
+      attendees: newEvent.attendees
     };
     
     const eventsToAdd = [baseEvent];
