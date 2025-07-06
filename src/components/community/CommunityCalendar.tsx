@@ -177,55 +177,49 @@ export const CommunityCalendar = () => {
     calendarDays.push({ date, isCurrentMonth: false });
   }
 
-  const handleAddEvent = () => {
-    const baseEvent: Event = {
-      id: Date.now().toString(),
-      title: newEvent.title,
-      date: newEvent.date,
-      time: newEvent.time,
-      type: 'workshop', // Default type, could be dynamic
-      description: newEvent.description,
-      location: newEvent.location,
-      duration: newEvent.duration,
-      isRecurring: newEvent.isRecurring,
-      zoomLink: newEvent.zoomLink,
-      remindMembers: newEvent.remindMembers,
-      attendees: newEvent.attendees
-    };
+  const handleAddEvent = async () => {
+    if (!user) return;
     
-    const eventsToAdd = [baseEvent];
-    
-    // If recurring, create events for next 12 weeks
-    if (newEvent.isRecurring) {
-      for (let i = 1; i <= 12; i++) {
-        const recurringDate = new Date(newEvent.date);
-        recurringDate.setDate(recurringDate.getDate() + (i * 7)); // Add 7 days for each week
-        
-        const recurringEvent: Event = {
-          ...baseEvent,
-          id: `${Date.now()}-${i}`,
-          date: recurringDate
-        };
-        eventsToAdd.push(recurringEvent);
-      }
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .insert({
+          title: newEvent.title,
+          description: newEvent.description,
+          event_date: newEvent.date.toISOString().split('T')[0],
+          event_time: newEvent.time,
+          duration: newEvent.duration,
+          location: newEvent.location,
+          zoom_link: newEvent.zoomLink,
+          event_type: 'workshop',
+          attendees: newEvent.attendees,
+          is_recurring: newEvent.isRecurring,
+          remind_members: newEvent.remindMembers,
+          created_by: user.id
+        });
+
+      if (error) throw error;
+
+      // Refresh events list
+      fetchEvents();
+      setIsAddEventOpen(false);
+      
+      // Reset form
+      setNewEvent({
+        title: '',
+        date: new Date(),
+        time: '',
+        duration: '1 hour',
+        location: 'Zoom',
+        zoomLink: '',
+        description: '',
+        isRecurring: false,
+        remindMembers: false,
+        attendees: 'All members'
+      });
+    } catch (error) {
+      console.error('Error creating event:', error);
     }
-    
-    setEvents([...events, ...eventsToAdd]);
-    setIsAddEventOpen(false);
-    
-    // Reset form
-    setNewEvent({
-      title: '',
-      date: new Date(),
-      time: '',
-      duration: '1 hour',
-      location: 'Zoom',
-      zoomLink: '',
-      description: '',
-      isRecurring: false,
-      remindMembers: false,
-      attendees: 'All members'
-    });
   };
 
   const addToCalendar = (event: Event) => {

@@ -223,6 +223,60 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          attendees: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          duration: string | null
+          event_date: string
+          event_time: string
+          event_type: string | null
+          id: string
+          is_recurring: boolean | null
+          location: string | null
+          remind_members: boolean | null
+          title: string
+          updated_at: string | null
+          zoom_link: string | null
+        }
+        Insert: {
+          attendees?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          duration?: string | null
+          event_date: string
+          event_time: string
+          event_type?: string | null
+          id?: string
+          is_recurring?: boolean | null
+          location?: string | null
+          remind_members?: boolean | null
+          title: string
+          updated_at?: string | null
+          zoom_link?: string | null
+        }
+        Update: {
+          attendees?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          duration?: string | null
+          event_date?: string
+          event_time?: string
+          event_type?: string | null
+          id?: string
+          is_recurring?: boolean | null
+          location?: string | null
+          remind_members?: boolean | null
+          title?: string
+          updated_at?: string | null
+          zoom_link?: string | null
+        }
+        Relationships: []
+      }
       members: {
         Row: {
           created_at: string
