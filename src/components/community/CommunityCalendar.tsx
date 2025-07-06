@@ -34,6 +34,8 @@ export const CommunityCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false);
   const { isAdmin } = useAdminRole();
   
   // Form state for adding new events
@@ -175,7 +177,7 @@ export const CommunityCalendar = () => {
   }
 
   const handleAddEvent = () => {
-    const event: Event = {
+    const baseEvent: Event = {
       id: Date.now().toString(),
       title: newEvent.title,
       date: newEvent.date,
@@ -188,7 +190,24 @@ export const CommunityCalendar = () => {
       zoomLink: newEvent.zoomLink
     };
     
-    setEvents([...events, event]);
+    const eventsToAdd = [baseEvent];
+    
+    // If recurring, create events for next 12 weeks
+    if (newEvent.isRecurring) {
+      for (let i = 1; i <= 12; i++) {
+        const recurringDate = new Date(newEvent.date);
+        recurringDate.setDate(recurringDate.getDate() + (i * 7)); // Add 7 days for each week
+        
+        const recurringEvent: Event = {
+          ...baseEvent,
+          id: `${Date.now()}-${i}`,
+          date: recurringDate
+        };
+        eventsToAdd.push(recurringEvent);
+      }
+    }
+    
+    setEvents([...events, ...eventsToAdd]);
     setIsAddEventOpen(false);
     
     // Reset form
@@ -206,224 +225,263 @@ export const CommunityCalendar = () => {
     });
   };
 
+  const addToCalendar = (event: Event) => {
+    const startDate = new Date(event.date);
+    const endDate = new Date(startDate);
+    
+    // Parse duration to add to end time
+    const duration = event.duration || '1 hour';
+    const durationValue = parseInt(duration.split(' ')[0]);
+    const durationUnit = duration.includes('hour') ? 'hours' : 'minutes';
+    
+    if (durationUnit === 'hours') {
+      endDate.setHours(endDate.getHours() + durationValue);
+    } else {
+      endDate.setMinutes(endDate.getMinutes() + durationValue);
+    }
+    
+    // Format dates for calendar
+    const formatDate = (date: Date) => {
+      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    };
+    
+    const details = [
+      event.description || '',
+      event.location && event.location !== 'Zoom' ? `Location: ${event.location}` : '',
+      event.zoomLink ? `Join: ${event.zoomLink}` : ''
+    ].filter(Boolean).join('\n\n');
+    
+    const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${formatDate(startDate)}/${formatDate(endDate)}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(event.zoomLink || '')}`;
+    
+    window.open(calendarUrl, '_blank');
+  };
+
+  const handleDayClick = (date: Date) => {
+    const dayEvents = getEventsForDate(date);
+    if (dayEvents.length > 0) {
+      setSelectedEvent(dayEvents[0]); // For now, show first event
+      setIsEventDetailsOpen(true);
+    }
+    setSelectedDate(date);
+  };
+
   return (
-    <div className="grid lg:grid-cols-4 gap-8">
+    <div className="w-full">
       {/* Calendar */}
-      <div className="lg:col-span-3">
-        <Card className="bg-slate-800/50 border-cyan-500/20">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-cyan-300 flex items-center gap-2">
-              Events Calendar
-            </CardTitle>
-            
-            {/* Add Event Dialog - Only visible to admins */}
-            {isAdmin && (
-              <Dialog open={isAddEventOpen} onOpenChange={setIsAddEventOpen}>
-                <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Event
-                  </Button>
-                </DialogTrigger>
-              <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle className="text-white text-xl">Add event</DialogTitle>
-                  <p className="text-gray-400 text-sm">
-                    Need ideas? Try one of these fun formats: 
-                    <span className="text-blue-400 hover:underline cursor-pointer"> coffee hour</span>,
-                    <span className="text-blue-400 hover:underline cursor-pointer"> Q&A</span>,
-                    <span className="text-blue-400 hover:underline cursor-pointer"> co-working session</span>, or
-                    <span className="text-blue-400 hover:underline cursor-pointer"> happy hour</span>
-                  </p>
-                </DialogHeader>
-                
-                <div className="space-y-6 mt-6">
-                  {/* Title */}
+      <Card className="bg-slate-800/50 border-cyan-500/20">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-cyan-300 flex items-center gap-2">
+            Events Calendar
+          </CardTitle>
+          
+          {/* Add Event Dialog - Only visible to admins */}
+          {isAdmin && (
+            <Dialog open={isAddEventOpen} onOpenChange={setIsAddEventOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Event
+                </Button>
+              </DialogTrigger>
+            <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-white text-xl">Add event</DialogTitle>
+                <p className="text-gray-400 text-sm">
+                  Need ideas? Try one of these fun formats: 
+                  <span className="text-blue-400 hover:underline cursor-pointer"> coffee hour</span>,
+                  <span className="text-blue-400 hover:underline cursor-pointer"> Q&A</span>,
+                  <span className="text-blue-400 hover:underline cursor-pointer"> co-working session</span>, or
+                  <span className="text-blue-400 hover:underline cursor-pointer"> happy hour</span>
+                </p>
+              </DialogHeader>
+              
+              <div className="space-y-6 mt-6">
+                {/* Title */}
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-white">Title</Label>
+                  <Input
+                    id="title"
+                    value={newEvent.title}
+                    onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                    className="bg-slate-700 border-gray-600 text-white"
+                    placeholder="Event title"
+                  />
+                  <div className="text-right text-sm text-gray-400">
+                    {newEvent.title.length} / 30
+                  </div>
+                </div>
+
+                {/* Date, Time, Duration */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="title" className="text-white">Title</Label>
-                    <Input
-                      id="title"
-                      value={newEvent.title}
-                      onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
-                      className="bg-slate-700 border-gray-600 text-white"
-                      placeholder="Event title"
-                    />
-                    <div className="text-right text-sm text-gray-400">
-                      {newEvent.title.length} / 30
-                    </div>
-                  </div>
-
-                  {/* Date, Time, Duration */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label className="text-white">Date</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal bg-slate-700 border-gray-600 text-white",
-                              !newEvent.date && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {newEvent.date ? format(newEvent.date, "PPP") : <span>Pick a date</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0 bg-slate-800 border-gray-700" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={newEvent.date}
-                            onSelect={(date) => date && setNewEvent({...newEvent, date})}
-                            initialFocus
-                            className="p-3 pointer-events-auto"
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label className="text-white">Time</Label>
-                      <Select value={newEvent.time} onValueChange={(value) => setNewEvent({...newEvent, time: value})}>
-                        <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
-                          <SelectValue placeholder="Select time" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-800 border-gray-700">
-                          {Array.from({length: 24}, (_, i) => (
-                            <SelectItem key={i} value={`${i.toString().padStart(2, '0')}:00`}>
-                              {i === 0 ? '12:00 AM' : i < 12 ? `${i}:00 AM` : i === 12 ? '12:00 PM' : `${i-12}:00 PM`}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label className="text-white">Duration</Label>
-                      <Select value={newEvent.duration} onValueChange={(value) => setNewEvent({...newEvent, duration: value})}>
-                        <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-800 border-gray-700">
-                          <SelectItem value="30 minutes">30 minutes</SelectItem>
-                          <SelectItem value="1 hour">1 hour</SelectItem>
-                          <SelectItem value="1.5 hours">1.5 hours</SelectItem>
-                          <SelectItem value="2 hours">2 hours</SelectItem>
-                          <SelectItem value="3 hours">3 hours</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  {/* Recurring Event */}
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="recurring"
-                      checked={newEvent.isRecurring}
-                      onCheckedChange={(checked) => setNewEvent({...newEvent, isRecurring: checked as boolean})}
-                    />
-                    <Label htmlFor="recurring" className="text-white">Recurring event</Label>
-                  </div>
-
-                  {/* Location */}
-                  <div className="space-y-4">
-                    <Label className="text-white">Location</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Select value={newEvent.location} onValueChange={(value) => setNewEvent({...newEvent, location: value})}>
-                        <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-800 border-gray-700">
-                          <SelectItem value="Zoom">🔵 Zoom</SelectItem>
-                          <SelectItem value="Google Meet">📹 Google Meet</SelectItem>
-                          <SelectItem value="Microsoft Teams">🟣 Microsoft Teams</SelectItem>
-                          <SelectItem value="In Person">📍 In Person</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      
-                      {newEvent.location === 'Zoom' && (
-                        <Input
-                          placeholder="Zoom link"
-                          value={newEvent.zoomLink}
-                          onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
-                          className="bg-slate-700 border-gray-600 text-white"
+                    <Label className="text-white">Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal bg-slate-700 border-gray-600 text-white",
+                            !newEvent.date && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {newEvent.date ? format(newEvent.date, "PPP") : <span>Pick a date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0 bg-slate-800 border-gray-700" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={newEvent.date}
+                          onSelect={(date) => date && setNewEvent({...newEvent, date})}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
                         />
-                      )}
-                    </div>
+                      </PopoverContent>
+                    </Popover>
                   </div>
-
-                  {/* Description */}
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="description" className="text-white">Description</Label>
-                    <Textarea
-                      id="description"
-                      value={newEvent.description}
-                      onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
-                      className="bg-slate-700 border-gray-600 text-white h-24"
-                      placeholder="Event description..."
-                    />
-                    <div className="text-right text-sm text-gray-400">
-                      {newEvent.description.length} / 300
-                    </div>
+                    <Label className="text-white">Time</Label>
+                    <Select value={newEvent.time} onValueChange={(value) => setNewEvent({...newEvent, time: value})}>
+                      <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                        <SelectValue placeholder="Select time" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-gray-700">
+                        {Array.from({length: 24}, (_, i) => (
+                          <SelectItem key={i} value={`${i.toString().padStart(2, '0')}:00`}>
+                            {i === 0 ? '12:00 AM' : i < 12 ? `${i}:00 AM` : i === 12 ? '12:00 PM' : `${i-12}:00 PM`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-
-                  {/* Who can attend */}
+                  
                   <div className="space-y-2">
-                    <Label className="text-white">Who can attend this event</Label>
-                    <Select value={newEvent.attendees} onValueChange={(value) => setNewEvent({...newEvent, attendees: value})}>
+                    <Label className="text-white">Duration</Label>
+                    <Select value={newEvent.duration} onValueChange={(value) => setNewEvent({...newEvent, duration: value})}>
                       <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-slate-800 border-gray-700">
-                        <SelectItem value="All members">All members</SelectItem>
-                        <SelectItem value="Premium members">Premium members only</SelectItem>
-                        <SelectItem value="Invited only">Invited members only</SelectItem>
+                        <SelectItem value="30 minutes">30 minutes</SelectItem>
+                        <SelectItem value="1 hour">1 hour</SelectItem>
+                        <SelectItem value="1.5 hours">1.5 hours</SelectItem>
+                        <SelectItem value="2 hours">2 hours</SelectItem>
+                        <SelectItem value="3 hours">3 hours</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
+                </div>
 
-                  {/* Upload cover image */}
-                  <div className="space-y-2">
-                    <Label className="text-white">Upload cover image</Label>
-                    <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
-                      <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-blue-400 text-sm cursor-pointer hover:underline">Upload cover image</p>
-                      <p className="text-gray-400 text-xs mt-1">1460 x 752 px</p>
-                    </div>
-                  </div>
+                {/* Recurring Event */}
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="recurring"
+                    checked={newEvent.isRecurring}
+                    onCheckedChange={(checked) => setNewEvent({...newEvent, isRecurring: checked as boolean})}
+                  />
+                  <Label htmlFor="recurring" className="text-white">Recurring event (creates 12 weekly events)</Label>
+                </div>
 
-                  {/* Remind members */}
-                  <div className="flex items-center space-x-2">
-                    <Checkbox 
-                      id="remind"
-                      checked={newEvent.remindMembers}
-                      onCheckedChange={(checked) => setNewEvent({...newEvent, remindMembers: checked as boolean})}
-                    />
-                    <Label htmlFor="remind" className="text-white">Remind members by email 1 day before</Label>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex justify-end gap-3 pt-4">
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => setIsAddEventOpen(false)}
-                      className="text-gray-400 hover:text-white"
-                    >
-                      CANCEL
-                    </Button>
-                    <Button 
-                      onClick={handleAddEvent}
-                      disabled={!newEvent.title || !newEvent.time}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      ADD
-                    </Button>
+                {/* Location */}
+                <div className="space-y-4">
+                  <Label className="text-white">Location</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Select value={newEvent.location} onValueChange={(value) => setNewEvent({...newEvent, location: value})}>
+                      <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-800 border-gray-700">
+                        <SelectItem value="Zoom">🔵 Zoom</SelectItem>
+                        <SelectItem value="Google Meet">📹 Google Meet</SelectItem>
+                        <SelectItem value="Microsoft Teams">🟣 Microsoft Teams</SelectItem>
+                        <SelectItem value="In Person">📍 In Person</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    {newEvent.location === 'Zoom' && (
+                      <Input
+                        placeholder="Zoom link"
+                        value={newEvent.zoomLink}
+                        onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
+                        className="bg-slate-700 border-gray-600 text-white"
+                      />
+                    )}
                   </div>
                 </div>
-              </DialogContent>
-            </Dialog>
-            )}
-          </CardHeader>
+
+                {/* Description */}
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-white">Description</Label>
+                  <Textarea
+                    id="description"
+                    value={newEvent.description}
+                    onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                    className="bg-slate-700 border-gray-600 text-white h-24"
+                    placeholder="Event description..."
+                  />
+                  <div className="text-right text-sm text-gray-400">
+                    {newEvent.description.length} / 300
+                  </div>
+                </div>
+
+                {/* Who can attend */}
+                <div className="space-y-2">
+                  <Label className="text-white">Who can attend this event</Label>
+                  <Select value={newEvent.attendees} onValueChange={(value) => setNewEvent({...newEvent, attendees: value})}>
+                    <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-gray-700">
+                      <SelectItem value="All members">All members</SelectItem>
+                      <SelectItem value="Premium members">Premium members only</SelectItem>
+                      <SelectItem value="Invited only">Invited members only</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Upload cover image */}
+                <div className="space-y-2">
+                  <Label className="text-white">Upload cover image</Label>
+                  <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
+                    <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-blue-400 text-sm cursor-pointer hover:underline">Upload cover image</p>
+                    <p className="text-gray-400 text-xs mt-1">1460 x 752 px</p>
+                  </div>
+                </div>
+
+                {/* Remind members */}
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="remind"
+                    checked={newEvent.remindMembers}
+                    onCheckedChange={(checked) => setNewEvent({...newEvent, remindMembers: checked as boolean})}
+                  />
+                  <Label htmlFor="remind" className="text-white">Remind members by email 1 day before</Label>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => setIsAddEventOpen(false)}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    CANCEL
+                  </Button>
+                  <Button 
+                    onClick={handleAddEvent}
+                    disabled={!newEvent.title || !newEvent.time}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    ADD
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          )}
+        </CardHeader>
           <CardContent>
             {/* Month Navigation */}
             <div className="flex items-center justify-between mb-6">
@@ -468,21 +526,22 @@ export const CommunityCalendar = () => {
                 return (
                   <button
                     key={index}
-                    onClick={() => setSelectedDate(date)}
+                    onClick={() => handleDayClick(date)}
                     className={`
-                      h-16 p-2 text-sm rounded-lg border transition-colors relative flex flex-col items-center justify-center
+                      h-16 p-2 text-sm rounded-lg border transition-colors relative flex flex-col items-center justify-center cursor-pointer
                       ${isSelected 
                         ? 'bg-cyan-600/30 border-cyan-500 text-cyan-300' 
                         : 'border-gray-700 hover:border-cyan-500/50 hover:bg-slate-700/50'
                       }
                       ${isCurrentMonth ? 'text-white' : 'text-gray-500'}
                       ${isToday && !isSelected ? 'bg-slate-700/50 border-cyan-400/50' : ''}
+                      ${hasEvents ? 'ring-1 ring-cyan-400/50' : ''}
                     `}
                   >
                     <span className="font-medium">{date.getDate()}</span>
                     {hasEvents && (
                       <div className="flex gap-1 mt-1">
-                        <div className="w-1 h-1 bg-cyan-400 rounded-full"></div>
+                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
                       </div>
                     )}
                   </button>
@@ -491,80 +550,82 @@ export const CommunityCalendar = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Event Details */}
-      <div className="lg:col-span-1">
-        <Card className="bg-slate-800/50 border-cyan-500/20">
-          <CardHeader>
-            <CardTitle className="text-cyan-300">
-              {selectedDate ? selectedDate.toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                month: 'long', 
-                day: 'numeric' 
-              }) : 'Select a date'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {selectedDateEvents.length > 0 ? (
+        
+        {/* Event Details Popup */}
+        <Dialog open={isEventDetailsOpen} onOpenChange={setIsEventDetailsOpen}>
+          <DialogContent className="bg-slate-800 border-gray-700 max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-white text-xl">
+                {selectedEvent?.title}
+              </DialogTitle>
+            </DialogHeader>
+            
+            {selectedEvent && (
               <div className="space-y-4">
-                {selectedDateEvents.map(event => (
-                  <div key={event.id} className="p-4 bg-slate-700/30 rounded-lg border border-gray-600">
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-medium text-white">{event.title}</h4>
-                      {event.isRecurring && (
-                        <Badge variant="outline" className="border-cyan-500/30 text-cyan-300 text-xs">
-                          Weekly
-                        </Badge>
-                      )}
+                <div className="text-gray-300">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CalendarIcon className="h-4 w-4 text-cyan-400" />
+                    <span>{selectedEvent.date.toLocaleDateString('en-US', { 
+                      weekday: 'long', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 mb-2">
+                    <Clock className="h-4 w-4 text-cyan-400" />
+                    <span>{selectedEvent.time}</span>
+                    {selectedEvent.duration && <span>• {selectedEvent.duration}</span>}
+                  </div>
+                  
+                  {selectedEvent.location && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <Video className="h-4 w-4 text-cyan-400" />
+                      <span>{selectedEvent.location}</span>
                     </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-gray-400">
-                        <Clock className="h-4 w-4" />
-                        {event.time}
+                  )}
+                  
+                  {selectedEvent.zoomLink && (
+                    <div className="bg-slate-700/50 rounded-lg p-3 mb-4">
+                      <div className="text-blue-400 text-sm break-all">
+                        {selectedEvent.zoomLink}
                       </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Badge className={getEventTypeColor(event.type)}>
-                          {getEventIcon(event.type)}
-                          <span className="ml-1 capitalize">{event.type}</span>
-                        </Badge>
-                      </div>
-                      
-                      {event.attendees && (
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
-                          <Users className="h-4 w-4" />
-                          {event.attendees} attending
-                        </div>
-                      )}
                     </div>
-                    
+                  )}
+                  
+                  {selectedEvent.description && (
+                    <p className="text-gray-300 text-sm mb-4">
+                      {selectedEvent.description}
+                    </p>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <Button 
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={() => addToCalendar(selectedEvent)}
+                  >
+                    <CalendarIcon className="h-4 w-4 mr-2" />
+                    ADD TO CALENDAR
+                  </Button>
+                  
+                  {selectedEvent.zoomLink && (
                     <Button 
-                      size="sm" 
-                      className="w-full mt-3 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
+                      variant="outline"
+                      className="w-full border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
                       onClick={() => {
-                        if (event.zoomLink) {
-                          window.open(event.zoomLink, '_blank');
-                        } else {
-                          // Default action for events without zoom links
-                          alert('No meeting link available for this event');
-                        }
+                        window.open(selectedEvent.zoomLink, '_blank');
+                        setIsEventDetailsOpen(false);
                       }}
                     >
                       Join Event
                     </Button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center text-gray-400 py-8">
-                <div className="text-lg font-medium mb-2">No events scheduled for this date</div>
+                  )}
+                </div>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </DialogContent>
+        </Dialog>
       </div>
-    </div>
-  );
-};
+    );
+  };
