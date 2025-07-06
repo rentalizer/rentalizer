@@ -167,7 +167,7 @@ const Community = () => {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="flex w-full bg-slate-800/50 border-b border-cyan-500/20 justify-evenly h-14 p-2">
+          <TabsList className="flex w-full bg-slate-800/50 border border-cyan-500/20 justify-evenly h-14 p-2">
             <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Users className="h-5 w-5 mr-2" />
               Discussions
