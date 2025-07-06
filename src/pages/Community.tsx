@@ -195,10 +195,6 @@ const Community = () => {
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
             </TabsTrigger>
-            <TabsTrigger value="documents" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-              <FileText size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
-              Business Docs
-            </TabsTrigger>
             <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Ask Richie
@@ -326,9 +322,6 @@ const Community = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="documents" className="mt-8">
-            <DocumentsLibrary />
-          </TabsContent>
         </Tabs>
       </div>
 

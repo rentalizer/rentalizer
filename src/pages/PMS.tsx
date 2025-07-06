@@ -27,8 +27,10 @@ import {
   TrendingUp,
   Eye,
   Download,
-  RefreshCw
+  RefreshCw,
+  FileText
 } from 'lucide-react';
+import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
 
 const PMS = () => {
   const [selectedProperty, setSelectedProperty] = useState('all');
@@ -257,7 +259,7 @@ const PMS = () => {
         </div>
 
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 bg-gray-800/50">
+          <TabsList className="grid w-full grid-cols-7 bg-gray-800/50">
             <TabsTrigger value="dashboard" className="data-[state=active]:bg-cyan-600">
               <Home className="h-4 w-4 mr-2" />
               Dashboard
@@ -281,6 +283,10 @@ const PMS = () => {
             <TabsTrigger value="platforms" className="data-[state=active]:bg-cyan-600">
               <Link className="h-4 w-4 mr-2" />
               Platforms
+            </TabsTrigger>
+            <TabsTrigger value="documents" className="data-[state=active]:bg-cyan-600">
+              <FileText className="h-4 w-4 mr-2" />
+              Documents
             </TabsTrigger>
           </TabsList>
 
@@ -658,6 +664,11 @@ const PMS = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Documents Tab */}
+          <TabsContent value="documents" className="space-y-6">
+            <DocumentsLibrary />
           </TabsContent>
 
           {/* Platforms Tab */}
