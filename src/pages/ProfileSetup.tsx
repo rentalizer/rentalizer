@@ -206,7 +206,7 @@ const ProfileSetup = () => {
               {/* Avatar Upload */}
               <div className="flex flex-col items-center space-y-4">
                 <Avatar className="h-32 w-32">
-                  <AvatarImage src={avatarUrl} />
+                  <AvatarImage src={avatarUrl} className="object-cover" />
                   <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-blue-500 text-white text-2xl">
                     {firstName.charAt(0)}{lastName.charAt(0)}
                   </AvatarFallback>
