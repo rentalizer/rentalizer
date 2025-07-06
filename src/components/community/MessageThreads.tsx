@@ -4,9 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, Plus, Search, Pin, Reply, Heart } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { MessageSquare, Plus, Search, Pin, Reply, Heart, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAdminRole } from '@/hooks/useAdminRole';
 
 interface Discussion {
   id: string;
@@ -27,24 +30,47 @@ export const MessageThreads = () => {
   const [loading, setLoading] = useState(true);
   const [likedDiscussions, setLikedDiscussions] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { isAdmin } = useAdminRole();
 
   useEffect(() => {
     fetchDiscussions();
     fetchUserLikes();
   }, []);
 
+  const [profiles, setProfiles] = useState<{ [key: string]: { avatar_url: string | null; display_name: string | null; first_name: string | null; last_name: string | null } }>({});
+
   const fetchDiscussions = async () => {
     try {
-      // Add cache busting to force fresh data fetch
-      const timestamp = Date.now();
-      const { data, error } = await supabase
+      // Fetch discussions
+      const { data: discussionsData, error: discussionsError } = await supabase
         .from('discussions')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      console.log('Fresh discussions data:', data); // Debug log
-      setDiscussions(data || []);
+      if (discussionsError) throw discussionsError;
+      
+      // Get unique user IDs
+      const userIds = [...new Set(discussionsData?.map(d => d.user_id) || [])];
+      
+      // Fetch profiles for these users
+      if (userIds.length > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('user_id, avatar_url, display_name, first_name, last_name')
+          .in('user_id', userIds);
+
+        if (!profilesError && profilesData) {
+          const profilesMap = profilesData.reduce((acc, profile) => {
+            acc[profile.user_id] = profile;
+            return acc;
+          }, {} as { [key: string]: any });
+          setProfiles(profilesMap);
+        }
+      }
+
+      console.log('Fresh discussions data:', discussionsData);
+      setDiscussions(discussionsData || []);
     } catch (error) {
       console.error('Error fetching discussions:', error);
       toast({
@@ -55,6 +81,36 @@ export const MessageThreads = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const deleteDiscussion = async (discussionId: string) => {
+    try {
+      const { error } = await supabase
+        .from('discussions')
+        .delete()
+        .eq('id', discussionId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Discussion Deleted",
+        description: "The discussion has been removed successfully.",
+      });
+
+      // Refresh discussions
+      fetchDiscussions();
+    } catch (error) {
+      console.error('Error deleting discussion:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete discussion",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const canDeleteDiscussion = (discussion: Discussion) => {
+    return isAdmin || (user && discussion.user_id === user.id);
   };
 
   const fetchUserLikes = async () => {
@@ -188,9 +244,15 @@ export const MessageThreads = () => {
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 {/* Avatar */}
-                <div className="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                  {getInitials(discussion.author_name)}
-                </div>
+                <Avatar className="w-12 h-12 flex-shrink-0">
+                  <AvatarImage 
+                    src={profiles[discussion.user_id]?.avatar_url || ''} 
+                    alt={discussion.author_name}
+                  />
+                  <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
+                    {getInitials(discussion.author_name)}
+                  </AvatarFallback>
+                </Avatar>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
@@ -212,30 +274,40 @@ export const MessageThreads = () => {
 
                   <p className="text-gray-300 mb-3 line-clamp-2">{discussion.content}</p>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-4">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-gray-400 hover:text-cyan-300 h-8 px-2"
-                    >
-                      <Reply className="h-4 w-4 mr-1" />
-                      {discussion.comments_count || 0} replies
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => toggleLike(discussion.id)}
-                      className={`h-8 px-2 ${
-                        likedDiscussions.has(discussion.id) 
-                          ? 'text-red-400 hover:text-red-300' 
-                          : 'text-gray-400 hover:text-red-300'
-                      }`}
-                    >
-                      <Heart className={`h-4 w-4 mr-1 ${likedDiscussions.has(discussion.id) ? 'fill-current' : ''}`} />
-                      {discussion.likes_count || 0}
-                    </Button>
-                  </div>
+                   {/* Actions */}
+                   <div className="flex items-center gap-4">
+                     <Button 
+                       variant="ghost" 
+                       size="sm" 
+                       className="text-gray-400 hover:text-cyan-300 h-8 px-2"
+                     >
+                       <Reply className="h-4 w-4 mr-1" />
+                       {discussion.comments_count || 0} replies
+                     </Button>
+                     <Button 
+                       variant="ghost" 
+                       size="sm" 
+                       onClick={() => toggleLike(discussion.id)}
+                       className={`h-8 px-2 ${
+                         likedDiscussions.has(discussion.id) 
+                           ? 'text-red-400 hover:text-red-300' 
+                           : 'text-gray-400 hover:text-red-300'
+                       }`}
+                     >
+                       <Heart className={`h-4 w-4 mr-1 ${likedDiscussions.has(discussion.id) ? 'fill-current' : ''}`} />
+                       {discussion.likes_count || 0}
+                     </Button>
+                     {canDeleteDiscussion(discussion) && (
+                       <Button 
+                         variant="ghost" 
+                         size="sm" 
+                         onClick={() => deleteDiscussion(discussion.id)}
+                         className="text-gray-400 hover:text-red-400 h-8 px-2 ml-auto"
+                       >
+                         <Trash2 className="h-4 w-4" />
+                       </Button>
+                     )}
+                   </div>
                 </div>
               </div>
             </CardContent>
