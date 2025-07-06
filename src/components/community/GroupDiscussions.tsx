@@ -100,30 +100,58 @@ export const GroupDiscussions = () => {
     return getInitials(name);
   };
 
-  // Persist discussions in localStorage to prevent deletion
-  const DISCUSSIONS_KEY = 'community_discussions';
-  
-  const loadDiscussions = () => {
+  // Fetch discussions from database
+  const fetchDiscussions = async () => {
     try {
-      const saved = localStorage.getItem(DISCUSSIONS_KEY);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  };
-  
-  const saveDiscussions = (discussions: Discussion[]) => {
-    try {
-      localStorage.setItem(DISCUSSIONS_KEY, JSON.stringify(discussions));
+      const { data, error } = await supabase
+        .from('discussions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      // Convert database format to component format
+      const formattedDiscussions = data?.map(discussion => ({
+        id: discussion.id,
+        title: discussion.title,
+        content: discussion.content,
+        author: discussion.author_name,
+        avatar: getInitials(discussion.author_name),
+        category: discussion.category,
+        likes: discussion.likes_count || 0,
+        comments: discussion.comments_count || 0,
+        timeAgo: formatTimeAgo(discussion.created_at),
+        isPinned: false,
+        isLiked: false,
+        attachments: undefined
+      })) || [];
+      
+      setDiscussionsList(formattedDiscussions);
     } catch (error) {
-      console.error('Failed to save discussions:', error);
+      console.error('Error fetching discussions:', error);
     }
   };
 
-  // Initialize discussions with saved data
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+    return `${Math.floor(diffInMinutes / 1440)}d ago`;
+  };
+
+  // Initialize discussions from database
   React.useEffect(() => {
-    const savedDiscussions = loadDiscussions();
-    setDiscussionsList(savedDiscussions);
+    // Clear any existing localStorage data to prevent conflicts
+    try {
+      localStorage.removeItem('community_discussions');
+    } catch (error) {
+      console.log('Could not clear localStorage:', error);
+    }
+    
+    fetchDiscussions();
   }, []);
 
   // Fetch real community stats
@@ -329,58 +357,62 @@ export const GroupDiscussions = () => {
     if (newPost.trim() && !isSubmitting) {
       setIsSubmitting(true);
       
-      const postTitleToUse = postTitle.trim() || 
-        (newPost.length > 50 ? newPost.substring(0, 50) + '...' : newPost);
-      
-      const newDiscussion: Discussion = {
-        id: String(Date.now()),
-        title: postTitleToUse,
-        content: newPost,
-        author: getUserName(),
-        avatar: getUserInitials(),
-        category: selectedCategory,
-        likes: 0,
-        comments: 0,
-        timeAgo: 'now',
-        isLiked: false,
-        attachments: attachments.length > 0 ? attachments : undefined
-      };
-      
-      const updatedDiscussions = [newDiscussion, ...discussionsList];
-      setDiscussionsList(updatedDiscussions);
-      saveDiscussions(updatedDiscussions);
-      
-      // Send email notification for new post
       try {
-        await supabase.functions.invoke('community-notification', {
-          body: {
-            type: 'post',
-            authorName: getUserName(),
-            authorEmail: user?.email,
-            content: newPost
-          }
-        });
+        const postTitleToUse = postTitle.trim() || 
+          (newPost.length > 50 ? newPost.substring(0, 50) + '...' : newPost);
         
+        // Save to database
+        const { data, error } = await supabase
+          .from('discussions')
+          .insert({
+            title: postTitleToUse,
+            content: newPost,
+            author_name: getUserName(),
+            category: selectedCategory,
+            user_id: user?.id
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        // Send email notification for new post
+        try {
+          await supabase.functions.invoke('community-notification', {
+            body: {
+              type: 'post',
+              authorName: getUserName(),
+              authorEmail: user?.email,
+              content: newPost
+            }
+          });
+        } catch (notificationError) {
+          console.error('Failed to send post notification:', notificationError);
+        }
+
         toast({
           title: "Post created!",
           description: "Your post has been shared with the community"
         });
+
+        // Refresh discussions list
+        fetchDiscussions();
+        
+        setNewPost('');
+        setPostTitle('');
+        setAttachments([]);
+        setShowEmojiPicker(false);
+        
       } catch (error) {
-        console.error('Failed to send post notification:', error);
+        console.error('Error creating post:', error);
         toast({
-          title: "Post created",
-          description: "Your post was created but notification failed to send",
+          title: "Error",
+          description: "Failed to create post. Please try again.",
           variant: "destructive"
         });
+      } finally {
+        setTimeout(() => setIsSubmitting(false), 1000);
       }
-      
-      setNewPost('');
-      setPostTitle('');
-      setAttachments([]);
-      setAttachments([]);
-      setShowEmojiPicker(false);
-      
-      setTimeout(() => setIsSubmitting(false), 1000);
     }
   };
 
