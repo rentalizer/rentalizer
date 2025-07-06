@@ -27,6 +27,7 @@ interface Event {
   description?: string;
   location?: string;
   duration?: string;
+  zoomLink?: string;
 }
 
 export const CommunityCalendar = () => {
@@ -183,7 +184,8 @@ export const CommunityCalendar = () => {
       description: newEvent.description,
       location: newEvent.location,
       duration: newEvent.duration,
-      isRecurring: newEvent.isRecurring
+      isRecurring: newEvent.isRecurring,
+      zoomLink: newEvent.zoomLink
     };
     
     setEvents([...events, event]);
@@ -541,6 +543,14 @@ export const CommunityCalendar = () => {
                     <Button 
                       size="sm" 
                       className="w-full mt-3 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
+                      onClick={() => {
+                        if (event.zoomLink) {
+                          window.open(event.zoomLink, '_blank');
+                        } else {
+                          // Default action for events without zoom links
+                          alert('No meeting link available for this event');
+                        }
+                      }}
                     >
                       Join Event
                     </Button>
