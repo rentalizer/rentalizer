@@ -27,6 +27,8 @@ const ProfileSetup = () => {
   useEffect(() => {
     if (user) {
       loadProfile();
+    } else {
+      setLoading(false);
     }
   }, [user]);
 
