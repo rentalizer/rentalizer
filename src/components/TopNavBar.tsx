@@ -105,13 +105,20 @@ export const TopNavBar = () => {
                 </Badge>
               </div>
               <Button
-                onClick={() => {
+                onClick={async () => {
                   console.log('🖱️ LOGOUT BUTTON CLICKED!');
-                  // Clear all storage immediately
+                  try {
+                    // Import supabase and call signOut first
+                    const { supabase } = await import('@/integrations/supabase/client');
+                    await supabase.auth.signOut({ scope: 'global' });
+                  } catch (error) {
+                    console.error('Error during Supabase signOut:', error);
+                  }
+                  // Clear all storage
                   localStorage.clear();
                   sessionStorage.clear();
-                  // Force immediate redirect to home page
-                  window.location.href = '/';
+                  // Force redirect
+                  window.location.replace('/');
                 }}
                 variant="outline"
                 size="sm"
