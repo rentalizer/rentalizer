@@ -62,7 +62,7 @@ const AdminMembers = () => {
         .from('user_roles')
         .select('user_id, role');
 
-      // Combine the data
+      // Combine the data and sort by creation date (newest first)
       const membersData: Member[] = userProfiles?.map(userProfile => {
         const profile = profiles?.find(p => p.user_id === userProfile.id);
         const adminRole = userRoles?.find(r => r.user_id === userProfile.id && r.role === 'admin');
@@ -82,7 +82,7 @@ const AdminMembers = () => {
           profile_complete: profile?.profile_complete || false,
           avatar_url: profile?.avatar_url
         };
-      }) || [];
+      }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) || [];
 
       setMembers(membersData);
     } catch (error) {
