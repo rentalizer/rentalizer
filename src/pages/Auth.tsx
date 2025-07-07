@@ -229,6 +229,12 @@ export const Auth = () => {
                   </div>
                   <p className="text-xs text-gray-400">Password must be at least 6 characters long</p>
                 </div>
+                
+                <div className="bg-cyan-600/10 border border-cyan-500/20 rounded-lg p-3">
+                  <p className="text-cyan-300 text-sm font-medium">🎉 Promo Code: T6MEM</p>
+                  <p className="text-gray-400 text-xs mt-1">Use this code for exclusive community access!</p>
+                </div>
+                
                 <Button
                   type="submit"
                   disabled={signupLoading}
@@ -239,6 +245,15 @@ export const Auth = () => {
               </form>
             </TabsContent>
           </Tabs>
+          
+          <div className="mt-6 text-center space-y-2">
+            <p className="text-xs text-gray-400">
+              After signing up, complete your profile in the Community section to access all features.
+            </p>
+            <p className="text-xs text-cyan-300">
+              Required: First Name, Last Name, Display Name
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>

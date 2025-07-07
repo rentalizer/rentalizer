@@ -34,6 +34,7 @@ import TestHome from "./pages/TestHome";
 import AdminMembers from "./pages/AdminMembers";
 import Members from "./pages/Members";
 import ProfileSetup from "./pages/ProfileSetup";
+import { Auth } from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,7 @@ const AppRoutes = () => (
     <Route path="/admin/members" element={<AdminMembers />} />
     <Route path="/members" element={<Members />} />
     <Route path="/profile-setup" element={<ProfileSetup />} />
+    <Route path="/auth" element={<Auth />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
     <Route path="/terms-of-service" element={<TermsOfService />} />
