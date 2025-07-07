@@ -105,19 +105,23 @@ export const TopNavBar = () => {
                 </Badge>
               </div>
               <Button
+                id="new-logout-btn-v3"
+                data-version="v3-no-alerts"
                 onClick={() => {
-                  // Force immediate logout without any alerts
-                  const supabaseKey = 'sb-bmemylmcbmrieheutktb-auth-token';
-                  Object.keys(localStorage).forEach(key => {
-                    if (key.includes('supabase') || key.includes('auth')) {
-                      localStorage.removeItem(key);
-                    }
-                  });
-                  localStorage.clear();
-                  sessionStorage.clear();
-                  document.cookie = 'sb-access-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                  document.cookie = 'sb-refresh-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-                  window.location.replace('/auth?cleared=' + Date.now());
+                  console.log('🚪 NEW LOGOUT BUTTON V3 - NO ALERTS!');
+                  // Aggressive cleanup
+                  try {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    // Clear cookies
+                    document.cookie.split(";").forEach(function(c) { 
+                      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                    });
+                  } catch (e) {
+                    console.log('Cleanup error:', e);
+                  }
+                  // Force redirect
+                  window.location.href = '/auth?v=3&t=' + Date.now();
                 }}
                 variant="outline"
                 size="sm"
