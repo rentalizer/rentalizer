@@ -106,10 +106,13 @@ export const TopNavBar = () => {
               </div>
               <form onSubmit={(e) => {
                 e.preventDefault();
-                console.log('🖱️ LOGOUT FORM SUBMITTED!');
+                console.log('🚪 LOGOUT FORM SUBMITTED - v2!');
+                // Clear everything aggressively
                 localStorage.clear();
                 sessionStorage.clear();
-                window.location.href = '/auth';
+                // Add timestamp to force cache bust
+                const timestamp = Date.now();
+                window.location.href = `/auth?t=${timestamp}`;
               }}>
                 <Button
                   type="submit"
