@@ -106,8 +106,11 @@ export const TopNavBar = () => {
               </div>
               <Button
                 onClick={() => {
-                  alert('BUTTON CLICKED - LOGGING OUT');
                   console.log('🖱️ LOGOUT BUTTON CLICKED!');
+                  // Clear all storage immediately
+                  localStorage.clear();
+                  sessionStorage.clear();
+                  // Force immediate redirect to home page
                   window.location.href = '/';
                 }}
                 variant="outline"
