@@ -44,12 +44,9 @@ export const useAuth = () => {
 
 // Check if we're in development environment (Lovable editor)
 const isDevelopment = () => {
-  return window.location.hostname.includes('lovable.app') || 
-         window.location.hostname.includes('lovableproject.com') ||
-         window.location.hostname.includes('localhost') ||
-         window.location.hostname.includes('127.0.0.1') ||
-         window.location.port === '5173' ||
-         window.location.port === '3000';
+  return (window.location.hostname.includes('lovable.app') || 
+         window.location.hostname.includes('lovableproject.com')) &&
+         !window.location.hostname.includes('rentalizer.ai');
 };
 
 // Create a mock user for development
