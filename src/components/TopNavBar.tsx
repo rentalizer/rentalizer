@@ -104,29 +104,23 @@ export const TopNavBar = () => {
                   {isAdmin ? 'Admin' : 'Pro'}
                 </Badge>
               </div>
-              <Button
-                onClick={async () => {
-                  console.log('🖱️ LOGOUT BUTTON CLICKED!');
-                  try {
-                    // Import supabase and call signOut first
-                    const { supabase } = await import('@/integrations/supabase/client');
-                    await supabase.auth.signOut({ scope: 'global' });
-                  } catch (error) {
-                    console.error('Error during Supabase signOut:', error);
-                  }
-                  // Clear all storage
-                  localStorage.clear();
-                  sessionStorage.clear();
-                  // Force redirect
-                  window.location.replace('/');
-                }}
-                variant="outline"
-                size="sm"
-                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                console.log('🖱️ LOGOUT FORM SUBMITTED!');
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = '/auth';
+              }}>
+                <Button
+                  type="submit"
+                  variant="outline"
+                  size="sm"
+                  className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </form>
             </div>
           ) : (
             <Button
