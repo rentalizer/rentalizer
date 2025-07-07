@@ -175,19 +175,6 @@ const LandingPage = () => {
               </div>
             </div>
 
-            {/* Single Button Layout */}
-            <div className="flex justify-center items-center mb-16">
-              <Button 
-                size="lg"
-                onClick={handleBookDemo}
-                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-6 text-xl font-semibold min-w-[200px]"
-              >
-                <Calendar className="h-6 w-6 mr-3" />
-                <span className="inline">
-                  {texts.buttonText}
-                </span>
-              </Button>
-            </div>
           </div>
 
           {/* Animated Features Section */}
