@@ -390,7 +390,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setProfile(null);
       console.log('🧹 AuthContext: Cleared local auth state');
 
-      // Call Supabase signOut
+      // Clear ALL storage before calling signOut
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+        console.log('🧹 AuthContext: Cleared all storage');
+      } catch (e) {
+        console.warn('⚠️ AuthContext: Could not clear storage:', e);
+      }
+
+      // Call Supabase signOut with global scope to clear all sessions
       const { error } = await supabase.auth.signOut({ scope: 'global' });
       if (error) {
         console.error('❌ AuthContext: Supabase signOut error:', error);
@@ -399,16 +408,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log('✅ AuthContext: Supabase signOut successful');
       }
 
-      // Clear any localStorage items
+      // Additional cleanup - manually remove any auth-related items
       try {
-        localStorage.removeItem('supabase.auth.token');
-        localStorage.clear();
-        console.log('🧹 AuthContext: Cleared localStorage');
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.includes('supabase') || key.includes('auth') || key.includes('session'))) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        console.log('🧹 AuthContext: Removed auth-related keys:', keysToRemove);
       } catch (e) {
-        console.warn('⚠️ AuthContext: Could not clear localStorage:', e);
+        console.warn('⚠️ AuthContext: Could not remove auth keys:', e);
       }
 
-      // Force navigation with page reload
+      // Force navigation with page reload to ensure clean state
       console.log('🔄 AuthContext: Forcing page reload and navigation');
       window.location.replace('/');
       
@@ -417,6 +432,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       // Force logout anyway
       setUser(null);
       setProfile(null);
+      localStorage.clear();
+      sessionStorage.clear();
       window.location.replace('/');
     }
   };
