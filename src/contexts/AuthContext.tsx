@@ -44,9 +44,11 @@ export const useAuth = () => {
 
 // Check if we're in development environment (Lovable editor)
 const isDevelopment = () => {
-  return (window.location.hostname.includes('lovable.app') || 
-         window.location.hostname.includes('lovableproject.com')) &&
-         !window.location.hostname.includes('rentalizer.ai');
+  const hostname = window.location.hostname;
+  const isDev = hostname.includes('lovable.app') || hostname.includes('lovableproject.com');
+  const isLive = hostname.includes('rentalizer.ai') || hostname.includes('rentalizer');
+  console.log('🔍 Environment check:', { hostname, isDev, isLive, result: isDev && !isLive });
+  return isDev && !isLive;
 };
 
 // Create a mock user for development
