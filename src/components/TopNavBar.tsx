@@ -15,9 +15,13 @@ export const TopNavBar = () => {
 
   const handleSignOut = async () => {
     try {
+      console.log('🔄 TopNavBar: Starting logout process...');
       await signOut();
+      console.log('✅ TopNavBar: Logout completed');
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('❌ TopNavBar: Error signing out:', error);
+      // Force logout even if there's an error
+      window.location.replace('/');
     }
   };
 

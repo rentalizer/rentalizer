@@ -374,22 +374,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
-    console.log('🚪 Signing out user');
+    console.log('🚪 AuthContext: Starting signOut process');
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('❌ Sign out error:', error);
-        throw error;
-      }
-      console.log('✅ Sign out successful');
+      // Clear local state first
       setUser(null);
       setProfile(null);
-      
-      // Force a complete page reload to ensure clean logout
+      console.log('🧹 AuthContext: Cleared local auth state');
+
+      // Call Supabase signOut
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      if (error) {
+        console.error('❌ AuthContext: Supabase signOut error:', error);
+        // Don't throw - we'll force logout anyway
+      } else {
+        console.log('✅ AuthContext: Supabase signOut successful');
+      }
+
+      // Clear any localStorage items
+      try {
+        localStorage.removeItem('supabase.auth.token');
+        localStorage.clear();
+        console.log('🧹 AuthContext: Cleared localStorage');
+      } catch (e) {
+        console.warn('⚠️ AuthContext: Could not clear localStorage:', e);
+      }
+
+      // Force navigation with page reload
+      console.log('🔄 AuthContext: Forcing page reload and navigation');
       window.location.replace('/');
+      
     } catch (error) {
-      console.error('❌ Sign out failed:', error);
-      throw error;
+      console.error('❌ AuthContext: Unexpected signOut error:', error);
+      // Force logout anyway
+      setUser(null);
+      setProfile(null);
+      window.location.replace('/');
     }
   };
 
