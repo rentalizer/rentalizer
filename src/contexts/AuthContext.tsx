@@ -221,6 +221,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Don't use mock user on test pages - they should use real auth
     const isTestPage = window.location.pathname.includes('/calculator-test');
     
+    // In development mode (except test pages), use mock user
+    if (isDevelopment() && !isTestPage) {
+      console.log('🔧 Using mock user for development');
+      const mockUser = createMockUser();
+      setUser(mockUser);
+      setIsLoading(false);
+      return;
+    }
+    
     const initTimeout = setTimeout(() => {
       console.log('⏰ Auth initialization timeout, setting loading to false');
       setIsLoading(false);
