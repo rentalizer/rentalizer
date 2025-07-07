@@ -29,12 +29,14 @@ const Index = () => {
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [promoCode, setPromoCode] = useState('');
   const [signupLoading, setSignupLoading] = useState(false);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated - check profile completion
   useEffect(() => {
     if (user) {
-      navigate('/community');
+      // Check if user has completed profile, otherwise redirect to profile setup
+      navigate('/profile-setup');
     }
   }, [user, navigate]);
 
@@ -73,10 +75,10 @@ const Index = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!signupEmail.trim() || !signupPassword.trim() || !displayName.trim()) {
+    if (!signupEmail.trim() || !signupPassword.trim() || !displayName.trim() || !promoCode.trim()) {
       toast({
         title: "Missing fields",
-        description: "Please enter your name, email and password",
+        description: "Please enter your name, email, password, and promo code",
         variant: "destructive"
       });
       return;
@@ -233,10 +235,16 @@ const Index = () => {
                   </div>
                   <p className="text-xs text-gray-400">Password must be at least 6 characters long</p>
                 </div>
-                
-                <div className="bg-cyan-600/10 border border-cyan-500/20 rounded-lg p-3">
-                  <p className="text-cyan-300 text-sm font-medium">🎉 Promo Code: T6MEM</p>
-                  <p className="text-gray-400 text-xs mt-1">Use this code for exclusive community access!</p>
+                <div className="space-y-2">
+                  <Label htmlFor="promo-code" className="text-gray-300">Promo Code</Label>
+                  <Input
+                    id="promo-code"
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                    className="bg-slate-700/50 border-cyan-500/20 text-white"
+                    required
+                  />
                 </div>
                 
                 <Button
@@ -252,7 +260,7 @@ const Index = () => {
           
           <div className="mt-6 text-center space-y-2">
             <p className="text-xs text-gray-400">
-              After signing up, complete your profile in the Community section to access all features.
+              After signing up, you'll be guided to complete your profile to access all community features.
             </p>
           </div>
         </CardContent>
