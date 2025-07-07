@@ -123,6 +123,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasLoggedOut, setHasLoggedOut] = useState(false);
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -220,15 +221,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Don't use mock user on test pages - they should use real auth
     const isTestPage = window.location.pathname.includes('/calculator-test');
     
-    // NEVER use mock user on live site
-    if (isDevelopment() && !isTestPage) {
+    // NEVER use mock user on live site OR if user has logged out
+    if (isDevelopment() && !isTestPage && !hasLoggedOut) {
       console.log('🔧 Using mock user for development');
       const mockUser = createMockUser();
       setUser(mockUser);
       setIsLoading(false);
       return;
     } else {
-      console.log('🌐 Live environment - using real auth only');
+      console.log('🌐 Live environment or logged out - using real auth only');
     }
     
     const initTimeout = setTimeout(() => {
@@ -386,6 +387,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signOut = async () => {
     console.log('🚪 AuthContext: Starting signOut process');
     try {
+      // Set logout flag to prevent mock user from being set again
+      setHasLoggedOut(true);
+      
       // Clear local state first
       setUser(null);
       setProfile(null);
@@ -431,6 +435,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error('❌ AuthContext: Unexpected signOut error:', error);
       // Force logout anyway
+      setHasLoggedOut(true);
       setUser(null);
       setProfile(null);
       localStorage.clear();
