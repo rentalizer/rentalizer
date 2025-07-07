@@ -104,26 +104,28 @@ export const TopNavBar = () => {
                   {isAdmin ? 'Admin' : 'Pro'}
                 </Badge>
               </div>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                console.log('🚪 LOGOUT FORM SUBMITTED - v2!');
-                // Clear everything aggressively
-                localStorage.clear();
-                sessionStorage.clear();
-                // Add timestamp to force cache bust
-                const timestamp = Date.now();
-                window.location.href = `/auth?t=${timestamp}`;
-              }}>
-                <Button
-                  type="submit"
-                  variant="outline"
-                  size="sm"
-                  className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              </form>
+              <Button
+                onClick={() => {
+                  // Force immediate logout without any alerts
+                  const supabaseKey = 'sb-bmemylmcbmrieheutktb-auth-token';
+                  Object.keys(localStorage).forEach(key => {
+                    if (key.includes('supabase') || key.includes('auth')) {
+                      localStorage.removeItem(key);
+                    }
+                  });
+                  localStorage.clear();
+                  sessionStorage.clear();
+                  document.cookie = 'sb-access-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                  document.cookie = 'sb-refresh-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                  window.location.replace('/auth?cleared=' + Date.now());
+                }}
+                variant="outline"
+                size="sm"
+                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
             </div>
           ) : (
             <Button
