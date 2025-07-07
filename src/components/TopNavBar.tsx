@@ -105,11 +105,10 @@ export const TopNavBar = () => {
                 </Badge>
               </div>
               <Button
-                onClick={(e) => {
+                onClick={() => {
+                  alert('BUTTON CLICKED - LOGGING OUT');
                   console.log('🖱️ LOGOUT BUTTON CLICKED!');
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleSignOut();
+                  window.location.href = '/';
                 }}
                 variant="outline"
                 size="sm"
