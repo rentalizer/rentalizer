@@ -375,16 +375,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     console.log('🚪 Signing out user');
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('❌ Sign out error:', error);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('❌ Sign out error:', error);
+        throw error;
+      }
+      console.log('✅ Sign out successful');
+      setUser(null);
+      setProfile(null);
+      
+      // Force a complete page reload to ensure clean logout
+      window.location.replace('/');
+    } catch (error) {
+      console.error('❌ Sign out failed:', error);
       throw error;
     }
-    console.log('✅ Sign out successful');
-    setUser(null);
-    setProfile(null);
-    // Force navigation to landing page after logout
-    window.location.href = '/';
   };
 
   const isSubscribed = user?.subscription_status === 'active';
