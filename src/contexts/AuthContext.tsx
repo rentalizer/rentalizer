@@ -382,6 +382,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     console.log('✅ Sign out successful');
     setUser(null);
+    setProfile(null);
+    // Force navigation to landing page after logout
+    window.location.href = '/';
   };
 
   const isSubscribed = user?.subscription_status === 'active';
