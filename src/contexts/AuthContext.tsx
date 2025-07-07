@@ -42,22 +42,6 @@ export const useAuth = () => {
   return context;
 };
 
-// Check if we're in development environment (Lovable editor)
-const isDevelopment = () => {
-  const hostname = window.location.hostname;
-  const isDev = hostname.includes('lovable.app') || hostname.includes('lovableproject.com');
-  const isLive = hostname.includes('rentalizer.ai') || hostname.includes('rentalizer');
-  console.log('🔍 Environment check:', { hostname, isDev, isLive, result: isDev && !isLive });
-  return isDev && !isLive; // Return true for Lovable development
-};
-
-// Create a mock user for development
-const createMockUser = (): User => ({
-  id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479', // Valid UUID format
-  email: 'richie@istayusa.com',
-  subscription_status: 'active',
-  subscription_tier: 'Premium'
-});
 
 const sendNewUserNotification = async (userEmail: string, userId: string) => {
   try {
@@ -216,21 +200,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    console.log('🔄 AuthProvider initializing...', 'isDev:', isDevelopment());
+    console.log('🔄 AuthProvider initializing...');
     
-    // Don't use mock user on test pages - they should use real auth
-    const isTestPage = window.location.pathname.includes('/calculator-test');
-    
-    // NEVER use mock user on live site OR if user has logged out
-    if (isDevelopment() && !isTestPage && !hasLoggedOut) {
-      console.log('🔧 Using mock user for development');
-      const mockUser = createMockUser();
-      setUser(mockUser);
-      setIsLoading(false);
-      return;
-    } else {
-      console.log('🌐 Live environment or logged out - using real auth only');
-    }
+    console.log('🌐 Using real authentication only');
     
     const initTimeout = setTimeout(() => {
       console.log('⏰ Auth initialization timeout, setting loading to false');
@@ -484,7 +456,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user, 'isSubscribed:', isSubscribed, 'tier:', user?.subscription_tier, 'isDev:', isDevelopment());
+  console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user, 'isSubscribed:', isSubscribed, 'tier:', user?.subscription_tier);
 
   if (isLoading) {
     return (
