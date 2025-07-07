@@ -13,6 +13,14 @@ export const TopNavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
   const navigationTabs = [
     {
       name: 'Training & Community',
@@ -93,7 +101,7 @@ export const TopNavBar = () => {
                 </Badge>
               </div>
               <Button
-                onClick={signOut}
+                onClick={handleSignOut}
                 variant="outline"
                 size="sm"
                 className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
