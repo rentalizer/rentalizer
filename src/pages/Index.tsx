@@ -73,10 +73,10 @@ const Index = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!signupEmail.trim() || !signupPassword.trim()) {
+    if (!signupEmail.trim() || !signupPassword.trim() || !displayName.trim()) {
       toast({
         title: "Missing fields",
-        description: "Please enter both email and password",
+        description: "Please enter your name, email and password",
         variant: "destructive"
       });
       return;
@@ -149,8 +149,7 @@ const Index = () => {
                     type="email"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+                    className="bg-slate-700/50 border-cyan-500/20 text-white"
                     required
                   />
                 </div>
@@ -162,8 +161,7 @@ const Index = () => {
                       type={showPassword ? "text" : "password"}
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 pr-10"
+                      className="bg-slate-700/50 border-cyan-500/20 text-white pr-10"
                       required
                     />
                     <Button
@@ -190,14 +188,14 @@ const Index = () => {
             <TabsContent value="signup">
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="display-name" className="text-gray-300">Your Name (Optional)</Label>
+                  <Label htmlFor="display-name" className="text-gray-300">Your Name</Label>
                   <Input
                     id="display-name"
                     type="text"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="How should we call you?"
                     className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+                    required
                   />
                 </div>
                 <div className="space-y-2">
@@ -207,8 +205,7 @@ const Index = () => {
                     type="email"
                     value={signupEmail}
                     onChange={(e) => setSignupEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+                    className="bg-slate-700/50 border-cyan-500/20 text-white"
                     required
                   />
                 </div>
@@ -220,8 +217,7 @@ const Index = () => {
                       type={showPassword ? "text" : "password"}
                       value={signupPassword}
                       onChange={(e) => setSignupPassword(e.target.value)}
-                      placeholder="Choose a strong password"
-                      className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 pr-10"
+                      className="bg-slate-700/50 border-cyan-500/20 text-white pr-10"
                       required
                       minLength={6}
                     />
