@@ -482,38 +482,23 @@ export type Database = {
       }
     }
     Views: {
-      public_profiles: {
-        Row: {
-          avatar_url: string | null
-          bio: string | null
-          display_name: string | null
-          first_name: string | null
-          last_name: string | null
-          user_id: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          bio?: string | null
-          display_name?: string | null
-          first_name?: string | null
-          last_name?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          bio?: string | null
-          display_name?: string | null
-          first_name?: string | null
-          last_name?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       can_submit_contact_message: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      get_public_profile: {
+        Args: { profile_user_id: string }
+        Returns: {
+          user_id: string
+          first_name: string
+          last_name: string
+          display_name: string
+          avatar_url: string
+          bio: string
+        }[]
       }
       has_role: {
         Args: {
