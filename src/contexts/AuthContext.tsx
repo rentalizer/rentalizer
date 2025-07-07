@@ -47,8 +47,8 @@ const isDevelopment = () => {
   const hostname = window.location.hostname;
   const isDev = hostname.includes('lovable.app') || hostname.includes('lovableproject.com');
   const isLive = hostname.includes('rentalizer.ai') || hostname.includes('rentalizer');
-  console.log('🔍 Environment check:', { hostname, isDev, isLive, result: false }); // Force real auth
-  return false; // Always use real auth
+  console.log('🔍 Environment check:', { hostname, isDev, isLive, result: isDev && !isLive });
+  return isDev && !isLive; // Return true for Lovable development
 };
 
 // Create a mock user for development
