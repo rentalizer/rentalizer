@@ -105,7 +105,12 @@ export const TopNavBar = () => {
                 </Badge>
               </div>
               <Button
-                onClick={handleSignOut}
+                onClick={(e) => {
+                  console.log('🖱️ LOGOUT BUTTON CLICKED!');
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSignOut();
+                }}
                 variant="outline"
                 size="sm"
                 className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
