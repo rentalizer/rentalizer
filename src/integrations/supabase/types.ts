@@ -489,17 +489,6 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
-      get_public_profile: {
-        Args: { profile_user_id: string }
-        Returns: {
-          user_id: string
-          first_name: string
-          last_name: string
-          display_name: string
-          avatar_url: string
-          bio: string
-        }[]
-      }
       has_role: {
         Args: {
           _user_id: string
