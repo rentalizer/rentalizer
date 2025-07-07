@@ -141,8 +141,7 @@ export const Auth = () => {
                     type="email"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+                    className="bg-slate-700/50 border-cyan-500/20 text-white"
                     required
                   />
                 </div>
@@ -154,8 +153,7 @@ export const Auth = () => {
                       type={showPassword ? "text" : "password"}
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 pr-10"
+                      className="bg-slate-700/50 border-cyan-500/20 text-white pr-10"
                       required
                     />
                     <Button
@@ -182,14 +180,13 @@ export const Auth = () => {
             <TabsContent value="signup">
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="display-name" className="text-gray-300">Your Name (Optional)</Label>
+                  <Label htmlFor="display-name" className="text-gray-300">Your Name</Label>
                   <Input
                     id="display-name"
                     type="text"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="How should we call you?"
-                    className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+                    className="bg-slate-700/50 border-cyan-500/20 text-white"
                   />
                 </div>
                 <div className="space-y-2">
@@ -199,8 +196,7 @@ export const Auth = () => {
                     type="email"
                     value={signupEmail}
                     onChange={(e) => setSignupEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+                    className="bg-slate-700/50 border-cyan-500/20 text-white"
                     required
                   />
                 </div>
@@ -212,8 +208,7 @@ export const Auth = () => {
                       type={showPassword ? "text" : "password"}
                       value={signupPassword}
                       onChange={(e) => setSignupPassword(e.target.value)}
-                      placeholder="Choose a strong password"
-                      className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 pr-10"
+                      className="bg-slate-700/50 border-cyan-500/20 text-white pr-10"
                       required
                       minLength={6}
                     />
@@ -249,9 +244,6 @@ export const Auth = () => {
           <div className="mt-6 text-center space-y-2">
             <p className="text-xs text-gray-400">
               After signing up, complete your profile in the Community section to access all features.
-            </p>
-            <p className="text-xs text-cyan-300">
-              Required: First Name, Last Name, Display Name
             </p>
           </div>
         </CardContent>
