@@ -194,7 +194,7 @@ const Index = () => {
                     type="text"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
-                    className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+                    className="bg-slate-700/50 border-cyan-500/20 text-white"
                     required
                   />
                 </div>
