@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Upload, User, Ticket } from 'lucide-react';
 
 export const Auth = () => {
   const { user, signIn, signUp, isLoading } = useAuth();
@@ -22,7 +23,11 @@ export const Auth = () => {
   // Signup form state
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [bio, setBio] = useState('');
+  const [promoCode, setPromoCode] = useState('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [signupLoading, setSignupLoading] = useState(false);
 
   // Redirect if already authenticated
@@ -65,10 +70,19 @@ export const Auth = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!signupEmail.trim() || !signupPassword.trim()) {
+    if (!signupEmail.trim() || !signupPassword.trim() || !firstName.trim() || !lastName.trim()) {
       toast({
         title: "Missing fields",
-        description: "Please enter both email and password",
+        description: "Please fill in all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (promoCode.toUpperCase() !== 'T6MEM') {
+      toast({
+        title: "Invalid promo code",
+        description: "Please enter a valid promo code to sign up",
         variant: "destructive"
       });
       return;
@@ -86,6 +100,7 @@ export const Auth = () => {
     setSignupLoading(true);
 
     try {
+      const displayName = `${firstName} ${lastName}`;
       await signUp(signupEmail, signupPassword, displayName);
       toast({
         title: "Welcome!",
@@ -179,16 +194,36 @@ export const Auth = () => {
 
             <TabsContent value="signup">
               <form onSubmit={handleSignup} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="display-name" className="text-gray-300">Your Name</Label>
-                  <Input
-                    id="display-name"
-                    type="text"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="bg-slate-700/50 border-cyan-500/20 text-white"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="first-name" className="text-gray-300 flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      First Name
+                    </Label>
+                    <Input
+                      id="first-name"
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="bg-slate-700/50 border-cyan-500/20 text-white"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="last-name" className="text-gray-300">
+                      Last Name
+                    </Label>
+                    <Input
+                      id="last-name"
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="bg-slate-700/50 border-cyan-500/20 text-white"
+                      required
+                    />
+                  </div>
                 </div>
+                
                 <div className="space-y-2">
                   <Label htmlFor="signup-email" className="text-gray-300">Email</Label>
                   <Input
@@ -200,6 +235,7 @@ export const Auth = () => {
                     required
                   />
                 </div>
+                
                 <div className="space-y-2">
                   <Label htmlFor="signup-password" className="text-gray-300">Password</Label>
                   <div className="relative">
@@ -224,10 +260,62 @@ export const Auth = () => {
                   </div>
                   <p className="text-xs text-gray-400">Password must be at least 6 characters long</p>
                 </div>
-                
-                <div className="bg-cyan-600/10 border border-cyan-500/20 rounded-lg p-3">
-                  <p className="text-cyan-300 text-sm font-medium">🎉 Promo Code: T6MEM</p>
-                  <p className="text-gray-400 text-xs mt-1">Use this code for exclusive community access!</p>
+
+                <div className="space-y-2">
+                  <Label htmlFor="avatar-upload" className="text-gray-300 flex items-center gap-2">
+                    <Upload className="h-4 w-4" />
+                    Upload Your Image
+                  </Label>
+                  <div className="border-2 border-dashed border-cyan-500/30 rounded-lg p-4 hover:border-cyan-500/50 transition-colors">
+                    <input
+                      id="avatar-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="avatar-upload"
+                      className="cursor-pointer flex flex-col items-center gap-2 text-gray-400 hover:text-gray-300"
+                    >
+                      {avatarFile ? (
+                        <span className="text-cyan-300">{avatarFile.name}</span>
+                      ) : (
+                        <>
+                          <Upload className="h-6 w-6" />
+                          <span className="text-sm">Click to upload profile image</span>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bio" className="text-gray-300">Tell The Community About Yourself</Label>
+                  <Textarea
+                    id="bio"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    className="bg-slate-700/50 border-cyan-500/20 text-white resize-none"
+                    placeholder="Share a bit about yourself, your interests, and what brings you to our community..."
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="promo-code" className="text-gray-300 flex items-center gap-2">
+                    <Ticket className="h-4 w-4" />
+                    Promo Code
+                  </Label>
+                  <Input
+                    id="promo-code"
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                    className="bg-slate-700/50 border-cyan-500/20 text-white"
+                    placeholder="Enter T6MEM for access"
+                    required
+                  />
                 </div>
                 
                 <Button
