@@ -254,9 +254,6 @@ const Index = () => {
             <p className="text-xs text-gray-400">
               After signing up, complete your profile in the Community section to access all features.
             </p>
-            <p className="text-xs text-cyan-300">
-              Required: First Name, Last Name, Display Name
-            </p>
           </div>
         </CardContent>
       </Card>
