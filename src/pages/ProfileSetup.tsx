@@ -185,6 +185,23 @@ const ProfileSetup = () => {
     );
   }
 
+  // Redirect to auth if no user
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-cyan-300 text-xl">Please sign in to access this page</p>
+          <Button 
+            onClick={() => navigate('/auth')}
+            className="bg-cyan-600 hover:bg-cyan-700"
+          >
+            Sign In
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <TopNavBar />
