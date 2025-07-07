@@ -4,10 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Upload, User } from 'lucide-react';
 
 export const Auth = () => {
   const { user, signIn, signUp, isLoading } = useAuth();
@@ -22,7 +23,12 @@ export const Auth = () => {
   // Signup form state
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [aboutMe, setAboutMe] = useState('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [signupLoading, setSignupLoading] = useState(false);
 
   // Redirect if already authenticated
@@ -62,13 +68,25 @@ export const Auth = () => {
     }
   };
 
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAvatarPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!signupEmail.trim() || !signupPassword.trim()) {
+    if (!signupEmail.trim() || !signupPassword.trim() || !firstName.trim() || !lastName.trim() || !displayName.trim()) {
       toast({
-        title: "Missing fields",
-        description: "Please enter both email and password",
+        title: "Missing required fields",
+        description: "Please fill in all required fields (email, password, first name, last name, and your name)",
         variant: "destructive"
       });
       return;
@@ -89,7 +107,7 @@ export const Auth = () => {
       await signUp(signupEmail, signupPassword, displayName);
       toast({
         title: "Welcome!",
-        description: "Your account has been created successfully. Please check your email to verify your account."
+        description: "Your account has been created successfully. Please check your email to verify your account and complete your profile."
       });
     } catch (error) {
       console.error('Signup error:', error);
@@ -181,8 +199,77 @@ export const Auth = () => {
 
             <TabsContent value="signup">
               <form onSubmit={handleSignup} className="space-y-4">
+                {/* Avatar Upload */}
                 <div className="space-y-2">
-                  <Label htmlFor="display-name" className="text-gray-300">Display Name (Optional)</Label>
+                  <Label className="text-gray-300">Profile Photo</Label>
+                  <div className="flex items-center gap-4">
+                    <div className="relative">
+                      <div className="w-16 h-16 rounded-full bg-slate-700/50 border-2 border-cyan-500/20 flex items-center justify-center overflow-hidden">
+                        {avatarPreview ? (
+                          <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+                        ) : (
+                          <User className="w-8 h-8 text-gray-400" />
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
+                        className="hidden"
+                        id="avatar-upload"
+                      />
+                      <label htmlFor="avatar-upload">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="border-cyan-500/20 text-cyan-300 hover:bg-cyan-500/10 cursor-pointer"
+                          asChild
+                        >
+                          <span>
+                            <Upload className="w-4 h-4 mr-2" />
+                            Upload Photo
+                          </span>
+                        </Button>
+                      </label>
+                      <p className="text-xs text-gray-400 mt-1">Recommended: Square image, 200x200px</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* First Name */}
+                <div className="space-y-2">
+                  <Label htmlFor="first-name" className="text-gray-300">First Name *</Label>
+                  <Input
+                    id="first-name"
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="Enter your first name"
+                    className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+                    required
+                  />
+                </div>
+
+                {/* Last Name */}
+                <div className="space-y-2">
+                  <Label htmlFor="last-name" className="text-gray-300">Last Name *</Label>
+                  <Input
+                    id="last-name"
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Enter your last name"
+                    className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+                    required
+                  />
+                </div>
+
+                {/* Your Name (Display Name) */}
+                <div className="space-y-2">
+                  <Label htmlFor="display-name" className="text-gray-300">Your Name *</Label>
                   <Input
                     id="display-name"
                     type="text"
@@ -190,10 +277,13 @@ export const Auth = () => {
                     onChange={(e) => setDisplayName(e.target.value)}
                     placeholder="How should we call you?"
                     className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+                    required
                   />
                 </div>
+
+                {/* Email */}
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email" className="text-gray-300">Email</Label>
+                  <Label htmlFor="signup-email" className="text-gray-300">Email *</Label>
                   <Input
                     id="signup-email"
                     type="email"
@@ -204,8 +294,10 @@ export const Auth = () => {
                     required
                   />
                 </div>
+
+                {/* Password */}
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password" className="text-gray-300">Password</Label>
+                  <Label htmlFor="signup-password" className="text-gray-300">Password *</Label>
                   <div className="relative">
                     <Input
                       id="signup-password"
@@ -229,6 +321,19 @@ export const Auth = () => {
                   </div>
                   <p className="text-xs text-gray-400">Password must be at least 6 characters long</p>
                 </div>
+
+                {/* About Me */}
+                <div className="space-y-2">
+                  <Label htmlFor="about-me" className="text-gray-300">About Yourself (Optional)</Label>
+                  <Textarea
+                    id="about-me"
+                    value={aboutMe}
+                    onChange={(e) => setAboutMe(e.target.value)}
+                    placeholder="Tell us a bit about yourself and your rental property interests..."
+                    className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 min-h-[80px]"
+                    rows={3}
+                  />
+                </div>
                 
                 <div className="bg-cyan-600/10 border border-cyan-500/20 rounded-lg p-3">
                   <p className="text-cyan-300 text-sm font-medium">🎉 Promo Code: T6MEM</p>
@@ -251,7 +356,7 @@ export const Auth = () => {
               After signing up, complete your profile in the Community section to access all features.
             </p>
             <p className="text-xs text-cyan-300">
-              Required: First Name, Last Name, Display Name
+              Required: First Name, Last Name, Your Name, Email, Password
             </p>
           </div>
         </CardContent>
