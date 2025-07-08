@@ -1,8 +1,10 @@
 
 import React, { useState } from 'react';
 import { TopNavBar } from '@/components/TopNavBar';
+import { Footer } from '@/components/Footer';
 import { PropertyFeed } from '@/components/acquisitions/PropertyFeed';
 import { AIEmailAgent } from '@/components/acquisitions/AIEmailAgent';
+import { AccessGate } from '@/components/AccessGate';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -45,11 +47,11 @@ export default function AcquisitionsAgent() {
     { label: 'Response Rate', icon: TrendingUp, color: 'text-purple-400' },
   ];
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/30 to-purple-900/30">
+  const PropertiesContent = () => (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/30 to-purple-900/30 flex flex-col">
       <TopNavBar />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 flex-1">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -209,6 +211,14 @@ export default function AcquisitionsAgent() {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <Footer />
     </div>
+  );
+
+  return (
+    <AccessGate title="Acquisition CRM" subtitle="Access your account">
+      <PropertiesContent />
+    </AccessGate>
   );
 }
