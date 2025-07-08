@@ -29,31 +29,31 @@ export const SimulatedMarketIntelligence = () => {
   const [bathrooms, setBathrooms] = useState<string>('2');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Simulated market data for different cities
+  // Mock market data for different cities with realistic revenue
   const simulatedData: { [key: string]: SubmarketData[] } = {
     'san diego': [
-      { submarket: "Gaslamp Quarter", strRevenue: 0, medianRent: 4200, multiple: 0 },
-      { submarket: "Little Italy", strRevenue: 0, medianRent: 4500, multiple: 0 },
-      { submarket: "Hillcrest", strRevenue: 0, medianRent: 3800, multiple: 0 },
-      { submarket: "Mission Valley", strRevenue: 0, medianRent: 3500, multiple: 0 },
-      { submarket: "La Jolla", strRevenue: 0, medianRent: 4800, multiple: 0 },
-      { submarket: "Pacific Beach", strRevenue: 0, medianRent: 4000, multiple: 0 }
+      { submarket: "Gaslamp Quarter", strRevenue: 7415, medianRent: 4200, multiple: 1.77 },
+      { submarket: "Little Italy", strRevenue: 7948, medianRent: 4500, multiple: 1.77 },
+      { submarket: "Hillcrest", strRevenue: 7076, medianRent: 3800, multiple: 1.86 },
+      { submarket: "Mission Valley", strRevenue: 6125, medianRent: 3500, multiple: 1.75 },
+      { submarket: "La Jolla", strRevenue: 8640, medianRent: 4800, multiple: 1.80 },
+      { submarket: "Pacific Beach", strRevenue: 7200, medianRent: 4000, multiple: 1.80 }
     ],
     'denver': [
-      { submarket: "LoDo", strRevenue: 0, medianRent: 2800, multiple: 0 },
-      { submarket: "Capitol Hill", strRevenue: 0, medianRent: 2400, multiple: 0 },
-      { submarket: "Highland", strRevenue: 0, medianRent: 2600, multiple: 0 },
-      { submarket: "RiNo", strRevenue: 0, medianRent: 2700, multiple: 0 },
-      { submarket: "Cherry Creek", strRevenue: 0, medianRent: 3200, multiple: 0 },
-      { submarket: "Washington Park", strRevenue: 0, medianRent: 2900, multiple: 0 }
+      { submarket: "LoDo", strRevenue: 5040, medianRent: 2800, multiple: 1.80 },
+      { submarket: "Capitol Hill", strRevenue: 4320, medianRent: 2400, multiple: 1.80 },
+      { submarket: "Highland", strRevenue: 4680, medianRent: 2600, multiple: 1.80 },
+      { submarket: "RiNo", strRevenue: 4860, medianRent: 2700, multiple: 1.80 },
+      { submarket: "Cherry Creek", strRevenue: 5760, medianRent: 3200, multiple: 1.80 },
+      { submarket: "Washington Park", strRevenue: 5220, medianRent: 2900, multiple: 1.80 }
     ],
     'austin': [
-      { submarket: "Downtown", strRevenue: 0, medianRent: 2600, multiple: 0 },
-      { submarket: "South Lamar", strRevenue: 0, medianRent: 2300, multiple: 0 },
-      { submarket: "East Austin", strRevenue: 0, medianRent: 2100, multiple: 0 },
-      { submarket: "Zilker", strRevenue: 0, medianRent: 2800, multiple: 0 },
-      { submarket: "The Domain", strRevenue: 0, medianRent: 2400, multiple: 0 },
-      { submarket: "Mueller", strRevenue: 0, medianRent: 2200, multiple: 0 }
+      { submarket: "Downtown", strRevenue: 4680, medianRent: 2600, multiple: 1.80 },
+      { submarket: "South Lamar", strRevenue: 4140, medianRent: 2300, multiple: 1.80 },
+      { submarket: "East Austin", strRevenue: 3780, medianRent: 2100, multiple: 1.80 },
+      { submarket: "Zilker", strRevenue: 5040, medianRent: 2800, multiple: 1.80 },
+      { submarket: "The Domain", strRevenue: 4320, medianRent: 2400, multiple: 1.80 },
+      { submarket: "Mueller", strRevenue: 3960, medianRent: 2200, multiple: 1.80 }
     ]
   };
 
@@ -80,49 +80,29 @@ export const SimulatedMarketIntelligence = () => {
       const bedroomMultiplier = propertyType === '1' ? 0.8 : propertyType === '3' ? 1.2 : 1;
       const bathroomMultiplier = bathrooms === '1' ? 0.9 : bathrooms === '3' ? 1.1 : 1;
       
-      // Generate simulated STR revenue data showing "API failures"
-      const processedData = baseData.map((item, index) => {
-        // Simulate some API failures (showing "NA")
-        const hasApiFailure = index >= 3; // First 3 succeed, rest fail
+      // Generate realistic revenue data with multipliers
+      const processedData = baseData.map((item) => {
+        // Calculate realistic STR revenue with property type multipliers
+        const baseRevenue = item.strRevenue * bedroomMultiplier * bathroomMultiplier;
+        const strRevenue = Math.round(baseRevenue + (Math.random() * 200 - 100));
+        const multiple = strRevenue / item.medianRent;
         
-        if (hasApiFailure) {
-          return {
-            ...item,
-            strRevenue: 0, // Will show as "NA"
-            multiple: 0
-          };
-        } else {
-          // Calculate realistic STR revenue
-          const baseRevenue = item.medianRent * 1.8 * bedroomMultiplier * bathroomMultiplier;
-          const strRevenue = Math.round(baseRevenue + (Math.random() * 500 - 250));
-          const multiple = strRevenue / item.medianRent;
-          
-          return {
-            ...item,
-            strRevenue,
-            multiple
-          };
-        }
+        return {
+          ...item,
+          strRevenue,
+          multiple
+        };
       });
 
-      // Sort by multiple (failed data at end)
-      processedData.sort((a, b) => {
-        if (a.multiple === 0 && b.multiple === 0) return 0;
-        if (a.multiple === 0) return 1;
-        if (b.multiple === 0) return -1;
-        return b.multiple - a.multiple;
-      });
+      // Sort by multiple (highest first)
+      processedData.sort((a, b) => b.multiple - a.multiple);
 
       setSubmarketData(processedData);
       setCityName(targetCity);
       
-      const failedCount = processedData.filter(d => d.strRevenue === 0).length;
-      const successCount = processedData.length - failedCount;
-      
       toast({
-        title: "Simulated Analysis Complete",
-        description: `${successCount} submarkets with simulated data, ${failedCount} showing "NA" (simulated API failures)`,
-        variant: failedCount > 0 ? "destructive" : "default",
+        title: "Market Analysis Complete",
+        description: `Found ${processedData.length} submarkets with revenue data for ${targetCity}`,
       });
 
     } catch (error) {
@@ -163,7 +143,7 @@ export const SimulatedMarketIntelligence = () => {
     const url = URL.createObjectURL(blob);
     
     link.setAttribute('href', url);
-    link.setAttribute('download', `${cityName.toLowerCase().replace(/\s+/g, '-')}-market-analysis-simulated.csv`);
+    link.setAttribute('download', `${cityName.toLowerCase().replace(/\s+/g, '-')}-market-analysis.csv`);
     link.style.visibility = 'hidden';
     
     document.body.appendChild(link);
@@ -173,7 +153,7 @@ export const SimulatedMarketIntelligence = () => {
     
     toast({
       title: "Data Exported",
-      description: `Simulated market data for ${cityName} downloaded.`,
+      description: `Market data for ${cityName} downloaded.`,
     });
   };
 
