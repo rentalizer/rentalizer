@@ -57,7 +57,7 @@ const TestHome = () => {
     feature2Title: 'Acquisition CRM',
     feature2Description: 'Property Outreach, Close Deals, Calculate Profit, Manage Relationships',
     feature3Title: 'Property Management',
-    feature3Description: 'Streamline Property Management And Automate Operations',
+    feature3Description: 'Automate Property Management, Operations & Cash Flow',
     feature4Title: 'Training Hub',
     feature4Description: 'Join Our Network Of Rental Arbitrage Entrepreneurs'
   };
