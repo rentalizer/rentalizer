@@ -37,13 +37,15 @@ serve(async (req) => {
     let textContent = '';
     const fileExtension = fileName.toLowerCase().split('.').pop();
 
-    if (fileExtension === 'pdf') {
-      // For PDF files, we'll need to extract text
-      // For now, we'll ask the user to provide text content or use a PDF-to-text service
-      textContent = await extractTextFromPDF(fileData);
-    } else if (fileExtension === 'txt' || fileExtension === 'md') {
+    if (fileExtension === 'txt' || fileExtension === 'md') {
       // Text files can be read directly
       textContent = await fileData.text();
+    } else if (fileExtension === 'doc' || fileExtension === 'docx') {
+      // Word files need special handling
+      textContent = await extractTextFromWord(fileData, fileExtension);
+    } else if (fileExtension === 'pdf') {
+      // For PDF files, we'll need to extract text
+      textContent = await extractTextFromPDF(fileData);
     } else {
       throw new Error(`Unsupported file type: ${fileExtension}`);
     }
@@ -137,6 +139,39 @@ serve(async (req) => {
     });
   }
 });
+
+async function extractTextFromWord(fileData: Blob, fileExtension: string): Promise<string> {
+  try {
+    // For Word files, we'll use a simple approach - convert to text
+    // This is a basic implementation that extracts readable text from Word files
+    const arrayBuffer = await fileData.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    
+    if (fileExtension === 'docx') {
+      // DOCX files are ZIP archives containing XML
+      // For now, we'll extract basic text content
+      const decoder = new TextDecoder('utf-8', { fatal: false });
+      let text = decoder.decode(uint8Array);
+      
+      // Basic cleanup for DOCX content
+      text = text.replace(/<[^>]*>/g, ' '); // Remove XML tags
+      text = text.replace(/\s+/g, ' '); // Normalize whitespace
+      text = text.replace(/[^\x20-\x7E\n\r\t]/g, ''); // Keep only printable ASCII + whitespace
+      text = text.trim();
+      
+      if (text.length < 50) {
+        throw new Error('Could not extract readable text from DOCX file. Please copy the text and use "Paste Text" tab instead.');
+      }
+      
+      return text;
+    } else {
+      // DOC files are binary format - more complex to parse
+      throw new Error('DOC files require conversion. Please save as DOCX or copy the text and use "Paste Text" tab instead.');
+    }
+  } catch (error) {
+    throw new Error(`Failed to extract text from Word file: ${error.message}. Please copy the text and use "Paste Text" tab instead.`);
+  }
+}
 
 async function extractTextFromPDF(fileData: Blob): Promise<string> {
   // PDF processing requires additional setup. For now, guide users to copy/paste text.

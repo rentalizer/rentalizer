@@ -109,11 +109,11 @@ export const RichieAdminPanel = () => {
         const fileName = file.name;
         const fileExtension = fileName.toLowerCase().split('.').pop();
 
-        // Check file type - now only supporting TXT and MD files
-        if (!['txt', 'md'].includes(fileExtension || '')) {
+        // Check file type - supporting TXT, MD, and Word files
+        if (!['txt', 'md', 'doc', 'docx'].includes(fileExtension || '')) {
           toast({
             title: "Unsupported File Type",
-            description: `${fileName}: Only TXT and MD files are supported. For PDFs, please copy the text and use "Paste Text" tab.`,
+            description: `${fileName}: Only TXT, MD, DOC, and DOCX files are supported.`,
             variant: "destructive"
           });
           continue;
@@ -301,7 +301,7 @@ export const RichieAdminPanel = () => {
                 Upload Course Materials
               </CardTitle>
               <p className="text-gray-400 text-sm">
-                Upload TXT and MD files for automatic processing. For PDFs, please copy the text and use the "Paste Text" tab.
+                Upload TXT, MD, DOC, and DOCX files for automatic processing.
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -320,7 +320,7 @@ export const RichieAdminPanel = () => {
                 <input
                   type="file"
                   multiple
-                  accept=".txt,.md"
+                  accept=".txt,.md,.doc,.docx"
                   onChange={handleFileSelect}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
@@ -329,7 +329,7 @@ export const RichieAdminPanel = () => {
                   Drag and drop files here, or click to select
                 </p>
                 <p className="text-gray-500 text-sm">
-                  Supports TXT and MD files • For PDFs, use "Paste Text" tab
+                  Supports TXT, MD, DOC, and DOCX files
                 </p>
               </div>
 
