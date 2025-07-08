@@ -64,7 +64,7 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
-    // Get all active members who should receive reminders
+    // Get all active members who should receive reminders (including admins)
     const { data: profiles, error: profilesError } = await supabaseClient
       .from('profiles')
       .select('user_id, display_name')
@@ -75,7 +75,23 @@ const handler = async (req: Request): Promise<Response> => {
       throw profilesError;
     }
 
-    console.log(`Found ${profiles?.length || 0} members to potentially send reminders to`);
+    // Also get admin users to ensure they receive notifications
+    const { data: adminUsers, error: adminError } = await supabaseClient
+      .from('user_roles')
+      .select('user_id')
+      .eq('role', 'admin');
+
+    if (adminError) {
+      console.error("Error fetching admin users:", adminError);
+    }
+
+    // Combine profiles with admins to ensure all admins get notifications
+    const allRecipients = new Set([
+      ...(profiles?.map(p => p.user_id) || []),
+      ...(adminUsers?.map(u => u.user_id) || [])
+    ]);
+
+    console.log(`Found ${profiles?.length || 0} members and ${adminUsers?.length || 0} admins to potentially send reminders to`);
 
     let remindersSent = 0;
 
@@ -83,16 +99,20 @@ const handler = async (req: Request): Promise<Response> => {
     for (const event of events) {
       console.log(`Processing reminders for event: ${event.title}`);
       
-      // Send reminder to all members (or filter based on attendees field)
-      for (const profile of profiles || []) {
+      // Send reminder to all recipients (members and admins)
+      for (const userId of allRecipients) {
         try {
           // Get user email from auth
-          const { data: userData, error: userError } = await supabaseClient.auth.admin.getUserById(profile.user_id);
+          const { data: userData, error: userError } = await supabaseClient.auth.admin.getUserById(userId);
           
           if (userError || !userData.user?.email) {
-            console.log(`Could not get email for user ${profile.user_id}`);
+            console.log(`Could not get email for user ${userId}`);
             continue;
           }
+
+          // Get display name from profiles if available
+          const userProfile = profiles?.find(p => p.user_id === userId);
+          const displayName = userProfile?.display_name || userData.user.email?.split('@')[0] || 'Member';
 
           // Call the send-event-reminder function
           const reminderResponse = await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/send-event-reminder`, {
@@ -110,7 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
               location: event.location,
               duration: event.duration,
               recipientEmail: userData.user.email,
-              recipientName: profile.display_name
+              recipientName: displayName
             })
           });
 
@@ -120,9 +140,9 @@ const handler = async (req: Request): Promise<Response> => {
           } else {
             console.error(`Failed to send reminder to ${userData.user.email}`);
           }
-        } catch (error) {
-          console.error(`Error sending reminder to ${profile.user_id}:`, error);
-        }
+          } catch (error) {
+            console.error(`Error sending reminder to ${userId}:`, error);
+          }
       }
     }
 

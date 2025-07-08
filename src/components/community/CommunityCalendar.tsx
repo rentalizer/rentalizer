@@ -39,6 +39,7 @@ export const CommunityCalendar = () => {
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false);
+  const [isEditEventOpen, setIsEditEventOpen] = useState(false);
   const { isAdmin } = useAdminRole();
   const { user } = useAuth();
   
@@ -229,6 +230,58 @@ export const CommunityCalendar = () => {
       // Show user-friendly error message
       alert(`Failed to create event: ${error.message || 'Unknown error'}`);
     }
+  };
+
+  const handleEditEvent = async () => {
+    if (!selectedEvent || !user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('events')
+        .update({
+          title: newEvent.title,
+          description: newEvent.description,
+          event_date: newEvent.date.toISOString().split('T')[0],
+          event_time: newEvent.time,
+          duration: newEvent.duration,
+          location: newEvent.location,
+          zoom_link: newEvent.zoomLink,
+          event_type: 'workshop',
+          attendees: newEvent.attendees,
+          is_recurring: newEvent.isRecurring,
+          remind_members: newEvent.remindMembers,
+        })
+        .eq('id', selectedEvent.id);
+
+      if (error) throw error;
+
+      // Refresh events list
+      await fetchEvents();
+      setIsEditEventOpen(false);
+      setIsEventDetailsOpen(false);
+      
+      console.log('Event updated successfully');
+    } catch (error) {
+      console.error('Error updating event:', error);
+      alert(`Failed to update event: ${error.message || 'Unknown error'}`);
+    }
+  };
+
+  const openEditDialog = (event: Event) => {
+    setSelectedEvent(event);
+    setNewEvent({
+      title: event.title,
+      date: event.date,
+      time: event.time,
+      duration: event.duration || '1 hour',
+      location: event.location || 'Zoom',
+      zoomLink: event.zoomLink || '',
+      description: event.description || '',
+      isRecurring: event.isRecurring || false,
+      remindMembers: event.remindMembers || false,
+      attendees: String(event.attendees) || 'All members'
+    });
+    setIsEditEventOpen(true);
   };
 
   const addToCalendar = (event: Event) => {
@@ -623,15 +676,180 @@ export const CommunityCalendar = () => {
                         window.open(selectedEvent.zoomLink, '_blank');
                         setIsEventDetailsOpen(false);
                       }}
-                    >
-                      Join Event
-                    </Button>
-                  )}
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+                     >
+                       Join Event
+                     </Button>
+                   )}
+                   
+                   {/* Admin Edit Button */}
+                   {isAdmin && (
+                     <Button 
+                       variant="outline"
+                       className="w-full border-purple-500/30 text-purple-300 hover:bg-purple-500/10"
+                       onClick={() => openEditDialog(selectedEvent)}
+                     >
+                       Edit Event
+                     </Button>
+                   )}
+                 </div>
+               </div>
+             )}
+           </DialogContent>
+         </Dialog>
+         
+         {/* Edit Event Dialog - Only visible to admins */}
+         {isAdmin && (
+           <Dialog open={isEditEventOpen} onOpenChange={setIsEditEventOpen}>
+             <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto">
+               <DialogHeader>
+                 <DialogTitle className="text-white text-xl">Edit Event</DialogTitle>
+               </DialogHeader>
+               
+               <div className="space-y-6 mt-6">
+                 {/* Title */}
+                 <div className="space-y-2">
+                   <Label htmlFor="edit-title" className="text-white">Title</Label>
+                   <Input
+                     id="edit-title"
+                     value={newEvent.title}
+                     onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                     className="bg-slate-700 border-gray-600 text-white"
+                     placeholder="Event title"
+                   />
+                 </div>
+
+                 {/* Date, Time, Duration */}
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                   <div className="space-y-2">
+                     <Label className="text-white">Date</Label>
+                     <Popover>
+                       <PopoverTrigger asChild>
+                         <Button
+                           variant="outline"
+                           className={cn(
+                             "w-full justify-start text-left font-normal bg-slate-700 border-gray-600 text-white",
+                             !newEvent.date && "text-muted-foreground"
+                           )}
+                         >
+                           <CalendarIcon className="mr-2 h-4 w-4" />
+                           {newEvent.date ? format(newEvent.date, "PPP") : <span>Pick a date</span>}
+                         </Button>
+                       </PopoverTrigger>
+                       <PopoverContent className="w-auto p-0 bg-slate-800 border-gray-700" align="start">
+                         <Calendar
+                           mode="single"
+                           selected={newEvent.date}
+                           onSelect={(date) => date && setNewEvent({...newEvent, date})}
+                           initialFocus
+                           className="p-3 pointer-events-auto"
+                         />
+                       </PopoverContent>
+                     </Popover>
+                   </div>
+                   
+                   <div className="space-y-2">
+                     <Label className="text-white">Time</Label>
+                     <Select value={newEvent.time} onValueChange={(value) => setNewEvent({...newEvent, time: value})}>
+                       <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                         <SelectValue placeholder="Select time" />
+                       </SelectTrigger>
+                       <SelectContent className="bg-slate-800 border-gray-700">
+                         {Array.from({length: 24}, (_, i) => (
+                           <SelectItem key={i} value={`${i.toString().padStart(2, '0')}:00`}>
+                             {i === 0 ? '12:00 AM' : i < 12 ? `${i}:00 AM` : i === 12 ? '12:00 PM' : `${i-12}:00 PM`}
+                           </SelectItem>
+                         ))}
+                       </SelectContent>
+                     </Select>
+                   </div>
+                   
+                   <div className="space-y-2">
+                     <Label className="text-white">Duration</Label>
+                     <Select value={newEvent.duration} onValueChange={(value) => setNewEvent({...newEvent, duration: value})}>
+                       <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                         <SelectValue />
+                       </SelectTrigger>
+                       <SelectContent className="bg-slate-800 border-gray-700">
+                         <SelectItem value="30 minutes">30 minutes</SelectItem>
+                         <SelectItem value="1 hour">1 hour</SelectItem>
+                         <SelectItem value="1.5 hours">1.5 hours</SelectItem>
+                         <SelectItem value="2 hours">2 hours</SelectItem>
+                         <SelectItem value="3 hours">3 hours</SelectItem>
+                       </SelectContent>
+                     </Select>
+                   </div>
+                 </div>
+
+                 {/* Location */}
+                 <div className="space-y-4">
+                   <Label className="text-white">Location</Label>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <Select value={newEvent.location} onValueChange={(value) => setNewEvent({...newEvent, location: value})}>
+                       <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                         <SelectValue />
+                       </SelectTrigger>
+                       <SelectContent className="bg-slate-800 border-gray-700">
+                         <SelectItem value="Zoom">🔵 Zoom</SelectItem>
+                         <SelectItem value="Google Meet">📹 Google Meet</SelectItem>
+                         <SelectItem value="Microsoft Teams">🟣 Microsoft Teams</SelectItem>
+                         <SelectItem value="In Person">📍 In Person</SelectItem>
+                       </SelectContent>
+                     </Select>
+                     
+                     {newEvent.location === 'Zoom' && (
+                       <Input
+                         placeholder="Zoom link"
+                         value={newEvent.zoomLink}
+                         onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
+                         className="bg-slate-700 border-gray-600 text-white"
+                       />
+                     )}
+                   </div>
+                 </div>
+
+                 {/* Description */}
+                 <div className="space-y-2">
+                   <Label htmlFor="edit-description" className="text-white">Description</Label>
+                   <Textarea
+                     id="edit-description"
+                     value={newEvent.description}
+                     onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                     className="bg-slate-700 border-gray-600 text-white h-24"
+                     placeholder="Event description..."
+                   />
+                 </div>
+
+                 {/* Remind members */}
+                 <div className="flex items-center space-x-2">
+                   <Checkbox 
+                     id="edit-remind"
+                     checked={newEvent.remindMembers}
+                     onCheckedChange={(checked) => setNewEvent({...newEvent, remindMembers: checked as boolean})}
+                   />
+                   <Label htmlFor="edit-remind" className="text-white">Remind members by email 1 day before</Label>
+                 </div>
+
+                 {/* Action Buttons */}
+                 <div className="flex justify-end gap-3 pt-4">
+                   <Button 
+                     variant="ghost" 
+                     onClick={() => setIsEditEventOpen(false)}
+                     className="text-gray-400 hover:text-white"
+                   >
+                     CANCEL
+                   </Button>
+                   <Button 
+                     onClick={handleEditEvent}
+                     disabled={!newEvent.title || !newEvent.time}
+                     className="bg-purple-600 hover:bg-purple-700 text-white"
+                   >
+                     UPDATE
+                   </Button>
+                 </div>
+               </div>
+             </DialogContent>
+           </Dialog>
+         )}
       </div>
     );
   };
