@@ -4,6 +4,7 @@ import { Download } from 'lucide-react';
 import logo from '@/assets/rentalizer-logo-high-res.png';
 import barChartLogo from '@/assets/barchart-logo-high-res.png';
 import exactLogo from '@/assets/rentalizer-logo-exact.svg';
+import exactLogoPNG from '@/assets/exact-logo-cyan.png';
 
 const LogoDownload = () => {
   return (
@@ -20,14 +21,14 @@ const LogoDownload = () => {
           <CardContent className="text-center space-y-6">
             <div className="bg-slate-900/50 rounded-lg p-8 inline-block">
               <img 
-                src={exactLogo} 
-                alt="Exact Rentalizer Logo with Cyan Color" 
+                src={exactLogoPNG} 
+                alt="Exact Rentalizer Logo PNG with Cyan Color" 
                 className="max-w-full h-auto"
                 style={{ maxHeight: '200px', minHeight: '100px' }}
               />
             </div>
             <p className="text-gray-300">
-              Right-click on the logo above and select "Save image as..." to download the exact SVG with cyan color.
+              Right-click on the logo above and select "Save image as..." to download the exact PNG with cyan color.
             </p>
           </CardContent>
         </Card>
