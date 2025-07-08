@@ -96,7 +96,7 @@ export const TopNavBar = () => {
             <div className="flex items-center gap-4">
               <div 
                 className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20 cursor-pointer hover:bg-gray-800/50 transition-colors"
-                onClick={() => navigate('/community')}
+                onClick={() => navigate('/profile-setup')}
               >
                 <User className="h-4 w-4 text-cyan-400" />
                 <span className="text-cyan-300">{user.email}</span>
