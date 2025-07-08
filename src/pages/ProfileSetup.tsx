@@ -143,20 +143,19 @@ const ProfileSetup = () => {
     if (!user) {
       console.error('❌ No user found when trying to save profile');
       toast({
-        title: "Authentication Error",
+        title: "Authentication Error", 
         description: "Please sign in again to save your profile",
         variant: "destructive",
       });
       return;
     }
 
-    console.log('🔍 Attempting to save profile for user:', user.id);
-    console.log('📊 Current auth state:', { user: !!user, userId: user.id });
+    console.log('🔍 User found:', user.id, user.email);
 
-    if (!firstName.trim() || !lastName.trim() || !avatarUrl) {
+    if (!firstName.trim() || !lastName.trim()) {
       toast({
         title: "Missing Information",
-        description: "Please fill in all required fields and upload a profile picture",
+        description: "Please fill in first name and last name",
         variant: "destructive",
       });
       return;
@@ -165,24 +164,28 @@ const ProfileSetup = () => {
     try {
       setSaving(true);
       
-      console.log('💾 Saving profile data:', {
+      console.log('💾 Attempting to save profile with data:', {
         user_id: user.id,
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         bio: bio.trim(),
-        avatar_url: avatarUrl,
+        avatar_url: avatarUrl || '',
         display_name: `${firstName.trim()} ${lastName.trim()}`,
         profile_complete: true
       });
 
-      const { error } = await supabase
+      // Use direct Supabase call with explicit auth
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('🔑 Current session:', !!session);
+
+      const { data, error } = await supabase
         .from('profiles')
         .upsert({
           user_id: user.id,
           first_name: firstName.trim(),
           last_name: lastName.trim(),
           bio: bio.trim(),
-          avatar_url: avatarUrl,
+          avatar_url: avatarUrl || '',
           display_name: `${firstName.trim()} ${lastName.trim()}`,
           profile_complete: true
         }, {
@@ -190,28 +193,27 @@ const ProfileSetup = () => {
         });
 
       if (error) {
-        console.error('❌ Supabase error saving profile:', error);
-        console.error('❌ Error details:', JSON.stringify(error, null, 2));
+        console.error('❌ Supabase error:', error);
         toast({
           title: "Database Error",
-          description: `Failed to save profile: ${error.message}`,
+          description: `Save failed: ${error.message}`,
           variant: "destructive",
         });
         return;
       }
 
-      console.log('✅ Profile saved successfully!');
+      console.log('✅ Profile saved successfully!', data);
       toast({
-        title: "Profile saved",
-        description: firstName || lastName ? "Your profile has been successfully updated" : "Your profile has been successfully created",
+        title: "Success!",
+        description: "Your profile has been saved successfully",
       });
 
       navigate('/community');
-    } catch (error) {
-      console.error('💥 Exception saving profile:', error);
+    } catch (error: any) {
+      console.error('💥 Exception:', error);
       toast({
         title: "Error",
-        description: "Failed to save profile",
+        description: `Unexpected error: ${error.message}`,
         variant: "destructive",
       });
     } finally {
