@@ -101,7 +101,13 @@ export const Auth = () => {
 
     try {
       const displayName = `${firstName} ${lastName}`;
-      await signUp(signupEmail, signupPassword, displayName);
+      await signUp(signupEmail, signupPassword, {
+        displayName,
+        firstName,
+        lastName,
+        bio,
+        avatarFile
+      });
       toast({
         title: "Welcome!",
         description: "Your account has been created successfully. Please check your email to verify your account."

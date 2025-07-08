@@ -32,11 +32,10 @@ const Index = () => {
   const [promoCode, setPromoCode] = useState('');
   const [signupLoading, setSignupLoading] = useState(false);
 
-  // Redirect if already authenticated - check profile completion
+  // Redirect if already authenticated - go directly to community
   useEffect(() => {
     if (user) {
-      // Check if user has completed profile, otherwise redirect to profile setup
-      navigate('/profile-setup');
+      navigate('/community');
     }
   }, [user, navigate]);
 
@@ -96,7 +95,7 @@ const Index = () => {
     setSignupLoading(true);
 
     try {
-      await signUp(signupEmail, signupPassword, displayName);
+      await signUp(signupEmail, signupPassword, { displayName });
       toast({
         title: "Welcome!",
         description: "Your account has been created successfully. Please check your email to verify your account."

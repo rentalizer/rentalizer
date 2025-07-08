@@ -21,7 +21,7 @@ interface AuthContextType {
   profile: Profile | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, displayName?: string) => Promise<void>;
+  signUp: (email: string, password: string, profileData?: { displayName?: string; firstName?: string; lastName?: string; bio?: string; avatarFile?: File }) => Promise<void>;
   signOut: () => Promise<void>;
   isSubscribed: boolean;
   hasEssentialsAccess: boolean;
@@ -315,7 +315,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('✅ Sign in successful for:', email);
   };
 
-  const signUp = async (email: string, password: string, displayName?: string) => {
+  const signUp = async (email: string, password: string, profileData?: { displayName?: string; firstName?: string; lastName?: string; bio?: string; avatarFile?: File }) => {
     console.log('📝 Starting sign up for:', email);
     
     const { data, error } = await supabase.auth.signUp({
@@ -323,7 +323,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/`,
-        data: displayName ? { display_name: displayName } : undefined
+        data: profileData?.displayName ? { display_name: profileData.displayName } : undefined
       }
     });
 
@@ -333,6 +333,53 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     console.log('✅ Sign up successful for:', email);
+    
+    // If we have profile data and a user was created, save the profile
+    if (data.user && profileData) {
+      try {
+        let avatarUrl = null;
+        
+        // Upload avatar if provided
+        if (profileData.avatarFile) {
+          const fileExt = profileData.avatarFile.name.split('.').pop();
+          const fileName = `${data.user.id}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('avatars')
+            .upload(fileName, profileData.avatarFile, {
+              upsert: true
+            });
+          
+          if (!uploadError) {
+            const { data: { publicUrl } } = supabase.storage
+              .from('avatars')
+              .getPublicUrl(fileName);
+            avatarUrl = publicUrl;
+          }
+        }
+        
+        // Create profile with all the data
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: data.user.id,
+            display_name: profileData.displayName || `${profileData.firstName} ${profileData.lastName}`.trim(),
+            first_name: profileData.firstName,
+            last_name: profileData.lastName,
+            bio: profileData.bio,
+            avatar_url: avatarUrl,
+            profile_complete: true
+          });
+          
+        if (profileError) {
+          console.error('❌ Error creating profile:', profileError);
+        } else {
+          console.log('✅ Profile created successfully');
+        }
+      } catch (profileError) {
+        console.error('❌ Error handling profile data:', profileError);
+      }
+    }
     
     if (data.user && data.user.email) {
       setTimeout(() => {
