@@ -365,7 +365,7 @@ export const AskRichieChat = () => {
       />
 
       {/* Ask Richie Button */}
-      <div className="fixed bottom-20 right-4 z-50">
+      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
         <Button
           onClick={handleChatOpen}
           className="relative bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 rounded-full w-16 h-16 shadow-lg group"
@@ -385,7 +385,7 @@ export const AskRichieChat = () => {
 
       {/* Chat Interface */}
       {isOpen && (
-        <Card className="fixed bottom-36 right-4 w-96 h-[600px] z-40 border-cyan-500/20 bg-slate-900/95 backdrop-blur-sm">
+        <Card className="fixed top-20 left-1/2 transform -translate-x-1/2 w-96 h-[600px] z-40 border-cyan-500/20 bg-slate-900/95 backdrop-blur-sm">
           <CardHeader className="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border-b border-cyan-500/20 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
