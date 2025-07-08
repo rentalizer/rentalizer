@@ -84,9 +84,15 @@ const Calculator = () => {
   
   // Check if we're in development environment
   const isDevelopment = () => {
-    return window.location.hostname.includes('lovable.app') || 
-           window.location.hostname.includes('localhost') ||
-           window.location.hostname.includes('127.0.0.1');
+    const hostname = window.location.hostname;
+    const isLovable = hostname.includes('lovable.app');
+    const isLocalhost = hostname.includes('localhost');
+    const is127 = hostname.includes('127.0.0.1');
+    const isDev = isLovable || isLocalhost || is127;
+    
+    console.log('🌐 Development check:', { hostname, isLovable, isLocalhost, is127, isDev });
+    
+    return isDev;
   };
 
   // Load Calendly script when component mounts
