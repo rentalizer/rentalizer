@@ -23,6 +23,7 @@ const ProfileSetup = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [profileComplete, setProfileComplete] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -50,6 +51,7 @@ const ProfileSetup = () => {
         setLastName(data.last_name || '');
         setBio(data.bio || '');
         setAvatarUrl(data.avatar_url || '');
+        setProfileComplete(data.profile_complete || false);
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -222,6 +224,20 @@ const ProfileSetup = () => {
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Incomplete Profile Warning */}
+              {!profileComplete && (firstName || lastName || avatarUrl) && (
+                <div className="bg-yellow-600/20 border border-yellow-500/50 rounded-lg p-4 mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+                    <div>
+                      <p className="text-yellow-300 font-medium">Profile Incomplete</p>
+                      <p className="text-yellow-200 text-sm">
+                        Complete your profile to use the platform and connect with the community
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
               {/* Avatar Upload */}
               <div className="flex flex-col items-center space-y-4">
                 <Avatar className="h-32 w-32">
