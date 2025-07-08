@@ -23,7 +23,7 @@ import { NewsFeed } from '@/components/community/NewsFeed';
 import { DirectMessaging } from '@/components/DirectMessaging';
 import { AskRichieChat } from '@/components/AskRichieChat';
 import { ContactChat } from '@/components/ContactChat';
-import { AdminSetup } from '@/components/AdminSetup';
+
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -408,7 +408,7 @@ const Community = () => {
         </Tabs>
       </div>
 
-      <AdminSetup />
+      
       <DirectMessaging />
       <AskRichieChat />
       <Footer />

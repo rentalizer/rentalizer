@@ -55,47 +55,5 @@ export const useAdminRole = () => {
     checkAdminRole();
   }, [user]);
 
-  const makeAdmin = async () => {
-    if (!user) return false;
-
-    try {
-      console.log('Attempting to make user admin:', user.id);
-      
-      // Call the database function that bypasses RLS
-      const { data, error } = await supabase.rpc('make_first_admin', {
-        target_user_id: user.id
-      });
-
-      if (error) {
-        console.error('Error making user admin:', error);
-        return false;
-      }
-
-      if (!data) {
-        console.log('Admin already exists or function returned false');
-        return false;
-      }
-
-      console.log('Successfully made user admin');
-      
-      // Force a re-check of admin status after successful creation
-      setTimeout(async () => {
-        const { data: roleData } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .eq('role', 'admin')
-          .maybeSingle();
-        
-        setIsAdmin(!!roleData);
-      }, 100);
-      
-      return true;
-    } catch (error) {
-      console.error('Error making user admin:', error);
-      return false;
-    }
-  };
-
-  return { isAdmin, loading, makeAdmin };
+  return { isAdmin, loading };
 };
