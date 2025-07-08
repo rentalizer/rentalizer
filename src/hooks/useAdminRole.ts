@@ -12,12 +12,12 @@ export const useAdminRole = () => {
       console.log('🔍 Checking admin role for user:', user?.id, 'email:', user?.email);
       console.log('🔍 User object:', user);
       
-      // Check if we're in development environment (Lovable) first
+      // Check if we're in development environment (Lovable) first - even without authentication
       const hostname = window.location.hostname;
       const isLovableDev = hostname.includes('lovable.app') || hostname.includes('localhost') || hostname.includes('127.0.0.1');
       
       if (isLovableDev) {
-        console.log('✅ Development environment detected, granting admin access');
+        console.log('✅ Development environment detected, granting admin access (no auth required)');
         setIsAdmin(true);
         setLoading(false);
         return;
