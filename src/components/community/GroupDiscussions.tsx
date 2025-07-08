@@ -162,6 +162,7 @@ export const GroupDiscussions = () => {
     try {
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Reset to start of day
+      console.log('Today (start of day):', today);
       
       const { data, error } = await supabase
         .from('events')
@@ -171,20 +172,30 @@ export const GroupDiscussions = () => {
         .limit(1);
 
       if (error) throw error;
+      console.log('Found events:', data);
 
       if (data && data.length > 0) {
         const event = data[0];
         const eventDate = new Date(event.event_date);
         eventDate.setHours(0, 0, 0, 0); // Reset to start of day
         
+        console.log('Event date (start of day):', eventDate);
+        console.log('Event raw date:', event.event_date);
+        
         // Calculate difference in days more accurately
         const timeDiff = eventDate.getTime() - today.getTime();
         const daysDiff = Math.round(timeDiff / (1000 * 3600 * 24));
+        
+        console.log('Time difference (ms):', timeDiff);
+        console.log('Days difference:', daysDiff);
         
         setUpcomingEvent({
           title: event.title,
           daysUntil: daysDiff
         });
+      } else {
+        console.log('No upcoming events found');
+        setUpcomingEvent(null);
       }
     } catch (error) {
       console.error('Error fetching upcoming events:', error);
