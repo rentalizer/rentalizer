@@ -112,16 +112,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchProfile = async (userId: string) => {
     try {
+      console.log('🔍 Fetching profile for user:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
       
-      if (error) throw error;
-      setProfile(data);
+      console.log('📊 Profile fetch result:', { data, error });
+      
+      if (error) {
+        console.error('❌ Error fetching profile:', error);
+        return;
+      }
+      
+      if (data) {
+        console.log('✅ Profile found:', data);
+        setProfile(data);
+      } else {
+        console.log('ℹ️ No profile found for user');
+        setProfile(null);
+      }
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error('💥 Exception fetching profile:', error);
     }
   };
 
