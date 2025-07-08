@@ -71,21 +71,26 @@ export const CommunityCalendar = () => {
       
       if (error) throw error;
       
-      // Convert database events to frontend format
-      const formattedEvents = data?.map(event => ({
-        id: event.id,
-        title: event.title,
-        date: new Date(event.event_date),
-        time: event.event_time,
-        type: event.event_type as 'training' | 'webinar' | 'discussion' | 'workshop',
-        description: event.description,
-        location: event.location,
-        duration: event.duration,
-        zoomLink: event.zoom_link,
-        attendees: event.attendees,
-        isRecurring: event.is_recurring,
-        remindMembers: event.remind_members
-      })) || [];
+      // Convert database events to frontend format with proper date handling
+      const formattedEvents = data?.map(event => {
+        // Create date object and ensure it's in local timezone
+        const eventDate = new Date(event.event_date + 'T00:00:00');
+        
+        return {
+          id: event.id,
+          title: event.title,
+          date: eventDate,
+          time: event.event_time,
+          type: event.event_type as 'training' | 'webinar' | 'discussion' | 'workshop',
+          description: event.description,
+          location: event.location,
+          duration: event.duration,
+          zoomLink: event.zoom_link,
+          attendees: event.attendees,
+          isRecurring: event.is_recurring,
+          remindMembers: event.remind_members
+        };
+      }) || [];
       
       setEvents(formattedEvents);
     } catch (error) {
@@ -186,6 +191,8 @@ export const CommunityCalendar = () => {
     });
     
     try {
+      console.log('Creating event with date:', newEvent.date.toLocaleDateString(), 'which will be stored as:', newEvent.date.toISOString().split('T')[0]);
+      
       const { data, error } = await supabase
         .from('events')
         .insert({
@@ -218,6 +225,8 @@ export const CommunityCalendar = () => {
         for (let i = 1; i < 12; i++) {
           const futureDate = new Date(newEvent.date);
           futureDate.setDate(futureDate.getDate() + (i * 7)); // Add weeks
+          
+          console.log(`Creating recurring event ${i} for date:`, futureDate.toLocaleDateString(), 'stored as:', futureDate.toISOString().split('T')[0]);
           
           recurringEvents.push({
             title: newEvent.title,
@@ -278,6 +287,9 @@ export const CommunityCalendar = () => {
   const handleEditEvent = async () => {
     if (!selectedEvent || !user) return;
     
+    console.log('Editing event with new date:', newEvent.date.toLocaleDateString(), 'stored as:', newEvent.date.toISOString().split('T')[0]);
+    console.log('Original event date was:', selectedEvent.date.toLocaleDateString());
+    
     try {
       // Update the original event
       const { error: updateError } = await supabase
@@ -297,7 +309,12 @@ export const CommunityCalendar = () => {
         })
         .eq('id', selectedEvent.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Update error:', updateError);
+        throw updateError;
+      }
+
+      console.log('Event updated successfully, refreshing events...');
 
       // If making it recurring, create additional weekly events (11 more for total of 12)
       if (newEvent.isRecurring && !selectedEvent.isRecurring) {
