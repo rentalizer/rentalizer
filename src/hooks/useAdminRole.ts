@@ -7,6 +7,8 @@ export const useAdminRole = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  console.log('🔧 useAdminRole current state:', { isAdmin, loading });
+
   useEffect(() => {
     const checkAdminRole = async () => {
       // ALWAYS check development environment FIRST - before any user checks
