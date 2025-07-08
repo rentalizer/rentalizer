@@ -18,7 +18,7 @@ const TestLogo = () => {
               src="/lovable-uploads/7bd31141-d3df-4e3e-9f94-29f10eb8c732.png" 
               alt="Rentalizer Logo" 
               className="max-w-full h-auto"
-              style={{ maxHeight: '200px' }}
+              style={{ width: '1460px', height: '752px', objectFit: 'contain' }}
             />
           </div>
           <p className="text-gray-300">
