@@ -9,89 +9,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { LoginDialog } from '@/components/LoginDialog';
 import { SimulatedMarketIntelligence } from '@/components/SimulatedMarketIntelligence';
+import { AccessGate } from '@/components/AccessGate';
 
 const MarketAnalysis = () => {
   const navigate = useNavigate();
-  const { user, isLoading } = useAuth();
   
-  // Check if we're in development environment
-  const isDevelopment = () => {
-    return window.location.hostname.includes('lovable.app') || 
-           window.location.hostname.includes('localhost') ||
-           window.location.hostname.includes('127.0.0.1');
-  };
-
-  // Show loading while checking auth
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="text-cyan-300 text-xl">Loading...</div>
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show login gate if not authenticated and not in development
-  if (!user && !isDevelopment()) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <TopNavBar />
-        
-        <div className="container mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="flex items-center justify-between gap-4 mb-8">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="text-gray-400 hover:text-gray-300"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
-          </div>
-
-          {/* Login Gate Content */}
-          <div className="max-w-md mx-auto text-center space-y-6">
-            <div className="bg-slate-700/90 backdrop-blur-lg rounded-lg p-8 border border-gray-500/50">
-              <BarChart3 className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
-              <h1 className="text-3xl font-bold text-white mb-4">
-                Sign In
-              </h1>
-              <p className="text-gray-300 mb-6">
-                Sign in to access the calculator
-              </p>
-              
-              <LoginDialog 
-                trigger={
-                  <Button className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white">
-                    Sign In
-                  </Button>
-                }
-              />
-              
-              <div className="mt-6">
-                <Button
-                  variant="ghost"
-                  className="text-cyan-300 hover:text-cyan-200 hover:bg-cyan-500/10"
-                >
-                  Create an Account
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <Footer />
-      </div>
-    );
-  }
-
-  return (
+  const MarketContent = () => (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-      <TopNavBar />
-
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500/10 blur-3xl animate-pulse delay-1000"></div>
@@ -142,9 +66,13 @@ const MarketAnalysis = () => {
           <SimulatedMarketIntelligence />
         </div>
       </div>
-
-      <Footer />
     </div>
+  );
+
+  return (
+    <AccessGate title="Market Intelligence" subtitle="Access your account">
+      <MarketContent />
+    </AccessGate>
   );
 };
 

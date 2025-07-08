@@ -32,6 +32,7 @@ import {
   FileText
 } from 'lucide-react';
 import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
+import { AccessGate } from '@/components/AccessGate';
 
 const PMS = () => {
   const [selectedProperty, setSelectedProperty] = useState('all');
@@ -232,9 +233,8 @@ const PMS = () => {
     }
   };
 
-  return (
+  const PMSContent = () => (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <TopNavBar />
       <div className="p-6">
         <div className="container mx-auto max-w-7xl">
         {/* Enhanced Header */}
@@ -748,6 +748,12 @@ const PMS = () => {
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <AccessGate title="Property Management System" subtitle="Access your account">
+      <PMSContent />
+    </AccessGate>
   );
 };
 
