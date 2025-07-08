@@ -235,9 +235,8 @@ export const NewsFeed = () => {
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Newspaper className="h-5 w-5 text-cyan-400" />
-          <h3 className="text-lg font-semibold text-cyan-300">Industry News</h3>
+        <div className="flex-1 text-center">
+          <h3 className="text-lg font-semibold text-cyan-300">Industry News Feed</h3>
         </div>
         
         {isAdmin && (
