@@ -35,11 +35,14 @@ const ProfileSetup = () => {
 
   const loadProfile = async () => {
     try {
+      console.log('🔍 Loading profile for user:', user?.id);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', user?.id)
         .single();
+
+      console.log('📊 Profile query result:', { data, error });
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading profile:', error);
@@ -47,19 +50,28 @@ const ProfileSetup = () => {
       }
 
       if (data) {
+        console.log('📋 Profile data found:', data);
         // If detailed profile exists, use it
         if (data.first_name || data.last_name) {
+          console.log('✅ Using first_name/last_name from profile');
           setFirstName(data.first_name || '');
           setLastName(data.last_name || '');
         } else if (data.display_name) {
           // If only display_name exists, try to split it into first/last
+          console.log('🔄 Splitting display_name into first/last:', data.display_name);
           const nameParts = data.display_name.split(' ');
-          setFirstName(nameParts[0] || '');
-          setLastName(nameParts.slice(1).join(' ') || '');
+          const firstName = nameParts[0] || '';
+          const lastName = nameParts.slice(1).join(' ') || '';
+          console.log('📝 Setting names - First:', firstName, 'Last:', lastName);
+          setFirstName(firstName);
+          setLastName(lastName);
         }
         setBio(data.bio || '');
         setAvatarUrl(data.avatar_url || '');
         setProfileComplete(data.profile_complete || false);
+        console.log('✨ Profile state updated');
+      } else {
+        console.log('❌ No profile data found');
       }
     } catch (error) {
       console.error('Error loading profile:', error);
