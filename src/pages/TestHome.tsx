@@ -59,7 +59,7 @@ const TestHome = () => {
     feature3Title: 'Property Management',
     feature3Description: 'Automate Property Management, Operations & Cash Flow',
     feature4Title: 'Training Hub',
-    feature4Description: 'Join Our Network Of Rental Arbitrage Entrepreneurs'
+    feature4Description: 'Live Training, Video & Documents Library, Resources, Community'
   };
 
   const handleFeatureClick = (feature: string) => {
@@ -206,7 +206,7 @@ const TestHome = () => {
                   <CardHeader className="text-center pb-4">
                     <div className="mx-auto mb-4 relative">
                       <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center transition-all duration-300">
-                        <MessageSquare className="h-10 w-10 text-white" />
+                        <Users className="h-10 w-10 text-white" />
                       </div>
                       <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
