@@ -94,24 +94,26 @@ export const TopNavBar = () => {
           {/* Right side - Login or User info */}
           {user ? (
             <div className="flex items-center gap-4">
-              <div 
-                className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20 cursor-pointer hover:bg-gray-800/50 transition-colors"
+              <button 
+                className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20 hover:bg-gray-800/50 transition-colors cursor-pointer"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log('Profile clicked, navigating to /profile-setup');
+                  console.log('🔧 Profile button clicked!');
                   navigate('/profile-setup');
                 }}
-                role="button"
-                tabIndex={0}
+                type="button"
                 title="Click to edit your profile"
               >
                 <User className="h-4 w-4 text-cyan-400" />
-                <span className="text-cyan-300">{user.email}</span>
-                <Badge variant="outline" className="bg-green-900/30 border-green-500/30 text-green-300 text-xs px-2 py-0">
+                <span className="text-cyan-300 pointer-events-none">{user.email}</span>
+                <Badge 
+                  variant="outline" 
+                  className="bg-green-900/30 border-green-500/30 text-green-300 text-xs px-2 py-0 pointer-events-none"
+                >
                   {isAdmin ? 'Admin' : 'Pro'}
                 </Badge>
-              </div>
+              </button>
               <Button
                 id="new-logout-btn-v3"
                 data-version="v3-no-alerts"
