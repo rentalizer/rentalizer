@@ -170,6 +170,7 @@ export const AskRichieChat = () => {
     if (!text.trim() || !voiceEnabled) return;
 
     try {
+      console.log('🎵 Starting TTS for text:', text.substring(0, 50) + '...');
       stopCurrentAudio(); // Stop any currently playing audio
       setIsSpeaking(true);
       if (messageId) setSpeakingMessageId(messageId);
@@ -183,20 +184,26 @@ export const AskRichieChat = () => {
 
       console.log('🎵 TTS response:', { data, error });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ TTS function error:', error);
+        throw error;
+      }
 
-      if (data.audioContent) {
+      if (data?.audioContent) {
+        console.log('🔊 Playing audio response...');
         const audioData = `data:audio/mpeg;base64,${data.audioContent}`;
         const audio = new Audio(audioData);
         currentAudioRef.current = audio;
         
         audio.onended = () => {
+          console.log('✅ Audio playback ended');
           setIsSpeaking(false);
           setSpeakingMessageId(null);
           currentAudioRef.current = null;
         };
         
-        audio.onerror = () => {
+        audio.onerror = (e) => {
+          console.error('❌ Audio playback error:', e);
           setIsSpeaking(false);
           setSpeakingMessageId(null);
           currentAudioRef.current = null;
@@ -204,11 +211,13 @@ export const AskRichieChat = () => {
         };
         
         await audio.play();
+        console.log('🎵 Audio started playing');
       } else {
+        console.error('❌ No audio content in response:', data);
         throw new Error('No audio content received');
       }
     } catch (error) {
-      console.error('Error playing audio:', error);
+      console.error('❌ TTS Error:', error);
       setIsSpeaking(false);
       setSpeakingMessageId(null);
       toast({
