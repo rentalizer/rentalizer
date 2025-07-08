@@ -208,7 +208,7 @@ export const Auth = () => {
             <div className="space-y-2">
               <Label htmlFor="avatar-upload" className="text-gray-300 flex items-center gap-2">
                 <Upload className="h-4 w-4" />
-                Upload Your Image
+                Upload Your Image *
               </Label>
               <div className="border-2 border-dashed border-cyan-500/30 rounded-lg p-4 hover:border-cyan-500/50 transition-colors">
                 <input
@@ -217,6 +217,7 @@ export const Auth = () => {
                   accept="image/*"
                   onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
                   className="hidden"
+                  required
                 />
                 <label
                   htmlFor="avatar-upload"
@@ -235,7 +236,7 @@ export const Auth = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="bio" className="text-gray-300">Tell The Community About Yourself</Label>
+              <Label htmlFor="bio" className="text-gray-300">Tell The Community About Yourself *</Label>
               <Textarea
                 id="bio"
                 value={bio}
@@ -243,6 +244,7 @@ export const Auth = () => {
                 className="bg-slate-700/50 border-cyan-500/20 text-white resize-none"
                 placeholder="Share a bit about yourself, your interests, and what brings you to our community..."
                 rows={3}
+                required
               />
             </div>
 
