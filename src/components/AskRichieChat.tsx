@@ -123,30 +123,40 @@ export const AskRichieChat = () => {
       setIsRecording(false);
       setIsTranscribing(true);
       
+      console.log('🔄 Processing recorded audio...');
       const audioBlob = await audioRecorderRef.current.stop();
+      console.log('📄 Converting to base64...');
       const base64Audio = await blobToBase64(audioBlob);
+      console.log('🚀 Sending to speech-to-text function...');
 
       // Transcribe audio using our edge function
       const { data, error } = await supabase.functions.invoke('speech-to-text', {
         body: { audio: base64Audio }
       });
 
-      if (error) throw error;
+      console.log('📨 Function response:', { data, error });
 
-      if (data.text) {
+      if (error) {
+        console.error('❌ Function error:', error);
+        throw error;
+      }
+
+      if (data?.text) {
+        console.log('✅ Transcription successful:', data.text);
         setCurrentQuestion(data.text);
         toast({
           title: "Transcription Complete",
           description: "Your question has been transcribed. Click send to submit.",
         });
       } else {
+        console.error('❌ No text in response:', data);
         throw new Error('No text transcribed');
       }
     } catch (error) {
-      console.error('Error transcribing audio:', error);
+      console.error('❌ Error transcribing audio:', error);
       toast({
         title: "Transcription Error",
-        description: "Failed to transcribe audio. Please try again or type your question.",
+        description: error.message || "Failed to transcribe audio. Please try again or type your question.",
         variant: "destructive"
       });
     } finally {

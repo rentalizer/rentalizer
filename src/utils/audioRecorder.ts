@@ -5,6 +5,8 @@ export class AudioRecorder {
 
   async start(): Promise<void> {
     try {
+      console.log('🎤 Starting audio recording...');
+      
       // Request microphone access
       this.stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -15,6 +17,8 @@ export class AudioRecorder {
           autoGainControl: true
         }
       });
+
+      console.log('✅ Microphone access granted');
 
       // Create MediaRecorder
       this.mediaRecorder = new MediaRecorder(this.stream, {
@@ -27,14 +31,15 @@ export class AudioRecorder {
       this.mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           this.audioChunks.push(event.data);
+          console.log('📊 Audio chunk received:', event.data.size, 'bytes');
         }
       };
 
       // Start recording
       this.mediaRecorder.start(100); // Collect data every 100ms
-      console.log('Recording started');
+      console.log('🔴 Recording started');
     } catch (error) {
-      console.error('Error starting recording:', error);
+      console.error('❌ Error starting recording:', error);
       throw new Error('Failed to access microphone. Please check permissions.');
     }
   }
@@ -46,15 +51,17 @@ export class AudioRecorder {
         return;
       }
 
+      console.log('⏹️ Stopping recording...');
+
       this.mediaRecorder.onstop = () => {
         const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+        console.log('✅ Recording stopped, blob size:', audioBlob.size, 'bytes');
         this.cleanup();
-        console.log('Recording stopped, blob size:', audioBlob.size);
         resolve(audioBlob);
       };
 
       this.mediaRecorder.onerror = (event) => {
-        console.error('MediaRecorder error:', event);
+        console.error('❌ MediaRecorder error:', event);
         this.cleanup();
         reject(new Error('Recording failed'));
       };
@@ -79,14 +86,20 @@ export class AudioRecorder {
 
 export const blobToBase64 = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
+    console.log('🔄 Converting blob to base64, size:', blob.size, 'type:', blob.type);
+    
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
       // Remove the data URL prefix to get just the base64 content
       const base64 = result.split(',')[1];
+      console.log('✅ Base64 conversion complete, length:', base64.length);
       resolve(base64);
     };
-    reader.onerror = reject;
+    reader.onerror = (error) => {
+      console.error('❌ Base64 conversion failed:', error);
+      reject(error);
+    };
     reader.readAsDataURL(blob);
   });
 };
