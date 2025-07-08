@@ -170,8 +170,7 @@ const TestHome = () => {
             {/* Updated Tagline */}
             <div className="mb-12 px-4">
               <div className="text-lg md:text-xl lg:text-2xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
-                All-In-One Platform To Launch, Automate, & Scale Rental Income—<br />
-                Powered By AI
+                Find Rental Markets. Source Deals. Automate Cash Flow—All in One Place
               </div>
             </div>
 
