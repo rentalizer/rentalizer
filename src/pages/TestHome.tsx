@@ -54,11 +54,11 @@ const TestHome = () => {
     buttonText: 'Book Demo',
     feature1Title: 'Market Intelligence',
     feature1Description: 'The First-Of-Its-Kind AI Tool To Find The Best Rental Arbitrage Markets',
-    feature2Title: 'Acquisition CRM & Calculator',
+    feature2Title: 'Acquisition CRM',
     feature2Description: 'Property Outreach, Close Deals, Profit Calculator, Manage Relationships',
-    feature3Title: 'PMS',
+    feature3Title: 'Property Management',
     feature3Description: 'Streamline Property Management And Automate Operations',
-    feature4Title: 'Community',
+    feature4Title: 'Training Hub',
     feature4Description: 'Join Our Network Of Rental Arbitrage Entrepreneurs'
   };
 
