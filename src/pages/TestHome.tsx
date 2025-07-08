@@ -55,7 +55,7 @@ const TestHome = () => {
     feature1Title: 'Market Intelligence',
     feature1Description: 'The First-Of-Its-Kind AI Tool To Find The Best Rental Arbitrage Markets',
     feature2Title: 'Acquisition CRM',
-    feature2Description: 'Property Outreach, Close Deals, Profit Calculator, Manage Relationships',
+    feature2Description: 'Property Outreach, Close Deals, Calculate Profit, Manage Relationships',
     feature3Title: 'Property Management',
     feature3Description: 'Streamline Property Management And Automate Operations',
     feature4Title: 'Training Hub',
