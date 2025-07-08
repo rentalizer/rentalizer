@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Users, ArrowLeft, LogIn, User, Lock, UserPlus, Ticket } from 'lucide-react';
+import { Users, ArrowLeft, LogIn, User, Lock, UserPlus, Ticket, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { TopNavBarTest } from '@/components/TopNavBarTest';
 import { Footer } from '@/components/Footer';
@@ -325,54 +325,149 @@ const CommunityGate = () => {
                     </div>
                     
                     <form onSubmit={handleSubmit} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="email" className="text-gray-300 flex items-center gap-2">
-                          <User className="h-4 w-4" />
-                          Email
-                        </Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          required
-                          disabled={isSubmitting}
-                          className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="password" className="text-gray-300 flex items-center gap-2">
-                          <Lock className="h-4 w-4" />
-                          Password
-                        </Label>
-                        <Input
-                          id="password"
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          required
-                          minLength={6}
-                          disabled={isSubmitting}
-                          className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
-                        />
-                      </div>
+                      {isSignUp ? (
+                        <>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                              <Label htmlFor="first-name" className="text-gray-300">
+                                First Name
+                              </Label>
+                              <Input
+                                id="first-name"
+                                type="text"
+                                required
+                                disabled={isSubmitting}
+                                className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="last-name" className="text-gray-300">
+                                Last Name
+                              </Label>
+                              <Input
+                                id="last-name"
+                                type="text"
+                                required
+                                disabled={isSubmitting}
+                                className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="email" className="text-gray-300">Email</Label>
+                            <Input
+                              id="email"
+                              type="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              required
+                              disabled={isSubmitting}
+                              className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="password" className="text-gray-300">Password</Label>
+                            <Input
+                              id="password"
+                              type="password"
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              required
+                              minLength={6}
+                              disabled={isSubmitting}
+                              className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                            />
+                            <p className="text-xs text-gray-400">Password must be at least 6 characters long</p>
+                          </div>
 
-                      {isSignUp && (
-                        <div className="space-y-2">
-                          <Label htmlFor="promoCode" className="text-gray-300 flex items-center gap-2">
-                            <Ticket className="h-4 w-4" />
-                            Promo Code
-                          </Label>
-                          <Input
-                            id="promoCode"
-                            type="text"
-                            value={promoCode}
-                            onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                            disabled={isSubmitting}
-                            className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
-                          />
-                        </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="avatar-upload" className="text-gray-300 flex items-center gap-2">
+                              <Upload className="h-4 w-4" />
+                              Upload Your Image *
+                            </Label>
+                            <div className="border-2 border-dashed border-cyan-500/30 rounded-lg p-4 hover:border-cyan-500/50 transition-colors">
+                              <input
+                                id="avatar-upload"
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                required
+                              />
+                              <label
+                                htmlFor="avatar-upload"
+                                className="cursor-pointer flex flex-col items-center gap-2 text-gray-400 hover:text-gray-300"
+                              >
+                                <Upload className="h-6 w-6" />
+                                <span className="text-sm">Click to upload profile image</span>
+                              </label>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="bio" className="text-gray-300">Tell The Community About Yourself *</Label>
+                            <textarea
+                              id="bio"
+                              className="w-full px-3 py-2 border border-cyan-500/30 bg-gray-800/50 text-gray-100 rounded-md resize-none focus:border-cyan-400 focus:ring-cyan-400/20 focus:outline-none focus:ring-2"
+                              placeholder="Share a bit about yourself, your interests, and what brings you to our community..."
+                              rows={3}
+                              required
+                              disabled={isSubmitting}
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="promoCode" className="text-gray-300 flex items-center gap-2">
+                              <Ticket className="h-4 w-4" />
+                              Promo Code
+                            </Label>
+                            <Input
+                              id="promoCode"
+                              type="text"
+                              value={promoCode}
+                              onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                              required
+                              disabled={isSubmitting}
+                              className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="space-y-2">
+                            <Label htmlFor="email" className="text-gray-300 flex items-center gap-2">
+                              <User className="h-4 w-4" />
+                              Email
+                            </Label>
+                            <Input
+                              id="email"
+                              type="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              required
+                              disabled={isSubmitting}
+                              className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="password" className="text-gray-300 flex items-center gap-2">
+                              <Lock className="h-4 w-4" />
+                              Password
+                            </Label>
+                            <Input
+                              id="password"
+                              type="password"
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              required
+                              minLength={6}
+                              disabled={isSubmitting}
+                              className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                            />
+                          </div>
+                        </>
                       )}
 
                       {!isSignUp && (
