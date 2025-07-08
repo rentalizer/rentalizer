@@ -12,6 +12,7 @@ import { useAdminRole } from '@/hooks/useAdminRole';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { format } from 'date-fns';
+import { NewsAggregationControls } from '@/components/community/NewsAggregationControls';
 
 interface Member {
   id: string;
@@ -255,6 +256,9 @@ const AdminMembers = () => {
             </Badge>
           </div>
         </div>
+
+        {/* News Aggregation Controls */}
+        <NewsAggregationControls />
 
         {/* Members Table */}
         <Card className="bg-slate-800/50 border-cyan-500/20">
