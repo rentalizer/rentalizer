@@ -754,7 +754,7 @@ const PMS = () => {
   );
 
   return (
-    <AccessGate title="Property Management System" subtitle="Access your account">
+    <AccessGate title="Property Management System" subtitle="Access your account to continue">
       <PMSContent />
     </AccessGate>
   );

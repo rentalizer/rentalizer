@@ -6,8 +6,6 @@ import { BarChart3, ArrowLeft, Home } from 'lucide-react';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { LoginDialog } from '@/components/LoginDialog';
 import { SimulatedMarketIntelligence } from '@/components/SimulatedMarketIntelligence';
 import { AccessGate } from '@/components/AccessGate';
 
@@ -74,7 +72,7 @@ const MarketAnalysis = () => {
   );
 
   return (
-    <AccessGate title="Market Intelligence" subtitle="Access your account">
+    <AccessGate title="Market Intelligence" subtitle="Access your account to continue">
       <MarketContent />
     </AccessGate>
   );
