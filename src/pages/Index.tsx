@@ -137,15 +137,6 @@ const Index = () => {
             
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
               <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-colors cursor-pointer"
-                    onClick={() => navigate('/community')}>
-                <CardContent className="p-6 text-center">
-                  <div className="text-2xl mb-2">👥</div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Training Hub</h3>
-                  <p className="text-gray-400 text-sm">Live Training, Video & Document Library, Tools, Resources, Community</p>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-colors cursor-pointer"
                     onClick={() => navigate('/markets')}>
                 <CardContent className="p-6 text-center">
                   <div className="text-2xl mb-2">📊</div>
@@ -158,8 +149,8 @@ const Index = () => {
                     onClick={() => navigate('/properties')}>
                 <CardContent className="p-6 text-center">
                   <div className="text-2xl mb-2">🏢</div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Acquisition Agent</h3>
-                  <p className="text-gray-400 text-sm">Automate Property Outreach, Close Deals, Calculate Profit, Robust CRM</p>
+                  <h3 className="text-lg font-semibold text-white mb-2">Acquisition CRM & Calculator</h3>
+                  <p className="text-gray-400 text-sm">Property Outreach, Close Deals, Profit Calculator, Manage Relationships</p>
                 </CardContent>
               </Card>
               
@@ -167,8 +158,17 @@ const Index = () => {
                     onClick={() => navigate('/pms')}>
                 <CardContent className="p-6 text-center">
                   <div className="text-2xl mb-2">🫶</div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Property Management</h3>
-                  <p className="text-gray-400 text-sm">Automate Property Management, Operations & Cash Flow</p>
+                  <h3 className="text-lg font-semibold text-white mb-2">PMS</h3>
+                  <p className="text-gray-400 text-sm">Streamline Property Management And Automate Operations</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-colors cursor-pointer"
+                    onClick={() => navigate('/community')}>
+                <CardContent className="p-6 text-center">
+                  <div className="text-2xl mb-2">👥</div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Community</h3>
+                  <p className="text-gray-400 text-sm">Join Our Network Of Rental Arbitrage Entrepreneurs</p>
                 </CardContent>
               </Card>
             </div>
