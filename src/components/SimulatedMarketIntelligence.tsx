@@ -209,20 +209,6 @@ export const SimulatedMarketIntelligence = () => {
 
   return (
     <div className="space-y-8">
-      {/* Demo Notice */}
-      <Card className="bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-cyan-500/30">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <Eye className="h-5 w-5 text-cyan-400" />
-            <div>
-              <h3 className="font-semibold text-cyan-300">Simulated Market Intelligence Demo</h3>
-              <p className="text-sm text-gray-300">
-                This is a demonstration showing how our market intelligence works. Some data points show "API Failures" to demonstrate real-world scenarios.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Market Analysis Input */}
       <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg">
