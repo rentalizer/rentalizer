@@ -14,6 +14,7 @@ import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { CommunityCalendar } from '@/components/community/CommunityCalendar';
 import { MessageThreads } from '@/components/community/MessageThreads';
 import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
+import { AskRichieChat } from '@/components/AskRichieChat';
 
 const LandingPage = () => {
   const [activeDemo, setActiveDemo] = useState<string | null>(null);
@@ -821,6 +822,9 @@ const LandingPage = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Ask Richie Chat */}
+      <AskRichieChat />
 
       {/* Footer */}
       <Footer showLinks={false} />
