@@ -171,6 +171,48 @@ export const GroupDiscussions = () => {
           isPinned: false,
           isLiked: false,
           attachments: undefined
+        },
+        {
+          id: 'mock-4',
+          title: 'The Grandmother of Our Group 😁',
+          content: "Hello Everyone, So glad to be here with each of you! I am a wife of 43 years, a mother of twin 37 yr old sons, and a grandmother of 5 incredibly cute kids 💪 I am a retired...",
+          author: 'Judith Dreher',
+          avatar: 'JD',
+          category: 'General',
+          likes: 5,
+          comments: 5,
+          timeAgo: '21d ago',
+          isPinned: false,
+          isLiked: false,
+          attachments: undefined
+        },
+        {
+          id: 'mock-5',
+          title: 'My new site...',
+          content: "Hello friends. I am new here and excited to be part of the community. Please check my new site... feedback is appreciated https://rentalsams.com/",
+          author: 'Marina Amber',
+          avatar: 'MA',
+          category: 'Share Your Wins',
+          likes: 4,
+          comments: 8,
+          timeAgo: '14d ago',
+          isPinned: false,
+          isLiked: false,
+          attachments: undefined
+        },
+        {
+          id: 'mock-6',
+          title: 'Another new website...',
+          content: "Similar to Marina, I just completed my website - https://hbb-ventures.com/ Any thoughts/suggestions please let me know. Thank you - Lynn",
+          author: 'Lynn Lueders',
+          avatar: 'LL',
+          category: 'General',
+          likes: 4,
+          comments: 2,
+          timeAgo: '12d ago',
+          isPinned: false,
+          isLiked: false,
+          attachments: undefined
         }
       ];
       
