@@ -176,8 +176,9 @@ export const GroupDiscussions = () => {
 
       if (data && data.length > 0) {
         const event = data[0];
-        const eventDate = new Date(event.event_date);
-        eventDate.setHours(0, 0, 0, 0); // Reset to start of day
+        // Parse date without timezone conversion
+        const [year, month, day] = event.event_date.split('-').map(Number);
+        const eventDate = new Date(year, month - 1, day); // month is 0-indexed
         
         console.log('Event date (start of day):', eventDate);
         console.log('Event raw date:', event.event_date);
