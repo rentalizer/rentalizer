@@ -427,7 +427,7 @@ const PromoCodeSignup = () => {
                 serviceFeeCalculated={0}
                 monthlyExpenses={0}
               />
-              <CompsSection data={{ address: '', bedrooms: 0, bathrooms: 0, averageComparable: 0, firstMonthRent: 0, securityDeposit: 0, furnishingsCost: 0, rent: 0, serviceFees: 0, maintenance: 0, power: 0, waterSewer: 0, internet: 0, taxLicense: 0, insurance: 0, software: 0, miscellaneous: 0, furnitureRental: 0, squareFootage: 0, furnishingsPSF: 0 }} updateData={() => {}} />
+              <CompsSection data={{ address: '', bedrooms: 0, bathrooms: 0, averageComparable: 0 }} updateData={() => {}} />
               <NetProfitSection 
                 monthlyRevenue={0}
                 netProfitMonthly={0}
