@@ -312,8 +312,11 @@ const Community = () => {
               <div className="bg-slate-800/50 border border-cyan-500/20 rounded-lg p-8">
                 <Bot className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
                 <h3 className="text-2xl font-bold text-white mb-4">Ask Richie AI</h3>
-                <p className="text-gray-300 mb-6">
-                  Get instant answers to your rental arbitrage questions based on Richie's training materials.
+                <p className="text-gray-300 mb-6 leading-relaxed">
+                  Ask Richie is your on-demand rental arbitrage mentor—powered by AI and trained on over 200 hours of video trainings and coaching calls, plus more than 1,350,000 words of transcripts, guides, checklists, and deal analysis tools.
+                </p>
+                <p className="text-cyan-300 mb-6 leading-relaxed">
+                  It pulls directly from my actual content—not generic internet data—so every answer reflects exactly how I teach, analyze, and execute. Whether you're asking about deal criteria, landlord objections, STR licensing, or next steps after a "yes," Ask Richie gives you clear, tactical responses 24/7—just like I would.
                 </p>
                 <div className="space-y-4">
                   <div className="text-left bg-slate-700/50 rounded-lg p-4">
