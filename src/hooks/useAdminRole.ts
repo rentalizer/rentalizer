@@ -10,6 +10,7 @@ export const useAdminRole = () => {
   useEffect(() => {
     const checkAdminRole = async () => {
       console.log('🔍 Checking admin role for user:', user?.id, 'email:', user?.email);
+      console.log('🔍 User object:', user);
       
       if (!user) {
         console.log('❌ No user found, setting isAdmin to false');
