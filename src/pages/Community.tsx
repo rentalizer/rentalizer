@@ -376,10 +376,21 @@ const Community = () => {
                 <div className="text-center">
                   <button 
                     onClick={() => {
-                      const askRichieButton = document.querySelector('[title="Ask AI Richie"]') as HTMLElement;
-                      if (askRichieButton) {
-                        askRichieButton.click();
-                      }
+                      // Scroll to bottom where the Ask Richie button is located
+                      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                      
+                      // Find and highlight the Ask Richie button
+                      setTimeout(() => {
+                        const askRichieButton = document.querySelector('[title="Ask AI Richie"]') as HTMLElement;
+                        if (askRichieButton) {
+                          // Add a pulsing animation to draw attention
+                          askRichieButton.style.animation = 'pulse 1s ease-in-out 3';
+                          // Click it after a short delay
+                          setTimeout(() => {
+                            askRichieButton.click();
+                          }, 500);
+                        }
+                      }, 1000);
                     }}
                     className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-3 mx-auto"
                   >
