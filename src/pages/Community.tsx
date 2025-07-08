@@ -23,6 +23,7 @@ import { NewsFeed } from '@/components/community/NewsFeed';
 import { DirectMessaging } from '@/components/DirectMessaging';
 import { AskRichieChat } from '@/components/AskRichieChat';
 import { ContactChat } from '@/components/ContactChat';
+import { AccessGate } from '@/components/AccessGate';
 
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useNavigate, Link } from 'react-router-dom';
@@ -164,10 +165,8 @@ const Community = () => {
     });
   };
 
-  return (
+  const CommunityContent = () => (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-      <TopNavBar />
-      
       <div className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">
         {/* Community Header */}
         <div className="text-center mb-8">
@@ -404,15 +403,18 @@ const Community = () => {
               </div>
             </div>
           </TabsContent>
-
         </Tabs>
       </div>
 
-      
       <DirectMessaging />
       <AskRichieChat />
-      <Footer />
     </div>
+  );
+
+  return (
+    <AccessGate title="Training & Community Hub" subtitle="Access your account">
+      <CommunityContent />
+    </AccessGate>
   );
 };
 
