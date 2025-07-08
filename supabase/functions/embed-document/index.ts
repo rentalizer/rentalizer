@@ -21,9 +21,12 @@ serve(async (req) => {
   }
 
   try {
-    const { title, docType, textContent, url, metadata } = await req.json();
+    const { title = '', docType, textContent, url, metadata } = await req.json();
 
-    console.log('Processing document:', title);
+    console.log('Processing document');
+
+    // Auto-generate title from content if not provided
+    const autoTitle = title || generateTitleFromContent(textContent, docType);
 
     // Split text into chunks if it's too long (max 8191 tokens for OpenAI)
     const chunks = splitTextIntoChunks(textContent, 6000);
@@ -31,7 +34,7 @@ serve(async (req) => {
 
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
-      const chunkTitle = chunks.length > 1 ? `${title} (Part ${i + 1})` : title;
+      const chunkTitle = chunks.length > 1 ? `${autoTitle} (Part ${i + 1})` : autoTitle;
 
       // Generate embedding using OpenAI
       const embeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
@@ -69,7 +72,7 @@ serve(async (req) => {
             ...metadata,
             chunk_index: i,
             total_chunks: chunks.length,
-            original_title: title
+            original_title: autoTitle
           }
         })
         .select()
@@ -81,14 +84,14 @@ serve(async (req) => {
       }
 
       allDocIds.push(data.id);
-      console.log(`Embedded chunk ${i + 1}/${chunks.length} for: ${title}`);
+      console.log(`Embedded chunk ${i + 1}/${chunks.length} for: ${autoTitle}`);
     }
 
     return new Response(JSON.stringify({ 
       success: true, 
       documentIds: allDocIds,
       chunks: chunks.length,
-      message: `Successfully embedded ${chunks.length} chunk(s) for "${title}"` 
+      message: `Successfully embedded ${chunks.length} chunk(s) for "${autoTitle}"` 
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -104,6 +107,30 @@ serve(async (req) => {
     });
   }
 });
+
+function generateTitleFromContent(text: string, docType: string): string {
+  if (!text || text.trim().length === 0) {
+    return `${docType} Document`;
+  }
+
+  // Clean and get first meaningful words
+  const cleanText = text.trim().replace(/\s+/g, ' ');
+  const words = cleanText.split(' ').filter(word => word.length > 2);
+  
+  // Take first 6-8 words for title, ensuring it's not too long
+  const titleWords = words.slice(0, 8);
+  let title = titleWords.join(' ');
+  
+  // Limit to 60 characters
+  if (title.length > 60) {
+    title = title.substring(0, 57) + '...';
+  }
+  
+  // Capitalize first letter
+  title = title.charAt(0).toUpperCase() + title.slice(1);
+  
+  return title || `${docType} Document`;
+}
 
 function splitTextIntoChunks(text: string, maxChunkSize: number): string[] {
   const chunks = [];

@@ -139,8 +139,7 @@ export const RichieAdminPanel = () => {
           body: {
             fileName,
             filePath,
-            docType: uploadForm.docType,
-            title: uploadForm.title || fileName.replace(/\.[^/.]+$/, "")
+            docType: uploadForm.docType
           }
         });
 
@@ -181,10 +180,10 @@ export const RichieAdminPanel = () => {
   };
 
   const uploadDocument = async () => {
-    if (!uploadForm.title.trim() || !uploadForm.textContent.trim()) {
+    if (!uploadForm.textContent.trim()) {
       toast({
-        title: "Missing Information",
-        description: "Please provide both title and content",
+        title: "Missing Content",
+        description: "Please provide content to upload",
         variant: "destructive"
       });
       return;
@@ -192,19 +191,18 @@ export const RichieAdminPanel = () => {
 
     setIsUploading(true);
 
-    try {
-      const { data, error } = await supabase.functions.invoke('embed-document', {
-        body: {
-          title: uploadForm.title.trim(),
-          docType: uploadForm.docType,
-          textContent: uploadForm.textContent.trim(),
-          url: uploadForm.url.trim() || null,
-          metadata: {
-            uploaded_by: user?.id,
-            upload_date: new Date().toISOString()
-          }
-        }
-      });
+        try {
+          const { data, error } = await supabase.functions.invoke('embed-document', {
+            body: {
+              docType: uploadForm.docType,
+              textContent: uploadForm.textContent.trim(),
+              url: uploadForm.url.trim() || null,
+              metadata: {
+                uploaded_by: user?.id,
+                upload_date: new Date().toISOString()
+              }
+            }
+          });
 
       if (error) throw error;
 
@@ -352,16 +350,7 @@ export const RichieAdminPanel = () => {
               )}
 
               {/* Upload Settings */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm text-gray-300 mb-2 block">Default Title Prefix (Optional)</label>
-                  <Input
-                    value={uploadForm.title}
-                    onChange={(e) => setUploadForm(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="e.g., Course Module"
-                    className="bg-slate-700 border-slate-600 text-white"
-                  />
-                </div>
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="text-sm text-gray-300 mb-2 block">Document Type</label>
                   <Select 
@@ -415,16 +404,7 @@ export const RichieAdminPanel = () => {
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm text-gray-300 mb-2 block">Document Title</label>
-                  <Input
-                    value={uploadForm.title}
-                    onChange={(e) => setUploadForm(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="e.g., Houston Market Guide"
-                    className="bg-slate-700 border-slate-600 text-white"
-                  />
-                </div>
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="text-sm text-gray-300 mb-2 block">Document Type</label>
                   <Select 
@@ -467,7 +447,7 @@ export const RichieAdminPanel = () => {
 
               <Button
                 onClick={uploadDocument}
-                disabled={isUploading || !uploadForm.title.trim() || !uploadForm.textContent.trim()}
+                disabled={isUploading || !uploadForm.textContent.trim()}
                 className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500"
               >
                 {isUploading ? (

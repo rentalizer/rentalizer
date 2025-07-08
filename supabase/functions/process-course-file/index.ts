@@ -20,7 +20,7 @@ serve(async (req) => {
   }
 
   try {
-    const { fileName, filePath, docType = 'pdf', title } = await req.json();
+    const { fileName, filePath, docType = 'pdf' } = await req.json();
 
     console.log('Processing course file:', fileName);
 
@@ -52,13 +52,16 @@ serve(async (req) => {
       throw new Error('No text content extracted from file');
     }
 
+    // Auto-generate title from content
+    const autoTitle = generateTitleFromContent(textContent, fileName, docType);
+
     // Split text into chunks for better embedding
     const chunks = splitTextIntoChunks(textContent, 6000);
     const allDocIds = [];
 
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
-      const chunkTitle = chunks.length > 1 ? `${title || fileName} (Part ${i + 1})` : (title || fileName);
+      const chunkTitle = chunks.length > 1 ? `${autoTitle} (Part ${i + 1})` : autoTitle;
 
       // Generate embedding using OpenAI
       const embeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
@@ -106,7 +109,7 @@ serve(async (req) => {
       }
 
       allDocIds.push(data.id);
-      console.log(`Embedded chunk ${i + 1}/${chunks.length} for: ${fileName}`);
+      console.log(`Embedded chunk ${i + 1}/${chunks.length} for: ${autoTitle}`);
     }
 
     // Clean up the uploaded file
@@ -118,7 +121,7 @@ serve(async (req) => {
       success: true,
       documentIds: allDocIds,
       chunks: chunks.length,
-      message: `Successfully processed "${fileName}" into ${chunks.length} chunk(s)`
+      message: `Successfully processed "${autoTitle}" into ${chunks.length} chunk(s)`
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -164,4 +167,28 @@ function splitTextIntoChunks(text: string, maxChunkSize: number): string[] {
   }
   
   return chunks.length > 0 ? chunks : [text];
+}
+
+function generateTitleFromContent(text: string, fileName: string, docType: string): string {
+  if (!text || text.trim().length === 0) {
+    return fileName.replace(/\.[^/.]+$/, "") || `${docType} Document`;
+  }
+
+  // Clean and get first meaningful words
+  const cleanText = text.trim().replace(/\s+/g, ' ');
+  const words = cleanText.split(' ').filter(word => word.length > 2);
+  
+  // Take first 6-8 words for title, ensuring it's not too long
+  const titleWords = words.slice(0, 8);
+  let title = titleWords.join(' ');
+  
+  // Limit to 60 characters
+  if (title.length > 60) {
+    title = title.substring(0, 57) + '...';
+  }
+  
+  // Capitalize first letter
+  title = title.charAt(0).toUpperCase() + title.slice(1);
+  
+  return title || fileName.replace(/\.[^/.]+$/, "") || `${docType} Document`;
 }
