@@ -181,6 +181,8 @@ export const AskRichieChat = () => {
         }
       });
 
+      console.log('🎵 TTS response:', { data, error });
+
       if (error) throw error;
 
       if (data.audioContent) {
@@ -439,45 +441,8 @@ export const AskRichieChat = () => {
                            )}
                          </div>
                        </div>
-                       
-                       {/* Sources */}
-                       {message.sources.length > 0 && (
-                         <Collapsible 
-                           open={sourcesOpen[message.id]} 
-                           onOpenChange={() => toggleSources(message.id)}
-                         >
-                           <CollapsibleTrigger asChild>
-                             <Button
-                               variant="ghost"
-                               size="sm"
-                               className="mt-2 text-cyan-400 hover:text-cyan-300 p-0 h-auto"
-                             >
-                               <span className="text-xs">
-                                 Sources ({message.sources.length})
-                               </span>
-                               {sourcesOpen[message.id] ? (
-                                 <ChevronUp className="h-3 w-3 ml-1" />
-                               ) : (
-                                 <ChevronDown className="h-3 w-3 ml-1" />
-                               )}
-                             </Button>
-                           </CollapsibleTrigger>
-                           <CollapsibleContent className="mt-2 space-y-1">
-                             {message.sources.map(source => (
-                               <div 
-                                 key={source.id} 
-                                 className="text-xs text-gray-400 flex items-center gap-2"
-                               >
-                                 <span className="text-cyan-400">{source.reference}:</span>
-                                 <span>{source.title}</span>
-                                 {source.url && (
-                                   <ExternalLink className="h-3 w-3" />
-                                 )}
-                               </div>
-                             ))}
-                           </CollapsibleContent>
-                         </Collapsible>
-                       )}
+                        
+                        {/* Sources - Hidden per user request */}
 
                        <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
                          <Clock className="h-3 w-3" />
