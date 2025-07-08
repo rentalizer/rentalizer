@@ -157,6 +157,20 @@ export const GroupDiscussions = () => {
           isPinned: false,
           isLiked: false,
           attachments: undefined
+        },
+        {
+          id: 'mock-3',
+          title: 'Hello from Virginia',
+          content: "Hello everyone! I just joined today. I'm from the Virginia area (DMV). I'm truly excited to be part of the Rental Arbitrage University and look forward to learning, collaborating, and growing our businesses",
+          author: 'Lincoln Khan',
+          avatar: 'LK',
+          category: 'General',
+          likes: 4,
+          comments: 7,
+          timeAgo: '1d ago',
+          isPinned: false,
+          isLiked: false,
+          attachments: undefined
         }
       ];
       
