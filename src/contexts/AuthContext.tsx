@@ -106,6 +106,7 @@ const createUserProfile = async (userId: string, email: string) => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasLoggedOut, setHasLoggedOut] = useState(false);
 
@@ -214,6 +215,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       clearTimeout(initTimeout);
       
+      // Always set the session first
+      setSession(session);
+      
       if (session?.user) {
         console.log('👤 User found, email:', session.user.email);
         
@@ -232,6 +236,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         console.log('❌ No user session found');
         setUser(null);
+        setProfile(null);
       }
       
       setIsLoading(false);
@@ -258,6 +263,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         console.log('📋 Initial session loaded:', !!session);
+        
+        // Always set the session
+        setSession(session);
         
         if (session?.user) {
           setUser({
