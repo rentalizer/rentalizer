@@ -131,6 +131,20 @@ export const GroupDiscussions = () => {
       // Add mock discussions based on actual Skool posts
       const mockDiscussions: Discussion[] = [
         {
+          id: 'pinned-welcome',
+          title: 'Welcome aboard!',
+          content: "We're excited to have you join our community of rental entrepreneurs. Whether you're brand new or already hosting, you're in the right place to level up, connect with others, and grow your business.\n\nHere's how to get started:\n\n1. Introduce Yourself\nPost a short intro and share your story with the group. Your background, goals, or why you joined—this helps us get to know you and keeps the energy strong!\n\n2. Start the Training\nJump into the training videos right away. You'll learn actionable strategies, insider tips, and proven systems to succeed with rental arbitrage—whether you're working toward your first unit or scaling a portfolio.",
+          author: 'Richie Matthews (Admin)',
+          avatar: 'RM',
+          category: 'General',
+          likes: 0,
+          comments: 0,
+          timeAgo: '1d ago',
+          isPinned: true,
+          isLiked: false,
+          attachments: undefined
+        },
+        {
           id: 'mock-1',
           title: 'Acquisitions',
           content: "Getting several yes's but with the requirement of not posting on Airbnb, VRBO etc. has anyone had success navigating around this issue, or should we just move on from these properties?",
