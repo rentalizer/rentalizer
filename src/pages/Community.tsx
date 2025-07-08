@@ -308,28 +308,86 @@ const Community = () => {
           </TabsContent>
 
           <TabsContent value="askrichie" className="mt-8">
-            <div className="text-center space-y-6">
-              <div className="bg-slate-800/50 border border-cyan-500/20 rounded-lg p-8">
-                <Bot className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-white mb-4">Ask Richie AI</h3>
-                <p className="text-gray-300 mb-6 leading-relaxed">
-                  Ask Richie is your on-demand rental arbitrage mentor—powered by AI and trained on over 200 hours of video trainings and coaching calls, plus more than 1,350,000 words of transcripts, guides, checklists, and deal analysis tools.
-                </p>
-                <p className="text-cyan-300 mb-6 leading-relaxed">
-                  It pulls directly from my actual content—not generic internet data—so every answer reflects exactly how I teach, analyze, and execute. Whether you're asking about deal criteria, landlord objections, STR licensing, or next steps after a "yes," Ask Richie gives you clear, tactical responses 24/7—just like I would.
-                </p>
-                <div className="space-y-4">
-                  <div className="text-left bg-slate-700/50 rounded-lg p-4">
-                    <p className="text-sm text-gray-400 mb-2">Features:</p>
-                    <ul className="text-cyan-300 space-y-1 text-sm">
-                      <li>• Market analysis insights from training materials</li>
-                      <li>• Investment strategy recommendations</li>
-                      <li>• Property evaluation assistance</li>
-                      <li>• Direct answers with source citations</li>
-                    </ul>
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-cyan-500/30 rounded-xl p-8 backdrop-blur-sm">
+                <div className="text-center mb-8">
+                  <div className="relative inline-block mb-6">
+                    <Bot className="h-20 w-20 text-cyan-400 mx-auto animate-pulse" />
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-slate-800 animate-pulse"></div>
                   </div>
-                  <p className="text-sm text-orange-300">
-                    Click the AI Richie button (bottom right) to start asking questions!
+                  <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+                    Ask Richie AI
+                  </h2>
+                  <p className="text-xl text-gray-300 mb-6 leading-relaxed max-w-3xl mx-auto">
+                    Your on-demand rental arbitrage mentor—powered by AI and trained on over 200 hours of video trainings and coaching calls, plus more than 1,350,000 words of transcripts, guides, checklists, and deal analysis tools.
+                  </p>
+                  <div className="bg-gradient-to-r from-cyan-600/20 to-blue-600/20 rounded-lg p-6 mb-8">
+                    <p className="text-cyan-300 leading-relaxed">
+                      It pulls directly from my actual content—not generic internet data—so every answer reflects exactly how I teach, analyze, and execute. Whether you're asking about deal criteria, landlord objections, STR licensing, or next steps after a "yes," Ask Richie gives you clear, tactical responses 24/7—just like I would.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8 mb-8">
+                  <div className="bg-slate-700/50 rounded-lg p-6 border border-cyan-500/20">
+                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <span className="w-2 h-2 bg-cyan-400 rounded-full"></span>
+                      What You Can Ask
+                    </h4>
+                    <div className="space-y-3 text-gray-300">
+                      <div className="flex items-start gap-3">
+                        <span className="text-cyan-400 mt-1">•</span>
+                        <span>Deal analysis and criteria</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-cyan-400 mt-1">•</span>
+                        <span>Landlord negotiation strategies</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-cyan-400 mt-1">•</span>
+                        <span>Market research techniques</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-cyan-400 mt-1">•</span>
+                        <span>Legal compliance and licensing</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-700/50 rounded-lg p-6 border border-purple-500/20">
+                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+                      Example Questions
+                    </h4>
+                    <div className="space-y-3 text-gray-300 text-sm">
+                      <div className="bg-slate-600/50 rounded p-3">
+                        "What's your process for finding 2.0+ multiple properties?"
+                      </div>
+                      <div className="bg-slate-600/50 rounded p-3">
+                        "How do I handle landlord objections about Airbnb?"
+                      </div>
+                      <div className="bg-slate-600/50 rounded p-3">
+                        "What are the key STR licensing requirements?"
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <button 
+                    onClick={() => {
+                      const askRichieButton = document.querySelector('[title="Ask AI Richie"]') as HTMLElement;
+                      if (askRichieButton) {
+                        askRichieButton.click();
+                      }
+                    }}
+                    className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-3 mx-auto"
+                  >
+                    <Bot className="h-6 w-6" />
+                    Start Chatting with Richie AI
+                  </button>
+                  <p className="text-sm text-gray-400 mt-4">
+                    Available 24/7 • Instant responses • Based on real training content
                   </p>
                 </div>
               </div>
