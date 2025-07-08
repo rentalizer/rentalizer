@@ -195,6 +195,59 @@ const AdminMembers = () => {
     }
   };
 
+  const handleDeleteMember = async (userId: string, memberName: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently delete ${memberName}? This will remove all their data and cannot be undone.`
+    );
+    
+    if (!confirmed) return;
+
+    try {
+      // First remove from user_roles
+      await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId);
+
+      // Remove from profiles
+      await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', userId);
+
+      // Remove from user_profiles
+      const { error } = await supabase
+        .from('user_profiles')
+        .delete()
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Error deleting member:', error);
+        toast({
+          title: "Error",
+          description: "Failed to delete member",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update local state
+      setMembers(members.filter(member => member.id !== userId));
+
+      toast({
+        title: "Member deleted",
+        description: `${memberName} has been permanently removed.`,
+      });
+    } catch (error) {
+      console.error('Error deleting member:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete member",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (adminLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
@@ -334,51 +387,61 @@ const AdminMembers = () => {
                           {format(new Date(member.created_at), 'MMM dd, yyyy')}
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
-                                onClick={() => setSelectedMember(member)}
-                              >
-                                <MessageSquare className="h-4 w-4 mr-1" />
-                                Chat
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="bg-slate-800 border-cyan-500/20">
-                              <DialogHeader>
-                                <DialogTitle className="text-white">Member Details</DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-4">
-                                <p className="text-gray-300">Chat functionality coming soon...</p>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+                       <TableCell>
+                         <div className="flex items-center gap-2 flex-wrap">
+                           <Dialog>
+                             <DialogTrigger asChild>
+                               <Button
+                                 size="sm"
+                                 variant="outline"
+                                 className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+                                 onClick={() => setSelectedMember(member)}
+                               >
+                                 <MessageSquare className="h-4 w-4 mr-1" />
+                                 Chat
+                               </Button>
+                             </DialogTrigger>
+                             <DialogContent className="bg-slate-800 border-cyan-500/20">
+                               <DialogHeader>
+                                 <DialogTitle className="text-white">Member Details</DialogTitle>
+                               </DialogHeader>
+                               <div className="space-y-4">
+                                 <p className="text-gray-300">Chat functionality coming soon...</p>
+                               </div>
+                             </DialogContent>
+                           </Dialog>
 
-                          {member.isAdmin && member.email !== 'richie@dialogo.us' ? (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="border-red-500/30 text-red-300 hover:bg-red-500/10"
-                              onClick={() => handleRemoveAdmin(member.id)}
-                            >
-                              Remove Admin
-                            </Button>
-                          ) : !member.isAdmin ? (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10"
-                              onClick={() => handleMakeAdmin(member.id)}
-                            >
-                              <Crown className="h-4 w-4 mr-1" />
-                              Make Admin
-                            </Button>
-                          ) : null}
-                        </div>
+                           {member.isAdmin && member.email !== 'richie@dialogo.us' ? (
+                             <Button
+                               size="sm"
+                               variant="outline"
+                               className="border-red-500/30 text-red-300 hover:bg-red-500/10"
+                               onClick={() => handleRemoveAdmin(member.id)}
+                             >
+                               Remove Admin
+                             </Button>
+                           ) : !member.isAdmin ? (
+                             <Button
+                               size="sm"
+                               variant="outline"
+                               className="border-purple-500/30 text-purple-300 hover:bg-purple-500/10"
+                               onClick={() => handleMakeAdmin(member.id)}
+                             >
+                               <Crown className="h-4 w-4 mr-1" />
+                               Make Admin
+                             </Button>
+                           ) : null}
+
+                           {/* Delete Member Button */}
+                           <Button
+                             size="sm"
+                             variant="outline"
+                             className="border-red-600/30 text-red-400 hover:bg-red-600/10"
+                             onClick={() => handleDeleteMember(member.id, member.display_name || member.email)}
+                           >
+                             Delete Member
+                           </Button>
+                         </div>
                       </TableCell>
                     </TableRow>
                   ))}
