@@ -13,6 +13,7 @@ import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { format } from 'date-fns';
 import { NewsAggregationControls } from '@/components/community/NewsAggregationControls';
+import { AdminSetup } from '@/components/AdminSetup';
 
 interface Member {
   id: string;
@@ -389,6 +390,7 @@ const AdminMembers = () => {
       </div>
 
       <Footer />
+      <AdminSetup />
     </div>
   );
 };
