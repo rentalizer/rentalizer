@@ -139,9 +139,8 @@ serve(async (req) => {
 });
 
 async function extractTextFromPDF(fileData: Blob): Promise<string> {
-  // For now, return an instruction for manual text extraction
-  // In a production setup, you'd use a PDF parsing library
-  throw new Error('PDF processing requires manual text extraction. Please copy and paste the text content from your PDF.');
+  // PDF processing requires additional setup. For now, guide users to copy/paste text.
+  throw new Error('PDF text extraction is not yet available. Please copy the text from your PDF and use the "Paste Text" tab instead.');
 }
 
 function splitTextIntoChunks(text: string, maxChunkSize: number): string[] {

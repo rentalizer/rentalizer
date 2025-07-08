@@ -109,11 +109,11 @@ export const RichieAdminPanel = () => {
         const fileName = file.name;
         const fileExtension = fileName.toLowerCase().split('.').pop();
 
-        // Check file type
-        if (!['pdf', 'txt', 'md'].includes(fileExtension || '')) {
+        // Check file type - now only supporting TXT and MD files
+        if (!['txt', 'md'].includes(fileExtension || '')) {
           toast({
             title: "Unsupported File Type",
-            description: `${fileName}: Only PDF, TXT, and MD files are supported`,
+            description: `${fileName}: Only TXT and MD files are supported. For PDFs, please copy the text and use "Paste Text" tab.`,
             variant: "destructive"
           });
           continue;
@@ -301,7 +301,7 @@ export const RichieAdminPanel = () => {
                 Upload Course Materials
               </CardTitle>
               <p className="text-gray-400 text-sm">
-                Upload PDFs, text files, or transcripts. Files will be automatically processed and embedded.
+                Upload TXT and MD files for automatic processing. For PDFs, please copy the text and use the "Paste Text" tab.
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -320,7 +320,7 @@ export const RichieAdminPanel = () => {
                 <input
                   type="file"
                   multiple
-                  accept=".pdf,.txt,.md"
+                  accept=".txt,.md"
                   onChange={handleFileSelect}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
@@ -329,7 +329,7 @@ export const RichieAdminPanel = () => {
                   Drag and drop files here, or click to select
                 </p>
                 <p className="text-gray-500 text-sm">
-                  Supports PDF, TXT, and MD files
+                  Supports TXT and MD files • For PDFs, use "Paste Text" tab
                 </p>
               </div>
 
