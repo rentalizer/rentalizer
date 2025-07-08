@@ -59,7 +59,7 @@ const TestHome = () => {
     feature3Title: 'Property Management',
     feature3Description: 'Automate Property Management, Operations & Cash Flow',
     feature4Title: 'Training Hub',
-    feature4Description: 'Live Training, Video & Document Library, AI Tools, Community'
+    feature4Description: 'Live Training, Video & Document Library, Tools, Resources, Community'
   };
 
   const handleFeatureClick = (feature: string) => {
