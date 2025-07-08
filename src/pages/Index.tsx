@@ -140,8 +140,8 @@ const Index = () => {
                     onClick={() => navigate('/community')}>
                 <CardContent className="p-6 text-center">
                   <div className="text-2xl mb-2">👥</div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Community</h3>
-                  <p className="text-gray-400 text-sm">Connect with other rental entrepreneurs</p>
+                  <h3 className="text-lg font-semibold text-white mb-2">Training Hub</h3>
+                  <p className="text-gray-400 text-sm">Live Training, Video & Document Library, Tools, Resources, Community</p>
                 </CardContent>
               </Card>
               
@@ -150,7 +150,7 @@ const Index = () => {
                 <CardContent className="p-6 text-center">
                   <div className="text-2xl mb-2">📊</div>
                   <h3 className="text-lg font-semibold text-white mb-2">Market Intelligence</h3>
-                  <p className="text-gray-400 text-sm">Analyze rental market data</p>
+                  <p className="text-gray-400 text-sm">The First-Of-Its-Kind AI Tool To Find The Best Rental Arbitrage Markets</p>
                 </CardContent>
               </Card>
               
@@ -158,8 +158,8 @@ const Index = () => {
                     onClick={() => navigate('/properties')}>
                 <CardContent className="p-6 text-center">
                   <div className="text-2xl mb-2">🏢</div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Acquisition CRM</h3>
-                  <p className="text-gray-400 text-sm">Manage property acquisitions</p>
+                  <h3 className="text-lg font-semibold text-white mb-2">Acquisition Agent</h3>
+                  <p className="text-gray-400 text-sm">Automate Property Outreach, Close Deals, Calculate Profit, Robust CRM</p>
                 </CardContent>
               </Card>
               
@@ -168,7 +168,7 @@ const Index = () => {
                 <CardContent className="p-6 text-center">
                   <div className="text-2xl mb-2">🫶</div>
                   <h3 className="text-lg font-semibold text-white mb-2">Property Management</h3>
-                  <p className="text-gray-400 text-sm">Manage your rental properties</p>
+                  <p className="text-gray-400 text-sm">Automate Property Management, Operations & Cash Flow</p>
                 </CardContent>
               </Card>
             </div>
