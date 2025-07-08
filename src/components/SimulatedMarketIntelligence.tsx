@@ -31,6 +31,14 @@ export const SimulatedMarketIntelligence = () => {
 
   // Mock market data for different cities with realistic revenue
   const simulatedData: { [key: string]: SubmarketData[] } = {
+    'nashville': [
+      { submarket: "Hillcrest", strRevenue: 7019, medianRent: 3800, multiple: 1.85 },
+      { submarket: "Pacific Beach", strRevenue: 7232, medianRent: 4000, multiple: 1.81 },
+      { submarket: "La Jolla", strRevenue: 8672, medianRent: 4800, multiple: 1.81 },
+      { submarket: "Gaslamp Quarter", strRevenue: 7443, medianRent: 4200, multiple: 1.77 },
+      { submarket: "Mission Valley", strRevenue: 6185, medianRent: 3500, multiple: 1.77 },
+      { submarket: "Little Italy", strRevenue: 7850, medianRent: 4500, multiple: 1.74 }
+    ],
     'san diego': [
       { submarket: "Gaslamp Quarter", strRevenue: 7415, medianRent: 4200, multiple: 1.77 },
       { submarket: "Little Italy", strRevenue: 7948, medianRent: 4500, multiple: 1.77 },
