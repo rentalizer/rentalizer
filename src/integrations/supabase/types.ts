@@ -628,6 +628,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      debug_auth_context: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          auth_uid: string
+          auth_role: string
+          auth_email: string
+        }[]
+      }
       halfvec_avg: {
         Args: { "": number[] }
         Returns: unknown
