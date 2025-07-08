@@ -149,7 +149,35 @@ export const CommunityCalendar = () => {
   }
 
   const handleAddEvent = async () => {
-    if (!user) return;
+    if (!user) {
+      console.error('No user found');
+      return;
+    }
+    
+    if (!newEvent.title.trim()) {
+      console.error('Title is required');
+      return;
+    }
+    
+    if (!newEvent.time) {
+      console.error('Time is required');
+      return;
+    }
+    
+    console.log('Creating event with data:', {
+      title: newEvent.title,
+      description: newEvent.description,
+      event_date: newEvent.date.toISOString().split('T')[0],
+      event_time: newEvent.time,
+      duration: newEvent.duration,
+      location: newEvent.location,
+      zoom_link: newEvent.zoomLink,
+      event_type: 'workshop',
+      attendees: newEvent.attendees,
+      is_recurring: newEvent.isRecurring,
+      remind_members: newEvent.remindMembers,
+      created_by: user.id
+    });
     
     try {
       const { data, error } = await supabase
@@ -167,12 +195,18 @@ export const CommunityCalendar = () => {
           is_recurring: newEvent.isRecurring,
           remind_members: newEvent.remindMembers,
           created_by: user.id
-        });
+        })
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      console.log('Event created successfully:', data);
 
       // Refresh events list
-      fetchEvents();
+      await fetchEvents();
       setIsAddEventOpen(false);
       
       // Reset form
@@ -188,8 +222,12 @@ export const CommunityCalendar = () => {
         remindMembers: false,
         attendees: 'All members'
       });
+      
+      console.log('Event added successfully');
     } catch (error) {
       console.error('Error creating event:', error);
+      // Show user-friendly error message
+      alert(`Failed to create event: ${error.message || 'Unknown error'}`);
     }
   };
 
