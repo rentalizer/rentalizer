@@ -207,21 +207,12 @@ export const GroupDiscussions = () => {
   useEffect(() => {
     const fetchCommunityStats = async () => {
       try {
-        // Count total profiles (members)
-        const { count: totalMembers } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true });
-
-        // Count admins
-        const { count: adminCount } = await supabase
-          .from('user_roles')
-          .select('*', { count: 'exact', head: true })
-          .eq('role', 'admin');
-
+        // Use mock data for now
         setCommunityStats(prev => ({
           ...prev,
-          totalMembers: totalMembers || 0,
-          adminCount: adminCount || 0
+          totalMembers: 181,
+          onlineUsers: 35,
+          adminCount: 2
         }));
       } catch (error) {
         console.error('Error fetching community stats:', error);
