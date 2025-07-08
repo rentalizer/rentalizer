@@ -193,7 +193,37 @@ const TestHome = () => {
           {/* Animated Features Section */}
           <div className="max-w-7xl mx-auto mb-20">
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {/* Feature 1: Market Intelligence */}
+              {/* Feature 1: Training Hub */}
+              <div className="group relative" onClick={() => handleFeatureClick('community')}>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
+                  <CardHeader className="text-center pb-4">
+                    <div className="mx-auto mb-4 relative">
+                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center transition-all duration-300">
+                        <MessageSquare className="h-10 w-10 text-white" />
+                      </div>
+                      <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    </div>
+                    <div className="text-xl font-bold text-purple-300">
+                      {texts.feature4Title}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <div className="text-gray-300 text-sm leading-relaxed">
+                      {texts.feature4Description}
+                    </div>
+                    <div className="mt-4 flex justify-center">
+                      <div className="flex -space-x-2">
+                        {[...Array(4)].map((_, i) => (
+                          <div key={i} className={`w-6 h-6 bg-gradient-to-br from-purple-400 to-cyan-400 rounded-full border-2 border-slate-800 animate-pulse`} style={{animationDelay: `${i * 150}ms`}}></div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Feature 2: Market Intelligence */}
               <div className="group relative" onClick={() => handleFeatureClick('market')}>
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
@@ -221,7 +251,7 @@ const TestHome = () => {
                 </Card>
               </div>
 
-              {/* Feature 2: Acquisition CRM & Calculator */}
+              {/* Feature 3: Acquisition CRM */}
               <div className="group relative" onClick={() => handleFeatureClick('acquisition')}>
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
@@ -249,7 +279,7 @@ const TestHome = () => {
                 </Card>
               </div>
 
-              {/* Feature 3: PMS */}
+              {/* Feature 4: Property Management */}
               <div className="group relative" onClick={() => handleFeatureClick('pms')}>
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                 <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
@@ -272,36 +302,6 @@ const TestHome = () => {
                       {[...Array(6)].map((_, i) => (
                         <div key={i} className={`h-2 bg-cyan-400/50 rounded animate-pulse`} style={{animationDelay: `${i * 100}ms`}}></div>
                       ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Feature 4: Community */}
-              <div className="group relative" onClick={() => handleFeatureClick('community')}>
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
-                  <CardHeader className="text-center pb-4">
-                    <div className="mx-auto mb-4 relative">
-                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center transition-all duration-300">
-                        <MessageSquare className="h-10 w-10 text-white" />
-                      </div>
-                      <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    </div>
-                    <div className="text-xl font-bold text-purple-300">
-                      {texts.feature4Title}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <div className="text-gray-300 text-sm leading-relaxed">
-                      {texts.feature4Description}
-                    </div>
-                    <div className="mt-4 flex justify-center">
-                      <div className="flex -space-x-2">
-                        {[...Array(4)].map((_, i) => (
-                          <div key={i} className={`w-6 h-6 bg-gradient-to-br from-purple-400 to-cyan-400 rounded-full border-2 border-slate-800 animate-pulse`} style={{animationDelay: `${i * 150}ms`}}></div>
-                        ))}
-                      </div>
                     </div>
                   </CardContent>
                 </Card>
