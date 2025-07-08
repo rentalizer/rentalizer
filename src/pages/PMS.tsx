@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { TopNavBar } from '@/components/TopNavBar';
+import { Footer } from '@/components/Footer';
 import { 
   Calendar,
   MessageCircle,
@@ -234,8 +235,9 @@ const PMS = () => {
   };
 
   const PMSContent = () => (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <div className="p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+      <TopNavBar />
+      <div className="p-6 flex-1">
         <div className="container mx-auto max-w-7xl">
         {/* Enhanced Header */}
         <div className="mb-8">
@@ -747,6 +749,7 @@ const PMS = () => {
         </Tabs>
         </div>
       </div>
+      <Footer />
     </div>
   );
 
