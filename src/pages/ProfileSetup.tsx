@@ -152,10 +152,10 @@ const ProfileSetup = () => {
 
     console.log('🔍 User found:', user.id, user.email);
 
-    if (!firstName.trim() || !lastName.trim()) {
+    if (!firstName.trim() || !lastName.trim() || !avatarUrl) {
       toast({
         title: "Missing Information",
-        description: "Please fill in first name and last name",
+        description: "Please fill in first name, last name, and upload a profile picture",
         variant: "destructive",
       });
       return;
