@@ -66,7 +66,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
             type="text"
             value={data.address}
             onChange={(e) => updateData({ address: e.target.value })}
-            placeholder="Enter property address"
+            placeholder=""
             className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
           />
         </div>
@@ -95,9 +95,9 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
           </div>
         </div>
 
-        {/* Add Comparable Values Section */}
+        {/* Comparable Values Section */}
         <div className="space-y-3">
-          <Label className="text-gray-200 text-center block text-sm">Add Comparable Property Values</Label>
+          <Label className="text-gray-200 text-center block text-sm">Comparable Property Values</Label>
           
           <div className="flex gap-2">
             <div className="relative flex-1">
@@ -107,7 +107,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
                 value={newCompValue}
                 onChange={(e) => setNewCompValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Enter property value"
+                placeholder=""
                 className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
               />
             </div>
