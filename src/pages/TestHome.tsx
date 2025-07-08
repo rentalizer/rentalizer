@@ -168,9 +168,16 @@ const TestHome = () => {
             </div>
             
             {/* Updated Tagline */}
-            <div className="mb-12 px-4">
+            <div className="mb-8 px-4">
               <div className="text-lg md:text-xl lg:text-2xl text-white max-w-5xl mx-auto leading-relaxed font-semibold">
                 Find Rental Markets. Source Deals. Automate Cash Flow—All in One Place
+              </div>
+            </div>
+
+            {/* New Description */}
+            <div className="mb-12 px-4">
+              <div className="text-lg text-gray-300 max-w-4xl mx-auto leading-relaxed">
+                Rentalizer is a complete training platform built to help you launch and grow a rental arbitrage business—with AI-powered tools to support every step. From market research and deal sourcing to property management, automation, and community—everything you need is all in one place.
               </div>
             </div>
 
@@ -308,12 +315,6 @@ const TestHome = () => {
             </div>
           </div>
 
-          {/* Description Section */}
-          <div className="text-center mb-16">
-            <div className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              {texts.description}
-            </div>
-          </div>
 
           {/* Testimonials Section */}
           <div className="max-w-7xl mx-auto mb-20">
