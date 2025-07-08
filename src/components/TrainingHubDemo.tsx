@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,8 @@ import {
   MapPin,
   Play,
   Download,
-  Star
+  Star,
+  ChevronRight
 } from 'lucide-react';
 
 interface TrainingHubDemoProps {
@@ -35,16 +36,37 @@ interface TrainingHubDemoProps {
 
 export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps) => {
   const [activeTab, setActiveTab] = useState('discussions');
+  const [demoStep, setDemoStep] = useState(0);
 
   const tabs = [
     { id: 'discussions', label: 'Discussions', icon: MessageSquare },
     { id: 'calendar', label: 'Calendar', icon: Calendar },
     { id: 'training', label: 'Training', icon: BookOpen },
-    { id: 'chat', label: 'Chat', icon: MessageSquare },
     { id: 'calculator', label: 'Calculator', icon: Calculator },
     { id: 'ask-richie', label: 'Ask Richie', icon: Bot },
     { id: 'members', label: 'Members', icon: Users },
   ];
+
+  // Automatic demo progression
+  useEffect(() => {
+    if (!isRunning) return;
+
+    const interval = setInterval(() => {
+      setDemoStep((prev) => {
+        const nextStep = (prev + 1) % tabs.length;
+        setActiveTab(tabs[nextStep].id);
+        return nextStep;
+      });
+    }, 4000); // Change tabs every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [isRunning, tabs.length]);
+
+  // Reset when component mounts
+  useEffect(() => {
+    setActiveTab('discussions');
+    setDemoStep(0);
+  }, []);
 
   return (
     <Card className="bg-slate-800/50 border-cyan-500/20 animate-fade-in max-w-7xl mx-auto">
@@ -55,28 +77,41 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
             <Users className="h-6 w-6 text-cyan-400" />
             Training & Community Hub
           </CardTitle>
-          <div className="flex items-center gap-2 text-sm text-cyan-400">
-            <Settings className="h-4 w-4" />
-            Manage Richie's Knowledge Base
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-cyan-400">
+              <Settings className="h-4 w-4" />
+              Manage Richie's Knowledge Base
+            </div>
+            {isRunning && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-green-500/20 rounded-full">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-green-400 text-xs font-medium">Auto Demo Running</span>
+              </div>
+            )}
           </div>
         </div>
         
         {/* Tab Navigation */}
-        <div className="flex gap-4 mt-4 border-b border-slate-700 pb-2">
-          {tabs.map((tab) => {
+        <div className="flex gap-4 mt-4 border-b border-slate-700 pb-2 overflow-x-auto">
+          {tabs.map((tab, index) => {
             const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            const isNext = index === (demoStep + 1) % tabs.length && isRunning;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 whitespace-nowrap relative ${
+                  isActive
+                    ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 scale-105'
                     : 'text-gray-400 hover:text-cyan-300 hover:bg-slate-700/50'
-                }`}
+                } ${isNext ? 'ring-2 ring-yellow-400/50 animate-pulse' : ''}`}
               >
                 <Icon className="h-4 w-4" />
                 {tab.label}
+                {isActive && (
+                  <ChevronRight className="h-3 w-3 text-cyan-400 animate-bounce" />
+                )}
               </button>
             );
           })}
@@ -343,6 +378,149 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
                         </div>
                       </div>
                       <Button variant="outline" className="border-purple-500 text-purple-300">Register</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {activeTab === 'ask-richie' && (
+              <Card className="bg-slate-700/30 border-slate-600">
+                <CardHeader>
+                  <CardTitle className="text-cyan-300 flex items-center gap-2">
+                    <Bot className="h-5 w-5" />
+                    Ask Richie - AI Assistant
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 bg-slate-800/50 rounded-lg">
+                      <div className="flex items-start gap-3 mb-4">
+                        <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full flex items-center justify-center">
+                          <Bot className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="bg-cyan-500/20 rounded-lg p-3 mb-2">
+                            <p className="text-white text-sm">
+                              Hi! I'm Richie, your AI assistant. I can help you with rental arbitrage questions, market analysis, deal evaluation, and more. What would you like to know?
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                          U
+                        </div>
+                        <div className="bg-slate-800/50 rounded-lg p-3 flex-1">
+                          <p className="text-white text-sm">What are the best markets for rental arbitrage in 2024?</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full flex items-center justify-center">
+                          <Bot className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="bg-cyan-500/20 rounded-lg p-3 flex-1">
+                          <p className="text-white text-sm">
+                            Based on current market data, the top rental arbitrage markets for 2024 include Austin TX, Nashville TN, Denver CO, and Miami FL. These markets show strong demand, favorable regulations, and good profit margins. Would you like specific data on any of these markets?
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2 mt-4">
+                      <Input 
+                        placeholder="Ask me anything about rental arbitrage..." 
+                        className="flex-1 bg-slate-800 border-slate-600 text-white"
+                      />
+                      <Button className="bg-cyan-600 hover:bg-cyan-700">Send</Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {activeTab === 'members' && (
+              <Card className="bg-slate-700/30 border-slate-600">
+                <CardHeader>
+                  <CardTitle className="text-cyan-300 flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Community Members
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="p-4 bg-slate-800/50 rounded-lg">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-10 h-10 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold">
+                            RM
+                          </div>
+                          <div>
+                            <div className="text-white font-medium">Richie Matthews</div>
+                            <div className="text-xs text-gray-400">Admin • Online</div>
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          Founder & Mentor - $2M+ in rental revenue
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 bg-slate-800/50 rounded-lg">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold">
+                            SC
+                          </div>
+                          <div>
+                            <div className="text-white font-medium">Sarah Chen</div>
+                            <div className="text-xs text-gray-400">Member • 2h ago</div>
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          Top performer - 12 active properties
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 bg-slate-800/50 rounded-lg">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold">
+                            MR
+                          </div>
+                          <div>
+                            <div className="text-white font-medium">Mike Rodriguez</div>
+                            <div className="text-xs text-gray-400">Member • 1d ago</div>
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          Rising star - 6 properties, $15k/month
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 bg-slate-800/50 rounded-lg">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-10 h-10 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center text-white font-bold">
+                            AT
+                          </div>
+                          <div>
+                            <div className="text-white font-medium">Alex Thompson</div>
+                            <div className="text-xs text-gray-400">Member • 3d ago</div>
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          Market leader - Austin, TX specialist
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="border-t border-slate-600 pt-4">
+                      <div className="text-center">
+                        <Button variant="outline" className="border-cyan-500 text-cyan-300">
+                          View All 181 Members
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
