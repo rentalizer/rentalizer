@@ -236,7 +236,8 @@ export const CommunityCalendar = () => {
     if (!selectedEvent || !user) return;
     
     try {
-      const { error } = await supabase
+      // Update the original event
+      const { error: updateError } = await supabase
         .from('events')
         .update({
           title: newEvent.title,
@@ -253,7 +254,45 @@ export const CommunityCalendar = () => {
         })
         .eq('id', selectedEvent.id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
+
+      // If making it recurring, create additional weekly events (11 more for total of 12)
+      if (newEvent.isRecurring && !selectedEvent.isRecurring) {
+        const recurringEvents = [];
+        
+        for (let i = 1; i < 12; i++) {
+          const futureDate = new Date(newEvent.date);
+          futureDate.setDate(futureDate.getDate() + (i * 7)); // Add weeks
+          
+          recurringEvents.push({
+            title: newEvent.title,
+            description: newEvent.description,
+            event_date: futureDate.toISOString().split('T')[0],
+            event_time: newEvent.time,
+            duration: newEvent.duration,
+            location: newEvent.location,
+            zoom_link: newEvent.zoomLink,
+            event_type: 'workshop',
+            attendees: newEvent.attendees,
+            is_recurring: true,
+            remind_members: newEvent.remindMembers,
+            created_by: user.id
+          });
+        }
+
+        if (recurringEvents.length > 0) {
+          const { error: recurringError } = await supabase
+            .from('events')
+            .insert(recurringEvents);
+          
+          if (recurringError) {
+            console.error('Error creating recurring events:', recurringError);
+            // Don't throw here, the main event was already updated successfully
+          } else {
+            console.log(`Created ${recurringEvents.length} additional recurring events`);
+          }
+        }
+      }
 
       // Refresh events list
       await fetchEvents();
