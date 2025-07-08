@@ -22,6 +22,8 @@ const CommunityGate = () => {
   const [promoCode, setPromoCode] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   
   // Check if we're in development environment
   const isDevelopment = () => {
@@ -203,6 +205,48 @@ const CommunityGate = () => {
       toast({
         title: "Authentication Failed",
         description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!forgotPasswordEmail.trim()) {
+      toast({
+        title: "Missing Email",
+        description: "Please enter your email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
+        redirectTo: `${window.location.origin}/community`,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Reset Email Sent",
+        description: "Check your email for password reset instructions.",
+      });
+
+      setShowForgotPassword(false);
+      setForgotPasswordEmail('');
+    } catch (error: any) {
+      console.error('Password reset error:', error);
+      toast({
+        title: "Reset Failed",
+        description: error.message || "Failed to send reset email.",
         variant: "destructive",
       });
     } finally {
@@ -464,6 +508,7 @@ const CommunityGate = () => {
                           <Button
                             type="button"
                             variant="ghost"
+                            onClick={() => setShowForgotPassword(true)}
                             className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 text-sm p-0 h-auto"
                           >
                             Forgot Your Password?
@@ -526,6 +571,77 @@ const CommunityGate = () => {
               </div>
             </div>
           </div>
+
+          {/* Forgot Password Modal */}
+          {showForgotPassword && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-50">
+              <div className="container mx-auto px-4 py-8 flex justify-center">
+                <div className="max-w-md w-full">
+                  <div className="bg-gray-900/95 border border-cyan-500/20 backdrop-blur-lg rounded-lg p-8">
+                    <div className="space-y-6">
+                      <div className="text-center">
+                        <div className="flex items-center gap-2 text-cyan-300 justify-center mb-2">
+                          <Lock className="h-5 w-5" />
+                          <h1 className="text-xl font-semibold">Reset Password</h1>
+                        </div>
+                        <p className="text-gray-400 text-sm">
+                          Enter your email to receive reset instructions
+                        </p>
+                      </div>
+                      
+                      <form onSubmit={handleForgotPassword} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="forgot-email" className="text-gray-300 flex items-center gap-2">
+                            <User className="h-4 w-4" />
+                            Email
+                          </Label>
+                          <Input
+                            id="forgot-email"
+                            type="email"
+                            value={forgotPasswordEmail}
+                            onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                            required
+                            disabled={isSubmitting}
+                            className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                            placeholder="Enter your email address"
+                          />
+                        </div>
+                        
+                        <div className="flex gap-3 pt-4">
+                          <Button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white disabled:opacity-50"
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                Sending...
+                              </>
+                            ) : (
+                              'Send Reset Email'
+                            )}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              setShowForgotPassword(false);
+                              setForgotPasswordEmail('');
+                            }}
+                            disabled={isSubmitting}
+                            className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+           )}
         </div>
         
         <Footer />
