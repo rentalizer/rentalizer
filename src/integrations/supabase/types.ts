@@ -699,6 +699,21 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: boolean
       }
+      match_richie_docs: {
+        Args: {
+          query_embedding: string
+          match_threshold?: number
+          match_count?: number
+        }
+        Returns: {
+          id: string
+          title: string
+          doc_type: string
+          url: string
+          text_content: string
+          similarity: number
+        }[]
+      }
       sparsevec_out: {
         Args: { "": unknown }
         Returns: unknown

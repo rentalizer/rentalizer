@@ -21,10 +21,11 @@ import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { CommunityLeaderboard } from '@/components/community/CommunityLeaderboard';
 import { NewsFeed } from '@/components/community/NewsFeed';
 import { DirectMessaging } from '@/components/DirectMessaging';
+import { AskRichieChat } from '@/components/AskRichieChat';
 import { ContactChat } from '@/components/ContactChat';
 import { AdminSetup } from '@/components/AdminSetup';
 import { useAdminRole } from '@/hooks/useAdminRole';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export interface CalculatorData {
   // Comps
@@ -178,6 +179,16 @@ const Community = () => {
           </div>
         </div>
 
+        {/* Admin Quick Links */}
+        {isAdmin && (
+          <div className="mb-6 flex justify-center">
+            <Link to="/admin/richie" className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center gap-2">
+              <Bot className="h-4 w-4" />
+              Manage Richie's Knowledge Base
+            </Link>
+          </div>
+        )}
+
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="flex w-full bg-slate-800/50 border border-cyan-500/20 justify-evenly h-14 p-2">
@@ -302,18 +313,21 @@ const Community = () => {
                 <Bot className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
                 <h3 className="text-2xl font-bold text-white mb-4">Ask Richie AI</h3>
                 <p className="text-gray-300 mb-6">
-                  Get instant answers to your rental investment questions from our AI assistant.
+                  Get instant answers to your rental arbitrage questions based on Richie's training materials.
                 </p>
                 <div className="space-y-4">
                   <div className="text-left bg-slate-700/50 rounded-lg p-4">
-                    <p className="text-sm text-gray-400 mb-2">Coming Soon:</p>
+                    <p className="text-sm text-gray-400 mb-2">Features:</p>
                     <ul className="text-cyan-300 space-y-1 text-sm">
-                      <li>• Market analysis insights</li>
+                      <li>• Market analysis insights from training materials</li>
                       <li>• Investment strategy recommendations</li>
                       <li>• Property evaluation assistance</li>
-                      <li>• Real-time Q&A support</li>
+                      <li>• Direct answers with source citations</li>
                     </ul>
                   </div>
+                  <p className="text-sm text-orange-300">
+                    Click the AI Richie button (bottom right) to start asking questions!
+                  </p>
                 </div>
               </div>
             </div>
@@ -324,6 +338,7 @@ const Community = () => {
 
       <AdminSetup />
       <DirectMessaging />
+      <AskRichieChat />
       <Footer />
     </div>
   );
