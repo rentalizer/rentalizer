@@ -342,42 +342,159 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
             {activeTab === 'calendar' && (
               <Card className="bg-slate-700/30 border-slate-600">
                 <CardHeader>
-                  <CardTitle className="text-cyan-300 flex items-center gap-2">
-                    <Calendar className="h-5 w-5" />
-                    Community Events
+                  <CardTitle className="text-cyan-300 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5" />
+                      December 2024
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" className="border-slate-600 text-gray-400">
+                        &lt;
+                      </Button>
+                      <Button size="sm" variant="outline" className="border-slate-600 text-gray-400">
+                        &gt;
+                      </Button>
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-cyan-500 rounded-lg flex items-center justify-center text-white font-bold">
-                          15
+                  {/* Calendar Grid */}
+                  <div className="mb-6">
+                    {/* Days of Week Header */}
+                    <div className="grid grid-cols-7 gap-1 mb-2">
+                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                        <div key={day} className="p-2 text-center text-gray-400 text-sm font-medium">
+                          {day}
                         </div>
-                        <div>
-                          <div className="text-white font-medium">Weekly Coaching Call</div>
-                          <div className="text-gray-400 text-sm flex items-center gap-2">
-                            <Clock className="h-4 w-4" />
-                            7:00 PM EST
-                          </div>
-                        </div>
-                      </div>
-                      <Button className="bg-cyan-600 hover:bg-cyan-700">Join</Button>
+                      ))}
                     </div>
-                    <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center text-white font-bold">
-                          18
-                        </div>
-                        <div>
-                          <div className="text-white font-medium">Market Analysis Workshop</div>
-                          <div className="text-gray-400 text-sm flex items-center gap-2">
-                            <Clock className="h-4 w-4" />
-                            6:00 PM EST
-                          </div>
+                    
+                    {/* Calendar Days */}
+                    <div className="grid grid-cols-7 gap-1">
+                      {/* Week 1 */}
+                      <div className="p-2 text-center text-gray-600 text-sm">1</div>
+                      <div className="p-2 text-center text-gray-600 text-sm">2</div>
+                      <div className="p-2 text-center text-gray-600 text-sm">3</div>
+                      <div className="p-2 text-center text-gray-600 text-sm">4</div>
+                      <div className="p-2 text-center text-gray-600 text-sm">5</div>
+                      <div className="p-2 text-center text-gray-600 text-sm">6</div>
+                      <div className="p-2 text-center text-gray-600 text-sm">7</div>
+                      
+                      {/* Week 2 */}
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">8</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">9</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">10</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">11</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">12</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded relative">
+                        13
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-cyan-400 rounded-full"></div>
+                      </div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">14</div>
+                      
+                      {/* Week 3 */}
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded relative">
+                        15
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-purple-400 rounded-full"></div>
+                      </div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">16</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">17</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded relative">
+                        18
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-orange-400 rounded-full"></div>
+                      </div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">19</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded relative">
+                        20
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-green-400 rounded-full"></div>
+                      </div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">21</div>
+                      
+                      {/* Week 4 */}
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">22</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded relative">
+                        23
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-cyan-400 rounded-full"></div>
+                      </div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">24</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">25</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">26</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">27</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">28</div>
+                      
+                      {/* Week 5 */}
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">29</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">30</div>
+                      <div className="p-2 text-center text-white text-sm bg-slate-800/50 rounded">31</div>
+                      <div className="p-2 text-center text-gray-600 text-sm">1</div>
+                      <div className="p-2 text-center text-gray-600 text-sm">2</div>
+                      <div className="p-2 text-center text-gray-600 text-sm">3</div>
+                      <div className="p-2 text-center text-gray-600 text-sm">4</div>
+                    </div>
+                  </div>
+                  
+                  {/* Upcoming Events List */}
+                  <div className="space-y-3">
+                    <h4 className="text-white font-medium mb-3">Upcoming Events</h4>
+                    
+                    <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border-l-4 border-cyan-400">
+                      <div className="text-center min-w-[3rem]">
+                        <div className="text-cyan-400 font-bold text-lg">13</div>
+                        <div className="text-gray-400 text-xs">Dec</div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-white font-medium">Weekly Coaching Call</div>
+                        <div className="text-gray-400 text-sm flex items-center gap-2">
+                          <Clock className="h-3 w-3" />
+                          7:00 PM EST
                         </div>
                       </div>
-                      <Button variant="outline" className="border-purple-500 text-purple-300">Register</Button>
+                      <Button size="sm" className="bg-cyan-600 hover:bg-cyan-700">Join</Button>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border-l-4 border-purple-400">
+                      <div className="text-center min-w-[3rem]">
+                        <div className="text-purple-400 font-bold text-lg">15</div>
+                        <div className="text-gray-400 text-xs">Dec</div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-white font-medium">Property Acquisitions Workshop</div>
+                        <div className="text-gray-400 text-sm flex items-center gap-2">
+                          <Clock className="h-3 w-3" />
+                          6:00 PM EST
+                        </div>
+                      </div>
+                      <Button size="sm" variant="outline" className="border-purple-400 text-purple-300">Register</Button>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border-l-4 border-orange-400">
+                      <div className="text-center min-w-[3rem]">
+                        <div className="text-orange-400 font-bold text-lg">18</div>
+                        <div className="text-gray-400 text-xs">Dec</div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-white font-medium">Market Analysis Deep Dive</div>
+                        <div className="text-gray-400 text-sm flex items-center gap-2">
+                          <Clock className="h-3 w-3" />
+                          8:00 PM EST
+                        </div>
+                      </div>
+                      <Button size="sm" variant="outline" className="border-orange-400 text-orange-300">RSVP</Button>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg border-l-4 border-green-400">
+                      <div className="text-center min-w-[3rem]">
+                        <div className="text-green-400 font-bold text-lg">20</div>
+                        <div className="text-gray-400 text-xs">Dec</div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-white font-medium">Success Stories Panel</div>
+                        <div className="text-gray-400 text-sm flex items-center gap-2">
+                          <Clock className="h-3 w-3" />
+                          7:30 PM EST
+                        </div>
+                      </div>
+                      <Button size="sm" variant="outline" className="border-green-400 text-green-300">Join</Button>
                     </div>
                   </div>
                 </CardContent>
