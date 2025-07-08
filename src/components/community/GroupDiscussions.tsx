@@ -476,21 +476,6 @@ export const GroupDiscussions = () => {
                   />
                 </div>
 
-                {/* Category Selector */}
-                <div>
-                  <label className="text-gray-400 text-sm font-medium mb-2 block">Category</label>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full bg-slate-700/50 border border-cyan-500/20 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  >
-                    {categories.map((category) => (
-                      <option key={category} value={category} className="bg-slate-700">
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
                 
                 {/* Content Input */}
                 <Textarea
