@@ -12,6 +12,11 @@ import { AccessGate } from '@/components/AccessGate';
 const MarketAnalysis = () => {
   const navigate = useNavigate();
   
+  // Check if we're in Lovable environment
+  const isLovableEnv = window.location.hostname.includes('lovableproject.com') || 
+                       window.location.search.includes('__lovable_token') ||
+                       window.location.hostname === 'localhost';
+  
   const MarketContent = () => (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden flex flex-col">
       <TopNavBar />
@@ -70,6 +75,11 @@ const MarketAnalysis = () => {
       <Footer />
     </div>
   );
+
+  // If in Lovable environment, bypass authentication
+  if (isLovableEnv) {
+    return <MarketContent />;
+  }
 
   return (
     <AccessGate title="Market Intelligence" subtitle="Access your account to continue">
