@@ -19,6 +19,7 @@ import { GroupDiscussions } from '@/components/community/GroupDiscussions';
 import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
 import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { CommunityLeaderboard } from '@/components/community/CommunityLeaderboard';
+import { DirectMessaging } from '@/components/DirectMessaging';
 import { ContactChat } from '@/components/ContactChat';
 import { AdminSetup } from '@/components/AdminSetup';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -310,6 +311,7 @@ const Community = () => {
       </div>
 
       <AdminSetup />
+      <DirectMessaging />
       <Footer />
     </div>
   );
