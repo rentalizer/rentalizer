@@ -102,7 +102,7 @@ export const GroupDiscussions = () => {
     return getInitials(name);
   };
 
-  // Fetch discussions from database
+  // Fetch discussions from database with mock data added
   const fetchDiscussions = async () => {
     try {
       const { data, error } = await supabase
@@ -127,8 +127,41 @@ export const GroupDiscussions = () => {
         isLiked: false,
         attachments: undefined
       })) || [];
+
+      // Add mock discussions based on actual Skool posts
+      const mockDiscussions: Discussion[] = [
+        {
+          id: 'mock-1',
+          title: 'Acquisitions',
+          content: "Getting several yes's but with the requirement of not posting on Airbnb, VRBO etc. has anyone had success navigating around this issue, or should we just move on from these properties?",
+          author: 'Nick Klimek',
+          avatar: 'NK',
+          category: 'General',
+          likes: 0,
+          comments: 1,
+          timeAgo: '4h ago',
+          isPinned: false,
+          isLiked: false,
+          attachments: undefined
+        },
+        {
+          id: 'mock-2',
+          title: 'Introduction',
+          content: "Hi everyone! I'm Vinod Kumar, and I'm excited to be part of this group. I live in Maryland and joined yesterday. I'm currently working in healthcare administration at Johns Hopkins Health Plan. Looking forward to learning and connecting with everyone!",
+          author: 'Vinod Kumar',
+          avatar: 'VK',
+          category: 'Network Here',
+          likes: 4,
+          comments: 5,
+          timeAgo: '16d ago',
+          isPinned: false,
+          isLiked: false,
+          attachments: undefined
+        }
+      ];
       
-      setDiscussionsList(formattedDiscussions);
+      // Combine mock discussions with real ones, putting mock at the top
+      setDiscussionsList([...mockDiscussions, ...formattedDiscussions]);
     } catch (error) {
       console.error('Error fetching discussions:', error);
     }
