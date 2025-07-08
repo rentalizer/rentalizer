@@ -56,7 +56,7 @@ export const AnimatedBannerDraft = () => {
             </div>
             <div className="relative">
               <h1 className="text-7xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                RENTALIZER
+                Rentalizer
               </h1>
               {/* Animated underline */}
               <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-purple-400 transform scale-x-0 animate-pulse origin-left"></div>

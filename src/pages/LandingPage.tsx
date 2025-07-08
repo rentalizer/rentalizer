@@ -47,10 +47,10 @@ const LandingPage = () => {
 
   // Static text content from the actual landing page
   const texts = {
-    mainTitle: 'RENTALIZER',
+    mainTitle: 'Rentalizer',
     byLine: '',
     tagline: 'All-In-One Platform To Launch, Automate, & Scale Rental Income—Powered By AI',
-    description: 'RENTALIZER Combines AI Powered Market Analysis, Deal Sourcing, Property Management Software, And Automation Tools With A Built-In CRM And Thriving Community—Everything You Need To Launch, Automate, And Scale Rental Arbitrage Income',
+    description: 'Rentalizer combines AI powered market analysis, deal sourcing, property management software, and automation tools with a built-in CRM and thriving community—everything you need to launch, automate, and scale rental arbitrage income',
     buttonText: 'Book Demo',
     feature1Title: 'Market Intelligence',
     feature1Description: 'The First-Of-Its-Kind AI Tool To Find The Best Rental Arbitrage Markets',
@@ -306,7 +306,7 @@ const LandingPage = () => {
           <div className="max-w-7xl mx-auto mb-20">
             <div className="text-center mb-12">
               <div className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
-                Some Recent Users Who've Unlocked Rental Income With RENTALIZER
+                Some Recent Users Who've Unlocked Rental Income With Rentalizer
               </div>
             </div>
 

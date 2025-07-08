@@ -133,7 +133,7 @@ const Demo = () => {
             <div className="flex items-center justify-center gap-4 mb-6">
               <BarChart3 className="h-12 w-12 text-cyan-400" />
               <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                RENTALIZER DEMO
+                Rentalizer Demo
               </h1>
             </div>
             <p className="text-lg text-cyan-300/80 font-medium mb-8">By Richie Matthews</p>
