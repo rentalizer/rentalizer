@@ -177,10 +177,6 @@ const TestCommunity = () => {
               Test Training & Community Hub
             </h1>
           </div>
-          <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg p-4 mb-6 max-w-md mx-auto">
-            <p className="text-orange-300 font-medium">🧪 Test Environment</p>
-            <p className="text-orange-200 text-sm">This is a duplicate of the community page for testing purposes</p>
-          </div>
         </div>
 
         {/* Admin Quick Links */}
