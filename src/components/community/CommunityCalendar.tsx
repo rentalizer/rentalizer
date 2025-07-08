@@ -819,6 +819,16 @@ export const CommunityCalendar = () => {
                    />
                  </div>
 
+                 {/* Recurring Event */}
+                 <div className="flex items-center space-x-2">
+                   <Checkbox 
+                     id="edit-recurring"
+                     checked={newEvent.isRecurring}
+                     onCheckedChange={(checked) => setNewEvent({...newEvent, isRecurring: checked as boolean})}
+                   />
+                   <Label htmlFor="edit-recurring" className="text-white">Recurring event (creates 12 weekly events)</Label>
+                 </div>
+
                  {/* Remind members */}
                  <div className="flex items-center space-x-2">
                    <Checkbox 
