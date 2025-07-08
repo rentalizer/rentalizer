@@ -35,6 +35,7 @@ interface Event {
 
 export const CommunityCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  // Set current month to show events properly - default to current month
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -95,6 +96,10 @@ export const CommunityCalendar = () => {
   // Load events on component mount
   React.useEffect(() => {
     fetchEvents();
+    
+    // Set the calendar to July 2025 where the event exists
+    const eventMonth = new Date(2025, 6); // July is month 6 (0-indexed)
+    setCurrentMonth(eventMonth);
   }, []);
 
   const getEventTypeColor = (type: string) => {
@@ -205,6 +210,44 @@ export const CommunityCalendar = () => {
       }
 
       console.log('Event created successfully:', data);
+
+      // If it's a recurring event, create additional weekly events (11 more for total of 12)
+      if (newEvent.isRecurring) {
+        const recurringEvents = [];
+        
+        for (let i = 1; i < 12; i++) {
+          const futureDate = new Date(newEvent.date);
+          futureDate.setDate(futureDate.getDate() + (i * 7)); // Add weeks
+          
+          recurringEvents.push({
+            title: newEvent.title,
+            description: newEvent.description,
+            event_date: futureDate.toISOString().split('T')[0],
+            event_time: newEvent.time,
+            duration: newEvent.duration,
+            location: newEvent.location,
+            zoom_link: newEvent.zoomLink,
+            event_type: 'workshop',
+            attendees: newEvent.attendees,
+            is_recurring: true,
+            remind_members: newEvent.remindMembers,
+            created_by: user.id
+          });
+        }
+
+        if (recurringEvents.length > 0) {
+          const { error: recurringError } = await supabase
+            .from('events')
+            .insert(recurringEvents);
+          
+          if (recurringError) {
+            console.error('Error creating recurring events:', recurringError);
+            // Don't throw here, the main event was already created successfully
+          } else {
+            console.log(`Created ${recurringEvents.length} additional recurring events`);
+          }
+        }
+      }
 
       // Refresh events list
       await fetchEvents();

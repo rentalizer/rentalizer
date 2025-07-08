@@ -56,11 +56,22 @@ export interface CalculatorData {
 }
 
 const Community = () => {
-  const [activeTab, setActiveTab] = useState('discussions');
+  // Get initial tab from URL hash or default to discussions
+  const getInitialTab = () => {
+    const hash = window.location.hash.substring(1);
+    return hash || 'discussions';
+  };
+  
+  const [activeTab, setActiveTab] = useState(getInitialTab());
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const { toast } = useToast();
   const { isAdmin } = useAdminRole();
   const navigate = useNavigate();
+  
+  // Update URL hash when tab changes
+  useEffect(() => {
+    window.location.hash = activeTab;
+  }, [activeTab]);
   
   // Calculator state
   const initialData: CalculatorData = {
