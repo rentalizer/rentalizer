@@ -291,17 +291,6 @@ const Calculator = () => {
         <div className="flex-1 relative">
           {/* Header Section - Clear and visible */}
           <div className="container mx-auto px-4 py-8">
-            <div className="flex items-center justify-between gap-4 mb-8">
-              <Button
-                variant="ghost"
-                onClick={() => navigate('/')}
-                className="text-gray-400 hover:text-gray-300"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Home
-              </Button>
-            </div>
-
             <div className="text-center mb-6 bg-transparent rounded-lg p-8">
               <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
                 <CalculatorIcon className="h-10 w-10 text-cyan-400" />
@@ -626,18 +615,6 @@ const AuthenticatedCalculator = () => {
       
       <div className="flex-1">
         <div className="container mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="flex items-center justify-between gap-4 mb-8">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="text-gray-400 hover:text-gray-300"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
-          </div>
-
           <div className="text-center mb-6 bg-slate-700/90 backdrop-blur-lg rounded-lg p-8 border border-gray-500/50">
             <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
               <CalculatorIcon className="h-10 w-10 text-cyan-400" />
