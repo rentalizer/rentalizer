@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Upload, FileText, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Upload, FileText, Trash2, CheckCircle, AlertCircle, File, FolderOpen } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -32,6 +33,8 @@ export const RichieAdminPanel = () => {
     textContent: '',
     url: ''
   });
+  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  const [dragActive, setDragActive] = useState(false);
 
   const docTypes = [
     { value: 'pdf', label: 'PDF Guide' },
@@ -58,6 +61,122 @@ export const RichieAdminPanel = () => {
         description: "Failed to load documents",
         variant: "destructive"
       });
+    }
+  };
+
+  // File upload handlers
+  const handleDrag = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      setSelectedFiles(e.dataTransfer.files);
+    }
+  }, []);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFiles(e.target.files);
+    }
+  };
+
+  const uploadFiles = async () => {
+    if (!selectedFiles || selectedFiles.length === 0) {
+      toast({
+        title: "No Files Selected",
+        description: "Please select files to upload",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        const fileName = file.name;
+        const fileExtension = fileName.toLowerCase().split('.').pop();
+
+        // Check file type
+        if (!['pdf', 'txt', 'md'].includes(fileExtension || '')) {
+          toast({
+            title: "Unsupported File Type",
+            description: `${fileName}: Only PDF, TXT, and MD files are supported`,
+            variant: "destructive"
+          });
+          continue;
+        }
+
+        // Upload file to storage
+        const filePath = `uploads/${Date.now()}-${fileName}`;
+        const { error: uploadError } = await supabase.storage
+          .from('course-materials')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          toast({
+            title: "Upload Failed",
+            description: `Failed to upload ${fileName}: ${uploadError.message}`,
+            variant: "destructive"
+          });
+          continue;
+        }
+
+        // Process the file
+        const { data, error } = await supabase.functions.invoke('process-course-file', {
+          body: {
+            fileName,
+            filePath,
+            docType: uploadForm.docType,
+            title: uploadForm.title || fileName.replace(/\.[^/.]+$/, "")
+          }
+        });
+
+        if (error) {
+          toast({
+            title: "Processing Failed",
+            description: `Failed to process ${fileName}: ${error.message}`,
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Success",
+            description: data.message || `Successfully processed ${fileName}`
+          });
+        }
+      }
+
+      // Reset form and reload documents
+      setSelectedFiles(null);
+      setUploadForm({
+        title: '',
+        docType: 'pdf',
+        textContent: '',
+        url: ''
+      });
+      loadDocuments();
+
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      toast({
+        title: "Upload Failed",
+        description: error.message || "Failed to process files",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -164,84 +283,211 @@ export const RichieAdminPanel = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-slate-800/50 border-cyan-500/20">
-        <CardHeader>
-          <CardTitle className="text-cyan-300 flex items-center gap-2">
-            <Upload className="h-5 w-5" />
-            Upload Knowledge Base Content
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm text-gray-300 mb-2 block">Document Title</label>
-              <Input
-                value={uploadForm.title}
-                onChange={(e) => setUploadForm(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="e.g., Houston Market Guide"
-                className="bg-slate-700 border-slate-600 text-white"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-gray-300 mb-2 block">Document Type</label>
-              <Select 
-                value={uploadForm.docType} 
-                onValueChange={(value) => setUploadForm(prev => ({ ...prev, docType: value }))}
+      <Tabs defaultValue="files" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 bg-slate-800/50 border border-cyan-500/20">
+          <TabsTrigger value="files" className="data-[state=active]:bg-cyan-600/20">
+            <File className="h-4 w-4 mr-2" />
+            Upload Files
+          </TabsTrigger>
+          <TabsTrigger value="text" className="data-[state=active]:bg-cyan-600/20">
+            <FileText className="h-4 w-4 mr-2" />
+            Paste Text
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="files">
+          <Card className="bg-slate-800/50 border-cyan-500/20">
+            <CardHeader>
+              <CardTitle className="text-cyan-300 flex items-center gap-2">
+                <FolderOpen className="h-5 w-5" />
+                Upload Course Materials
+              </CardTitle>
+              <p className="text-gray-400 text-sm">
+                Upload PDFs, text files, or transcripts. Files will be automatically processed and embedded.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* File Upload Area */}
+              <div
+                className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                  dragActive 
+                    ? 'border-cyan-400 bg-cyan-400/10' 
+                    : 'border-slate-600 hover:border-cyan-500'
+                }`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
               >
-                <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {docTypes.map(type => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
+                <input
+                  type="file"
+                  multiple
+                  accept=".pdf,.txt,.md"
+                  onChange={handleFileSelect}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <FolderOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-300 mb-2">
+                  Drag and drop files here, or click to select
+                </p>
+                <p className="text-gray-500 text-sm">
+                  Supports PDF, TXT, and MD files
+                </p>
+              </div>
+
+              {/* Selected Files */}
+              {selectedFiles && (
+                <div className="space-y-2">
+                  <h4 className="text-white font-medium">Selected Files:</h4>
+                  {Array.from(selectedFiles).map((file, index) => (
+                    <div key={index} className="flex items-center gap-2 p-2 bg-slate-700/50 rounded">
+                      <File className="h-4 w-4 text-cyan-400" />
+                      <span className="text-gray-300">{file.name}</span>
+                      <span className="text-gray-500 text-sm">
+                        ({(file.size / 1024).toFixed(1)} KB)
+                      </span>
+                    </div>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+                </div>
+              )}
 
-          <div>
-            <label className="text-sm text-gray-300 mb-2 block">URL (Optional)</label>
-            <Input
-              value={uploadForm.url}
-              onChange={(e) => setUploadForm(prev => ({ ...prev, url: e.target.value }))}
-              placeholder="https://example.com/document.pdf"
-              className="bg-slate-700 border-slate-600 text-white"
-            />
-          </div>
+              {/* Upload Settings */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-gray-300 mb-2 block">Default Title Prefix (Optional)</label>
+                  <Input
+                    value={uploadForm.title}
+                    onChange={(e) => setUploadForm(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="e.g., Course Module"
+                    className="bg-slate-700 border-slate-600 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-300 mb-2 block">Document Type</label>
+                  <Select 
+                    value={uploadForm.docType} 
+                    onValueChange={(value) => setUploadForm(prev => ({ ...prev, docType: value }))}
+                  >
+                    <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {docTypes.map(type => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-          <div>
-            <label className="text-sm text-gray-300 mb-2 block">Content</label>
-            <Textarea
-              value={uploadForm.textContent}
-              onChange={(e) => setUploadForm(prev => ({ ...prev, textContent: e.target.value }))}
-              placeholder="Paste the full text content here..."
-              className="bg-slate-700 border-slate-600 text-white min-h-[200px]"
-            />
-          </div>
+              <Button
+                onClick={uploadFiles}
+                disabled={isUploading || !selectedFiles || selectedFiles.length === 0}
+                className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500"
+              >
+                {isUploading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Processing Files...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload & Process Files ({selectedFiles?.length || 0})
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          <Button
-            onClick={uploadDocument}
-            disabled={isUploading || !uploadForm.title.trim() || !uploadForm.textContent.trim()}
-            className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500"
-          >
-            {isUploading ? (
-              <>
-                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                Processing...
-              </>
-            ) : (
-              <>
-                <Upload className="h-4 w-4 mr-2" />
-                Upload & Embed
-              </>
-            )}
-          </Button>
-        </CardContent>
-      </Card>
+        <TabsContent value="text">
+          <Card className="bg-slate-800/50 border-cyan-500/20">
+            <CardHeader>
+              <CardTitle className="text-cyan-300 flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Paste Text Content
+              </CardTitle>
+              <p className="text-gray-400 text-sm">
+                Manually paste text content for processing and embedding.
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-gray-300 mb-2 block">Document Title</label>
+                  <Input
+                    value={uploadForm.title}
+                    onChange={(e) => setUploadForm(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="e.g., Houston Market Guide"
+                    className="bg-slate-700 border-slate-600 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-300 mb-2 block">Document Type</label>
+                  <Select 
+                    value={uploadForm.docType} 
+                    onValueChange={(value) => setUploadForm(prev => ({ ...prev, docType: value }))}
+                  >
+                    <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {docTypes.map(type => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
+              <div>
+                <label className="text-sm text-gray-300 mb-2 block">URL (Optional)</label>
+                <Input
+                  value={uploadForm.url}
+                  onChange={(e) => setUploadForm(prev => ({ ...prev, url: e.target.value }))}
+                  placeholder="https://example.com/document.pdf"
+                  className="bg-slate-700 border-slate-600 text-white"
+                />
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-300 mb-2 block">Content</label>
+                <Textarea
+                  value={uploadForm.textContent}
+                  onChange={(e) => setUploadForm(prev => ({ ...prev, textContent: e.target.value }))}
+                  placeholder="Paste the full text content here..."
+                  className="bg-slate-700 border-slate-600 text-white min-h-[200px]"
+                />
+              </div>
+
+              <Button
+                onClick={uploadDocument}
+                disabled={isUploading || !uploadForm.title.trim() || !uploadForm.textContent.trim()}
+                className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500"
+              >
+                {isUploading ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload & Embed
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Knowledge Base Display */}
       <Card className="bg-slate-800/50 border-cyan-500/20">
         <CardHeader>
           <CardTitle className="text-cyan-300 flex items-center gap-2">
