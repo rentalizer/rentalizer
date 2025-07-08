@@ -13,6 +13,7 @@ import { ProfileSetup } from '@/components/ProfileSetup';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { NewsFeed } from '@/components/community/NewsFeed';
 
 interface Discussion {
   id: string;
@@ -996,6 +997,11 @@ export const GroupDiscussions = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* News Feed */}
+          <div className="max-h-[800px] overflow-y-auto">
+            <NewsFeed />
+          </div>
 
           {/* 30-Day Leaderboard */}
           <Card className="bg-slate-800/50 border-cyan-500/20">
