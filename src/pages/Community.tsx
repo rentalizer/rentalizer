@@ -416,4 +416,5 @@ const Community = () => {
   );
 };
 
+// Admin button removed for security
 export default Community;
