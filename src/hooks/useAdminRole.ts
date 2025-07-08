@@ -17,7 +17,7 @@ export const useAdminRole = () => {
       const isLovableDev = hostname.includes('lovable.app') || hostname.includes('localhost') || hostname.includes('127.0.0.1');
       
       if (isLovableDev) {
-        console.log('✅ Development environment detected, granting admin access (no auth required)');
+        console.log('✅ Development environment detected, granting admin access (no auth required)', hostname);
         setIsAdmin(true);
         setLoading(false);
         return;
