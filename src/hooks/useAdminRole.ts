@@ -9,19 +9,20 @@ export const useAdminRole = () => {
 
   useEffect(() => {
     const checkAdminRole = async () => {
-      console.log('🔍 Checking admin role for user:', user?.id, 'email:', user?.email);
-      console.log('🔍 User object:', user);
-      
-      // Check if we're in development environment (Lovable) first - even without authentication
+      // ALWAYS check development environment FIRST - before any user checks
       const hostname = window.location.hostname;
       const isLovableDev = hostname.includes('lovable.app') || hostname.includes('localhost') || hostname.includes('127.0.0.1');
       
+      console.log('🔍 Hostname:', hostname, 'Is Lovable Dev:', isLovableDev);
+      
       if (isLovableDev) {
-        console.log('✅ Development environment detected, granting admin access (no auth required)', hostname);
+        console.log('✅ LOVABLE DEVELOPMENT - GRANTING ADMIN ACCESS');
         setIsAdmin(true);
         setLoading(false);
         return;
       }
+      
+      console.log('🔍 Checking admin role for user:', user?.id, 'email:', user?.email);
       
       if (!user) {
         console.log('❌ No user found, setting isAdmin to false');
