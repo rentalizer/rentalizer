@@ -657,16 +657,16 @@ export const GroupDiscussions = () => {
       {upcomingEvent && (
         <Card className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-blue-500/30">
           <CardContent className="p-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center gap-3">
               <Calendar className="h-5 w-5 text-blue-300" />
-              <div className="flex-1">
+              <div className="text-center">
                 <span className="text-blue-300 font-medium">{upcomingEvent.title}</span>
                 <span className="text-gray-300 ml-2">
                   {upcomingEvent.daysUntil === 0 
-                    ? 'is happening today'
+                    ? 'Is Happening Today'
                     : upcomingEvent.daysUntil === 1
-                    ? 'is happening tomorrow'
-                    : `is happening in ${upcomingEvent.daysUntil} days`
+                    ? 'Is Happening Tomorrow'
+                    : `Is Happening In ${upcomingEvent.daysUntil} Days`
                   }
                 </span>
               </div>
@@ -674,28 +674,6 @@ export const GroupDiscussions = () => {
           </CardContent>
         </Card>
       )}
-
-      {/* Filter Tabs */}
-      <div className="flex items-center justify-center gap-3 overflow-x-auto pb-2">
-        {filters.map((filter) => (
-          <Button
-            key={filter}
-            variant={selectedFilter === filter ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSelectedFilter(filter)}
-            className={
-              selectedFilter === filter
-                ? "bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap"
-                : "border-gray-600 text-gray-300 hover:bg-gray-800 whitespace-nowrap"
-            }
-          >
-            {filter}
-          </Button>
-        ))}
-        <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-300 ml-2">
-          <Filter className="h-4 w-4" />
-        </Button>
-      </div>
 
       {/* Discussion Posts */}
       <div className="space-y-4">
