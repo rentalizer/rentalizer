@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Download } from 'lucide-react';
+import hdLogo from '@/assets/rentalizer-logo-hd.png';
 
 const TestLogo = () => {
   return (
@@ -15,8 +16,8 @@ const TestLogo = () => {
         <CardContent className="text-center space-y-6">
           <div className="bg-slate-900/50 rounded-lg p-8 inline-block">
             <img 
-              src="/lovable-uploads/7bd31141-d3df-4e3e-9f94-29f10eb8c732.png" 
-              alt="Rentalizer Logo" 
+              src={hdLogo} 
+              alt="Rentalizer Logo High Resolution" 
               className="max-w-full h-auto"
               style={{ width: '1460px', height: '752px', objectFit: 'contain' }}
             />
