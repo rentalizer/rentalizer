@@ -532,7 +532,7 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
                           U
                         </div>
                         <div className="bg-slate-800/50 rounded-lg p-3 flex-1">
-                          <p className="text-white text-sm">What are the best markets for rental arbitrage in 2024?</p>
+                          <p className="text-white text-sm">What are the best markets for rental arbitrage in 2025?</p>
                         </div>
                       </div>
                       
@@ -542,7 +542,7 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
                         </div>
                         <div className="bg-cyan-500/20 rounded-lg p-3 flex-1">
                           <p className="text-white text-sm">
-                            Based on current market data, the top rental arbitrage markets for 2024 include Austin TX, Nashville TN, Denver CO, and Miami FL. These markets show strong demand, favorable regulations, and good profit margins. Would you like specific data on any of these markets?
+                            Based on current market data, the top rental arbitrage markets for 2025 include Austin TX, Nashville TN, Denver CO, and Miami FL. These markets show strong demand, favorable regulations, and excellent profit margins. Would you like specific data on any of these markets?
                           </p>
                         </div>
                       </div>
