@@ -91,6 +91,7 @@ export const NewsFeed = () => {
   const fetchNewsItems = async () => {
     try {
       setLoading(true);
+      console.log('🔍 Fetching news items...');
       
       const { data, error } = await supabase
         .from('news_items')
@@ -99,8 +100,14 @@ export const NewsFeed = () => {
         .order('is_pinned', { ascending: false })
         .order('published_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('📰 News items query result:', { data, error });
 
+      if (error) {
+        console.error('❌ Error fetching news items:', error);
+        throw error;
+      }
+
+      console.log(`✅ Successfully fetched ${data?.length || 0} news items`);
       setNewsItems(data || []);
     } catch (error) {
       console.error('Error fetching news items:', error);
