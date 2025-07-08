@@ -32,12 +32,7 @@ const Index = () => {
   const [promoCode, setPromoCode] = useState('');
   const [signupLoading, setSignupLoading] = useState(false);
 
-  // Redirect if already authenticated - go directly to community
-  useEffect(() => {
-    if (user) {
-      navigate('/community');
-    }
-  }, [user, navigate]);
+  // No automatic redirect - let users see the welcome page with TopNavBar
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,6 +114,84 @@ const Index = () => {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
           <div className="text-cyan-300 text-xl">Loading...</div>
         </div>
+      </div>
+    );
+  }
+
+  // If user is logged in, show welcome page with TopNavBar
+  if (user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black">
+        <TopNavBar />
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto text-center space-y-8">
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold text-white">Welcome to Rentalizer!</h1>
+              <p className="text-xl text-gray-300">
+                You're logged in as <span className="text-cyan-400">{user.email}</span>
+              </p>
+              <p className="text-gray-400">
+                Click on your email in the top navigation to complete your profile, or explore the platform below.
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+              <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-colors cursor-pointer"
+                    onClick={() => navigate('/community')}>
+                <CardContent className="p-6 text-center">
+                  <div className="text-2xl mb-2">👥</div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Community</h3>
+                  <p className="text-gray-400 text-sm">Connect with other rental entrepreneurs</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-colors cursor-pointer"
+                    onClick={() => navigate('/markets')}>
+                <CardContent className="p-6 text-center">
+                  <div className="text-2xl mb-2">📊</div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Market Intelligence</h3>
+                  <p className="text-gray-400 text-sm">Analyze rental market data</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-colors cursor-pointer"
+                    onClick={() => navigate('/properties')}>
+                <CardContent className="p-6 text-center">
+                  <div className="text-2xl mb-2">🏢</div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Acquisition CRM</h3>
+                  <p className="text-gray-400 text-sm">Manage property acquisitions</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-colors cursor-pointer"
+                    onClick={() => navigate('/pms')}>
+                <CardContent className="p-6 text-center">
+                  <div className="text-2xl mb-2">🫶</div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Property Management</h3>
+                  <p className="text-gray-400 text-sm">Manage your rental properties</p>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div className="mt-12">
+              <Card className="bg-slate-800/50 border-cyan-500/20">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-semibold text-white mb-4">Complete Your Profile</h3>
+                  <p className="text-gray-400 mb-4">
+                    To get the most out of our community, complete your profile with your name, photo, and bio.
+                  </p>
+                  <Button 
+                    onClick={() => navigate('/profile-setup')}
+                    className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                  >
+                    Complete Profile
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+        <Footer />
       </div>
     );
   }
