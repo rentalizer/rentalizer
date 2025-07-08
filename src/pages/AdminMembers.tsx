@@ -44,42 +44,7 @@ const AdminMembers = () => {
     try {
       setLoading(true);
       
-      // Check if we're in development environment
-      const hostname = window.location.hostname;
-      const isLovableDev = hostname.includes('lovable.app') || hostname.includes('localhost') || hostname.includes('127.0.0.1');
-      
-      if (isLovableDev) {
-        // In development, use a simpler approach that bypasses RLS issues
-        console.log('🔧 Development mode - using alternative data fetching');
-        
-        // Try to get profiles directly (this table has more permissive policies)
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('*');
-        
-        if (profiles && profiles.length > 0) {
-          // Create members data from profiles
-          const membersData: Member[] = profiles.map(profile => ({
-            id: profile.user_id,
-            email: `${profile.display_name || 'user'}@example.com`, // Placeholder for dev
-            created_at: profile.created_at || '',
-            last_sign_in_at: null,
-            email_confirmed_at: profile.created_at || '',
-            display_name: profile.first_name && profile.last_name 
-              ? `${profile.first_name} ${profile.last_name}`
-              : profile.display_name || 'Member',
-            isAdmin: false, // Default for dev
-            profile_complete: profile.profile_complete || false,
-            avatar_url: profile.avatar_url
-          }));
-          
-          setMembers(membersData);
-          setLoading(false);
-          return;
-        }
-      }
-      
-      // Production mode - normal queries
+      // Get user profiles which contain the user IDs and emails we need
       const { data: userProfiles, error: profilesError } = await supabase
         .from('user_profiles')
         .select('*');
