@@ -158,7 +158,7 @@ export const LeadCapture = ({ isOpen, onClose, onSuccess }: LeadCaptureProps) =>
           <div className="text-gray-300 text-sm text-center mt-4 space-y-4">
             <p className="font-medium text-cyan-300">Your on-demand rental arbitrage mentor—powered by AI and trained on over 200 hours of video trainings and coaching calls, plus more than 1,350,000 words of transcripts, guides, checklists, and deal analysis tools.</p>
             
-            <p>It pulls directly from my actual content—not generic internet data—so every answer reflects exactly how I teach, analyze, and execute. Whether you're asking about deal criteria, landlord objections, STR licensing, or next steps after a "yes," Ask Richie gives you clear, tactical responses 24/7—just like I would.</p>
+            <p>It pulls directly from my actual content—not generic internet data—so every answer reflects exactly how I teach, analyze, and execute. Whether you're asking about deal criteria, landlord objections, STR licensing, or next steps after a "yes," Ask Richie gives you clear, tactical responses 24/7—just like I would. - Richie Matthews</p>
           </div>
         </DialogHeader>
         
