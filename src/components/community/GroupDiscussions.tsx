@@ -775,8 +775,24 @@ export const GroupDiscussions = () => {
           <Card key={discussion.id} className="bg-slate-800/50 border-gray-700/50 hover:bg-slate-800/70 transition-colors cursor-pointer">
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
-                {/* User Avatar */}
-                <Avatar className="w-12 h-12 flex-shrink-0">
+                {/* User Avatar - clickable to start DM */}
+                <Avatar 
+                  className="w-12 h-12 flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-cyan-400 transition-all" 
+                  onClick={() => {
+                    if (user && discussion.author !== getUserName()) {
+                      // Find user by author name to get their user_id
+                      // For now, we'll trigger the DM component to open
+                      const dmButton = document.querySelector('[data-dm-trigger]') as HTMLElement;
+                      if (dmButton) dmButton.click();
+                      
+                      toast({
+                        title: "Direct Message",
+                        description: `Click the user icon in the chat to find and message ${discussion.author}`,
+                      });
+                    }
+                  }}
+                  title={discussion.author !== getUserName() ? `Send direct message to ${discussion.author}` : ''}
+                >
                   <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
                     {discussion.avatar}
                   </AvatarFallback>

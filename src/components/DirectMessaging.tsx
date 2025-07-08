@@ -282,6 +282,7 @@ export const DirectMessaging = () => {
       {/* Chat button with notification badge */}
       <div className="fixed bottom-4 right-4 z-50">
         <Button
+          data-dm-trigger
           onClick={() => setIsOpen(!isOpen)}
           className="relative bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 rounded-full w-14 h-14 shadow-lg"
         >
