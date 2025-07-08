@@ -39,7 +39,7 @@ When asked about listing optimization, give specifics like:
 • Exact platforms: Airbnb, VRBO, Booking.com, plus direct booking site
 • Specific design elements: bright lighting, neutral colors, 6+ photos per room
 • Pricing tactics: 20% above comparable hotels, adjust for events, use dynamic pricing tools
-• Operational hacks: keyless entry, noise monitors, local guidebooks
+• Operational hacks: keyless entry, noise monitors, local guidebooks`;
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -73,8 +73,8 @@ serve(async (req) => {
         .from('richie_chat_usage')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
-        .gte('created_at', `${today}T00:00:00.000Z`)
-        .lte('created_at', `${today}T23:59:59.999Z`);
+        .gte('created_at', today + 'T00:00:00.000Z')
+        .lte('created_at', today + 'T23:59:59.999Z');
 
       if (todayUsage && todayUsage >= 25) {
         return new Response(JSON.stringify({ 
@@ -91,7 +91,7 @@ serve(async (req) => {
     const questionEmbeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Authorization': 'Bearer ' + openAIApiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -133,20 +133,20 @@ serve(async (req) => {
     }
 
     const relevantDocs = similarDocs || [];
-    console.log(`Found ${relevantDocs.length} relevant documents`);
+    console.log('Found ' + relevantDocs.length + ' relevant documents');
 
     // Build context from relevant documents
     let context = '';
     const sources = [];
 
     relevantDocs.forEach((doc, index) => {
-      context += `[doc-${index + 1}: ${doc.title}]\n${doc.text_content}\n\n`;
+      context += '[doc-' + (index + 1) + ': ' + doc.title + ']\n' + doc.text_content + '\n\n';
       sources.push({
         id: doc.id,
         title: doc.title,
         docType: doc.doc_type,
         url: doc.url,
-        reference: `doc-${index + 1}`
+        reference: 'doc-' + (index + 1)
       });
     });
 
@@ -155,21 +155,14 @@ serve(async (req) => {
       { role: 'system', content: RICHIE_SYSTEM_PROMPT },
       { 
         role: 'user', 
-        content: `Based on the following context from my training materials, answer this question as Richie Matthews:
-
-CONTEXT:
-${context}
-
-QUESTION: ${question}
-
-Remember to cite sources using the [doc-X: Title] format and follow all the formatting rules.` 
+        content: 'Based on the following context from my training materials, answer this question as Richie Matthews:\n\nCONTEXT:\n' + context + '\n\nQUESTION: ' + question + '\n\nRemember to cite sources using the [doc-X: Title] format and follow all the formatting rules.' 
       }
     ];
 
     const gptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Authorization': 'Bearer ' + openAIApiKey,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -184,7 +177,7 @@ Remember to cite sources using the [doc-X: Title] format and follow all the form
     if (!gptResponse.ok) {
       const errorText = await gptResponse.text();
       console.error('OpenAI API error:', errorText);
-      throw new Error(`OpenAI API failed: ${errorText}`);
+      throw new Error('OpenAI API failed: ' + errorText);
     }
 
     const gptData = await gptResponse.json();
