@@ -55,6 +55,7 @@ export const GroupDiscussions = () => {
   const [editContent, setEditContent] = useState('');
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
+  const [upcomingEvent, setUpcomingEvent] = useState<{title: string; daysUntil: number} | null>(null);
   
   // Real community stats
   const [communityStats, setCommunityStats] = useState({
@@ -153,7 +154,37 @@ export const GroupDiscussions = () => {
     }
     
     fetchDiscussions();
+    fetchUpcomingEvents();
   }, []);
+
+  // Fetch upcoming events from calendar
+  const fetchUpcomingEvents = async () => {
+    try {
+      const today = new Date();
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .gte('event_date', today.toISOString().split('T')[0])
+        .order('event_date', { ascending: true })
+        .limit(1);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const event = data[0];
+        const eventDate = new Date(event.event_date);
+        const timeDiff = eventDate.getTime() - today.getTime();
+        const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        
+        setUpcomingEvent({
+          title: event.title,
+          daysUntil: daysDiff
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching upcoming events:', error);
+    }
+  };
 
   // Fetch real community stats
   useEffect(() => {
@@ -606,17 +637,26 @@ export const GroupDiscussions = () => {
       </Card>
 
       {/* Upcoming Events Banner */}
-      <Card className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-blue-500/30">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <Calendar className="h-5 w-5 text-blue-300" />
-            <div className="flex-1">
-              <span className="text-blue-300 font-medium">Property Acquisitions</span>
-              <span className="text-gray-300 ml-2">is happening in 8 days</span>
+      {upcomingEvent && (
+        <Card className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-blue-500/30">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <Calendar className="h-5 w-5 text-blue-300" />
+              <div className="flex-1">
+                <span className="text-blue-300 font-medium">{upcomingEvent.title}</span>
+                <span className="text-gray-300 ml-2">
+                  {upcomingEvent.daysUntil === 0 
+                    ? 'is happening today'
+                    : upcomingEvent.daysUntil === 1
+                    ? 'is happening tomorrow'
+                    : `is happening in ${upcomingEvent.daysUntil} days`
+                  }
+                </span>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Filter Tabs */}
       <div className="flex items-center justify-center gap-3 overflow-x-auto pb-2">
