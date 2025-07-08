@@ -249,12 +249,6 @@ const TestCommunity = () => {
 
           <TabsContent value="calculator" className="mt-8">
             <div className="space-y-6">
-              <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold text-cyan-300 mb-4 flex items-center justify-center gap-3">
-                  <Calculator className="h-8 w-8 text-cyan-400" />
-                  Rental Calculator
-                </h2>
-              </div>
               
               {/* Action buttons */}
               <div className="flex items-center justify-center gap-4">
