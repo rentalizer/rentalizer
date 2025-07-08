@@ -140,7 +140,18 @@ const ProfileSetup = () => {
   };
 
   const saveProfile = async () => {
-    if (!user) return;
+    if (!user) {
+      console.error('❌ No user found when trying to save profile');
+      toast({
+        title: "Authentication Error",
+        description: "Please sign in again to save your profile",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log('🔍 Attempting to save profile for user:', user.id);
+    console.log('📊 Current auth state:', { user: !!user, userId: user.id });
 
     if (!firstName.trim() || !lastName.trim() || !avatarUrl) {
       toast({
@@ -153,6 +164,16 @@ const ProfileSetup = () => {
 
     try {
       setSaving(true);
+      
+      console.log('💾 Saving profile data:', {
+        user_id: user.id,
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        bio: bio.trim(),
+        avatar_url: avatarUrl,
+        display_name: `${firstName.trim()} ${lastName.trim()}`,
+        profile_complete: true
+      });
 
       const { error } = await supabase
         .from('profiles')
@@ -169,15 +190,17 @@ const ProfileSetup = () => {
         });
 
       if (error) {
-        console.error('Error saving profile:', error);
+        console.error('❌ Supabase error saving profile:', error);
+        console.error('❌ Error details:', JSON.stringify(error, null, 2));
         toast({
-          title: "Error",
+          title: "Database Error",
           description: `Failed to save profile: ${error.message}`,
           variant: "destructive",
         });
         return;
       }
 
+      console.log('✅ Profile saved successfully!');
       toast({
         title: "Profile saved",
         description: firstName || lastName ? "Your profile has been successfully updated" : "Your profile has been successfully created",
@@ -185,7 +208,7 @@ const ProfileSetup = () => {
 
       navigate('/community');
     } catch (error) {
-      console.error('Error saving profile:', error);
+      console.error('💥 Exception saving profile:', error);
       toast({
         title: "Error",
         description: "Failed to save profile",
