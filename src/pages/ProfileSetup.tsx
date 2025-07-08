@@ -47,8 +47,16 @@ const ProfileSetup = () => {
       }
 
       if (data) {
-        setFirstName(data.first_name || '');
-        setLastName(data.last_name || '');
+        // If detailed profile exists, use it
+        if (data.first_name || data.last_name) {
+          setFirstName(data.first_name || '');
+          setLastName(data.last_name || '');
+        } else if (data.display_name) {
+          // If only display_name exists, try to split it into first/last
+          const nameParts = data.display_name.split(' ');
+          setFirstName(nameParts[0] || '');
+          setLastName(nameParts.slice(1).join(' ') || '');
+        }
         setBio(data.bio || '');
         setAvatarUrl(data.avatar_url || '');
         setProfileComplete(data.profile_complete || false);
