@@ -271,11 +271,6 @@ export const Auth = () => {
             </Button>
           </form>
           
-          <div className="mt-6 text-center space-y-2">
-            <p className="text-xs text-gray-400">
-              After signing up, complete your profile in the Community section to access all features.
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>
