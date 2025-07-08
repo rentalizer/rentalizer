@@ -309,15 +309,19 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
                     <div className="space-y-4">
                       <div>
                         <label className="text-white text-sm mb-2 block">Monthly Rent</label>
-                        <Input placeholder="$2,500" className="bg-slate-800 border-slate-600 text-white" />
+                        <Input placeholder="$2,500" className="bg-slate-800 border-slate-600 text-white text-sm" />
                       </div>
                       <div>
                         <label className="text-white text-sm mb-2 block">Estimated Income</label>
-                        <Input placeholder="$4,200" className="bg-slate-800 border-slate-600 text-white" />
+                        <Input placeholder="$4,200" className="bg-slate-800 border-slate-600 text-white text-sm" />
                       </div>
                       <div>
                         <label className="text-white text-sm mb-2 block">Monthly Expenses</label>
-                        <Input placeholder="$800" className="bg-slate-800 border-slate-600 text-white" />
+                        <Input placeholder="$800" className="bg-slate-800 border-slate-600 text-white text-sm" />
+                      </div>
+                      <div>
+                        <label className="text-white text-sm mb-2 block">Furnishing Costs</label>
+                        <Input placeholder="$5,678" className="bg-slate-800 border-slate-600 text-white text-sm" />
                       </div>
                     </div>
                     <div className="space-y-4">
@@ -332,6 +336,10 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
                       <div className="p-4 bg-slate-800/50 rounded-lg">
                         <div className="text-white text-sm mb-1">Break-even Time</div>
                         <div className="text-2xl font-bold text-purple-400">2.8 months</div>
+                      </div>
+                      <div className="p-4 bg-slate-800/50 rounded-lg">
+                        <div className="text-white text-sm mb-1">Cash on Cash Return</div>
+                        <div className="text-2xl font-bold text-blue-400">42%</div>
                       </div>
                     </div>
                   </div>
