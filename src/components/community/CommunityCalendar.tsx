@@ -366,6 +366,39 @@ export const CommunityCalendar = () => {
     }
   };
 
+  const handleDeleteEvent = async () => {
+    if (!selectedEvent || !user) return;
+    
+    // Confirm deletion
+    const confirmDelete = window.confirm(`Are you sure you want to delete "${selectedEvent.title}"? This action cannot be undone.`);
+    if (!confirmDelete) return;
+    
+    try {
+      console.log('Deleting event:', selectedEvent.id);
+      
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', selectedEvent.id);
+
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
+
+      console.log('Event deleted successfully');
+      
+      // Refresh events list
+      await fetchEvents();
+      setIsEditEventOpen(false);
+      setIsEventDetailsOpen(false);
+      
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      alert(`Failed to delete event: ${error.message || 'Unknown error'}`);
+    }
+  };
+
   const openEditDialog = (event: Event) => {
     setSelectedEvent(event);
     setNewEvent({
@@ -939,21 +972,31 @@ export const CommunityCalendar = () => {
                  </div>
 
                  {/* Action Buttons */}
-                 <div className="flex justify-end gap-3 pt-4">
+                 <div className="flex justify-between gap-3 pt-4">
                    <Button 
-                     variant="ghost" 
-                     onClick={() => setIsEditEventOpen(false)}
-                     className="text-gray-400 hover:text-white"
+                     variant="destructive" 
+                     onClick={handleDeleteEvent}
+                     className="bg-red-600 hover:bg-red-700 text-white"
                    >
-                     CANCEL
+                     DELETE
                    </Button>
-                   <Button 
-                     onClick={handleEditEvent}
-                     disabled={!newEvent.title || !newEvent.time}
-                     className="bg-purple-600 hover:bg-purple-700 text-white"
-                   >
-                     UPDATE
-                   </Button>
+                   
+                   <div className="flex gap-3">
+                     <Button 
+                       variant="ghost" 
+                       onClick={() => setIsEditEventOpen(false)}
+                       className="text-gray-400 hover:text-white"
+                     >
+                       CANCEL
+                     </Button>
+                     <Button 
+                       onClick={handleEditEvent}
+                       disabled={!newEvent.title || !newEvent.time}
+                       className="bg-purple-600 hover:bg-purple-700 text-white"
+                     >
+                       UPDATE
+                     </Button>
+                   </div>
                  </div>
                </div>
              </DialogContent>
