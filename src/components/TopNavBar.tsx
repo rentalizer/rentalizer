@@ -96,9 +96,8 @@ export const TopNavBar = () => {
             <div className="flex items-center gap-4">
               <button 
                 className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20 hover:bg-gray-800/50 transition-colors cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
+                onClick={() => {
+                  alert('Profile button clicked! Navigating to profile setup...');
                   console.log('🔧 Profile button clicked!');
                   navigate('/profile-setup');
                 }}
