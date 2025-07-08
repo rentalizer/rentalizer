@@ -276,13 +276,18 @@ const Calculator = () => {
     );
   }
 
+  // In development mode, always show calculator directly
+  if (isDevelopment()) {
+    return <AuthenticatedCalculator />;
+  }
+
   // Show calculator if user is authenticated  
   if (user) {
     return <AuthenticatedCalculator />;
   }
 
   // Show login gate if not authenticated and not in development
-  if (!user && !isDevelopment()) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
         <TopNavBar />
