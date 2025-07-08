@@ -24,10 +24,11 @@ serve(async (req) => {
       throw new Error('ElevenLabs API key not configured');
     }
 
-    console.log('Generating speech for text:', text.substring(0, 50) + '...');
+    console.log('🎵 Generating speech for text:', text.substring(0, 50) + '...');
 
     // Use a high-quality voice (Aria is very natural)
     const voiceId = voice || '9BWtsMINqrJLrRacOk9x'; // Aria voice
+    console.log('🔊 Using voice ID:', voiceId);
 
     // Generate speech using ElevenLabs
     const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
@@ -49,19 +50,24 @@ serve(async (req) => {
       }),
     });
 
+    console.log('📨 ElevenLabs response status:', response.status);
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('ElevenLabs API error:', errorText);
-      throw new Error(`ElevenLabs API error: ${errorText}`);
+      console.error('❌ ElevenLabs API error:', response.status, errorText);
+      throw new Error(`ElevenLabs API error: ${response.status} - ${errorText}`);
     }
 
     // Convert audio buffer to base64
     const arrayBuffer = await response.arrayBuffer();
+    console.log('📊 Audio buffer size:', arrayBuffer.byteLength, 'bytes');
+    
     const base64Audio = btoa(
       String.fromCharCode(...new Uint8Array(arrayBuffer))
     );
+    console.log('✅ Base64 conversion complete, length:', base64Audio.length);
 
-    console.log('Speech generated successfully');
+    console.log('🎵 Speech generated successfully');
 
     return new Response(
       JSON.stringify({ audioContent: base64Audio }),
