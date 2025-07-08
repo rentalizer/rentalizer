@@ -217,7 +217,7 @@ export default function AcquisitionsAgent() {
   );
 
   return (
-    <AccessGate title="Acquisition CRM" subtitle="Access your account">
+    <AccessGate title="Acquisition CRM" subtitle="Access your account to continue">
       <PropertiesContent />
     </AccessGate>
   );
