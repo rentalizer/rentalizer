@@ -140,8 +140,7 @@ export const Auth = () => {
           <form onSubmit={handleSignup} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label htmlFor="first-name" className="text-gray-300 flex items-center gap-2">
-                  <User className="h-4 w-4" />
+                <Label htmlFor="first-name" className="text-gray-300">
                   First Name
                 </Label>
                 <Input
