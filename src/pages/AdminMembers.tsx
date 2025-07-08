@@ -44,58 +44,25 @@ const AdminMembers = () => {
     try {
       setLoading(true);
       
-      // Check if we're in development environment
-      const hostname = window.location.hostname;
-      const isLovableDev = hostname.includes('lovable.app') || hostname.includes('localhost') || hostname.includes('127.0.0.1');
-      
-      // In development, use a different approach to bypass RLS issues
-      let userProfiles, profiles, userRoles;
-      
-      if (isLovableDev) {
-        // Try to fetch data, but handle RLS errors gracefully
-        try {
-          const profilesResult = await supabase.from('profiles').select('*');
-          profiles = profilesResult.data;
-          
-          // Create user profiles from profiles data for development
-          userProfiles = profiles?.map(profile => ({
-            id: profile.user_id,
-            email: profile.user_id + '@example.com', // Placeholder
-            created_at: profile.created_at,
-            subscription_status: 'trial'
-          }));
-          
-          const rolesResult = await supabase.from('user_roles').select('*');
-          userRoles = rolesResult.data;
-        } catch (devError) {
-          console.error('Development mode - some data unavailable due to RLS:', devError);
-          // Show sample data for development
-          userProfiles = [];
-          profiles = [];
-          userRoles = [];
-        }
-      } else {
-        // Production mode - normal queries
-        const { data: userProfilesData, error: profilesError } = await supabase
-          .from('user_profiles')
-          .select('*');
+      // Get user profiles which contain the user IDs and emails we need
+      const { data: userProfiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('*');
 
-        if (profilesError) {
-          console.error('Error fetching user profiles:', profilesError);
-          return;
-        }
-        userProfiles = userProfilesData;
-
-        const { data: profilesData } = await supabase
-          .from('profiles')
-          .select('user_id, display_name, first_name, last_name, avatar_url, profile_complete');
-        profiles = profilesData;
-
-        const { data: userRolesData } = await supabase
-          .from('user_roles')
-          .select('user_id, role');
-        userRoles = userRolesData;
+      if (profilesError) {
+        console.error('Error fetching user profiles:', profilesError);
+        return;
       }
+
+      // Get display names from profiles table  
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, display_name, first_name, last_name, avatar_url, profile_complete');
+
+      // Get user roles
+      const { data: userRoles } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
 
       // Combine the data and sort by creation date (newest first)
       const membersData: Member[] = userProfiles?.map(userProfile => {
@@ -110,7 +77,7 @@ const AdminMembers = () => {
           id: userProfile.id,
           email: userProfile.email,
           created_at: userProfile.created_at || '',
-          last_sign_in_at: null, // We'll need to get this from auth.users if needed
+          last_sign_in_at: null,
           email_confirmed_at: userProfile.created_at || '',
           display_name: displayName,
           isAdmin: !!adminRole,
