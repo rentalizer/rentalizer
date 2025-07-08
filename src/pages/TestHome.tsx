@@ -15,6 +15,7 @@ import { CommunityCalendar } from '@/components/community/CommunityCalendar';
 import { MessageThreads } from '@/components/community/MessageThreads';
 import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
 import { AskRichieChat } from '@/components/AskRichieChat';
+import { TrainingHubDemo } from '@/components/TrainingHubDemo';
 
 const TestHome = () => {
   const [activeDemo, setActiveDemo] = useState<string | null>(null);
@@ -403,109 +404,10 @@ const TestHome = () => {
             )}
             
             {activeDemo === 'community' && (
-              <div className="space-y-6">
-                {/* Community Header */}
-                <div className="text-center mb-8">
-                  <div className="flex items-center justify-center gap-3 mb-4">
-                    <Users className="h-8 w-8 text-cyan-400" />
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                      Training & Community Hub
-                    </h1>
-                  </div>
-                </div>
-
-                {/* Navigation Tabs */}
-                <Tabs defaultValue="discussions" className="w-full">
-                  <TabsList className="flex w-full bg-slate-800/50 border border-cyan-500/20 justify-evenly h-14 p-2">
-                    <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-                      <Users className="h-4 w-4 mr-2" />
-                      Discussions
-                    </TabsTrigger>
-                    <TabsTrigger value="calendar" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Calendar
-                    </TabsTrigger>
-                    <TabsTrigger value="training" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-                      <Video className="h-4 w-4 mr-2" />
-                      Training
-                    </TabsTrigger>
-                    <TabsTrigger value="chat" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      Chat
-                    </TabsTrigger>
-                    <TabsTrigger value="calculator" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-                      <Calculator className="h-4 w-4 mr-2" />
-                      Calculator
-                    </TabsTrigger>
-                    <TabsTrigger value="docs" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Business Docs
-                    </TabsTrigger>
-                    <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-                      <Bot className="h-4 w-4 mr-2" />
-                      Ask Richie
-                    </TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="discussions" className="mt-6">
-                    <GroupDiscussions />
-                  </TabsContent>
-                  
-                  <TabsContent value="calendar" className="mt-6">
-                    <CommunityCalendar />
-                  </TabsContent>
-
-                  <TabsContent value="training" className="mt-6">
-                    <VideoLibrary />
-                  </TabsContent>
-
-                  <TabsContent value="chat" className="mt-6">
-                    <MessageThreads />
-                  </TabsContent>
-
-                  <TabsContent value="calculator" className="mt-6">
-                    <Card className="bg-slate-800/50 border-cyan-500/20">
-                      <CardContent className="p-8 text-center">
-                        <Calculator className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
-                        <h3 className="text-2xl font-bold text-white mb-4">Rental Calculator</h3>
-                        <p className="text-gray-300 mb-6">
-                          Calculate profitability, ROI, and cash flow for your rental arbitrage deals.
-                        </p>
-                        <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-                          Open Calculator
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-
-                  <TabsContent value="docs" className="mt-6">
-                    <DocumentsLibrary />
-                  </TabsContent>
-
-                  <TabsContent value="askrichie" className="mt-6">
-                    <Card className="bg-slate-800/50 border-cyan-500/20">
-                      <CardContent className="p-8 text-center">
-                        <Bot className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
-                        <h3 className="text-2xl font-bold text-white mb-4">Ask Richie AI</h3>
-                        <p className="text-gray-300 mb-6">
-                          Get instant answers to your rental investment questions from our AI assistant.
-                        </p>
-                        <div className="space-y-4">
-                          <div className="text-left bg-slate-700/50 rounded-lg p-4">
-                            <p className="text-sm text-gray-400 mb-2">Coming Soon:</p>
-                            <ul className="text-cyan-300 space-y-1 text-sm">
-                              <li>• Market analysis insights</li>
-                              <li>• Investment strategy recommendations</li>
-                              <li>• Property evaluation assistance</li>
-                              <li>• Real-time Q&A support</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-                </Tabs>
-              </div>
+              <TrainingHubDemo 
+                currentStep={currentStep}
+                isRunning={true}
+              />
             )}
           </div>
         </DialogContent>
