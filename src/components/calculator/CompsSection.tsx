@@ -5,11 +5,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { MapPin, DollarSign, Plus, X } from 'lucide-react';
-import { CalculatorData } from '@/pages/Calculator';
+// Define interface locally for this component to avoid breaking other files
+interface LocalCalculatorData {
+  address: string;
+  bedrooms: number;
+  bathrooms: number;
+  averageComparable: number;
+  hasGym?: boolean;
+  hasHotTub?: boolean;
+}
 
 interface CompsSectionProps {
-  data: CalculatorData;
-  updateData: (updates: Partial<CalculatorData>) => void;
+  data: LocalCalculatorData;
+  updateData: (updates: Partial<LocalCalculatorData>) => void;
 }
 
 export const CompsSection: React.FC<CompsSectionProps> = ({
@@ -92,6 +100,32 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
               placeholder=""
               className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
             />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Gym</Label>
+            <select
+              value={data.hasGym ? 'yes' : 'no'}
+              onChange={(e) => updateData({ hasGym: e.target.value === 'yes' })}
+              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full rounded-md px-3"
+            >
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Hot Tub</Label>
+            <select
+              value={data.hasHotTub ? 'yes' : 'no'}
+              onChange={(e) => updateData({ hasHotTub: e.target.value === 'yes' })}
+              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full rounded-md px-3"
+            >
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
           </div>
         </div>
 

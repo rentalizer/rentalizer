@@ -33,6 +33,8 @@ export interface CalculatorData {
   bedrooms: number;
   bathrooms: number;
   averageComparable: number;
+  hasGym: boolean;
+  hasHotTub: boolean;
   
   // Build Out
   firstMonthRent: number;
@@ -81,6 +83,8 @@ const TestCommunity = () => {
     bedrooms: 0,
     bathrooms: 0,
     averageComparable: 0,
+    hasGym: false,
+    hasHotTub: false,
     firstMonthRent: 0,
     securityDeposit: 0,
     furnishingsCost: 0,
