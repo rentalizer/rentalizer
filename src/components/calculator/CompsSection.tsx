@@ -56,7 +56,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center justify-center gap-2 text-white text-lg text-center">
           <MapPin className="h-5 w-5 text-cyan-400" />
-          Property Comps
+          Property
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
