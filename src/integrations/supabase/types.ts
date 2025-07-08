@@ -321,6 +321,72 @@ export type Database = {
         }
         Relationships: []
       }
+      news_items: {
+        Row: {
+          admin_submitted: boolean
+          click_count: number
+          content: string | null
+          created_at: string
+          engagement_score: number
+          featured_image_url: string | null
+          id: string
+          is_featured: boolean
+          is_pinned: boolean
+          published_at: string
+          source: string
+          status: string
+          submitted_by: string | null
+          summary: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          url: string
+          view_count: number
+        }
+        Insert: {
+          admin_submitted?: boolean
+          click_count?: number
+          content?: string | null
+          created_at?: string
+          engagement_score?: number
+          featured_image_url?: string | null
+          id?: string
+          is_featured?: boolean
+          is_pinned?: boolean
+          published_at: string
+          source: string
+          status?: string
+          submitted_by?: string | null
+          summary?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          url: string
+          view_count?: number
+        }
+        Update: {
+          admin_submitted?: boolean
+          click_count?: number
+          content?: string | null
+          created_at?: string
+          engagement_score?: number
+          featured_image_url?: string | null
+          id?: string
+          is_featured?: boolean
+          is_pinned?: boolean
+          published_at?: string
+          source?: string
+          status?: string
+          submitted_by?: string | null
+          summary?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          url?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
