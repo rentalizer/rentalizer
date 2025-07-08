@@ -149,15 +149,17 @@ export const LeadCapture = ({ isOpen, onClose, onSuccess }: LeadCaptureProps) =>
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-900 border-cyan-500/20 max-w-md">
+      <DialogContent className="bg-slate-900 border-cyan-500/20 max-w-2xl fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
         <DialogHeader>
           <DialogTitle className="text-white text-xl text-center flex items-center justify-center gap-2">
             <Bot className="h-6 w-6 text-cyan-400" />
             Access Ask Richie AI
           </DialogTitle>
-          <p className="text-gray-300 text-sm text-center mt-2">
-            Get 10 free questions with our AI rental expert
-          </p>
+          <div className="text-gray-300 text-sm text-center mt-4 space-y-4">
+            <p className="font-medium text-cyan-300">Your on-demand rental arbitrage mentor—powered by AI and trained on over 200 hours of video trainings and coaching calls, plus more than 1,350,000 words of transcripts, guides, checklists, and deal analysis tools.</p>
+            
+            <p>It pulls directly from my actual content—not generic internet data—so every answer reflects exactly how I teach, analyze, and execute. Whether you're asking about deal criteria, landlord objections, STR licensing, or next steps after a "yes," Ask Richie gives you clear, tactical responses 24/7—just like I would.</p>
+          </div>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6 mt-4">
@@ -165,7 +167,7 @@ export const LeadCapture = ({ isOpen, onClose, onSuccess }: LeadCaptureProps) =>
             <div>
               <Label htmlFor="name" className="text-cyan-300 flex items-center gap-2">
                 <User className="h-4 w-4" />
-                Full Name
+                Name
               </Label>
               <Input
                 id="name"
@@ -173,7 +175,6 @@ export const LeadCapture = ({ isOpen, onClose, onSuccess }: LeadCaptureProps) =>
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 className="bg-slate-700 border-slate-600 text-white mt-1"
-                placeholder="Enter your full name"
                 required
               />
             </div>
@@ -189,7 +190,6 @@ export const LeadCapture = ({ isOpen, onClose, onSuccess }: LeadCaptureProps) =>
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 className="bg-slate-700 border-slate-600 text-white mt-1"
-                placeholder="Enter your email"
                 required
               />
             </div>
@@ -205,7 +205,6 @@ export const LeadCapture = ({ isOpen, onClose, onSuccess }: LeadCaptureProps) =>
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
                 className="bg-slate-700 border-slate-600 text-white mt-1"
-                placeholder="Enter your phone number"
                 required
               />
             </div>

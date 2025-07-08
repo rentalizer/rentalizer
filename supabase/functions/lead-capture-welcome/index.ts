@@ -16,6 +16,7 @@ serve(async (req) => {
   try {
     const { name, email, phone } = await req.json();
 
+    // Send welcome email to lead
     const emailResponse = await resend.emails.send({
       from: "Richie AI <onboarding@resend.dev>",
       to: [email],
@@ -33,6 +34,21 @@ serve(async (req) => {
           <li>Scaling your business</li>
         </ul>
         <p>Best regards,<br>The Rentalizer Team</p>
+      `,
+    });
+
+    // Send admin notification
+    await resend.emails.send({
+      from: "Richie AI <onboarding@resend.dev>",
+      to: ["richie@dialogo.us"],
+      subject: "New Lead Captured - Ask Richie AI",
+      html: `
+        <h1>New Lead Captured</h1>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+        <p>This lead now has access to Ask Richie AI with 10 free questions.</p>
       `,
     });
 

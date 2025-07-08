@@ -2,6 +2,7 @@ import React from 'react';
 import { TopNavBar } from '@/components/TopNavBar';
 import { Footer } from '@/components/Footer';
 import { RichieAdminPanel } from '@/components/RichieAdminPanel';
+import { AdminLeadsPanel } from '@/components/AdminLeadsPanel';
 import { Bot, Database } from 'lucide-react';
 
 const RichieAdmin = () => {
@@ -26,6 +27,11 @@ const RichieAdmin = () => {
 
         {/* Admin Panel */}
         <RichieAdminPanel />
+        
+        {/* Lead Captures Panel */}
+        <div className="mt-8">
+          <AdminLeadsPanel />
+        </div>
       </div>
 
       <Footer />
