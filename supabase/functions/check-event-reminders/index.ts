@@ -37,9 +37,32 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Looking for events between ${tomorrowStart.toISOString()} and ${tomorrowEnd.toISOString()}`);
 
-    // For now, we'll use a mock events array since events are stored in localStorage
-    // In a real implementation, you'd want to store events in the database
-    // This is a simplified version that demonstrates how it would work
+    // Get actual events from the database that need reminders
+    const { data: events, error: eventsError } = await supabaseClient
+      .from('events')
+      .select('*')
+      .eq('event_date', tomorrow.toISOString().split('T')[0])
+      .eq('remind_members', true);
+
+    if (eventsError) {
+      console.error("Error fetching events:", eventsError);
+      throw eventsError;
+    }
+
+    console.log(`Found ${events?.length || 0} events for tomorrow that need reminders`);
+
+    if (!events || events.length === 0) {
+      console.log("No events found for tomorrow that require reminders");
+      return new Response(JSON.stringify({ 
+        success: true, 
+        eventsChecked: 0,
+        remindersSent: 0,
+        message: "No events requiring reminders found for tomorrow"
+      }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
 
     // Get all active members who should receive reminders
     const { data: profiles, error: profilesError } = await supabaseClient
@@ -54,72 +77,51 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Found ${profiles?.length || 0} members to potentially send reminders to`);
 
-    // Get user emails from auth (this would need to be done by the service role)
-    // Note: In a real implementation, you might want to store email preferences in profiles table
-    
-    // Mock event data for demonstration - in reality, you'd query your events table
-    const mockEventsForTomorrow = [
-      {
-        id: "demo-event-1",
-        title: "Weekly Live Training",
-        date: tomorrow.toISOString().split('T')[0], // YYYY-MM-DD format
-        time: "5:00 PM PST",
-        duration: "1 hour",
-        location: "Zoom",
-        zoomLink: "https://us06web.zoom.us/j/84255424839?pwd=803338",
-        description: "Join us for our weekly live training session where we discuss market trends and answer your questions.",
-        remindMembers: true,
-        attendees: "All members"
-      }
-    ];
-
     let remindersSent = 0;
 
-    // Send reminders for each event that has remindMembers = true
-    for (const event of mockEventsForTomorrow) {
-      if (event.remindMembers) {
-        console.log(`Processing reminders for event: ${event.title}`);
-        
-        // Send reminder to all members (or filter based on attendees field)
-        for (const profile of profiles || []) {
-          try {
-            // Get user email from auth
-            const { data: userData, error: userError } = await supabaseClient.auth.admin.getUserById(profile.user_id);
-            
-            if (userError || !userData.user?.email) {
-              console.log(`Could not get email for user ${profile.user_id}`);
-              continue;
-            }
-
-            // Call the send-event-reminder function
-            const reminderResponse = await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/send-event-reminder`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
-              },
-              body: JSON.stringify({
-                eventTitle: event.title,
-                eventDate: event.date,
-                eventTime: event.time,
-                eventDescription: event.description,
-                zoomLink: event.zoomLink,
-                location: event.location,
-                duration: event.duration,
-                recipientEmail: userData.user.email,
-                recipientName: profile.display_name
-              })
-            });
-
-            if (reminderResponse.ok) {
-              remindersSent++;
-              console.log(`Reminder sent to ${userData.user.email} for event: ${event.title}`);
-            } else {
-              console.error(`Failed to send reminder to ${userData.user.email}`);
-            }
-          } catch (error) {
-            console.error(`Error sending reminder to ${profile.user_id}:`, error);
+    // Send reminders for each event
+    for (const event of events) {
+      console.log(`Processing reminders for event: ${event.title}`);
+      
+      // Send reminder to all members (or filter based on attendees field)
+      for (const profile of profiles || []) {
+        try {
+          // Get user email from auth
+          const { data: userData, error: userError } = await supabaseClient.auth.admin.getUserById(profile.user_id);
+          
+          if (userError || !userData.user?.email) {
+            console.log(`Could not get email for user ${profile.user_id}`);
+            continue;
           }
+
+          // Call the send-event-reminder function
+          const reminderResponse = await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/send-event-reminder`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+            },
+            body: JSON.stringify({
+              eventTitle: event.title,
+              eventDate: event.event_date,
+              eventTime: event.event_time,
+              eventDescription: event.description,
+              zoomLink: event.zoom_link,
+              location: event.location,
+              duration: event.duration,
+              recipientEmail: userData.user.email,
+              recipientName: profile.display_name
+            })
+          });
+
+          if (reminderResponse.ok) {
+            remindersSent++;
+            console.log(`Reminder sent to ${userData.user.email} for event: ${event.title}`);
+          } else {
+            console.error(`Failed to send reminder to ${userData.user.email}`);
+          }
+        } catch (error) {
+          console.error(`Error sending reminder to ${profile.user_id}:`, error);
         }
       }
     }
@@ -128,7 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify({ 
       success: true, 
-      eventsChecked: mockEventsForTomorrow.length,
+      eventsChecked: events.length,
       remindersSent: remindersSent,
       message: `Successfully sent ${remindersSent} event reminders`
     }), {
