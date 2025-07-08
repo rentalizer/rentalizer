@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Newspaper, ExternalLink, Calendar, Eye, MousePointer, Pin, Plus, Filter, TrendingUp } from 'lucide-react';
+import { Newspaper, ExternalLink, Calendar, Eye, MousePointer, Pin, Plus, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -37,11 +37,12 @@ interface NewsItem {
 export const NewsFeed = () => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedTag, setSelectedTag] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'recent' | 'trending'>('recent');
+  const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
   const { toast } = useToast();
   const { isAdmin } = useAdminRole();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Form state for manual submission
   const [submitForm, setSubmitForm] = useState({
@@ -52,11 +53,6 @@ export const NewsFeed = () => {
     tags: [] as string[],
     featured_image_url: ''
   });
-
-  const availableTags = [
-    'Regulations', 'Tech Updates', 'Market Trends', 'Industry News',
-    'Software', 'Analytics', 'Pricing', 'Operations', 'Legal'
-  ];
 
   const availableSources = [
     'AirDNA', 'Skift', 'VRM Intel', 'ShortTermRentalz', 'Rental Scale-Up',
@@ -69,37 +65,43 @@ export const NewsFeed = () => {
     fetchNewsItems();
   }, []);
 
+  // Auto-scroll effect
+  useEffect(() => {
+    if (newsItems.length > 5) {
+      const interval = setInterval(() => {
+        setCurrentIndex(prev => (prev + 1) % newsItems.length);
+      }, 5000); // Scroll every 5 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [newsItems.length]);
+
+  // Smooth scroll effect
+  useEffect(() => {
+    if (scrollContainerRef.current && newsItems.length > 0) {
+      const container = scrollContainerRef.current;
+      const itemHeight = 120; // Approximate height of each news item
+      container.scrollTo({
+        top: currentIndex * itemHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [currentIndex]);
+
   const fetchNewsItems = async () => {
     try {
       setLoading(true);
       
-      let query = supabase
+      const { data, error } = await supabase
         .from('news_items')
         .select('*')
         .eq('status', 'published')
-        .order('is_pinned', { ascending: false });
-
-      // Apply secondary sort
-      if (sortBy === 'recent') {
-        query = query.order('published_at', { ascending: false });
-      } else {
-        query = query.order('engagement_score', { ascending: false });
-      }
-
-      const { data, error } = await query;
+        .order('is_pinned', { ascending: false })
+        .order('published_at', { ascending: false });
 
       if (error) throw error;
 
-      let filteredData = data || [];
-
-      // Filter by tag if selected
-      if (selectedTag !== 'all') {
-        filteredData = filteredData.filter(item => 
-          item.tags && item.tags.includes(selectedTag)
-        );
-      }
-
-      setNewsItems(filteredData);
+      setNewsItems(data || []);
     } catch (error) {
       console.error('Error fetching news items:', error);
       toast({
@@ -119,9 +121,6 @@ export const NewsFeed = () => {
         .from('news_items')
         .update({ click_count: newsItem.click_count + 1 })
         .eq('id', newsItem.id);
-
-      // Open link in new tab
-      window.open(newsItem.url, '_blank');
       
       // Update local state
       setNewsItems(prev => 
@@ -131,11 +130,18 @@ export const NewsFeed = () => {
             : item
         )
       );
+
+      // Show article in popup
+      setSelectedArticle(newsItem);
     } catch (error) {
       console.error('Error tracking click:', error);
-      // Still open the link even if tracking fails
-      window.open(newsItem.url, '_blank');
+      // Still show the article even if tracking fails
+      setSelectedArticle(newsItem);
     }
+  };
+
+  const handleExternalLink = (url: string) => {
+    window.open(url, '_blank');
   };
 
   const handlePinToggle = async (newsItem: NewsItem) => {
@@ -215,38 +221,37 @@ export const NewsFeed = () => {
     }
   };
 
-  const uniqueTags = Array.from(
-    new Set(newsItems.flatMap(item => item.tags || []))
-  ).sort();
+  const visibleNewsItems = newsItems.slice(0, 5);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-cyan-400">Loading news feed...</div>
+      <div className="flex items-center justify-center py-8">
+        <div className="text-cyan-400 text-sm">Loading news...</div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Newspaper className="h-8 w-8 text-cyan-400" />
-          <h2 className="text-3xl font-bold text-cyan-300">Industry News Feed</h2>
+        <div className="flex items-center gap-2">
+          <Newspaper className="h-5 w-5 text-cyan-400" />
+          <h3 className="text-lg font-semibold text-cyan-300">Industry News</h3>
         </div>
         
         {isAdmin && (
           <Dialog open={isSubmitDialogOpen} onOpenChange={setIsSubmitDialogOpen}>
             <DialogTrigger asChild>
               <Button 
+                size="sm"
                 className="bg-cyan-600 hover:bg-cyan-700 text-white"
               >
-                <Plus className="h-4 w-4 mr-2" />
-                Submit News
+                <Plus className="h-3 w-3 mr-1" />
+                Add
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-slate-800 border-cyan-500/20 text-white max-w-2xl">
+            <DialogContent className="bg-slate-800 border-cyan-500/20 text-white max-w-2xl z-50">
               <DialogHeader>
                 <DialogTitle className="text-cyan-300">Submit News Article</DialogTitle>
               </DialogHeader>
@@ -280,7 +285,7 @@ export const NewsFeed = () => {
                     <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
                       <SelectValue placeholder="Select source" />
                     </SelectTrigger>
-                    <SelectContent className="bg-slate-700 border-slate-600">
+                    <SelectContent className="bg-slate-700 border-slate-600 z-50">
                       {availableSources.map(source => (
                         <SelectItem key={source} value={source} className="text-white hover:bg-slate-600">
                           {source}
@@ -298,16 +303,6 @@ export const NewsFeed = () => {
                     className="bg-slate-700 border-slate-600 text-white"
                     placeholder="Brief summary of the article..."
                     rows={3}
-                  />
-                </div>
-                
-                <div>
-                  <label className="text-sm text-gray-300 mb-2 block">Featured Image URL</label>
-                  <Input
-                    value={submitForm.featured_image_url}
-                    onChange={(e) => setSubmitForm(prev => ({ ...prev, featured_image_url: e.target.value }))}
-                    className="bg-slate-700 border-slate-600 text-white"
-                    placeholder="https://..."
                   />
                 </div>
                 
@@ -332,79 +327,39 @@ export const NewsFeed = () => {
         )}
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4 items-center">
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-gray-400" />
-          <Select value={selectedTag} onValueChange={setSelectedTag}>
-            <SelectTrigger className="w-48 bg-slate-800 border-slate-600 text-white">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-slate-700 border-slate-600">
-              <SelectItem value="all" className="text-white hover:bg-slate-600">All Topics</SelectItem>
-              {uniqueTags.map(tag => (
-                <SelectItem key={tag} value={tag} className="text-white hover:bg-slate-600">
-                  {tag}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-gray-400" />
-          <Select value={sortBy} onValueChange={(value: 'recent' | 'trending') => setSortBy(value)}>
-            <SelectTrigger className="w-32 bg-slate-800 border-slate-600 text-white">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-slate-700 border-slate-600">
-              <SelectItem value="recent" className="text-white hover:bg-slate-600">Recent</SelectItem>
-              <SelectItem value="trending" className="text-white hover:bg-slate-600">Trending</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <Button 
-          onClick={fetchNewsItems}
-          variant="outline"
-          size="sm"
-          className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
-        >
-          Refresh
-        </Button>
-      </div>
-
-      {/* News Items */}
-      <div className="space-y-4">
-        {newsItems.length === 0 ? (
-          <Card className="bg-slate-800/50 border-slate-700">
-            <CardContent className="p-8 text-center">
-              <Newspaper className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-              <p className="text-gray-400">No news items found. Check back soon for updates!</p>
-            </CardContent>
-          </Card>
+      {/* Scrolling News Feed */}
+      <div 
+        ref={scrollContainerRef}
+        className="space-y-3 max-h-[600px] overflow-hidden"
+      >
+        {visibleNewsItems.length === 0 ? (
+          <div className="text-center py-8">
+            <Newspaper className="h-8 w-8 text-gray-500 mx-auto mb-3" />
+            <p className="text-gray-400 text-sm">No news items available</p>
+          </div>
         ) : (
-          newsItems.map((item) => (
+          newsItems.map((item, index) => (
             <Card 
               key={item.id} 
-              className={`bg-slate-800/50 border-slate-700 hover:border-cyan-500/30 transition-colors ${
-                item.is_pinned ? 'ring-2 ring-cyan-500/20' : ''
+              className={`bg-slate-800/50 border-slate-700 hover:border-cyan-500/30 transition-all cursor-pointer ${
+                item.is_pinned ? 'ring-1 ring-cyan-500/20' : ''
               }`}
+              onClick={() => handleNewsClick(item)}
             >
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       {item.is_pinned && (
-                        <Pin className="h-4 w-4 text-cyan-400" />
+                        <Pin className="h-3 w-3 text-cyan-400 flex-shrink-0" />
                       )}
                       <Badge 
                         variant="outline" 
-                        className="border-cyan-500/30 text-cyan-400 text-xs"
+                        className="border-cyan-500/30 text-cyan-400 text-xs flex-shrink-0"
                       >
                         {item.source}
                       </Badge>
-                      <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <div className="flex items-center gap-3 text-xs text-gray-500 flex-shrink-0">
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           {formatDistanceToNow(new Date(item.published_at), { addSuffix: true })}
@@ -413,38 +368,17 @@ export const NewsFeed = () => {
                           <Eye className="h-3 w-3" />
                           {item.view_count}
                         </div>
-                        <div className="flex items-center gap-1">
-                          <MousePointer className="h-3 w-3" />
-                          {item.click_count}
-                        </div>
                       </div>
                     </div>
                     
-                    <h3 
-                      className="text-lg font-semibold text-white mb-2 cursor-pointer hover:text-cyan-300 transition-colors"
-                      onClick={() => handleNewsClick(item)}
-                    >
+                    <h4 className="text-sm font-semibold text-white mb-1 line-clamp-2 hover:text-cyan-300 transition-colors">
                       {item.title}
-                    </h3>
+                    </h4>
                     
                     {item.summary && (
-                      <p className="text-gray-300 text-sm line-clamp-2 mb-3">
+                      <p className="text-gray-400 text-xs line-clamp-2">
                         {item.summary}
                       </p>
-                    )}
-                    
-                    {item.tags && item.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {item.tags.map((tag) => (
-                          <Badge 
-                            key={tag} 
-                            variant="secondary" 
-                            className="bg-slate-700 text-gray-300 text-xs"
-                          >
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
                     )}
                   </div>
                   
@@ -452,34 +386,8 @@ export const NewsFeed = () => {
                     <img 
                       src={item.featured_image_url} 
                       alt={item.title}
-                      className="w-24 h-16 object-cover rounded-lg"
+                      className="w-16 h-12 object-cover rounded flex-shrink-0"
                     />
-                  )}
-                </div>
-              </CardHeader>
-              
-              <CardContent className="pt-0">
-                <div className="flex items-center justify-between">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleNewsClick(item)}
-                    className="text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 p-0"
-                  >
-                    <ExternalLink className="h-4 w-4 mr-1" />
-                    Read Article
-                  </Button>
-                  
-                  {isAdmin && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handlePinToggle(item)}
-                      className="text-gray-400 hover:text-cyan-300"
-                    >
-                      <Pin className="h-4 w-4 mr-1" />
-                      {item.is_pinned ? 'Unpin' : 'Pin'}
-                    </Button>
                   )}
                 </div>
               </CardContent>
@@ -487,6 +395,116 @@ export const NewsFeed = () => {
           ))
         )}
       </div>
+
+      {/* Article Popup Modal */}
+      {selectedArticle && (
+        <Dialog open={!!selectedArticle} onOpenChange={() => setSelectedArticle(null)}>
+          <DialogContent className="bg-slate-800 border-cyan-500/20 text-white max-w-4xl max-h-[90vh] overflow-y-auto z-50">
+            <DialogHeader className="relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedArticle(null)}
+                className="absolute -top-2 -right-2 text-gray-400 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+              <div className="flex items-center gap-2 mb-3">
+                <Badge 
+                  variant="outline" 
+                  className="border-cyan-500/30 text-cyan-400"
+                >
+                  {selectedArticle.source}
+                </Badge>
+                <div className="flex items-center gap-4 text-sm text-gray-400">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-3 w-3" />
+                    {formatDistanceToNow(new Date(selectedArticle.published_at), { addSuffix: true })}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Eye className="h-3 w-3" />
+                    {selectedArticle.view_count}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <MousePointer className="h-3 w-3" />
+                    {selectedArticle.click_count}
+                  </div>
+                </div>
+              </div>
+              <DialogTitle className="text-xl font-bold text-white text-left leading-tight">
+                {selectedArticle.title}
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {selectedArticle.featured_image_url && (
+                <img 
+                  src={selectedArticle.featured_image_url} 
+                  alt={selectedArticle.title}
+                  className="w-full h-64 object-cover rounded-lg"
+                />
+              )}
+              
+              {selectedArticle.summary && (
+                <div className="bg-slate-700/30 p-4 rounded-lg border-l-4 border-cyan-500/50">
+                  <p className="text-gray-300 italic">
+                    {selectedArticle.summary}
+                  </p>
+                </div>
+              )}
+              
+              {selectedArticle.content ? (
+                <div className="prose prose-invert max-w-none">
+                  <div className="text-gray-300 whitespace-pre-wrap leading-relaxed">
+                    {selectedArticle.content}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-400 mb-4">Full article content not available. Read the complete story at the source.</p>
+                </div>
+              )}
+              
+              {selectedArticle.tags && selectedArticle.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-700">
+                  {selectedArticle.tags.map((tag) => (
+                    <Badge 
+                      key={tag} 
+                      variant="secondary" 
+                      className="bg-slate-700 text-gray-300 text-xs"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              
+              <div className="flex justify-between items-center pt-4 border-t border-slate-700">
+                <Button
+                  variant="outline"
+                  onClick={() => handleExternalLink(selectedArticle.url)}
+                  className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Read Full Article
+                </Button>
+                
+                {isAdmin && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handlePinToggle(selectedArticle)}
+                    className="text-gray-400 hover:text-cyan-300"
+                  >
+                    <Pin className="h-4 w-4 mr-1" />
+                    {selectedArticle.is_pinned ? 'Unpin' : 'Pin'}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
