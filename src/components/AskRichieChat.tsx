@@ -279,12 +279,18 @@ export const AskRichieChat = () => {
       setCurrentQuestion('');
       setDailyUsage(prev => prev + 1);
 
+      console.log('🎵 About to check voice settings - voiceEnabled:', voiceEnabled, 'answer:', !!data.answer);
+      
       // Automatically speak the answer if voice is enabled
       if (voiceEnabled && data.answer) {
+        console.log('🎵 Voice is enabled, starting TTS in 800ms...');
         // Small delay to let the user see the text first
         setTimeout(() => {
+          console.log('🎵 Calling speakAnswer now...');
           speakAnswer(data.answer, questionId);
         }, 800);
+      } else {
+        console.log('❌ Voice not enabled or no answer - voiceEnabled:', voiceEnabled, 'hasAnswer:', !!data.answer);
       }
 
     } catch (error) {
