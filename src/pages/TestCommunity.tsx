@@ -252,11 +252,8 @@ const TestCommunity = () => {
               <div className="text-center mb-6">
                 <h2 className="text-3xl font-bold text-cyan-300 mb-4 flex items-center justify-center gap-3">
                   <Calculator className="h-8 w-8 text-cyan-400" />
-                  Test Rental Calculator
+                  Rental Calculator
                 </h2>
-                <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-3 inline-block">
-                  <p className="text-blue-300 text-sm">Testing environment with enhanced calculator features</p>
-                </div>
               </div>
               
               {/* Action buttons */}
@@ -319,11 +316,8 @@ const TestCommunity = () => {
                     <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-slate-800 animate-pulse"></div>
                   </div>
                   <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
-                    Test Ask Richie AI
+                    Ask Richie AI
                   </h2>
-                  <div className="bg-purple-500/20 border border-purple-500/30 rounded-lg p-3 mb-6">
-                    <p className="text-purple-300 text-sm">🧪 Testing environment for AI chat functionality</p>
-                  </div>
                   <p className="text-xl text-gray-300 mb-6 leading-relaxed max-w-3xl mx-auto">
                     Your on-demand rental arbitrage mentor—powered by AI and trained on over 200 hours of video trainings and coaching calls, plus more than 1,350,000 words of transcripts, guides, checklists, and deal analysis tools.
                   </p>
@@ -401,7 +395,7 @@ const TestCommunity = () => {
                     className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-3 mx-auto"
                   >
                     <Bot className="h-6 w-6" />
-                    Start Chatting with Test Richie AI
+                    Start Chatting with Richie AI
                   </button>
                   <p className="text-sm text-gray-400 mt-4">
                     Available 24/7 • Instant responses • Based on real training content
