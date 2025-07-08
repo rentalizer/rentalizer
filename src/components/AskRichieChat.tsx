@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { AudioRecorder, blobToBase64, playAudioFromBase64 } from '@/utils/audioRecorder';
+import { LeadCapture } from './LeadCapture';
 
 interface ChatMessage {
   id: string;
@@ -40,6 +41,9 @@ export const AskRichieChat = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const [leadId, setLeadId] = useState<string | null>(null);
+  const [questionsRemaining, setQuestionsRemaining] = useState(0);
+  const [showLeadCapture, setShowLeadCapture] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioRecorderRef = useRef<AudioRecorder | null>(null);
@@ -63,25 +67,38 @@ export const AskRichieChat = () => {
     };
   }, []);
 
-  // Check daily usage for rate limiting
-  useEffect(() => {
-    if (user && isOpen) {
-      checkDailyUsage();
+  // Check lead usage for rate limiting
+  const checkLeadUsage = async (leadCaptureId: string) => {
+    try {
+      const { data: lead, error } = await supabase
+        .from('lead_captures')
+        .select('total_questions_asked')
+        .eq('id', leadCaptureId)
+        .single();
+
+      if (error) throw error;
+      
+      const remaining = Math.max(0, 10 - (lead?.total_questions_asked || 0));
+      setQuestionsRemaining(remaining);
+      return remaining;
+    } catch (error) {
+      console.error('Error checking lead usage:', error);
+      return 0;
     }
-  }, [user, isOpen]);
+  };
 
-  const checkDailyUsage = async () => {
-    if (!user) return;
+  const handleLeadCaptureSuccess = (leadCaptureId: string) => {
+    setLeadId(leadCaptureId);
+    setShowLeadCapture(false);
+    checkLeadUsage(leadCaptureId);
+  };
 
-    const today = new Date().toISOString().split('T')[0];
-    const { count } = await supabase
-      .from('richie_chat_usage')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .gte('created_at', `${today}T00:00:00.000Z`)
-      .lte('created_at', `${today}T23:59:59.999Z`);
-
-    setDailyUsage(count || 0);
+  const handleChatOpen = () => {
+    if (!leadId) {
+      setShowLeadCapture(true);
+    } else {
+      setIsOpen(true);
+    }
   };
 
   // Stop any currently playing audio
@@ -229,17 +246,27 @@ export const AskRichieChat = () => {
   };
 
   const askRichie = async () => {
-    if (!currentQuestion.trim() || !user || isLoading) return;
+    if (!currentQuestion.trim() || !leadId || isLoading || questionsRemaining <= 0) return;
+
+    // Limit question length for free users (500 characters)
+    if (currentQuestion.length > 500) {
+      toast({
+        title: "Question Too Long",
+        description: "Please limit your question to 500 characters for free access.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     setIsLoading(true);
     stopCurrentAudio(); // Stop any playing audio
     const questionId = Date.now().toString();
 
     try {
-      const { data, error } = await supabase.functions.invoke('ask-richie', {
+      const { data, error } = await supabase.functions.invoke('ask-richie-lead', {
         body: {
           question: currentQuestion.trim(),
-          userId: user.id
+          leadId: leadId
         }
       });
 
@@ -250,10 +277,11 @@ export const AskRichieChat = () => {
 
       if (data.rateLimited) {
         toast({
-          title: "Daily Limit Reached",
-          description: "You've reached your 25 questions per day. Upgrade to Pro for unlimited access.",
+          title: "Question Limit Reached",
+          description: "You've used all 10 free questions. Contact us for more access!",
           variant: "destructive"
         });
+        setQuestionsRemaining(0);
         return;
       }
 
@@ -277,7 +305,7 @@ export const AskRichieChat = () => {
 
       setMessages(prev => [...prev, newMessage]);
       setCurrentQuestion('');
-      setDailyUsage(prev => prev + 1);
+      setQuestionsRemaining(prev => Math.max(0, prev - 1));
 
       console.log('🎵 About to check voice settings - voiceEnabled:', voiceEnabled, 'answer:', !!data.answer);
       
@@ -327,26 +355,29 @@ export const AskRichieChat = () => {
       .replace(/\[doc-(\d+):\s*([^\]]+)\]/g, '<span class="text-cyan-400 font-medium">[doc-$1: $2]</span>');
   };
 
-  if (!user) {
-    return null;
-  }
-
   return (
     <>
+      {/* Lead Capture Dialog */}
+      <LeadCapture 
+        isOpen={showLeadCapture}
+        onClose={() => setShowLeadCapture(false)}
+        onSuccess={handleLeadCaptureSuccess}
+      />
+
       {/* Ask Richie Button */}
       <div className="fixed bottom-20 right-4 z-50">
         <Button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={handleChatOpen}
           className="relative bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 rounded-full w-16 h-16 shadow-lg group"
           title="Ask AI Richie"
         >
           <Bot className="h-8 w-8" />
-          {dailyUsage > 0 && (
+          {leadId && questionsRemaining > 0 && (
             <Badge 
               variant="secondary" 
-              className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 flex items-center justify-center text-xs bg-orange-500 text-white"
+              className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 flex items-center justify-center text-xs bg-green-500 text-white"
             >
-              {dailyUsage}
+              {questionsRemaining}
             </Badge>
           )}
         </Button>
@@ -388,9 +419,9 @@ export const AskRichieChat = () => {
                 </Button>
               </div>
             </div>
-            {user.subscription_status === 'trial' && (
-              <div className="text-sm text-orange-300 mt-2">
-                Free: {dailyUsage}/25 questions today
+            {leadId && (
+              <div className="text-sm text-cyan-300 mt-2">
+                Questions remaining: {questionsRemaining}/10
               </div>
             )}
           </CardHeader>

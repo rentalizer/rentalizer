@@ -282,6 +282,42 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_captures: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          last_question_at: string | null
+          name: string
+          phone: string
+          status: string
+          total_questions_asked: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          last_question_at?: string | null
+          name: string
+          phone: string
+          status?: string
+          total_questions_asked?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          last_question_at?: string | null
+          name?: string
+          phone?: string
+          status?: string
+          total_questions_asked?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       members: {
         Row: {
           created_at: string
@@ -431,6 +467,7 @@ export type Database = {
           answer: string | null
           created_at: string
           id: string
+          lead_capture_id: string | null
           question: string
           sources_used: Json | null
           tokens_used: number | null
@@ -440,6 +477,7 @@ export type Database = {
           answer?: string | null
           created_at?: string
           id?: string
+          lead_capture_id?: string | null
           question: string
           sources_used?: Json | null
           tokens_used?: number | null
@@ -449,12 +487,21 @@ export type Database = {
           answer?: string | null
           created_at?: string
           id?: string
+          lead_capture_id?: string | null
           question?: string
           sources_used?: Json | null
           tokens_used?: number | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "richie_chat_usage_lead_capture_id_fkey"
+            columns: ["lead_capture_id"]
+            isOneToOne: false
+            referencedRelation: "lead_captures"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       richie_docs: {
         Row: {
