@@ -38,70 +38,44 @@ export const LeadCapture = ({ isOpen, onClose, onSuccess }: LeadCaptureProps) =>
     setIsLoading(true);
 
     try {
-      // Check if lead already exists
-      const { data: existingLead } = await supabase
+      // Create new lead capture directly - remove the duplicate check for now
+      const { data: newLead, error: dbError } = await supabase
         .from('lead_captures')
-        .select('id, total_questions_asked')
-        .eq('email', formData.email.trim())
-        .maybeSingle();
-
-      let leadId: string;
-
-      if (existingLead) {
-        // Lead exists, use existing ID
-        leadId = existingLead.id;
-        
-        if (existingLead.total_questions_asked >= 10) {
-          toast({
-            title: "Question Limit Reached",
-            description: "You've reached your 10 free questions. Please contact us for more access.",
-            variant: "destructive"
-          });
-          setIsLoading(false);
-          return;
-        }
-      } else {
-        // Create new lead capture
-        const { data: newLead, error: dbError } = await supabase
-          .from('lead_captures')
-          .insert([
-            {
-              name: formData.name.trim(),
-              email: formData.email.trim(),
-              phone: formData.phone.trim()
-            }
-          ])
-          .select('id')
-          .single();
-
-        if (dbError) {
-          console.error('Database error:', dbError);
-          throw dbError;
-        }
-
-        leadId = newLead.id;
-
-        // Send welcome email via edge function
-        const { error: emailError } = await supabase.functions.invoke('lead-capture-welcome', {
-          body: {
+        .insert([
+          {
             name: formData.name.trim(),
             email: formData.email.trim(),
             phone: formData.phone.trim()
           }
-        });
+        ])
+        .select('id')
+        .single();
 
-        if (emailError) {
-          console.error('Email error:', emailError);
-          // Don't throw here - the signup was successful even if email fails
+      if (dbError) {
+        console.error('Database error:', dbError);
+        throw dbError;
+      }
+
+      const leadId = newLead.id;
+
+      // Send welcome email via edge function
+      const { error: emailError } = await supabase.functions.invoke('lead-capture-welcome', {
+        body: {
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim()
         }
+      });
+
+      if (emailError) {
+        console.error('Email error:', emailError);
+        // Don't throw here - the signup was successful even if email fails
       }
 
       setIsSuccessState(true);
       toast({
         title: "Access Granted!",
-        description: existingLead 
-          ? `Welcome back! You have ${10 - existingLead.total_questions_asked} questions remaining.`
-          : "You now have access to Ask Richie AI with 10 free questions.",
+        description: "You now have access to Ask Richie AI with 10 free questions.",
       });
 
       // Pass lead ID to parent and close after short delay
