@@ -19,9 +19,33 @@ export const useAdminRole = () => {
         return;
       }
 
-      // In Lovable development environment, any authenticated user is admin
-      console.log('✅ User is authenticated, granting admin access for Lovable development');
-      setIsAdmin(true);
+      // Check if we're in development environment (Lovable)
+      const hostname = window.location.hostname;
+      const isLovableDev = hostname.includes('lovable.app') || hostname.includes('localhost') || hostname.includes('127.0.0.1');
+      
+      if (isLovableDev) {
+        console.log('✅ Development environment detected, granting admin access');
+        setIsAdmin(true);
+        setLoading(false);
+        return;
+      }
+
+      // In production, check actual admin role in database
+      try {
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
+        
+        setIsAdmin(!!roleData);
+        console.log('🔐 Production admin check result:', !!roleData);
+      } catch (error) {
+        console.error('Error checking admin role:', error);
+        setIsAdmin(false);
+      }
+      
       setLoading(false);
     };
 
