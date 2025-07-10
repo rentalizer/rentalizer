@@ -130,6 +130,9 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
   const saveProfile = async () => {
     if (!user || !profile) return;
 
+    console.log('Auth user:', user);
+    console.log('Profile to save:', profile);
+
     setLoading(true);
     try {
       let avatarUrl = profile.avatar_url;
