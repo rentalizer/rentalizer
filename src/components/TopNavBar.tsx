@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart3, User, LogOut, Users, TrendingUp, Building } from 'lucide-react';
+import { BarChart3, User, LogOut, Calendar, MessageSquare, Menu, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,31 +20,26 @@ export const TopNavBar = () => {
       console.log('✅ TopNavBar: Logout completed');
     } catch (error) {
       console.error('❌ TopNavBar: Error signing out:', error);
-      // Don't redirect on error - let the current page handle the logged-out state
     }
   };
 
-  const navigationTabs = [
+  const navigationItems = [
     {
-      name: 'Training & Community',
-      path: '/community',
-      icon: Users
+      name: 'Today',
+      path: '/',
     },
     {
-      name: 'Market Intelligence',
-      path: '/markets',
-      icon: TrendingUp
+      name: 'Calendar',
+      path: '/calendar',
     },
     {
-      name: 'Acquisition CRM',
-      path: '/properties',
-      icon: Building
+      name: 'Listings',
+      path: '/listings',
     },
     {
-      name: 'Property Management',
-      path: '/pms',
-      icon: null,
-      emoji: '🫶'
+      name: 'Messages',
+      path: '/messages',
+      hasNotification: true
     }
   ];
 
@@ -53,101 +48,84 @@ export const TopNavBar = () => {
   };
 
   return (
-    <div className="w-full bg-slate-700/90 backdrop-blur-lg border-b border-gray-500/50">
-      <div className="max-w-full mx-auto px-4 py-4">
-        <div className="flex items-center justify-between w-full">
+    <div className="w-full bg-white border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
           {/* Left side - Logo */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <BarChart3 className="h-8 w-8 text-cyan-400" style={{
-              filter: 'drop-shadow(0 0 6px rgba(6, 182, 212, 1)) drop-shadow(0 0 12px rgba(6, 182, 212, 0.9)) drop-shadow(0 0 18px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 24px rgba(6, 182, 212, 0.7)) drop-shadow(0 0 30px rgba(6, 182, 212, 0.6)) drop-shadow(0 0 36px rgba(6, 182, 212, 0.5))'
-            }} />
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center">
+              <BarChart3 className="h-8 w-8 text-red-500" />
+            </Link>
           </div>
 
-          {/* Center - Navigation Tabs (only show for logged-in users) */}
+          {/* Center - Navigation (only show for logged-in users) */}
           {user && (
-            <div className="flex items-center gap-1">
-              {navigationTabs.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = isActiveTab(tab.path);
+            <div className="hidden md:flex items-center space-x-8">
+              {navigationItems.map((item) => {
+                const isActive = isActiveTab(item.path);
                 
                 return (
                   <Link
-                    key={tab.path}
-                    to={tab.path}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                    key={item.path}
+                    to={item.path}
+                    className={`relative flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                       isActive
-                        ? 'bg-gray-600/20 text-gray-300 border border-gray-500/30'
-                        : 'text-gray-300 hover:bg-slate-600/50 hover:text-gray-300'
+                        ? 'text-gray-900 border-b-2 border-gray-900'
+                        : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
-                    {tab.emoji ? (
-                      <span className="text-base grayscale brightness-75">{tab.emoji}</span>
-                    ) : (
-                      <Icon className="h-4 w-4" />
+                    {item.name}
+                    {item.hasNotification && (
+                      <Badge className="ml-1 bg-red-500 text-white text-xs px-1 py-0 min-w-[16px] h-4 rounded-full">
+                        1
+                      </Badge>
                     )}
-                    <span className="font-medium text-sm">{tab.name}</span>
                   </Link>
                 );
               })}
             </div>
           )}
 
-          {/* Right side - Login or User info */}
-          <div className="flex-shrink-0">
-          {user ? (
-            <div className="flex items-center gap-4">
-              <button 
-                className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20 hover:bg-gray-800/50 transition-colors cursor-pointer"
-                onClick={() => {
-                  alert('Profile button clicked! Navigating to profile setup...');
-                  console.log('🔧 Profile button clicked!');
-                  navigate('/profile-setup');
-                }}
-                type="button"
-                title="Click to edit your profile"
-              >
-                <User className="h-4 w-4 text-cyan-400" />
-                <span className="text-cyan-300 pointer-events-none">{user.email}</span>
-                <Badge 
-                  variant="outline" 
-                  className="bg-green-900/30 border-green-500/30 text-green-300 text-xs px-2 py-0 pointer-events-none"
+          {/* Right side - Menu and User */}
+          <div className="flex items-center space-x-4">
+            {user && (
+              <>
+                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                  Menu
+                </Button>
+                <Button
+                  onClick={() => navigate('/profile-setup')}
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center space-x-2"
                 >
-                  {isAdmin ? 'Admin' : 'Pro'}
-                </Badge>
-              </button>
-              <Button
-                onClick={handleSignOut}
-                variant="outline"
-                size="sm"
-                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
-            </div>
-          ) : null}
-          
-          {/* Always show these buttons when not authenticated */}
-          {!user && (
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={() => window.open('mailto:support@rentalizer.com', '_blank')}
-                variant="outline"
-                size="sm"
-                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium text-xs px-2"
-              >
-                Contact Us
-              </Button>
-              <Button
-                onClick={() => navigate('/auth')}
-                variant="outline"
-                size="sm"
-                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium text-xs px-2"
-              >
-                Login
-              </Button>
-            </div>
-          )}
+                  <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center">
+                    <User className="h-4 w-4 text-white" />
+                  </div>
+                </Button>
+              </>
+            )}
+            
+            {!user && (
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => window.open('mailto:support@rentalizer.com', '_blank')}
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-300 text-gray-600 hover:bg-gray-50"
+                >
+                  Contact Us
+                </Button>
+                <Button
+                  onClick={() => navigate('/auth')}
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-300 text-gray-600 hover:bg-gray-50"
+                >
+                  Login
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
