@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar, Star, X, Video, FileText, Bot } from 'lucide-react';
+import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar, Star, X, Video, FileText, Bot, LogOut } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { MarketIntelligenceDemo } from '@/components/MarketIntelligenceDemo';
@@ -18,8 +20,17 @@ import { AskRichieChat } from '@/components/AskRichieChat';
 import { TrainingHubDemo } from '@/components/TrainingHubDemo';
 
 const LandingPage = () => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [activeDemo, setActiveDemo] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Redirect authenticated users to community
+  useEffect(() => {
+    if (user) {
+      navigate('/community');
+    }
+  }, [user, navigate]);
 
   // Auto-progression through demo steps
   useEffect(() => {
@@ -131,18 +142,35 @@ const LandingPage = () => {
 
             {/* Navigation */}
             <nav className="flex items-center gap-4">
-              <LoginDialog 
-                trigger={
-                  <Button 
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-cyan-300 text-sm">
+                    {user.email}
+                  </span>
+                  <Button
+                    onClick={signOut}
                     variant="outline"
-                    size="lg"
-                    className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 px-6 py-3"
+                    size="sm"
+                    className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"
                   >
-                    <LogIn className="h-4 w-4 mr-2" />
-                    Login
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
                   </Button>
-                }
-              />
+                </div>
+              ) : (
+                <LoginDialog 
+                  trigger={
+                    <Button 
+                      variant="outline"
+                      size="lg"
+                      className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 px-6 py-3"
+                    >
+                      <LogIn className="h-4 w-4 mr-2" />
+                      Login
+                    </Button>
+                  }
+                />
+              )}
             </nav>
           </div>
         </div>
