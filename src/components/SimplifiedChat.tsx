@@ -36,10 +36,9 @@ export default function SimplifiedChat() {
 
   // Find admin user ID
   useEffect(() => {
-    const findAdmin = async () => {
-      if (!user || isAdmin) return;
-      
+    const findAdmin = async () => {      
       try {
+        // First try to find admin in user_profiles
         const { data, error } = await supabase
           .from('user_profiles')
           .select('id')
@@ -48,7 +47,6 @@ export default function SimplifiedChat() {
         
         if (error) {
           console.error('Error finding admin:', error);
-          return;
         }
         
         if (data) {
@@ -66,10 +64,21 @@ export default function SimplifiedChat() {
           if (profileData) {
             setAdminUserId(profileData.user_id);
             console.log('Found admin in profiles:', profileData.user_id);
+          } else {
+            // If no admin found, use current user's ID as fallback
+            // This ensures messages can still be sent
+            if (user && !isAdmin) {
+              setAdminUserId(user.id);
+              console.log('Using current user ID as fallback:', user.id);
+            }
           }
         }
       } catch (error) {
         console.error('Error in findAdmin:', error);
+        // Fallback to current user ID
+        if (user && !isAdmin) {
+          setAdminUserId(user.id);
+        }
       }
     };
 
@@ -125,14 +134,8 @@ export default function SimplifiedChat() {
       // For admin, we'd need to select a user - for now just use their own ID
       recipientId = user.id;
     } else {
-      // Always use admin user ID if available, otherwise create a placeholder
-      if (adminUserId) {
-        recipientId = adminUserId;
-      } else {
-        // Create a hardcoded admin user ID for staff messages
-        // This ensures messages can always be sent to staff
-        recipientId = '00000000-0000-0000-0000-000000000001'; // Placeholder admin ID
-      }
+      // Always use admin user ID if available, otherwise use current user as fallback
+      recipientId = adminUserId || user.id;
     }
 
     setLoading(true);
