@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper } from 'lucide-react';
+import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
@@ -25,6 +25,7 @@ import { AskRichieChat } from '@/components/AskRichieChat';
 import { ContactChat } from '@/components/ContactChat';
 import { AccessGate } from '@/components/AccessGate';
 import { MembersList } from '@/components/MembersList';
+import { ProfileEditor } from '@/components/ProfileEditor';
 
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
@@ -71,6 +72,7 @@ const Community = () => {
   const [isChatOpen, setChatOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
+  const [profileEditorOpen, setProfileEditorOpen] = useState(false);
   const { toast } = useToast();
   const { isAdmin } = useAdminRole();
   const { unreadCount } = useUnreadMessages();
@@ -235,6 +237,13 @@ const Community = () => {
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Ask Richie
             </TabsTrigger>
+            <button
+              onClick={() => setProfileEditorOpen(true)}
+              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors"
+            >
+              <User size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
+              Profile
+            </button>
             {isAdmin && (
               <button
                 onClick={() => setMembersDialogOpen(true)}
@@ -439,6 +448,11 @@ const Community = () => {
           console.log('Message member:', member);
           // Handle messaging logic here if needed
         }}
+      />
+
+      <ProfileEditor
+        isOpen={profileEditorOpen}
+        onClose={() => setProfileEditorOpen(false)}
       />
     </div>
   );
