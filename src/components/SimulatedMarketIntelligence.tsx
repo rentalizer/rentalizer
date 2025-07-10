@@ -199,7 +199,7 @@ export const SimulatedMarketIntelligence = () => {
     <div className="space-y-8">
 
       {/* Market Analysis Input */}
-      <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg max-w-6xl mx-auto">
+      <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg w-full mx-auto">
         <CardHeader className="pb-4 border-b border-gray-700/50">
           <CardTitle className="flex items-center justify-center gap-2 text-cyan-300 text-xl">
             <MapPin className="h-5 w-5 text-cyan-400" />
