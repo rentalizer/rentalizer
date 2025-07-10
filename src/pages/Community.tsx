@@ -24,6 +24,7 @@ import SimplifiedChat from '@/components/SimplifiedChat';
 import { AskRichieChat } from '@/components/AskRichieChat';
 import { ContactChat } from '@/components/ContactChat';
 import { AccessGate } from '@/components/AccessGate';
+import { MembersList } from '@/components/MembersList';
 
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useNavigate, Link } from 'react-router-dom';
@@ -67,6 +68,7 @@ const Community = () => {
   
   const [activeTab, setActiveTab] = useState(getInitialTab());
   const [isChatOpen, setChatOpen] = useState(false);
+  const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const { toast } = useToast();
   const { isAdmin } = useAdminRole();
@@ -225,17 +227,13 @@ const Community = () => {
               Ask Richie
             </TabsTrigger>
             {isAdmin && (
-              <TabsTrigger 
-                value="members" 
-                className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/admin/members');
-                }}
+              <button
+                onClick={() => setMembersDialogOpen(true)}
+                className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors"
               >
                 <Users size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
                 Members
-              </TabsTrigger>
+              </button>
             )}
           </TabsList>
 
@@ -423,6 +421,16 @@ const Community = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Members List Dialog */}
+      <MembersList 
+        open={membersDialogOpen} 
+        onOpenChange={setMembersDialogOpen}
+        onMessageMember={(member) => {
+          console.log('Message member:', member);
+          // Handle messaging logic here if needed
+        }}
+      />
     </div>
   );
 
