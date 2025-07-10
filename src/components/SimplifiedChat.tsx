@@ -24,6 +24,7 @@ export default function SimplifiedChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [adminUserId, setAdminUserId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Simple check if current user is admin
@@ -33,32 +34,163 @@ export default function SimplifiedChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Find admin user ID
+  useEffect(() => {
+    const findAdmin = async () => {
+      if (!user || isAdmin) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('id')
+          .eq('email', ADMIN_EMAIL)
+          .maybeSingle();
+        
+        if (error) {
+          console.error('Error finding admin:', error);
+          return;
+        }
+        
+        if (data) {
+          setAdminUserId(data.id);
+          console.log('Found admin user ID:', data.id);
+        } else {
+          console.log('Admin user not found in user_profiles');
+          // Try to find in profiles table instead
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('user_id')
+            .eq('display_name', 'Richie')
+            .maybeSingle();
+          
+          if (profileData) {
+            setAdminUserId(profileData.user_id);
+            console.log('Found admin in profiles:', profileData.user_id);
+          }
+        }
+      } catch (error) {
+        console.error('Error in findAdmin:', error);
+      }
+    };
+
+    findAdmin();
+  }, [user, isAdmin]);
+
+  // Load existing messages
+  useEffect(() => {
+    const loadMessages = async () => {
+      if (!user || (!isAdmin && !adminUserId)) return;
+
+      try {
+        let query = supabase
+          .from('direct_messages')
+          .select('*')
+          .order('created_at', { ascending: true });
+
+        if (isAdmin) {
+          // Admin sees all messages involving them
+          query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`);
+        } else if (adminUserId) {
+          // Regular user sees messages between them and admin
+          query = query.or(
+            `and(sender_id.eq.${user.id},recipient_id.eq.${adminUserId}),and(sender_id.eq.${adminUserId},recipient_id.eq.${user.id})`
+          );
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+          console.error('Error loading messages:', error);
+          return;
+        }
+
+        if (data) {
+          setMessages(data);
+        }
+      } catch (error) {
+        console.error('Error in loadMessages:', error);
+      }
+    };
+
+    loadMessages();
+  }, [user, adminUserId, isAdmin]);
+
   // Send message
   const sendMessage = async () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !user) return;
+
+    // Determine recipient
+    let recipientId = '';
+    if (isAdmin) {
+      // For admin, we'd need to select a user - for now just use their own ID
+      recipientId = user.id;
+    } else if (adminUserId) {
+      recipientId = adminUserId;
+    } else {
+      toast({
+        title: "Cannot send message",
+        description: "Staff member not available right now. Please try again later.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     setLoading(true);
     
-    const { error } = await supabase
-      .from('direct_messages')
-      .insert({
-        sender_id: user?.id || 'temp-user',
-        recipient_id: 'admin-temp', // We'll fix this later
-        sender_name: user?.email?.split('@')[0] || 'User',
-        message: newMessage.trim()
-      });
+    try {
+      const { error } = await supabase
+        .from('direct_messages')
+        .insert({
+          sender_id: user.id,
+          recipient_id: recipientId,
+          sender_name: user.email?.split('@')[0] || 'User',
+          message: newMessage.trim()
+        });
 
-    if (error) {
+      if (error) {
+        console.error('Error sending message:', error);
+        toast({
+          title: "Error sending message",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        setNewMessage('');
+        toast({
+          title: "Message sent!",
+          description: "Your message has been sent to staff"
+        });
+        
+        // Reload messages
+        setTimeout(() => {
+          const loadMessages = async () => {
+            let query = supabase
+              .from('direct_messages')
+              .select('*')
+              .order('created_at', { ascending: true });
+
+            if (isAdmin) {
+              query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`);
+            } else if (adminUserId) {
+              query = query.or(
+                `and(sender_id.eq.${user.id},recipient_id.eq.${adminUserId}),and(sender_id.eq.${adminUserId},recipient_id.eq.${user.id})`
+              );
+            }
+
+            const { data } = await query;
+            if (data) {
+              setMessages(data);
+            }
+          };
+          loadMessages();
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error in sendMessage:', error);
       toast({
         title: "Error sending message",
-        description: error.message,
+        description: "Failed to send message. Please try again.",
         variant: "destructive"
-      });
-    } else {
-      setNewMessage('');
-      toast({
-        title: "Message sent!",
-        description: "Your message has been sent to staff"
       });
     }
     
