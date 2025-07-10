@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -23,6 +24,7 @@ interface LoginDialogProps {
 export const LoginDialog = ({ trigger }: LoginDialogProps) => {
   const { signIn } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -90,10 +92,13 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
         description: "Welcome back to Rentalizer!",
       });
       
-      console.log('✅ Authentication successful, closing dialog');
+      console.log('✅ Authentication successful, navigating to community');
       setIsOpen(false);
       setEmail('');
       setPassword('');
+      
+      // Navigate to community page after successful login
+      navigate('/community');
       
     } catch (error: any) {
       console.error('❌ Authentication error:', error);
