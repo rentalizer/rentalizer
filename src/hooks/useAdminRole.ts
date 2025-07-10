@@ -13,9 +13,10 @@ export const useAdminRole = () => {
     const checkAdminRole = async () => {
       // ALWAYS check development environment FIRST - before any user checks
       const hostname = window.location.hostname;
-      const isLovableDev = hostname.includes('lovable.app') || hostname.includes('localhost') || hostname.includes('127.0.0.1');
+      const url = window.location.href;
+      const isLovableDev = hostname.includes('lovable.app') || hostname.includes('localhost') || hostname.includes('127.0.0.1') || url.includes('lovable');
       
-      console.log('🔍 Hostname:', hostname, 'Is Lovable Dev:', isLovableDev);
+      console.log('🔍 Hostname:', hostname, 'URL:', url, 'Is Lovable Dev:', isLovableDev);
       
       if (isLovableDev) {
         console.log('✅ LOVABLE DEVELOPMENT - GRANTING ADMIN ACCESS');
