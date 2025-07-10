@@ -20,7 +20,7 @@ import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
 import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { CommunityLeaderboard } from '@/components/community/CommunityLeaderboard';
 import { NewsFeed } from '@/components/community/NewsFeed';
-import { DirectMessaging } from '@/components/DirectMessaging';
+import { SimplifiedChat } from '@/components/SimplifiedChat';
 import { AskRichieChat } from '@/components/AskRichieChat';
 import { ContactChat } from '@/components/ContactChat';
 import { AccessGate } from '@/components/AccessGate';
@@ -248,7 +248,7 @@ const Community = () => {
           </TabsContent>
 
           <TabsContent value="messages" className="mt-8">
-            <MessageThreads />
+            <SimplifiedChat />
           </TabsContent>
 
           <TabsContent value="calculator" className="mt-8">
@@ -411,7 +411,7 @@ const Community = () => {
         </Tabs>
       </div>
 
-      <DirectMessaging />
+      
       <AskRichieChat />
     </div>
   );
