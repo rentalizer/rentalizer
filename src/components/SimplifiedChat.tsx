@@ -7,6 +7,7 @@ import { MessageCircle, Send, Crown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const ADMIN_EMAIL = 'richie@dialogo.us';
+const ADMIN_USER_ID = '4c1c3756-0815-4d9f-929e-9c12f1b6d9db';
 
 interface Message {
   id: string;
@@ -24,7 +25,7 @@ export default function SimplifiedChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [adminUserId, setAdminUserId] = useState<string | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Simple check if current user is admin
@@ -34,61 +35,10 @@ export default function SimplifiedChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Find admin user ID
-  useEffect(() => {
-    const findAdmin = async () => {      
-      try {
-        // First try to find admin in user_profiles
-        const { data, error } = await supabase
-          .from('user_profiles')
-          .select('id')
-          .eq('email', ADMIN_EMAIL)
-          .maybeSingle();
-        
-        if (error) {
-          console.error('Error finding admin:', error);
-        }
-        
-        if (data) {
-          setAdminUserId(data.id);
-          console.log('Found admin user ID:', data.id);
-        } else {
-          console.log('Admin user not found in user_profiles');
-          // Try to find in profiles table instead
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('user_id')
-            .eq('display_name', 'Richie')
-            .maybeSingle();
-          
-          if (profileData) {
-            setAdminUserId(profileData.user_id);
-            console.log('Found admin in profiles:', profileData.user_id);
-          } else {
-            // If no admin found, use current user's ID as fallback
-            // This ensures messages can still be sent
-            if (user && !isAdmin) {
-              setAdminUserId(user.id);
-              console.log('Using current user ID as fallback:', user.id);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error in findAdmin:', error);
-        // Fallback to current user ID
-        if (user && !isAdmin) {
-          setAdminUserId(user.id);
-        }
-      }
-    };
-
-    findAdmin();
-  }, [user, isAdmin]);
-
   // Load existing messages
   useEffect(() => {
     const loadMessages = async () => {
-      if (!user || (!isAdmin && !adminUserId)) return;
+      if (!user) return;
 
       try {
         let query = supabase
@@ -99,10 +49,10 @@ export default function SimplifiedChat() {
         if (isAdmin) {
           // Admin sees all messages involving them
           query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`);
-        } else if (adminUserId) {
+        } else {
           // Regular user sees messages between them and admin
           query = query.or(
-            `and(sender_id.eq.${user.id},recipient_id.eq.${adminUserId}),and(sender_id.eq.${adminUserId},recipient_id.eq.${user.id})`
+            `and(sender_id.eq.${user.id},recipient_id.eq.${ADMIN_USER_ID}),and(sender_id.eq.${ADMIN_USER_ID},recipient_id.eq.${user.id})`
           );
         }
 
@@ -115,6 +65,16 @@ export default function SimplifiedChat() {
 
         if (data) {
           setMessages(data);
+          
+          // Count unread messages for admin
+          if (isAdmin) {
+            const unread = data.filter(msg => 
+              msg.recipient_id === user.id && 
+              msg.sender_id !== user.id && 
+              !msg.read_at
+            ).length;
+            setUnreadCount(unread);
+          }
         }
       } catch (error) {
         console.error('Error in loadMessages:', error);
@@ -122,21 +82,14 @@ export default function SimplifiedChat() {
     };
 
     loadMessages();
-  }, [user, adminUserId, isAdmin]);
+  }, [user, isAdmin]);
 
   // Send message
   const sendMessage = async () => {
     if (!newMessage.trim() || !user) return;
 
-    // Determine recipient
-    let recipientId = '';
-    if (isAdmin) {
-      // For admin, we'd need to select a user - for now just use their own ID
-      recipientId = user.id;
-    } else {
-      // Always use admin user ID if available, otherwise use current user as fallback
-      recipientId = adminUserId || user.id;
-    }
+    // Determine recipient - non-admins always send to admin
+    const recipientId = isAdmin ? user.id : ADMIN_USER_ID;
 
     setLoading(true);
     
@@ -161,7 +114,7 @@ export default function SimplifiedChat() {
         setNewMessage('');
         toast({
           title: "Message sent!",
-          description: "Your message has been sent to staff"
+          description: isAdmin ? "Message sent" : "Your message has been sent to staff"
         });
         
         // Reload messages
@@ -174,9 +127,9 @@ export default function SimplifiedChat() {
 
             if (isAdmin) {
               query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`);
-            } else if (adminUserId) {
+            } else {
               query = query.or(
-                `and(sender_id.eq.${user.id},recipient_id.eq.${adminUserId}),and(sender_id.eq.${adminUserId},recipient_id.eq.${user.id})`
+                `and(sender_id.eq.${user.id},recipient_id.eq.${ADMIN_USER_ID}),and(sender_id.eq.${ADMIN_USER_ID},recipient_id.eq.${user.id})`
               );
             }
 
@@ -200,6 +153,30 @@ export default function SimplifiedChat() {
     setLoading(false);
   };
 
+  // Mark messages as read when admin opens chat
+  useEffect(() => {
+    if (isAdmin && messages.length > 0) {
+      const markAsRead = async () => {
+        const unreadMessages = messages.filter(msg => 
+          msg.recipient_id === user?.id && 
+          msg.sender_id !== user?.id && 
+          !msg.read_at
+        );
+
+        if (unreadMessages.length > 0) {
+          await supabase
+            .from('direct_messages')
+            .update({ read_at: new Date().toISOString() })
+            .in('id', unreadMessages.map(msg => msg.id));
+          
+          setUnreadCount(0);
+        }
+      };
+      
+      markAsRead();
+    }
+  }, [isAdmin, messages, user?.id]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -210,7 +187,14 @@ export default function SimplifiedChat() {
       <div className="p-4 border-b border-gray-700 bg-gradient-to-r from-cyan-600/20 to-purple-600/20">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <MessageCircle className="h-5 w-5 text-cyan-400" />
+            <div className="relative">
+              <MessageCircle className="h-5 w-5 text-cyan-400" />
+              {isAdmin && unreadCount > 0 && (
+                <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {unreadCount}
+                </div>
+              )}
+            </div>
             <h2 className="text-white font-semibold">
               {isAdmin ? 'Admin Chat' : 'Chat with Staff'}
             </h2>
