@@ -18,7 +18,7 @@ export const Listings = () => {
   const mockListings: Listing[] = [
     {
       id: '1',
-      image: '/lovable-uploads/d0f04aff-7c0b-4008-ac0c-7dd5c108ab09.png',
+      image: '/lovable-uploads/0776c07d-f4e4-4ca6-8376-0f5ad36cd715.png',
       title: 'La Jolla UTC w/ Pool & Hot Tub, Parking, King Beds',
       type: 'Apartment',
       location: 'San Diego, CA',
@@ -26,7 +26,7 @@ export const Listings = () => {
     },
     {
       id: '2', 
-      image: '/lovable-uploads/d21f97f7-ec22-4fdf-9adc-269fa47fec73.png',
+      image: '/lovable-uploads/0b25ffb5-6d6c-4c9e-9588-382c6f623250.png',
       title: 'King Bed Suite w/Gym/Bikes/Roof Top Pool & Hot Tub',
       type: 'Apartment',
       location: 'National City, CA', 
@@ -34,7 +34,7 @@ export const Listings = () => {
     },
     {
       id: '3',
-      image: '/lovable-uploads/d68927c6-c7f4-4dd4-8d17-979d51a48dad.png',
+      image: '/lovable-uploads/0d9f9b9f-0e87-44b9-9fcd-070f6385b0b3.png',
       title: 'Resort Style Condo w/Pool/Hot Tub, Gym, Game Room',
       type: 'Apartment',
       location: 'San Diego, CA',
@@ -42,7 +42,7 @@ export const Listings = () => {
     },
     {
       id: '4',
-      image: '/lovable-uploads/d6a5a46f-caad-4378-8869-7525c7e6f621.png',
+      image: '/lovable-uploads/15a50a5b-6be3-4748-890e-e21cc49858d6.png',
       title: 'Classy & Clean Apt w/ Parking, AC, Cable+HBO',
       type: 'Apartment',
       location: 'San Diego, CA',
@@ -50,7 +50,7 @@ export const Listings = () => {
     },
     {
       id: '5',
-      image: '/lovable-uploads/e23a9817-2f9e-42bb-8e9c-6fa45ccc8deb.png',
+      image: '/lovable-uploads/22d0aaf6-1675-429d-8460-84635d496d31.png',
       title: 'Central King Bed Lux Suite w/Pool/HotTub/Gym/Bikes',
       type: 'Apartment',
       location: 'National City, CA',
@@ -58,7 +58,7 @@ export const Listings = () => {
     },
     {
       id: '6',
-      image: '/lovable-uploads/e5dcd8f4-2858-4789-9448-f876221dedec.png',
+      image: '/lovable-uploads/27446a86-7a38-4fbf-9e31-d209f852fca3.png',
       title: 'Sunny Studio Near Restaurants+Attractions',
       type: 'Apartment',
       location: 'San Diego, CA',
@@ -66,7 +66,7 @@ export const Listings = () => {
     },
     {
       id: '7',
-      image: '/lovable-uploads/ef710610-2357-4b37-930f-9f6f689c6888.png',
+      image: '/lovable-uploads/3094bcc7-d39b-4765-89d3-ce4f2146e7f1.png',
       title: 'Resort Style by Beach w/Pool/Gym/Theater/King Beds',
       type: 'Apartment',
       location: 'San Diego, CA',
@@ -74,7 +74,7 @@ export const Listings = () => {
     },
     {
       id: '8',
-      image: '/lovable-uploads/f01a7927-4318-452b-8513-c35042097178.png',
+      image: '/lovable-uploads/3ff6b265-2add-4f8e-9f58-2ffe760dc9a6.png',
       title: 'Resort Style by Beach + Pool/Hot Tub/Gym/King Beds',
       type: 'Apartment',
       location: 'San Diego, CA',
@@ -82,7 +82,7 @@ export const Listings = () => {
     },
     {
       id: '9',
-      image: '/lovable-uploads/f475d8b4-915e-4c34-b435-fe9e431107e3.png',
+      image: '/lovable-uploads/4cae85e1-7ac3-4a4b-989d-c4cb8ecca460.png',
       title: 'Bright Downtown Apt w/WiFi, Cable, Walk to All',
       type: 'Apartment',
       location: 'San Diego, CA',
@@ -90,7 +90,7 @@ export const Listings = () => {
     },
     {
       id: '10',
-      image: '/lovable-uploads/f5ff4f34-560a-42e3-92d3-aea5ceced3a5.png',
+      image: '/lovable-uploads/551496ee-3322-4eef-bc59-fad0dc27bfb3.png',
       title: 'Modern Close to Airport, Suite w/ WiFi + Cable/HBO',
       type: 'Apartment',
       location: 'San Diego, CA',
@@ -98,7 +98,7 @@ export const Listings = () => {
     },
     {
       id: '11',
-      image: '/lovable-uploads/fcf74d36-487a-4dca-bb60-87c5b306b7e0.png',
+      image: '/lovable-uploads/5eeba32a-ec11-45dd-9658-aa22f387c552.png',
       title: 'Sunny Downtown Apt: Walk to All, Parking/HBO/WiFi',
       type: 'Apartment',
       location: 'San Diego, CA',
@@ -106,7 +106,7 @@ export const Listings = () => {
     },
     {
       id: '12',
-      image: '/lovable-uploads/8f8edc04-6698-4212-8d0d-49e6b8c81e58.png',
+      image: '/lovable-uploads/63fa0f83-9854-40b9-9b31-5e8cb09b7e76.png',
       title: 'Sunny Top Floor Old Town Studio by SeaWorld + All',
       type: 'Apartment',
       location: 'San Diego, CA',
