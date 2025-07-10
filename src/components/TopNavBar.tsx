@@ -91,78 +91,65 @@ export const TopNavBar = () => {
             })}
           </div>
 
-          {/* Right side - Contact Us and Login/User info */}
-          <div className="flex items-center gap-3">
-            {/* Contact Us button - always visible */}
+          {/* Right side - Login or User info */}
+          {user ? (
+            <div className="flex items-center gap-4">
+              <button 
+                className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20 hover:bg-gray-800/50 transition-colors cursor-pointer"
+                onClick={() => {
+                  alert('Profile button clicked! Navigating to profile setup...');
+                  console.log('🔧 Profile button clicked!');
+                  navigate('/profile-setup');
+                }}
+                type="button"
+                title="Click to edit your profile"
+              >
+                <User className="h-4 w-4 text-cyan-400" />
+                <span className="text-cyan-300 pointer-events-none">{user.email}</span>
+                <Badge 
+                  variant="outline" 
+                  className="bg-green-900/30 border-green-500/30 text-green-300 text-xs px-2 py-0 pointer-events-none"
+                >
+                  {isAdmin ? 'Admin' : 'Pro'}
+                </Badge>
+              </button>
+              <Button
+                id="new-logout-btn-v3"
+                data-version="v3-no-alerts"
+                onClick={() => {
+                  console.log('🚪 NEW LOGOUT BUTTON V3 - NO ALERTS!');
+                  // Aggressive cleanup
+                  try {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    // Clear cookies
+                    document.cookie.split(";").forEach(function(c) { 
+                      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                    });
+                  } catch (e) {
+                    console.log('Cleanup error:', e);
+                  }
+                  // Force redirect
+                  window.location.href = '/auth?v=3&t=' + Date.now();
+                }}
+                variant="outline"
+                size="sm"
+                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            </div>
+          ) : (
             <Button
-              onClick={() => window.open('mailto:support@rentalizer.com', '_blank')}
+              onClick={() => navigate('/auth')}
               variant="outline"
               size="sm"
               className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium"
             >
-              Contact Us
+              Login
             </Button>
-            
-            {/* Login or User info */}
-            {user ? (
-              <div className="flex items-center gap-4">
-                <button 
-                  className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20 hover:bg-gray-800/50 transition-colors cursor-pointer"
-                  onClick={() => {
-                    alert('Profile button clicked! Navigating to profile setup...');
-                    console.log('🔧 Profile button clicked!');
-                    navigate('/profile-setup');
-                  }}
-                  type="button"
-                  title="Click to edit your profile"
-                >
-                  <User className="h-4 w-4 text-cyan-400" />
-                  <span className="text-cyan-300 pointer-events-none">{user.email}</span>
-                  <Badge 
-                    variant="outline" 
-                    className="bg-green-900/30 border-green-500/30 text-green-300 text-xs px-2 py-0 pointer-events-none"
-                  >
-                    {isAdmin ? 'Admin' : 'Pro'}
-                  </Badge>
-                </button>
-                <Button
-                  id="new-logout-btn-v3"
-                  data-version="v3-no-alerts"
-                  onClick={() => {
-                    console.log('🚪 NEW LOGOUT BUTTON V3 - NO ALERTS!');
-                    // Aggressive cleanup
-                    try {
-                      localStorage.clear();
-                      sessionStorage.clear();
-                      // Clear cookies
-                      document.cookie.split(";").forEach(function(c) { 
-                        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-                      });
-                    } catch (e) {
-                      console.log('Cleanup error:', e);
-                    }
-                    // Force redirect
-                    window.location.href = '/auth?v=3&t=' + Date.now();
-                  }}
-                  variant="outline"
-                  size="sm"
-                  className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
-                </Button>
-              </div>
-            ) : (
-              <Button
-                onClick={() => navigate('/auth')}
-                variant="outline"
-                size="sm"
-                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium"
-              >
-                Login
-              </Button>
-            )}
-          </div>
+          )}
         </div>
       </div>
     </div>
