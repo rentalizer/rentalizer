@@ -268,7 +268,12 @@ const CommunityGate = () => {
 
   // Show community if user is authenticated  
   if (user) {
-    return <Community />;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+        <TopNavBarTest />
+        <Community />
+      </div>
+    );
   }
 
   // Show login gate if not authenticated and not in development
