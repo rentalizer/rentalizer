@@ -8,8 +8,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { User, DollarSign } from "lucide-react";
 import Index from "./pages/Index";
 import LandingPage from "./pages/LandingPage";
-import Demo from "./pages/Demo";
-import Calculator from "./pages/Calculator";
+import DemoGate from "./pages/DemoGate";
+import CalculatorGate from "./pages/CalculatorGate";
 import Calc from "./pages/Calc";
 import Login from "./pages/Login";
 import MarketAnalysis from "./pages/MarketAnalysis";
@@ -48,10 +48,10 @@ const AppRoutes = () => (
     <Route path="/test-home" element={<TestHome />} />
     <Route path="/login" element={<Login />} />
     <Route path="/dashboard" element={<Index />} />
-    <Route path="/demo" element={<Demo />} />
+    <Route path="/demo" element={<DemoGate />} />
     <Route path="/pricing" element={<Pricing />} />
     <Route path="/markets" element={<MarketAnalysis />} />
-    <Route path="/calculator" element={<Calculator />} />
+    <Route path="/calculator" element={<CalculatorGate />} />
     <Route path="/calculator-test" element={<CalculatorTest />} />
     <Route path="/calculator-test-gate" element={<CalculatorTestGate />} />
     <Route path="/calc" element={<Calc />} />
