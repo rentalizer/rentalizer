@@ -66,6 +66,7 @@ const Community = () => {
   };
   
   const [activeTab, setActiveTab] = useState(getInitialTab());
+  const [isChatOpen, setChatOpen] = useState(false);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const { toast } = useToast();
   const { isAdmin } = useAdminRole();
@@ -208,10 +209,13 @@ const Community = () => {
               <Video className="h-5 w-5 mr-2" />
               Training
             </TabsTrigger>
-            <TabsTrigger value="messages" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+            <button 
+              onClick={() => setChatOpen(true)}
+              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors"
+            >
               <MessageSquare className="h-5 w-5 mr-2" />
               Chat
-            </TabsTrigger>
+            </button>
             <TabsTrigger value="calculator" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
@@ -247,9 +251,6 @@ const Community = () => {
             <VideoLibrary />
           </TabsContent>
 
-          <TabsContent value="messages" className="mt-8">
-            <SimplifiedChat />
-          </TabsContent>
 
           <TabsContent value="calculator" className="mt-8">
             <div className="space-y-6">
@@ -413,6 +414,21 @@ const Community = () => {
 
       
       <AskRichieChat />
+      
+      {/* Chat Dialog */}
+      <Dialog open={isChatOpen} onOpenChange={setChatOpen}>
+        <DialogContent className="max-w-4xl h-[80vh] bg-slate-900 border-cyan-500/20">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-cyan-400" />
+              Chat with Staff
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <SimplifiedChat />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 
