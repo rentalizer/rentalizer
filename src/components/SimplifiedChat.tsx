@@ -86,8 +86,8 @@ export default function SimplifiedChat() {
   const sendMessage = async () => {
     if (!newMessage.trim() || !user) return;
 
-    // Determine recipient - non-admins always send to admin
-    const recipientId = isAdmin ? user.id : ADMIN_USER_ID;
+    // Determine recipient - non-admins always send to admin, admins send to admin (for now)
+    const recipientId = isAdmin ? ADMIN_USER_ID : ADMIN_USER_ID;
 
     setLoading(true);
     
