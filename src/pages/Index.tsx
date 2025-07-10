@@ -197,8 +197,10 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-slate-800/50 border-cyan-500/20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black">
+      <TopNavBar />
+      <div className="flex items-center justify-center p-4 pt-20">
+        <Card className="w-full max-w-md bg-slate-800/50 border-cyan-500/20">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl text-white">Community Access</CardTitle>
           <p className="text-gray-400">Join our vibrant community of rental entrepreneurs</p>
@@ -336,7 +338,8 @@ const Index = () => {
             </p>
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };
