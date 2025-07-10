@@ -55,7 +55,7 @@ export const MembersList = ({ open, onOpenChange, onMessageMember }: MembersList
   const fetchMembers = async () => {
     setLoading(true);
     try {
-      // Fetch all user profiles and check for admin roles
+      // Fetch all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('user_id, display_name, first_name, last_name, avatar_url, created_at')
@@ -71,6 +71,15 @@ export const MembersList = ({ open, onOpenChange, onMessageMember }: MembersList
         return;
       }
 
+      // Fetch all user_profiles to get emails
+      const { data: userProfiles, error: userProfilesError } = await supabase
+        .from('user_profiles')
+        .select('id, email');
+
+      if (userProfilesError) {
+        console.error('Error fetching user profiles:', userProfilesError);
+      }
+
       // Get admin roles
       const { data: adminRoles } = await supabase
         .from('user_roles')
@@ -79,12 +88,14 @@ export const MembersList = ({ open, onOpenChange, onMessageMember }: MembersList
 
       const adminUserIds = new Set(adminRoles?.map(role => role.user_id) || []);
 
-      // Get auth users for email info (this is a simplified approach)
-      // In a real app, you'd want to handle this differently for better performance
+      // Create a map of user_id to email
+      const emailMap = new Map(userProfiles?.map(up => [up.id, up.email]) || []);
+
+      // Map profiles with real email addresses
       const membersList: Member[] = profiles?.map(profile => {
         return {
           id: profile.user_id,
-          email: `user-${profile.user_id.slice(0, 8)}@example.com`, // Placeholder for now
+          email: emailMap.get(profile.user_id) || 'No email available',
           display_name: profile.display_name,
           first_name: profile.first_name,
           last_name: profile.last_name,
