@@ -20,7 +20,7 @@ import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
 import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { CommunityLeaderboard } from '@/components/community/CommunityLeaderboard';
 import { NewsFeed } from '@/components/community/NewsFeed';
-import { SimplifiedChat } from '@/components/SimplifiedChat';
+import SimplifiedChat from '@/components/SimplifiedChat';
 import { AskRichieChat } from '@/components/AskRichieChat';
 import { ContactChat } from '@/components/ContactChat';
 import { AccessGate } from '@/components/AccessGate';
