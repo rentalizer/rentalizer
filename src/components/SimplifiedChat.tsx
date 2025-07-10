@@ -26,8 +26,6 @@ export default function SimplifiedChat() {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  console.log('SimplifiedChat render - user:', user);
-
   // Simple check if current user is admin
   const isAdmin = user?.email === ADMIN_EMAIL;
 
@@ -37,16 +35,16 @@ export default function SimplifiedChat() {
 
   // Send message
   const sendMessage = async () => {
-    if (!newMessage.trim() || !user) return;
+    if (!newMessage.trim()) return;
 
     setLoading(true);
     
     const { error } = await supabase
       .from('direct_messages')
       .insert({
-        sender_id: user.id,
-        recipient_id: 'admin-id', // We'll fix this later
-        sender_name: user.email?.split('@')[0] || 'User',
+        sender_id: user?.id || 'temp-user',
+        recipient_id: 'admin-temp', // We'll fix this later
+        sender_name: user?.email?.split('@')[0] || 'User',
         message: newMessage.trim()
       });
 
@@ -67,7 +65,10 @@ export default function SimplifiedChat() {
     setLoading(false);
   };
 
-  // Always show the chat interface
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   return (
     <div className="h-full flex flex-col bg-slate-800/50 rounded-lg">
       {/* Header */}
@@ -83,11 +84,6 @@ export default function SimplifiedChat() {
             <Crown className="h-5 w-5 text-yellow-400" />
           )}
         </div>
-        {user && (
-          <div className="text-sm text-gray-400 mt-1">
-            Logged in as: {user.email}
-          </div>
-        )}
       </div>
 
       {/* Messages */}
@@ -96,9 +92,6 @@ export default function SimplifiedChat() {
           <div className="text-center text-gray-400 py-8">
             <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>No messages yet. Start the conversation!</p>
-            {!user && (
-              <p className="text-sm mt-2">Please sign in to chat with staff</p>
-            )}
           </div>
         ) : (
           messages.map((message) => (
@@ -129,33 +122,27 @@ export default function SimplifiedChat() {
 
       {/* Message Input */}
       <div className="p-4 border-t border-gray-700">
-        {user ? (
-          <div className="flex gap-2">
-            <Input
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type your message..."
-              className="flex-1 bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  sendMessage();
-                }
-              }}
-              disabled={loading}
-            />
-            <Button
-              onClick={sendMessage}
-              disabled={!newMessage.trim() || loading}
-              className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-        ) : (
-          <div className="text-center text-gray-400">
-            Please sign in to send messages
-          </div>
-        )}
+        <div className="flex gap-2">
+          <Input
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-1 bg-slate-700 border-slate-600 text-white placeholder-gray-400"
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                sendMessage();
+              }
+            }}
+            disabled={loading}
+          />
+          <Button
+            onClick={sendMessage}
+            disabled={!newMessage.trim() || loading}
+            className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
+          >
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
