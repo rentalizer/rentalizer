@@ -203,38 +203,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black">
-      <div className="w-full bg-slate-700/90 backdrop-blur-lg border-b border-gray-500/50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            {/* Left side - Logo */}
-            <div className="flex items-center gap-3">
-              <BarChart3 className="h-8 w-8 text-cyan-400" style={{
-                filter: 'drop-shadow(0 0 6px rgba(6, 182, 212, 1)) drop-shadow(0 0 12px rgba(6, 182, 212, 0.9)) drop-shadow(0 0 18px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 24px rgba(6, 182, 212, 0.7)) drop-shadow(0 0 30px rgba(6, 182, 212, 0.6)) drop-shadow(0 0 36px rgba(6, 182, 212, 0.5))'
-              }} />
-            </div>
-            
-            {/* Right side - Contact Us and Login */}
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={() => window.open('mailto:support@rentalizer.com', '_blank')}
-                variant="outline"
-                size="sm"
-                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium"
-              >
-                Contact Us
-              </Button>
-              <Button
-                onClick={() => navigate('/auth')}
-                variant="outline"
-                size="sm"
-                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium"
-              >
-                Login
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <TopNavBar />
       <div className="flex items-center justify-center p-4 pt-20">
         <Card className="w-full max-w-md bg-slate-800/50 border-cyan-500/20">
         <CardHeader className="text-center">
