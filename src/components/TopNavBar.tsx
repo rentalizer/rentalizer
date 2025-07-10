@@ -92,9 +92,9 @@ export const TopNavBar = () => {
             </div>
           )}
 
-          {/* Right side - Always show Contact Us when not logged in */}
+          {/* Right side - Login or User info */}
           <div className="flex-shrink-0">
-          {user && !isLoading ? (
+          {user ? (
             <div className="flex items-center gap-4">
               <button 
                 className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20 hover:bg-gray-800/50 transition-colors cursor-pointer"
@@ -125,8 +125,11 @@ export const TopNavBar = () => {
                 Sign Out
               </Button>
             </div>
-          ) : (
-            <div className="flex items-center gap-2 min-w-0">
+          ) : null}
+          
+          {/* Always show these buttons when not authenticated */}
+          {!user && (
+            <div className="flex items-center gap-2">
               <Button
                 onClick={() => window.open('mailto:support@rentalizer.com', '_blank')}
                 variant="outline"
