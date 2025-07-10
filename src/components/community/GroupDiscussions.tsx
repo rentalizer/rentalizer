@@ -25,6 +25,7 @@ interface Discussion {
   likes: number;
   comments: number;
   timeAgo: string;
+  created_at: string;
   isPinned?: boolean;
   isLiked?: boolean;
   attachments?: {
@@ -123,6 +124,7 @@ export const GroupDiscussions = () => {
         likes: discussion.likes_count || 0,
         comments: discussion.comments_count || 0,
         timeAgo: formatTimeAgo(discussion.created_at),
+        created_at: discussion.created_at,
         isPinned: false,
         isLiked: false,
         attachments: undefined
@@ -140,6 +142,7 @@ export const GroupDiscussions = () => {
           likes: 0,
           comments: 0,
           timeAgo: '1d ago',
+          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
           isPinned: true,
           isLiked: false,
           attachments: undefined
@@ -154,6 +157,7 @@ export const GroupDiscussions = () => {
           likes: 0,
           comments: 1,
           timeAgo: '4h ago',
+          created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -168,6 +172,7 @@ export const GroupDiscussions = () => {
           likes: 4,
           comments: 5,
           timeAgo: '16d ago',
+          created_at: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString(), // 16 days ago
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -182,6 +187,7 @@ export const GroupDiscussions = () => {
           likes: 4,
           comments: 7,
           timeAgo: '1d ago',
+          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -196,6 +202,7 @@ export const GroupDiscussions = () => {
           likes: 5,
           comments: 5,
           timeAgo: '21d ago',
+          created_at: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(), // 21 days ago
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -210,6 +217,7 @@ export const GroupDiscussions = () => {
           likes: 4,
           comments: 8,
           timeAgo: '14d ago',
+          created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days ago
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -224,6 +232,7 @@ export const GroupDiscussions = () => {
           likes: 4,
           comments: 2,
           timeAgo: '12d ago',
+          created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(), // 12 days ago
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -576,7 +585,9 @@ export const GroupDiscussions = () => {
       // Sort pinned posts to top
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
-      return 0;
+      
+      // For posts with same pinned status, sort by creation date (newest first)
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
 
   return (
