@@ -50,8 +50,8 @@ export default function SimplifiedChat() {
           // Admin sees all messages involving the admin account
           query = query.or(`sender_id.eq.${ADMIN_USER_ID},recipient_id.eq.${ADMIN_USER_ID}`);
         } else {
-          // Regular user sees messages between them and admin
-          query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${ADMIN_USER_ID}`);
+          // Regular user sees full conversation: messages they sent to admin AND messages admin sent to them
+          query = query.or(`sender_id.eq.${user.id}.and.recipient_id.eq.${ADMIN_USER_ID},sender_id.eq.${ADMIN_USER_ID}.and.recipient_id.eq.${user.id}`);
         }
 
         const { data, error } = await query;
@@ -126,7 +126,7 @@ export default function SimplifiedChat() {
             if (isAdmin) {
               query = query.or(`sender_id.eq.${ADMIN_USER_ID},recipient_id.eq.${ADMIN_USER_ID}`);
             } else {
-              query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${ADMIN_USER_ID}`);
+              query = query.or(`sender_id.eq.${user.id}.and.recipient_id.eq.${ADMIN_USER_ID},sender_id.eq.${ADMIN_USER_ID}.and.recipient_id.eq.${user.id}`);
             }
 
             const { data } = await query;
