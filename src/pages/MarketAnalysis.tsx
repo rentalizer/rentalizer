@@ -33,25 +33,6 @@ const MarketAnalysis = () => {
                 Market Intelligence
               </h1>
             </div>
-            <p className="text-2xl text-cyan-100 mb-8 max-w-3xl mx-auto">
-              Find The Best Rental Arbitrage Markets
-            </p>
-            
-            <div className="flex items-center justify-center gap-4 mb-8 flex-wrap">
-              <Badge variant="outline" className="bg-gray-800/50 border-cyan-500/30 text-cyan-300 px-4 py-2">
-                <Home className="h-4 w-4 mr-1" />
-                1BR - 3BR Apartments
-              </Badge>
-              <Badge variant="outline" className="bg-gray-800/50 border-purple-500/30 text-purple-300 px-4 py-2">
-                Revenue/Rent Ratio
-              </Badge>
-              <Badge variant="outline" className="bg-gray-800/50 border-blue-500/30 text-blue-300 px-4 py-2">
-                Heat Map
-              </Badge>
-              <Badge variant="outline" className="bg-gray-800/50 border-green-500/30 text-green-300 px-4 py-2">
-                Export Data
-              </Badge>
-            </div>
           </div>
 
           {/* Simulated Market Intelligence Component */}
