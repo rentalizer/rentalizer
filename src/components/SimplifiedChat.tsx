@@ -45,16 +45,21 @@ export const SimplifiedChat = () => {
   // Find admin user ID
   const findAdminUserId = async () => {
     try {
+      console.log('Looking for admin user with email:', ADMIN_EMAIL);
       const { data, error } = await supabase
         .from('user_profiles')
         .select('id')
         .eq('email', ADMIN_EMAIL)
         .single();
 
+      console.log('Admin lookup result:', { data, error });
       if (error) throw error;
       setAdminUserId(data?.id || null);
+      console.log('Admin user ID set to:', data?.id || null);
     } catch (error) {
       console.error('Error finding admin:', error);
+      // Set a fallback so component doesn't stay stuck
+      setAdminUserId('not-found');
     }
   };
 
@@ -256,7 +261,21 @@ export const SimplifiedChat = () => {
     scrollToBottom();
   }, [messages]);
 
-  if (!user) return <div className="text-gray-400 text-center">Please log in to chat</div>;
+  if (!user) return (
+    <div className="h-full flex items-center justify-center bg-slate-800/50 rounded-lg">
+      <div className="text-center p-8">
+        <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+        <h3 className="text-white font-semibold mb-2">Join the Conversation</h3>
+        <p className="text-gray-400 mb-4">Please log in to chat with Richie and other community members</p>
+        <Button 
+          onClick={() => window.location.href = '/auth'}
+          className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
+        >
+          Sign In
+        </Button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="h-full flex flex-col bg-slate-800/50 rounded-lg">
