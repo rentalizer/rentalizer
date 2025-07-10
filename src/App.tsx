@@ -22,6 +22,7 @@ import Test3 from "./pages/Test3";
 import Test4 from "./pages/Test4";
 import Test5 from "./pages/Test5";
 import Pricing from "./pages/Pricing";
+import ListingsGate from "./pages/ListingsGate";
 import AcquisitionsAgent from "./pages/AcquisitionsAgent";
 import Community from "./pages/Community";
 import TestCommunity from "./pages/TestCommunity";
@@ -49,6 +50,7 @@ const AppRoutes = () => (
     <Route path="/login" element={<Login />} />
     <Route path="/dashboard" element={<Index />} />
     <Route path="/demo" element={<DemoGate />} />
+    <Route path="/listings" element={<ListingsGate />} />
     <Route path="/pricing" element={<Pricing />} />
     <Route path="/markets" element={<MarketAnalysis />} />
     <Route path="/calculator" element={<CalculatorGate />} />
