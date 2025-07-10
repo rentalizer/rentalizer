@@ -27,6 +27,7 @@ import { AccessGate } from '@/components/AccessGate';
 import { MembersList } from '@/components/MembersList';
 
 import { useAdminRole } from '@/hooks/useAdminRole';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useNavigate, Link } from 'react-router-dom';
 
 export interface CalculatorData {
@@ -72,6 +73,7 @@ const Community = () => {
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const { toast } = useToast();
   const { isAdmin } = useAdminRole();
+  const { unreadCount } = useUnreadMessages();
   const navigate = useNavigate();
   
   // Check if we're in Lovable environment
@@ -213,10 +215,17 @@ const Community = () => {
             </TabsTrigger>
             <button 
               onClick={() => setChatOpen(true)}
-              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors"
+              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors relative"
             >
               <MessageSquare className="h-5 w-5 mr-2" />
               Chat
+              {unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-xs text-white font-semibold">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                </div>
+              )}
             </button>
             <TabsTrigger value="calculator" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
