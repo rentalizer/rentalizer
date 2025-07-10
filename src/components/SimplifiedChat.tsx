@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MessageCircle, Send, Crown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAdminRole } from '@/hooks/useAdminRole';
 
 const ADMIN_EMAIL = 'richie@dialogo.us';
 const ADMIN_USER_ID = '4c1c3756-0815-4d9f-929e-9c12f1b6d9db';
@@ -21,15 +22,13 @@ interface Message {
 
 export default function SimplifiedChat() {
   const { user } = useAuth();
+  const { isAdmin } = useAdminRole();
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Simple check if current user is admin
-  const isAdmin = user?.email === ADMIN_EMAIL;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
