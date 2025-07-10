@@ -19,7 +19,7 @@ export const Listings = () => {
     {
       id: '1',
       image: '/lovable-uploads/3094bcc7-d39b-4765-89d3-ce4f2146e7f1.png',
-      title: 'La Jolla UTC King Bed Suite w/Sauna/Gym/Parking',
+      title: 'La Jolla UTC w/ Pool & Hot Tub, Parking, King Beds',
       type: 'Home',
       location: 'San Diego, CA',
       status: 'Listed'
@@ -27,90 +27,90 @@ export const Listings = () => {
     {
       id: '2', 
       image: '/lovable-uploads/4cae85e1-7ac3-4a4b-989d-c4cb8ecca460.png',
-      title: 'La Jolla UTC w/Pool&HotTub, Parking, DBL King Beds',
+      title: 'King Bed Suite w/Gym/Bikes/Roof Top Pool & Hot Tub',
       type: 'Home',
-      location: 'San Diego, CA', 
-      status: 'Unlisted'
+      location: 'National City, CA', 
+      status: 'Listed'
     },
     {
       id: '3',
       image: '/lovable-uploads/5eeba32a-ec11-45dd-9658-aa22f387c552.png',
-      title: 'King Bed Suite w/Gym/Bikes/Roof Top Pool & Hot Tub',
+      title: 'Resort Style Condo w/Pool/Hot Tub, Gym, Game Room',
       type: 'Home',
-      location: 'National City, CA',
-      status: 'Unlisted'
+      location: 'San Diego, CA',
+      status: 'Listed'
     },
     {
       id: '4',
       image: '/lovable-uploads/63fa0f83-9854-40b9-9b31-5e8cb09b7e76.png',
-      title: 'La Jolla UTC w/ Pool & Hot Tub, Parking, King Bed',
+      title: 'Classy & Clean Apt w/ Parking, AC, Cable+HBO',
       type: 'Home',
       location: 'San Diego, CA',
-      status: 'Unlisted'
+      status: 'Listed'
     },
     {
       id: '5',
       image: '/lovable-uploads/70c9252d-ac0e-4032-ba29-4f8266b1376e.png',
-      title: 'King Bed Suite w/Gym/Bikes/Roof Top Pool & Hot Tub',
+      title: 'Central King Bed Lux Suite w/Pool/HotTub/Gym/Bikes',
       type: 'Home',
       location: 'National City, CA',
-      status: 'Unlisted'
+      status: 'Listed'
     },
     {
       id: '6',
       image: '/lovable-uploads/7bd31141-d3df-4e3e-9f94-29f10eb8c732.png',
-      title: 'Central King Beds Suite, Gym, Roof Top Pool/HotTub',
+      title: 'Sunny Studio Near Restaurants+Attractions',
       type: 'Home',
-      location: 'National City, CA',
-      status: 'Unlisted'
+      location: 'San Diego, CA',
+      status: 'Listed'
     },
     {
       id: '7',
       image: '/lovable-uploads/7f34eb9c-8203-4a0e-9138-da167c04b7a7.png',
-      title: 'Central King Beds Suite, Gym, Roof Top Pool/HotTub',
+      title: 'Resort Style by Beach w/Pool/Gym/Theater/King Beds',
       type: 'Home',
-      location: 'National City, CA',
-      status: 'Unlisted'
+      location: 'San Diego, CA',
+      status: 'Listed'
     },
     {
       id: '8',
       image: '/lovable-uploads/858e220e-58b7-4df0-a31b-5672f102d711.png',
-      title: 'Central King Beds Suite, Gym, Roof Top Pool/HotTub',
+      title: 'Resort Style by Beach + Pool/Hot Tub/Gym/King Beds',
       type: 'Home',
-      location: 'National City, CA',
-      status: 'Unlisted'
+      location: 'San Diego, CA',
+      status: 'Listed'
     },
     {
       id: '9',
       image: '/lovable-uploads/89726636-685c-405f-b66b-5429eb0d7431.png',
-      title: 'Beach Penthouse w/Hot Tub/Gym/King Bed',
+      title: 'Bright Downtown Apt w/WiFi, Cable, Walk to All',
       type: 'Home',
-      location: 'Carlsbad, CA',
-      status: 'Unlisted'
+      location: 'San Diego, CA',
+      status: 'Listed'
     },
     {
       id: '10',
       image: '/lovable-uploads/8d3cb97f-6ec1-444e-9e13-776f5fb850e5.png',
-      title: 'Beach Penthouse w/King Hot Tub, Gym/30GymMin',
+      title: 'Modern Close to Airport, Suite w/ WiFi + Cable/HBO',
       type: 'Home',
-      location: 'Carlsbad, CA',
-      status: 'Unlisted'
+      location: 'San Diego, CA',
+      status: 'Listed'
     },
     {
       id: '11',
       image: '/lovable-uploads/8da8a7e7-2b4f-4a58-aecd-6b808e930891.png',
-      title: 'Beach Stay with Bikes, Pool, King Bed, Fast WiFi',
+      title: 'Sunny Downtown Apt: Walk to All, Parking/HBO/WiFi',
       type: 'Home',
-      location: 'Solana Beach, CA',
-      status: 'Unlisted'
+      location: 'San Diego, CA',
+      status: 'Listed'
     },
     {
       id: '12',
       image: '/lovable-uploads/8e300e4a-2470-4019-a82d-fae65ffdaa2b.png',
-      title: 'Beach Staycation: Bikes, King Bed, Fast WiFi, Pool',
+      title: 'Sunny Top Floor Old Town Studio by SeaWorld + All',
       type: 'Home',
-      location: 'Solana Beach, CA',
-      status: 'Unlisted'
+      location: 'San Diego, CA',
+      status: 'Listed'
     }
   ];
 
