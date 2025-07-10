@@ -32,7 +32,12 @@ const Index = () => {
   const [promoCode, setPromoCode] = useState('');
   const [signupLoading, setSignupLoading] = useState(false);
 
-  // No automatic redirect - let users see the welcome page with TopNavBar
+  // Redirect authenticated users to community
+  useEffect(() => {
+    if (user && !isLoading) {
+      navigate('/community');
+    }
+  }, [user, isLoading, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
