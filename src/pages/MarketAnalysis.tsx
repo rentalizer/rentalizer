@@ -21,24 +21,11 @@ const MarketAnalysis = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden flex flex-col">
       <TopNavBar />
       
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-purple-500/10 blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-blue-500/5 blur-2xl animate-pulse delay-500"></div>
-      </div>
 
       <div className="relative z-10 flex-1">
-        <div className="container mx-auto px-6 py-8">
+        <div className="max-w-4xl mx-auto px-6 py-8">
           {/* Header */}
           <div className="text-center mb-12">
-            <Button
-              onClick={() => navigate('/')}
-              variant="outline"
-              className="mb-6 border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
             
             <div className="flex items-center justify-center gap-6 mb-8 px-4">
               <BarChart3 className="h-16 w-16 text-cyan-400 flex-shrink-0" />
