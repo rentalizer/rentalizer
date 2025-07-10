@@ -51,9 +51,7 @@ export default function SimplifiedChat() {
           query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`);
         } else {
           // Regular user sees messages between them and admin
-          query = query.or(
-            `and(sender_id.eq.${user.id},recipient_id.eq.${ADMIN_USER_ID}),and(sender_id.eq.${ADMIN_USER_ID},recipient_id.eq.${user.id})`
-          );
+          query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${ADMIN_USER_ID}`);
         }
 
         const { data, error } = await query;
@@ -128,9 +126,7 @@ export default function SimplifiedChat() {
             if (isAdmin) {
               query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`);
             } else {
-              query = query.or(
-                `and(sender_id.eq.${user.id},recipient_id.eq.${ADMIN_USER_ID}),and(sender_id.eq.${ADMIN_USER_ID},recipient_id.eq.${user.id})`
-              );
+              query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${ADMIN_USER_ID}`);
             }
 
             const { data } = await query;
