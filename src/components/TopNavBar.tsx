@@ -8,7 +8,7 @@ import { useAdminRole } from '@/hooks/useAdminRole';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 export const TopNavBar = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isLoading } = useAuth();
   const { isAdmin } = useAdminRole();
   const navigate = useNavigate();
   const location = useLocation();
@@ -92,9 +92,9 @@ export const TopNavBar = () => {
             </div>
           )}
 
-          {/* Right side - Login or User info */}
+          {/* Right side - Always show Contact Us when not logged in */}
           <div className="flex-shrink-0">
-          {user ? (
+          {user && !isLoading ? (
             <div className="flex items-center gap-4">
               <button 
                 className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20 hover:bg-gray-800/50 transition-colors cursor-pointer"
