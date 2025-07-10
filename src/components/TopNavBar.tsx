@@ -55,7 +55,7 @@ export const TopNavBar = () => {
   return (
     <div className="w-full bg-slate-700/90 backdrop-blur-lg border-b border-gray-500/50">
       <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between min-w-0">
           {/* Left side - Logo */}
           <div className="flex items-center gap-3">
             <BarChart3 className="h-8 w-8 text-cyan-400" style={{
