@@ -271,7 +271,7 @@ export const SimplifiedChat = () => {
           <div className="flex items-center gap-3">
             <MessageCircle className="h-5 w-5 text-cyan-400" />
             <h2 className="text-white font-semibold">
-              {isAdmin ? 'Admin Chat' : 'Chat with Richie'}
+              {isAdmin ? 'Admin Chat' : 'Chat with Staff'}
             </h2>
           </div>
           {isAdmin && (
