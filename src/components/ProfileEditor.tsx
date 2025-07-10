@@ -151,7 +151,10 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
         .from('profiles')
         .upsert(updatedProfile, { onConflict: 'user_id' });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
       toast({
         title: "Success",
@@ -163,7 +166,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
       console.error('Error saving profile:', error);
       toast({
         title: "Error",
-        description: "Failed to save profile",
+        description: `Failed to save profile: ${error.message || error}`,
         variant: "destructive"
       });
     } finally {
