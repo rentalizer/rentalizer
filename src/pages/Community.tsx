@@ -417,7 +417,7 @@ const Community = () => {
       
       {/* Chat Dialog */}
       <Dialog open={isChatOpen} onOpenChange={setChatOpen}>
-        <DialogContent className="max-w-4xl h-[80vh] bg-slate-900 border-cyan-500/20">
+        <DialogContent className="max-w-md h-[500px] bg-slate-900 border-cyan-500/20">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
               <MessageSquare className="h-5 w-5 text-cyan-400" />
