@@ -25,12 +25,7 @@ const LandingPage = () => {
   const [activeDemo, setActiveDemo] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
 
-  // Redirect authenticated users to community
-  useEffect(() => {
-    if (user) {
-      navigate('/community');
-    }
-  }, [user, navigate]);
+  // Note: Removed automatic redirect to community - let users stay on landing page
 
   // Auto-progression through demo steps
   useEffect(() => {
