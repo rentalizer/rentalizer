@@ -261,21 +261,7 @@ export const SimplifiedChat = () => {
     scrollToBottom();
   }, [messages]);
 
-  if (!user) return (
-    <div className="h-full flex items-center justify-center bg-slate-800/50 rounded-lg">
-      <div className="text-center p-8">
-        <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-white font-semibold mb-2">Join the Conversation</h3>
-        <p className="text-gray-400 mb-4">Please log in to chat with Richie and other community members</p>
-        <Button 
-          onClick={() => window.location.href = '/auth'}
-          className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
-        >
-          Sign In
-        </Button>
-      </div>
-    </div>
-  );
+  if (!user) return <div className="h-full flex items-center justify-center text-gray-400">Loading...</div>;
 
   return (
     <div className="h-full flex flex-col bg-slate-800/50 rounded-lg">
