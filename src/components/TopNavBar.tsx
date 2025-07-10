@@ -20,8 +20,7 @@ export const TopNavBar = () => {
       console.log('✅ TopNavBar: Logout completed');
     } catch (error) {
       console.error('❌ TopNavBar: Error signing out:', error);
-      // Force logout even if there's an error
-      window.location.replace('/');
+      // Don't redirect on error - let the current page handle the logged-out state
     }
   };
 
@@ -114,24 +113,7 @@ export const TopNavBar = () => {
                 </Badge>
               </button>
               <Button
-                id="new-logout-btn-v3"
-                data-version="v3-no-alerts"
-                onClick={() => {
-                  console.log('🚪 NEW LOGOUT BUTTON V3 - NO ALERTS!');
-                  // Aggressive cleanup
-                  try {
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    // Clear cookies
-                    document.cookie.split(";").forEach(function(c) { 
-                      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-                    });
-                  } catch (e) {
-                    console.log('Cleanup error:', e);
-                  }
-                  // Force redirect
-                  window.location.href = '/auth?v=3&t=' + Date.now();
-                }}
+                onClick={handleSignOut}
                 variant="outline"
                 size="sm"
                 className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
