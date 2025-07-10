@@ -85,8 +85,24 @@ export default function SimplifiedChat() {
   const sendMessage = async () => {
     if (!newMessage.trim() || !user) return;
 
-    // Determine recipient - non-admins always send to admin, admins send to admin (for now)
-    const recipientId = isAdmin ? ADMIN_USER_ID : ADMIN_USER_ID;
+    // Determine recipient based on role
+    let recipientId: string;
+    if (isAdmin) {
+      // Admin needs to reply to the latest user who sent a message
+      const latestUserMessage = messages
+        .filter(msg => msg.sender_id !== ADMIN_USER_ID && msg.recipient_id === ADMIN_USER_ID)
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+      
+      if (latestUserMessage) {
+        recipientId = latestUserMessage.sender_id;
+      } else {
+        // Fallback: if no user messages found, send to admin (shouldn't happen)
+        recipientId = ADMIN_USER_ID;
+      }
+    } else {
+      // Non-admin always sends to admin
+      recipientId = ADMIN_USER_ID;
+    }
 
     setLoading(true);
     
