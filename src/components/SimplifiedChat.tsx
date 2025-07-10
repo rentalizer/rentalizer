@@ -50,16 +50,17 @@ export const SimplifiedChat = () => {
         .from('user_profiles')
         .select('id')
         .eq('email', ADMIN_EMAIL)
-        .single();
+        .maybeSingle();
 
       console.log('Admin lookup result:', { data, error });
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error finding admin:', error);
+      }
       setAdminUserId(data?.id || null);
       console.log('Admin user ID set to:', data?.id || null);
     } catch (error) {
       console.error('Error finding admin:', error);
-      // Set a fallback so component doesn't stay stuck
-      setAdminUserId('not-found');
+      setAdminUserId(null);
     }
   };
 
@@ -247,7 +248,9 @@ export const SimplifiedChat = () => {
   }, [user, isAdmin, selectedUserId, adminUserId]);
 
   useEffect(() => {
+    console.log('User changed:', user);
     if (user) {
+      console.log('User authenticated, starting admin lookup...');
       findAdminUserId();
       fetchAllUsers();
     }
@@ -261,7 +264,7 @@ export const SimplifiedChat = () => {
     scrollToBottom();
   }, [messages]);
 
-  if (!user) return <div className="h-full flex items-center justify-center text-gray-400">Loading...</div>;
+  if (!user) return <div className="h-full flex items-center justify-center text-gray-400">Please wait...</div>;
 
   return (
     <div className="h-full flex flex-col bg-slate-800/50 rounded-lg">
