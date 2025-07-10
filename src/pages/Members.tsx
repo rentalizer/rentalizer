@@ -43,11 +43,11 @@ const Members = () => {
     try {
       setLoading(true);
       
-      // Get all profiles with complete information
+      // Get all profiles (admins can see all members)
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('profile_complete', true);
+        .order('created_at', { ascending: false });
 
       if (profilesError) {
         console.error('Error fetching profiles:', profilesError);
