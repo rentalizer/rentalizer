@@ -468,9 +468,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.warn('⚠️ AuthContext: Could not remove auth keys:', e);
       }
 
-      // Force navigation with page reload to ensure clean state
-      console.log('🔄 AuthContext: Forcing page reload and navigation');
-      window.location.replace('/');
+      // Don't redirect - let the current page handle the logged-out state
+      console.log('✅ AuthContext: SignOut complete, staying on current page');
       
     } catch (error) {
       console.error('❌ AuthContext: Unexpected signOut error:', error);
@@ -480,7 +479,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setProfile(null);
       localStorage.clear();
       sessionStorage.clear();
-      window.location.replace('/');
+      // Don't redirect - let the current page handle the logged-out state
     }
   };
 
