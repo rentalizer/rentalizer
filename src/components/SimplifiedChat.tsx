@@ -47,8 +47,8 @@ export default function SimplifiedChat() {
           .order('created_at', { ascending: true });
 
         if (isAdmin) {
-          // Admin sees all messages involving them
-          query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`);
+          // Admin sees all messages involving the admin account
+          query = query.or(`sender_id.eq.${ADMIN_USER_ID},recipient_id.eq.${ADMIN_USER_ID}`);
         } else {
           // Regular user sees messages between them and admin
           query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${ADMIN_USER_ID}`);
@@ -67,8 +67,8 @@ export default function SimplifiedChat() {
           // Count unread messages for admin
           if (isAdmin) {
             const unread = data.filter(msg => 
-              msg.recipient_id === user.id && 
-              msg.sender_id !== user.id && 
+              msg.recipient_id === ADMIN_USER_ID && 
+              msg.sender_id !== ADMIN_USER_ID && 
               !msg.read_at
             ).length;
             setUnreadCount(unread);
@@ -124,7 +124,7 @@ export default function SimplifiedChat() {
               .order('created_at', { ascending: true });
 
             if (isAdmin) {
-              query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`);
+              query = query.or(`sender_id.eq.${ADMIN_USER_ID},recipient_id.eq.${ADMIN_USER_ID}`);
             } else {
               query = query.or(`sender_id.eq.${user.id},recipient_id.eq.${ADMIN_USER_ID}`);
             }
@@ -154,8 +154,8 @@ export default function SimplifiedChat() {
     if (isAdmin && messages.length > 0) {
       const markAsRead = async () => {
         const unreadMessages = messages.filter(msg => 
-          msg.recipient_id === user?.id && 
-          msg.sender_id !== user?.id && 
+          msg.recipient_id === ADMIN_USER_ID && 
+          msg.sender_id !== ADMIN_USER_ID && 
           !msg.read_at
         );
 
