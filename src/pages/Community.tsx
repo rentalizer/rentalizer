@@ -418,13 +418,7 @@ const Community = () => {
       {/* Chat Dialog */}
       <Dialog open={isChatOpen} onOpenChange={setChatOpen}>
         <DialogContent className="max-w-md h-[500px] bg-slate-900 border-cyan-500/20">
-          <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-cyan-400" />
-              Chat with Staff
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden h-full">
             <SimplifiedChat />
           </div>
         </DialogContent>
