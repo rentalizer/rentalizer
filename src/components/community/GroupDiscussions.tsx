@@ -239,8 +239,8 @@ export const GroupDiscussions = () => {
         }
       ];
       
-      // Combine mock discussions with real ones, putting mock at the top
-      setDiscussionsList([...mockDiscussions, ...formattedDiscussions]);
+      // Combine all discussions and let the sorting handle the proper order
+      setDiscussionsList([...formattedDiscussions, ...mockDiscussions]);
     } catch (error) {
       console.error('Error fetching discussions:', error);
     }
