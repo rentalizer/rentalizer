@@ -14,6 +14,7 @@ import { useAdminRole } from '@/hooks/useAdminRole';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { NewsFeed } from '@/components/community/NewsFeed';
+import { MembersList } from '@/components/MembersList';
 
 interface Discussion {
   id: string;
@@ -65,6 +66,7 @@ export const GroupDiscussions = () => {
     adminCount: 0
   });
   const [onlinePresence, setOnlinePresence] = useState<Record<string, any>>({});
+  const [showMembersList, setShowMembersList] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -1095,17 +1097,19 @@ export const GroupDiscussions = () => {
       {/* Right Sidebar - Leaderboard */}
       <div className="hidden lg:block w-80 flex-shrink-0">
         <div className="sticky top-6 space-y-6">
-          {/* Community Stats */}
           <Card className="bg-slate-800/50 border-cyan-500/20">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
-                <Users className="h-5 w-5 text-cyan-400" />
-                Community Stats
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 pt-6">
               <div className="flex justify-between items-center">
-                <span className="text-gray-400">Total Members</span>
+                {isAdmin ? (
+                  <button 
+                    onClick={() => setShowMembersList(true)}
+                    className="text-gray-400 hover:text-cyan-300 transition-colors cursor-pointer"
+                  >
+                    Members
+                  </button>
+                ) : (
+                  <span className="text-gray-400">Members</span>
+                )}
                 <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
                   {communityStats.totalMembers}
                 </Badge>
@@ -1234,6 +1238,19 @@ export const GroupDiscussions = () => {
           </Card>
         </div>
       </div>
+
+      {/* Members List Modal for Admin */}
+      <MembersList
+        open={showMembersList}
+        onOpenChange={setShowMembersList}
+        onMessageMember={(memberId, memberName) => {
+          // For now, just show a toast - we can integrate with the chat later
+          toast({
+            title: "Message Member",
+            description: `Starting conversation with ${memberName}`,
+          });
+        }}
+      />
     </div>
   );
 };
