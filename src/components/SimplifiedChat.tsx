@@ -7,7 +7,7 @@ import { MessageCircle, Send, Crown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const ADMIN_EMAIL = 'richie@dialogo.us';
-const ADMIN_USER_ID = 'df8700fc-061f-4aff-a84f-c061abfe15c9';
+const ADMIN_USER_ID = '4c1c3756-0815-4d9f-929e-9c12f1b6d9db';
 
 interface Message {
   id: string;
