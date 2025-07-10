@@ -126,12 +126,12 @@ export const TopNavBar = () => {
               </Button>
             </div>
           ) : (
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 min-w-0">
               <Button
                 onClick={() => window.open('mailto:support@rentalizer.com', '_blank')}
                 variant="outline"
                 size="sm"
-                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium whitespace-nowrap"
+                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium text-xs px-2"
               >
                 Contact Us
               </Button>
@@ -139,7 +139,7 @@ export const TopNavBar = () => {
                 onClick={() => navigate('/auth')}
                 variant="outline"
                 size="sm"
-                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium whitespace-nowrap"
+                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium text-xs px-2"
               >
                 Login
               </Button>
