@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAdminRole } from '@/hooks/useAdminRole';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +16,7 @@ const CommunityGate = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, isLoading } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdminRole();
   
   // State for the auth overlay form
   const [email, setEmail] = useState('');
@@ -255,7 +257,7 @@ const CommunityGate = () => {
   };
 
   // Show loading while checking auth
-  if (isLoading) {
+  if (isLoading || adminLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -266,8 +268,8 @@ const CommunityGate = () => {
     );
   }
 
-  // Show community if user is authenticated  
-  if (user) {
+  // Show community if user is authenticated OR if admin access is granted
+  if (user || isAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
         <TopNavBarTest />
@@ -276,8 +278,8 @@ const CommunityGate = () => {
     );
   }
 
-  // Show login gate if not authenticated and not in development
-  if (!user && !isDevelopment()) {
+  // Show login gate if not authenticated and not admin
+  if (!user && !isAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
         <TopNavBarTest />
