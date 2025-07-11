@@ -24,9 +24,14 @@ interface ProfileEditorProps {
   onProfileUpdate?: (profile: Profile) => void;
 }
 
-export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, onProfileUpdate }) => {
+export const ProfileEditor: React.FC<ProfileEditorProps> = ({ 
+  isOpen, 
+  onClose, 
+  onProfileUpdate 
+}) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -35,39 +40,26 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
 
   // Fetch current profile
   const fetchProfile = async () => {
-    if (!user) {
-      console.log('❌ ProfileEditor: No user found, cannot fetch profile');
-      return;
-    }
+    if (!user) return;
 
     try {
-      console.log('🔍 ProfileEditor: Fetching profile for user:', user.id);
-      console.log('🔍 ProfileEditor: User object:', user);
-      
-      // First, let's check what the current auth state is
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      console.log('🔍 ProfileEditor: Current session:', session);
-      console.log('🔍 ProfileEditor: Session error:', sessionError);
-      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (error) {
-        console.error('❌ ProfileEditor: Error fetching profile:', error);
-        // Don't throw error, just log it as profile might not exist yet
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching profile:', error);
+        throw error;
       }
 
       if (data) {
-        console.log('✅ ProfileEditor: Profile data found:', data);
         setProfile(data);
         if (data.avatar_url) {
           setPreviewUrl(data.avatar_url);
         }
       } else {
-        console.log('📝 ProfileEditor: Creating initial profile structure');
         // Create initial profile structure
         const newProfile: Profile = {
           user_id: user.id,
@@ -80,7 +72,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
         setProfile(newProfile);
       }
     } catch (error) {
-      console.error('💥 ProfileEditor: Exception fetching profile:', error);
+      console.error('Exception fetching profile:', error);
       toast({
         title: "Error",
         description: "Failed to load profile",
@@ -93,7 +85,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      if (file.size > 5 * 1024 * 1024) {
         toast({
           title: "Error",
           description: "Image must be less than 5MB",
@@ -114,7 +106,6 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
 
     setUploading(true);
     try {
-      console.log('📤 ProfileEditor: Uploading avatar...');
       const fileExt = avatarFile.name.split('.').pop();
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
@@ -123,19 +114,15 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
         .from('avatars')
         .upload(filePath, avatarFile);
 
-      if (uploadError) {
-        console.error('❌ ProfileEditor: Upload error:', uploadError);
-        throw uploadError;
-      }
+      if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
 
-      console.log('✅ ProfileEditor: Avatar uploaded successfully:', publicUrl);
       return publicUrl;
     } catch (error) {
-      console.error('💥 ProfileEditor: Exception uploading avatar:', error);
+      console.error('Exception uploading avatar:', error);
       toast({
         title: "Error",
         description: "Failed to upload avatar",
@@ -150,9 +137,6 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
   // Save profile changes
   const saveProfile = async () => {
     if (!user || !profile) {
-      console.error('❌ ProfileEditor: No user or profile data');
-      console.error('❌ ProfileEditor: User:', user);
-      console.error('❌ ProfileEditor: Profile:', profile);
       toast({
         title: "Error",
         description: "Missing user or profile data",
@@ -160,23 +144,6 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
       });
       return;
     }
-
-    console.log('💾 ProfileEditor: Saving profile for user:', user.id);
-    console.log('📋 ProfileEditor: Profile data to save:', profile);
-
-    // Double-check authentication before proceeding
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !session) {
-      console.error('❌ ProfileEditor: Not authenticated:', sessionError);
-      toast({
-        title: "Error",
-        description: "You must be logged in to save your profile",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    console.log('✅ ProfileEditor: Authentication confirmed:', session.user.id);
 
     setLoading(true);
     try {
@@ -191,7 +158,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
       }
 
       const profileData = {
-        user_id: session.user.id, // Use session user ID to be extra sure
+        user_id: user.id,
         display_name: profile.display_name?.trim() || null,
         first_name: profile.first_name?.trim() || null,
         last_name: profile.last_name?.trim() || null,
@@ -199,9 +166,6 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
         avatar_url: avatarUrl
       };
 
-      console.log('🔄 ProfileEditor: Attempting upsert with data:', profileData);
-
-      // Use upsert to handle both insert and update cases
       const { data, error } = await supabase
         .from('profiles')
         .upsert(profileData, {
@@ -210,19 +174,8 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
         .select()
         .single();
 
-      if (error) {
-        console.error('❌ ProfileEditor: Supabase upsert error:', error);
-        console.error('❌ ProfileEditor: Error details:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint
-        });
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log('✅ ProfileEditor: Profile saved successfully:', data);
-      
       toast({
         title: "Success",
         description: "Profile updated successfully",
@@ -232,7 +185,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
       setProfile(data);
       setAvatarFile(null);
       
-      // Call the callback if provided to update parent component
+      // Call the callback if provided
       if (onProfileUpdate) {
         onProfileUpdate(data);
       }
@@ -241,7 +194,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
       onClose();
       
     } catch (error: any) {
-      console.error('💥 ProfileEditor: Exception saving profile:', error);
+      console.error('Exception saving profile:', error);
       toast({
         title: "Error",
         description: `Failed to save profile: ${error.message || 'Unknown error'}`,
