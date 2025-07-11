@@ -363,7 +363,11 @@ export const GroupDiscussions = () => {
                       {/* User Avatar */}
                       <Avatar className="w-12 h-12 flex-shrink-0">
                         {profileInfo.avatar_url ? (
-                          <AvatarImage src={profileInfo.avatar_url} alt={`${discussion.author}'s avatar`} />
+                          <AvatarImage 
+                            src={profileInfo.avatar_url} 
+                            alt={`${discussion.author}'s avatar`}
+                            className="object-cover w-full h-full"
+                          />
                         ) : null}
                         <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
                           {profileInfo.initials}
@@ -486,7 +490,11 @@ export const GroupDiscussions = () => {
                               <div className="flex items-start gap-3 mt-4 pt-4 border-t border-gray-700">
                                 <Avatar className="w-8 h-8 flex-shrink-0">
                                   {getUserAvatar() ? (
-                                    <AvatarImage src={getUserAvatar()!} alt="Your avatar" />
+                                    <AvatarImage 
+                                      src={getUserAvatar()!} 
+                                      alt="Your avatar"
+                                      className="object-cover w-full h-full"
+                                    />
                                   ) : (
                                     <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold text-sm">
                                       {getUserInitials()}
