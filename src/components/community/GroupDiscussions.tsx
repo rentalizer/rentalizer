@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -146,7 +147,7 @@ export const GroupDiscussions = () => {
         user_id: discussion.user_id,
         isPinned: false,
         isLiked: false,
-        isMockData: false
+        isMockData: false // Explicitly mark as database discussion
       })) || [];
 
       // Add mock discussions with proper user_id handling, but only if not deleted
@@ -168,7 +169,7 @@ export const GroupDiscussions = () => {
           user_id: 'admin-user-id',
           isPinned: true,
           isLiked: false,
-          isMockData: true
+          isMockData: true // Explicitly mark as mock data
         });
       }
       
@@ -297,7 +298,7 @@ export const GroupDiscussions = () => {
   }, [newComment, selectedDiscussion, getUserName, getUserInitials]);
 
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
-    console.log('🗑️ Attempting to delete discussion:', discussionId);
+    console.log('🗑️ Admin attempting to delete discussion:', discussionId);
     
     try {
       // Find the discussion to check if it's mock data
@@ -305,10 +306,15 @@ export const GroupDiscussions = () => {
       
       if (!discussionToDelete) {
         console.log('🗑️ Discussion not found in local state');
+        toast({
+          title: "Error",
+          description: "Discussion not found.",
+          variant: "destructive",
+        });
         return;
       }
 
-      // If it's mock data, add to deleted set and remove from local state
+      // If it's mock data, add to deleted set and remove from local state immediately
       if (discussionToDelete.isMockData) {
         console.log('🗑️ Deleting mock discussion permanently');
         setDeletedMockDiscussions(prev => new Set([...prev, discussionId]));
@@ -338,8 +344,13 @@ export const GroupDiscussions = () => {
         return;
       }
 
-      // Remove from local state after successful database deletion
-      setDiscussionsList(prev => prev.filter(d => d.id !== discussionId));
+      // Remove from local state immediately after successful database deletion
+      console.log('🗑️ Successfully deleted from database, updating local state');
+      setDiscussionsList(prev => {
+        const updated = prev.filter(d => d.id !== discussionId);
+        console.log('🗑️ Local state updated, remaining discussions:', updated.length);
+        return updated;
+      });
       
       toast({
         title: "Success",
@@ -356,7 +367,9 @@ export const GroupDiscussions = () => {
   }, [toast, discussionsList]);
 
   const canEditOrDelete = useCallback((discussion: Discussion) => {
+    // Admins can edit/delete any post
     if (isAdmin) return true;
+    // Users can only edit/delete their own posts
     if (user && discussion.user_id === user.id) return true;
     return false;
   }, [isAdmin, user]);
