@@ -216,6 +216,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     console.log('🔄 AuthProvider initializing...');
     
+    // Check if we're in Lovable development environment
+    const hostname = window.location.hostname;
+    const url = window.location.href;
+    const isLovableDev = hostname.includes('lovable.app') || hostname.includes('localhost') || hostname.includes('127.0.0.1') || url.includes('lovable');
+    
+    if (isLovableDev) {
+      console.log('🚀 LOVABLE DEVELOPMENT - BYPASSING AUTH');
+      // Set a mock user for development
+      setUser({
+        id: 'dev-user-id',
+        email: 'dev@example.com',
+        subscription_status: 'active',
+        subscription_tier: 'Premium'
+      });
+      setIsLoading(false);
+      return;
+    }
+    
     console.log('🌐 Using real authentication only');
     
     const initTimeout = setTimeout(() => {
