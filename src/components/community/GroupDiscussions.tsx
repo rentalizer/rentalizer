@@ -62,6 +62,7 @@ export const GroupDiscussions = () => {
     adminCount: 2
   });
   const [showMembersList, setShowMembersList] = useState(false);
+  const [forceRender, setForceRender] = useState(0); // Force re-render trigger
 
   // Check if user needs to set up profile
   useEffect(() => {
@@ -224,15 +225,17 @@ export const GroupDiscussions = () => {
     };
   }, [user, profile, isAdmin, userProfiles, getInitials]);
 
-  // Memoized filtered discussions to prevent unnecessary re-renders
+  // Memoized filtered discussions - now with forceRender dependency
   const filteredDiscussions = useMemo(() => {
+    console.log('🔍 Filtering discussions. Total discussions:', discussionsList.length, 'Force render:', forceRender);
+    
     return discussionsList
       .sort((a, b) => {
         if (a.isPinned && !b.isPinned) return -1;
         if (!a.isPinned && b.isPinned) return 1;
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
-  }, [discussionsList]);
+  }, [discussionsList, forceRender]);
 
   const handleLike = useCallback((discussionId: string) => {
     setDiscussionsList(prev => prev.map(discussion => 
@@ -272,16 +275,21 @@ export const GroupDiscussions = () => {
   }, [newComment, selectedDiscussion, getUserName, getUserInitials]);
 
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
-    console.log('🗑️ Starting delete process for discussion:', discussionId);
+    console.log('🗑️ DELETING DISCUSSION:', discussionId);
+    console.log('🗑️ Current discussions count BEFORE deletion:', discussionsList.length);
     
-    // IMMEDIATELY remove from discussions list - this is the key fix
-    setDiscussionsList(prev => {
-      const filtered = prev.filter(d => d.id !== discussionId);
-      console.log('🗑️ Removed from discussions list. Before:', prev.length, 'After:', filtered.length);
-      return filtered;
+    // FORCE IMMEDIATE UI UPDATE
+    setDiscussionsList(prevDiscussions => {
+      const newDiscussions = prevDiscussions.filter(d => d.id !== discussionId);
+      console.log('🗑️ NEW discussions count AFTER deletion:', newDiscussions.length);
+      console.log('🗑️ Removed discussion with ID:', discussionId);
+      return newDiscussions;
     });
 
-    // Show success message immediately
+    // Force re-render to ensure UI updates
+    setForceRender(prev => prev + 1);
+
+    // Show success message
     toast({
       title: "Discussion Deleted",
       description: "Discussion has been permanently removed.",
@@ -296,17 +304,13 @@ export const GroupDiscussions = () => {
         
       if (error) {
         console.error('❌ Database deletion failed:', error);
-        // On database error, we could optionally revert the UI change
-        // But for now, keep the UI updated since user expects it to be deleted
       } else {
         console.log('✅ Database deletion successful');
       }
     } catch (error) {
       console.error('❌ Exception during database deletion:', error);
-      // On exception, we could optionally revert the UI change
-      // But for now, keep the UI updated since user expects it to be deleted
     }
-  }, [toast]);
+  }, [discussionsList.length, toast]);
 
   const canEditOrDelete = useCallback((discussion: Discussion) => {
     // Admins can edit/delete any post
@@ -327,6 +331,9 @@ export const GroupDiscussions = () => {
     fetchDiscussions();
   }, [fetchDiscussions]);
 
+  // Debug render
+  console.log('🎨 RENDERING GroupDiscussions with', filteredDiscussions.length, 'discussions');
+
   return (
     <div className="flex gap-6">
       {/* Main Content */}
@@ -344,13 +351,18 @@ export const GroupDiscussions = () => {
           {/* Header with Post Input */}
           <CommunityHeader onPostCreated={handlePostCreated} />
 
+          {/* Debug Info */}
+          <div className="text-xs text-gray-500 p-2 bg-slate-800 rounded">
+            Debug: Showing {filteredDiscussions.length} discussions (Force render: {forceRender})
+          </div>
+
           {/* Discussion Posts */}
           <div className="space-y-4">
             {filteredDiscussions.map((discussion) => {
               const profileInfo = getProfileInfo(discussion.user_id, discussion.author);
               
               return (
-                <Card key={discussion.id} className="bg-slate-800/50 border-gray-700/50 hover:bg-slate-800/70 transition-colors">
+                <Card key={`${discussion.id}-${forceRender}`} className="bg-slate-800/50 border-gray-700/50 hover:bg-slate-800/70 transition-colors">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       {/* User Avatar */}
@@ -405,7 +417,10 @@ export const GroupDiscussions = () => {
                                   Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuItem 
-                                  onClick={() => handleDeleteDiscussion(discussion.id)}
+                                  onClick={() => {
+                                    console.log('🗑️ DELETE BUTTON CLICKED for discussion:', discussion.id);
+                                    handleDeleteDiscussion(discussion.id);
+                                  }}
                                   className="text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
