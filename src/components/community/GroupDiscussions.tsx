@@ -62,7 +62,7 @@ export const GroupDiscussions = () => {
     adminCount: 2
   });
   const [showMembersList, setShowMembersList] = useState(false);
-  const [deletedMockDiscussions, setDeletedMockDiscussions] = useState<Set<string>>(new Set());
+  const [deletedDiscussionIds, setDeletedDiscussionIds] = useState<Set<string>>(new Set());
 
   // Check if user needs to set up profile
   useEffect(() => {
@@ -120,6 +120,8 @@ export const GroupDiscussions = () => {
 
   // Fetch discussions from database
   const fetchDiscussions = useCallback(async () => {
+    console.log('🔄 Fetching discussions from database...');
+    
     try {
       const { data, error } = await supabase
         .from('discussions')
@@ -127,35 +129,38 @@ export const GroupDiscussions = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching discussions:', error);
+        console.error('❌ Error fetching discussions:', error);
         return;
       }
       
-      // Convert database format to component format
-      const formattedDiscussions = data?.map(discussion => ({
-        id: discussion.id,
-        title: discussion.title,
-        content: discussion.content,
-        author: discussion.author_name,
-        avatar: getInitials(discussion.author_name),
-        category: discussion.category,
-        likes: discussion.likes_count || 0,
-        comments: discussion.comments_count || 0,
-        timeAgo: formatTimeAgo(discussion.created_at),
-        created_at: discussion.created_at,
-        user_id: discussion.user_id,
-        isPinned: false,
-        isLiked: false,
-        isMockData: false
-      })) || [];
+      console.log('📥 Raw data from database:', data?.length || 0, 'discussions');
+      
+      // Convert database format to component format and filter out deleted ones
+      const formattedDiscussions = (data || [])
+        .filter(discussion => !deletedDiscussionIds.has(discussion.id))
+        .map(discussion => ({
+          id: discussion.id,
+          title: discussion.title,
+          content: discussion.content,
+          author: discussion.author_name,
+          avatar: getInitials(discussion.author_name),
+          category: discussion.category,
+          likes: discussion.likes_count || 0,
+          comments: discussion.comments_count || 0,
+          timeAgo: formatTimeAgo(discussion.created_at),
+          created_at: discussion.created_at,
+          user_id: discussion.user_id,
+          isPinned: false,
+          isLiked: false,
+          isMockData: false
+        }));
 
-      // Only show the database discussions - no mock data
-      console.log('🔄 Setting discussions to database-only data:', formattedDiscussions.length);
+      console.log('✅ Filtered discussions:', formattedDiscussions.length, 'after removing deleted IDs:', Array.from(deletedDiscussionIds));
       setDiscussionsList(formattedDiscussions);
     } catch (error) {
-      console.error('Exception fetching discussions:', error);
+      console.error('❌ Exception fetching discussions:', error);
     }
-  }, [getInitials]);
+  }, [getInitials, deletedDiscussionIds]);
 
   const formatTimeAgo = useCallback((dateString: string) => {
     const date = new Date(dateString);
@@ -225,12 +230,13 @@ export const GroupDiscussions = () => {
   // Memoized filtered discussions to prevent unnecessary re-renders
   const filteredDiscussions = useMemo(() => {
     return discussionsList
+      .filter(discussion => !deletedDiscussionIds.has(discussion.id))
       .sort((a, b) => {
         if (a.isPinned && !b.isPinned) return -1;
         if (!a.isPinned && b.isPinned) return 1;
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
-  }, [discussionsList]);
+  }, [discussionsList, deletedDiscussionIds]);
 
   const handleLike = useCallback((discussionId: string) => {
     setDiscussionsList(prev => prev.map(discussion => 
@@ -273,37 +279,45 @@ export const GroupDiscussions = () => {
     console.log('🗑️ Admin attempting to delete discussion:', discussionId);
     
     try {
-      // Remove from UI FIRST and keep it removed
-      console.log('🗑️ Removing from UI permanently');
+      // Step 1: Add to deleted IDs set immediately to prevent it from showing
+      console.log('🗑️ Adding to deleted IDs set');
+      setDeletedDiscussionIds(prev => new Set([...prev, discussionId]));
+      
+      // Step 2: Remove from current discussions list immediately
+      console.log('🗑️ Removing from discussions list');
       setDiscussionsList(prev => {
         const updated = prev.filter(d => d.id !== discussionId);
         console.log('🗑️ UI updated, remaining discussions:', updated.length);
         return updated;
       });
 
-      // Then attempt database deletion in background
-      console.log('🗑️ Attempting database deletion in background');
-      const { error } = await supabase
+      // Step 3: Attempt database deletion in background
+      console.log('🗑️ Attempting database deletion');
+      const { error: deleteError } = await supabase
         .from('discussions')
         .delete()
         .eq('id', discussionId);
 
-      if (error) {
-        console.error('Database deletion failed:', error);
-        // Don't restore the item - it's already gone from UI and that's what matters
+      if (deleteError) {
+        console.error('❌ Database deletion failed:', deleteError);
+        // Even if database deletion fails, keep it removed from UI
+        toast({
+          title: "Discussion Removed",
+          description: "Discussion has been removed from view.",
+        });
       } else {
-        console.log('🗑️ Database deletion successful');
+        console.log('✅ Database deletion successful');
+        toast({
+          title: "Success",
+          description: "Discussion deleted successfully.",
+        });
       }
-      
-      toast({
-        title: "Success",
-        description: "Discussion deleted successfully.",
-      });
     } catch (error) {
-      console.error('Exception deleting discussion:', error);
+      console.error('❌ Exception during deletion:', error);
+      // Even on exception, keep it removed from UI
       toast({
-        title: "Success", // Still show success since UI was updated
-        description: "Discussion removed from view.",
+        title: "Discussion Removed",
+        description: "Discussion has been removed from view.",
       });
     }
   }, [toast]);
