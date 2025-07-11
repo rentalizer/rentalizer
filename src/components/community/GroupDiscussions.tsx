@@ -135,23 +135,33 @@ export const GroupDiscussions = () => {
     return getInitials(name);
   };
 
-  // Get profile info for a specific user - Enhanced to properly return avatar URLs
-  const getProfileInfo = (userId: string, authorName: string) => {
-    const profile = userProfiles[userId];
-    if (profile) {
+  // Get profile info for a specific user
+  const getProfileInfo = (userId: string | undefined, authorName: string) => {
+    // If no userId provided, return default
+    if (!userId) {
       return {
-        avatar_url: profile.avatar_url,
-        display_name: profile.display_name || profile.first_name || authorName,
-        initials: getInitials(profile.display_name || profile.first_name || authorName)
+        avatar_url: null,
+        display_name: authorName,
+        initials: getInitials(authorName)
       };
     }
-    
-    // For admin users, check if this is the current user
-    if (user && user.id === userId && getUserAvatar()) {
+
+    // Check if this is the current user
+    if (user && user.id === userId) {
       return {
         avatar_url: getUserAvatar(),
         display_name: getUserName(),
         initials: getUserInitials()
+      };
+    }
+
+    // Look up in fetched profiles
+    const profile = userProfiles[userId];
+    if (profile && profile.avatar_url) {
+      return {
+        avatar_url: profile.avatar_url,
+        display_name: profile.display_name || profile.first_name || authorName,
+        initials: getInitials(profile.display_name || profile.first_name || authorName)
       };
     }
     
@@ -190,7 +200,8 @@ export const GroupDiscussions = () => {
         attachments: undefined
       })) || [];
 
-      // Add mock discussions with proper user IDs for profile lookup
+      // Add mock discussions without invalid UUIDs - use current user's ID or null
+      const currentUserId = user?.id;
       const mockDiscussions: Discussion[] = [
         {
           id: 'pinned-welcome',
@@ -203,7 +214,7 @@ export const GroupDiscussions = () => {
           comments: 0,
           timeAgo: '1d ago',
           created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          user_id: user?.id || 'admin-user-id', // Use current user's ID for admin posts
+          user_id: currentUserId, // Use current user's ID for admin posts
           isPinned: true,
           isLiked: false,
           attachments: undefined
@@ -219,7 +230,7 @@ export const GroupDiscussions = () => {
           comments: 1,
           timeAgo: '4h ago',
           created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-          user_id: 'user-nick-id',
+          user_id: undefined, // No user ID for mock data
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -235,7 +246,7 @@ export const GroupDiscussions = () => {
           comments: 5,
           timeAgo: '16d ago',
           created_at: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString(),
-          user_id: 'user-vinod-id',
+          user_id: undefined,
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -251,7 +262,7 @@ export const GroupDiscussions = () => {
           comments: 7,
           timeAgo: '1d ago',
           created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          user_id: 'user-lincoln-id',
+          user_id: undefined,
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -267,7 +278,7 @@ export const GroupDiscussions = () => {
           comments: 5,
           timeAgo: '21d ago',
           created_at: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
-          user_id: 'user-judith-id',
+          user_id: undefined,
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -283,7 +294,7 @@ export const GroupDiscussions = () => {
           comments: 8,
           timeAgo: '14d ago',
           created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-          user_id: 'user-marina-id',
+          user_id: undefined,
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -299,7 +310,7 @@ export const GroupDiscussions = () => {
           comments: 2,
           timeAgo: '12d ago',
           created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
-          user_id: 'user-lynn-id',
+          user_id: undefined,
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -811,7 +822,7 @@ export const GroupDiscussions = () => {
       {/* Discussion Posts */}
       <div className="space-y-4">
         {filteredDiscussions.map((discussion) => {
-          const profileInfo = getProfileInfo(discussion.user_id || '', discussion.author);
+          const profileInfo = getProfileInfo(discussion.user_id, discussion.author);
           
           return (
             <Card key={discussion.id} className="bg-slate-800/50 border-gray-700/50 hover:bg-slate-800/70 transition-colors cursor-pointer">
