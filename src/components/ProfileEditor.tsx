@@ -21,9 +21,10 @@ interface Profile {
 interface ProfileEditorProps {
   isOpen: boolean;
   onClose: () => void;
+  onProfileUpdate?: (profile: Profile) => void;
 }
 
-export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose }) => {
+export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, onProfileUpdate }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -218,8 +219,13 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
       setProfile(data);
       setAvatarFile(null);
       
-      // Refresh the page to update the profile display
-      window.location.reload();
+      // Call the callback if provided to update parent component
+      if (onProfileUpdate) {
+        onProfileUpdate(data);
+      }
+      
+      // Close the editor
+      onClose();
       
     } catch (error: any) {
       console.error('💥 ProfileEditor: Exception saving profile:', error);
