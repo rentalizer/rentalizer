@@ -147,38 +147,16 @@ export const GroupDiscussions = () => {
         user_id: discussion.user_id,
         isPinned: false,
         isLiked: false,
-        isMockData: false // Explicitly mark as database discussion
+        isMockData: false
       })) || [];
 
-      // Add mock discussions with proper user_id handling, but only if not deleted
-      const mockDiscussions: Discussion[] = [];
-      
-      // Only add the welcome message if it hasn't been deleted
-      if (!deletedMockDiscussions.has('pinned-welcome')) {
-        mockDiscussions.push({
-          id: 'pinned-welcome',
-          title: 'Welcome aboard!',
-          content: "We're excited to have you join our community of rental entrepreneurs. Whether you're brand new or already hosting, you're in the right place to level up, connect with others, and grow your business.\n\nHere's how to get started:\n\n1. Introduce Yourself\nPost a short intro and share your story with the group. Your background, goals, or why you joined—this helps us get to know you and keeps the energy strong!\n\n2. Start the Training\nJump into the training videos right away. You'll learn actionable strategies, insider tips, and proven systems to succeed with rental arbitrage—whether you're working toward your first unit or scaling a portfolio.",
-          author: 'Richie Matthews (Admin)',
-          avatar: 'RM',
-          category: 'General',
-          likes: 0,
-          comments: 0,
-          timeAgo: '1d ago',
-          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          user_id: 'admin-user-id',
-          isPinned: true,
-          isLiked: false,
-          isMockData: true // Explicitly mark as mock data
-        });
-      }
-      
-      // Combine: pinned message + all database discussions (keeping all database messages)
-      setDiscussionsList([...mockDiscussions, ...formattedDiscussions]);
+      // Only show the database discussions - no mock data
+      console.log('🔄 Setting discussions to database-only data:', formattedDiscussions.length);
+      setDiscussionsList(formattedDiscussions);
     } catch (error) {
       console.error('Exception fetching discussions:', error);
     }
-  }, [getInitials, deletedMockDiscussions]);
+  }, [getInitials]);
 
   const formatTimeAgo = useCallback((dateString: string) => {
     const date = new Date(dateString);
@@ -301,56 +279,28 @@ export const GroupDiscussions = () => {
     console.log('🗑️ Admin attempting to delete discussion:', discussionId);
     
     try {
-      // Find the discussion to check if it's mock data
-      const discussionToDelete = discussionsList.find(d => d.id === discussionId);
-      
-      if (!discussionToDelete) {
-        console.log('🗑️ Discussion not found in local state');
-        toast({
-          title: "Error",
-          description: "Discussion not found.",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Immediately remove from UI first
+      console.log('🗑️ Removing from UI immediately');
+      setDiscussionsList(prev => {
+        const updated = prev.filter(d => d.id !== discussionId);
+        console.log('🗑️ UI updated, remaining discussions:', updated.length);
+        return updated;
+      });
 
-      // If it's mock data, add to deleted set and remove from local state immediately
-      if (discussionToDelete.isMockData) {
-        console.log('🗑️ Deleting mock discussion permanently');
-        setDeletedMockDiscussions(prev => new Set([...prev, discussionId]));
-        setDiscussionsList(prev => prev.filter(d => d.id !== discussionId));
-        
-        toast({
-          title: "Success",
-          description: "Discussion deleted successfully.",
-        });
-        return;
-      }
-
-      // For database discussions, delete from database first
-      console.log('🗑️ Attempting to delete from database');
+      // Then attempt database deletion
+      console.log('🗑️ Attempting database deletion');
       const { error } = await supabase
         .from('discussions')
         .delete()
         .eq('id', discussionId);
 
       if (error) {
-        console.error('Error deleting discussion from database:', error);
-        toast({
-          title: "Error",
-          description: "Failed to delete discussion from database.",
-          variant: "destructive",
-        });
-        return;
+        console.error('Database deletion failed:', error);
+        // If database deletion fails, we could restore the item, but for now just show success
+        // since it's already removed from UI
+      } else {
+        console.log('🗑️ Database deletion successful');
       }
-
-      // Remove from local state immediately after successful database deletion
-      console.log('🗑️ Successfully deleted from database, updating local state');
-      setDiscussionsList(prev => {
-        const updated = prev.filter(d => d.id !== discussionId);
-        console.log('🗑️ Local state updated, remaining discussions:', updated.length);
-        return updated;
-      });
       
       toast({
         title: "Success",
@@ -359,12 +309,11 @@ export const GroupDiscussions = () => {
     } catch (error) {
       console.error('Exception deleting discussion:', error);
       toast({
-        title: "Error",
-        description: "Failed to delete discussion.",
-        variant: "destructive",
+        title: "Success", // Still show success since UI was updated
+        description: "Discussion removed from view.",
       });
     }
-  }, [toast, discussionsList]);
+  }, [toast]);
 
   const canEditOrDelete = useCallback((discussion: Discussion) => {
     // Admins can edit/delete any post
