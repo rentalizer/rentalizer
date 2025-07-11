@@ -5,10 +5,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+
+const profileSchema = z.object({
+  display_name: z.string().min(1, 'Display name is required'),
+  first_name: z.string().min(1, 'First name is required'),
+  last_name: z.string().min(1, 'Last name is required'),
+  bio: z.string().optional(),
+});
+
+type ProfileFormData = z.infer<typeof profileSchema>;
 
 interface Profile {
   user_id: string;
@@ -32,24 +45,37 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { profile: currentProfile, loading: profileLoading, fetchProfile, updateProfile } = useProfile();
+  const { profile: currentProfile, loading: profileLoading, updateProfile } = useProfile();
   
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // Initialize local profile state when currentProfile changes
+  const form = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      display_name: '',
+      first_name: '',
+      last_name: '',
+      bio: '',
+    },
+  });
+
+  // Initialize form when currentProfile changes
   useEffect(() => {
     if (currentProfile) {
       console.log('🔄 Initializing profile editor with:', currentProfile);
-      setProfile(currentProfile);
+      form.reset({
+        display_name: currentProfile.display_name || '',
+        first_name: currentProfile.first_name || '',
+        last_name: currentProfile.last_name || '',
+        bio: currentProfile.bio || '',
+      });
       if (currentProfile.avatar_url) {
         setPreviewUrl(currentProfile.avatar_url);
       }
     }
-  }, [currentProfile]);
+  }, [currentProfile, form]);
 
   // Handle avatar file selection
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,19 +131,18 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
   };
 
   // Save profile changes
-  const saveProfile = async () => {
-    if (!user || !profile) {
+  const onSubmit = async (data: ProfileFormData) => {
+    if (!user) {
       toast({
         title: "Error",
-        description: "Missing user or profile data",
+        description: "Missing user data",
         variant: "destructive"
       });
       return;
     }
 
-    setLoading(true);
     try {
-      let avatarUrl = profile.avatar_url;
+      let avatarUrl = currentProfile?.avatar_url || null;
 
       // Upload new avatar if selected
       if (avatarFile) {
@@ -129,16 +154,16 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
 
       const profileData = {
         user_id: user.id,
-        display_name: profile.display_name?.trim() || null,
-        first_name: profile.first_name?.trim() || null,
-        last_name: profile.last_name?.trim() || null,
-        bio: profile.bio?.trim() || null,
+        display_name: data.display_name.trim(),
+        first_name: data.first_name.trim(),
+        last_name: data.last_name.trim(),
+        bio: data.bio?.trim() || null,
         avatar_url: avatarUrl
       };
 
       console.log('💾 Saving profile data:', profileData);
 
-      const { data, error } = await supabase
+      const { data: savedProfile, error } = await supabase
         .from('profiles')
         .upsert(profileData, {
           onConflict: 'user_id'
@@ -151,7 +176,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
         throw error;
       }
 
-      console.log('✅ Profile saved successfully:', data);
+      console.log('✅ Profile saved successfully:', savedProfile);
 
       toast({
         title: "Success",
@@ -159,13 +184,12 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
       });
 
       // Update local profile state
-      setProfile(data);
       setAvatarFile(null);
-      updateProfile(data);
+      updateProfile(savedProfile);
       
       // Call the callback if provided
       if (onProfileUpdate) {
-        onProfileUpdate(data);
+        onProfileUpdate(savedProfile);
       }
       
       // Close the editor
@@ -178,15 +202,13 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
         description: `Failed to save profile: ${error.message || 'Unknown error'}`,
         variant: "destructive"
       });
-    } finally {
-      setLoading(false);
     }
   };
 
   if (!isOpen) return null;
 
   // Show loading state while profile is being fetched
-  if (profileLoading || !profile) {
+  if (profileLoading || !currentProfile) {
     return (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <Card className="w-full max-w-md bg-slate-800 border-cyan-500/20">
@@ -217,94 +239,122 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
         </CardHeader>
 
         <CardContent className="space-y-6 p-6">
-          {/* Avatar Section */}
-          <div className="flex flex-col items-center space-y-4">
-            <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden">
-                {previewUrl ? (
-                  <img 
-                    src={previewUrl} 
-                    alt="Avatar" 
-                    className="w-full h-full object-cover"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Avatar Section */}
+              <div className="flex flex-col items-center space-y-4">
+                <div className="relative">
+                  <div className="w-24 h-24 rounded-full bg-slate-700 flex items-center justify-center overflow-hidden">
+                    {previewUrl ? (
+                      <img 
+                        src={previewUrl} 
+                        alt="Avatar" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="h-12 w-12 text-gray-400" />
+                    )}
+                  </div>
+                  <label className="absolute bottom-0 right-0 w-8 h-8 bg-cyan-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-cyan-500 transition-colors">
+                    <Upload className="h-4 w-4 text-white" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <p className="text-sm text-gray-400">Click to upload avatar (max 5MB)</p>
+              </div>
+
+              {/* Form Fields */}
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="display_name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">Display Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Enter display name"
+                          className="bg-slate-700 border-slate-600 text-white"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="first_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">First Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="First name"
+                            className="bg-slate-700 border-slate-600 text-white"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                ) : (
-                  <User className="h-12 w-12 text-gray-400" />
-                )}
-              </div>
-              <label className="absolute bottom-0 right-0 w-8 h-8 bg-cyan-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-cyan-500 transition-colors">
-                <Upload className="h-4 w-4 text-white" />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                  className="hidden"
-                />
-              </label>
-            </div>
-            <p className="text-sm text-gray-400">Click to upload avatar (max 5MB)</p>
-          </div>
+                  <FormField
+                    control={form.control}
+                    name="last_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-300">Last Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Last name"
+                            className="bg-slate-700 border-slate-600 text-white"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-          {/* Form Fields */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Display Name
-              </label>
-              <Input
-                value={profile.display_name || ''}
-                onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
-                placeholder="Enter display name"
-                className="bg-slate-700 border-slate-600 text-white"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  First Name
-                </label>
-                <Input
-                  value={profile.first_name || ''}
-                  onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
-                  placeholder="First name"
-                  className="bg-slate-700 border-slate-600 text-white"
+                <FormField
+                  control={form.control}
+                  name="bio"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">Bio</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          placeholder="Tell us about yourself..."
+                          className="bg-slate-700 border-slate-600 text-white min-h-[80px]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Last Name
-                </label>
-                <Input
-                  value={profile.last_name || ''}
-                  onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
-                  placeholder="Last name"
-                  className="bg-slate-700 border-slate-600 text-white"
-                />
-              </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Bio
-              </label>
-              <Textarea
-                value={profile.bio || ''}
-                onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                placeholder="Tell us about yourself..."
-                className="bg-slate-700 border-slate-600 text-white min-h-[80px]"
-              />
-            </div>
-          </div>
-
-          {/* Save Button */}
-          <Button
-            onClick={saveProfile}
-            disabled={loading || uploading}
-            className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
-          >
-            <Save className="h-4 w-4 mr-2" />
-            {loading || uploading ? 'Saving...' : 'Save Profile'}
-          </Button>
+              {/* Save Button */}
+              <Button
+                type="submit"
+                disabled={form.formState.isSubmitting || uploading}
+                className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                {form.formState.isSubmitting || uploading ? 'Saving...' : 'Save Profile'}
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>
