@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Profile {
@@ -31,6 +32,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { profile: currentProfile, loading: profileLoading, fetchProfile, updateProfile } = useProfile();
   
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(false);
@@ -38,48 +40,16 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // Fetch current profile
-  const fetchProfile = async () => {
-    if (!user) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching profile:', error);
-        throw error;
+  // Initialize local profile state when currentProfile changes
+  useEffect(() => {
+    if (currentProfile) {
+      console.log('🔄 Initializing profile editor with:', currentProfile);
+      setProfile(currentProfile);
+      if (currentProfile.avatar_url) {
+        setPreviewUrl(currentProfile.avatar_url);
       }
-
-      if (data) {
-        setProfile(data);
-        if (data.avatar_url) {
-          setPreviewUrl(data.avatar_url);
-        }
-      } else {
-        // Create initial profile structure
-        const newProfile: Profile = {
-          user_id: user.id,
-          display_name: user.email?.split('@')[0] || null,
-          first_name: null,
-          last_name: null,
-          bio: null,
-          avatar_url: null
-        };
-        setProfile(newProfile);
-      }
-    } catch (error) {
-      console.error('Exception fetching profile:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load profile",
-        variant: "destructive"
-      });
     }
-  };
+  }, [currentProfile]);
 
   // Handle avatar file selection
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,6 +136,8 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
         avatar_url: avatarUrl
       };
 
+      console.log('💾 Saving profile data:', profileData);
+
       const { data, error } = await supabase
         .from('profiles')
         .upsert(profileData, {
@@ -174,7 +146,12 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Save profile error:', error);
+        throw error;
+      }
+
+      console.log('✅ Profile saved successfully:', data);
 
       toast({
         title: "Success",
@@ -184,6 +161,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
       // Update local profile state
       setProfile(data);
       setAvatarFile(null);
+      updateProfile(data);
       
       // Call the callback if provided
       if (onProfileUpdate) {
@@ -205,13 +183,21 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (isOpen && user) {
-      fetchProfile();
-    }
-  }, [isOpen, user]);
+  if (!isOpen) return null;
 
-  if (!isOpen || !profile) return null;
+  // Show loading state while profile is being fetched
+  if (profileLoading || !profile) {
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-slate-800 border-cyan-500/20">
+          <CardContent className="p-6 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+            <p className="text-gray-300">Loading profile...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
