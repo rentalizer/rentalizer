@@ -48,7 +48,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
 
       if (error) {
         console.error('❌ ProfileEditor: Error fetching profile:', error);
-        throw error;
+        // Don't throw error, just log it as profile might not exist yet
       }
 
       if (data) {
@@ -176,35 +176,17 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
 
       console.log('🔄 ProfileEditor: Attempting upsert with data:', profileData);
 
-      // Check if profile exists first
-      const { data: existingProfile } = await supabase
+      // Use upsert to handle both insert and update cases
+      const { data, error } = await supabase
         .from('profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      let result;
-      if (existingProfile) {
-        // Update existing profile
-        result = await supabase
-          .from('profiles')
-          .update(profileData)
-          .eq('user_id', user.id)
-          .select()
-          .single();
-      } else {
-        // Insert new profile
-        result = await supabase
-          .from('profiles')
-          .insert(profileData)
-          .select()
-          .single();
-      }
-
-      const { data, error } = result;
+        .upsert(profileData, {
+          onConflict: 'user_id'
+        })
+        .select()
+        .single();
 
       if (error) {
-        console.error('❌ ProfileEditor: Supabase operation error:', error);
+        console.error('❌ ProfileEditor: Supabase upsert error:', error);
         throw error;
       }
 
