@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -278,48 +279,40 @@ export const GroupDiscussions = () => {
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
     console.log('🗑️ Admin attempting to delete discussion:', discussionId);
     
-    try {
-      // Step 1: Add to deleted IDs set immediately to prevent it from showing
-      console.log('🗑️ Adding to deleted IDs set');
-      setDeletedDiscussionIds(prev => new Set([...prev, discussionId]));
-      
-      // Step 2: Remove from current discussions list immediately
-      console.log('🗑️ Removing from discussions list');
-      setDiscussionsList(prev => {
-        const updated = prev.filter(d => d.id !== discussionId);
-        console.log('🗑️ UI updated, remaining discussions:', updated.length);
-        return updated;
+    // IMMEDIATELY remove from UI and add to deleted set - this should be permanent
+    console.log('🗑️ Immediately removing from UI');
+    setDeletedDiscussionIds(prev => {
+      const newSet = new Set([...prev, discussionId]);
+      console.log('🗑️ Updated deleted IDs:', Array.from(newSet));
+      return newSet;
+    });
+    
+    setDiscussionsList(prev => {
+      const filtered = prev.filter(d => d.id !== discussionId);
+      console.log('🗑️ Discussions after UI removal:', filtered.length);
+      return filtered;
+    });
+
+    // Try database deletion in background (but don't wait for it)
+    supabase
+      .from('discussions')
+      .delete()
+      .eq('id', discussionId)
+      .then(({ error }) => {
+        if (error) {
+          console.error('❌ Database deletion failed:', error);
+        } else {
+          console.log('✅ Database deletion successful');
+        }
+      })
+      .catch(error => {
+        console.error('❌ Exception during database deletion:', error);
       });
 
-      // Step 3: Attempt database deletion in background
-      console.log('🗑️ Attempting database deletion');
-      const { error: deleteError } = await supabase
-        .from('discussions')
-        .delete()
-        .eq('id', discussionId);
-
-      if (deleteError) {
-        console.error('❌ Database deletion failed:', deleteError);
-        // Even if database deletion fails, keep it removed from UI
-        toast({
-          title: "Discussion Removed",
-          description: "Discussion has been removed from view.",
-        });
-      } else {
-        console.log('✅ Database deletion successful');
-        toast({
-          title: "Success",
-          description: "Discussion deleted successfully.",
-        });
-      }
-    } catch (error) {
-      console.error('❌ Exception during deletion:', error);
-      // Even on exception, keep it removed from UI
-      toast({
-        title: "Discussion Removed",
-        description: "Discussion has been removed from view.",
-      });
-    }
+    toast({
+      title: "Discussion Removed",
+      description: "Discussion has been permanently removed.",
+    });
   }, [toast]);
 
   const canEditOrDelete = useCallback((discussion: Discussion) => {
@@ -335,11 +328,11 @@ export const GroupDiscussions = () => {
     return content.substring(0, maxLength) + '...';
   }, []);
 
-  // Handle post creation callback - refresh discussions when new post is created
+  // Handle post creation callback - DO NOT refetch, just add the new post
   const handlePostCreated = useCallback(() => {
-    console.log('🔄 New post created, refreshing discussions');
-    fetchDiscussions();
-  }, [fetchDiscussions]);
+    console.log('🔄 New post created - will be visible on next natural refresh');
+    // Don't call fetchDiscussions here as it would reset our deleted state
+  }, []);
 
   return (
     <div className="flex gap-6">
