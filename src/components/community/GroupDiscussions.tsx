@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Users, MessageCircle, Heart, Pin, TrendingUp, Calendar, Edit, Trash2, Send } from 'lucide-react';
+import { Users, MessageCircle, Heart, Pin, TrendingUp, Calendar, Edit, Trash2, Send, MoreHorizontal } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileSetup } from '@/components/ProfileSetup';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -268,6 +269,46 @@ export const GroupDiscussions = () => {
     setNewComment('');
   }, [newComment, selectedDiscussion, getUserName, getUserInitials]);
 
+  const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
+    try {
+      const { error } = await supabase
+        .from('discussions')
+        .delete()
+        .eq('id', discussionId);
+
+      if (error) {
+        console.error('Error deleting discussion:', error);
+        toast({
+          title: "Error",
+          description: "Failed to delete discussion.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Remove from local state
+      setDiscussionsList(prev => prev.filter(d => d.id !== discussionId));
+      
+      toast({
+        title: "Success",
+        description: "Discussion deleted successfully.",
+      });
+    } catch (error) {
+      console.error('Exception deleting discussion:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete discussion.",
+        variant: "destructive",
+      });
+    }
+  }, [toast]);
+
+  const canEditOrDelete = useCallback((discussion: Discussion) => {
+    if (isAdmin) return true;
+    if (user && discussion.user_id === user.id) return true;
+    return false;
+  }, [isAdmin, user]);
+
   const getTruncatedContent = useCallback((content: string, maxLength: number = 150) => {
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength) + '...';
@@ -312,17 +353,49 @@ export const GroupDiscussions = () => {
                       {/* Post Content */}
                       <div className="flex-1 min-w-0">
                         {/* Header */}
-                        <div className="flex items-center gap-2 mb-2">
-                          {discussion.isPinned && <Pin className="h-4 w-4 text-yellow-400" />}
-                          <span className="text-cyan-300 font-medium">{discussion.author}</span>
-                          <span className="text-gray-400">•</span>
-                          <span className="text-gray-400 text-sm">{discussion.timeAgo}</span>
-                          <span className="text-gray-400">•</span>
-                          <span className="text-gray-400 text-sm">{discussion.category}</span>
-                          {discussion.isPinned && (
-                            <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs ml-2">
-                              Pinned
-                            </Badge>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            {discussion.isPinned && <Pin className="h-4 w-4 text-yellow-400" />}
+                            <span className="text-cyan-300 font-medium">{discussion.author}</span>
+                            <span className="text-gray-400">•</span>
+                            <span className="text-gray-400 text-sm">{discussion.timeAgo}</span>
+                            <span className="text-gray-400">•</span>
+                            <span className="text-gray-400 text-sm">{discussion.category}</span>
+                            {discussion.isPinned && (
+                              <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs ml-2">
+                                Pinned
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          {/* Options Menu */}
+                          {canEditOrDelete(discussion) && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-white">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-slate-800 border-gray-700">
+                                <DropdownMenuItem 
+                                  onClick={() => {
+                                    setEditingPost(discussion.id);
+                                    setEditContent(discussion.content);
+                                  }}
+                                  className="text-gray-300 hover:text-white hover:bg-slate-700 cursor-pointer"
+                                >
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => handleDeleteDiscussion(discussion.id)}
+                                  className="text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           )}
                         </div>
 
