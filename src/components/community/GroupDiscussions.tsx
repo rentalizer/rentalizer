@@ -290,23 +290,46 @@ export const GroupDiscussions = () => {
   }, [newComment, selectedDiscussion, getUserName, getUserInitials]);
 
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
+    console.log('🗑️ Attempting to delete discussion:', discussionId);
+    
     try {
+      // Check if this is a mock discussion (exists only in local state)
+      const isMockDiscussion = discussionId.startsWith('pinned-') || 
+        discussionsList.find(d => d.id === discussionId && !d.user_id?.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i));
+      
+      if (isMockDiscussion) {
+        console.log('🗑️ Deleting mock discussion from local state only');
+        // Remove from local state only
+        setDiscussionsList(prev => prev.filter(d => d.id !== discussionId));
+        
+        toast({
+          title: "Success",
+          description: "Discussion deleted successfully.",
+        });
+        return;
+      }
+
+      // Try to delete from database for real discussions
+      console.log('🗑️ Attempting to delete from database');
       const { error } = await supabase
         .from('discussions')
         .delete()
         .eq('id', discussionId);
 
       if (error) {
-        console.error('Error deleting discussion:', error);
+        console.error('Error deleting discussion from database:', error);
+        // Even if database deletion fails, remove from local state for better UX
+        setDiscussionsList(prev => prev.filter(d => d.id !== discussionId));
+        
         toast({
-          title: "Error",
-          description: "Failed to delete discussion.",
+          title: "Warning",
+          description: "Discussion removed from view, but there may have been a database error.",
           variant: "destructive",
         });
         return;
       }
 
-      // Remove from local state
+      // Remove from local state after successful database deletion
       setDiscussionsList(prev => prev.filter(d => d.id !== discussionId));
       
       toast({
@@ -315,13 +338,16 @@ export const GroupDiscussions = () => {
       });
     } catch (error) {
       console.error('Exception deleting discussion:', error);
+      // Even if there's an exception, remove from local state for better UX
+      setDiscussionsList(prev => prev.filter(d => d.id !== discussionId));
+      
       toast({
-        title: "Error",
-        description: "Failed to delete discussion.",
+        title: "Warning",
+        description: "Discussion removed from view, but there may have been an error.",
         variant: "destructive",
       });
     }
-  }, [toast]);
+  }, [toast, discussionsList]);
 
   const canEditOrDelete = useCallback((discussion: Discussion) => {
     if (isAdmin) return true;
