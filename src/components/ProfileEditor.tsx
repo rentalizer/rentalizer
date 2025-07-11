@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { User, Upload, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
     if (!user) return;
 
     try {
+      console.log('🔍 ProfileEditor: Fetching profile for user:', user.id);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -43,15 +45,18 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
+        console.error('❌ ProfileEditor: Error fetching profile:', error);
         throw error;
       }
 
       if (data) {
+        console.log('✅ ProfileEditor: Profile data found:', data);
         setProfile(data);
         if (data.avatar_url) {
           setPreviewUrl(data.avatar_url);
         }
       } else {
+        console.log('📝 ProfileEditor: Creating initial profile');
         // Create initial profile if it doesn't exist
         const newProfile: Profile = {
           user_id: user.id,
@@ -64,7 +69,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
         setProfile(newProfile);
       }
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.error('💥 ProfileEditor: Exception fetching profile:', error);
       toast({
         title: "Error",
         description: "Failed to load profile",
@@ -98,6 +103,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
 
     setUploading(true);
     try {
+      console.log('📤 ProfileEditor: Uploading avatar...');
       const fileExt = avatarFile.name.split('.').pop();
       const fileName = `${user.id}-${Date.now()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
@@ -106,15 +112,19 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
         .from('avatars')
         .upload(filePath, avatarFile);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('❌ ProfileEditor: Upload error:', uploadError);
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
 
+      console.log('✅ ProfileEditor: Avatar uploaded successfully:', publicUrl);
       return publicUrl;
     } catch (error) {
-      console.error('Error uploading avatar:', error);
+      console.error('💥 ProfileEditor: Exception uploading avatar:', error);
       toast({
         title: "Error",
         description: "Failed to upload avatar",
@@ -128,10 +138,13 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
 
   // Save profile changes
   const saveProfile = async () => {
-    if (!user || !profile) return;
+    if (!user || !profile) {
+      console.error('❌ ProfileEditor: No user or profile data');
+      return;
+    }
 
-    console.log('Auth user:', user);
-    console.log('Profile to save:', profile);
+    console.log('💾 ProfileEditor: Saving profile for user:', user.id);
+    console.log('📋 ProfileEditor: Profile data to save:', profile);
 
     setLoading(true);
     try {
@@ -150,23 +163,37 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
         avatar_url: avatarUrl
       };
 
-      const { error } = await supabase
+      console.log('🔄 ProfileEditor: Attempting upsert with data:', updatedProfile);
+
+      // First try to get the current session to ensure we're authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('🔑 ProfileEditor: Current session exists:', !!session);
+
+      if (!session) {
+        throw new Error('No authentication session found');
+      }
+
+      const { data, error } = await supabase
         .from('profiles')
-        .upsert(updatedProfile, { onConflict: 'user_id' });
+        .upsert(updatedProfile, { onConflict: 'user_id' })
+        .select()
+        .single();
 
       if (error) {
-        console.error('Supabase error:', error);
+        console.error('❌ ProfileEditor: Supabase upsert error:', error);
         throw error;
       }
 
+      console.log('✅ ProfileEditor: Profile saved successfully:', data);
+      
       toast({
         title: "Success",
         description: "Profile updated successfully",
       });
 
       onClose();
-    } catch (error) {
-      console.error('Error saving profile:', error);
+    } catch (error: any) {
+      console.error('💥 ProfileEditor: Exception saving profile:', error);
       toast({
         title: "Error",
         description: `Failed to save profile: ${error.message || error}`,

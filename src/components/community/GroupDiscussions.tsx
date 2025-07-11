@@ -91,11 +91,15 @@ export const GroupDiscussions = () => {
   // Fetch user profiles for avatar display
   const fetchUserProfiles = async () => {
     try {
+      console.log('🔍 Fetching user profiles...');
       const { data, error } = await supabase
         .from('profiles')
         .select('user_id, avatar_url, display_name, first_name, last_name');
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Error fetching profiles:', error);
+        return;
+      }
 
       const profilesMap: {[key: string]: UserProfile} = {};
       data?.forEach(profile => {
@@ -103,9 +107,9 @@ export const GroupDiscussions = () => {
       });
       
       setUserProfiles(profilesMap);
-      console.log('Fetched user profiles:', profilesMap);
+      console.log('✅ Fetched user profiles:', Object.keys(profilesMap).length, 'profiles');
     } catch (error) {
-      console.error('Error fetching user profiles:', error);
+      console.error('💥 Exception fetching user profiles:', error);
     }
   };
 
@@ -157,7 +161,7 @@ export const GroupDiscussions = () => {
 
     // Look up in fetched profiles
     const profile = userProfiles[userId];
-    if (profile && profile.avatar_url) {
+    if (profile) {
       return {
         avatar_url: profile.avatar_url,
         display_name: profile.display_name || profile.first_name || authorName,
@@ -175,12 +179,15 @@ export const GroupDiscussions = () => {
   // Fetch discussions from database with mock data added
   const fetchDiscussions = async () => {
     try {
+      console.log('🔍 Fetching discussions...');
       const { data, error } = await supabase
         .from('discussions')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Error fetching discussions:', error);
+      }
       
       // Convert database format to component format
       const formattedDiscussions = data?.map(discussion => ({
@@ -200,7 +207,7 @@ export const GroupDiscussions = () => {
         attachments: undefined
       })) || [];
 
-      // Add mock discussions without invalid UUIDs - use current user's ID or null
+      // Add mock discussions with proper UUIDs - only use current user's ID for admin posts
       const currentUserId = user?.id;
       const mockDiscussions: Discussion[] = [
         {
@@ -319,8 +326,9 @@ export const GroupDiscussions = () => {
       
       // Combine all discussions and let the sorting handle the proper order
       setDiscussionsList([...formattedDiscussions, ...mockDiscussions]);
+      console.log('✅ Set discussions list with', formattedDiscussions.length, 'real +', mockDiscussions.length, 'mock discussions');
     } catch (error) {
-      console.error('Error fetching discussions:', error);
+      console.error('💥 Exception fetching discussions:', error);
     }
   };
 
@@ -563,6 +571,8 @@ export const GroupDiscussions = () => {
         const postTitleToUse = postTitle.trim() || 
           (newPost.length > 50 ? newPost.substring(0, 50) + '...' : newPost);
         
+        console.log('📝 Submitting post with user:', user?.id, user?.email);
+        
         const { data, error } = await supabase
           .from('discussions')
           .insert({
@@ -575,7 +585,12 @@ export const GroupDiscussions = () => {
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Error creating post:', error);
+          throw error;
+        }
+
+        console.log('✅ Post created successfully:', data);
 
         try {
           await supabase.functions.invoke('community-notification', {
@@ -603,7 +618,7 @@ export const GroupDiscussions = () => {
         setShowEmojiPicker(false);
         
       } catch (error) {
-        console.error('Error creating post:', error);
+        console.error('💥 Exception creating post:', error);
         toast({
           title: "Error",
           description: "Failed to create post. Please try again.",
@@ -844,19 +859,19 @@ export const GroupDiscussions = () => {
                     }}
                     title={discussion.author !== getUserName() ? `Send direct message to ${discussion.author}` : ''}
                   >
-                    {profileInfo.avatar_url && (
+                    {profileInfo.avatar_url ? (
                       <AvatarImage 
                         src={profileInfo.avatar_url} 
                         alt={`${discussion.author}'s avatar`}
                         onError={(e) => {
-                          console.log('Avatar image failed to load:', profileInfo.avatar_url);
+                          console.log('❌ Avatar image failed to load:', profileInfo.avatar_url);
                           e.currentTarget.style.display = 'none';
                         }}
                         onLoad={() => {
-                          console.log('Avatar image loaded successfully:', profileInfo.avatar_url);
+                          console.log('✅ Avatar image loaded successfully:', profileInfo.avatar_url);
                         }}
                       />
-                    )}
+                    ) : null}
                     <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
                       {profileInfo.initials}
                     </AvatarFallback>
