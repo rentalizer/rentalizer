@@ -88,7 +88,11 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated 
           <div className="flex items-start gap-4">
             <Avatar className="w-12 h-12 flex-shrink-0">
               {getUserAvatar() ? (
-                <AvatarImage src={getUserAvatar()!} alt="Your avatar" />
+                <AvatarImage 
+                  src={getUserAvatar()!} 
+                  alt="Your avatar" 
+                  className="object-cover w-full h-full"
+                />
               ) : (
                 <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
                   {getUserInitials()}
