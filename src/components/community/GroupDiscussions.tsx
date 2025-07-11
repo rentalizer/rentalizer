@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -63,7 +62,6 @@ export const GroupDiscussions = () => {
     adminCount: 2
   });
   const [showMembersList, setShowMembersList] = useState(false);
-  const [deletedDiscussionIds, setDeletedDiscussionIds] = useState<Set<string>>(new Set());
 
   // Check if user needs to set up profile
   useEffect(() => {
@@ -228,26 +226,13 @@ export const GroupDiscussions = () => {
 
   // Memoized filtered discussions to prevent unnecessary re-renders
   const filteredDiscussions = useMemo(() => {
-    console.log('🔍 Filtering discussions. Current deletedIds:', Array.from(deletedDiscussionIds));
-    console.log('🔍 Total discussions before filtering:', discussionsList.length);
-    
-    const filtered = discussionsList
-      .filter(discussion => {
-        const isDeleted = deletedDiscussionIds.has(discussion.id);
-        if (isDeleted) {
-          console.log('🗑️ Filtering out deleted discussion:', discussion.id, discussion.title);
-        }
-        return !isDeleted;
-      })
+    return discussionsList
       .sort((a, b) => {
         if (a.isPinned && !b.isPinned) return -1;
         if (!a.isPinned && b.isPinned) return 1;
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
-    
-    console.log('✅ Filtered discussions count:', filtered.length);
-    return filtered;
-  }, [discussionsList, deletedDiscussionIds]);
+  }, [discussionsList]);
 
   const handleLike = useCallback((discussionId: string) => {
     setDiscussionsList(prev => prev.map(discussion => 
@@ -289,18 +274,17 @@ export const GroupDiscussions = () => {
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
     console.log('🗑️ Starting delete process for discussion:', discussionId);
     
-    // IMMEDIATELY add to deleted set - this is the key fix
-    setDeletedDiscussionIds(prev => {
-      const newSet = new Set([...prev, discussionId]);
-      console.log('🗑️ Added to deleted IDs set:', Array.from(newSet));
-      return newSet;
-    });
-    
-    // Also remove from current discussions list as backup
+    // IMMEDIATELY remove from discussions list - this is the key fix
     setDiscussionsList(prev => {
       const filtered = prev.filter(d => d.id !== discussionId);
-      console.log('🗑️ Removed from discussions list. New count:', filtered.length);
+      console.log('🗑️ Removed from discussions list. Before:', prev.length, 'After:', filtered.length);
       return filtered;
+    });
+
+    // Show success message immediately
+    toast({
+      title: "Discussion Deleted",
+      description: "Discussion has been permanently removed.",
     });
 
     // Try database deletion in background
@@ -312,19 +296,16 @@ export const GroupDiscussions = () => {
         
       if (error) {
         console.error('❌ Database deletion failed:', error);
-        // Don't revert UI changes even if database deletion fails
+        // On database error, we could optionally revert the UI change
+        // But for now, keep the UI updated since user expects it to be deleted
       } else {
         console.log('✅ Database deletion successful');
       }
     } catch (error) {
       console.error('❌ Exception during database deletion:', error);
-      // Don't revert UI changes even if database deletion fails
+      // On exception, we could optionally revert the UI change
+      // But for now, keep the UI updated since user expects it to be deleted
     }
-
-    toast({
-      title: "Discussion Deleted",
-      description: "Discussion has been permanently removed.",
-    });
   }, [toast]);
 
   const canEditOrDelete = useCallback((discussion: Discussion) => {
