@@ -1,3 +1,4 @@
+
 // Community Component - Fixed TopNavBar issue
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,6 +32,8 @@ import { ProfileEditor } from '@/components/ProfileEditor';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface CalculatorData {
   // Comps
@@ -74,15 +77,60 @@ const Community = () => {
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [profileEditorOpen, setProfileEditorOpen] = useState(false);
+  const [userIsAdmin, setUserIsAdmin] = useState(false);
+  const [adminCheckLoading, setAdminCheckLoading] = useState(true);
   const { toast } = useToast();
   const { isAdmin } = useAdminRole();
   const { unreadCount } = useUnreadMessages();
+  const { user } = useAuth();
   const navigate = useNavigate();
   
   // Check if we're in Lovable environment
   const isLovableEnv = window.location.hostname.includes('lovableproject.com') || 
                        window.location.search.includes('__lovable_token') ||
                        window.location.hostname === 'localhost';
+  
+  // Enhanced admin check that works on live site
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user) {
+        setUserIsAdmin(false);
+        setAdminCheckLoading(false);
+        return;
+      }
+
+      try {
+        // First check using the hook
+        if (isAdmin) {
+          setUserIsAdmin(true);
+          setAdminCheckLoading(false);
+          return;
+        }
+
+        // Direct database check as fallback
+        const { data: roles, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .limit(1);
+
+        if (error) {
+          console.error('Error checking admin status:', error);
+          setUserIsAdmin(false);
+        } else {
+          setUserIsAdmin(roles && roles.length > 0);
+        }
+      } catch (error) {
+        console.error('Exception checking admin status:', error);
+        setUserIsAdmin(false);
+      }
+      
+      setAdminCheckLoading(false);
+    };
+
+    checkAdminStatus();
+  }, [user, isAdmin]);
   
   // Update URL hash when tab changes
   useEffect(() => {
@@ -192,7 +240,7 @@ const Community = () => {
         </div>
 
         {/* Admin Quick Links */}
-        {isAdmin && (
+        {userIsAdmin && (
           <div className="mb-6 flex justify-center">
             <Link to="/admin/richie" className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center gap-2">
               <Bot className="h-4 w-4" />
@@ -245,7 +293,7 @@ const Community = () => {
               <User size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Profile
             </button>
-            {isAdmin && (
+            {!adminCheckLoading && userIsAdmin && (
               <button
                 onClick={() => setMembersDialogOpen(true)}
                 className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors"
