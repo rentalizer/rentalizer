@@ -159,7 +159,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
         last_name: data.last_name.trim(),
         bio: data.bio?.trim() || null,
         avatar_url: avatarUrl,
-        profile_complete: true // Mark profile as complete when saving
+        profile_complete: true
       };
 
       console.log('💾 Saving profile data:', profileData);
