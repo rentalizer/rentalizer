@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,11 +28,20 @@ interface Discussion {
   created_at: string;
   isPinned?: boolean;
   isLiked?: boolean;
+  user_id?: string;
   attachments?: {
     type: 'image' | 'video' | 'file';
     url: string;
     name: string;
   }[];
+}
+
+interface UserProfile {
+  user_id: string;
+  avatar_url: string | null;
+  display_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
 }
 
 export const GroupDiscussions = () => {
@@ -58,6 +66,7 @@ export const GroupDiscussions = () => {
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [upcomingEvent, setUpcomingEvent] = useState<{title: string; daysUntil: number} | null>(null);
+  const [userProfiles, setUserProfiles] = useState<{[key: string]: UserProfile}>({});
   
   // Real community stats
   const [communityStats, setCommunityStats] = useState({
@@ -78,6 +87,26 @@ export const GroupDiscussions = () => {
       setShowProfileSetup(true);
     }
   }, [user, profile]);
+
+  // Fetch user profiles for avatar display
+  const fetchUserProfiles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('user_id, avatar_url, display_name, first_name, last_name');
+
+      if (error) throw error;
+
+      const profilesMap: {[key: string]: UserProfile} = {};
+      data?.forEach(profile => {
+        profilesMap[profile.user_id] = profile;
+      });
+      
+      setUserProfiles(profilesMap);
+    } catch (error) {
+      console.error('Error fetching user profiles:', error);
+    }
+  };
 
   const getInitials = (name: string) => {
     return name
@@ -105,6 +134,23 @@ export const GroupDiscussions = () => {
     return getInitials(name);
   };
 
+  // Get profile info for a specific user
+  const getProfileInfo = (userId: string, authorName: string) => {
+    const profile = userProfiles[userId];
+    if (profile) {
+      return {
+        avatar_url: profile.avatar_url,
+        display_name: profile.display_name || profile.first_name || authorName,
+        initials: getInitials(profile.display_name || profile.first_name || authorName)
+      };
+    }
+    return {
+      avatar_url: null,
+      display_name: authorName,
+      initials: getInitials(authorName)
+    };
+  };
+
   // Fetch discussions from database with mock data added
   const fetchDiscussions = async () => {
     try {
@@ -127,12 +173,13 @@ export const GroupDiscussions = () => {
         comments: discussion.comments_count || 0,
         timeAgo: formatTimeAgo(discussion.created_at),
         created_at: discussion.created_at,
+        user_id: discussion.user_id,
         isPinned: false,
         isLiked: false,
         attachments: undefined
       })) || [];
 
-      // Add mock discussions based on actual Skool posts
+      // Add mock discussions with proper user IDs for profile lookup
       const mockDiscussions: Discussion[] = [
         {
           id: 'pinned-welcome',
@@ -144,7 +191,8 @@ export const GroupDiscussions = () => {
           likes: 0,
           comments: 0,
           timeAgo: '1d ago',
-          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          user_id: 'admin-user-id',
           isPinned: true,
           isLiked: false,
           attachments: undefined
@@ -159,7 +207,8 @@ export const GroupDiscussions = () => {
           likes: 0,
           comments: 1,
           timeAgo: '4h ago',
-          created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
+          created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+          user_id: 'user-nick-id',
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -174,7 +223,8 @@ export const GroupDiscussions = () => {
           likes: 4,
           comments: 5,
           timeAgo: '16d ago',
-          created_at: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString(), // 16 days ago
+          created_at: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000).toISOString(),
+          user_id: 'user-vinod-id',
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -189,7 +239,8 @@ export const GroupDiscussions = () => {
           likes: 4,
           comments: 7,
           timeAgo: '1d ago',
-          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+          user_id: 'user-lincoln-id',
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -204,7 +255,8 @@ export const GroupDiscussions = () => {
           likes: 5,
           comments: 5,
           timeAgo: '21d ago',
-          created_at: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(), // 21 days ago
+          created_at: new Date(Date.now() - 21 * 24 * 60 * 60 * 1000).toISOString(),
+          user_id: 'user-judith-id',
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -219,7 +271,8 @@ export const GroupDiscussions = () => {
           likes: 4,
           comments: 8,
           timeAgo: '14d ago',
-          created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days ago
+          created_at: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+          user_id: 'user-marina-id',
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -234,7 +287,8 @@ export const GroupDiscussions = () => {
           likes: 4,
           comments: 2,
           timeAgo: '12d ago',
-          created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(), // 12 days ago
+          created_at: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+          user_id: 'user-lynn-id',
           isPinned: false,
           isLiked: false,
           attachments: undefined
@@ -267,16 +321,15 @@ export const GroupDiscussions = () => {
       console.log('Could not clear localStorage:', error);
     }
     
+    fetchUserProfiles();
     fetchDiscussions();
     fetchUpcomingEvents();
   }, []);
 
-  // Fetch upcoming events from calendar
   const fetchUpcomingEvents = async () => {
     try {
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Reset to start of day
-      console.log('Today (start of day):', today);
+      today.setHours(0, 0, 0, 0);
       
       const { data, error } = await supabase
         .from('events')
@@ -286,30 +339,20 @@ export const GroupDiscussions = () => {
         .limit(1);
 
       if (error) throw error;
-      console.log('Found events:', data);
 
       if (data && data.length > 0) {
         const event = data[0];
-        // Parse date without timezone conversion
         const [year, month, day] = event.event_date.split('-').map(Number);
-        const eventDate = new Date(year, month - 1, day); // month is 0-indexed
+        const eventDate = new Date(year, month - 1, day);
         
-        console.log('Event date (start of day):', eventDate);
-        console.log('Event raw date:', event.event_date);
-        
-        // Calculate difference in days more accurately
         const timeDiff = eventDate.getTime() - today.getTime();
         const daysDiff = Math.round(timeDiff / (1000 * 3600 * 24));
-        
-        console.log('Time difference (ms):', timeDiff);
-        console.log('Days difference:', daysDiff);
         
         setUpcomingEvent({
           title: event.title,
           daysUntil: daysDiff
         });
       } else {
-        console.log('No upcoming events found');
         setUpcomingEvent(null);
       }
     } catch (error) {
@@ -317,11 +360,9 @@ export const GroupDiscussions = () => {
     }
   };
 
-  // Fetch real community stats
   useEffect(() => {
     const fetchCommunityStats = async () => {
       try {
-        // Use mock data for now
         setCommunityStats(prev => ({
           ...prev,
           totalMembers: 181,
@@ -335,16 +376,13 @@ export const GroupDiscussions = () => {
 
     fetchCommunityStats();
 
-    // Set up presence tracking
     const channel = supabase.channel('community_presence');
     
-    // Track current user presence
     if (user) {
       channel
         .on('presence', { event: 'sync' }, () => {
           const state = channel.presenceState();
           const onlineCount = Object.keys(state).length;
-          console.log('Presence sync - Online users:', state);
           setCommunityStats(prev => ({
             ...prev,
             onlineUsers: onlineCount
@@ -359,7 +397,6 @@ export const GroupDiscussions = () => {
         })
         .subscribe(async (status) => {
           if (status === 'SUBSCRIBED') {
-            // Track this user's presence
             await channel.track({
               user_id: user.id,
               display_name: profile?.display_name || user.email?.split('@')[0] || 'Anonymous',
@@ -376,7 +413,6 @@ export const GroupDiscussions = () => {
     };
   }, [user, profile]);
 
-  // Functions to handle likes and comments
   const handleLike = (discussionId: string) => {
     setDiscussionsList(prev => prev.map(discussion => 
       discussion.id === discussionId
@@ -393,7 +429,6 @@ export const GroupDiscussions = () => {
     setSelectedDiscussion(discussion);
   };
 
-  // Comment handlers
   const handleAddComment = async () => {
     if (newComment.trim() && selectedDiscussion) {
       const comment = {
@@ -409,14 +444,12 @@ export const GroupDiscussions = () => {
         [selectedDiscussion.id]: [...(prev[selectedDiscussion.id] || []), comment]
       }));
       
-      // Update discussion comment count
       setDiscussionsList(prev => prev.map(d => 
         d.id === selectedDiscussion.id 
           ? { ...d, comments: d.comments + 1 }
           : d
       ));
       
-      // Send email notification for comment
       try {
         await supabase.functions.invoke('community-notification', {
           body: {
@@ -435,7 +468,6 @@ export const GroupDiscussions = () => {
     }
   };
 
-  // File upload handlers
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, type: 'image' | 'video' | 'file') => {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -449,23 +481,19 @@ export const GroupDiscussions = () => {
     setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Emoji handler
   const handleEmojiSelect = (emoji: string) => {
     setNewPost(prev => prev + emoji);
     setShowEmojiPicker(false);
   };
 
-  // Common emojis
   const commonEmojis = ['😀', '😂', '🤔', '👍', '❤️', '🎉', '💡', '🔥', '💪', '🚀', '✨', '🎯'];
 
-  // Delete post handler
   const handleDeletePost = (discussionId: string) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       setDiscussionsList(prev => prev.filter(discussion => discussion.id !== discussionId));
     }
   };
 
-  // Edit post handlers
   const handleEditPost = (discussion: Discussion) => {
     setEditingPost(discussion.id);
     setEditContent(discussion.content);
@@ -492,7 +520,6 @@ export const GroupDiscussions = () => {
     setEditContent('');
   };
 
-  // Pin toggle handler
   const handleTogglePin = (discussionId: string) => {
     setDiscussionsList(prev => prev.map(discussion => 
       discussion.id === discussionId
@@ -501,7 +528,6 @@ export const GroupDiscussions = () => {
     ));
   };
 
-  // Get truncated content for preview
   const getTruncatedContent = (content: string, maxLength: number = 150) => {
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength) + '...';
@@ -515,7 +541,6 @@ export const GroupDiscussions = () => {
         const postTitleToUse = postTitle.trim() || 
           (newPost.length > 50 ? newPost.substring(0, 50) + '...' : newPost);
         
-        // Save to database
         const { data, error } = await supabase
           .from('discussions')
           .insert({
@@ -530,7 +555,6 @@ export const GroupDiscussions = () => {
 
         if (error) throw error;
 
-        // Send email notification for new post
         try {
           await supabase.functions.invoke('community-notification', {
             body: {
@@ -549,7 +573,6 @@ export const GroupDiscussions = () => {
           description: "Your post has been shared with the community"
         });
 
-        // Refresh discussions list
         fetchDiscussions();
         
         setNewPost('');
@@ -584,11 +607,9 @@ export const GroupDiscussions = () => {
       return matchesSearch && matchesFilter;
     })
     .sort((a, b) => {
-      // Sort pinned posts to top
       if (a.isPinned && !b.isPinned) return -1;
       if (!a.isPinned && b.isPinned) return 1;
       
-      // For posts with same pinned status, sort by creation date (newest first)
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
 
@@ -605,7 +626,9 @@ export const GroupDiscussions = () => {
           </DialogContent>
         </Dialog>
       )}
+      
       {/* Header with Post Input */}
+      
       <Card className="bg-slate-800/50 border-cyan-500/20">
         <CardContent className="p-6">
           <div className="space-y-4">
@@ -620,7 +643,6 @@ export const GroupDiscussions = () => {
                 )}
               </Avatar>
               <div className="flex-1 space-y-4">
-                {/* Title Input */}
                 <div>
                   <label className="text-gray-400 text-sm font-medium mb-2 block">Title</label>
                   <Input
@@ -631,8 +653,6 @@ export const GroupDiscussions = () => {
                   />
                 </div>
 
-                
-                {/* Content Input */}
                 <Textarea
                   placeholder="Write something..."
                   value={newPost}
@@ -640,7 +660,6 @@ export const GroupDiscussions = () => {
                   className="min-h-[120px] bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 resize-none"
                 />
                 
-                {/* Attachment Options */}
                 <div className="flex items-center justify-between mt-3">
                   <div className="flex items-center gap-2 relative">
                     <Button
@@ -677,7 +696,6 @@ export const GroupDiscussions = () => {
                         <Smile className="h-4 w-4" />
                       </Button>
                       
-                      {/* Emoji Picker */}
                       {showEmojiPicker && (
                         <div className="absolute bottom-full left-0 mb-2 bg-slate-700 border border-gray-600 rounded-lg p-3 grid grid-cols-6 gap-2 z-10">
                           {commonEmojis.map((emoji, index) => (
@@ -700,7 +718,6 @@ export const GroupDiscussions = () => {
                       <AtSign className="h-4 w-4" />
                     </Button>
                     
-                    {/* Hidden File Inputs */}
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -733,7 +750,6 @@ export const GroupDiscussions = () => {
                   </Button>
                 </div>
                 
-                {/* Attachments Preview */}
                 {attachments.length > 0 && (
                   <div className="mt-3 space-y-2">
                     {attachments.map((attachment, index) => (
@@ -760,7 +776,6 @@ export const GroupDiscussions = () => {
         </CardContent>
       </Card>
 
-      {/* Upcoming Events Banner */}
       {upcomingEvent && (
         <Card className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border-blue-500/30">
           <CardContent className="p-4">
@@ -784,279 +799,276 @@ export const GroupDiscussions = () => {
 
       {/* Discussion Posts */}
       <div className="space-y-4">
-        {filteredDiscussions.map((discussion) => (
-          <Card key={discussion.id} className="bg-slate-800/50 border-gray-700/50 hover:bg-slate-800/70 transition-colors cursor-pointer">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                {/* User Avatar - clickable to start DM */}
-                <Avatar 
-                  className="w-12 h-12 flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-cyan-400 transition-all" 
-                  onClick={() => {
-                    if (user && discussion.author !== getUserName()) {
-                      // Find user by author name to get their user_id
-                      // For now, we'll trigger the DM component to open
-                      const dmButton = document.querySelector('[data-dm-trigger]') as HTMLElement;
-                      if (dmButton) dmButton.click();
+        {filteredDiscussions.map((discussion) => {
+          const profileInfo = getProfileInfo(discussion.user_id || '', discussion.author);
+          
+          return (
+            <Card key={discussion.id} className="bg-slate-800/50 border-gray-700/50 hover:bg-slate-800/70 transition-colors cursor-pointer">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  {/* User Avatar with proper profile image */}
+                  <Avatar 
+                    className="w-12 h-12 flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-cyan-400 transition-all" 
+                    onClick={() => {
+                      if (user && discussion.author !== getUserName()) {
+                        const dmButton = document.querySelector('[data-dm-trigger]') as HTMLElement;
+                        if (dmButton) dmButton.click();
+                        
+                        toast({
+                          title: "Direct Message",
+                          description: `Click the user icon in the chat to find and message ${discussion.author}`,
+                        });
+                      }
+                    }}
+                    title={discussion.author !== getUserName() ? `Send direct message to ${discussion.author}` : ''}
+                  >
+                    {profileInfo.avatar_url ? (
+                      <AvatarImage src={profileInfo.avatar_url} alt={`${discussion.author}'s avatar`} />
+                    ) : null}
+                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
+                      {profileInfo.initials}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  {/* Post Content */}
+                  <div className="flex-1 min-w-0">
+                    {/* Header with Pin and Author */}
+                    <div className="flex items-center gap-2 mb-2">
+                      {discussion.isPinned && (
+                        <Pin className="h-4 w-4 text-yellow-400" />
+                      )}
+                      <span className="text-cyan-300 font-medium">{discussion.author}</span>
+                      <span className="text-gray-400">•</span>
+                      <span className="text-gray-400 text-sm">{discussion.timeAgo}</span>
+                      <span className="text-gray-400">•</span>
+                      <span className="text-gray-400 text-sm">{discussion.category}</span>
+                      {discussion.isPinned && (
+                        <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs ml-2">
+                          Pinned
+                        </Badge>
+                      )}
                       
-                      toast({
-                        title: "Direct Message",
-                        description: `Click the user icon in the chat to find and message ${discussion.author}`,
-                      });
-                    }
-                  }}
-                  title={discussion.author !== getUserName() ? `Send direct message to ${discussion.author}` : ''}
-                >
-                  <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
-                    {discussion.avatar}
-                  </AvatarFallback>
-                </Avatar>
-
-                {/* Post Content */}
-                <div className="flex-1 min-w-0">
-                  {/* Header with Pin and Author */}
-                  <div className="flex items-center gap-2 mb-2">
-                    {discussion.isPinned && (
-                      <Pin className="h-4 w-4 text-yellow-400" />
-                    )}
-                    <span className="text-cyan-300 font-medium">{discussion.author}</span>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-gray-400 text-sm">{discussion.timeAgo}</span>
-                    <span className="text-gray-400">•</span>
-                    <span className="text-gray-400 text-sm">{discussion.category}</span>
-                    {discussion.isPinned && (
-                      <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs ml-2">
-                        Pinned
-                      </Badge>
-                    )}
-                    
-                    {/* Pin and Edit/Delete buttons - show for current user's posts or admins */}
-                    {(discussion.author === getUserName() || isAdmin) && (
-                      <div className="flex items-center gap-1 ml-auto">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleTogglePin(discussion.id);
-                          }}
-                          className={`p-1 ${discussion.isPinned ? 'text-yellow-400 hover:text-yellow-300' : 'text-gray-400 hover:text-yellow-400'}`}
-                          title={discussion.isPinned ? 'Unpin post' : 'Pin post'}
-                        >
-                          <Pin className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditPost(discussion);
-                          }}
-                          className="text-gray-400 hover:text-blue-400 p-1"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeletePost(discussion.id);
-                          }}
-                          className="text-gray-400 hover:text-red-400 p-1"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Post Title */}
-                  <h3 className="text-xl font-semibold text-white mb-3 hover:text-cyan-300 transition-colors">
-                    {discussion.title}
-                  </h3>
-
-                  {/* Post Content Preview or Edit Mode */}
-                  {editingPost === discussion.id ? (
-                    <div className="mb-4 space-y-3">
-                      <Textarea
-                        value={editContent}
-                        onChange={(e) => setEditContent(e.target.value)}
-                        className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 min-h-[100px]"
-                        placeholder="Edit your post..."
-                      />
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={() => handleSaveEdit(discussion.id)}
-                          disabled={!editContent.trim()}
-                          className="bg-cyan-600 hover:bg-cyan-700 text-white"
-                          size="sm"
-                        >
-                          Save
-                        </Button>
-                        <Button
-                          onClick={handleCancelEdit}
-                          variant="outline"
-                          className="border-gray-600 text-gray-300 hover:bg-gray-800"
-                          size="sm"
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div 
-                      className="text-gray-300 mb-4 leading-relaxed whitespace-pre-wrap cursor-pointer hover:text-gray-200 transition-colors"
-                      onClick={() => setExpandedPost(expandedPost === discussion.id ? null : discussion.id)}
-                    >
-                      {expandedPost === discussion.id ? discussion.content : getTruncatedContent(discussion.content)}
-                      {discussion.content.length > 150 && expandedPost !== discussion.id && (
-                        <span className="text-cyan-400 ml-2 font-medium">Read more</span>
-                      )}
-                      {expandedPost === discussion.id && discussion.content.length > 150 && (
-                        <span className="text-cyan-400 ml-2 font-medium">Show less</span>
+                      {(discussion.author === getUserName() || isAdmin) && (
+                        <div className="flex items-center gap-1 ml-auto">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleTogglePin(discussion.id);
+                            }}
+                            className={`p-1 ${discussion.isPinned ? 'text-yellow-400 hover:text-yellow-300' : 'text-gray-400 hover:text-yellow-400'}`}
+                            title={discussion.isPinned ? 'Unpin post' : 'Pin post'}
+                          >
+                            <Pin className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditPost(discussion);
+                            }}
+                            className="text-gray-400 hover:text-blue-400 p-1"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeletePost(discussion.id);
+                            }}
+                            className="text-gray-400 hover:text-red-400 p-1"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       )}
                     </div>
-                  )}
 
-                  {/* Attachments Display */}
-                  {discussion.attachments && discussion.attachments.length > 0 && (
-                    <div className="mb-4 space-y-2">
-                      {discussion.attachments.map((attachment, index) => (
-                        <div key={index} className="inline-flex items-center gap-2 bg-slate-700/50 p-2 rounded mr-2">
-                          {attachment.type === 'image' && (
-                             <img 
-                               src={attachment.url} 
-                               alt={attachment.name}
-                               className="h-20 w-20 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
-                               onClick={(e) => {
-                                 e.stopPropagation();
-                                 setSelectedImage(attachment.url);
-                               }}
-                             />
-                           )}
-                          {attachment.type === 'video' && (
-                            <div className="flex items-center gap-2">
-                              <Video className="h-4 w-4 text-cyan-400" />
-                              <video 
-                                src={attachment.url}
-                                className="h-20 w-32 object-cover rounded"
-                                controls
-                              />
-                            </div>
-                          )}
-                          {attachment.type === 'file' && (
-                            <div className="flex items-center gap-2">
-                              <Paperclip className="h-4 w-4 text-cyan-400" />
-                              <span className="text-sm text-gray-300">{attachment.name}</span>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                    <h3 className="text-xl font-semibold text-white mb-3 hover:text-cyan-300 transition-colors">
+                      {discussion.title}
+                    </h3>
 
-                  {/* Engagement Stats */}
-                  <div className="flex items-center gap-6">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleLike(discussion.id)}
-                      className={`flex items-center gap-2 hover:bg-red-500/10 transition-colors ${discussion.isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'}`}
-                    >
-                      <Heart className={`h-4 w-4 ${discussion.isLiked ? 'fill-current' : ''}`} />
-                      {discussion.likes}
-                    </Button>
-                    
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleComment(discussion)}
-                          className="flex items-center gap-2 text-gray-400 hover:bg-blue-500/10 hover:text-blue-300 transition-colors"
-                        >
-                          <MessageCircle className="h-4 w-4" />
-                          {discussion.comments}
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[80vh] overflow-y-auto">
-                        <DialogHeader>
-                          <DialogTitle className="text-white">Comments - {discussion.title}</DialogTitle>
-                        </DialogHeader>
-                        
-                        {/* Comments List */}
-                        <div className="space-y-4 max-h-96 overflow-y-auto">
-                          {comments[discussion.id]?.map((comment) => (
-                            <div key={comment.id} className="flex items-start gap-3">
-                              <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                                {comment.avatar}
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className="text-cyan-300 font-medium text-sm">{comment.author}</span>
-                                  <span className="text-gray-400 text-xs">{comment.timeAgo}</span>
-                                </div>
-                                <p className="text-gray-300 text-sm">{comment.content}</p>
-                              </div>
-                            </div>
-                          )) || (
-                            <p className="text-gray-400 text-center py-8">No comments yet. Be the first to comment!</p>
-                          )}
+                    {editingPost === discussion.id ? (
+                      <div className="mb-4 space-y-3">
+                        <Textarea
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                          className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 min-h-[100px]"
+                          placeholder="Edit your post..."
+                        />
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => handleSaveEdit(discussion.id)}
+                            disabled={!editContent.trim()}
+                            className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                            size="sm"
+                          >
+                            Save
+                          </Button>
+                          <Button
+                            onClick={handleCancelEdit}
+                            variant="outline"
+                            className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                            size="sm"
+                          >
+                            Cancel
+                          </Button>
                         </div>
-                        
-                        {/* Add Comment */}
-                        <div className="flex items-start gap-3 mt-4 pt-4 border-t border-gray-700">
-                          <Avatar className="w-8 h-8 flex-shrink-0">
-                            {getUserAvatar() ? (
-                              <AvatarImage src={getUserAvatar()!} alt="Your avatar" />
-                            ) : (
-                              <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold text-sm">
-                                {getUserInitials()}
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
-                          <div className="flex-1 flex gap-2">
-                            <Textarea
-                              placeholder="Write a comment..."
-                              value={newComment}
-                              onChange={(e) => setNewComment(e.target.value)}
-                              className="flex-1 bg-slate-700/50 border-gray-600 text-white placeholder-gray-400 min-h-[80px]"
-                            />
-                            <Button
-                              onClick={handleAddComment}
-                              disabled={!newComment.trim()}
-                              className="bg-cyan-600 hover:bg-cyan-700 text-white self-end"
-                            >
-                              <Send className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-
-                    {/* Avatar Stack for Commenters */}
-                    {discussion.comments > 0 && (
-                      <div className="flex -space-x-2 ml-2">
-                        <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full border-2 border-slate-800"></div>
-                        <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-blue-500 rounded-full border-2 border-slate-800"></div>
-                        <div className="w-6 h-6 bg-gradient-to-r from-orange-500 to-red-500 rounded-full border-2 border-slate-800"></div>
-                        {discussion.comments > 3 && (
-                          <div className="w-6 h-6 bg-gradient-to-r from-gray-600 to-gray-500 rounded-full border-2 border-slate-800 flex items-center justify-center">
-                            <span className="text-xs text-white font-medium">+</span>
-                          </div>
+                      </div>
+                    ) : (
+                      <div 
+                        className="text-gray-300 mb-4 leading-relaxed whitespace-pre-wrap cursor-pointer hover:text-gray-200 transition-colors"
+                        onClick={() => setExpandedPost(expandedPost === discussion.id ? null : discussion.id)}
+                      >
+                        {expandedPost === discussion.id ? discussion.content : getTruncatedContent(discussion.content)}
+                        {discussion.content.length > 150 && expandedPost !== discussion.id && (
+                          <span className="text-cyan-400 ml-2 font-medium">Read more</span>
+                        )}
+                        {expandedPost === discussion.id && discussion.content.length > 150 && (
+                          <span className="text-cyan-400 ml-2 font-medium">Show less</span>
                         )}
                       </div>
                     )}
 
-                    <span className="text-gray-500 text-sm ml-auto">
-                      Last comment {discussion.timeAgo}
-                    </span>
+                    {discussion.attachments && discussion.attachments.length > 0 && (
+                      <div className="mb-4 space-y-2">
+                        {discussion.attachments.map((attachment, index) => (
+                          <div key={index} className="inline-flex items-center gap-2 bg-slate-700/50 p-2 rounded mr-2">
+                            {attachment.type === 'image' && (
+                               <img 
+                                 src={attachment.url} 
+                                 alt={attachment.name}
+                                 className="h-20 w-20 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+                                 onClick={(e) => {
+                                   e.stopPropagation();
+                                   setSelectedImage(attachment.url);
+                                 }}
+                               />
+                             )}
+                            {attachment.type === 'video' && (
+                              <div className="flex items-center gap-2">
+                                <Video className="h-4 w-4 text-cyan-400" />
+                                <video 
+                                  src={attachment.url}
+                                  className="h-20 w-32 object-cover rounded"
+                                  controls
+                                />
+                              </div>
+                            )}
+                            {attachment.type === 'file' && (
+                              <div className="flex items-center gap-2">
+                                <Paperclip className="h-4 w-4 text-cyan-400" />
+                                <span className="text-sm text-gray-300">{attachment.name}</span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-6">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleLike(discussion.id)}
+                        className={`flex items-center gap-2 hover:bg-red-500/10 transition-colors ${discussion.isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'}`}
+                      >
+                        <Heart className={`h-4 w-4 ${discussion.isLiked ? 'fill-current' : ''}`} />
+                        {discussion.likes}
+                      </Button>
+                      
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleComment(discussion)}
+                            className="flex items-center gap-2 text-gray-400 hover:bg-blue-500/10 hover:text-blue-300 transition-colors"
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                            {discussion.comments}
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[80vh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle className="text-white">Comments - {discussion.title}</DialogTitle>
+                          </DialogHeader>
+                          
+                          <div className="space-y-4 max-h-96 overflow-y-auto">
+                            {comments[discussion.id]?.map((comment) => (
+                              <div key={comment.id} className="flex items-start gap-3">
+                                <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                                  {comment.avatar}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-cyan-300 font-medium text-sm">{comment.author}</span>
+                                    <span className="text-gray-400 text-xs">{comment.timeAgo}</span>
+                                  </div>
+                                  <p className="text-gray-300 text-sm">{comment.content}</p>
+                                </div>
+                              </div>
+                            )) || (
+                              <p className="text-gray-400 text-center py-8">No comments yet. Be the first to comment!</p>
+                            )}
+                          </div>
+                          
+                          <div className="flex items-start gap-3 mt-4 pt-4 border-t border-gray-700">
+                            <Avatar className="w-8 h-8 flex-shrink-0">
+                              {getUserAvatar() ? (
+                                <AvatarImage src={getUserAvatar()!} alt="Your avatar" />
+                              ) : (
+                                <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold text-sm">
+                                  {getUserInitials()}
+                                </AvatarFallback>
+                              )}
+                            </Avatar>
+                            <div className="flex-1 flex gap-2">
+                              <Textarea
+                                placeholder="Write a comment..."
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                className="flex-1 bg-slate-700/50 border-gray-600 text-white placeholder-gray-400 min-h-[80px]"
+                              />
+                              <Button
+                                onClick={handleAddComment}
+                                disabled={!newComment.trim()}
+                                className="bg-cyan-600 hover:bg-cyan-700 text-white self-end"
+                              >
+                                <Send className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+
+                      {discussion.comments > 0 && (
+                        <div className="flex -space-x-2 ml-2">
+                          <div className="w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full border-2 border-slate-800"></div>
+                          <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-blue-500 rounded-full border-2 border-slate-800"></div>
+                          <div className="w-6 h-6 bg-gradient-to-r from-orange-500 to-red-500 rounded-full border-2 border-slate-800"></div>
+                          {discussion.comments > 3 && (
+                            <div className="w-6 h-6 bg-gradient-to-r from-gray-600 to-gray-500 rounded-full border-2 border-slate-800 flex items-center justify-center">
+                              <span className="text-xs text-white font-medium">+</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      <span className="text-gray-500 text-sm ml-auto">
+                        Last comment {discussion.timeAgo}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {filteredDiscussions.length === 0 && (
@@ -1069,7 +1081,6 @@ export const GroupDiscussions = () => {
         </Card>
       )}
 
-      {/* Image Expansion Modal */}
       {selectedImage && (
         <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
           <DialogContent className="bg-slate-900/95 border-gray-700 max-w-4xl p-2">
@@ -1120,7 +1131,6 @@ export const GroupDiscussions = () => {
                   {communityStats.onlineUsers}
                 </Badge>
               </div>
-              {/* Show who is online */}
               {Object.keys(onlinePresence).length > 0 && (
                 <div className="space-y-2">
                   <span className="text-gray-400 text-sm">Online Members:</span>
@@ -1143,12 +1153,10 @@ export const GroupDiscussions = () => {
             </CardContent>
           </Card>
 
-          {/* News Feed */}
           <div className="max-h-[800px] overflow-y-auto">
             <NewsFeed />
           </div>
 
-          {/* 30-Day Leaderboard */}
           <Card className="bg-slate-800/50 border-cyan-500/20">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
@@ -1157,7 +1165,6 @@ export const GroupDiscussions = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {/* Top 5 members - excluding admins */}
               <div className="space-y-3">
                 <div className="flex items-center gap-3 p-2 rounded-lg bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20">
                   <div className="flex items-center justify-center w-6 h-6">
@@ -1239,12 +1246,10 @@ export const GroupDiscussions = () => {
         </div>
       </div>
 
-      {/* Members List Modal for Admin */}
       <MembersList
         open={showMembersList}
         onOpenChange={setShowMembersList}
         onMessageMember={(memberId, memberName) => {
-          // For now, just show a toast - we can integrate with the chat later
           toast({
             title: "Message Member",
             description: `Starting conversation with ${memberName}`,
