@@ -149,6 +149,9 @@ export const GroupDiscussions = () => {
         isMockData: false
       })) || [];
 
+      // Keep only the most recent database discussion (if any)
+      const recentDiscussion = formattedDiscussions.length > 0 ? [formattedDiscussions[0]] : [];
+
       // Add mock discussions with proper user_id handling, but only if not deleted
       const mockDiscussions: Discussion[] = [];
       
@@ -172,7 +175,8 @@ export const GroupDiscussions = () => {
         });
       }
       
-      setDiscussionsList([...formattedDiscussions, ...mockDiscussions]);
+      // Combine: pinned message + most recent discussion only
+      setDiscussionsList([...mockDiscussions, ...recentDiscussion]);
     } catch (error) {
       console.error('Exception fetching discussions:', error);
     }
@@ -561,7 +565,7 @@ export const GroupDiscussions = () => {
         </div>
       </div>
 
-      {/* Right Sidebar - Leaderboard and News Feed */}
+      {/* Right Sidebar */}
       <div className="hidden lg:block w-80 flex-shrink-0">
         <div className="sticky top-6 space-y-6">
           <Card className="bg-slate-800/50 border-cyan-500/20">
