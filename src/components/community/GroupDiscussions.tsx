@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -160,7 +159,7 @@ export const GroupDiscussions = () => {
           comments: 0,
           timeAgo: '1d ago',
           created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          user_id: user?.id,
+          user_id: 'admin-user-id',
           isPinned: true,
           isLiked: false
         }
@@ -170,7 +169,7 @@ export const GroupDiscussions = () => {
     } catch (error) {
       console.error('Exception fetching discussions:', error);
     }
-  }, [getInitials, user?.id]);
+  }, [getInitials]);
 
   const formatTimeAgo = useCallback((dateString: string) => {
     const date = new Date(dateString);
@@ -188,8 +187,9 @@ export const GroupDiscussions = () => {
     fetchDiscussions();
   }, [fetchUserProfiles, fetchDiscussions]);
 
-  // Get profile info for a specific user
+  // Fixed profile info function - this was the source of the bug
   const getProfileInfo = useCallback((userId: string | undefined, authorName: string) => {
+    // For posts without a user_id, use the author name and generate initials
     if (!userId) {
       return {
         avatar_url: null,
@@ -198,6 +198,7 @@ export const GroupDiscussions = () => {
       };
     }
 
+    // Only return current user's profile info if this post belongs to the current user
     if (user && user.id === userId) {
       return {
         avatar_url: getUserAvatar(),
@@ -206,15 +207,18 @@ export const GroupDiscussions = () => {
       };
     }
 
-    const profile = userProfiles[userId];
-    if (profile) {
+    // For other users, get their profile from the profiles map
+    const userProfile = userProfiles[userId];
+    if (userProfile) {
+      const displayName = userProfile.display_name || userProfile.first_name || authorName;
       return {
-        avatar_url: profile.avatar_url,
-        display_name: profile.display_name || profile.first_name || authorName,
-        initials: getInitials(profile.display_name || profile.first_name || authorName)
+        avatar_url: userProfile.avatar_url,
+        display_name: displayName,
+        initials: getInitials(displayName)
       };
     }
     
+    // Fallback to author name and initials
     return {
       avatar_url: null,
       display_name: authorName,
@@ -502,7 +506,7 @@ export const GroupDiscussions = () => {
         </div>
       </div>
 
-      {/* Right Sidebar - Leaderboard */}
+      {/* Right Sidebar - Leaderboard and News Feed */}
       <div className="hidden lg:block w-80 flex-shrink-0">
         <div className="sticky top-6 space-y-6">
           <Card className="bg-slate-800/50 border-cyan-500/20">
