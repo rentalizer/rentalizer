@@ -11,7 +11,7 @@ import { BuildOutSection } from '@/components/calculator/BuildOutSection';
 import { ExpensesSection } from '@/components/calculator/ExpensesSection';
 import { NetProfitSection } from '@/components/calculator/NetProfitSection';
 import { exportCalculatorToCSV } from '@/utils/calculatorExport';
-import { TopNavBar } from '@/components/TopNavBar';
+
 import { Footer } from '@/components/Footer';
 import { CommunityCalendar } from '@/components/community/CommunityCalendar';
 import { MessageThreads } from '@/components/community/MessageThreads';
@@ -461,7 +461,6 @@ const Community = () => {
   if (isLovableEnv) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-        <TopNavBar />
         <CommunityContent />
         <Footer />
       </div>
