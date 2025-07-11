@@ -149,9 +149,6 @@ export const GroupDiscussions = () => {
         isMockData: false
       })) || [];
 
-      // Keep only the most recent database discussion (if any)
-      const recentDiscussion = formattedDiscussions.length > 0 ? [formattedDiscussions[0]] : [];
-
       // Add mock discussions with proper user_id handling, but only if not deleted
       const mockDiscussions: Discussion[] = [];
       
@@ -175,8 +172,8 @@ export const GroupDiscussions = () => {
         });
       }
       
-      // Combine: pinned message + most recent discussion only
-      setDiscussionsList([...mockDiscussions, ...recentDiscussion]);
+      // Combine: pinned message + all database discussions (keeping all database messages)
+      setDiscussionsList([...mockDiscussions, ...formattedDiscussions]);
     } catch (error) {
       console.error('Exception fetching discussions:', error);
     }
