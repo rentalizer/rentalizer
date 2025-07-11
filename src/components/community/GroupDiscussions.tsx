@@ -62,6 +62,7 @@ export const GroupDiscussions = () => {
     adminCount: 2
   });
   const [showMembersList, setShowMembersList] = useState(false);
+  const [deletedMockDiscussions, setDeletedMockDiscussions] = useState<Set<string>>(new Set());
 
   // Check if user needs to set up profile
   useEffect(() => {
@@ -148,9 +149,12 @@ export const GroupDiscussions = () => {
         isMockData: false
       })) || [];
 
-      // Add mock discussions with proper user_id handling
-      const mockDiscussions: Discussion[] = [
-        {
+      // Add mock discussions with proper user_id handling, but only if not deleted
+      const mockDiscussions: Discussion[] = [];
+      
+      // Only add the welcome message if it hasn't been deleted
+      if (!deletedMockDiscussions.has('pinned-welcome')) {
+        mockDiscussions.push({
           id: 'pinned-welcome',
           title: 'Welcome aboard!',
           content: "We're excited to have you join our community of rental entrepreneurs. Whether you're brand new or already hosting, you're in the right place to level up, connect with others, and grow your business.\n\nHere's how to get started:\n\n1. Introduce Yourself\nPost a short intro and share your story with the group. Your background, goals, or why you joined—this helps us get to know you and keeps the energy strong!\n\n2. Start the Training\nJump into the training videos right away. You'll learn actionable strategies, insider tips, and proven systems to succeed with rental arbitrage—whether you're working toward your first unit or scaling a portfolio.",
@@ -165,14 +169,14 @@ export const GroupDiscussions = () => {
           isPinned: true,
           isLiked: false,
           isMockData: true
-        }
-      ];
+        });
+      }
       
       setDiscussionsList([...formattedDiscussions, ...mockDiscussions]);
     } catch (error) {
       console.error('Exception fetching discussions:', error);
     }
-  }, [getInitials]);
+  }, [getInitials, deletedMockDiscussions]);
 
   const formatTimeAgo = useCallback((dateString: string) => {
     const date = new Date(dateString);
@@ -303,9 +307,10 @@ export const GroupDiscussions = () => {
         return;
       }
 
-      // If it's mock data, just remove from local state
+      // If it's mock data, add to deleted set and remove from local state
       if (discussionToDelete.isMockData) {
-        console.log('🗑️ Deleting mock discussion from local state only');
+        console.log('🗑️ Deleting mock discussion permanently');
+        setDeletedMockDiscussions(prev => new Set([...prev, discussionId]));
         setDiscussionsList(prev => prev.filter(d => d.id !== discussionId));
         
         toast({
