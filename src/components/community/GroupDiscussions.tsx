@@ -103,6 +103,7 @@ export const GroupDiscussions = () => {
       });
       
       setUserProfiles(profilesMap);
+      console.log('Fetched user profiles:', profilesMap);
     } catch (error) {
       console.error('Error fetching user profiles:', error);
     }
@@ -134,7 +135,7 @@ export const GroupDiscussions = () => {
     return getInitials(name);
   };
 
-  // Get profile info for a specific user
+  // Get profile info for a specific user - Enhanced to properly return avatar URLs
   const getProfileInfo = (userId: string, authorName: string) => {
     const profile = userProfiles[userId];
     if (profile) {
@@ -144,6 +145,16 @@ export const GroupDiscussions = () => {
         initials: getInitials(profile.display_name || profile.first_name || authorName)
       };
     }
+    
+    // For admin users, check if this is the current user
+    if (user && user.id === userId && getUserAvatar()) {
+      return {
+        avatar_url: getUserAvatar(),
+        display_name: getUserName(),
+        initials: getUserInitials()
+      };
+    }
+    
     return {
       avatar_url: null,
       display_name: authorName,
@@ -192,7 +203,7 @@ export const GroupDiscussions = () => {
           comments: 0,
           timeAgo: '1d ago',
           created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          user_id: 'admin-user-id',
+          user_id: user?.id || 'admin-user-id', // Use current user's ID for admin posts
           isPinned: true,
           isLiked: false,
           attachments: undefined
@@ -822,9 +833,19 @@ export const GroupDiscussions = () => {
                     }}
                     title={discussion.author !== getUserName() ? `Send direct message to ${discussion.author}` : ''}
                   >
-                    {profileInfo.avatar_url ? (
-                      <AvatarImage src={profileInfo.avatar_url} alt={`${discussion.author}'s avatar`} />
-                    ) : null}
+                    {profileInfo.avatar_url && (
+                      <AvatarImage 
+                        src={profileInfo.avatar_url} 
+                        alt={`${discussion.author}'s avatar`}
+                        onError={(e) => {
+                          console.log('Avatar image failed to load:', profileInfo.avatar_url);
+                          e.currentTarget.style.display = 'none';
+                        }}
+                        onLoad={() => {
+                          console.log('Avatar image loaded successfully:', profileInfo.avatar_url);
+                        }}
+                      />
+                    )}
                     <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
                       {profileInfo.initials}
                     </AvatarFallback>
