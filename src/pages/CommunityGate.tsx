@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Users, ArrowLeft, LogIn, User, Lock, UserPlus, Ticket, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { TopNavBarTest } from '@/components/TopNavBarTest';
 
 import { Footer } from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
@@ -272,6 +273,7 @@ const CommunityGate = () => {
   if (user || isAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+        <TopNavBarTest />
         <Community />
       </div>
     );
@@ -281,6 +283,7 @@ const CommunityGate = () => {
   if (!user && !isAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+        <TopNavBarTest />
         
         {/* Main content area */}
         <div className="flex-1 relative">
