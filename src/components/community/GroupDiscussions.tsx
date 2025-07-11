@@ -294,23 +294,23 @@ export const GroupDiscussions = () => {
     });
 
     // Try database deletion in background (but don't wait for it)
-    supabase
-      .from('discussions')
-      .delete()
-      .eq('id', discussionId)
-      .then(({ error }) => {
-        if (error) {
-          console.error('❌ Database deletion failed:', error);
-        } else {
-          console.log('✅ Database deletion successful');
-        }
-      })
-      .catch(error => {
-        console.error('❌ Exception during database deletion:', error);
-      });
+    try {
+      const { error } = await supabase
+        .from('discussions')
+        .delete()
+        .eq('id', discussionId);
+        
+      if (error) {
+        console.error('❌ Database deletion failed:', error);
+      } else {
+        console.log('✅ Database deletion successful');
+      }
+    } catch (error) {
+      console.error('❌ Exception during database deletion:', error);
+    }
 
     toast({
-      title: "Discussion Removed",
+      title: "Discussion Deleted",
       description: "Discussion has been permanently removed.",
     });
   }, [toast]);
