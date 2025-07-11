@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -187,8 +188,15 @@ export const GroupDiscussions = () => {
     fetchDiscussions();
   }, [fetchUserProfiles, fetchDiscussions]);
 
+  // Refresh profiles when user profile changes
+  useEffect(() => {
+    fetchUserProfiles();
+  }, [profile, fetchUserProfiles]);
+
   // Fixed profile info function - this was the source of the bug
   const getProfileInfo = useCallback((userId: string | undefined, authorName: string) => {
+    console.log('🔍 Getting profile info for:', { userId, authorName, currentUserId: user?.id });
+    
     // For posts without a user_id, use the author name and generate initials
     if (!userId) {
       return {
@@ -198,12 +206,20 @@ export const GroupDiscussions = () => {
       };
     }
 
-    // Only return current user's profile info if this post belongs to the current user
+    // For the current user's posts, use their current profile from the auth context
     if (user && user.id === userId) {
+      const currentDisplayName = profile?.display_name || user.email?.split('@')[0] || authorName;
+      const finalDisplayName = isAdmin ? `${currentDisplayName} (Admin)` : currentDisplayName;
+      
+      console.log('✅ Using current user profile:', { 
+        displayName: finalDisplayName, 
+        avatarUrl: profile?.avatar_url 
+      });
+      
       return {
-        avatar_url: getUserAvatar(),
-        display_name: getUserName(),
-        initials: getUserInitials()
+        avatar_url: profile?.avatar_url,
+        display_name: finalDisplayName,
+        initials: getInitials(currentDisplayName)
       };
     }
 
@@ -224,7 +240,7 @@ export const GroupDiscussions = () => {
       display_name: authorName,
       initials: getInitials(authorName)
     };
-  }, [user, getUserAvatar, getUserName, getUserInitials, userProfiles, getInitials]);
+  }, [user, profile, isAdmin, userProfiles, getInitials]);
 
   // Memoized filtered discussions to prevent unnecessary re-renders
   const filteredDiscussions = useMemo(() => {
@@ -360,7 +376,7 @@ export const GroupDiscussions = () => {
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             {discussion.isPinned && <Pin className="h-4 w-4 text-yellow-400" />}
-                            <span className="text-cyan-300 font-medium">{discussion.author}</span>
+                            <span className="text-cyan-300 font-medium">{profileInfo.display_name}</span>
                             <span className="text-gray-400">•</span>
                             <span className="text-gray-400 text-sm">{discussion.timeAgo}</span>
                             <span className="text-gray-400">•</span>
