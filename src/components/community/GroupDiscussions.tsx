@@ -136,32 +136,30 @@ export const GroupDiscussions = () => {
       
       console.log('📥 Raw data from database:', data?.length || 0, 'discussions');
       
-      // Convert database format to component format and filter out deleted ones
-      const formattedDiscussions = (data || [])
-        .filter(discussion => !deletedDiscussionIds.has(discussion.id))
-        .map(discussion => ({
-          id: discussion.id,
-          title: discussion.title,
-          content: discussion.content,
-          author: discussion.author_name,
-          avatar: getInitials(discussion.author_name),
-          category: discussion.category,
-          likes: discussion.likes_count || 0,
-          comments: discussion.comments_count || 0,
-          timeAgo: formatTimeAgo(discussion.created_at),
-          created_at: discussion.created_at,
-          user_id: discussion.user_id,
-          isPinned: false,
-          isLiked: false,
-          isMockData: false
-        }));
+      // Convert database format to component format
+      const formattedDiscussions = (data || []).map(discussion => ({
+        id: discussion.id,
+        title: discussion.title,
+        content: discussion.content,
+        author: discussion.author_name,
+        avatar: getInitials(discussion.author_name),
+        category: discussion.category,
+        likes: discussion.likes_count || 0,
+        comments: discussion.comments_count || 0,
+        timeAgo: formatTimeAgo(discussion.created_at),
+        created_at: discussion.created_at,
+        user_id: discussion.user_id,
+        isPinned: false,
+        isLiked: false,
+        isMockData: false
+      }));
 
-      console.log('✅ Filtered discussions:', formattedDiscussions.length, 'after removing deleted IDs:', Array.from(deletedDiscussionIds));
+      console.log('✅ Formatted discussions:', formattedDiscussions.length);
       setDiscussionsList(formattedDiscussions);
     } catch (error) {
       console.error('❌ Exception fetching discussions:', error);
     }
-  }, [getInitials, deletedDiscussionIds]);
+  }, [getInitials]);
 
   const formatTimeAgo = useCallback((dateString: string) => {
     const date = new Date(dateString);
@@ -230,13 +228,25 @@ export const GroupDiscussions = () => {
 
   // Memoized filtered discussions to prevent unnecessary re-renders
   const filteredDiscussions = useMemo(() => {
-    return discussionsList
-      .filter(discussion => !deletedDiscussionIds.has(discussion.id))
+    console.log('🔍 Filtering discussions. Current deletedIds:', Array.from(deletedDiscussionIds));
+    console.log('🔍 Total discussions before filtering:', discussionsList.length);
+    
+    const filtered = discussionsList
+      .filter(discussion => {
+        const isDeleted = deletedDiscussionIds.has(discussion.id);
+        if (isDeleted) {
+          console.log('🗑️ Filtering out deleted discussion:', discussion.id, discussion.title);
+        }
+        return !isDeleted;
+      })
       .sort((a, b) => {
         if (a.isPinned && !b.isPinned) return -1;
         if (!a.isPinned && b.isPinned) return 1;
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
+    
+    console.log('✅ Filtered discussions count:', filtered.length);
+    return filtered;
   }, [discussionsList, deletedDiscussionIds]);
 
   const handleLike = useCallback((discussionId: string) => {
@@ -277,23 +287,23 @@ export const GroupDiscussions = () => {
   }, [newComment, selectedDiscussion, getUserName, getUserInitials]);
 
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
-    console.log('🗑️ Admin attempting to delete discussion:', discussionId);
+    console.log('🗑️ Starting delete process for discussion:', discussionId);
     
-    // IMMEDIATELY remove from UI and add to deleted set - this should be permanent
-    console.log('🗑️ Immediately removing from UI');
+    // IMMEDIATELY add to deleted set - this is the key fix
     setDeletedDiscussionIds(prev => {
       const newSet = new Set([...prev, discussionId]);
-      console.log('🗑️ Updated deleted IDs:', Array.from(newSet));
+      console.log('🗑️ Added to deleted IDs set:', Array.from(newSet));
       return newSet;
     });
     
+    // Also remove from current discussions list as backup
     setDiscussionsList(prev => {
       const filtered = prev.filter(d => d.id !== discussionId);
-      console.log('🗑️ Discussions after UI removal:', filtered.length);
+      console.log('🗑️ Removed from discussions list. New count:', filtered.length);
       return filtered;
     });
 
-    // Try database deletion in background (but don't wait for it)
+    // Try database deletion in background
     try {
       const { error } = await supabase
         .from('discussions')
@@ -302,11 +312,13 @@ export const GroupDiscussions = () => {
         
       if (error) {
         console.error('❌ Database deletion failed:', error);
+        // Don't revert UI changes even if database deletion fails
       } else {
         console.log('✅ Database deletion successful');
       }
     } catch (error) {
       console.error('❌ Exception during database deletion:', error);
+      // Don't revert UI changes even if database deletion fails
     }
 
     toast({
@@ -330,9 +342,9 @@ export const GroupDiscussions = () => {
 
   // Handle post creation callback - DO NOT refetch, just add the new post
   const handlePostCreated = useCallback(() => {
-    console.log('🔄 New post created - will be visible on next natural refresh');
-    // Don't call fetchDiscussions here as it would reset our deleted state
-  }, []);
+    console.log('🔄 New post created - refreshing discussions list');
+    fetchDiscussions();
+  }, [fetchDiscussions]);
 
   return (
     <div className="flex gap-6">
