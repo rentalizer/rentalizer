@@ -135,7 +135,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
     if (!user) {
       toast({
         title: "Error",
-        description: "Missing user data",
+        description: "You must be logged in to update your profile",
         variant: "destructive"
       });
       return;
@@ -158,7 +158,8 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
         first_name: data.first_name.trim(),
         last_name: data.last_name.trim(),
         bio: data.bio?.trim() || null,
-        avatar_url: avatarUrl
+        avatar_url: avatarUrl,
+        profile_complete: true // Mark profile as complete when saving
       };
 
       console.log('💾 Saving profile data:', profileData);

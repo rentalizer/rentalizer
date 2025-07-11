@@ -10,6 +10,7 @@ interface Profile {
   last_name: string | null;
   bio: string | null;
   avatar_url: string | null;
+  profile_complete?: boolean | null;
 }
 
 export const useProfile = () => {
@@ -36,10 +37,7 @@ export const useProfile = () => {
       console.log('📊 Profile query result:', { data, error });
 
       if (error) {
-        // Only log actual errors, not "no rows found"
-        if (error.code !== 'PGRST116') {
-          console.error('Error fetching profile:', error);
-        }
+        console.error('Error fetching profile:', error);
         
         // Create a default profile structure if none exists
         const defaultProfile: Profile = {
@@ -48,7 +46,8 @@ export const useProfile = () => {
           first_name: null,
           last_name: null,
           bio: null,
-          avatar_url: null
+          avatar_url: null,
+          profile_complete: false
         };
         setProfile(defaultProfile);
       } else {
@@ -59,7 +58,8 @@ export const useProfile = () => {
           first_name: null,
           last_name: null,
           bio: null,
-          avatar_url: null
+          avatar_url: null,
+          profile_complete: false
         };
         
         console.log('✅ Profile loaded successfully:', profileData);
@@ -74,7 +74,8 @@ export const useProfile = () => {
         first_name: null,
         last_name: null,
         bio: null,
-        avatar_url: null
+        avatar_url: null,
+        profile_complete: false
       };
       setProfile(fallbackProfile);
     } finally {
