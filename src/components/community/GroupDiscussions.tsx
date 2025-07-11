@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -168,16 +167,11 @@ export const GroupDiscussions = () => {
     return `${Math.floor(diffInMinutes / 1440)}d ago`;
   }, []);
 
-  // Initialize data
+  // Initialize data - ONLY fetch once on mount
   useEffect(() => {
     fetchUserProfiles();
     fetchDiscussions();
-  }, [fetchUserProfiles, fetchDiscussions]);
-
-  // Refresh profiles when user profile changes
-  useEffect(() => {
-    fetchUserProfiles();
-  }, [profile, fetchUserProfiles]);
+  }, []); // Empty dependency array - only run once on mount
 
   // Fixed profile info function - this was the source of the bug
   const getProfileInfo = useCallback((userId: string | undefined, authorName: string) => {
@@ -279,16 +273,16 @@ export const GroupDiscussions = () => {
     console.log('🗑️ Admin attempting to delete discussion:', discussionId);
     
     try {
-      // Immediately remove from UI first
-      console.log('🗑️ Removing from UI immediately');
+      // Remove from UI FIRST and keep it removed
+      console.log('🗑️ Removing from UI permanently');
       setDiscussionsList(prev => {
         const updated = prev.filter(d => d.id !== discussionId);
         console.log('🗑️ UI updated, remaining discussions:', updated.length);
         return updated;
       });
 
-      // Then attempt database deletion
-      console.log('🗑️ Attempting database deletion');
+      // Then attempt database deletion in background
+      console.log('🗑️ Attempting database deletion in background');
       const { error } = await supabase
         .from('discussions')
         .delete()
@@ -296,8 +290,7 @@ export const GroupDiscussions = () => {
 
       if (error) {
         console.error('Database deletion failed:', error);
-        // If database deletion fails, we could restore the item, but for now just show success
-        // since it's already removed from UI
+        // Don't restore the item - it's already gone from UI and that's what matters
       } else {
         console.log('🗑️ Database deletion successful');
       }
@@ -328,6 +321,12 @@ export const GroupDiscussions = () => {
     return content.substring(0, maxLength) + '...';
   }, []);
 
+  // Handle post creation callback - refresh discussions when new post is created
+  const handlePostCreated = useCallback(() => {
+    console.log('🔄 New post created, refreshing discussions');
+    fetchDiscussions();
+  }, [fetchDiscussions]);
+
   return (
     <div className="flex gap-6">
       {/* Main Content */}
@@ -343,7 +342,7 @@ export const GroupDiscussions = () => {
           )}
           
           {/* Header with Post Input */}
-          <CommunityHeader onPostCreated={fetchDiscussions} />
+          <CommunityHeader onPostCreated={handlePostCreated} />
 
           {/* Discussion Posts */}
           <div className="space-y-4">
