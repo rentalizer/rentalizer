@@ -35,10 +35,19 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
 
   // Fetch current profile
   const fetchProfile = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('❌ ProfileEditor: No user found, cannot fetch profile');
+      return;
+    }
 
     try {
       console.log('🔍 ProfileEditor: Fetching profile for user:', user.id);
+      console.log('🔍 ProfileEditor: User object:', user);
+      
+      // First, let's check what the current auth state is
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log('🔍 ProfileEditor: Current session:', session);
+      console.log('🔍 ProfileEditor: Session error:', sessionError);
       
       const { data, error } = await supabase
         .from('profiles')
@@ -142,6 +151,8 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
   const saveProfile = async () => {
     if (!user || !profile) {
       console.error('❌ ProfileEditor: No user or profile data');
+      console.error('❌ ProfileEditor: User:', user);
+      console.error('❌ ProfileEditor: Profile:', profile);
       toast({
         title: "Error",
         description: "Missing user or profile data",
@@ -152,6 +163,20 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
 
     console.log('💾 ProfileEditor: Saving profile for user:', user.id);
     console.log('📋 ProfileEditor: Profile data to save:', profile);
+
+    // Double-check authentication before proceeding
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+      console.error('❌ ProfileEditor: Not authenticated:', sessionError);
+      toast({
+        title: "Error",
+        description: "You must be logged in to save your profile",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    console.log('✅ ProfileEditor: Authentication confirmed:', session.user.id);
 
     setLoading(true);
     try {
@@ -166,7 +191,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
       }
 
       const profileData = {
-        user_id: user.id,
+        user_id: session.user.id, // Use session user ID to be extra sure
         display_name: profile.display_name?.trim() || null,
         first_name: profile.first_name?.trim() || null,
         last_name: profile.last_name?.trim() || null,
@@ -187,6 +212,12 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose, o
 
       if (error) {
         console.error('❌ ProfileEditor: Supabase upsert error:', error);
+        console.error('❌ ProfileEditor: Error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
         throw error;
       }
 
