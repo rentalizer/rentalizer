@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,6 +31,7 @@ interface Discussion {
   isPinned?: boolean;
   isLiked?: boolean;
   user_id?: string;
+  isMockData?: boolean;
 }
 
 interface UserProfile {
@@ -144,7 +144,8 @@ export const GroupDiscussions = () => {
         created_at: discussion.created_at,
         user_id: discussion.user_id,
         isPinned: false,
-        isLiked: false
+        isLiked: false,
+        isMockData: false
       })) || [];
 
       // Add mock discussions with proper user_id handling
@@ -162,7 +163,8 @@ export const GroupDiscussions = () => {
           created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
           user_id: 'admin-user-id',
           isPinned: true,
-          isLiked: false
+          isLiked: false,
+          isMockData: true
         }
       ];
       
@@ -293,9 +295,17 @@ export const GroupDiscussions = () => {
     console.log('🗑️ Attempting to delete discussion:', discussionId);
     
     try {
-      // Check if this is the pinned mock discussion
-      if (discussionId === 'pinned-welcome') {
-        console.log('🗑️ Deleting pinned mock discussion from local state only');
+      // Find the discussion to check if it's mock data
+      const discussionToDelete = discussionsList.find(d => d.id === discussionId);
+      
+      if (!discussionToDelete) {
+        console.log('🗑️ Discussion not found in local state');
+        return;
+      }
+
+      // If it's mock data, just remove from local state
+      if (discussionToDelete.isMockData) {
+        console.log('🗑️ Deleting mock discussion from local state only');
         setDiscussionsList(prev => prev.filter(d => d.id !== discussionId));
         
         toast({
@@ -305,7 +315,7 @@ export const GroupDiscussions = () => {
         return;
       }
 
-      // For all other discussions, try to delete from database first
+      // For database discussions, delete from database first
       console.log('🗑️ Attempting to delete from database');
       const { error } = await supabase
         .from('discussions')
@@ -337,7 +347,7 @@ export const GroupDiscussions = () => {
         variant: "destructive",
       });
     }
-  }, [toast]);
+  }, [toast, discussionsList]);
 
   const canEditOrDelete = useCallback((discussion: Discussion) => {
     if (isAdmin) return true;
