@@ -12,7 +12,7 @@ export const TopNavBarTest = () => {
   const showUserInfo = user && user.email !== 'dev@example.com';
 
   return (
-    <div className="w-full bg-slate-800/60 backdrop-blur-lg border-b border-slate-600/30">
+    <div className="w-full bg-slate-700/95 backdrop-blur-lg">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Left side - Logo only */}
