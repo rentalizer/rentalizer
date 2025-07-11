@@ -38,13 +38,14 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
 
     try {
       console.log('🔍 ProfileEditor: Fetching profile for user:', user.id);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error('❌ ProfileEditor: Error fetching profile:', error);
         throw error;
       }
@@ -56,8 +57,8 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
           setPreviewUrl(data.avatar_url);
         }
       } else {
-        console.log('📝 ProfileEditor: Creating initial profile');
-        // Create initial profile if it doesn't exist
+        console.log('📝 ProfileEditor: Creating initial profile structure');
+        // Create initial profile structure
         const newProfile: Profile = {
           user_id: user.id,
           display_name: user.email?.split('@')[0] || null,
@@ -140,6 +141,11 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
   const saveProfile = async () => {
     if (!user || !profile) {
       console.error('❌ ProfileEditor: No user or profile data');
+      toast({
+        title: "Error",
+        description: "Missing user or profile data",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -158,29 +164,46 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
         }
       }
 
-      const updatedProfile = {
-        ...profile,
+      const profileData = {
+        user_id: user.id,
+        display_name: profile.display_name?.trim() || null,
+        first_name: profile.first_name?.trim() || null,
+        last_name: profile.last_name?.trim() || null,
+        bio: profile.bio?.trim() || null,
         avatar_url: avatarUrl
       };
 
-      console.log('🔄 ProfileEditor: Attempting upsert with data:', updatedProfile);
+      console.log('🔄 ProfileEditor: Attempting upsert with data:', profileData);
 
-      // First try to get the current session to ensure we're authenticated
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('🔑 ProfileEditor: Current session exists:', !!session);
+      // Check if profile exists first
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (!session) {
-        throw new Error('No authentication session found');
+      let result;
+      if (existingProfile) {
+        // Update existing profile
+        result = await supabase
+          .from('profiles')
+          .update(profileData)
+          .eq('user_id', user.id)
+          .select()
+          .single();
+      } else {
+        // Insert new profile
+        result = await supabase
+          .from('profiles')
+          .insert(profileData)
+          .select()
+          .single();
       }
 
-      const { data, error } = await supabase
-        .from('profiles')
-        .upsert(updatedProfile, { onConflict: 'user_id' })
-        .select()
-        .single();
+      const { data, error } = result;
 
       if (error) {
-        console.error('❌ ProfileEditor: Supabase upsert error:', error);
+        console.error('❌ ProfileEditor: Supabase operation error:', error);
         throw error;
       }
 
@@ -191,12 +214,18 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({ isOpen, onClose })
         description: "Profile updated successfully",
       });
 
-      onClose();
+      // Update local profile state
+      setProfile(data);
+      setAvatarFile(null);
+      
+      // Refresh the page to update the profile display
+      window.location.reload();
+      
     } catch (error: any) {
       console.error('💥 ProfileEditor: Exception saving profile:', error);
       toast({
         title: "Error",
-        description: `Failed to save profile: ${error.message || error}`,
+        description: `Failed to save profile: ${error.message || 'Unknown error'}`,
         variant: "destructive"
       });
     } finally {

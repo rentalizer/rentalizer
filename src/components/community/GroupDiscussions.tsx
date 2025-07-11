@@ -176,7 +176,7 @@ export const GroupDiscussions = () => {
     };
   };
 
-  // Fetch discussions from database with mock data added
+  // Fetch discussions from database with mock data added (FIXED - no invalid UUIDs)
   const fetchDiscussions = async () => {
     try {
       console.log('🔍 Fetching discussions...');
@@ -207,8 +207,7 @@ export const GroupDiscussions = () => {
         attachments: undefined
       })) || [];
 
-      // Add mock discussions with proper UUIDs - only use current user's ID for admin posts
-      const currentUserId = user?.id;
+      // Add mock discussions - FIXED: Only use current user's ID for admin posts, others get undefined
       const mockDiscussions: Discussion[] = [
         {
           id: 'pinned-welcome',
@@ -221,7 +220,7 @@ export const GroupDiscussions = () => {
           comments: 0,
           timeAgo: '1d ago',
           created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          user_id: currentUserId, // Use current user's ID for admin posts
+          user_id: user?.id, // Only set user_id if current user is logged in
           isPinned: true,
           isLiked: false,
           attachments: undefined
@@ -344,13 +343,6 @@ export const GroupDiscussions = () => {
 
   // Initialize discussions from database
   React.useEffect(() => {
-    // Clear any existing localStorage data to prevent conflicts
-    try {
-      localStorage.removeItem('community_discussions');
-    } catch (error) {
-      console.log('Could not clear localStorage:', error);
-    }
-    
     fetchUserProfiles();
     fetchDiscussions();
     fetchUpcomingEvents();
