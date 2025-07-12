@@ -270,7 +270,7 @@ const Community = () => {
               className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors relative"
             >
               <MessageSquare className="h-5 w-5 mr-2" />
-              DM Admin
+              Ask Richie
               {unreadCount > 0 && (
                 <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
                   <span className="text-xs text-white font-semibold">
