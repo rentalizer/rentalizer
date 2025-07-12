@@ -275,7 +275,6 @@ export const MemberAskRichie = () => {
           </Avatar>
           <div>
             <h3 className="text-white text-lg font-semibold">Ask AI Richie</h3>
-            <p className="text-cyan-300 text-sm">Rental Arbitrage Expert</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
