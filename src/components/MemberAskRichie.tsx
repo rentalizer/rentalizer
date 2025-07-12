@@ -192,7 +192,8 @@ export const MemberAskRichie = () => {
     try {
       const { data, error } = await supabase.functions.invoke('ask-richie', {
         body: {
-          question: currentQuestion.trim()
+          question: currentQuestion.trim(),
+          userId: user.id
         }
       });
 
