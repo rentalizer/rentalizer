@@ -262,34 +262,6 @@ const Community = () => {
               Training Dashboard
             </h1>
           </div>
-          
-          {/* Theme Toggle Button - Only for authenticated users */}
-          {user && (
-            <div className="flex justify-center mb-4">
-              <Button
-                onClick={toggleTheme}
-                variant="outline"
-                size="sm"
-                className={`transition-all duration-300 ${
-                  isDayMode 
-                    ? 'border-cyan-300 text-cyan-800 hover:bg-cyan-100 bg-white shadow-sm' 
-                    : 'border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10'
-                }`}
-              >
-                {isDayMode ? (
-                  <>
-                    <Moon className="h-4 w-4 mr-2" />
-                    Switch to Night
-                  </>
-                ) : (
-                  <>
-                    <Sun className="h-4 w-4 mr-2" />
-                    Switch to Day
-                  </>
-                )}
-              </Button>
-            </div>
-          )}
         </div>
 
         {/* Admin Quick Links */}
