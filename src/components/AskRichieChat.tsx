@@ -49,6 +49,14 @@ export const AskRichieChat = () => {
   const audioRecorderRef = useRef<AudioRecorder | null>(null);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Only show on home page for non-logged-in users
+  const shouldShow = !user && (window.location.pathname === '/' || window.location.pathname === '/landing');
+
+  // If shouldn't show, return null
+  if (!shouldShow) {
+    return null;
+  }
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
