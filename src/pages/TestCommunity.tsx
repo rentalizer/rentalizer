@@ -1,17 +1,18 @@
+// Community Component - Fixed TopNavBar issue
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper } from 'lucide-react';
+import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
 import { ExpensesSection } from '@/components/calculator/ExpensesSection';
 import { NetProfitSection } from '@/components/calculator/NetProfitSection';
 import { exportCalculatorToCSV } from '@/utils/calculatorExport';
-import { TopNavBar } from '@/components/TopNavBar';
+
 import { Footer } from '@/components/Footer';
 import { CommunityCalendar } from '@/components/community/CommunityCalendar';
 import { MessageThreads } from '@/components/community/MessageThreads';
@@ -20,12 +21,19 @@ import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
 import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { CommunityLeaderboard } from '@/components/community/CommunityLeaderboard';
 import { NewsFeed } from '@/components/community/NewsFeed';
-import { DirectMessaging } from '@/components/DirectMessaging';
+import SimplifiedChat from '@/components/SimplifiedChat';
 import { AskRichieChat } from '@/components/AskRichieChat';
 import { ContactChat } from '@/components/ContactChat';
+import { AccessGate } from '@/components/AccessGate';
+import { MembersList } from '@/components/MembersList';
+import { ProfileEditor } from '@/components/ProfileEditor';
 
 import { useAdminRole } from '@/hooks/useAdminRole';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { TopNavBar } from '@/components/TopNavBar';
 
 export interface CalculatorData {
   // Comps
@@ -33,8 +41,6 @@ export interface CalculatorData {
   bedrooms: number;
   bathrooms: number;
   averageComparable: number;
-  hasGym: boolean;
-  hasHotTub: boolean;
   
   // Build Out
   firstMonthRent: number;
@@ -67,10 +73,64 @@ const TestCommunity = () => {
   };
   
   const [activeTab, setActiveTab] = useState(getInitialTab());
+  const [isChatOpen, setChatOpen] = useState(false);
+  const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
+  const [profileEditorOpen, setProfileEditorOpen] = useState(false);
+  const [userIsAdmin, setUserIsAdmin] = useState(false);
+  const [adminCheckLoading, setAdminCheckLoading] = useState(true);
   const { toast } = useToast();
   const { isAdmin } = useAdminRole();
+  const { unreadCount } = useUnreadMessages();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  
+  // Check if we're in Lovable environment
+  const isLovableEnv = window.location.hostname.includes('lovableproject.com') || 
+                       window.location.search.includes('__lovable_token') ||
+                       window.location.hostname === 'localhost';
+  
+  // Enhanced admin check that works on live site
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user) {
+        setUserIsAdmin(false);
+        setAdminCheckLoading(false);
+        return;
+      }
+
+      try {
+        // First check using the hook
+        if (isAdmin) {
+          setUserIsAdmin(true);
+          setAdminCheckLoading(false);
+          return;
+        }
+
+        // Direct database check as fallback
+        const { data: roles, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .limit(1);
+
+        if (error) {
+          console.error('Error checking admin status:', error);
+          setUserIsAdmin(false);
+        } else {
+          setUserIsAdmin(roles && roles.length > 0);
+        }
+      } catch (error) {
+        console.error('Exception checking admin status:', error);
+        setUserIsAdmin(false);
+      }
+      
+      setAdminCheckLoading(false);
+    };
+
+    checkAdminStatus();
+  }, [user, isAdmin]);
   
   // Update URL hash when tab changes
   useEffect(() => {
@@ -83,8 +143,6 @@ const TestCommunity = () => {
     bedrooms: 0,
     bathrooms: 0,
     averageComparable: 0,
-    hasGym: false,
-    hasHotTub: false,
     firstMonthRent: 0,
     securityDeposit: 0,
     furnishingsCost: 0,
@@ -168,23 +226,21 @@ const TestCommunity = () => {
     });
   };
 
-  return (
+  const CommunityContent = () => (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-      <TopNavBar />
-      
       <div className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">
-        {/* Test Community Header */}
+        {/* Community Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Users className="h-12 w-12 text-cyan-400" />
             <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight py-2">
-              Training & Community Hub
+              Test Training Dashboard
             </h1>
           </div>
         </div>
 
         {/* Admin Quick Links */}
-        {isAdmin && (
+        {userIsAdmin && (
           <div className="mb-6 flex justify-center">
             <Link to="/admin/richie" className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center gap-2">
               <Bot className="h-4 w-4" />
@@ -208,10 +264,20 @@ const TestCommunity = () => {
               <Video className="h-5 w-5 mr-2" />
               Training
             </TabsTrigger>
-            <TabsTrigger value="messages" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+            <button 
+              onClick={() => setChatOpen(true)}
+              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors relative"
+            >
               <MessageSquare className="h-5 w-5 mr-2" />
               Chat
-            </TabsTrigger>
+              {unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-xs text-white font-semibold">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                </div>
+              )}
+            </button>
             <TabsTrigger value="calculator" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
@@ -220,18 +286,21 @@ const TestCommunity = () => {
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Ask Richie
             </TabsTrigger>
-            {isAdmin && (
-              <TabsTrigger 
-                value="members" 
-                className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/admin/members');
-                }}
+            <button
+              onClick={() => setProfileEditorOpen(true)}
+              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors"
+            >
+              <User size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
+              Profile
+            </button>
+            {!adminCheckLoading && userIsAdmin && (
+              <button
+                onClick={() => setMembersDialogOpen(true)}
+                className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors"
               >
                 <Users size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
                 Members
-              </TabsTrigger>
+              </button>
             )}
           </TabsList>
 
@@ -247,12 +316,14 @@ const TestCommunity = () => {
             <VideoLibrary />
           </TabsContent>
 
-          <TabsContent value="messages" className="mt-8">
-            <MessageThreads />
-          </TabsContent>
-
           <TabsContent value="calculator" className="mt-8">
             <div className="space-y-6">
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold text-cyan-300 mb-4 flex items-center justify-center gap-3">
+                  <Calculator className="h-8 w-8 text-cyan-400" />
+                  Rental Calculator
+                </h2>
+              </div>
               
               {/* Action buttons */}
               <div className="flex items-center justify-center gap-4">
@@ -277,11 +348,6 @@ const TestCommunity = () => {
 
               {/* Calculator Sections */}
               <div className="grid xl:grid-cols-4 lg:grid-cols-2 grid-cols-1 gap-6">
-                <CompsSection 
-                  data={calculatorData} 
-                  updateData={updateCalculatorData} 
-                />
-
                 <BuildOutSection 
                   data={calculatorData} 
                   updateData={updateCalculatorData} 
@@ -293,6 +359,11 @@ const TestCommunity = () => {
                   updateData={updateCalculatorData} 
                   serviceFeeCalculated={serviceFeeCalculated}
                   monthlyExpenses={monthlyExpenses}
+                />
+                
+                <CompsSection 
+                  data={calculatorData} 
+                  updateData={updateCalculatorData} 
                 />
 
                 <NetProfitSection 
@@ -343,57 +414,56 @@ const TestCommunity = () => {
                       </div>
                       <div className="flex items-start gap-3">
                         <span className="text-cyan-400 mt-1">•</span>
-                        <span>Market research techniques</span>
+                        <span>STR licensing requirements</span>
                       </div>
                       <div className="flex items-start gap-3">
                         <span className="text-cyan-400 mt-1">•</span>
-                        <span>Legal compliance and licensing</span>
+                        <span>Setup and launch checklists</span>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <span className="text-cyan-400 mt-1">•</span>
+                        <span>Market research techniques</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-slate-700/50 rounded-lg p-6 border border-purple-500/20">
+                  <div className="bg-slate-700/50 rounded-lg p-6 border border-cyan-500/20">
                     <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+                      <span className="w-2 h-2 bg-green-400 rounded-full"></span>
                       Example Questions
                     </h4>
                     <div className="space-y-3 text-gray-300 text-sm">
-                      <div className="bg-slate-600/50 rounded p-3">
-                        "What's your process for finding 2.0+ multiple properties?"
+                      <div className="bg-slate-800/50 rounded p-3">
+                        "What's the best way to present rental arbitrage to skeptical landlords?"
                       </div>
-                      <div className="bg-slate-600/50 rounded p-3">
-                        "How do I handle landlord objections about Airbnb?"
+                      <div className="bg-slate-800/50 rounded p-3">
+                        "How do I calculate if a property meets the 1% rule?"
                       </div>
-                      <div className="bg-slate-600/50 rounded p-3">
-                        "What are the key STR licensing requirements?"
+                      <div className="bg-slate-800/50 rounded p-3">
+                        "What permits do I need for STR in Nashville?"
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="text-center">
-                  <button 
+                  <button
+                    id="ask-richie-button"
                     onClick={() => {
-                      // Scroll to bottom where the Ask Richie button is located
-                      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                      
-                      // Find and highlight the Ask Richie button
-                      setTimeout(() => {
-                        const askRichieButton = document.querySelector('[title="Ask AI Richie"]') as HTMLElement;
-                        if (askRichieButton) {
-                          // Add a pulsing animation to draw attention
-                          askRichieButton.style.animation = 'pulse 1s ease-in-out 3';
-                          // Click it after a short delay
-                          setTimeout(() => {
-                            askRichieButton.click();
-                          }, 500);
+                      const askRichieComponent = document.querySelector('[data-component="AskRichieChat"]') as HTMLElement;
+                      if (askRichieComponent) {
+                        const toggleButton = askRichieComponent.querySelector('[data-action="toggle"]') as HTMLElement;
+                        if (toggleButton) {
+                          toggleButton.click();
                         }
-                      }, 1000);
+                      }
                     }}
-                    className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-3 mx-auto"
+                    className="group bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-semibold py-4 px-8 rounded-xl shadow-xl transform transition-all duration-200 hover:scale-105 hover:shadow-2xl border border-cyan-500/20"
                   >
-                    <Bot className="h-6 w-6" />
-                    Start Chatting with Richie AI
+                    <div className="flex items-center justify-center gap-3">
+                      <Bot className="h-6 w-6 group-hover:animate-pulse" />
+                      <span className="text-lg">Start Chat with Richie AI</span>
+                    </div>
                   </button>
                   <p className="text-sm text-gray-400 mt-4">
                     Available 24/7 • Instant responses • Based on real training content
@@ -405,14 +475,64 @@ const TestCommunity = () => {
         </Tabs>
       </div>
 
-      {/* Ask Richie Floating Button */}
+      {/* Chat Dialog */}
+      <Dialog open={isChatOpen} onOpenChange={setChatOpen}>
+        <DialogContent className="max-w-4xl h-[80vh] bg-slate-900 border-cyan-500/20 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-cyan-300 flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              Community Chat
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <SimplifiedChat />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Members Dialog */}
+      <Dialog open={membersDialogOpen} onOpenChange={setMembersDialogOpen}>
+        <DialogContent className="max-w-4xl h-[80vh] bg-slate-900 border-cyan-500/20 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-cyan-300 flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Community Members
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <MembersList 
+              open={membersDialogOpen} 
+              onOpenChange={setMembersDialogOpen}
+              onMessageMember={() => {}}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Profile Editor Dialog */}
+      <Dialog open={profileEditorOpen} onOpenChange={setProfileEditorOpen}>
+        <DialogContent className="max-w-2xl bg-slate-900 border-cyan-500/20 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-cyan-300 flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Edit Profile
+            </DialogTitle>
+          </DialogHeader>
+          <ProfileEditor />
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+
+  // Show community content directly since this is a test version 
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+      <TopNavBar />
+      <CommunityContent />
+      
+      {/* Fixed position components */}
       <AskRichieChat />
-      
-      {/* Contact Chat Floating Button */}
       <ContactChat />
-      
-      {/* Direct Messaging */}
-      <DirectMessaging />
       
       <Footer />
     </div>
