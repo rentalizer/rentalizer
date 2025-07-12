@@ -274,25 +274,11 @@ export const GroupDiscussions = () => {
   }, [newComment, selectedDiscussion, getUserName, getUserInitials]);
 
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
-    console.log('🗑️ DELETING DISCUSSION:', discussionId);
+    console.log('🗑️ ADMIN DELETING DISCUSSION:', discussionId);
     console.log('🗑️ Current discussions count BEFORE deletion:', discussionsList.length);
     
     try {
-      // IMMEDIATE UI UPDATE - Remove from state first
-      setDiscussionsList(prevDiscussions => {
-        const newDiscussions = prevDiscussions.filter(d => d.id !== discussionId);
-        console.log('🗑️ NEW discussions count AFTER filtering:', newDiscussions.length);
-        console.log('🗑️ Filtered out discussion with ID:', discussionId);
-        return newDiscussions;
-      });
-
-      // Show success message immediately
-      toast({
-        title: "Discussion Deleted",
-        description: "Discussion has been removed.",
-      });
-
-      // Then try database deletion in background
+      // First delete from database to ensure admin permissions work
       const { error } = await supabase
         .from('discussions')
         .delete()
@@ -300,15 +286,28 @@ export const GroupDiscussions = () => {
         
       if (error) {
         console.error('❌ Database deletion failed:', error);
-        // If database deletion fails, show error but keep UI updated
         toast({
-          title: "Warning",
-          description: "Discussion removed from view, but there was an error updating the database.",
+          title: "Error",
+          description: "Failed to delete discussion. You may not have permission.",
           variant: "destructive"
         });
-      } else {
-        console.log('✅ Database deletion successful');
+        return;
       }
+
+      console.log('✅ Database deletion successful - now updating UI');
+
+      // After successful database deletion, update UI
+      setDiscussionsList(prevDiscussions => {
+        const newDiscussions = prevDiscussions.filter(d => d.id !== discussionId);
+        console.log('🗑️ UI updated - discussions count:', newDiscussions.length);
+        return newDiscussions;
+      });
+
+      toast({
+        title: "Discussion Deleted",
+        description: "Discussion has been permanently removed.",
+      });
+
     } catch (error) {
       console.error('❌ Exception during deletion:', error);
       toast({
@@ -317,7 +316,7 @@ export const GroupDiscussions = () => {
         variant: "destructive"
       });
     }
-  }, [discussionsList.length, toast]);
+  }, [toast]);
 
   const canEditOrDelete = useCallback((discussion: Discussion) => {
     // Admins can edit/delete any post
