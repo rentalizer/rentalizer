@@ -249,7 +249,7 @@ const Community = () => {
   const CommunityContent = () => (
     <div className={`min-h-screen flex flex-col transition-all duration-500 ${
       isDayMode 
-        ? 'bg-gradient-to-br from-blue-50 via-white to-cyan-50' 
+        ? 'bg-gradient-to-br from-slate-100 via-blue-50 to-cyan-100' 
         : 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900'
     }`}>
       <TopNavBarTest />
@@ -257,7 +257,7 @@ const Community = () => {
         {/* Community Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Users className={`h-12 w-12 ${isDayMode ? 'text-cyan-600' : 'text-cyan-400'}`} />
+            <Users className={`h-12 w-12 ${isDayMode ? 'text-cyan-700' : 'text-cyan-400'}`} />
             <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight py-2">
               Training Dashboard
             </h1>
@@ -272,7 +272,7 @@ const Community = () => {
                 size="sm"
                 className={`transition-all duration-300 ${
                   isDayMode 
-                    ? 'border-cyan-600/30 text-cyan-700 hover:bg-cyan-50 bg-white/50' 
+                    ? 'border-cyan-300 text-cyan-800 hover:bg-cyan-100 bg-white shadow-sm' 
                     : 'border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10'
                 }`}
               >
@@ -308,7 +308,7 @@ const Community = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className={`flex w-full justify-evenly h-14 p-2 transition-all duration-300 ${
             isDayMode 
-              ? 'bg-white/70 border border-cyan-200 backdrop-blur-sm' 
+              ? 'bg-white border-2 border-slate-200 shadow-lg' 
               : 'bg-slate-800/50 border border-cyan-500/20'
           }`}>
             <TabsTrigger value="discussions" className={`transition-all duration-300 ${
@@ -410,8 +410,10 @@ const Community = () => {
           <TabsContent value="calculator" className="mt-8">
             <div className="space-y-6">
               <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold text-cyan-300 mb-4 flex items-center justify-center gap-3">
-                  <Calculator className="h-8 w-8 text-cyan-400" />
+                <h2 className={`text-3xl font-bold mb-4 flex items-center justify-center gap-3 ${
+                  isDayMode ? 'text-slate-700' : 'text-cyan-300'
+                }`}>
+                  <Calculator className={`h-8 w-8 ${isDayMode ? 'text-cyan-700' : 'text-cyan-400'}`} />
                   Rental Calculator
                 </h2>
               </div>
