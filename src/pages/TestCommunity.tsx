@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper, User } from 'lucide-react';
+import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper, User, Sun, Moon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
@@ -80,11 +80,30 @@ const Community = () => {
   const [profileEditorOpen, setProfileEditorOpen] = useState(false);
   const [userIsAdmin, setUserIsAdmin] = useState(false);
   const [adminCheckLoading, setAdminCheckLoading] = useState(true);
+  const [isDayMode, setIsDayMode] = useState(() => {
+    // Load theme preference from localStorage, default to night mode
+    const saved = localStorage.getItem('test-community-theme');
+    return saved === 'day';
+  });
   const { toast } = useToast();
   const { isAdmin } = useAdminRole();
   const { unreadCount } = useUnreadMessages();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  // Save theme preference to localStorage
+  useEffect(() => {
+    localStorage.setItem('test-community-theme', isDayMode ? 'day' : 'night');
+  }, [isDayMode]);
+
+  // Toggle theme function
+  const toggleTheme = () => {
+    setIsDayMode(!isDayMode);
+    toast({
+      title: `Switched to ${!isDayMode ? 'Day' : 'Night'} Mode`,
+      description: `You're now viewing the ${!isDayMode ? 'light' : 'dark'} theme.`,
+    });
+  };
   
   // Check if we're in Lovable environment
   const isLovableEnv = window.location.hostname.includes('lovableproject.com') || 
@@ -228,23 +247,57 @@ const Community = () => {
   };
 
   const CommunityContent = () => (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+    <div className={`min-h-screen flex flex-col transition-all duration-500 ${
+      isDayMode 
+        ? 'bg-gradient-to-br from-blue-50 via-white to-cyan-50' 
+        : 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900'
+    }`}>
       <TopNavBarTest />
       <div className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">
         {/* Community Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Users className="h-12 w-12 text-cyan-400" />
+            <Users className={`h-12 w-12 ${isDayMode ? 'text-cyan-600' : 'text-cyan-400'}`} />
             <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight py-2">
               Training Dashboard
             </h1>
           </div>
+          
+          {/* Theme Toggle Button - Only for authenticated users */}
+          {user && (
+            <div className="flex justify-center mb-4">
+              <Button
+                onClick={toggleTheme}
+                variant="outline"
+                size="sm"
+                className={`transition-all duration-300 ${
+                  isDayMode 
+                    ? 'border-cyan-600/30 text-cyan-700 hover:bg-cyan-50 bg-white/50' 
+                    : 'border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10'
+                }`}
+              >
+                {isDayMode ? (
+                  <>
+                    <Moon className="h-4 w-4 mr-2" />
+                    Switch to Night
+                  </>
+                ) : (
+                  <>
+                    <Sun className="h-4 w-4 mr-2" />
+                    Switch to Day
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Admin Quick Links */}
         {userIsAdmin && (
           <div className="mb-6 flex justify-center">
-            <Link to="/admin/richie" className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center gap-2">
+            <Link to="/admin/richie" className={`text-sm flex items-center gap-2 transition-colors ${
+              isDayMode ? 'text-cyan-600 hover:text-cyan-700' : 'text-cyan-400 hover:text-cyan-300'
+            }`}>
               <Bot className="h-4 w-4" />
               Manage Richie's Knowledge Base
             </Link>
@@ -253,22 +306,42 @@ const Community = () => {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="flex w-full bg-slate-800/50 border border-cyan-500/20 justify-evenly h-14 p-2">
-            <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+          <TabsList className={`flex w-full justify-evenly h-14 p-2 transition-all duration-300 ${
+            isDayMode 
+              ? 'bg-white/70 border border-cyan-200 backdrop-blur-sm' 
+              : 'bg-slate-800/50 border border-cyan-500/20'
+          }`}>
+            <TabsTrigger value="discussions" className={`transition-all duration-300 ${
+              isDayMode 
+                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-cyan-800 text-slate-600 hover:text-cyan-700' 
+                : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
+            }`}>
               <Users className="h-5 w-5 mr-2" />
               Discussions
             </TabsTrigger>
-            <TabsTrigger value="calendar" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+            <TabsTrigger value="calendar" className={`transition-all duration-300 ${
+              isDayMode 
+                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-cyan-800 text-slate-600 hover:text-cyan-700' 
+                : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
+            }`}>
               <Calendar className="h-5 w-5 mr-2" />
               Calendar
             </TabsTrigger>
-            <TabsTrigger value="videos" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+            <TabsTrigger value="videos" className={`transition-all duration-300 ${
+              isDayMode 
+                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-cyan-800 text-slate-600 hover:text-cyan-700' 
+                : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
+            }`}>
               <Video className="h-5 w-5 mr-2" />
               Training
             </TabsTrigger>
             <button 
               onClick={() => setChatOpen(true)}
-              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors relative"
+              className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 relative ${
+                isDayMode 
+                  ? 'text-slate-600 hover:text-cyan-700 hover:bg-cyan-50' 
+                  : 'text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10'
+              }`}
             >
               <MessageSquare className="h-5 w-5 mr-2" />
               Chat
@@ -280,17 +353,29 @@ const Community = () => {
                 </div>
               )}
             </button>
-            <TabsTrigger value="calculator" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+            <TabsTrigger value="calculator" className={`transition-all duration-300 ${
+              isDayMode 
+                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-cyan-800 text-slate-600 hover:text-cyan-700' 
+                : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
+            }`}>
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
             </TabsTrigger>
-            <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+            <TabsTrigger value="askrichie" className={`transition-all duration-300 ${
+              isDayMode 
+                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-cyan-800 text-slate-600 hover:text-cyan-700' 
+                : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
+            }`}>
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Ask Richie
             </TabsTrigger>
             <button
               onClick={() => setProfileEditorOpen(true)}
-              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors"
+              className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+                isDayMode 
+                  ? 'text-slate-600 hover:text-cyan-700 hover:bg-cyan-50' 
+                  : 'text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10'
+              }`}
             >
               <User size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Profile
@@ -298,7 +383,11 @@ const Community = () => {
             {!adminCheckLoading && userIsAdmin && (
               <button
                 onClick={() => setMembersDialogOpen(true)}
-                className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors"
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+                  isDayMode 
+                    ? 'text-slate-600 hover:text-cyan-700 hover:bg-cyan-50' 
+                    : 'text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10'
+                }`}
               >
                 <Users size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
                 Members
