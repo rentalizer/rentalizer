@@ -518,7 +518,10 @@ const TestCommunity = () => {
               Edit Profile
             </DialogTitle>
           </DialogHeader>
-          <ProfileEditor />
+          <ProfileEditor 
+            isOpen={profileEditorOpen} 
+            onClose={() => setProfileEditorOpen(false)} 
+          />
         </DialogContent>
       </Dialog>
     </div>
