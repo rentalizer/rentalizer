@@ -149,7 +149,7 @@ const Pricing = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-400" />
-                    <span className="text-gray-300">Market Intelligence Tool</span>
+                    <span className="text-gray-300 animate-pulse">Market Intelligence</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Check className="h-5 w-5 text-green-400" />
