@@ -90,19 +90,27 @@ export const TopNavBar = () => {
           <div className="flex items-center space-x-4">
             {user && (
               <>
-                <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-                  Menu
-                </Button>
-                <Button
-                  onClick={() => navigate('/profile-setup')}
-                  variant="ghost"
-                  size="sm"
-                  className="flex items-center space-x-2"
-                >
-                  <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center">
-                    <User className="h-4 w-4 text-white" />
-                  </div>
-                </Button>
+                 <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                   Menu
+                 </Button>
+                 <Button
+                   onClick={() => navigate('/profile-setup')}
+                   variant="ghost"
+                   size="sm"
+                   className="text-gray-600 hover:text-gray-900"
+                 >
+                   Profile
+                 </Button>
+                 <Button
+                   onClick={() => navigate('/profile-setup')}
+                   variant="ghost"
+                   size="sm"
+                   className="flex items-center space-x-2"
+                 >
+                   <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center">
+                     <User className="h-4 w-4 text-white" />
+                   </div>
+                 </Button>
               </>
             )}
             

@@ -287,13 +287,10 @@ const Community = () => {
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Ask Richie
             </TabsTrigger>
-            <button
-              onClick={() => setProfileEditorOpen(true)}
-              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors"
-            >
-              <User size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
-              Profile
-            </button>
+            <TabsTrigger value="propertyfinder" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+              <FileText size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
+              Property Finder
+            </TabsTrigger>
             {!adminCheckLoading && userIsAdmin && (
               <button
                 onClick={() => setMembersDialogOpen(true)}
@@ -374,6 +371,22 @@ const Community = () => {
                   paybackMonths={paybackMonths}
                   cashOnCashReturn={cashOnCashReturn}
                 />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="propertyfinder" className="mt-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-cyan-500/30 rounded-xl p-8 backdrop-blur-sm">
+                <div className="text-center mb-8">
+                  <FileText className="h-20 w-20 text-cyan-400 mx-auto mb-6" />
+                  <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+                    Property Finder
+                  </h2>
+                  <p className="text-xl text-gray-300 mb-6 leading-relaxed max-w-3xl mx-auto">
+                    Find and analyze potential rental properties with our advanced search tools.
+                  </p>
+                </div>
               </div>
             </div>
           </TabsContent>
