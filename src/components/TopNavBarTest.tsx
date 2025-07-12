@@ -25,10 +25,10 @@ export const TopNavBarTest = () => {
           {/* Right side - Login or User info */}
           {showUserInfo ? (
             <div className="flex items-center gap-4 mr-48">
-              <div className="flex items-center gap-2 text-sm bg-gray-900/50 px-3 py-1.5 rounded-lg border border-cyan-500/20">
+              <div className="flex items-center gap-2 text-sm">
                 <User className="h-4 w-4 text-cyan-400" />
                 <span className="text-cyan-300">{user.email}</span>
-                <Badge variant="outline" className="bg-green-900/30 border-green-500/30 text-green-300 text-xs px-2 py-0">
+                <Badge variant="outline" className="bg-blue-900/30 border-blue-500/30 text-blue-300 text-xs px-2 py-0 ml-2">
                   Pro
                 </Badge>
               </div>
@@ -36,9 +36,9 @@ export const TopNavBarTest = () => {
                 onClick={signOut}
                 variant="outline"
                 size="sm"
-                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 flex items-center gap-2"
               >
-                <LogOut className="h-4 w-4 mr-2" />
+                <LogOut className="h-4 w-4" />
                 Sign Out
               </Button>
             </div>
