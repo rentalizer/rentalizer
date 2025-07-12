@@ -380,6 +380,15 @@ const GuideBook = () => {
       return;
     }
 
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "Please log in to create a guidebook",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const guestSlug = `guide-${Date.now().toString(36)}-${newGuidebook.property_name.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
       
