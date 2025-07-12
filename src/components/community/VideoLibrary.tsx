@@ -6,9 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Video, Search, Play, Clock, Eye, Calendar, Star, X, FileText, Download, Plus, Edit, Trash2, GripVertical } from 'lucide-react';
+import { Video, Search, Play, Clock, Eye, Calendar, Star, X, FileText, Download, Plus, Edit, Trash2, GripVertical, Lock } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useAdminRole } from '@/hooks/useAdminRole';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import {
   DndContext,
@@ -48,6 +49,7 @@ interface VideoItem {
 interface SortableVideoCardProps {
   video: VideoItem;
   isAdmin: boolean;
+  isAuthenticated: boolean;
   onEdit: (video: VideoItem) => void;
   onDelete: (videoId: string) => void;
   onToggleFeatured: (videoId: string) => void;
@@ -55,7 +57,7 @@ interface SortableVideoCardProps {
   getCategoryColor: (category: string) => string;
 }
 
-const SortableVideoCard = ({ video, isAdmin, onEdit, onDelete, onToggleFeatured, onClick, getCategoryColor }: SortableVideoCardProps) => {
+const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, onToggleFeatured, onClick, getCategoryColor }: SortableVideoCardProps) => {
   const {
     attributes,
     listeners,
@@ -130,14 +132,27 @@ const SortableVideoCard = ({ video, isAdmin, onEdit, onDelete, onToggleFeatured,
               <img
                 src={video.thumbnail}
                 alt={video.title}
-                className="w-full h-full object-cover"
+                className={`w-full h-full object-cover transition-all ${!isAuthenticated ? 'filter grayscale opacity-50' : ''}`}
                 onError={(e) => {
                   e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIyNSIgdmlld0JveD0iMCAwIDQwMCAyMjUiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjI1IiBmaWxsPSIjMzM0MTU1Ii8+CjxjaXJjbGUgY3g9IjIwMCIgY3k9IjExMi41IiByPSIzMCIgZmlsbD0iIzk0QTNCOCIvPgo8cG9seWdvbiBwb2ludHM9IjE5MCwxMDAuNSAyMTAsOTAuNSAyMTAsMTM0LjUgMTkwLDEyNC41IiBmaWxsPSIjMzM0MTU1Ii8+Cjwvc3ZnPgo=';
                 }}
               />
-              <div className="absolute inset-0 bg-black/20 hover:bg-black/10 transition-colors flex items-center justify-center">
-                <Play className="h-12 w-12 text-white opacity-80" />
-              </div>
+              
+              {/* Member access overlay for non-authenticated users */}
+              {!isAuthenticated && (
+                <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white">
+                  <Lock className="h-8 w-8 mb-2 text-cyan-400" />
+                  <span className="text-sm font-medium">Member Access</span>
+                  <span className="text-xs text-gray-300">Required</span>
+                </div>
+              )}
+              
+              {/* Play button overlay for authenticated users */}
+              {isAuthenticated && (
+                <div className="absolute inset-0 bg-black/20 hover:bg-black/10 transition-colors flex items-center justify-center">
+                  <Play className="h-12 w-12 text-white opacity-80" />
+                </div>
+              )}
               
               {/* Duration */}
               <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
@@ -197,6 +212,7 @@ const SortableVideoCard = ({ video, isAdmin, onEdit, onDelete, onToggleFeatured,
 
 export const VideoLibrary = () => {
   const { isAdmin } = useAdminRole();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -570,6 +586,15 @@ export const VideoLibrary = () => {
     .sort((a, b) => (a.order || 0) - (b.order || 0));
 
   const handleVideoClick = (video: VideoItem) => {
+    if (!user) {
+      toast({
+        title: "Member Access Required",
+        description: "Please log in to access training videos.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     if (video.videoUrl) {
       setSelectedVideo(video);
     }
@@ -968,6 +993,7 @@ export const VideoLibrary = () => {
                   key={video.id}
                   video={video}
                   isAdmin={isAdmin}
+                  isAuthenticated={!!user}
                   onEdit={handleEditVideo}
                   onDelete={handleDeleteVideo}
                   onToggleFeatured={handleToggleFeatured}
@@ -985,6 +1011,7 @@ export const VideoLibrary = () => {
               key={video.id}
               video={video}
               isAdmin={false}
+              isAuthenticated={!!user}
               onEdit={() => {}}
               onDelete={() => {}}
               onToggleFeatured={() => {}}
