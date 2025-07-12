@@ -14,7 +14,7 @@ import { NetProfitSection } from '@/components/calculator/NetProfitSection';
 import { exportCalculatorToCSV } from '@/utils/calculatorExport';
 
 import { Footer } from '@/components/Footer';
-import { TopNavBar } from '@/components/TopNavBar';
+import { TopNavBarTest } from '@/components/TopNavBarTest';
 import { CommunityCalendar } from '@/components/community/CommunityCalendar';
 import { MessageThreads } from '@/components/community/MessageThreads';
 import { GroupDiscussions } from '@/components/community/GroupDiscussions';
@@ -229,7 +229,7 @@ const Community = () => {
 
   const CommunityContent = () => (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-      <TopNavBar />
+      <TopNavBarTest />
       <div className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">
         {/* Community Header */}
         <div className="text-center mb-8">
