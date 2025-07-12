@@ -25,6 +25,7 @@ import { NewsFeed } from '@/components/community/NewsFeed';
 import SimplifiedChat from '@/components/SimplifiedChat';
 import { AskRichieChat } from '@/components/AskRichieChat';
 import { MemberAskRichie } from '@/components/MemberAskRichie';
+import { AdminSupportChat } from '@/components/AdminSupportChat';
 import { ContactChat } from '@/components/ContactChat';
 import { AccessGate } from '@/components/AccessGate';
 import { MembersList } from '@/components/MembersList';
@@ -75,6 +76,7 @@ const Community = () => {
   
   const [activeTab, setActiveTab] = useState(getInitialTab());
   const [isChatOpen, setChatOpen] = useState(false);
+  const [isAdminSupportOpen, setAdminSupportOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [profileEditorOpen, setProfileEditorOpen] = useState(false);
@@ -266,7 +268,7 @@ const Community = () => {
               Training
             </TabsTrigger>
             <button 
-              onClick={() => setChatOpen(true)}
+              onClick={() => setAdminSupportOpen(true)}
               className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors relative"
             >
               <MessageSquare className="h-5 w-5 mr-2" />
@@ -502,6 +504,13 @@ const Community = () => {
       <Dialog open={isChatOpen} onOpenChange={setChatOpen}>
         <DialogContent className="max-w-4xl h-[700px] bg-slate-900 border-cyan-500/20 p-0">
           <MemberAskRichie />
+        </DialogContent>
+      </Dialog>
+
+      {/* Admin Support Chat Dialog */}
+      <Dialog open={isAdminSupportOpen} onOpenChange={setAdminSupportOpen}>
+        <DialogContent className="max-w-4xl h-[700px] bg-slate-900 border-cyan-500/20 p-0">
+          <AdminSupportChat />
         </DialogContent>
       </Dialog>
 
