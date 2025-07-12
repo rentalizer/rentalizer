@@ -24,6 +24,7 @@ import { CommunityLeaderboard } from '@/components/community/CommunityLeaderboar
 import { NewsFeed } from '@/components/community/NewsFeed';
 import SimplifiedChat from '@/components/SimplifiedChat';
 import { AskRichieChat } from '@/components/AskRichieChat';
+import { MemberAskRichie } from '@/components/MemberAskRichie';
 import { ContactChat } from '@/components/ContactChat';
 import { AccessGate } from '@/components/AccessGate';
 import { MembersList } from '@/components/MembersList';
@@ -445,23 +446,7 @@ const Community = () => {
 
                 <div className="text-center">
                   <button 
-                    onClick={() => {
-                      // Scroll to bottom where the Ask Richie button is located
-                      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                      
-                      // Find and highlight the Ask Richie button
-                      setTimeout(() => {
-                        const askRichieButton = document.querySelector('[title="Ask AI Richie"]') as HTMLElement;
-                        if (askRichieButton) {
-                          // Add a pulsing animation to draw attention
-                          askRichieButton.style.animation = 'pulse 1s ease-in-out 3';
-                          // Click it after a short delay
-                          setTimeout(() => {
-                            askRichieButton.click();
-                          }, 500);
-                        }
-                      }, 1000);
-                    }}
+                    onClick={() => setChatOpen(true)}
                     className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-3 mx-auto"
                   >
                     <Bot className="h-6 w-6" />
@@ -480,12 +465,10 @@ const Community = () => {
       
       <AskRichieChat />
       
-      {/* Chat Dialog */}
+      {/* Ask Richie Chat Dialog for Members */}
       <Dialog open={isChatOpen} onOpenChange={setChatOpen}>
-        <DialogContent className="max-w-md h-[500px] bg-slate-900 border-cyan-500/20">
-          <div className="flex-1 overflow-hidden h-full">
-            <SimplifiedChat />
-          </div>
+        <DialogContent className="max-w-4xl h-[700px] bg-slate-900 border-cyan-500/20 p-0">
+          <MemberAskRichie />
         </DialogContent>
       </Dialog>
 
