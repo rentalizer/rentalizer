@@ -106,7 +106,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated 
                   placeholder="Write a title..."
                   value={postTitle}
                   onChange={(e) => setPostTitle(e.target.value)}
-                  className="bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400"
+                  className="bg-slate-700/50 border-cyan-500/20 text-slate-900 placeholder-slate-600"
                 />
               </div>
 
@@ -114,7 +114,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated 
                 placeholder="What's on your mind?"
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
-                className="min-h-[120px] bg-slate-700/50 border-cyan-500/20 text-white placeholder-gray-400 resize-none"
+                className="min-h-[120px] bg-slate-700/50 border-cyan-500/20 text-slate-900 placeholder-slate-600 resize-none"
               />
               
               <div className="flex items-center justify-between mt-3">
