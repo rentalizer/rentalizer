@@ -65,6 +65,63 @@ export type Database = {
         }
         Relationships: []
       }
+      card_templates: {
+        Row: {
+          button_color: string | null
+          button_text: string | null
+          card_subtype: string | null
+          card_type: string
+          category: string | null
+          created_at: string
+          description: string | null
+          external_url: string | null
+          id: string
+          media_url: string | null
+          template_category: string
+          title: string
+          updated_at: string
+          user_id: string
+          video_type: string | null
+          video_url: string | null
+        }
+        Insert: {
+          button_color?: string | null
+          button_text?: string | null
+          card_subtype?: string | null
+          card_type?: string
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          external_url?: string | null
+          id?: string
+          media_url?: string | null
+          template_category: string
+          title: string
+          updated_at?: string
+          user_id: string
+          video_type?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          button_color?: string | null
+          button_text?: string | null
+          card_subtype?: string | null
+          card_type?: string
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          external_url?: string | null
+          id?: string
+          media_url?: string | null
+          template_category?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          video_type?: string | null
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -319,43 +376,88 @@ export type Database = {
       }
       guidebook_cards: {
         Row: {
+          button_color: string | null
+          button_text: string | null
+          card_subtype: string | null
           card_type: string
+          category: string | null
           content: string | null
           created_at: string
+          currency: string | null
           display_order: number
+          external_url: string | null
           id: string
+          is_template: boolean | null
           link_url: string | null
+          location_address: string | null
+          location_distance: string | null
           media_url: string | null
+          price_cents: number | null
+          rating: number | null
           section_id: string
+          stripe_price_id: string | null
+          template_category: string | null
           template_type: string | null
           title: string | null
           updated_at: string
+          video_type: string | null
+          video_url: string | null
         }
         Insert: {
+          button_color?: string | null
+          button_text?: string | null
+          card_subtype?: string | null
           card_type?: string
+          category?: string | null
           content?: string | null
           created_at?: string
+          currency?: string | null
           display_order?: number
+          external_url?: string | null
           id?: string
+          is_template?: boolean | null
           link_url?: string | null
+          location_address?: string | null
+          location_distance?: string | null
           media_url?: string | null
+          price_cents?: number | null
+          rating?: number | null
           section_id: string
+          stripe_price_id?: string | null
+          template_category?: string | null
           template_type?: string | null
           title?: string | null
           updated_at?: string
+          video_type?: string | null
+          video_url?: string | null
         }
         Update: {
+          button_color?: string | null
+          button_text?: string | null
+          card_subtype?: string | null
           card_type?: string
+          category?: string | null
           content?: string | null
           created_at?: string
+          currency?: string | null
           display_order?: number
+          external_url?: string | null
           id?: string
+          is_template?: boolean | null
           link_url?: string | null
+          location_address?: string | null
+          location_distance?: string | null
           media_url?: string | null
+          price_cents?: number | null
+          rating?: number | null
           section_id?: string
+          stripe_price_id?: string | null
+          template_category?: string | null
           template_type?: string | null
           title?: string | null
           updated_at?: string
+          video_type?: string | null
+          video_url?: string | null
         }
         Relationships: [
           {
@@ -373,7 +475,10 @@ export type Database = {
           description: string | null
           display_order: number
           guidebook_id: string
+          icon: string | null
           id: string
+          is_collapsible: boolean | null
+          is_expanded_default: boolean | null
           title: string
           updated_at: string
         }
@@ -382,7 +487,10 @@ export type Database = {
           description?: string | null
           display_order?: number
           guidebook_id: string
+          icon?: string | null
           id?: string
+          is_collapsible?: boolean | null
+          is_expanded_default?: boolean | null
           title: string
           updated_at?: string
         }
@@ -391,7 +499,10 @@ export type Database = {
           description?: string | null
           display_order?: number
           guidebook_id?: string
+          icon?: string | null
           id?: string
+          is_collapsible?: boolean | null
+          is_expanded_default?: boolean | null
           title?: string
           updated_at?: string
         }
@@ -407,40 +518,61 @@ export type Database = {
       }
       guidebooks: {
         Row: {
+          check_in_time: string | null
+          check_out_time: string | null
           cover_photo_url: string | null
           created_at: string
           description: string | null
+          guest_link_slug: string | null
           id: string
+          is_active: boolean | null
           is_published: boolean
           property_address: string | null
           property_name: string
+          property_type: string | null
           shareable_link: string | null
           updated_at: string
           user_id: string
+          wifi_name: string | null
+          wifi_password: string | null
         }
         Insert: {
+          check_in_time?: string | null
+          check_out_time?: string | null
           cover_photo_url?: string | null
           created_at?: string
           description?: string | null
+          guest_link_slug?: string | null
           id?: string
+          is_active?: boolean | null
           is_published?: boolean
           property_address?: string | null
           property_name: string
+          property_type?: string | null
           shareable_link?: string | null
           updated_at?: string
           user_id: string
+          wifi_name?: string | null
+          wifi_password?: string | null
         }
         Update: {
+          check_in_time?: string | null
+          check_out_time?: string | null
           cover_photo_url?: string | null
           created_at?: string
           description?: string | null
+          guest_link_slug?: string | null
           id?: string
+          is_active?: boolean | null
           is_published?: boolean
           property_address?: string | null
           property_name?: string
+          property_type?: string | null
           shareable_link?: string | null
           updated_at?: string
           user_id?: string
+          wifi_name?: string | null
+          wifi_password?: string | null
         }
         Relationships: []
       }
@@ -479,6 +611,63 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      marketplace_orders: {
+        Row: {
+          amount_cents: number
+          card_id: string
+          created_at: string
+          currency: string
+          guest_email: string | null
+          guest_name: string | null
+          guidebook_id: string
+          id: string
+          status: string
+          stripe_payment_intent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          card_id: string
+          created_at?: string
+          currency?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          guidebook_id: string
+          id?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          card_id?: string
+          created_at?: string
+          currency?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          guidebook_id?: string
+          id?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_orders_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "guidebook_cards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketplace_orders_guidebook_id_fkey"
+            columns: ["guidebook_id"]
+            isOneToOne: false
+            referencedRelation: "guidebooks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       members: {
         Row: {
