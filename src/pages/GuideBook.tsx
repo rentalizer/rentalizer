@@ -33,14 +33,6 @@ const GuideBook = () => {
 
   const fetchGuidebooks = async () => {
     try {
-      // Check if we're in development with a mock user
-      if (user?.id === 'dev-user-id') {
-        console.log('Development mode: skipping guidebooks fetch');
-        setGuidebooks([]);
-        setIsLoading(false);
-        return;
-      }
-
       const { data, error } = await supabase
         .from("guidebooks")
         .select("*")
@@ -66,16 +58,6 @@ const GuideBook = () => {
       toast({
         title: "Error",
         description: "Property name is required",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Check if we're in development with a mock user
-    if (user?.id === 'dev-user-id') {
-      toast({
-        title: "Development Mode",
-        description: "Database operations are disabled in development mode",
         variant: "destructive",
       });
       return;
@@ -144,16 +126,6 @@ const GuideBook = () => {
   };
 
   const deleteGuidebook = async (id: string) => {
-    // Check if we're in development with a mock user
-    if (user?.id === 'dev-user-id') {
-      toast({
-        title: "Development Mode", 
-        description: "Database operations are disabled in development mode",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       const { error } = await supabase
         .from("guidebooks")
@@ -178,16 +150,6 @@ const GuideBook = () => {
   };
 
   const togglePublish = async (guidebook: Guidebook) => {
-    // Check if we're in development with a mock user
-    if (user?.id === 'dev-user-id') {
-      toast({
-        title: "Development Mode",
-        description: "Database operations are disabled in development mode", 
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       const { error } = await supabase
         .from("guidebooks")

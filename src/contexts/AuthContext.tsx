@@ -223,9 +223,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     if (isLovableDev) {
       console.log('🚀 LOVABLE DEVELOPMENT - BYPASSING AUTH');
-      // Set a mock user for development
+      // Set a mock user for development with a proper UUID
       setUser({
-        id: 'dev-user-id',
+        id: '00000000-0000-0000-0000-000000000001', // Valid UUID for development
         email: 'dev@example.com',
         subscription_status: 'active',
         subscription_tier: 'Premium'
