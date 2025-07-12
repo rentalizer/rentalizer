@@ -282,6 +282,168 @@ export type Database = {
         }
         Relationships: []
       }
+      guidebook_analytics: {
+        Row: {
+          action: string
+          created_at: string
+          guest_ip: string | null
+          guidebook_id: string
+          id: string
+          metadata: Json | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          guest_ip?: string | null
+          guidebook_id: string
+          id?: string
+          metadata?: Json | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          guest_ip?: string | null
+          guidebook_id?: string
+          id?: string
+          metadata?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guidebook_analytics_guidebook_id_fkey"
+            columns: ["guidebook_id"]
+            isOneToOne: false
+            referencedRelation: "guidebooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guidebook_cards: {
+        Row: {
+          card_type: string
+          content: string | null
+          created_at: string
+          display_order: number
+          id: string
+          link_url: string | null
+          media_url: string | null
+          section_id: string
+          template_type: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          card_type?: string
+          content?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          link_url?: string | null
+          media_url?: string | null
+          section_id: string
+          template_type?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          card_type?: string
+          content?: string | null
+          created_at?: string
+          display_order?: number
+          id?: string
+          link_url?: string | null
+          media_url?: string | null
+          section_id?: string
+          template_type?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guidebook_cards_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "guidebook_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guidebook_sections: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number
+          guidebook_id: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          guidebook_id: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          guidebook_id?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guidebook_sections_guidebook_id_fkey"
+            columns: ["guidebook_id"]
+            isOneToOne: false
+            referencedRelation: "guidebooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guidebooks: {
+        Row: {
+          cover_photo_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_published: boolean
+          property_address: string | null
+          property_name: string
+          shareable_link: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cover_photo_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          property_address?: string | null
+          property_name: string
+          shareable_link?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cover_photo_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          property_address?: string | null
+          property_name?: string
+          shareable_link?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lead_captures: {
         Row: {
           created_at: string

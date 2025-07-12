@@ -39,6 +39,7 @@ import ProfileSetup from "./pages/ProfileSetup";
 import RichieAdmin from "./pages/RichieAdmin";
 import LogoDownload from "./pages/LogoDownload";
 import TestLogo from "./pages/TestLogo";
+import GuideBook from "./pages/GuideBook";
 import { Auth } from "./pages/Auth";
 
 const queryClient = new QueryClient();
@@ -76,6 +77,7 @@ const AppRoutes = () => (
     <Route path="/test3" element={<Test3 />} />
     <Route path="/test4" element={<Test4 />} />
     <Route path="/test5" element={<Test5 />} />
+    <Route path="/Guide-Book" element={<GuideBook />} />
     <Route path="/logo-download" element={<LogoDownload />} />
     <Route path="/test-logo" element={<TestLogo />} />
   </Routes>
