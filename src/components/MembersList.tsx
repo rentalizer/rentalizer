@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { MessageCircle, Search, Users, Crown, X } from 'lucide-react';
+import { MessageCircle, Search, Users, Crown, X, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface Member {
   id: string;
@@ -37,6 +38,7 @@ export const MembersList: React.FC<MembersListProps> = ({ open, onOpenChange, on
   const [sendingMessage, setSendingMessage] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (open) {
@@ -124,6 +126,11 @@ export const MembersList: React.FC<MembersListProps> = ({ open, onOpenChange, on
   const handleMessageClick = (member: Member) => {
     setSelectedMember(member);
     setMessageDialogOpen(true);
+  };
+
+  const handleProfileClick = (member: Member) => {
+    onOpenChange(false); // Close the dialog
+    navigate('/profile-setup'); // Navigate to profile page
   };
 
   const sendDirectMessage = async () => {
@@ -214,13 +221,16 @@ export const MembersList: React.FC<MembersListProps> = ({ open, onOpenChange, on
                   key={member.id}
                   className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg hover:bg-slate-700/70 transition-colors"
                 >
-                  <div className="flex items-center gap-3 flex-1">
+                  <div 
+                    className="flex items-center gap-3 flex-1 cursor-pointer"
+                    onClick={() => handleProfileClick(member)}
+                  >
                     <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
                       {getMemberName(member).charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-white font-medium">{getMemberName(member)}</span>
+                        <span className="text-white font-medium hover:text-cyan-300 transition-colors">{getMemberName(member)}</span>
                         {member.is_admin && (
                           <Crown className="h-4 w-4 text-yellow-400" />
                         )}
@@ -231,15 +241,32 @@ export const MembersList: React.FC<MembersListProps> = ({ open, onOpenChange, on
                       {member.is_admin ? 'Admin' : 'Member'}
                     </Badge>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleMessageClick(member)}
-                    className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
-                  >
-                    <MessageCircle className="h-4 w-4 mr-1" />
-                    Message
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleProfileClick(member);
+                      }}
+                      className="border-blue-500/30 text-blue-300 hover:bg-blue-500/10"
+                    >
+                      <User className="h-4 w-4 mr-1" />
+                      Profile
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMessageClick(member);
+                      }}
+                      className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+                    >
+                      <MessageCircle className="h-4 w-4 mr-1" />
+                      Message
+                    </Button>
+                  </div>
                 </div>
               ))
             )}
