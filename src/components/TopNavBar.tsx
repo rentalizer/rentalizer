@@ -97,16 +97,9 @@ export const TopNavBar = () => {
                    onClick={() => navigate('/profile-setup')}
                    variant="ghost"
                    size="sm"
-                   className="text-gray-600 hover:text-gray-900"
+                   className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
                  >
-                   Profile
-                 </Button>
-                 <Button
-                   onClick={() => navigate('/profile-setup')}
-                   variant="ghost"
-                   size="sm"
-                   className="flex items-center space-x-2"
-                 >
+                   <span className="hidden sm:inline">{user.email}</span>
                    <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center">
                      <User className="h-4 w-4 text-white" />
                    </div>
