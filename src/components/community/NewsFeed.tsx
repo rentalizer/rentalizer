@@ -34,7 +34,11 @@ interface NewsItem {
   status: string;
 }
 
-export const NewsFeed = () => {
+interface NewsFeedProps {
+  isDayMode?: boolean;
+}
+
+export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
@@ -377,12 +381,16 @@ export const NewsFeed = () => {
                       </div>
                     </div>
                     
-                    <h4 className="text-sm font-semibold text-white mb-1 line-clamp-2 hover:text-cyan-300 transition-colors">
+                    <h4 className={`text-sm font-semibold mb-1 line-clamp-2 transition-colors ${
+                      isDayMode ? 'text-slate-600 hover:text-cyan-700' : 'text-white hover:text-cyan-300'
+                    }`}>
                       {item.title}
                     </h4>
                     
                     {item.summary && (
-                      <p className="text-gray-400 text-xs line-clamp-2">
+                      <p className={`text-xs line-clamp-2 ${
+                        isDayMode ? 'text-slate-500' : 'text-gray-400'
+                      }`}>
                         {item.summary}
                       </p>
                     )}

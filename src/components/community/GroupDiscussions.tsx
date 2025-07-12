@@ -42,7 +42,7 @@ interface UserProfile {
   last_name: string | null;
 }
 
-export const GroupDiscussions = () => {
+export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean }) => {
   const { user, profile } = useAuth();
   const { isAdmin } = useAdminRole();
   const { toast } = useToast();
@@ -378,7 +378,7 @@ export const GroupDiscussions = () => {
           )}
           
           {/* Header with Post Input */}
-          <CommunityHeader onPostCreated={handlePostCreated} />
+          <CommunityHeader onPostCreated={handlePostCreated} isDayMode={isDayMode} />
 
           {/* Debug Info */}
           <div className="text-xs text-gray-500 p-2 bg-slate-800 rounded">
@@ -460,12 +460,14 @@ export const GroupDiscussions = () => {
                           )}
                         </div>
 
-                        <h3 className="text-xl font-semibold text-white mb-3">
+                        <h3 className={`text-xl font-semibold mb-3 ${isDayMode ? 'text-slate-700' : 'text-white'}`}>
                           {discussion.title}
                         </h3>
 
                         <div 
-                          className="text-gray-300 mb-4 leading-relaxed whitespace-pre-wrap cursor-pointer hover:text-gray-200 transition-colors"
+                          className={`mb-4 leading-relaxed whitespace-pre-wrap cursor-pointer transition-colors ${
+                            isDayMode ? 'text-slate-600 hover:text-slate-700' : 'text-gray-300 hover:text-gray-200'
+                          }`}
                           onClick={() => setExpandedPost(expandedPost === discussion.id ? null : discussion.id)}
                         >
                           {expandedPost === discussion.id ? discussion.content : getTruncatedContent(discussion.content)}
@@ -588,7 +590,7 @@ export const GroupDiscussions = () => {
           </Card>
 
           <div className="max-h-[800px] overflow-y-auto">
-            <NewsFeed />
+            <NewsFeed isDayMode={isDayMode} />
           </div>
 
           <Card className="bg-slate-800/50 border-cyan-500/20">

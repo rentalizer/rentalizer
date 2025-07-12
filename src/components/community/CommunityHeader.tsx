@@ -12,9 +12,10 @@ import { useToast } from '@/hooks/use-toast';
 
 interface CommunityHeaderProps {
   onPostCreated: () => void;
+  isDayMode?: boolean;
 }
 
-export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated }) => {
+export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated, isDayMode = false }) => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   
@@ -106,7 +107,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated 
                   placeholder="Write a title..."
                   value={postTitle}
                   onChange={(e) => setPostTitle(e.target.value)}
-                  className="bg-slate-700/50 border-cyan-500/20 text-slate-900 placeholder-slate-600"
+                  className={`border-cyan-500/20 ${isDayMode ? 'bg-slate-100 text-slate-700 placeholder-slate-500' : 'bg-slate-700/50 text-white placeholder-gray-400'}`}
                 />
               </div>
 
@@ -114,7 +115,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated 
                 placeholder="What's on your mind?"
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
-                className="min-h-[120px] bg-slate-700/50 border-cyan-500/20 text-slate-900 placeholder-slate-600 resize-none"
+                className={`min-h-[120px] border-cyan-500/20 resize-none ${isDayMode ? 'bg-slate-100 text-slate-700 placeholder-slate-500' : 'bg-slate-700/50 text-white placeholder-gray-400'}`}
               />
               
               <div className="flex items-center justify-between mt-3">

@@ -397,7 +397,7 @@ const Community = () => {
 
           {/* Other Tabs */}
           <TabsContent value="discussions" className="mt-8">
-            <GroupDiscussions />
+            <GroupDiscussions isDayMode={isDayMode} />
           </TabsContent>
           <TabsContent value="calendar" className="mt-8">
             <CommunityCalendar />
