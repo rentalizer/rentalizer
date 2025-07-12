@@ -119,6 +119,51 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated 
               
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center gap-2 relative">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-400 hover:text-cyan-300"
+                    onClick={() => {
+                      // TODO: Add image upload functionality
+                      toast({
+                        title: "Coming Soon",
+                        description: "Image upload functionality will be available soon"
+                      });
+                    }}
+                  >
+                    <Image className="h-4 w-4" />
+                  </Button>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-400 hover:text-cyan-300"
+                    onClick={() => {
+                      // TODO: Add video upload functionality
+                      toast({
+                        title: "Coming Soon", 
+                        description: "Video upload functionality will be available soon"
+                      });
+                    }}
+                  >
+                    <Video className="h-4 w-4" />
+                  </Button>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-400 hover:text-cyan-300"
+                    onClick={() => {
+                      // TODO: Add attachment functionality
+                      toast({
+                        title: "Coming Soon",
+                        description: "File attachment functionality will be available soon"
+                      });
+                    }}
+                  >
+                    <Paperclip className="h-4 w-4" />
+                  </Button>
+
                   <div className="relative">
                     <Button
                       variant="ghost"
