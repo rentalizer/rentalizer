@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper, User, Sun, Moon } from 'lucide-react';
+import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper, User, Sun, Moon, Mail, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
@@ -35,6 +35,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { LoginPrompt } from '@/components/LoginPrompt';
+import { LoginDialog } from '@/components/LoginDialog';
 
 
 export interface CalculatorData {
@@ -69,6 +70,7 @@ export interface CalculatorData {
 
 const Community = () => {
   const { user, isLoading } = useAuth();
+  const [showLoginModal, setShowLoginModal] = useState(false);
   
   // Check if we're in Lovable environment (bypass auth for development)
   const isLovableEnv = window.location.hostname.includes('lovableproject.com') || 
@@ -76,23 +78,15 @@ const Community = () => {
                        window.location.hostname === 'localhost' ||
                        window.location.hostname.includes('lovable.app');
 
-  // If not in development and user is not authenticated, show login prompt
-  if (!isLoading && !user && !isLovableEnv) {
-    return <LoginPrompt />;
-  }
+  // Show login modal automatically if not authenticated and not in development
+  useEffect(() => {
+    if (!isLoading && !user && !isLovableEnv) {
+      setShowLoginModal(true);
+    } else {
+      setShowLoginModal(false);
+    }
+  }, [isLoading, user, isLovableEnv]);
 
-  // Show loading state while checking authentication
-  if (isLoading && !isLovableEnv) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-cyan-400 mx-auto"></div>
-          <p className="text-cyan-300 mt-4 text-lg">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-  
   // Get initial tab from URL hash or default to discussions
   const getInitialTab = () => {
     const hash = window.location.hash.substring(1);
@@ -612,11 +606,92 @@ const Community = () => {
     </div>
   );
 
-  // Show community content directly since this is a test version 
+  // Show community content with login modal overlay if needed
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
       <CommunityContent />
       <Footer />
+      
+      {/* Login Modal Overlay */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-md">
+            <LoginDialog 
+              trigger={
+                <div className="hidden" />
+              }
+            />
+            {/* Force modal to be open by using a trick */}
+            <div className="bg-slate-800/95 border border-cyan-500/20 backdrop-blur-lg rounded-lg p-8 shadow-2xl">
+              <div className="text-center mb-6">
+                <Users className="h-12 w-12 text-cyan-400 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-cyan-300 mb-2">Sign In to Rentalizer</h2>
+                <p className="text-gray-400">Access your account</p>
+              </div>
+              
+              <form className="space-y-4">
+                <div>
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                    <Mail className="h-4 w-4 inline mr-1" />
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    className="w-full px-3 py-2 bg-slate-700/50 border border-cyan-500/30 rounded-lg text-white placeholder-gray-400 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/20 outline-none"
+                    placeholder="Enter your email"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                    <Lock className="h-4 w-4 inline mr-1" />
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    className="w-full px-3 py-2 bg-slate-700/50 border border-cyan-500/30 rounded-lg text-white placeholder-gray-400 focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/20 outline-none"
+                    placeholder="Enter your password"
+                  />
+                </div>
+                
+                <div className="text-right">
+                  <button
+                    type="button"
+                    className="text-cyan-400 hover:text-cyan-300 text-sm"
+                  >
+                    Forgot Your Password?
+                  </button>
+                </div>
+                
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="submit"
+                    className="flex-1 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white py-2 px-4 rounded-lg font-medium transition-all duration-200"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowLoginModal(false)}
+                    className="px-6 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+                
+                <div className="text-center pt-2">
+                  <button
+                    type="button"
+                    className="text-cyan-300 hover:text-cyan-200 text-sm"
+                  >
+                    Don't have an account? Sign Up
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
