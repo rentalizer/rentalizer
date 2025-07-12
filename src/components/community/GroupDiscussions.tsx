@@ -276,25 +276,48 @@ export const GroupDiscussions = () => {
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
     console.log('🗑️ ADMIN DELETING DISCUSSION:', discussionId);
     console.log('🗑️ Current discussions count BEFORE deletion:', discussionsList.length);
+    console.log('🗑️ Current user ID:', user?.id);
+    console.log('🗑️ Admin status:', isAdmin);
     
     try {
       // First delete from database to ensure admin permissions work
-      const { error } = await supabase
+      console.log('🗑️ Attempting database deletion...');
+      const { data, error } = await supabase
         .from('discussions')
         .delete()
-        .eq('id', discussionId);
+        .eq('id', discussionId)
+        .select();
+        
+      console.log('🗑️ Delete response data:', data);
+      console.log('🗑️ Delete response error:', error);
         
       if (error) {
         console.error('❌ Database deletion failed:', error);
+        console.error('❌ Error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
         toast({
           title: "Error",
-          description: "Failed to delete discussion. You may not have permission.",
+          description: `Failed to delete discussion: ${error.message}`,
           variant: "destructive"
         });
         return;
       }
 
-      console.log('✅ Database deletion successful - now updating UI');
+      if (!data || data.length === 0) {
+        console.warn('⚠️ No rows were deleted - discussion may not exist or permission denied');
+        toast({
+          title: "Warning", 
+          description: "No discussion was deleted. It may not exist or you may not have permission.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      console.log('✅ Database deletion successful - deleted rows:', data.length);
 
       // After successful database deletion, update UI
       setDiscussionsList(prevDiscussions => {
@@ -316,7 +339,7 @@ export const GroupDiscussions = () => {
         variant: "destructive"
       });
     }
-  }, [toast]);
+  }, [toast, user?.id, isAdmin, discussionsList.length]);
 
   const canEditOrDelete = useCallback((discussion: Discussion) => {
     // Admins can edit/delete any post
