@@ -292,6 +292,18 @@ const GuideBook = () => {
                         src={guidebook.cover_photo_url} 
                         alt={guidebook.property_name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('Failed to load image:', guidebook.cover_photo_url);
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.parentElement!.innerHTML = `
+                            <div class="w-full h-full flex items-center justify-center text-muted-foreground text-sm">
+                              Image failed to load
+                            </div>
+                          `;
+                        }}
+                        onLoad={() => {
+                          console.log('Image loaded successfully:', guidebook.cover_photo_url);
+                        }}
                       />
                     </div>
                   )}
