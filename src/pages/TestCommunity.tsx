@@ -296,7 +296,7 @@ const Community = () => {
         {userIsAdmin && (
           <div className="mb-6 flex justify-center">
             <Link to="/admin/richie" className={`text-sm flex items-center gap-2 transition-colors ${
-              isDayMode ? 'text-cyan-600 hover:text-cyan-700' : 'text-cyan-400 hover:text-cyan-300'
+              isDayMode ? 'text-slate-800 hover:text-cyan-800' : 'text-cyan-400 hover:text-cyan-300'
             }`}>
               <Bot className="h-4 w-4" />
               Manage Richie's Knowledge Base
@@ -313,7 +313,7 @@ const Community = () => {
           }`}>
             <TabsTrigger value="discussions" className={`transition-all duration-300 ${
               isDayMode 
-                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-cyan-800 text-slate-600 hover:text-cyan-700' 
+                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-slate-900 text-slate-800 hover:text-slate-900' 
                 : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
             }`}>
               <Users className="h-5 w-5 mr-2" />
@@ -321,7 +321,7 @@ const Community = () => {
             </TabsTrigger>
             <TabsTrigger value="calendar" className={`transition-all duration-300 ${
               isDayMode 
-                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-cyan-800 text-slate-600 hover:text-cyan-700' 
+                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-slate-900 text-slate-800 hover:text-slate-900' 
                 : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
             }`}>
               <Calendar className="h-5 w-5 mr-2" />
@@ -329,7 +329,7 @@ const Community = () => {
             </TabsTrigger>
             <TabsTrigger value="videos" className={`transition-all duration-300 ${
               isDayMode 
-                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-cyan-800 text-slate-600 hover:text-cyan-700' 
+                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-slate-900 text-slate-800 hover:text-slate-900' 
                 : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
             }`}>
               <Video className="h-5 w-5 mr-2" />
@@ -339,7 +339,7 @@ const Community = () => {
               onClick={() => setChatOpen(true)}
               className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 relative ${
                 isDayMode 
-                  ? 'text-slate-600 hover:text-cyan-700 hover:bg-cyan-50' 
+                  ? 'text-slate-800 hover:text-slate-900 hover:bg-cyan-50' 
                   : 'text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10'
               }`}
             >
@@ -355,7 +355,7 @@ const Community = () => {
             </button>
             <TabsTrigger value="calculator" className={`transition-all duration-300 ${
               isDayMode 
-                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-cyan-800 text-slate-600 hover:text-cyan-700' 
+                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-slate-900 text-slate-800 hover:text-slate-900' 
                 : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
             }`}>
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
@@ -363,7 +363,7 @@ const Community = () => {
             </TabsTrigger>
             <TabsTrigger value="askrichie" className={`transition-all duration-300 ${
               isDayMode 
-                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-cyan-800 text-slate-600 hover:text-cyan-700' 
+                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-slate-900 text-slate-800 hover:text-slate-900' 
                 : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
             }`}>
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
@@ -373,7 +373,7 @@ const Community = () => {
               onClick={() => setProfileEditorOpen(true)}
               className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
                 isDayMode 
-                  ? 'text-slate-600 hover:text-cyan-700 hover:bg-cyan-50' 
+                  ? 'text-slate-800 hover:text-slate-900 hover:bg-cyan-50' 
                   : 'text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10'
               }`}
             >
@@ -385,7 +385,7 @@ const Community = () => {
                 onClick={() => setMembersDialogOpen(true)}
                 className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
                   isDayMode 
-                    ? 'text-slate-600 hover:text-cyan-700 hover:bg-cyan-50' 
+                    ? 'text-slate-800 hover:text-slate-900 hover:bg-cyan-50' 
                     : 'text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10'
                 }`}
               >
