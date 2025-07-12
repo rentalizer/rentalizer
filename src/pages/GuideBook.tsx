@@ -18,7 +18,15 @@ const GuideBook = () => {
   const [guidebooks, setGuidebooks] = useState<Guidebook[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingGuidebook, setEditingGuidebook] = useState<Guidebook | null>(null);
   const [newGuidebook, setNewGuidebook] = useState({
+    property_name: "",
+    property_address: "",
+    description: "",
+    cover_photo_url: ""
+  });
+  const [editGuidebook, setEditGuidebook] = useState({
     property_name: "",
     property_address: "",
     description: "",
@@ -178,6 +186,65 @@ const GuideBook = () => {
     }
   };
 
+  const openEditDialog = (guidebook: Guidebook) => {
+    setEditingGuidebook(guidebook);
+    setEditGuidebook({
+      property_name: guidebook.property_name,
+      property_address: guidebook.property_address || "",
+      description: guidebook.description || "",
+      cover_photo_url: guidebook.cover_photo_url || ""
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const updateGuidebook = async () => {
+    if (!editGuidebook.property_name.trim()) {
+      toast({
+        title: "Error",
+        description: "Property name is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!editingGuidebook) return;
+
+    try {
+      const { error } = await supabase
+        .from("guidebooks")
+        .update({
+          property_name: editGuidebook.property_name,
+          property_address: editGuidebook.property_address,
+          description: editGuidebook.description,
+          cover_photo_url: editGuidebook.cover_photo_url,
+        })
+        .eq("id", editingGuidebook.id);
+
+      if (error) throw error;
+
+      setGuidebooks(guidebooks.map(g => 
+        g.id === editingGuidebook.id 
+          ? { ...g, ...editGuidebook }
+          : g
+      ));
+
+      setIsEditDialogOpen(false);
+      setEditingGuidebook(null);
+
+      toast({
+        title: "Success",
+        description: "Guidebook updated successfully!",
+      });
+    } catch (error) {
+      console.error("Error updating guidebook:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update guidebook",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -260,6 +327,57 @@ const GuideBook = () => {
                 </div>
               </DialogContent>
             </Dialog>
+
+            {/* Edit Dialog */}
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Edit Guidebook</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="edit_property_name">Property Name *</Label>
+                    <Input
+                      id="edit_property_name"
+                      value={editGuidebook.property_name}
+                      onChange={(e) => setEditGuidebook({...editGuidebook, property_name: e.target.value})}
+                      placeholder="e.g., Cozy Downtown Apartment"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit_property_address">Property Address</Label>
+                    <Input
+                      id="edit_property_address"
+                      value={editGuidebook.property_address}
+                      onChange={(e) => setEditGuidebook({...editGuidebook, property_address: e.target.value})}
+                      placeholder="e.g., 123 Main St, City, State"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit_description">Description</Label>
+                    <Textarea
+                      id="edit_description"
+                      value={editGuidebook.description}
+                      onChange={(e) => setEditGuidebook({...editGuidebook, description: e.target.value})}
+                      placeholder="Brief description of your property..."
+                      rows={3}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit_cover_photo">Cover Photo URL</Label>
+                    <Input
+                      id="edit_cover_photo"
+                      value={editGuidebook.cover_photo_url}
+                      onChange={(e) => setEditGuidebook({...editGuidebook, cover_photo_url: e.target.value})}
+                      placeholder="https://..."
+                    />
+                  </div>
+                  <Button onClick={updateGuidebook} className="w-full">
+                    Update Guidebook
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>
@@ -329,7 +447,12 @@ const GuideBook = () => {
                   )}
                   
                   <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" className="flex-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => openEditDialog(guidebook)}
+                    >
                       <Edit className="h-3 w-3 mr-1" />
                       Edit
                     </Button>
