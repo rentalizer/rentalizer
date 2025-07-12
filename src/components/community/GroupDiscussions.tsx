@@ -574,12 +574,21 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         <div className="sticky top-6 space-y-6">
           <Card className="bg-slate-800/50 border-cyan-500/20">
             <CardContent className="space-y-3 pt-6">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-400">Members</span>
-                <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
-                  {communityStats.totalMembers}
-                </Badge>
-              </div>
+               <div className="flex justify-between items-center">
+                 {isAdmin ? (
+                   <button 
+                     onClick={() => setShowMembersList(true)}
+                     className="text-gray-400 hover:text-cyan-300 transition-colors cursor-pointer"
+                   >
+                     Members
+                   </button>
+                 ) : (
+                   <span className="text-gray-400">Members</span>
+                 )}
+                 <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
+                   {communityStats.totalMembers}
+                 </Badge>
+               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-400">Online Now</span>
                 <Badge className="bg-green-600/20 text-green-300 border-green-500/30">
