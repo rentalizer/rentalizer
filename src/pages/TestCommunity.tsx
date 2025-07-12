@@ -33,7 +33,7 @@ import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { TopNavBar } from '@/components/TopNavBar';
+
 
 export interface CalculatorData {
   // Comps
@@ -530,13 +530,7 @@ const TestCommunity = () => {
   // Show community content directly since this is a test version 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-      <TopNavBar />
       <CommunityContent />
-      
-      {/* Fixed position components */}
-      <AskRichieChat />
-      <ContactChat />
-      
       <Footer />
     </div>
   );
