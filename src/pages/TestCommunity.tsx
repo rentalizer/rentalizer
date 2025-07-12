@@ -34,6 +34,7 @@ import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { LoginPrompt } from '@/components/LoginPrompt';
 
 
 export interface CalculatorData {
@@ -67,6 +68,31 @@ export interface CalculatorData {
 }
 
 const Community = () => {
+  const { user, isLoading } = useAuth();
+  
+  // Check if we're in Lovable environment (bypass auth for development)
+  const isLovableEnv = window.location.hostname.includes('lovableproject.com') || 
+                       window.location.search.includes('__lovable_token') ||
+                       window.location.hostname === 'localhost' ||
+                       window.location.hostname.includes('lovable.app');
+
+  // If not in development and user is not authenticated, show login prompt
+  if (!isLoading && !user && !isLovableEnv) {
+    return <LoginPrompt />;
+  }
+
+  // Show loading state while checking authentication
+  if (isLoading && !isLovableEnv) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-cyan-400 mx-auto"></div>
+          <p className="text-cyan-300 mt-4 text-lg">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
   // Get initial tab from URL hash or default to discussions
   const getInitialTab = () => {
     const hash = window.location.hash.substring(1);
@@ -88,7 +114,6 @@ const Community = () => {
   const { toast } = useToast();
   const { isAdmin } = useAdminRole();
   const { unreadCount } = useUnreadMessages();
-  const { user } = useAuth();
   const navigate = useNavigate();
 
   // Save theme preference to localStorage
@@ -104,11 +129,6 @@ const Community = () => {
       description: `You're now viewing the ${!isDayMode ? 'light' : 'dark'} theme.`,
     });
   };
-  
-  // Check if we're in Lovable environment
-  const isLovableEnv = window.location.hostname.includes('lovableproject.com') || 
-                       window.location.search.includes('__lovable_token') ||
-                       window.location.hostname === 'localhost';
   
   // Enhanced admin check that works on live site
   useEffect(() => {
