@@ -65,7 +65,7 @@ export interface CalculatorData {
   furnishingsPSF: number;
 }
 
-const TestCommunity = () => {
+const Community = () => {
   // Get initial tab from URL hash or default to discussions
   const getInitialTab = () => {
     const hash = window.location.hash.substring(1);
@@ -234,7 +234,7 @@ const TestCommunity = () => {
           <div className="flex items-center justify-center gap-3 mb-4">
             <Users className="h-12 w-12 text-cyan-400" />
             <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight py-2">
-              Test Training Dashboard
+              Training Dashboard
             </h1>
           </div>
         </div>
@@ -536,4 +536,4 @@ const TestCommunity = () => {
   );
 };
 
-export default TestCommunity;
+export default Community;
