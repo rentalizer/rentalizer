@@ -1,4 +1,11 @@
 
+// Extend Window interface for Calendly
+declare global {
+  interface Window {
+    Calendly: any;
+  }
+}
+
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, BarChart3 } from 'lucide-react';
+import { Eye, EyeOff, BarChart3, Calendar } from 'lucide-react';
 
 const Index = () => {
   const { user, signIn, signUp, isLoading } = useAuth();
@@ -38,6 +45,30 @@ const Index = () => {
       navigate('/community');
     }
   }, [user, isLoading, navigate]);
+
+  // Load Calendly script when component mounts
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://assets.calendly.com/assets/external/widget.js';
+    script.async = true;
+    document.head.appendChild(script);
+
+    const link = document.createElement('link');
+    link.href = 'https://assets.calendly.com/assets/external/widget.css';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+  }, []);
+
+  // Book demo function
+  const handleBookDemo = () => {
+    console.log('📅 Book Demo clicked - opening Calendly popup');
+    if (window.Calendly) {
+      // @ts-ignore
+      window.Calendly.initPopupWidget({
+        url: 'https://calendly.com/richies-schedule/scale'
+      });
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -341,6 +372,21 @@ const Index = () => {
             <p className="text-xs text-gray-400">
               After signing up, you'll be guided to complete your profile to access all community features.
             </p>
+            
+            {/* Book A Demo Button */}
+            <div className="mt-4">
+              <Button
+                onClick={handleBookDemo}
+                variant="outline"
+                className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-400"
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Book A Demo
+              </Button>
+              <p className="text-xs text-gray-400 mt-2">
+                Schedule a 1-on-1 demo call
+              </p>
+            </div>
           </div>
         </CardContent>
         </Card>
