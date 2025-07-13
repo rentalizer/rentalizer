@@ -232,6 +232,47 @@ const Community = () => {
     });
   };
 
+  const handleCheckout = async (plan: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to subscribe.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      toast({
+        title: "Redirecting to Checkout",
+        description: "Opening Stripe checkout...",
+      });
+
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          plan: plan,
+          billing: 'monthly' // Default to monthly
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        // Open Stripe checkout in a new tab
+        window.open(data.url, '_blank');
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast({
+        title: "Checkout Failed",
+        description: error instanceof Error ? error.message : "Failed to start checkout process",
+        variant: "destructive",
+      });
+    }
+  };
+
   const CommunityContent = () => (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
       <div className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">
@@ -456,7 +497,10 @@ const Community = () => {
                             Email support
                           </li>
                         </ul>
-                        <Button className="w-full bg-cyan-600 hover:bg-cyan-500 text-white">
+                        <Button 
+                          className="w-full bg-cyan-600 hover:bg-cyan-500 text-white"
+                          onClick={() => handleCheckout('property_basic')}
+                        >
                           Get Started
                         </Button>
                       </div>
@@ -491,7 +535,10 @@ const Community = () => {
                             Multi-property management
                           </li>
                         </ul>
-                        <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white">
+                        <Button 
+                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white"
+                          onClick={() => handleCheckout('property_premium')}
+                        >
                           Upgrade to Premium
                         </Button>
                       </div>
@@ -521,7 +568,10 @@ const Community = () => {
                             Unlimited properties
                           </li>
                         </ul>
-                        <Button className="w-full bg-purple-600 hover:bg-purple-500 text-white">
+                        <Button 
+                          className="w-full bg-purple-600 hover:bg-purple-500 text-white"
+                          onClick={() => handleCheckout('property_enterprise')}
+                        >
                           Contact Sales
                         </Button>
                       </div>

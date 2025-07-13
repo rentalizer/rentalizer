@@ -63,12 +63,27 @@ serve(async (req) => {
       complete: {
         monthly: 295000, // $2,950 in cents
         yearly: 595000,  // $5,950 in cents
+      },
+      property_basic: {
+        monthly: 2900,   // $29 in cents
+        yearly: 29000,   // $290 in cents (annual discount)
+      },
+      property_premium: {
+        monthly: 7900,   // $79 in cents
+        yearly: 79000,   // $790 in cents (annual discount)
+      },
+      property_enterprise: {
+        monthly: 19900,  // $199 in cents
+        yearly: 199000,  // $1,990 in cents (annual discount)
       }
     };
 
     const planNames = {
       essentials: "Market Insights + Calculator",
-      complete: "All-In-One System"
+      complete: "All-In-One System",
+      property_basic: "Property Management Basic",
+      property_premium: "Property Management Premium",
+      property_enterprise: "Property Management Enterprise"
     };
 
     const amount = pricing[plan][billing];
@@ -90,7 +105,13 @@ serve(async (req) => {
               name: planName,
               description: plan === 'essentials' 
                 ? "AI-powered market research and rental arbitrage calculator"
-                : "Complete rental arbitrage system with acquisitions and property management"
+                : plan === 'complete'
+                ? "Complete rental arbitrage system with acquisitions and property management"
+                : plan === 'property_basic'
+                ? "Basic property tracking and rent collection tools"
+                : plan === 'property_premium'
+                ? "Advanced analytics and automated workflows for growing portfolios"
+                : "Custom integrations and unlimited properties for large portfolios"
             },
             unit_amount: amount,
             recurring: { interval },
