@@ -368,25 +368,25 @@ const Index = () => {
             </TabsContent>
           </Tabs>
           
-          <div className="mt-6 text-center space-y-2">
+          {/* Book A Demo Button - Prominent placement */}
+          <div className="mt-6 pt-4 border-t border-gray-700/50">
+            <Button
+              onClick={handleBookDemo}
+              variant="outline"
+              className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-400"
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              Book A Demo
+            </Button>
+            <p className="text-xs text-gray-400 mt-2 text-center">
+              Schedule a 1-on-1 demo call
+            </p>
+          </div>
+          
+          <div className="mt-4 text-center">
             <p className="text-xs text-gray-400">
               After signing up, you'll be guided to complete your profile to access all community features.
             </p>
-            
-            {/* Book A Demo Button */}
-            <div className="mt-4">
-              <Button
-                onClick={handleBookDemo}
-                variant="outline"
-                className="w-full border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-400"
-              >
-                <Calendar className="h-4 w-4 mr-2" />
-                Book A Demo
-              </Button>
-              <p className="text-xs text-gray-400 mt-2">
-                Schedule a 1-on-1 demo call
-              </p>
-            </div>
           </div>
         </CardContent>
         </Card>
