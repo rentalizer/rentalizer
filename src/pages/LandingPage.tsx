@@ -331,7 +331,7 @@ const LandingPage = () => {
           <div className="max-w-7xl mx-auto mb-20">
             <div className="text-center mb-12">
               <div className="text-xl md:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
-                Some Recent Users Who've Unlocked Rental Income With Rentalizer
+                Recent Users Who've Unlocked Rental Income With Rentalizer
               </div>
             </div>
 
