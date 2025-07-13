@@ -84,6 +84,7 @@ const Community = () => {
   const [profileEditorOpen, setProfileEditorOpen] = useState(false);
   const [userIsAdmin, setUserIsAdmin] = useState(false);
   const [adminCheckLoading, setAdminCheckLoading] = useState(true);
+  const [showPricingOverlay, setShowPricingOverlay] = useState(false);
   const { toast } = useToast();
   const { isAdmin } = useAdminRole();
   const { unreadCount } = useUnreadMessages();
@@ -396,7 +397,7 @@ const Community = () => {
           </TabsContent>
 
           <TabsContent value="propertymanagement" className="mt-8">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto relative">
               <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-cyan-500/30 rounded-xl p-8 backdrop-blur-sm">
                 <div className="text-center mb-8">
                   <Settings className="h-20 w-20 text-cyan-400 mx-auto mb-6" />
@@ -408,12 +409,136 @@ const Community = () => {
                   </p>
                 </div>
                 
+                <div className="text-center mb-8">
+                  <Button 
+                    onClick={() => setShowPricingOverlay(true)}
+                    className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold py-3 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    Upgrade Now
+                  </Button>
+                </div>
+                
                 <div className="text-center">
                   <p className="text-gray-400">
                     Property Management features coming soon...
                   </p>
                 </div>
               </div>
+
+              {/* Pricing Overlay */}
+              {showPricingOverlay && (
+                <div className="absolute inset-0 bg-black/90 rounded-xl flex items-center justify-center z-50 p-8">
+                  <div className="max-w-4xl mx-auto">
+                    <div className="text-center mb-8">
+                      <h3 className="text-3xl font-bold text-white mb-4">Choose Your Plan</h3>
+                      <p className="text-gray-300">Unlock powerful property management tools</p>
+                    </div>
+                    
+                    <div className="grid md:grid-cols-3 gap-6 mb-8">
+                      {/* Basic Plan */}
+                      <div className="bg-slate-800/90 rounded-lg p-6 border border-gray-600 hover:border-cyan-500/50 transition-all">
+                        <div className="text-center mb-6">
+                          <h4 className="text-xl font-semibold text-white mb-2">Basic</h4>
+                          <div className="text-3xl font-bold text-cyan-400 mb-2">$29<span className="text-lg text-gray-400">/mo</span></div>
+                          <p className="text-gray-400 text-sm">Perfect for beginners</p>
+                        </div>
+                        <ul className="space-y-3 text-gray-300 text-sm mb-6">
+                          <li className="flex items-center gap-2">
+                            <span className="w-2 h-2 bg-cyan-400 rounded-full"></span>
+                            Basic property tracking
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-2 h-2 bg-cyan-400 rounded-full"></span>
+                            Rent collection tools
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-2 h-2 bg-cyan-400 rounded-full"></span>
+                            Email support
+                          </li>
+                        </ul>
+                        <Button className="w-full bg-cyan-600 hover:bg-cyan-500 text-white">
+                          Get Started
+                        </Button>
+                      </div>
+
+                      {/* Premium Plan */}
+                      <div className="bg-gradient-to-b from-blue-900/50 to-purple-900/50 rounded-lg p-6 border-2 border-blue-500 relative hover:border-blue-400 transition-all transform scale-105">
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                          <span className="bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold">Most Popular</span>
+                        </div>
+                        <div className="text-center mb-6">
+                          <h4 className="text-xl font-semibold text-white mb-2">Premium</h4>
+                          <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+                            $79<span className="text-lg text-gray-400">/mo</span>
+                          </div>
+                          <p className="text-gray-400 text-sm">For growing portfolios</p>
+                        </div>
+                        <ul className="space-y-3 text-gray-300 text-sm mb-6">
+                          <li className="flex items-center gap-2">
+                            <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                            Advanced analytics
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                            Automated workflows
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                            Priority support
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                            Multi-property management
+                          </li>
+                        </ul>
+                        <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white">
+                          Upgrade to Premium
+                        </Button>
+                      </div>
+
+                      {/* Enterprise Plan */}
+                      <div className="bg-slate-800/90 rounded-lg p-6 border border-gray-600 hover:border-purple-500/50 transition-all">
+                        <div className="text-center mb-6">
+                          <h4 className="text-xl font-semibold text-white mb-2">Enterprise</h4>
+                          <div className="text-3xl font-bold text-purple-400 mb-2">$199<span className="text-lg text-gray-400">/mo</span></div>
+                          <p className="text-gray-400 text-sm">For large portfolios</p>
+                        </div>
+                        <ul className="space-y-3 text-gray-300 text-sm mb-6">
+                          <li className="flex items-center gap-2">
+                            <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+                            Custom integrations
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+                            Dedicated account manager
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+                            White-label options
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+                            Unlimited properties
+                          </li>
+                        </ul>
+                        <Button className="w-full bg-purple-600 hover:bg-purple-500 text-white">
+                          Contact Sales
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="text-center">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setShowPricingOverlay(false)}
+                        className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                      >
+                        Close
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </TabsContent>
 
