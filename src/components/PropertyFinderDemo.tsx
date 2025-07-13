@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,12 +14,16 @@ import {
   Crown,
   CheckCircle,
   Clock,
-  DollarSign
+  DollarSign,
+  Check,
+  Zap
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 export const PropertyFinderDemo = () => {
-  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [showPricing, setShowPricing] = useState(false);
 
   const mockProperties = [
     {
@@ -64,8 +68,43 @@ export const PropertyFinderDemo = () => {
     "Final Offer - Partnership Proposal"
   ];
 
-  const handleUpgrade = () => {
-    navigate('/pricing');
+  const handleUpgrade = async (plan: string) => {
+    if (!user) {
+      // Show login dialog if user is not authenticated
+      return;
+    }
+
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        console.error('No active session');
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          plan: plan,
+          billing: 'monthly'
+        },
+        headers: {
+          Authorization: `Bearer ${session.session.access_token}`,
+        },
+      });
+
+      if (error) {
+        console.error('Checkout error:', error);
+        return;
+      }
+
+      if (data?.url) {
+        // Open Stripe checkout in a new tab
+        window.open(data.url, '_blank');
+      } else {
+        console.error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+    }
   };
 
   return (
@@ -94,21 +133,115 @@ export const PropertyFinderDemo = () => {
         <div className="bg-slate-700/30 rounded-lg p-6 mb-8 relative overflow-hidden">
           {/* Premium Overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-[2px] z-10 flex items-center justify-center">
-            <div className="text-center p-8 bg-slate-800/90 rounded-xl border border-purple-500/30">
-              <Lock className="h-12 w-12 text-purple-400 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-purple-300 mb-4">Premium Feature</h3>
-              <p className="text-gray-300 mb-6 max-w-md">
-                Unlock Property Finder to automate your deal sourcing and property outreach with AI-powered tools.
-              </p>
-              <Button
-                onClick={handleUpgrade}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-8 py-3"
-                size="lg"
-              >
-                <Crown className="h-5 w-5 mr-2" />
-                Upgrade Now
-              </Button>
-            </div>
+            {!showPricing ? (
+              <div className="text-center p-8 bg-slate-800/90 rounded-xl border border-purple-500/30">
+                <Lock className="h-12 w-12 text-purple-400 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-purple-300 mb-4">Premium Feature</h3>
+                <p className="text-gray-300 mb-6 max-w-md">
+                  Unlock Property Finder to automate your deal sourcing and property outreach with AI-powered tools.
+                </p>
+                <Button
+                  onClick={() => setShowPricing(true)}
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white px-8 py-3"
+                  size="lg"
+                >
+                  <Crown className="h-5 w-5 mr-2" />
+                  Upgrade Now
+                </Button>
+              </div>
+            ) : (
+              <div className="p-8 bg-slate-800/95 rounded-xl border border-purple-500/30 max-w-2xl w-full mx-4">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-purple-300 mb-2">Choose Your Plan</h3>
+                  <p className="text-gray-300">Access Property Finder with our premium plans</p>
+                </div>
+                
+                <div className="grid md:grid-cols-2 gap-4 mb-6">
+                  {/* Market Insights + Calculator Plan */}
+                  <div className="bg-slate-700/50 border border-cyan-500/20 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Zap className="h-5 w-5 text-cyan-400" />
+                      <h4 className="text-lg font-bold text-cyan-300">Market Insights + Calculator</h4>
+                    </div>
+                    <div className="text-2xl font-bold text-white mb-2">
+                      $1,950<span className="text-sm text-gray-400">/month</span>
+                    </div>
+                    <p className="text-gray-400 text-sm mb-4">Perfect for getting started</p>
+                    <div className="space-y-2 text-sm mb-4">
+                      <div className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-green-400" />
+                        <span className="text-gray-300">Market Intelligence</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-green-400" />
+                        <span className="text-gray-300">Property Calculator</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-green-400" />
+                        <span className="text-gray-300">Live Airbnb Revenue Data</span>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => handleUpgrade('essentials')}
+                      className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white"
+                      disabled={!user}
+                    >
+                      {user ? 'Get Started' : 'Login Required'}
+                    </Button>
+                  </div>
+
+                  {/* All-In-One System Plan */}
+                  <div className="bg-slate-700/50 border border-purple-500/20 rounded-lg p-4 relative">
+                    <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs">
+                      Most Popular
+                    </Badge>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Crown className="h-5 w-5 text-purple-400" />
+                      <h4 className="text-lg font-bold text-purple-300">All-In-One System</h4>
+                    </div>
+                    <div className="text-2xl font-bold text-white mb-2">
+                      $2,950<span className="text-sm text-gray-400">/month</span>
+                    </div>
+                    <p className="text-gray-400 text-sm mb-4">Complete rental arbitrage solution</p>
+                    <div className="space-y-2 text-sm mb-4">
+                      <div className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-green-400" />
+                        <span className="text-gray-300">Everything in Market Insights</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-green-400" />
+                        <span className="text-gray-300 font-semibold">+ Property Finder</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-green-400" />
+                        <span className="text-gray-300">Market Finder</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="h-4 w-4 text-green-400" />
+                        <span className="text-gray-300">AI-Powered Outreach</span>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => handleUpgrade('complete')}
+                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white"
+                      disabled={!user}
+                    >
+                      {user ? 'Get Started' : 'Login Required'}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <Button
+                    onClick={() => setShowPricing(false)}
+                    variant="outline"
+                    className="border-gray-500/30 text-gray-400 hover:text-gray-300"
+                  >
+                    Back to Demo
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Blurred Demo Content */}
@@ -250,7 +383,7 @@ export const PropertyFinderDemo = () => {
             Join our All-In-One System plan to access Property Finder and scale your rental arbitrage business.
           </p>
           <Button
-            onClick={handleUpgrade}
+            onClick={() => setShowPricing(true)}
             className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-8 py-4 text-lg"
             size="lg"
           >
