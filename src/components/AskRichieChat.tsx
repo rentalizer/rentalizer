@@ -57,15 +57,7 @@ export const AskRichieChat = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Only show on home page for non-logged-in users
-  const shouldShow = !user && (window.location.pathname === '/' || window.location.pathname === '/landing');
-
-  // If shouldn't show, return null
-  if (!shouldShow) {
-    return null;
-  }
-
-  // Cleanup on unmount
+  // Cleanup on unmount - MUST be before conditional return
   useEffect(() => {
     return () => {
       stopCurrentAudio();
@@ -74,6 +66,14 @@ export const AskRichieChat = () => {
       }
     };
   }, []);
+
+  // Only show on home page for non-logged-in users
+  const shouldShow = !user && (window.location.pathname === '/' || window.location.pathname === '/landing');
+
+  // If shouldn't show, return null
+  if (!shouldShow) {
+    return null;
+  }
 
   // Check lead usage for rate limiting
   const checkLeadUsage = async (leadCaptureId: string) => {
