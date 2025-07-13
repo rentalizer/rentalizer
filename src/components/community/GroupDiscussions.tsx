@@ -575,26 +575,29 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           <Card className="bg-slate-800/50 border-cyan-500/20">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-cyan-400" />
-                Community Activity
+                <Users className="h-5 w-5 text-cyan-400" />
+                Members
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
                <div className="flex justify-between items-center">
-                 <span className="text-gray-400">Total Posts</span>
-                 <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
-                   247
-                 </Badge>
-               </div>
+                  {isAdmin ? (
+                    <button
+                      onClick={() => setShowMembersList(true)}
+                      className="text-gray-400 hover:text-cyan-300 transition-colors cursor-pointer"
+                    >
+                      Total Members
+                    </button>
+                  ) : (
+                    <span className="text-gray-400">Total Members</span>
+                  )}
+                  <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
+                    {communityStats.totalMembers}
+                  </Badge>
+                </div>
                <div className="flex justify-between items-center">
-                 <span className="text-gray-400">This Week</span>
+                 <span className="text-gray-400">Online Now</span>
                  <Badge className="bg-green-600/20 text-green-300 border-green-500/30">
-                   18
-                 </Badge>
-               </div>
-               <div className="flex justify-between items-center">
-                 <span className="text-gray-400">Active Users</span>
-                 <Badge className="bg-purple-600/20 text-purple-300 border-purple-500/30">
                    {communityStats.onlineUsers}
                  </Badge>
                </div>
