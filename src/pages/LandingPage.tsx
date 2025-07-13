@@ -1,3 +1,10 @@
+// Extend Window interface for Calendly
+declare global {
+  interface Window {
+    Calendly: any;
+  }
+}
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -324,6 +331,27 @@ const LandingPage = () => {
                 </Card>
               </div>
             </div>
+          </div>
+
+          {/* Book A Demo Section */}
+          <div className="max-w-4xl mx-auto mb-20 text-center">
+            <div className="mb-8">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+                Ready to Get Started?
+              </h2>
+              <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+                Book a personalized demo to see how Rentalizer can help you launch and scale your rental arbitrage business.
+              </p>
+            </div>
+            
+            <Button
+              onClick={handleBookDemo}
+              size="lg"
+              className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            >
+              <Calendar className="h-6 w-6 mr-3" />
+              Book A Demo
+            </Button>
           </div>
 
 
