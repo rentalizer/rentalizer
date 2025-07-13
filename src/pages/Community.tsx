@@ -346,13 +346,10 @@ const Community = () => {
               Property Management
             </TabsTrigger>
             {!adminCheckLoading && userIsAdmin && (
-              <button
-                onClick={() => setMembersDialogOpen(true)}
-                className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors"
-              >
+              <TabsTrigger value="members" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
                 <Users size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
                 Members
-              </button>
+              </TabsTrigger>
             )}
           </TabsList>
 
@@ -673,6 +670,29 @@ const Community = () => {
               </div>
             </div>
           </TabsContent>
+
+          {/* Members Tab Content */}
+          {!adminCheckLoading && userIsAdmin && (
+            <TabsContent value="members" className="mt-8">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-cyan-300 mb-4 flex items-center justify-center gap-3">
+                  <Users className="h-8 w-8 text-cyan-400" />
+                  Community Members
+                </h2>
+                <p className="text-gray-400">Manage and view all community members</p>
+              </div>
+              
+              <div className="bg-slate-800/50 rounded-lg p-8 border border-cyan-500/20">
+                <Button
+                  onClick={() => setMembersDialogOpen(true)}
+                  className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  <Users className="h-5 w-5 mr-2" />
+                  View All Members
+                </Button>
+              </div>
+            </TabsContent>
+          )}
         </Tabs>
       </div>
 

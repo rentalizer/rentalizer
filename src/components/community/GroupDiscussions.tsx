@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Users, MessageCircle, Heart, Pin, TrendingUp, Calendar, Edit, Trash2, Send, MoreHorizontal } from 'lucide-react';
+import { Users, MessageCircle, Heart, Pin, TrendingUp, Calendar, Edit, Trash2, Send, MoreHorizontal, BarChart3 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileSetup } from '@/components/ProfileSetup';
@@ -573,30 +573,33 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       <div className="hidden lg:block w-80 flex-shrink-0">
         <div className="sticky top-6 space-y-6">
           <Card className="bg-slate-800/50 border-cyan-500/20">
-            <CardContent className="space-y-3 pt-6">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-cyan-400" />
+                Community Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
                <div className="flex justify-between items-center">
-                 {isAdmin ? (
-                   <button 
-                     onClick={() => setShowMembersList(true)}
-                     className="text-gray-400 hover:text-cyan-300 transition-colors cursor-pointer"
-                   >
-                     Members
-                   </button>
-                 ) : (
-                   <span className="text-gray-400">Members</span>
-                 )}
+                 <span className="text-gray-400">Total Posts</span>
                  <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
-                   {communityStats.totalMembers}
+                   247
                  </Badge>
                </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-400">Online Now</span>
-                <Badge className="bg-green-600/20 text-green-300 border-green-500/30">
-                  {communityStats.onlineUsers}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
+               <div className="flex justify-between items-center">
+                 <span className="text-gray-400">This Week</span>
+                 <Badge className="bg-green-600/20 text-green-300 border-green-500/30">
+                   18
+                 </Badge>
+               </div>
+               <div className="flex justify-between items-center">
+                 <span className="text-gray-400">Active Users</span>
+                 <Badge className="bg-purple-600/20 text-purple-300 border-purple-500/30">
+                   {communityStats.onlineUsers}
+                 </Badge>
+               </div>
+             </CardContent>
+           </Card>
 
           <div className="max-h-[800px] overflow-y-auto">
             <NewsFeed isDayMode={isDayMode} />
