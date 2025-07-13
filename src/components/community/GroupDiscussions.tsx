@@ -639,29 +639,6 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
             </CardContent>
           </Card>
 
-          {/* Book A Demo Button */}
-          <Card className="bg-slate-800/50 border-cyan-500/20">
-            <CardContent className="pt-6">
-              <Button
-                onClick={() => {
-                  console.log('📅 Book Demo clicked - opening Calendly popup');
-                  if (window.Calendly) {
-                    // @ts-ignore
-                    window.Calendly.initPopupWidget({
-                      url: 'https://calendly.com/richies-schedule/scale'
-                    });
-                  }
-                }}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                <Calendar className="h-5 w-5 mr-2" />
-                Book A Demo
-              </Button>
-              <p className="text-sm text-gray-400 mt-2 text-center">
-                Schedule a 1-on-1 demo call
-              </p>
-            </CardContent>
-          </Card>
         </div>
       </div>
 
