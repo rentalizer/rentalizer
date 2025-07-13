@@ -1,6 +1,13 @@
 
 // Community Component - Fixed TopNavBar issue
 import React, { useState, useEffect } from 'react';
+
+// Extend Window interface for Calendly
+declare global {
+  interface Window {
+    Calendly: any;
+  }
+}
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -84,6 +91,18 @@ const Community = () => {
   const [profileEditorOpen, setProfileEditorOpen] = useState(false);
   const [userIsAdmin, setUserIsAdmin] = useState(false);
   const [adminCheckLoading, setAdminCheckLoading] = useState(true);
+
+  // Calendly demo booking function
+  const bookDemo = () => {
+    console.log('📅 Book Demo clicked - opening Calendly popup');
+    
+    if (window.Calendly) {
+      // @ts-ignore
+      window.Calendly.initPopupWidget({
+        url: 'https://calendly.com/richies-schedule/scale'
+      });
+    }
+  };
   const [showPricingOverlay, setShowPricingOverlay] = useState(false);
   const { toast } = useToast();
   const { isAdmin } = useAdminRole();
@@ -191,6 +210,19 @@ const Community = () => {
       serviceFees: Math.round(prev.rent * 0.029)
     }));
   }, [calculatorData.rent]);
+
+  // Load Calendly script when component mounts
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://assets.calendly.com/assets/external/widget.js';
+    script.async = true;
+    document.head.appendChild(script);
+
+    const link = document.createElement('link');
+    link.href = 'https://assets.calendly.com/assets/external/widget.css';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+  }, []);
 
   const updateCalculatorData = (updates: Partial<CalculatorData>) => {
     const roundedUpdates = Object.entries(updates).reduce((acc, [key, value]) => {
