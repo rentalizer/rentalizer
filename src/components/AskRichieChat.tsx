@@ -53,6 +53,16 @@ export const AskRichieChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Stop any currently playing audio - defined early to avoid hoisting issues
+  const stopCurrentAudio = () => {
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current = null;
+      setIsSpeaking(false);
+      setSpeakingMessageId(null);
+    }
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -109,15 +119,6 @@ export const AskRichieChat = () => {
     }
   };
 
-  // Stop any currently playing audio
-  const stopCurrentAudio = () => {
-    if (currentAudioRef.current) {
-      currentAudioRef.current.pause();
-      currentAudioRef.current = null;
-      setIsSpeaking(false);
-      setSpeakingMessageId(null);
-    }
-  };
 
   // Start voice recording
   const startRecording = async () => {
