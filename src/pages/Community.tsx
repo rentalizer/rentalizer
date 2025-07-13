@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper, User, Building, TrendingUp } from 'lucide-react';
+import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper, User, Building, TrendingUp, Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
@@ -299,6 +299,10 @@ const Community = () => {
               <TrendingUp size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Market Finder
             </TabsTrigger>
+            <TabsTrigger value="propertymanagement" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+              <Settings size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
+              Property Management
+            </TabsTrigger>
             {!adminCheckLoading && userIsAdmin && (
               <button
                 onClick={() => setMembersDialogOpen(true)}
@@ -389,6 +393,28 @@ const Community = () => {
 
           <TabsContent value="marketfinder" className="mt-8">
             <MarketFinderDemo />
+          </TabsContent>
+
+          <TabsContent value="propertymanagement" className="mt-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-cyan-500/30 rounded-xl p-8 backdrop-blur-sm">
+                <div className="text-center mb-8">
+                  <Settings className="h-20 w-20 text-cyan-400 mx-auto mb-6" />
+                  <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+                    Property Management
+                  </h2>
+                  <p className="text-xl text-gray-300 mb-6 leading-relaxed">
+                    Comprehensive tools and resources for managing your rental properties efficiently.
+                  </p>
+                </div>
+                
+                <div className="text-center">
+                  <p className="text-gray-400">
+                    Property Management features coming soon...
+                  </p>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="askrichie" className="mt-8">
