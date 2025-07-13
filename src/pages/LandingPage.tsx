@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar, Star, X, Video, FileText, Bot, LogOut } from 'lucide-react';
+import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar as CalendarIcon, Star, X, Video, FileText, Bot, LogOut } from 'lucide-react';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { MarketIntelligenceDemo } from '@/components/MarketIntelligenceDemo';
@@ -219,7 +219,7 @@ const LandingPage = () => {
                 onClick={handleBookDemo}
                 className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white px-12 py-6 text-xl font-semibold min-w-[200px]"
               >
-                <Calendar className="h-6 w-6 mr-3" />
+                <CalendarIcon className="h-6 w-6 mr-3" />
                 Book Demo
               </Button>
             </div>
