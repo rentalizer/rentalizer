@@ -123,29 +123,24 @@ export default function SimplifiedChat() {
       userId: user.id 
     });
 
+    // Determine available admin users - use current user if they're admin
+    const currentAdminUsers = isAdmin && user ? [user.id] : adminUsers;
+    
+    console.log('🎯 Using admin users:', currentAdminUsers);
+
     // Check if admins are available
-    if (adminUsers.length === 0) {
-      console.log('❌ No admin users found, trying to set current user as admin if they are admin');
-      
-      // If current user is admin but no adminUsers in state, use current user
-      if (isAdmin && user) {
-        console.log('🔧 Setting current user as admin in adminUsers array');
-        setAdminUsers([user.id]);
-        // Don't return, let the function continue to send the message
-      } else {
-        console.log('💥 Showing error toast - isAdmin:', isAdmin, 'user:', !!user);
-        toast({
-          title: "No administrators available",
-          description: "Please try again later.",
-          variant: "destructive"
-        });
-        return;
-      }
+    if (currentAdminUsers.length === 0) {
+      console.log('💥 Showing error toast - no admins available');
+      toast({
+        title: "No administrators available",
+        description: "Please try again later.",
+        variant: "destructive"
+      });
+      return;
     }
 
     // Determine recipient based on role
     let recipientId: string;
-    const currentAdminUsers = adminUsers.length > 0 ? adminUsers : (isAdmin && user ? [user.id] : []);
     
     if (isAdmin) {
       // Admin needs to reply to the latest user who sent a message
