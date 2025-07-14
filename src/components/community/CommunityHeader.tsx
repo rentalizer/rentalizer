@@ -1,11 +1,11 @@
-
 import React, { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Paperclip, Image, Video, Smile, AtSign, X, Check, AlertCircle } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Paperclip, Image, Video, Smile, AtSign, X, Check, AlertCircle, Play, Pause } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -23,10 +23,21 @@ interface AttachedFile {
   error?: string;
 }
 
+interface VideoUpload {
+  file: File;
+  url?: string;
+  uploaded: boolean;
+  uploading: boolean;
+  uploadProgress: number;
+  error?: string;
+}
+
 export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated, isDayMode = false }) => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   
   const [newPost, setNewPost] = useState('');
   const [postTitle, setPostTitle] = useState('');
@@ -34,6 +45,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
+  const [videoUpload, setVideoUpload] = useState<VideoUpload | null>(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
   const getUserAvatar = () => profile?.avatar_url || null;
   const getUserName = () => profile?.display_name || user?.email?.split('@')[0] || 'Anonymous User';
@@ -51,8 +64,16 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
     return file.type.startsWith('image/');
   };
 
+  const isVideoFile = (file: File) => {
+    return file.type.startsWith('video/');
+  };
+
   const handleFileAttach = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleVideoUpload = () => {
+    videoInputRef.current?.click();
   };
 
   const uploadSingleFile = async (file: File, index: number): Promise<string | null> => {
@@ -123,6 +144,76 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
     }
   };
 
+  const uploadVideoFile = async (file: File): Promise<string | null> => {
+    try {
+      // Check if user is authenticated
+      if (!user) {
+        console.error('User not authenticated');
+        setVideoUpload(prev => prev ? { ...prev, uploading: false, error: 'User not authenticated' } : null);
+        return null;
+      }
+
+      // Update video upload status to uploading
+      setVideoUpload(prev => prev ? { ...prev, uploading: true, uploadProgress: 0, error: undefined } : null);
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `community-videos/${fileName}`;
+
+      console.log('Uploading video to:', filePath);
+      console.log('User ID:', user.id);
+      console.log('File size:', file.size);
+
+      // Upload with progress tracking
+      const { data, error } = await supabase.storage
+        .from('community-videos')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (error) {
+        console.error('Video upload error:', error);
+        setVideoUpload(prev => prev ? { ...prev, uploading: false, error: 'Upload failed: ' + error.message } : null);
+        return null;
+      }
+
+      console.log('Video upload successful:', data);
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('community-videos')
+        .getPublicUrl(filePath);
+
+      console.log('Video public URL:', publicUrl);
+
+      // Update video upload status to uploaded with URL
+      setVideoUpload(prev => prev ? { 
+        ...prev, 
+        uploading: false, 
+        uploaded: true, 
+        url: publicUrl, 
+        uploadProgress: 100 
+      } : null);
+
+      // Show success message
+      toast({
+        title: "Video uploaded!",
+        description: `${file.name} has been uploaded successfully`
+      });
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Exception uploading video:', error);
+      setVideoUpload(prev => prev ? { 
+        ...prev, 
+        uploading: false, 
+        error: 'Upload failed: ' + (error as Error).message 
+      } : null);
+      return null;
+    }
+  };
+
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     const validFiles = files.filter(file => {
@@ -171,8 +262,79 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
     }
   };
 
+  const handleVideoSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    const videoFile = files[0];
+
+    if (!videoFile) return;
+
+    // Check file type
+    const validVideoTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/webm', 'video/quicktime'];
+    if (!validVideoTypes.includes(videoFile.type)) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select a valid video file (.mp4, .mov, .avi, .webm)",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check file size (1GB limit)
+    const maxSize = 1024 * 1024 * 1024; // 1GB in bytes
+    if (videoFile.size > maxSize) {
+      toast({
+        title: "File too large",
+        description: "Video file must be smaller than 1GB",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check if user is authenticated
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to upload videos",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Set initial video upload state
+    setVideoUpload({
+      file: videoFile,
+      uploaded: false,
+      uploading: false,
+      uploadProgress: 0
+    });
+
+    // Start upload
+    await uploadVideoFile(videoFile);
+
+    // Reset the input
+    if (event.target) {
+      event.target.value = '';
+    }
+  };
+
   const removeAttachedFile = (index: number) => {
     setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeVideoUpload = () => {
+    setVideoUpload(null);
+    setIsVideoPlaying(false);
+  };
+
+  const toggleVideoPlayback = () => {
+    if (videoRef.current) {
+      if (isVideoPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsVideoPlaying(!isVideoPlaying);
+    }
   };
 
   const handleSubmitPost = async () => {
@@ -184,8 +346,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       const postTitleToUse = postTitle.trim() || 
         (newPost.length > 50 ? newPost.substring(0, 50) + '...' : newPost);
       
-      // Add file attachments to post content if any were uploaded
-      let contentWithFiles = newPost;
+      // Add file attachments and video to post content if any were uploaded
+      let contentWithMedia = newPost;
       const uploadedFiles = attachedFiles.filter(item => item.uploaded && item.url);
       
       if (uploadedFiles.length > 0) {
@@ -193,14 +355,20 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
           const fileName = item.file.name;
           return `📎 [${fileName}](${item.url})`;
         }).join('\n');
-        contentWithFiles = `${newPost}\n\n${fileLinks}`;
+        contentWithMedia = `${newPost}\n\n${fileLinks}`;
+      }
+      
+      // Add video if uploaded
+      if (videoUpload?.uploaded && videoUpload.url) {
+        const videoLink = `🎥 [${videoUpload.file.name}](${videoUpload.url})`;
+        contentWithMedia = `${contentWithMedia}\n\n${videoLink}`;
       }
       
       const { data, error } = await supabase
         .from('discussions')
         .insert({
           title: postTitleToUse,
-          content: contentWithFiles,
+          content: contentWithMedia,
           author_name: getUserName(),
           category: 'General',
           user_id: user?.id
@@ -210,17 +378,20 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
       if (error) throw error;
 
+      const attachmentCount = uploadedFiles.length + (videoUpload?.uploaded ? 1 : 0);
       toast({
         title: "Post created!",
-        description: uploadedFiles.length > 0 
-          ? `Your post has been shared with ${uploadedFiles.length} attachment(s)`
+        description: attachmentCount > 0 
+          ? `Your post has been shared with ${attachmentCount} attachment(s)`
           : "Your post has been shared with the community"
       });
 
       setNewPost('');
       setPostTitle('');
       setAttachedFiles([]);
+      setVideoUpload(null);
       setUploadSuccess(null);
+      setIsVideoPlaying(false);
       onPostCreated();
       
     } catch (error) {
@@ -278,6 +449,102 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                   className={`min-h-[120px] border-cyan-500/20 resize-none ${isDayMode ? 'bg-slate-100 text-slate-700 placeholder-slate-500' : 'bg-slate-700/50 text-white placeholder-gray-400'}`}
                 />
                 
+                {/* Video upload display */}
+                {videoUpload && (
+                  <div className="bg-slate-700/30 border border-cyan-500/20 rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Video className="h-4 w-4 text-cyan-400" />
+                        <span className="text-sm font-medium text-cyan-300">Video Upload</span>
+                        {videoUpload.uploaded && (
+                          <span className="text-xs text-green-400">✓ Uploaded</span>
+                        )}
+                        {videoUpload.uploading && (
+                          <span className="text-xs text-yellow-400">Uploading...</span>
+                        )}
+                        {videoUpload.error && (
+                          <span className="text-xs text-red-400">Failed</span>
+                        )}
+                      </div>
+                      <button
+                        onClick={removeVideoUpload}
+                        className="text-red-400 hover:text-red-300 p-1 hover:bg-red-500/10 rounded transition-colors"
+                        title="Remove video"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between bg-slate-600/50 rounded-lg px-3 py-2 border border-slate-500/30">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          {videoUpload.uploading ? (
+                            <div className="h-4 w-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                          ) : videoUpload.uploaded ? (
+                            <Check className="h-4 w-4 text-green-400 flex-shrink-0" />
+                          ) : videoUpload.error ? (
+                            <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0" />
+                          ) : (
+                            <Video className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm text-gray-200 truncate" title={videoUpload.file.name}>
+                              {videoUpload.file.name}
+                            </div>
+                            <div className="text-xs text-gray-400">
+                              {(videoUpload.file.size / 1024 / 1024).toFixed(2)} MB
+                              {videoUpload.error && (
+                                <span className="text-red-400 ml-2">• {videoUpload.error}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Upload progress bar */}
+                      {videoUpload.uploading && (
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs text-gray-400">
+                            <span>Uploading...</span>
+                            <span>{Math.round(videoUpload.uploadProgress)}%</span>
+                          </div>
+                          <Progress value={videoUpload.uploadProgress} className="h-2" />
+                        </div>
+                      )}
+
+                      {/* Video preview */}
+                      {videoUpload.uploaded && videoUpload.url && (
+                        <div className="relative">
+                          <video
+                            ref={videoRef}
+                            src={videoUpload.url}
+                            className="w-full h-48 object-cover rounded-lg border border-slate-500/30"
+                            onPlay={() => setIsVideoPlaying(true)}
+                            onPause={() => setIsVideoPlaying(false)}
+                            controls={false}
+                            preload="metadata"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <button
+                              onClick={toggleVideoPlayback}
+                              className="bg-black/60 hover:bg-black/80 text-white p-3 rounded-full transition-colors"
+                            >
+                              {isVideoPlaying ? (
+                                <Pause className="h-6 w-6" />
+                              ) : (
+                                <Play className="h-6 w-6 ml-1" />
+                              )}
+                            </button>
+                          </div>
+                          <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                            Video Preview
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Enhanced file attachments display with upload status and image previews */}
                 {attachedFiles.length > 0 && (
                   <div className="bg-slate-700/30 border border-cyan-500/20 rounded-lg p-3 space-y-3">
@@ -378,20 +645,30 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                     <Image className="h-4 w-4" />
                   </Button>
                   
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-400 hover:text-cyan-300"
-                    onClick={() => {
-                      // TODO: Add video upload functionality
-                      toast({
-                        title: "Coming Soon", 
-                        description: "Video upload functionality will be available soon"
-                      });
-                    }}
-                  >
-                    <Video className="h-4 w-4" />
-                  </Button>
+                  <div className="relative">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={`${videoUpload ? 'text-cyan-400 bg-cyan-500/10' : 'text-gray-400'} hover:text-cyan-300 relative`}
+                      onClick={handleVideoUpload}
+                      title={videoUpload ? 'Video attached' : 'Upload video'}
+                    >
+                      <Video className="h-4 w-4" />
+                      {videoUpload && (
+                        <span className="ml-1 text-xs bg-cyan-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                          1
+                        </span>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <input
+                    ref={videoInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={handleVideoSelect}
+                    accept="video/mp4,video/mov,video/avi,video/webm,video/quicktime"
+                  />
                   
                   <div className="relative">
                     <Button
