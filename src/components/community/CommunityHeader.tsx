@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -198,7 +197,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
       console.log('Video public URL:', publicUrl);
 
-      // Update video upload status to uploaded with URL and full progress
+      // Update video upload status to uploaded with URL and full progress - NO TOAST
       setVideoUpload(prev => prev ? { 
         ...prev, 
         uploading: false, 
@@ -207,12 +206,6 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
         uploadProgress: 100,
         error: undefined
       } : null);
-
-      // Show success message
-      toast({
-        title: "Video uploaded!",
-        description: `${file.name} has been uploaded successfully and is ready to include in your post`
-      });
 
       return publicUrl;
     } catch (error) {
@@ -546,7 +539,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                   </div>
                 )}
 
-                {/* Video upload display - This now persists properly after upload */}
+                {/* Video upload display - This stays visible after upload */}
                 {videoUpload && (
                   <div className="bg-slate-700/30 border border-cyan-500/20 rounded-lg p-3 space-y-3">
                     <div className="flex items-center gap-2">
