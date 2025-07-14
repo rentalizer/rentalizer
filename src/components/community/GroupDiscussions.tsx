@@ -35,9 +35,10 @@ interface Comment {
 
 interface GroupDiscussionsProps {
   refreshTrigger?: number;
+  isDayMode: boolean;
 }
 
-export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigger = 0 }) => {
+export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigger = 0, isDayMode }) => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
   
@@ -211,11 +212,11 @@ export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigg
 
   if (loading) {
     return (
-      <Card className="bg-slate-800/50 border-cyan-500/20">
+      <Card className={`${isDayMode ? 'bg-white border-slate-200' : 'bg-slate-800/50 border-cyan-500/20'}`}>
         <CardContent className="p-6">
           <div className="animate-pulse space-y-4">
             {[1, 2, 3].map(i => (
-              <div key={i} className="h-24 bg-slate-700/50 rounded-lg"></div>
+              <div key={i} className={`h-24 rounded-lg ${isDayMode ? 'bg-slate-200' : 'bg-slate-700/50'}`}></div>
             ))}
           </div>
         </CardContent>
@@ -226,16 +227,16 @@ export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigg
   return (
     <div className="space-y-6">
       {/* Search and Filter */}
-      <Card className="bg-slate-800/50 border-cyan-500/20">
+      <Card className={`${isDayMode ? 'bg-white border-slate-200' : 'bg-slate-800/50 border-cyan-500/20'}`}>
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${isDayMode ? 'text-slate-400' : 'text-gray-400'}`} />
               <Input
                 placeholder="Search discussions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-slate-700/50 border-slate-600"
+                className={`pl-10 ${isDayMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-700/50 border-slate-600'}`}
               />
             </div>
             <div className="flex gap-2 flex-wrap">
@@ -246,8 +247,8 @@ export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigg
                   size="sm"
                   onClick={() => setSelectedCategory(category)}
                   className={selectedCategory === category ? 
-                    "bg-cyan-600 hover:bg-cyan-700" : 
-                    "border-slate-600 hover:bg-slate-700"
+                    (isDayMode ? "bg-cyan-600 hover:bg-cyan-700 text-white" : "bg-cyan-600 hover:bg-cyan-700") : 
+                    (isDayMode ? "border-slate-300 hover:bg-slate-100 text-slate-700" : "border-slate-600 hover:bg-slate-700")
                   }
                 >
                   {category}
@@ -261,9 +262,9 @@ export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigg
       {/* Discussions */}
       <div className="space-y-4">
         {filteredDiscussions.length === 0 ? (
-          <Card className="bg-slate-800/50 border-cyan-500/20">
+          <Card className={`${isDayMode ? 'bg-white border-slate-200' : 'bg-slate-800/50 border-cyan-500/20'}`}>
             <CardContent className="p-8 text-center">
-              <div className="text-gray-400">
+              <div className={isDayMode ? 'text-slate-600' : 'text-gray-400'}>
                 {searchTerm || selectedCategory !== 'All' ? 
                   'No discussions match your filters' : 
                   'No discussions yet. Be the first to start a conversation!'
@@ -273,7 +274,7 @@ export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigg
           </Card>
         ) : (
           filteredDiscussions.map(discussion => (
-            <Card key={discussion.id} className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-colors">
+            <Card key={discussion.id} className={`${isDayMode ? 'bg-white border-slate-200 hover:border-cyan-400/40' : 'bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40'} transition-colors`}>
               <CardContent className="p-6">
                 <div className="space-y-4">
                   {/* Header */}
@@ -289,14 +290,14 @@ export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigg
                         )}
                       </Avatar>
                       <div>
-                        <div className="font-medium text-white">{discussion.author_name}</div>
-                        <div className="text-sm text-gray-400">
+                        <div className={`font-medium ${isDayMode ? 'text-slate-900' : 'text-white'}`}>{discussion.author_name}</div>
+                        <div className={`text-sm ${isDayMode ? 'text-slate-500' : 'text-gray-400'}`}>
                           {new Date(discussion.created_at).toLocaleDateString()}
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
+                      <Badge variant="outline" className={`${isDayMode ? 'border-cyan-600/30 text-cyan-700' : 'border-cyan-500/30 text-cyan-300'}`}>
                         {discussion.category}
                       </Badge>
                       {user?.id === discussion.user_id && (
@@ -304,7 +305,7 @@ export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigg
                           variant="ghost"
                           size="sm"
                           onClick={() => deleteDiscussion(discussion.id)}
-                          className="text-gray-400 hover:text-red-400 p-2"
+                          className={`p-2 ${isDayMode ? 'text-slate-400 hover:text-red-600' : 'text-gray-400 hover:text-red-400'}`}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -314,8 +315,8 @@ export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigg
 
                   {/* Content */}
                   <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">{discussion.title}</h3>
-                    <p className="text-gray-300 leading-relaxed">{discussion.content}</p>
+                    <h3 className={`text-lg font-semibold mb-2 ${isDayMode ? 'text-slate-900' : 'text-white'}`}>{discussion.title}</h3>
+                    <p className={`leading-relaxed ${isDayMode ? 'text-slate-700' : 'text-gray-300'}`}>{discussion.content}</p>
                   </div>
 
                   {/* Attachments */}
@@ -324,12 +325,12 @@ export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigg
                   )}
 
                   {/* Actions */}
-                  <div className="flex items-center gap-4 pt-2 border-t border-slate-700">
+                  <div className={`flex items-center gap-4 pt-2 border-t ${isDayMode ? 'border-slate-200' : 'border-slate-700'}`}>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleLike(discussion.id)}
-                      className="text-gray-400 hover:text-red-400 flex items-center gap-2"
+                      className={`flex items-center gap-2 ${isDayMode ? 'text-slate-600 hover:text-red-600' : 'text-gray-400 hover:text-red-400'}`}
                     >
                       <Heart className="h-4 w-4" />
                       <span>{discussion.likes_count || 0}</span>
@@ -338,7 +339,7 @@ export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigg
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleDiscussion(discussion.id)}
-                      className="text-gray-400 hover:text-cyan-300 flex items-center gap-2"
+                      className={`flex items-center gap-2 ${isDayMode ? 'text-slate-600 hover:text-cyan-700' : 'text-gray-400 hover:text-cyan-300'}`}
                     >
                       <MessageCircle className="h-4 w-4" />
                       <span>{discussion.comments_count || 0}</span>
@@ -347,23 +348,23 @@ export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigg
 
                   {/* Comments Section */}
                   {expandedDiscussion === discussion.id && (
-                    <div className="space-y-4 pt-4 border-t border-slate-700">
+                    <div className={`space-y-4 pt-4 border-t ${isDayMode ? 'border-slate-200' : 'border-slate-700'}`}>
                       {/* Existing Comments */}
                       {comments[discussion.id]?.map(comment => (
                         <div key={comment.id} className="flex gap-3">
                           <Avatar className="w-8 h-8">
-                            <AvatarFallback className="bg-slate-600 text-xs">
+                            <AvatarFallback className={`text-xs ${isDayMode ? 'bg-slate-200 text-slate-700' : 'bg-slate-600'}`}>
                               {comment.author_name.charAt(0).toUpperCase()}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="text-sm font-medium text-white">{comment.author_name}</span>
-                              <span className="text-xs text-gray-500">
+                              <span className={`text-sm font-medium ${isDayMode ? 'text-slate-900' : 'text-white'}`}>{comment.author_name}</span>
+                              <span className={`text-xs ${isDayMode ? 'text-slate-500' : 'text-gray-500'}`}>
                                 {new Date(comment.created_at).toLocaleDateString()}
                               </span>
                             </div>
-                            <p className="text-sm text-gray-300">{comment.content}</p>
+                            <p className={`text-sm ${isDayMode ? 'text-slate-700' : 'text-gray-300'}`}>{comment.content}</p>
                           </div>
                         </div>
                       ))}
@@ -381,13 +382,13 @@ export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigg
                               placeholder="Write a comment..."
                               value={newComment}
                               onChange={(e) => setNewComment(e.target.value)}
-                              className="min-h-[80px] bg-slate-700/50 border-slate-600 resize-none"
+                              className={`min-h-[80px] resize-none ${isDayMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-700/50 border-slate-600'}`}
                             />
                             <Button
                               onClick={() => handleComment(discussion.id)}
                               disabled={!newComment.trim() || submittingComment}
                               size="sm"
-                              className="bg-cyan-600 hover:bg-cyan-700"
+                              className="bg-cyan-600 hover:bg-cyan-700 text-white"
                             >
                               {submittingComment ? 'Posting...' : 'Comment'}
                             </Button>
