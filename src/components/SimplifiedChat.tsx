@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { MessageCircle, Send, Crown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAdminRole } from '@/hooks/useAdminRole';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
 const ADMIN_EMAIL = 'richie@dialogo.us';
 const ADMIN_USER_ID = '4c1c3756-0815-4d9f-929e-9c12f1b6d9db';
@@ -24,10 +26,10 @@ export default function SimplifiedChat() {
   const { user } = useAuth();
   const { isAdmin } = useAdminRole();
   const { toast } = useToast();
+  const { unreadCount, refreshUnreadCount } = useUnreadMessages();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -62,16 +64,6 @@ export default function SimplifiedChat() {
 
         if (data) {
           setMessages(data);
-          
-          // Count unread messages for admin
-          if (isAdmin) {
-            const unread = data.filter(msg => 
-              msg.recipient_id === ADMIN_USER_ID && 
-              msg.sender_id !== ADMIN_USER_ID && 
-              !msg.read_at
-            ).length;
-            setUnreadCount(unread);
-          }
         }
       } catch (error) {
         console.error('Error in loadMessages:', error);
@@ -130,7 +122,7 @@ export default function SimplifiedChat() {
           description: isAdmin ? "Message sent" : "Your message has been sent to staff"
         });
         
-        // Reload messages
+        // Reload messages after sending
         setTimeout(() => {
           const loadMessages = async () => {
             let query = supabase
@@ -175,18 +167,24 @@ export default function SimplifiedChat() {
         );
 
         if (unreadMessages.length > 0) {
-          await supabase
+          const { error } = await supabase
             .from('direct_messages')
             .update({ read_at: new Date().toISOString() })
             .in('id', unreadMessages.map(msg => msg.id));
           
-          setUnreadCount(0);
+          if (!error) {
+            console.log('Marked messages as read, refreshing count');
+            // Force refresh the unread count after marking as read
+            setTimeout(() => {
+              refreshUnreadCount();
+            }, 500);
+          }
         }
       };
       
       markAsRead();
     }
-  }, [isAdmin, messages, user?.id]);
+  }, [isAdmin, messages, user?.id, refreshUnreadCount]);
 
   useEffect(() => {
     scrollToBottom();
