@@ -1,408 +1,657 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+
+// Extend Window interface for Calendly
+declare global {
+  interface Window {
+    Calendly: any;
+  }
+}
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Heart, MessageCircle, Search, Filter, Plus, Trash2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Users, MessageCircle, Heart, Pin, TrendingUp, Calendar, Edit, Trash2, Send, MoreHorizontal, BarChart3 } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
+import { ProfileSetup } from '@/components/ProfileSetup';
+import { useAdminRole } from '@/hooks/useAdminRole';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { AttachmentViewer } from './AttachmentViewer';
+import { NewsFeed } from '@/components/community/NewsFeed';
+import { MembersList } from '@/components/MembersList';
+import { CommunityHeader } from '@/components/community/CommunityHeader';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 
 interface Discussion {
   id: string;
   title: string;
   content: string;
-  author_name: string;
-  author_avatar?: string;
+  author: string;
+  avatar: string;
   category: string;
-  likes_count: number;
-  comments_count: number;
+  likes: number;
+  comments: number;
+  timeAgo: string;
   created_at: string;
+  isPinned?: boolean;
+  isLiked?: boolean;
+  user_id?: string;
+  isMockData?: boolean;
+}
+
+interface UserProfile {
   user_id: string;
-  attachments?: string[];
+  avatar_url: string | null;
+  display_name: string | null;
+  first_name: string | null;
+  last_name: string | null;
 }
 
-interface Comment {
-  id: string;
-  content: string;
-  author_name: string;
-  created_at: string;
-  user_id: string;
-}
-
-interface GroupDiscussionsProps {
-  refreshTrigger?: number;
-  isDayMode: boolean;
-}
-
-export const GroupDiscussions: React.FC<GroupDiscussionsProps> = ({ refreshTrigger = 0, isDayMode }) => {
+export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean }) => {
   const { user, profile } = useAuth();
+  const { isAdmin } = useAdminRole();
   const { toast } = useToast();
   
-  const [discussions, setDiscussions] = useState<Discussion[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [loading, setLoading] = useState(true);
-  const [expandedDiscussion, setExpandedDiscussion] = useState<string | null>(null);
-  const [comments, setComments] = useState<{ [key: string]: Comment[] }>({});
+  const [discussionsList, setDiscussionsList] = useState<Discussion[]>([]);
+  const [selectedDiscussion, setSelectedDiscussion] = useState<Discussion | null>(null);
   const [newComment, setNewComment] = useState('');
-  const [submittingComment, setSubmittingComment] = useState(false);
+  const [comments, setComments] = useState<{[key: string]: {id: string; author: string; avatar: string; content: string; timeAgo: string;}[]}>({});
+  const [editingPost, setEditingPost] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
+  const [showProfileSetup, setShowProfileSetup] = useState(false);
+  const [expandedPost, setExpandedPost] = useState<string | null>(null);
+  const [userProfiles, setUserProfiles] = useState<{[key: string]: UserProfile}>({});
+  const [communityStats, setCommunityStats] = useState({
+    totalMembers: 181,
+    onlineUsers: 35,
+    adminCount: 2
+  });
+  const [showMembersList, setShowMembersList] = useState(false);
 
-  const categories = ['All', 'General', 'Market Analysis', 'Deals', 'Q&A', 'Resources'];
+  // Check if user needs to set up profile
+  useEffect(() => {
+    if (user && profile && (!profile.display_name || profile.display_name.trim() === '')) {
+      setShowProfileSetup(true);
+    }
+  }, [user, profile]);
 
-  const fetchDiscussions = async () => {
+  // Memoized helper functions to prevent re-renders
+  const getInitials = useCallback((name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }, []);
+
+  const getUserAvatar = useCallback(() => {
+    return profile?.avatar_url || null;
+  }, [profile?.avatar_url]);
+
+  const getUserName = useCallback(() => {
+    const name = profile?.display_name || user?.email?.split('@')[0] || 'Anonymous User';
+    return isAdmin ? `${name} (Admin)` : name;
+  }, [profile?.display_name, user?.email, isAdmin]);
+
+  const getUserInitials = useCallback(() => {
+    const name = profile?.display_name || user?.email?.split('@')[0] || 'Anonymous User';
+    return getInitials(name);
+  }, [profile?.display_name, user?.email, getInitials]);
+
+  // Fetch user profiles
+  const fetchUserProfiles = useCallback(async () => {
     try {
-      setLoading(true);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('user_id, avatar_url, display_name, first_name, last_name');
+
+      if (error) {
+        console.error('Error fetching profiles:', error);
+        return;
+      }
+
+      const profilesMap: {[key: string]: UserProfile} = {};
+      data?.forEach(profile => {
+        profilesMap[profile.user_id] = profile;
+      });
+      
+      setUserProfiles(profilesMap);
+    } catch (error) {
+      console.error('Exception fetching user profiles:', error);
+    }
+  }, []);
+
+  // Fetch discussions from database
+  const fetchDiscussions = useCallback(async () => {
+    console.log('🔄 Fetching discussions from database...');
+    
+    try {
       const { data, error } = await supabase
         .from('discussions')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setDiscussions(data || []);
-    } catch (error) {
-      console.error('Error fetching discussions:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load discussions",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (error) {
+        console.error('❌ Error fetching discussions:', error);
+        return;
+      }
+      
+      console.log('📥 Raw data from database:', data?.length || 0, 'discussions');
+      
+      // Convert database format to component format
+      const formattedDiscussions = (data || []).map(discussion => ({
+        id: discussion.id,
+        title: discussion.title,
+        content: discussion.content,
+        author: discussion.author_name,
+        avatar: getInitials(discussion.author_name),
+        category: discussion.category,
+        likes: discussion.likes_count || 0,
+        comments: discussion.comments_count || 0,
+        timeAgo: formatTimeAgo(discussion.created_at),
+        created_at: discussion.created_at,
+        user_id: discussion.user_id,
+        isPinned: false,
+        isLiked: false,
+        isMockData: false
+      }));
 
-  const fetchComments = async (discussionId: string) => {
+      console.log('✅ Formatted discussions:', formattedDiscussions.length);
+      setDiscussionsList(formattedDiscussions);
+    } catch (error) {
+      console.error('❌ Exception fetching discussions:', error);
+    }
+  }, [getInitials]);
+
+  const formatTimeAgo = useCallback((dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+    return `${Math.floor(diffInMinutes / 1440)}d ago`;
+  }, []);
+
+  // Initialize data - ONLY fetch once on mount
+  useEffect(() => {
+    fetchUserProfiles();
+    fetchDiscussions();
+  }, []); // Empty dependency array - only run once on mount
+
+  // Fixed profile info function - this was the source of the bug
+  const getProfileInfo = useCallback((userId: string | undefined, authorName: string) => {
+    console.log('🔍 Getting profile info for:', { userId, authorName, currentUserId: user?.id });
+    
+    // For posts without a user_id, use the author name and generate initials
+    if (!userId) {
+      return {
+        avatar_url: null,
+        display_name: authorName,
+        initials: getInitials(authorName)
+      };
+    }
+
+    // For the current user's posts, use their current profile from the auth context
+    if (user && user.id === userId) {
+      const currentDisplayName = profile?.display_name || user.email?.split('@')[0] || authorName;
+      const finalDisplayName = isAdmin ? `${currentDisplayName} (Admin)` : currentDisplayName;
+      
+      console.log('✅ Using current user profile:', { 
+        displayName: finalDisplayName, 
+        avatarUrl: profile?.avatar_url 
+      });
+      
+      return {
+        avatar_url: profile?.avatar_url,
+        display_name: finalDisplayName,
+        initials: getInitials(currentDisplayName)
+      };
+    }
+
+    // For other users, get their profile from the profiles map
+    const userProfile = userProfiles[userId];
+    if (userProfile) {
+      const displayName = userProfile.display_name || userProfile.first_name || authorName;
+      return {
+        avatar_url: userProfile.avatar_url,
+        display_name: displayName,
+        initials: getInitials(displayName)
+      };
+    }
+    
+    // Fallback to author name and initials
+    return {
+      avatar_url: null,
+      display_name: authorName,
+      initials: getInitials(authorName)
+    };
+  }, [user, profile, isAdmin, userProfiles, getInitials]);
+
+  // Memoized filtered discussions
+  const filteredDiscussions = useMemo(() => {
+    console.log('🔍 Filtering discussions. Total discussions:', discussionsList.length);
+    
+    return discussionsList
+      .sort((a, b) => {
+        if (a.isPinned && !b.isPinned) return -1;
+        if (!a.isPinned && b.isPinned) return 1;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
+  }, [discussionsList]);
+
+  const handleLike = useCallback((discussionId: string) => {
+    setDiscussionsList(prev => prev.map(discussion => 
+      discussion.id === discussionId
+        ? { 
+            ...discussion, 
+            isLiked: !discussion.isLiked,
+            likes: discussion.isLiked ? discussion.likes - 1 : discussion.likes + 1
+          }
+        : discussion
+    ));
+  }, []);
+
+  const handleAddComment = useCallback(async () => {
+    if (!newComment.trim() || !selectedDiscussion) return;
+
+    const comment = {
+      id: String(Date.now()),
+      author: getUserName(),
+      avatar: getUserInitials(),
+      content: newComment,
+      timeAgo: 'now'
+    };
+    
+    setComments(prev => ({
+      ...prev,
+      [selectedDiscussion.id]: [...(prev[selectedDiscussion.id] || []), comment]
+    }));
+    
+    setDiscussionsList(prev => prev.map(d => 
+      d.id === selectedDiscussion.id 
+        ? { ...d, comments: d.comments + 1 }
+        : d
+    ));
+    
+    setNewComment('');
+  }, [newComment, selectedDiscussion, getUserName, getUserInitials]);
+
+  const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
+    console.log('🗑️ ADMIN DELETING DISCUSSION:', discussionId);
+    console.log('🗑️ Current discussions count BEFORE deletion:', discussionsList.length);
+    console.log('🗑️ Current user ID:', user?.id);
+    console.log('🗑️ Admin status:', isAdmin);
+    
     try {
+      // First delete from database to ensure admin permissions work
+      console.log('🗑️ Attempting database deletion...');
       const { data, error } = await supabase
-        .from('discussion_comments')
-        .select('*')
-        .eq('discussion_id', discussionId)
-        .order('created_at', { ascending: true });
-
-      if (error) throw error;
-      setComments(prev => ({ ...prev, [discussionId]: data || [] }));
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-    }
-  };
-
-  const handleLike = async (discussionId: string) => {
-    if (!user) return;
-
-    try {
-      // Check if already liked
-      const { data: existingLike } = await supabase
-        .from('discussion_likes')
-        .select('id')
-        .eq('discussion_id', discussionId)
-        .eq('user_id', user.id)
-        .single();
-
-      if (existingLike) {
-        // Unlike
-        await supabase
-          .from('discussion_likes')
-          .delete()
-          .eq('discussion_id', discussionId)
-          .eq('user_id', user.id);
-      } else {
-        // Like
-        await supabase
-          .from('discussion_likes')
-          .insert({
-            discussion_id: discussionId,
-            user_id: user.id
-          });
-      }
-
-      // Refresh discussions to update like count
-      fetchDiscussions();
-    } catch (error) {
-      console.error('Error handling like:', error);
-    }
-  };
-
-  const handleComment = async (discussionId: string) => {
-    if (!user || !newComment.trim() || submittingComment) return;
-
-    try {
-      setSubmittingComment(true);
-      const { error } = await supabase
-        .from('discussion_comments')
-        .insert({
-          discussion_id: discussionId,
-          content: newComment,
-          author_name: profile?.display_name || user.email?.split('@')[0] || 'Anonymous',
-          user_id: user.id
-        });
-
-      if (error) throw error;
-
-      setNewComment('');
-      fetchComments(discussionId);
-      toast({
-        title: "Comment added!",
-        description: "Your comment has been posted"
-      });
-    } catch (error) {
-      console.error('Error adding comment:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add comment",
-        variant: "destructive"
-      });
-    } finally {
-      setSubmittingComment(false);
-    }
-  };
-
-  const toggleDiscussion = (discussionId: string) => {
-    if (expandedDiscussion === discussionId) {
-      setExpandedDiscussion(null);
-    } else {
-      setExpandedDiscussion(discussionId);
-      if (!comments[discussionId]) {
-        fetchComments(discussionId);
-      }
-    }
-  };
-
-  const deleteDiscussion = async (discussionId: string) => {
-    if (!user) return;
-
-    try {
-      const { error } = await supabase
         .from('discussions')
         .delete()
         .eq('id', discussionId)
-        .eq('user_id', user.id);
+        .select();
+        
+      console.log('🗑️ Delete response data:', data);
+      console.log('🗑️ Delete response error:', error);
+        
+      if (error) {
+        console.error('❌ Database deletion failed:', error);
+        console.error('❌ Error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
+        toast({
+          title: "Error",
+          description: `Failed to delete discussion: ${error.message}`,
+          variant: "destructive"
+        });
+        return;
+      }
 
-      if (error) throw error;
+      if (!data || data.length === 0) {
+        console.warn('⚠️ No rows were deleted - discussion may not exist or permission denied');
+        toast({
+          title: "Warning", 
+          description: "No discussion was deleted. It may not exist or you may not have permission.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      console.log('✅ Database deletion successful - deleted rows:', data.length);
+
+      // After successful database deletion, update UI
+      setDiscussionsList(prevDiscussions => {
+        const newDiscussions = prevDiscussions.filter(d => d.id !== discussionId);
+        console.log('🗑️ UI updated - discussions count:', newDiscussions.length);
+        return newDiscussions;
+      });
 
       toast({
-        title: "Discussion deleted",
-        description: "Your discussion has been removed"
+        title: "Discussion Deleted",
+        description: "Discussion has been permanently removed.",
       });
-      
-      fetchDiscussions();
+
     } catch (error) {
-      console.error('Error deleting discussion:', error);
+      console.error('❌ Exception during deletion:', error);
       toast({
         title: "Error",
-        description: "Failed to delete discussion",
+        description: "There was an error deleting the discussion.",
         variant: "destructive"
       });
     }
-  };
+  }, [toast, user?.id, isAdmin, discussionsList.length]);
 
-  useEffect(() => {
+  const canEditOrDelete = useCallback((discussion: Discussion) => {
+    // Admins can edit/delete any post
+    if (isAdmin) return true;
+    // Users can only edit/delete their own posts
+    if (user && discussion.user_id === user.id) return true;
+    return false;
+  }, [isAdmin, user]);
+
+  const getTruncatedContent = useCallback((content: string, maxLength: number = 150) => {
+    if (content.length <= maxLength) return content;
+    return content.substring(0, maxLength) + '...';
+  }, []);
+
+  // Handle post creation callback - DO NOT refetch, just add the new post
+  const handlePostCreated = useCallback(() => {
+    console.log('🔄 New post created - refreshing discussions list');
     fetchDiscussions();
-  }, [refreshTrigger]);
+  }, [fetchDiscussions]);
 
-  const filteredDiscussions = discussions.filter(discussion => {
-    const matchesSearch = discussion.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         discussion.content.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || discussion.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  if (loading) {
-    return (
-      <Card className={`${isDayMode ? 'bg-white border-slate-200' : 'bg-slate-800/50 border-cyan-500/20'}`}>
-        <CardContent className="p-6">
-          <div className="animate-pulse space-y-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className={`h-24 rounded-lg ${isDayMode ? 'bg-slate-200' : 'bg-slate-700/50'}`}></div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  // Debug render
+  console.log('🎨 RENDERING GroupDiscussions with', filteredDiscussions.length, 'discussions');
 
   return (
-    <div className="space-y-6">
-      {/* Search and Filter */}
-      <Card className={`${isDayMode ? 'bg-white border-slate-200' : 'bg-slate-800/50 border-cyan-500/20'}`}>
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${isDayMode ? 'text-slate-400' : 'text-gray-400'}`} />
-              <Input
-                placeholder="Search discussions..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className={`pl-10 ${isDayMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-700/50 border-slate-600'}`}
-              />
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              {categories.map(category => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSelectedCategory(category)}
-                  className={selectedCategory === category ? 
-                    (isDayMode ? "bg-cyan-600 hover:bg-cyan-700 text-white" : "bg-cyan-600 hover:bg-cyan-700") : 
-                    (isDayMode ? "border-slate-300 hover:bg-slate-100 text-slate-700" : "border-slate-600 hover:bg-slate-700")
-                  }
-                >
-                  {category}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="flex gap-6">
+      {/* Main Content */}
+      <div className="flex-1">
+        <div className="max-w-4xl space-y-6">
+          {/* Profile Setup Modal */}
+          {showProfileSetup && (
+            <Dialog open={showProfileSetup} onOpenChange={setShowProfileSetup}>
+              <DialogContent className="bg-slate-900/95 border-gray-700 max-w-md">
+                <ProfileSetup onComplete={() => setShowProfileSetup(false)} />
+              </DialogContent>
+            </Dialog>
+          )}
+          
+          {/* Header with Post Input */}
+          <CommunityHeader onPostCreated={handlePostCreated} isDayMode={isDayMode} />
 
-      {/* Discussions */}
-      <div className="space-y-4">
-        {filteredDiscussions.length === 0 ? (
-          <Card className={`${isDayMode ? 'bg-white border-slate-200' : 'bg-slate-800/50 border-cyan-500/20'}`}>
-            <CardContent className="p-8 text-center">
-              <div className={isDayMode ? 'text-slate-600' : 'text-gray-400'}>
-                {searchTerm || selectedCategory !== 'All' ? 
-                  'No discussions match your filters' : 
-                  'No discussions yet. Be the first to start a conversation!'
-                }
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          filteredDiscussions.map(discussion => (
-            <Card key={discussion.id} className={`${isDayMode ? 'bg-white border-slate-200 hover:border-cyan-400/40' : 'bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40'} transition-colors`}>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  {/* Header */}
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="w-10 h-10">
-                        {discussion.author_avatar ? (
-                          <AvatarImage src={discussion.author_avatar} alt={discussion.author_name} />
-                        ) : (
-                          <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white text-sm">
-                            {discussion.author_name.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        )}
+          {/* Debug Info */}
+          <div className="text-xs text-gray-500 p-2 bg-slate-800 rounded">
+            Debug: Showing {filteredDiscussions.length} discussions
+          </div>
+
+          {/* Discussion Posts */}
+          <div className="space-y-4">
+            {filteredDiscussions.map((discussion) => {
+              const profileInfo = getProfileInfo(discussion.user_id, discussion.author);
+              
+              return (
+                <Card key={discussion.id} className="bg-slate-800/50 border-gray-700/50 hover:bg-slate-800/70 transition-colors">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      {/* User Avatar */}
+                      <Avatar className="w-12 h-12 flex-shrink-0">
+                        {profileInfo.avatar_url ? (
+                          <AvatarImage 
+                            src={profileInfo.avatar_url} 
+                            alt={`${discussion.author}'s avatar`}
+                            className="object-cover w-full h-full"
+                          />
+                        ) : null}
+                        <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
+                          {profileInfo.initials}
+                        </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <div className={`font-medium ${isDayMode ? 'text-slate-900' : 'text-white'}`}>{discussion.author_name}</div>
-                        <div className={`text-sm ${isDayMode ? 'text-slate-500' : 'text-gray-400'}`}>
-                          {new Date(discussion.created_at).toLocaleDateString()}
+
+                      {/* Post Content */}
+                      <div className="flex-1 min-w-0">
+                        {/* Header */}
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            {discussion.isPinned && <Pin className="h-4 w-4 text-yellow-400" />}
+                            <span className="text-cyan-300 font-medium">{profileInfo.display_name}</span>
+                            <span className="text-gray-400">•</span>
+                            <span className="text-gray-400 text-sm">{discussion.timeAgo}</span>
+                            <span className="text-gray-400">•</span>
+                            <span className="text-gray-400 text-sm">{discussion.category}</span>
+                            {discussion.isPinned && (
+                              <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs ml-2">
+                                Pinned
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          {/* Options Menu */}
+                          {canEditOrDelete(discussion) && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-white">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-slate-800 border-gray-700">
+                                <DropdownMenuItem 
+                                  onClick={() => {
+                                    setEditingPost(discussion.id);
+                                    setEditContent(discussion.content);
+                                  }}
+                                  className="text-gray-300 hover:text-white hover:bg-slate-700 cursor-pointer"
+                                >
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => {
+                                    console.log('🗑️ DELETE BUTTON CLICKED for discussion:', discussion.id);
+                                    handleDeleteDiscussion(discussion.id);
+                                  }}
+                                  className="text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </div>
+
+                        <h3 className={`text-xl font-semibold mb-3 ${isDayMode ? 'text-slate-700' : 'text-white'}`}>
+                          {discussion.title}
+                        </h3>
+
+                        <div 
+                          className={`mb-4 leading-relaxed whitespace-pre-wrap cursor-pointer transition-colors ${
+                            isDayMode ? 'text-slate-600 hover:text-slate-700' : 'text-gray-300 hover:text-gray-200'
+                          }`}
+                          onClick={() => setExpandedPost(expandedPost === discussion.id ? null : discussion.id)}
+                        >
+                          {expandedPost === discussion.id ? discussion.content : getTruncatedContent(discussion.content)}
+                          {discussion.content.length > 150 && expandedPost !== discussion.id && (
+                            <span className="text-cyan-400 ml-2 font-medium">Read more</span>
+                          )}
+                          {expandedPost === discussion.id && discussion.content.length > 150 && (
+                            <span className="text-cyan-400 ml-2 font-medium">Show less</span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-6">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleLike(discussion.id)}
+                            className={`flex items-center gap-2 hover:bg-red-500/10 transition-colors ${discussion.isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'}`}
+                          >
+                            <Heart className={`h-4 w-4 ${discussion.isLiked ? 'fill-current' : ''}`} />
+                            {discussion.likes}
+                          </Button>
+                          
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => setSelectedDiscussion(discussion)}
+                                className="flex items-center gap-2 text-gray-400 hover:bg-blue-500/10 hover:text-blue-300 transition-colors"
+                              >
+                                <MessageCircle className="h-4 w-4" />
+                                {discussion.comments}
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[80vh] overflow-y-auto">
+                              <DialogHeader>
+                                <DialogTitle className="text-white">Comments - {discussion.title}</DialogTitle>
+                              </DialogHeader>
+                              
+                              <div className="space-y-4 max-h-96 overflow-y-auto">
+                                {comments[discussion.id]?.map((comment) => (
+                                  <div key={comment.id} className="flex items-start gap-3">
+                                    <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                                      {comment.avatar}
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-cyan-300 font-medium text-sm">{comment.author}</span>
+                                        <span className="text-gray-400 text-xs">{comment.timeAgo}</span>
+                                      </div>
+                                      <p className="text-gray-300 text-sm">{comment.content}</p>
+                                    </div>
+                                  </div>
+                                )) || (
+                                  <p className="text-gray-400 text-center py-8">No comments yet. Be the first to comment!</p>
+                                )}
+                              </div>
+                              
+                              <div className="flex items-start gap-3 mt-4 pt-4 border-t border-gray-700">
+                                <Avatar className="w-8 h-8 flex-shrink-0">
+                                  {getUserAvatar() ? (
+                                    <AvatarImage 
+                                      src={getUserAvatar()!} 
+                                      alt="Your avatar"
+                                      className="object-cover w-full h-full"
+                                    />
+                                  ) : (
+                                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold text-sm">
+                                      {getUserInitials()}
+                                    </AvatarFallback>
+                                  )}
+                                </Avatar>
+                                <div className="flex-1 flex gap-2">
+                                  <Textarea
+                                    placeholder="Write a comment..."
+                                    value={newComment}
+                                    onChange={(e) => setNewComment(e.target.value)}
+                                    className="flex-1 bg-slate-700/50 border-gray-600 text-white placeholder-gray-400 min-h-[80px]"
+                                  />
+                                  <Button
+                                    onClick={handleAddComment}
+                                    disabled={!newComment.trim()}
+                                    className="bg-cyan-600 hover:bg-cyan-700 text-white self-end"
+                                  >
+                                    <Send className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </DialogContent>
+                          </Dialog>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className={`${isDayMode ? 'border-cyan-600/30 text-cyan-700' : 'border-cyan-500/30 text-cyan-300'}`}>
-                        {discussion.category}
-                      </Badge>
-                      {user?.id === discussion.user_id && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteDiscussion(discussion.id)}
-                          className={`p-2 ${isDayMode ? 'text-slate-400 hover:text-red-600' : 'text-gray-400 hover:text-red-400'}`}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div>
-                    <h3 className={`text-lg font-semibold mb-2 ${isDayMode ? 'text-slate-900' : 'text-white'}`}>{discussion.title}</h3>
-                    <p className={`leading-relaxed ${isDayMode ? 'text-slate-700' : 'text-gray-300'}`}>{discussion.content}</p>
-                  </div>
-
-                  {/* Attachments */}
-                  {discussion.attachments && discussion.attachments.length > 0 && (
-                    <AttachmentViewer attachments={discussion.attachments} />
-                  )}
-
-                  {/* Actions */}
-                  <div className={`flex items-center gap-4 pt-2 border-t ${isDayMode ? 'border-slate-200' : 'border-slate-700'}`}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleLike(discussion.id)}
-                      className={`flex items-center gap-2 ${isDayMode ? 'text-slate-600 hover:text-red-600' : 'text-gray-400 hover:text-red-400'}`}
-                    >
-                      <Heart className="h-4 w-4" />
-                      <span>{discussion.likes_count || 0}</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleDiscussion(discussion.id)}
-                      className={`flex items-center gap-2 ${isDayMode ? 'text-slate-600 hover:text-cyan-700' : 'text-gray-400 hover:text-cyan-300'}`}
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                      <span>{discussion.comments_count || 0}</span>
-                    </Button>
-                  </div>
-
-                  {/* Comments Section */}
-                  {expandedDiscussion === discussion.id && (
-                    <div className={`space-y-4 pt-4 border-t ${isDayMode ? 'border-slate-200' : 'border-slate-700'}`}>
-                      {/* Existing Comments */}
-                      {comments[discussion.id]?.map(comment => (
-                        <div key={comment.id} className="flex gap-3">
-                          <Avatar className="w-8 h-8">
-                            <AvatarFallback className={`text-xs ${isDayMode ? 'bg-slate-200 text-slate-700' : 'bg-slate-600'}`}>
-                              {comment.author_name.charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className={`text-sm font-medium ${isDayMode ? 'text-slate-900' : 'text-white'}`}>{comment.author_name}</span>
-                              <span className={`text-xs ${isDayMode ? 'text-slate-500' : 'text-gray-500'}`}>
-                                {new Date(comment.created_at).toLocaleDateString()}
-                              </span>
-                            </div>
-                            <p className={`text-sm ${isDayMode ? 'text-slate-700' : 'text-gray-300'}`}>{comment.content}</p>
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* Add Comment */}
-                      {user && (
-                        <div className="flex gap-3">
-                          <Avatar className="w-8 h-8">
-                            <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white text-xs">
-                              {(profile?.display_name || user.email?.split('@')[0] || 'A').charAt(0).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 space-y-2">
-                            <Textarea
-                              placeholder="Write a comment..."
-                              value={newComment}
-                              onChange={(e) => setNewComment(e.target.value)}
-                              className={`min-h-[80px] resize-none ${isDayMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-700/50 border-slate-600'}`}
-                            />
-                            <Button
-                              onClick={() => handleComment(discussion.id)}
-                              disabled={!newComment.trim() || submittingComment}
-                              size="sm"
-                              className="bg-cyan-600 hover:bg-cyan-700 text-white"
-                            >
-                              {submittingComment ? 'Posting...' : 'Comment'}
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
       </div>
+
+      {/* Right Sidebar */}
+      <div className="hidden lg:block w-80 flex-shrink-0">
+        <div className="sticky top-6 space-y-6">
+          <Card className="bg-slate-800/50 border-cyan-500/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
+                <Users className="h-5 w-5 text-cyan-400" />
+                Members
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+               <div className="flex justify-between items-center">
+                  {isAdmin ? (
+                    <button
+                      onClick={() => setShowMembersList(true)}
+                      className="text-gray-400 hover:text-cyan-300 transition-colors cursor-pointer"
+                    >
+                      Total Members
+                    </button>
+                  ) : (
+                    <span className="text-gray-400">Total Members</span>
+                  )}
+                  <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
+                    {communityStats.totalMembers}
+                  </Badge>
+                </div>
+               <div className="flex justify-between items-center">
+                 <span className="text-gray-400">Online Now</span>
+                 <Badge className="bg-green-600/20 text-green-300 border-green-500/30">
+                   {communityStats.onlineUsers}
+                 </Badge>
+               </div>
+             </CardContent>
+           </Card>
+
+          <div className="max-h-[800px] overflow-y-auto">
+            <NewsFeed isDayMode={isDayMode} />
+          </div>
+
+          <Card className="bg-slate-800/50 border-cyan-500/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-yellow-400" />
+                30-Day Leaderboard
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-3">
+                {/* Leaderboard entries */}
+                <div className="flex items-center gap-3 p-2 rounded-lg bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20">
+                  <Badge className="bg-yellow-500 text-black font-bold text-xs w-6 h-6 rounded-full flex items-center justify-center p-0">1</Badge>
+                  <Avatar className="w-8 h-8">
+                    <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-sm">JD</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-white font-medium text-sm truncate">Judith Dreher</span>
+                    <div className="text-gray-400 font-semibold text-sm">+9 pts</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+        </div>
+      </div>
+
+      <MembersList
+        open={showMembersList}
+        onOpenChange={setShowMembersList}
+        onMessageMember={(memberId, memberName) => {
+          toast({
+            title: "Message Member",
+            description: `Starting conversation with ${memberName}`,
+          });
+        }}
+      />
     </div>
   );
 };

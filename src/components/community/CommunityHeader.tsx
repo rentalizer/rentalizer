@@ -5,33 +5,24 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Image, Video, Smile } from 'lucide-react';
+import { Paperclip, Image, Video, Smile, AtSign, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { FileUpload, useFileUpload } from './FileUpload';
 
 interface CommunityHeaderProps {
   onPostCreated: () => void;
   isDayMode?: boolean;
 }
 
-interface AttachmentFile {
-  file: File;
-  preview?: string;
-  id: string;
-}
-
 export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated, isDayMode = false }) => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
-  const { uploadFiles } = useFileUpload();
   
   const [newPost, setNewPost] = useState('');
   const [postTitle, setPostTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
 
   const getUserAvatar = () => profile?.avatar_url || null;
   const getUserName = () => profile?.display_name || user?.email?.split('@')[0] || 'Anonymous User';
@@ -54,12 +45,6 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       const postTitleToUse = postTitle.trim() || 
         (newPost.length > 50 ? newPost.substring(0, 50) + '...' : newPost);
       
-      // Upload attachments first
-      let uploadedUrls: string[] = [];
-      if (attachments.length > 0 && user?.id) {
-        uploadedUrls = await uploadFiles(attachments, user.id);
-      }
-
       const { data, error } = await supabase
         .from('discussions')
         .insert({
@@ -67,8 +52,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
           content: newPost,
           author_name: getUserName(),
           category: 'General',
-          user_id: user?.id,
-          attachments: uploadedUrls.length > 0 ? uploadedUrls : null
+          user_id: user?.id
         })
         .select()
         .single();
@@ -77,14 +61,11 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
       toast({
         title: "Post created!",
-        description: attachments.length > 0 
-          ? `Your post with ${attachments.length} attachment(s) has been shared with the community`
-          : "Your post has been shared with the community"
+        description: "Your post has been shared with the community"
       });
 
       setNewPost('');
       setPostTitle('');
-      setAttachments([]);
       onPostCreated();
       
     } catch (error) {
@@ -137,45 +118,6 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                 className={`min-h-[120px] border-cyan-500/20 resize-none ${isDayMode ? 'bg-slate-100 text-slate-700 placeholder-slate-500' : 'bg-slate-700/50 text-white placeholder-gray-400'}`}
               />
               
-              {/* Show attachment previews if any */}
-              {attachments.length > 0 && (
-                <div className="space-y-2">
-                  {attachments.map((attachment) => (
-                    <div key={attachment.id} className="flex items-center gap-2 p-2 bg-slate-700/50 rounded-lg">
-                      {attachment.preview ? (
-                        <img 
-                          src={attachment.preview} 
-                          alt={attachment.file.name}
-                          className="w-8 h-8 object-cover rounded"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 bg-slate-600 rounded flex items-center justify-center">
-                          <span className="text-xs text-gray-400">📄</span>
-                        </div>
-                      )}
-                      <span className="text-sm text-gray-300 flex-1 truncate">
-                        {attachment.file.name}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {(attachment.file.size / 1024).toFixed(1)}KB
-                      </span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          const newAttachments = attachments.filter(att => att.id !== attachment.id);
-                          setAttachments(newAttachments);
-                        }}
-                        className="text-gray-400 hover:text-red-400 p-1"
-                      >
-                        ×
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center gap-2 relative">
                   <Button
@@ -208,11 +150,20 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                     <Video className="h-4 w-4" />
                   </Button>
                   
-                  <FileUpload
-                    onFilesChange={setAttachments}
-                    maxFiles={5}
-                    maxSizeBytes={10 * 1024 * 1024}
-                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-400 hover:text-cyan-300"
+                    onClick={() => {
+                      // TODO: Add attachment functionality
+                      toast({
+                        title: "Coming Soon",
+                        description: "File attachment functionality will be available soon"
+                      });
+                    }}
+                  >
+                    <Paperclip className="h-4 w-4" />
+                  </Button>
 
                   <div className="relative">
                     <Button
