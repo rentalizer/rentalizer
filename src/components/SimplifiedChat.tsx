@@ -115,31 +115,9 @@ export default function SimplifiedChat() {
   const sendMessage = async () => {
     if (!newMessage.trim() || !user) return;
 
-    console.log('🚀 START sendMessage - attempting to send message');
-    console.log('📊 Raw state values:', { 
-      adminUsersLength: adminUsers.length, 
-      adminUsers, 
-      isAdmin, 
-      userId: user?.id,
-      userExists: !!user,
-      messageContent: newMessage.trim()
-    });
-
-    // Determine available admin users - use current user if they're admin
-    const currentAdminUsers = isAdmin && user ? [user.id] : adminUsers;
-    
-    console.log('🎯 Calculated currentAdminUsers:', currentAdminUsers);
-    console.log('🔍 Logic check - isAdmin && user:', isAdmin && !!user);
-
-    // Check if admins are available
-    if (currentAdminUsers.length === 0) {
-      console.log('💥 ERROR CONDITION HIT - currentAdminUsers is empty');
-      console.log('💥 Final state before error:', { 
-        currentAdminUsersLength: currentAdminUsers.length,
-        isAdmin,
-        userExists: !!user,
-        calculation: `${isAdmin} && ${!!user} ? [${user?.id}] : ${JSON.stringify(adminUsers)}`
-      });
+    // For admin users, they should always be able to send messages
+    // For non-admin users, check if there are admin users available
+    if (!isAdmin && adminUsers.length === 0) {
       toast({
         title: "No administrators available",
         description: "Please try again later.",
@@ -148,26 +126,24 @@ export default function SimplifiedChat() {
       return;
     }
 
-    console.log('✅ Admin check passed, continuing with message send');
-
     // Determine recipient based on role
     let recipientId: string;
     
     if (isAdmin) {
       // Admin needs to reply to the latest user who sent a message
       const latestUserMessage = messages
-        .filter(msg => !currentAdminUsers.includes(msg.sender_id) && currentAdminUsers.includes(msg.recipient_id))
+        .filter(msg => !adminUsers.includes(msg.sender_id) && adminUsers.includes(msg.recipient_id))
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
       
       if (latestUserMessage) {
         recipientId = latestUserMessage.sender_id;
       } else {
-        // Fallback: if no user messages found, send to first admin
-        recipientId = currentAdminUsers[0];
+        // Fallback: if no user messages found, send to user ID (admin to themselves for testing)
+        recipientId = user.id;
       }
     } else {
       // Non-admin always sends to first available admin
-      recipientId = currentAdminUsers[0];
+      recipientId = adminUsers[0];
     }
 
     setLoading(true);
