@@ -115,7 +115,13 @@ export default function SimplifiedChat() {
   const sendMessage = async () => {
     if (!newMessage.trim() || !user) return;
 
-    console.log('🚀 Attempting to send message. Admin users available:', adminUsers.length);
+    console.log('🚀 Attempting to send message');
+    console.log('📊 Current state:', { 
+      adminUsersLength: adminUsers.length, 
+      adminUsers, 
+      isAdmin, 
+      userId: user.id 
+    });
 
     // Check if admins are available
     if (adminUsers.length === 0) {
@@ -127,6 +133,7 @@ export default function SimplifiedChat() {
         setAdminUsers([user.id]);
         // Don't return, let the function continue to send the message
       } else {
+        console.log('💥 Showing error toast - isAdmin:', isAdmin, 'user:', !!user);
         toast({
           title: "No administrators available",
           description: "Please try again later.",
