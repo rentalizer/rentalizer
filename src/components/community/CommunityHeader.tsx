@@ -176,19 +176,21 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                     </Button>
                     
                     {showEmojiPicker && (
-                      <div className="absolute bottom-full left-0 mb-2 bg-slate-700 border border-gray-600 rounded-lg p-3 grid grid-cols-6 gap-2 z-10">
-                        {commonEmojis.map((emoji, index) => (
-                          <button
-                            key={index}
-                            onClick={() => {
-                              setNewPost(prev => prev + emoji);
-                              setShowEmojiPicker(false);
-                            }}
-                            className="text-lg hover:bg-slate-600 p-1 rounded transition-colors"
-                          >
-                            {emoji}
-                          </button>
-                        ))}
+                      <div className="absolute bottom-full left-0 mb-2 bg-slate-700 border border-gray-600 rounded-lg p-4 shadow-lg z-10 min-w-[200px]">
+                        <div className="grid grid-cols-4 gap-3">
+                          {commonEmojis.map((emoji, index) => (
+                            <button
+                              key={index}
+                              onClick={() => {
+                                setNewPost(prev => prev + emoji);
+                                setShowEmojiPicker(false);
+                              }}
+                              className="text-xl hover:bg-slate-600 p-2 rounded transition-colors flex items-center justify-center w-10 h-10 hover:scale-110 transform duration-200"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
