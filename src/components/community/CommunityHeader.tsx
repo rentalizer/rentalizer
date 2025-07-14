@@ -137,6 +137,45 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                 className={`min-h-[120px] border-cyan-500/20 resize-none ${isDayMode ? 'bg-slate-100 text-slate-700 placeholder-slate-500' : 'bg-slate-700/50 text-white placeholder-gray-400'}`}
               />
               
+              {/* Show attachment previews if any */}
+              {attachments.length > 0 && (
+                <div className="space-y-2">
+                  {attachments.map((attachment) => (
+                    <div key={attachment.id} className="flex items-center gap-2 p-2 bg-slate-700/50 rounded-lg">
+                      {attachment.preview ? (
+                        <img 
+                          src={attachment.preview} 
+                          alt={attachment.file.name}
+                          className="w-8 h-8 object-cover rounded"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-slate-600 rounded flex items-center justify-center">
+                          <span className="text-xs text-gray-400">📄</span>
+                        </div>
+                      )}
+                      <span className="text-sm text-gray-300 flex-1 truncate">
+                        {attachment.file.name}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {(attachment.file.size / 1024).toFixed(1)}KB
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const newAttachments = attachments.filter(att => att.id !== attachment.id);
+                          setAttachments(newAttachments);
+                        }}
+                        className="text-gray-400 hover:text-red-400 p-1"
+                      >
+                        ×
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center gap-2 relative">
                   <Button
