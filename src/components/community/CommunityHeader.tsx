@@ -5,24 +5,33 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Paperclip, Image, Video, Smile, AtSign, X } from 'lucide-react';
+import { Image, Video, Smile } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { FileUpload, useFileUpload } from './FileUpload';
 
 interface CommunityHeaderProps {
   onPostCreated: () => void;
   isDayMode?: boolean;
 }
 
+interface AttachmentFile {
+  file: File;
+  preview?: string;
+  id: string;
+}
+
 export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated, isDayMode = false }) => {
   const { user, profile } = useAuth();
   const { toast } = useToast();
+  const { uploadFiles } = useFileUpload();
   
   const [newPost, setNewPost] = useState('');
   const [postTitle, setPostTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [attachments, setAttachments] = useState<AttachmentFile[]>([]);
 
   const getUserAvatar = () => profile?.avatar_url || null;
   const getUserName = () => profile?.display_name || user?.email?.split('@')[0] || 'Anonymous User';
@@ -45,6 +54,12 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       const postTitleToUse = postTitle.trim() || 
         (newPost.length > 50 ? newPost.substring(0, 50) + '...' : newPost);
       
+      // Upload attachments first
+      let uploadedUrls: string[] = [];
+      if (attachments.length > 0 && user?.id) {
+        uploadedUrls = await uploadFiles(attachments, user.id);
+      }
+
       const { data, error } = await supabase
         .from('discussions')
         .insert({
@@ -52,7 +67,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
           content: newPost,
           author_name: getUserName(),
           category: 'General',
-          user_id: user?.id
+          user_id: user?.id,
+          attachments: uploadedUrls.length > 0 ? uploadedUrls : null
         })
         .select()
         .single();
@@ -61,11 +77,14 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
       toast({
         title: "Post created!",
-        description: "Your post has been shared with the community"
+        description: attachments.length > 0 
+          ? `Your post with ${attachments.length} attachment(s) has been shared with the community`
+          : "Your post has been shared with the community"
       });
 
       setNewPost('');
       setPostTitle('');
+      setAttachments([]);
       onPostCreated();
       
     } catch (error) {
@@ -150,20 +169,11 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                     <Video className="h-4 w-4" />
                   </Button>
                   
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-400 hover:text-cyan-300"
-                    onClick={() => {
-                      // TODO: Add attachment functionality
-                      toast({
-                        title: "Coming Soon",
-                        description: "File attachment functionality will be available soon"
-                      });
-                    }}
-                  >
-                    <Paperclip className="h-4 w-4" />
-                  </Button>
+                  <FileUpload
+                    onFilesChange={setAttachments}
+                    maxFiles={5}
+                    maxSizeBytes={10 * 1024 * 1024}
+                  />
 
                   <div className="relative">
                     <Button
