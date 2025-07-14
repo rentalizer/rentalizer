@@ -33,40 +33,35 @@ export default function SimplifiedChat() {
   // Get available admin users
   useEffect(() => {
     const fetchAdminUsers = async () => {
-      console.log('🔍 Fetching admin users, current user:', user?.id, 'isAdmin:', isAdmin);
+      if (!user) return;
+      
+      // If current user is admin (including development mode), always include them
+      if (isAdmin) {
+        console.log('✅ Current user is admin, using them as admin user:', user.id);
+        setAdminUsers([user.id]);
+        return;
+      }
+      
+      // For non-admin users, fetch actual admin users from database
       try {
         const { data, error } = await supabase
           .from('user_roles')
           .select('user_id')
           .eq('role', 'admin');
         
-        console.log('📊 Admin users query result:', { data, error });
-        
         if (data && data.length > 0) {
           const adminIds = data.map(role => role.user_id);
-          console.log('✅ Found admin users from DB:', adminIds);
           setAdminUsers(adminIds);
-        } else if (user && isAdmin) {
-          // In development mode, if current user is admin but no admin roles in DB, use current user
-          console.log('⚡ Using current user as admin fallback:', user.id);
-          setAdminUsers([user.id]);
         } else {
-          console.log('❌ No admin users found and current user is not admin');
           setAdminUsers([]);
         }
       } catch (error) {
         console.error('Error fetching admin users:', error);
-        // Fallback: if current user is admin, use them
-        if (user && isAdmin) {
-          console.log('🔧 Error fallback: using current user as admin:', user.id);
-          setAdminUsers([user.id]);
-        }
+        setAdminUsers([]);
       }
     };
 
-    if (user) {
-      fetchAdminUsers();
-    }
+    fetchAdminUsers();
   }, [user, isAdmin]);
 
   const scrollToBottom = () => {
