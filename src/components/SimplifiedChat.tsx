@@ -120,33 +120,46 @@ export default function SimplifiedChat() {
   const sendMessage = async () => {
     if (!newMessage.trim() || !user) return;
 
+    console.log('🚀 Attempting to send message. Admin users available:', adminUsers.length);
+
     // Check if admins are available
     if (adminUsers.length === 0) {
-      toast({
-        title: "No administrators available",
-        description: "Please try again later.",
-        variant: "destructive"
-      });
-      return;
+      console.log('❌ No admin users found, trying to set current user as admin if they are admin');
+      
+      // If current user is admin but no adminUsers in state, use current user
+      if (isAdmin && user) {
+        console.log('🔧 Setting current user as admin in adminUsers array');
+        setAdminUsers([user.id]);
+        // Don't return, let the function continue to send the message
+      } else {
+        toast({
+          title: "No administrators available",
+          description: "Please try again later.",
+          variant: "destructive"
+        });
+        return;
+      }
     }
 
     // Determine recipient based on role
     let recipientId: string;
+    const currentAdminUsers = adminUsers.length > 0 ? adminUsers : (isAdmin && user ? [user.id] : []);
+    
     if (isAdmin) {
       // Admin needs to reply to the latest user who sent a message
       const latestUserMessage = messages
-        .filter(msg => !adminUsers.includes(msg.sender_id) && adminUsers.includes(msg.recipient_id))
+        .filter(msg => !currentAdminUsers.includes(msg.sender_id) && currentAdminUsers.includes(msg.recipient_id))
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
       
       if (latestUserMessage) {
         recipientId = latestUserMessage.sender_id;
       } else {
         // Fallback: if no user messages found, send to first admin
-        recipientId = adminUsers[0];
+        recipientId = currentAdminUsers[0];
       }
     } else {
       // Non-admin always sends to first available admin
-      recipientId = adminUsers[0];
+      recipientId = currentAdminUsers[0];
     }
 
     setLoading(true);
