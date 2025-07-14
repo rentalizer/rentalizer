@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper, User, Building, TrendingUp, Settings } from 'lucide-react';
+import AdminChatButton from '@/components/AdminChatButton';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
@@ -315,6 +316,19 @@ const Community = () => {
             <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight py-2">
               Training Dashboard
             </h1>
+          </div>
+          
+          {/* Admin Chat Button */}
+          <div className="flex items-center justify-center gap-4 mt-4">
+            <AdminChatButton />
+            <Button
+              onClick={bookDemo}
+              className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
+              size="sm"
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              Book Demo
+            </Button>
           </div>
         </div>
 
