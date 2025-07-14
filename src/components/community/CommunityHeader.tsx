@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -153,8 +154,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
         return null;
       }
 
-      // Update video upload status to uploading
-      setVideoUpload(prev => prev ? { ...prev, uploading: true, uploadProgress: 0, error: undefined } : null);
+      // Update video upload status to uploading with progress
+      setVideoUpload(prev => prev ? { ...prev, uploading: true, uploadProgress: 10, error: undefined } : null);
 
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
@@ -164,6 +165,14 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       console.log('User ID:', user.id);
       console.log('File size:', file.size);
 
+      // Simulate progress updates
+      const progressInterval = setInterval(() => {
+        setVideoUpload(prev => prev ? { 
+          ...prev, 
+          uploadProgress: Math.min(prev.uploadProgress + 20, 90) 
+        } : null);
+      }, 500);
+
       // Upload with progress tracking
       const { data, error } = await supabase.storage
         .from('community-videos')
@@ -171,6 +180,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
           cacheControl: '3600',
           upsert: false
         });
+
+      clearInterval(progressInterval);
 
       if (error) {
         console.error('Video upload error:', error);
@@ -187,7 +198,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
       console.log('Video public URL:', publicUrl);
 
-      // Update video upload status to uploaded with URL
+      // Update video upload status to uploaded with URL and full progress
       setVideoUpload(prev => prev ? { 
         ...prev, 
         uploading: false, 
@@ -300,7 +311,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       return;
     }
 
-    // Set initial video upload state
+    // Set initial video upload state - this will make it show immediately
     setVideoUpload({
       file: videoFile,
       uploaded: false,
@@ -449,7 +460,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                   className={`min-h-[120px] border-cyan-500/20 resize-none ${isDayMode ? 'bg-slate-100 text-slate-700 placeholder-slate-500' : 'bg-slate-700/50 text-white placeholder-gray-400'}`}
                 />
                 
-                {/* Enhanced file attachments display with upload status and image previews */}
+                {/* File attachments display */}
                 {attachedFiles.length > 0 && (
                   <div className="bg-slate-700/30 border border-cyan-500/20 rounded-lg p-3 space-y-3">
                     <div className="flex items-center gap-2">
@@ -531,16 +542,16 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                   </div>
                 )}
 
-                {/* Video upload display - persistent video preview after upload */}
+                {/* Video upload display - This will show and persist after upload */}
                 {videoUpload && (
                   <div className="bg-slate-700/30 border border-cyan-500/20 rounded-lg p-3 space-y-3">
                     <div className="flex items-center gap-2">
                       <Video className="h-4 w-4 text-cyan-400" />
                       <span className="text-sm font-medium text-cyan-300">
-                        Video Upload (1)
+                        Video Upload
                       </span>
                       {videoUpload.uploaded && (
-                        <span className="text-xs text-green-400">1 uploaded</span>
+                        <span className="text-xs text-green-400">uploaded</span>
                       )}
                       {videoUpload.uploading && (
                         <span className="text-xs text-yellow-400">uploading...</span>
@@ -550,7 +561,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                       )}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-3">
+                      {/* File info section */}
                       <div className="flex items-center justify-between bg-slate-600/50 rounded-lg px-3 py-2 border border-slate-500/30">
                         <div className="flex items-center gap-2 min-w-0 flex-1">
                           {videoUpload.uploading ? (
@@ -583,20 +595,20 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                         </button>
                       </div>
 
-                      {/* Upload progress bar - only show during upload */}
+                      {/* Upload progress bar - only shown during upload */}
                       {videoUpload.uploading && (
                         <div className="space-y-2">
                           <div className="flex justify-between text-xs text-gray-400">
-                            <span>Uploading...</span>
+                            <span>Uploading video...</span>
                             <span>{Math.round(videoUpload.uploadProgress)}%</span>
                           </div>
                           <Progress value={videoUpload.uploadProgress} className="h-2" />
                         </div>
                       )}
 
-                      {/* Video preview - ALWAYS SHOW after successful upload */}
+                      {/* Video preview - shown after successful upload */}
                       {videoUpload.uploaded && videoUpload.url && (
-                        <div className="relative mt-3">
+                        <div className="relative">
                           <video
                             ref={videoRef}
                             src={videoUpload.url}
