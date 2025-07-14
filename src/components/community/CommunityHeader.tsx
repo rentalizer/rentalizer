@@ -66,22 +66,28 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `community-attachments/${fileName}`;
 
+      console.log('Uploading file to:', filePath);
+
       const { data, error } = await supabase.storage
         .from('course-materials')
         .upload(filePath, file);
 
       if (error) {
-        console.error('Error uploading file:', error);
+        console.error('Storage upload error:', error);
         setAttachedFiles(prev => prev.map((item, i) => 
-          i === index ? { ...item, uploading: false, error: 'Upload failed' } : item
+          i === index ? { ...item, uploading: false, error: 'Upload failed: ' + error.message } : item
         ));
         return null;
       }
+
+      console.log('Upload successful:', data);
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('course-materials')
         .getPublicUrl(filePath);
+
+      console.log('Public URL:', publicUrl);
 
       // Update file status to uploaded with URL
       setAttachedFiles(prev => prev.map((item, i) => 
@@ -96,7 +102,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
     } catch (error) {
       console.error('Exception uploading file:', error);
       setAttachedFiles(prev => prev.map((item, i) => 
-        i === index ? { ...item, uploading: false, error: 'Upload failed' } : item
+        i === index ? { ...item, uploading: false, error: 'Upload failed: ' + (error as Error).message } : item
       ));
       return null;
     }
