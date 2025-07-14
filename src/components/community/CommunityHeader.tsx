@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -532,33 +531,26 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                   </div>
                 )}
 
-                {/* Video upload display - moved below text area like file attachments */}
+                {/* Video upload display - now matches the file attachments style exactly */}
                 {videoUpload && (
                   <div className="bg-slate-700/30 border border-cyan-500/20 rounded-lg p-3 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Video className="h-4 w-4 text-cyan-400" />
-                        <span className="text-sm font-medium text-cyan-300">Video Upload</span>
-                        {videoUpload.uploaded && (
-                          <span className="text-xs text-green-400">✓ Uploaded</span>
-                        )}
-                        {videoUpload.uploading && (
-                          <span className="text-xs text-yellow-400">Uploading...</span>
-                        )}
-                        {videoUpload.error && (
-                          <span className="text-xs text-red-400">Failed</span>
-                        )}
-                      </div>
-                      <button
-                        onClick={removeVideoUpload}
-                        className="text-red-400 hover:text-red-300 p-1 hover:bg-red-500/10 rounded transition-colors"
-                        title="Remove video"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
+                    <div className="flex items-center gap-2">
+                      <Video className="h-4 w-4 text-cyan-400" />
+                      <span className="text-sm font-medium text-cyan-300">
+                        Video Upload (1)
+                      </span>
+                      {videoUpload.uploaded && (
+                        <span className="text-xs text-green-400">1 uploaded</span>
+                      )}
+                      {videoUpload.uploading && (
+                        <span className="text-xs text-yellow-400">uploading...</span>
+                      )}
+                      {videoUpload.error && (
+                        <span className="text-xs text-red-400">failed</span>
+                      )}
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       <div className="flex items-center justify-between bg-slate-600/50 rounded-lg px-3 py-2 border border-slate-500/30">
                         <div className="flex items-center gap-2 min-w-0 flex-1">
                           {videoUpload.uploading ? (
@@ -582,6 +574,13 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                             </div>
                           </div>
                         </div>
+                        <button
+                          onClick={removeVideoUpload}
+                          className="text-red-400 hover:text-red-300 ml-2 flex-shrink-0 p-1 hover:bg-red-500/10 rounded transition-colors"
+                          title="Remove video"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
                       </div>
 
                       {/* Upload progress bar */}
