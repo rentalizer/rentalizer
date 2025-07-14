@@ -14,7 +14,7 @@ export const useUnreadMessages = () => {
     }
 
     try {
-      // Always fetch fresh data from the server, bypassing any cache
+      // Clear any existing cache and fetch fresh data
       const { data, error } = await supabase
         .from('direct_messages')
         .select('id', { count: 'exact' })
@@ -23,11 +23,12 @@ export const useUnreadMessages = () => {
 
       if (error) {
         console.error('Error fetching unread messages:', error);
+        setUnreadCount(0);
         return;
       }
 
       const count = data?.length || 0;
-      console.log('Fetched unread count:', count);
+      console.log('Current unread count for user:', user.id, 'Count:', count);
       setUnreadCount(count);
     } catch (error) {
       console.error('Error fetching unread messages:', error);
@@ -41,57 +42,43 @@ export const useUnreadMessages = () => {
       return;
     }
 
-    // Initial fetch
+    // Initial fetch with force refresh
     fetchUnreadCount(true);
 
-    // Set up realtime subscription for new messages
+    // Set up realtime subscription for changes to direct_messages
     const channel = supabase
-      .channel('direct-messages-unread-count')
+      .channel('unread-messages-counter')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'direct_messages',
-          filter: `recipient_id=eq.${user.id}`
         },
         (payload) => {
-          console.log('Real-time message update:', payload);
-          // Immediately refetch count when any change occurs
-          fetchUnreadCount(true);
-        }
-      )
-      .subscribe();
-
-    // Also listen for read status updates
-    const readChannel = supabase
-      .channel('direct-messages-read-status')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'direct_messages',
-          filter: `recipient_id=eq.${user.id}`
-        },
-        (payload) => {
-          console.log('Message read status updated:', payload);
-          // Refetch count when read status changes
-          fetchUnreadCount(true);
+          console.log('Direct message change detected:', payload);
+          // Refetch count whenever any message is added, updated, or deleted
+          setTimeout(() => fetchUnreadCount(true), 500);
         }
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
-      supabase.removeChannel(readChannel);
     };
   }, [user]);
 
   // Force refresh function for manual updates
   const refreshUnreadCount = () => {
+    console.log('Manual refresh of unread count triggered');
     fetchUnreadCount(true);
   };
 
-  return { unreadCount, refreshUnreadCount };
+  // Reset count function
+  const resetUnreadCount = () => {
+    console.log('Resetting unread count to 0');
+    setUnreadCount(0);
+  };
+
+  return { unreadCount, refreshUnreadCount, resetUnreadCount };
 };
