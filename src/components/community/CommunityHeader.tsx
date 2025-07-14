@@ -213,33 +213,32 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                 />
               </div>
 
-              <Textarea
-                placeholder="What's on your mind?"
-                value={newPost}
-                onChange={(e) => setNewPost(e.target.value)}
-                className={`min-h-[120px] border-cyan-500/20 resize-none ${isDayMode ? 'bg-slate-100 text-slate-700 placeholder-slate-500' : 'bg-slate-700/50 text-white placeholder-gray-400'}`}
-              />
-
-              {/* File attachments display */}
-              {attachedFiles.length > 0 && (
-                <div className="space-y-2">
-                  <label className="text-gray-400 text-sm font-medium">Attached Files:</label>
-                  <div className="flex flex-wrap gap-2">
+              <div className="relative">
+                <Textarea
+                  placeholder="What's on your mind?"
+                  value={newPost}
+                  onChange={(e) => setNewPost(e.target.value)}
+                  className={`min-h-[120px] border-cyan-500/20 resize-none ${isDayMode ? 'bg-slate-100 text-slate-700 placeholder-slate-500' : 'bg-slate-700/50 text-white placeholder-gray-400'} ${attachedFiles.length > 0 ? 'pb-12' : ''}`}
+                />
+                
+                {/* Display attached files inside the textarea container */}
+                {attachedFiles.length > 0 && (
+                  <div className="absolute bottom-2 left-3 right-3 flex flex-wrap gap-2">
                     {attachedFiles.map((file, index) => (
-                      <div key={index} className="flex items-center gap-2 bg-slate-700 rounded-lg px-3 py-2">
-                        <Paperclip className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-300 truncate max-w-[200px]">{file.name}</span>
+                      <div key={index} className="flex items-center gap-1 bg-slate-600/80 rounded px-2 py-1 text-xs backdrop-blur-sm">
+                        <Paperclip className="h-3 w-3 text-gray-300" />
+                        <span className="text-gray-200 truncate max-w-[120px]">{file.name}</span>
                         <button
                           onClick={() => removeAttachedFile(index)}
-                          className="text-red-400 hover:text-red-300"
+                          className="text-red-400 hover:text-red-300 ml-1"
                         >
-                          <X className="h-4 w-4" />
+                          <X className="h-3 w-3" />
                         </button>
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
               
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center gap-2 relative">
