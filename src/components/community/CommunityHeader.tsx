@@ -62,15 +62,30 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
         i === index ? { ...item, uploading: true, error: undefined } : item
       ));
 
+      // Check if user is authenticated
+      if (!user) {
+        console.error('User not authenticated');
+        setAttachedFiles(prev => prev.map((item, i) => 
+          i === index ? { ...item, uploading: false, error: 'User not authenticated' } : item
+        ));
+        return null;
+      }
+
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `community-attachments/${fileName}`;
 
       console.log('Uploading file to:', filePath);
+      console.log('User ID:', user.id);
+      console.log('File size:', file.size);
 
+      // Upload with explicit options
       const { data, error } = await supabase.storage
         .from('course-materials')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
       if (error) {
         console.error('Storage upload error:', error);
@@ -124,6 +139,16 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
     });
 
     if (validFiles.length === 0) return;
+
+    // Check if user is authenticated before proceeding
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to upload files",
+        variant: "destructive"
+      });
+      return;
+    }
 
     // Add files to state with initial status
     const newAttachedFiles: AttachedFile[] = validFiles.map(file => ({
