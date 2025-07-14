@@ -185,7 +185,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
       if (error) {
         console.error('Video upload error:', error);
-        setVideoUpload(prev => prev ? { ...prev, uploading: false, error: 'Upload failed: ' + error.message } : null);
+        setVideoUpload(prev => prev ? { ...prev, uploading: false, uploadProgress: 0, error: 'Upload failed: ' + error.message } : null);
         return null;
       }
 
@@ -204,13 +204,14 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
         uploading: false, 
         uploaded: true, 
         url: publicUrl, 
-        uploadProgress: 100 
+        uploadProgress: 100,
+        error: undefined
       } : null);
 
       // Show success message
       toast({
         title: "Video uploaded!",
-        description: `${file.name} has been uploaded successfully`
+        description: `${file.name} has been uploaded successfully and is ready to include in your post`
       });
 
       return publicUrl;
@@ -219,6 +220,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       setVideoUpload(prev => prev ? { 
         ...prev, 
         uploading: false, 
+        uploadProgress: 0,
         error: 'Upload failed: ' + (error as Error).message 
       } : null);
       return null;
@@ -311,15 +313,17 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       return;
     }
 
-    // Set initial video upload state - this will make it show immediately
+    // Initialize video upload state immediately - this makes it show right away
     setVideoUpload({
       file: videoFile,
       uploaded: false,
       uploading: false,
-      uploadProgress: 0
+      uploadProgress: 0,
+      url: undefined,
+      error: undefined
     });
 
-    // Start upload
+    // Start upload process
     await uploadVideoFile(videoFile);
 
     // Reset the input
@@ -542,7 +546,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                   </div>
                 )}
 
-                {/* Video upload display - This will show and persist after upload */}
+                {/* Video upload display - This now persists properly after upload */}
                 {videoUpload && (
                   <div className="bg-slate-700/30 border border-cyan-500/20 rounded-lg p-3 space-y-3">
                     <div className="flex items-center gap-2">
@@ -551,7 +555,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                         Video Upload
                       </span>
                       {videoUpload.uploaded && (
-                        <span className="text-xs text-green-400">uploaded</span>
+                        <span className="text-xs text-green-400">✓ uploaded</span>
                       )}
                       {videoUpload.uploading && (
                         <span className="text-xs text-yellow-400">uploading...</span>
@@ -633,7 +637,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                             </button>
                           </div>
                           <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                            Video Preview
+                            Video Ready
                           </div>
                         </div>
                       )}
