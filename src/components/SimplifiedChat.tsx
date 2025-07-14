@@ -115,22 +115,31 @@ export default function SimplifiedChat() {
   const sendMessage = async () => {
     if (!newMessage.trim() || !user) return;
 
-    console.log('🚀 Attempting to send message');
-    console.log('📊 Current state:', { 
+    console.log('🚀 START sendMessage - attempting to send message');
+    console.log('📊 Raw state values:', { 
       adminUsersLength: adminUsers.length, 
       adminUsers, 
       isAdmin, 
-      userId: user.id 
+      userId: user?.id,
+      userExists: !!user,
+      messageContent: newMessage.trim()
     });
 
     // Determine available admin users - use current user if they're admin
     const currentAdminUsers = isAdmin && user ? [user.id] : adminUsers;
     
-    console.log('🎯 Using admin users:', currentAdminUsers);
+    console.log('🎯 Calculated currentAdminUsers:', currentAdminUsers);
+    console.log('🔍 Logic check - isAdmin && user:', isAdmin && !!user);
 
     // Check if admins are available
     if (currentAdminUsers.length === 0) {
-      console.log('💥 Showing error toast - no admins available');
+      console.log('💥 ERROR CONDITION HIT - currentAdminUsers is empty');
+      console.log('💥 Final state before error:', { 
+        currentAdminUsersLength: currentAdminUsers.length,
+        isAdmin,
+        userExists: !!user,
+        calculation: `${isAdmin} && ${!!user} ? [${user?.id}] : ${JSON.stringify(adminUsers)}`
+      });
       toast({
         title: "No administrators available",
         description: "Please try again later.",
@@ -138,6 +147,8 @@ export default function SimplifiedChat() {
       });
       return;
     }
+
+    console.log('✅ Admin check passed, continuing with message send');
 
     // Determine recipient based on role
     let recipientId: string;
