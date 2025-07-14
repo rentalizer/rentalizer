@@ -1,4 +1,3 @@
-
 // Community Component - Fixed TopNavBar issue
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,7 +36,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { LoginPrompt } from '@/components/LoginPrompt';
 import { LoginDialog } from '@/components/LoginDialog';
-
 
 export interface CalculatorData {
   // Comps
@@ -322,16 +320,13 @@ const Community = () => {
               <Video className="h-5 w-5 mr-2" />
               Training
             </TabsTrigger>
-            <button 
-              onClick={() => setChatOpen(true)}
-              className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 relative ${
-                isDayMode 
-                  ? 'text-slate-800 hover:text-slate-900 hover:bg-cyan-50' 
-                  : 'text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10'
-              }`}
-            >
+            <TabsTrigger value="dmadmin" className={`transition-all duration-300 relative ${
+              isDayMode 
+                ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-slate-900 text-slate-800 hover:text-slate-900' 
+                : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
+            }`}>
               <MessageSquare className="h-5 w-5 mr-2" />
-              Chat
+              DM Admin
               {unreadCount > 0 && (
                 <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
                   <span className="text-xs text-white font-semibold">
@@ -339,7 +334,7 @@ const Community = () => {
                   </span>
                 </div>
               )}
-            </button>
+            </TabsTrigger>
             <TabsTrigger value="calculator" className={`transition-all duration-300 ${
               isDayMode 
                 ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-slate-900 text-slate-800 hover:text-slate-900' 
@@ -367,19 +362,6 @@ const Community = () => {
               <User size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Profile
             </button>
-            {!adminCheckLoading && userIsAdmin && (
-              <button
-                onClick={() => setMembersDialogOpen(true)}
-                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
-                  isDayMode 
-                    ? 'text-slate-800 hover:text-slate-900 hover:bg-cyan-50' 
-                    : 'text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10'
-                }`}
-              >
-                <Users size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
-                Members
-              </button>
-            )}
           </TabsList>
 
           {/* Tab Content */}
@@ -392,6 +374,18 @@ const Community = () => {
 
           <TabsContent value="videos" className="mt-8">
             <VideoLibrary />
+          </TabsContent>
+
+          <TabsContent value="dmadmin" className="mt-8">
+            <div className="max-w-6xl mx-auto">
+              <div className={`border rounded-xl p-8 backdrop-blur-sm ${
+                isDayMode 
+                  ? 'bg-white/80 border-slate-200' 
+                  : 'bg-slate-800/80 border-cyan-500/30'
+              }`}>
+                <SimplifiedChat />
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="calculator" className="mt-8">
@@ -554,40 +548,6 @@ const Community = () => {
           </TabsContent>
         </Tabs>
       </div>
-
-      {/* Chat Dialog */}
-      <Dialog open={isChatOpen} onOpenChange={setChatOpen}>
-        <DialogContent className="max-w-4xl h-[80vh] bg-slate-900 border-cyan-500/20 text-white">
-          <DialogHeader>
-            <DialogTitle className="text-cyan-300 flex items-center gap-2">
-              <MessageSquare className="h-5 w-5" />
-              Community Chat
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 overflow-hidden">
-            <SimplifiedChat />
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Members Dialog */}
-      <Dialog open={membersDialogOpen} onOpenChange={setMembersDialogOpen}>
-        <DialogContent className="max-w-4xl h-[80vh] bg-slate-900 border-cyan-500/20 text-white">
-          <DialogHeader>
-            <DialogTitle className="text-cyan-300 flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Community Members
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 overflow-hidden">
-            <MembersList 
-              open={membersDialogOpen} 
-              onOpenChange={setMembersDialogOpen}
-              onMessageMember={() => {}}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
 
       {/* Profile Editor Dialog */}
       <Dialog open={profileEditorOpen} onOpenChange={setProfileEditorOpen}>
