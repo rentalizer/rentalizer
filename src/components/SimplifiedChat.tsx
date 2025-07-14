@@ -115,9 +115,18 @@ export default function SimplifiedChat() {
   const sendMessage = async () => {
     if (!newMessage.trim() || !user) return;
 
+    console.log('🚀 SEND MESSAGE DEBUG:', {
+      isAdmin,
+      adminUsersLength: adminUsers.length,
+      adminUsers,
+      userID: user?.id,
+      userEmail: user?.email
+    });
+
     // For admin users, they should always be able to send messages
     // For non-admin users, check if there are admin users available
     if (!isAdmin && adminUsers.length === 0) {
+      console.log('❌ BLOCKING: Non-admin user with no admin users available');
       toast({
         title: "No administrators available",
         description: "Please try again later.",
@@ -125,6 +134,8 @@ export default function SimplifiedChat() {
       });
       return;
     }
+
+    console.log('✅ PROCEEDING with message send');
 
     // Determine recipient based on role
     let recipientId: string;
