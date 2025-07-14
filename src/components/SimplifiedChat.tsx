@@ -26,7 +26,7 @@ export default function SimplifiedChat() {
   const { user } = useAuth();
   const { isAdmin } = useAdminRole();
   const { toast } = useToast();
-  const { unreadCount, refreshUnreadCount, resetUnreadCount } = useUnreadMessages();
+  const { unreadCount, refreshUnreadCount } = useUnreadMessages();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -72,41 +72,6 @@ export default function SimplifiedChat() {
 
     loadMessages();
   }, [user, isAdmin]);
-
-  // Mark messages as read when admin opens chat and reset notification count
-  useEffect(() => {
-    if (isAdmin && messages.length > 0) {
-      const markAsRead = async () => {
-        const unreadMessages = messages.filter(msg => 
-          msg.recipient_id === ADMIN_USER_ID && 
-          msg.sender_id !== ADMIN_USER_ID && 
-          !msg.read_at
-        );
-
-        if (unreadMessages.length > 0) {
-          const { error } = await supabase
-            .from('direct_messages')
-            .update({ read_at: new Date().toISOString() })
-            .in('id', unreadMessages.map(msg => msg.id));
-          
-          if (!error) {
-            console.log('Marked messages as read, resetting notification count');
-            // Reset the notification count immediately
-            resetUnreadCount();
-            // Also refresh to ensure consistency
-            setTimeout(() => {
-              refreshUnreadCount();
-            }, 1000);
-          }
-        } else if (isAdmin) {
-          // If admin opens chat and there are no unread messages, reset count anyway
-          resetUnreadCount();
-        }
-      };
-      
-      markAsRead();
-    }
-  }, [isAdmin, messages, resetUnreadCount, refreshUnreadCount]);
 
   // Send message
   const sendMessage = async () => {
@@ -190,6 +155,36 @@ export default function SimplifiedChat() {
     
     setLoading(false);
   };
+
+  // Mark messages as read when admin opens chat
+  useEffect(() => {
+    if (isAdmin && messages.length > 0) {
+      const markAsRead = async () => {
+        const unreadMessages = messages.filter(msg => 
+          msg.recipient_id === ADMIN_USER_ID && 
+          msg.sender_id !== ADMIN_USER_ID && 
+          !msg.read_at
+        );
+
+        if (unreadMessages.length > 0) {
+          const { error } = await supabase
+            .from('direct_messages')
+            .update({ read_at: new Date().toISOString() })
+            .in('id', unreadMessages.map(msg => msg.id));
+          
+          if (!error) {
+            console.log('Marked messages as read, refreshing count');
+            // Force refresh the unread count after marking as read
+            setTimeout(() => {
+              refreshUnreadCount();
+            }, 500);
+          }
+        }
+      };
+      
+      markAsRead();
+    }
+  }, [isAdmin, messages, user?.id, refreshUnreadCount]);
 
   useEffect(() => {
     scrollToBottom();
