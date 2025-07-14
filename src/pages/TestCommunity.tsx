@@ -1,3 +1,4 @@
+
 // Community Component - Fixed TopNavBar issue
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -381,7 +382,7 @@ const Community = () => {
             )}
           </TabsList>
 
-          {/* Other Tabs */}
+          {/* Tab Content */}
           <TabsContent value="discussions" className="mt-8">
             <GroupDiscussions isDayMode={isDayMode} />
           </TabsContent>
