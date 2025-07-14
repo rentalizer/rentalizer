@@ -39,16 +39,25 @@ export default function SimplifiedChat() {
           .select('user_id')
           .eq('role', 'admin');
         
-        if (data) {
+        if (data && data.length > 0) {
           setAdminUsers(data.map(role => role.user_id));
+        } else if (user && isAdmin) {
+          // In development mode, if current user is admin but no admin roles in DB, use current user
+          setAdminUsers([user.id]);
         }
       } catch (error) {
         console.error('Error fetching admin users:', error);
+        // Fallback: if current user is admin, use them
+        if (user && isAdmin) {
+          setAdminUsers([user.id]);
+        }
       }
     };
 
-    fetchAdminUsers();
-  }, []);
+    if (user) {
+      fetchAdminUsers();
+    }
+  }, [user, isAdmin]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
