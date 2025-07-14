@@ -531,7 +531,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                   </div>
                 )}
 
-                {/* Video upload display - now matches the file attachments style exactly */}
+                {/* Video upload display - persistent video preview after upload */}
                 {videoUpload && (
                   <div className="bg-slate-700/30 border border-cyan-500/20 rounded-lg p-3 space-y-3">
                     <div className="flex items-center gap-2">
@@ -583,7 +583,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                         </button>
                       </div>
 
-                      {/* Upload progress bar */}
+                      {/* Upload progress bar - only show during upload */}
                       {videoUpload.uploading && (
                         <div className="space-y-2">
                           <div className="flex justify-between text-xs text-gray-400">
@@ -594,22 +594,24 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                         </div>
                       )}
 
-                      {/* Video preview */}
+                      {/* Video preview - ALWAYS SHOW after successful upload */}
                       {videoUpload.uploaded && videoUpload.url && (
-                        <div className="relative">
+                        <div className="relative mt-3">
                           <video
                             ref={videoRef}
                             src={videoUpload.url}
-                            className="w-full h-48 object-cover rounded-lg border border-slate-500/30"
+                            className="w-full h-48 object-cover rounded-lg border border-slate-500/30 bg-black"
                             onPlay={() => setIsVideoPlaying(true)}
                             onPause={() => setIsVideoPlaying(false)}
+                            onEnded={() => setIsVideoPlaying(false)}
                             controls={false}
                             preload="metadata"
+                            playsInline
                           />
                           <div className="absolute inset-0 flex items-center justify-center">
                             <button
                               onClick={toggleVideoPlayback}
-                              className="bg-black/60 hover:bg-black/80 text-white p-3 rounded-full transition-colors"
+                              className="bg-black/60 hover:bg-black/80 text-white p-3 rounded-full transition-colors shadow-lg"
                             >
                               {isVideoPlaying ? (
                                 <Pause className="h-6 w-6" />
