@@ -9,9 +9,6 @@ import { useToast } from '@/hooks/use-toast';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
-const ADMIN_EMAIL = 'richie@dialogo.us';
-const ADMIN_USER_ID = '4c1c3756-0815-4d9f-929e-9c12f1b6d9db';
-
 interface Message {
   id: string;
   sender_id: string;
@@ -30,7 +27,28 @@ export default function SimplifiedChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [adminUsers, setAdminUsers] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Get available admin users
+  useEffect(() => {
+    const fetchAdminUsers = async () => {
+      try {
+        const { data } = await supabase
+          .from('user_roles')
+          .select('user_id')
+          .eq('role', 'admin');
+        
+        if (data) {
+          setAdminUsers(data.map(role => role.user_id));
+        }
+      } catch (error) {
+        console.error('Error fetching admin users:', error);
+      }
+    };
+
+    fetchAdminUsers();
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -39,7 +57,7 @@ export default function SimplifiedChat() {
   // Load existing messages
   useEffect(() => {
     const loadMessages = async () => {
-      if (!user) return;
+      if (!user || adminUsers.length === 0) return;
 
       try {
         let query = supabase
@@ -48,11 +66,17 @@ export default function SimplifiedChat() {
           .order('created_at', { ascending: true });
 
         if (isAdmin) {
-          // Admin sees all messages where admin is either sender OR recipient
-          query = query.or(`sender_id.eq.${ADMIN_USER_ID},recipient_id.eq.${ADMIN_USER_ID}`);
+          // Admin sees all messages where any admin is either sender OR recipient
+          const adminFilters = adminUsers.map(adminId => 
+            `sender_id.eq.${adminId},recipient_id.eq.${adminId}`
+          ).join(',');
+          query = query.or(adminFilters);
         } else {
-          // Regular user sees full conversation: messages they sent to admin AND messages admin sent to them
-          query = query.or(`and(sender_id.eq.${user.id},recipient_id.eq.${ADMIN_USER_ID}),and(sender_id.eq.${ADMIN_USER_ID},recipient_id.eq.${user.id})`);
+          // Regular user sees conversation with any admin
+          const userToAdminFilters = adminUsers.map(adminId =>
+            `and(sender_id.eq.${user.id},recipient_id.eq.${adminId}),and(sender_id.eq.${adminId},recipient_id.eq.${user.id})`
+          ).join(',');
+          query = query.or(userToAdminFilters);
         }
 
         const { data, error } = await query;
@@ -71,29 +95,39 @@ export default function SimplifiedChat() {
     };
 
     loadMessages();
-  }, [user, isAdmin]);
+  }, [user, isAdmin, adminUsers]);
 
   // Send message
   const sendMessage = async () => {
     if (!newMessage.trim() || !user) return;
+
+    // Check if admins are available
+    if (adminUsers.length === 0) {
+      toast({
+        title: "No administrators available",
+        description: "Please try again later.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     // Determine recipient based on role
     let recipientId: string;
     if (isAdmin) {
       // Admin needs to reply to the latest user who sent a message
       const latestUserMessage = messages
-        .filter(msg => msg.sender_id !== ADMIN_USER_ID && msg.recipient_id === ADMIN_USER_ID)
+        .filter(msg => !adminUsers.includes(msg.sender_id) && adminUsers.includes(msg.recipient_id))
         .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
       
       if (latestUserMessage) {
         recipientId = latestUserMessage.sender_id;
       } else {
-        // Fallback: if no user messages found, send to admin (shouldn't happen)
-        recipientId = ADMIN_USER_ID;
+        // Fallback: if no user messages found, send to first admin
+        recipientId = adminUsers[0];
       }
     } else {
-      // Non-admin always sends to admin
-      recipientId = ADMIN_USER_ID;
+      // Non-admin always sends to first available admin
+      recipientId = adminUsers[0];
     }
 
     setLoading(true);
@@ -131,9 +165,15 @@ export default function SimplifiedChat() {
               .order('created_at', { ascending: true });
 
             if (isAdmin) {
-              query = query.or(`sender_id.eq.${ADMIN_USER_ID},recipient_id.eq.${ADMIN_USER_ID}`);
+              const adminFilters = adminUsers.map(adminId => 
+                `sender_id.eq.${adminId},recipient_id.eq.${adminId}`
+              ).join(',');
+              query = query.or(adminFilters);
             } else {
-              query = query.or(`and(sender_id.eq.${user.id},recipient_id.eq.${ADMIN_USER_ID}),and(sender_id.eq.${ADMIN_USER_ID},recipient_id.eq.${user.id})`);
+              const userToAdminFilters = adminUsers.map(adminId =>
+                `and(sender_id.eq.${user.id},recipient_id.eq.${adminId}),and(sender_id.eq.${adminId},recipient_id.eq.${user.id})`
+              ).join(',');
+              query = query.or(userToAdminFilters);
             }
 
             const { data } = await query;
@@ -158,11 +198,11 @@ export default function SimplifiedChat() {
 
   // Mark messages as read when admin opens chat
   useEffect(() => {
-    if (isAdmin && messages.length > 0) {
+    if (isAdmin && messages.length > 0 && adminUsers.length > 0) {
       const markAsRead = async () => {
         const unreadMessages = messages.filter(msg => 
-          msg.recipient_id === ADMIN_USER_ID && 
-          msg.sender_id !== ADMIN_USER_ID && 
+          adminUsers.includes(msg.recipient_id) && 
+          !adminUsers.includes(msg.sender_id) && 
           !msg.read_at
         );
 
@@ -184,7 +224,7 @@ export default function SimplifiedChat() {
       
       markAsRead();
     }
-  }, [isAdmin, messages, user?.id, refreshUnreadCount]);
+  }, [isAdmin, messages, user?.id, refreshUnreadCount, adminUsers]);
 
   useEffect(() => {
     scrollToBottom();
