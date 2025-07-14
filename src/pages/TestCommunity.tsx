@@ -1,3 +1,4 @@
+
 // Community Component - Fixed TopNavBar issue
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -94,7 +95,6 @@ const Community = () => {
   
   const [activeTab, setActiveTab] = useState(getInitialTab());
   const [isChatOpen, setChatOpen] = useState(false);
-  const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [profileEditorOpen, setProfileEditorOpen] = useState(false);
   const [userIsAdmin, setUserIsAdmin] = useState(false);
@@ -320,7 +320,7 @@ const Community = () => {
               <Video className="h-5 w-5 mr-2" />
               Training
             </TabsTrigger>
-            <TabsTrigger value="dmadmin" className={`transition-all duration-300 relative ${
+            <TabsTrigger value="dmadmin" className={`relative transition-all duration-300 ${
               isDayMode 
                 ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-slate-900 text-slate-800 hover:text-slate-900' 
                 : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
@@ -328,11 +328,12 @@ const Community = () => {
               <MessageSquare className="h-5 w-5 mr-2" />
               DM Admin
               {unreadCount > 0 && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-xs text-white font-semibold">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                </div>
+                <Badge 
+                  variant="destructive" 
+                  className="absolute -top-1 -right-1 min-w-[20px] h-5 text-xs flex items-center justify-center bg-red-500 text-white"
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="calculator" className={`transition-all duration-300 ${
@@ -340,7 +341,7 @@ const Community = () => {
                 ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-slate-900 text-slate-800 hover:text-slate-900' 
                 : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
             }`}>
-              <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
+              <Calculator className="h-5 w-5 mr-2" />
               Calculator
             </TabsTrigger>
             <TabsTrigger value="askrichie" className={`transition-all duration-300 ${
@@ -348,26 +349,28 @@ const Community = () => {
                 ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-slate-900 text-slate-800 hover:text-slate-900' 
                 : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
             }`}>
-              <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
-              Ask Richie
+              <Bot className="h-5 w-5 mr-2" />
+              AI Richie
             </TabsTrigger>
-            <button
+            <TabsTrigger 
+              value="profile"
               onClick={() => setProfileEditorOpen(true)}
-              className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+              className={`transition-all duration-300 ${
                 isDayMode 
-                  ? 'text-slate-800 hover:text-slate-900 hover:bg-cyan-50' 
-                  : 'text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10'
+                  ? 'data-[state=active]:bg-cyan-100 data-[state=active]:text-slate-900 text-slate-800 hover:text-slate-900' 
+                  : 'data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300'
               }`}
             >
-              <User size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
+              <User className="h-5 w-5 mr-2" />
               Profile
-            </button>
+            </TabsTrigger>
           </TabsList>
 
           {/* Tab Content */}
           <TabsContent value="discussions" className="mt-8">
             <GroupDiscussions isDayMode={isDayMode} />
           </TabsContent>
+          
           <TabsContent value="calendar" className="mt-8">
             <CommunityCalendar />
           </TabsContent>
