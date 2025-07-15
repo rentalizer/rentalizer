@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 // Extend Window interface for Calendly
@@ -101,6 +102,13 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     const name = profile?.display_name || user?.email?.split('@')[0] || 'Anonymous User';
     return getInitials(name);
   }, [profile?.display_name, user?.email, getInitials]);
+
+  // Check if a discussion is from an admin
+  const isAdminPost = useCallback((discussion: Discussion) => {
+    // Check if the author name contains "(Admin)" or if the user_id matches current admin user
+    return discussion.author.includes('(Admin)') || 
+           (user && discussion.user_id === user.id && isAdmin);
+  }, [user, isAdmin]);
 
   // Fetch user profiles
   const fetchUserProfiles = useCallback(async () => {
@@ -434,38 +442,46 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                             )}
                           </div>
                           
-                          {/* Options Menu */}
-                          {canEditOrDelete(discussion) && (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-white">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="bg-slate-800 border-gray-700">
-                                <DropdownMenuItem 
-                                  onClick={() => {
-                                    setEditingPost(discussion.id);
-                                    setEditContent(discussion.content);
-                                  }}
-                                  className="text-gray-300 hover:text-white hover:bg-slate-700 cursor-pointer"
-                                >
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  onClick={() => {
-                                    console.log('🗑️ DELETE BUTTON CLICKED for discussion:', discussion.id);
-                                    handleDeleteDiscussion(discussion.id);
-                                  }}
-                                  className="text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          )}
+                          {/* Pin Icon and Options Menu */}
+                          <div className="flex items-center gap-2">
+                            {/* Pin Icon for Admin Posts */}
+                            {isAdminPost(discussion) && (
+                              <Pin className="h-4 w-4 text-yellow-400" />
+                            )}
+                            
+                            {/* Options Menu */}
+                            {canEditOrDelete(discussion) && (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-white">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="bg-slate-800 border-gray-700">
+                                  <DropdownMenuItem 
+                                    onClick={() => {
+                                      setEditingPost(discussion.id);
+                                      setEditContent(discussion.content);
+                                    }}
+                                    className="text-gray-300 hover:text-white hover:bg-slate-700 cursor-pointer"
+                                  >
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={() => {
+                                      console.log('🗑️ DELETE BUTTON CLICKED for discussion:', discussion.id);
+                                      handleDeleteDiscussion(discussion.id);
+                                    }}
+                                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            )}
+                          </div>
                         </div>
 
                         <h3 className={`text-xl font-semibold mb-3 ${isDayMode ? 'text-slate-700' : 'text-white'}`}>
@@ -656,3 +672,4 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     </div>
   );
 };
+
