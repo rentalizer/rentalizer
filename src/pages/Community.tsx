@@ -306,16 +306,6 @@ const Community = () => {
             </h1>
           </div>
           
-          {/* Community Stats - This is where the member count should be displayed */}
-          <div className="flex items-center justify-center gap-8 mt-6">
-            <div className="bg-slate-800/50 rounded-lg px-6 py-4 text-center border border-cyan-500/20">
-              <div className="text-3xl font-bold text-cyan-400">
-                {loading ? '...' : memberCount.toLocaleString()}
-              </div>
-              <div className="text-sm text-gray-400">Total Members</div>
-            </div>
-          </div>
-          
           {/* Admin Chat Button */}
           <div className="flex items-center justify-center gap-4 mt-4">
             <AdminChatButton />
