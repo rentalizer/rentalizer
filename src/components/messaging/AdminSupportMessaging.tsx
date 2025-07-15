@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -34,16 +33,10 @@ export default function AdminSupportMessaging() {
 
   // Load members (for admin view)
   useEffect(() => {
-    if (!user || !isAdmin) {
-      setLoading(false);
-      return;
-    }
-
-    console.log('🔧 AdminSupportMessaging: Starting member load for admin user:', user.id);
+    if (!user || !isAdmin) return;
 
     const loadMembers = async () => {
       try {
-        console.log('🔍 Loading profiles...');
         const { data: profiles, error } = await supabase
           .from('profiles')
           .select(`
@@ -55,28 +48,16 @@ export default function AdminSupportMessaging() {
           `);
 
         if (error) {
-          console.error('❌ Error loading members:', error);
-          console.error('Full error details:', error.message, error.details, error.hint);
-          setLoading(false);
+          console.error('Error loading members:', error);
           return;
         }
 
-        console.log('✅ Profiles loaded:', profiles?.length || 0, 'profiles');
-
         // Get user roles to identify admins
-        console.log('🔍 Loading user roles...');
-        const { data: userRoles, error: rolesError } = await supabase
+        const { data: userRoles } = await supabase
           .from('user_roles')
           .select('user_id, role');
 
-        if (rolesError) {
-          console.error('❌ Error loading user roles:', rolesError);
-        } else {
-          console.log('✅ User roles loaded:', userRoles?.length || 0, 'roles');
-        }
-
         // Load conversations for each member
-        console.log('🔍 Processing members and loading conversations...');
         const membersList: Member[] = await Promise.all(
           profiles
             .filter(profile => profile.user_id !== user.id)
@@ -86,7 +67,7 @@ export default function AdminSupportMessaging() {
               );
 
               // Get latest message with this member
-              const { data: latestMessage, error: messageError } = await supabase
+              const { data: latestMessage } = await supabase
                 .from('direct_messages')
                 .select('*')
                 .or(`and(sender_id.eq.${user.id},recipient_id.eq.${profile.user_id}),and(sender_id.eq.${profile.user_id},recipient_id.eq.${user.id})`)
@@ -94,21 +75,13 @@ export default function AdminSupportMessaging() {
                 .limit(1)
                 .single();
 
-              if (messageError && messageError.code !== 'PGRST116') {
-                console.error(`❌ Error loading latest message for ${profile.user_id}:`, messageError);
-              }
-
               // Count unread messages from this member
-              const { count: unreadCount, error: countError } = await supabase
+              const { count: unreadCount } = await supabase
                 .from('direct_messages')
                 .select('*', { count: 'exact', head: true })
                 .eq('sender_id', profile.user_id)
                 .eq('recipient_id', user.id)
                 .is('read_at', null);
-
-              if (countError) {
-                console.error(`❌ Error counting unread messages for ${profile.user_id}:`, countError);
-              }
 
               return {
                 id: profile.user_id,
@@ -127,18 +100,15 @@ export default function AdminSupportMessaging() {
             })
         );
 
-        console.log('✅ Members list processed:', membersList.length, 'members');
         setMembers(membersList);
         
         // Calculate total unread
         const total = membersList.reduce((sum, member) => sum + member.unreadCount, 0);
-        console.log('📊 Total unread messages:', total);
         setTotalUnread(total);
         
       } catch (error) {
-        console.error('❌ Error in loadMembers:', error);
+        console.error('Error in loadMembers:', error);
       } finally {
-        console.log('🏁 Member loading complete, setting loading to false');
         setLoading(false);
       }
     };
@@ -163,7 +133,7 @@ export default function AdminSupportMessaging() {
           .order('created_at', { ascending: true });
 
         if (error) {
-          console.error('❌ Error loading messages:', error);
+          console.error('Error loading messages:', error);
           setMessages([]);
           return;
         }
@@ -179,7 +149,6 @@ export default function AdminSupportMessaging() {
           senderName: msg.sender_name
         }));
 
-        console.log('✅ Messages loaded:', formattedMessages.length, 'messages');
         setMessages(formattedMessages);
 
         // Mark messages as read if current user is recipient
@@ -202,7 +171,7 @@ export default function AdminSupportMessaging() {
         }
 
       } catch (error) {
-        console.error('❌ Error in loadMessages:', error);
+        console.error('Error in loadMessages:', error);
         setMessages([]);
       }
     };
@@ -393,7 +362,7 @@ export default function AdminSupportMessaging() {
       });
 
     } catch (error) {
-      console.error('❌ Error in handleSendMessage:', error);
+      console.error('Error in handleSendMessage:', error);
       toast({
         title: "Error sending message",
         description: "Failed to send message. Please try again.",
@@ -404,17 +373,7 @@ export default function AdminSupportMessaging() {
 
   const selectedMember = members.find(m => m.id === selectedMemberId);
 
-  console.log('🎯 AdminSupportMessaging render state:', {
-    user: user?.id,
-    isAdmin,
-    loading,
-    membersCount: members.length,
-    selectedMemberId,
-    selectedMember: selectedMember?.name
-  });
-
   if (!user) {
-    console.log('🚫 No user, showing login prompt');
     return (
       <div className="flex items-center justify-center h-64 bg-slate-800/90 rounded-lg">
         <div className="text-center">
@@ -426,7 +385,6 @@ export default function AdminSupportMessaging() {
   }
 
   if (loading) {
-    console.log('⏳ Still loading, showing loading state');
     return (
       <div className="flex items-center justify-center h-64 bg-slate-800/90 rounded-lg">
         <div className="text-center">
@@ -437,20 +395,60 @@ export default function AdminSupportMessaging() {
     );
   }
 
-  // Member view - simple support chat interface
+  // Member view - simple chat with admin
   if (!isAdmin) {
-    console.log('👤 Non-admin user view - Support Chat Interface');
-    
-    // For members, we'll show a simple support chat that works even without admin users in DB
+    // For members, find the first admin to chat with
     useEffect(() => {
       if (!user || isAdmin || selectedMemberId) return;
 
-      console.log('🔍 Member setting up support chat...');
-      
-      // Set a default admin user ID for support messaging
-      // This allows members to send support messages even if no admin users exist in the DB yet
-      const supportAdminId = '00000000-0000-0000-0000-000000000001'; // Default support ID
-      setSelectedMemberId(supportAdminId);
+      console.log('🔍 Member finding admin to chat with...');
+
+      const findAdminAndLoadMessages = async () => {
+        try {
+          setLoading(true);
+          
+          // Find first admin user
+          const { data: adminRoles, error: adminError } = await supabase
+            .from('user_roles')
+            .select('user_id')
+            .eq('role', 'admin')
+            .limit(1);
+
+          if (adminError) {
+            console.error('❌ Error finding admin:', adminError);
+            toast({
+              title: "Error",
+              description: "Could not find admin to chat with",
+              variant: "destructive"
+            });
+            return;
+          }
+
+          if (adminRoles && adminRoles.length > 0) {
+            const adminId = adminRoles[0].user_id;
+            console.log('✅ Found admin:', adminId);
+            setSelectedMemberId(adminId);
+          } else {
+            console.log('❌ No admin found');
+            toast({
+              title: "No admin available",
+              description: "Please try again later",
+              variant: "destructive"
+            });
+          }
+        } catch (error) {
+          console.error('❌ Error in findAdminAndLoadMessages:', error);
+          toast({
+            title: "Error",
+            description: "Failed to connect to admin support",
+            variant: "destructive"
+          });
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      findAdminAndLoadMessages();
     }, [user, isAdmin, selectedMemberId]);
 
     return (
@@ -458,29 +456,33 @@ export default function AdminSupportMessaging() {
         <div className="bg-slate-700/50 border border-border rounded-lg p-6 mb-4">
           <div className="flex items-center gap-3 mb-4">
             <MessageSquare className="h-6 w-6 text-primary" />
-            <h2 className="text-xl font-semibold text-white">Contact Support</h2>
+            <h2 className="text-xl font-semibold text-white">Contact Admin Support</h2>
             {totalUnread > 0 && (
               <Badge variant="destructive">{totalUnread}</Badge>
             )}
           </div>
           <p className="text-slate-300 mb-4">
-            Need help? Send a message to our support team and we'll get back to you as soon as possible.
+            Need help? Send a message to our admin team and we'll get back to you as soon as possible.
           </p>
         </div>
 
-        {selectedMemberId ? (
+        {loading ? (
+          <div className="bg-slate-800/90 rounded-lg p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+            <p className="text-slate-300">Connecting to admin support...</p>
+          </div>
+        ) : selectedMemberId ? (
           <MessageThread
             messages={messages}
             currentUserId={user.id}
             isTyping={isTyping}
             onSendMessage={handleSendMessage}
-            recipientName="Support Team"
+            recipientName="Admin Support"
             isOnline={true}
           />
         ) : (
           <div className="bg-slate-800/90 rounded-lg p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-            <p className="text-slate-300">Setting up support chat...</p>
+            <p className="text-slate-300">Unable to connect to admin support. Please try refreshing the page.</p>
           </div>
         )}
       </div>
@@ -488,7 +490,6 @@ export default function AdminSupportMessaging() {
   }
 
   // Admin view - full messaging interface
-  console.log('🔧 Admin view rendering');
   return (
     <div className="h-[600px] flex bg-card border border-border rounded-lg overflow-hidden shadow-lg">
       {/* Main Chat Area */}

@@ -1,3 +1,4 @@
+
 // Community Component - Fixed TopNavBar issue
 import React, { useState, useEffect } from 'react';
 
@@ -334,15 +335,6 @@ const Community = () => {
               <Video className="h-5 w-5 mr-2" />
               Training
             </TabsTrigger>
-            <TabsTrigger value="dmadmin" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 relative">
-              <MessageSquare className="h-5 w-5 mr-2" />
-              DM Admin
-              {unreadCount > 0 && (
-                <Badge className="ml-1 bg-red-500 text-white text-xs px-1 py-0 min-w-[16px] h-4 rounded-full">
-                  {unreadCount}
-                </Badge>
-              )}
-            </TabsTrigger>
             <TabsTrigger value="calculator" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
@@ -377,9 +369,6 @@ const Community = () => {
             <VideoLibrary />
           </TabsContent>
 
-          <TabsContent value="dmadmin" className="mt-8">
-            <AdminSupportMessaging />
-          </TabsContent>
 
           <TabsContent value="calculator" className="mt-8">
             <div className="space-y-6">
