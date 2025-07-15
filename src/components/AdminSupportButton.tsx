@@ -4,16 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import AdminSupportMessaging from './messaging/AdminSupportMessaging';
 
-interface AdminSupportButtonProps {
-  unreadCount?: number;
-}
-
-export default function AdminSupportButton({ unreadCount = 0 }: AdminSupportButtonProps) {
+export default function AdminSupportButton() {
   const [isOpen, setIsOpen] = useState(false);
   const { isAdmin } = useAdminRole();
   const { user } = useAuth();
+  const { unreadCount } = useUnreadMessages();
 
   // Don't show the button if user is not authenticated
   if (!user) {
@@ -64,12 +62,9 @@ export default function AdminSupportButton({ unreadCount = 0 }: AdminSupportButt
       <MessageSquare className="h-4 w-4 mr-2" />
       {isAdmin ? 'Support Center' : 'Support'}
       {unreadCount > 0 && (
-        <Badge
-          variant="destructive"
-          className="absolute -top-2 -right-2 h-5 w-5 text-xs p-0 flex items-center justify-center"
-        >
+        <div className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full min-w-5 h-5 text-xs flex items-center justify-center px-1">
           {unreadCount > 99 ? '99+' : unreadCount}
-        </Badge>
+        </div>
       )}
     </Button>
   );
