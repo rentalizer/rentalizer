@@ -238,19 +238,28 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     };
   }, [user, profile, isAdmin, userProfiles, getInitials]);
 
-  // Memoized filtered discussions
+  // Memoized filtered discussions with enhanced sorting
   const filteredDiscussions = useMemo(() => {
     console.log('🔍 Filtering discussions. Total discussions:', discussionsList.length);
     
     const sorted = discussionsList
       .sort((a, b) => {
+        // First priority: pinned posts go to top
         if (a.isPinned && !b.isPinned) return -1;
         if (!a.isPinned && b.isPinned) return 1;
+        
+        // Second priority: among pinned posts, sort by creation date (newest first)
+        if (a.isPinned && b.isPinned) {
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        }
+        
+        // Third priority: among non-pinned posts, sort by creation date (newest first)
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
     
     const pinnedCount = sorted.filter(d => d.isPinned).length;
     console.log('📌 Pinned posts:', pinnedCount, 'Regular posts:', sorted.length - pinnedCount);
+    console.log('📌 First 3 posts order:', sorted.slice(0, 3).map(d => ({ title: d.title.substring(0, 30), isPinned: d.isPinned })));
     
     return sorted;
   }, [discussionsList]);
@@ -309,7 +318,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     try {
       const newPinnedStatus = !discussion.isPinned;
       
-      // Update database
+      // Update database first
       const { error } = await supabase
         .from('discussions')
         .update({ is_pinned: newPinnedStatus })
@@ -325,17 +334,21 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         return;
       }
 
-      // Update local state
-      setDiscussionsList(prev => prev.map(d => 
-        d.id === discussionId 
-          ? { ...d, isPinned: newPinnedStatus }
-          : d
-      ));
+      // Update local state immediately to trigger re-render and re-sort
+      setDiscussionsList(prev => {
+        const updated = prev.map(d => 
+          d.id === discussionId 
+            ? { ...d, isPinned: newPinnedStatus }
+            : d
+        );
+        console.log('📌 Updated discussions list with new pin status');
+        return updated;
+      });
 
       toast({
         title: newPinnedStatus ? "Post Pinned" : "Post Unpinned",
         description: newPinnedStatus 
-          ? "This post will appear at the top of the discussions" 
+          ? "This post will now appear at the top of the discussions" 
           : "This post will no longer be pinned",
       });
 
@@ -436,7 +449,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     return content.substring(0, maxLength) + '...';
   }, []);
 
-  // Handle post creation callback - DO NOT refetch, just add the new post
+  // Handle post creation callback - refresh discussions list
   const handlePostCreated = useCallback(() => {
     console.log('🔄 New post created - refreshing discussions list');
     fetchDiscussions();
