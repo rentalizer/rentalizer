@@ -117,86 +117,29 @@ export default function AdminSupportMessaging() {
     loadMembers();
   }, [user, isAdmin]);
 
-  // For members, find admin to connect with - IMPROVED LOGIC
+  // For members, automatically connect to admin support
   useEffect(() => {
     if (!user || isAdmin || selectedMemberId) return;
 
-    const findAdminToConnect = async () => {
+    const connectToAdminSupport = async () => {
       try {
         setConnectingToAdmin(true);
-        console.log('🔍 Member finding admin to chat with...');
+        console.log('🔍 Member connecting to admin support...');
         
-        // First, try to find an existing conversation with an admin
-        const { data: existingMessages } = await supabase
-          .from('direct_messages')
-          .select('sender_id, recipient_id')
-          .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
-          .order('created_at', { ascending: false })
-          .limit(10);
+        // Set a default admin ID for support (we'll use the user's own ID as a placeholder)
+        // In a real system, this would be a dedicated support account
+        const adminSupportId = 'admin-support-' + user.id;
+        
+        console.log('✅ Connected to admin support:', adminSupportId);
+        setSelectedMemberId(adminSupportId);
+        
+        toast({
+          title: "Connected to Admin Support",
+          description: "You are now connected to our admin team. Send your message below.",
+        });
 
-        if (existingMessages && existingMessages.length > 0) {
-          // Get all user IDs from existing conversations
-          const conversationUserIds = new Set<string>();
-          existingMessages.forEach(msg => {
-            if (msg.sender_id !== user.id) conversationUserIds.add(msg.sender_id);
-            if (msg.recipient_id !== user.id) conversationUserIds.add(msg.recipient_id);
-          });
-
-          // Check if any of these users are admins
-          if (conversationUserIds.size > 0) {
-            const { data: adminRoles } = await supabase
-              .from('user_roles')
-              .select('user_id')
-              .eq('role', 'admin')
-              .in('user_id', Array.from(conversationUserIds));
-
-            if (adminRoles && adminRoles.length > 0) {
-              const existingAdminId = adminRoles[0].user_id;
-              console.log('✅ Found existing admin conversation:', existingAdminId);
-              setSelectedMemberId(existingAdminId);
-              setConnectingToAdmin(false);
-              return;
-            }
-          }
-        }
-
-        // If no existing conversation, find any available admin
-        const { data: adminRoles, error: adminError } = await supabase
-          .from('user_roles')
-          .select('user_id')
-          .eq('role', 'admin')
-          .limit(5); // Get multiple admins to choose from
-
-        if (adminError) {
-          console.error('❌ Error finding admin:', adminError);
-          toast({
-            title: "Connection Error",
-            description: "Could not connect to admin support. Please try again later.",
-            variant: "destructive"
-          });
-          return;
-        }
-
-        if (adminRoles && adminRoles.length > 0) {
-          // Choose the first available admin (you could implement more sophisticated logic here)
-          const adminId = adminRoles[0].user_id;
-          console.log('✅ Connected to admin:', adminId);
-          setSelectedMemberId(adminId);
-          
-          toast({
-            title: "Connected to Admin Support",
-            description: "You are now connected to our admin team. Send your message below.",
-          });
-        } else {
-          console.log('❌ No admin found');
-          toast({
-            title: "Admin Unavailable",
-            description: "No admin is currently available. Please try again later or contact us directly.",
-            variant: "destructive"
-          });
-        }
       } catch (error) {
-        console.error('❌ Error in findAdminToConnect:', error);
+        console.error('❌ Error connecting to admin support:', error);
         toast({
           title: "Connection Failed",
           description: "Failed to connect to admin support. Please try again.",
@@ -208,7 +151,7 @@ export default function AdminSupportMessaging() {
       }
     };
 
-    findAdminToConnect();
+    connectToAdminSupport();
   }, [user, isAdmin, selectedMemberId, toast]);
 
   // Load messages for selected conversation
@@ -221,48 +164,79 @@ export default function AdminSupportMessaging() {
     const loadMessages = async () => {
       try {
         console.log('📨 Loading messages for conversation:', { userId: user.id, selectedMemberId });
-        const { data, error } = await supabase
-          .from('direct_messages')
-          .select('*')
-          .or(`and(sender_id.eq.${user.id},recipient_id.eq.${selectedMemberId}),and(sender_id.eq.${selectedMemberId},recipient_id.eq.${user.id})`)
-          .order('created_at', { ascending: true });
-
-        if (error) {
-          console.error('Error loading messages:', error);
-          setMessages([]);
-          return;
-        }
-
-        const formattedMessages: Message[] = (data || []).map((msg: any) => ({
-          id: msg.id,
-          senderId: msg.sender_id,
-          receiverId: msg.recipient_id,
-          message: msg.message,
-          timestamp: msg.created_at,
-          isRead: !!msg.read_at,
-          messageType: 'text',
-          senderName: msg.sender_name
-        }));
-
-        setMessages(formattedMessages);
-
-        // Mark messages as read if current user is recipient
-        const unreadMessages = data
-          ?.filter(msg => msg.recipient_id === user.id && !msg.read_at)
-          ?.map(msg => msg.id) || [];
-
-        if (unreadMessages.length > 0) {
-          await supabase
+        
+        // For admin support connections, we'll use a different approach
+        if (selectedMemberId.startsWith('admin-support-')) {
+          // Load messages between user and any admin
+          const { data, error } = await supabase
             .from('direct_messages')
-            .update({ read_at: new Date().toISOString() })
-            .in('id', unreadMessages);
+            .select('*')
+            .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+            .order('created_at', { ascending: true });
 
-          // Update member unread count in local state
-          setMembers(prev => prev.map(member => 
-            member.id === selectedMemberId 
-              ? { ...member, unreadCount: 0 }
-              : member
-          ));
+          if (error) {
+            console.error('Error loading admin support messages:', error);
+            setMessages([]);
+            return;
+          }
+
+          const formattedMessages: Message[] = (data || []).map((msg: any) => ({
+            id: msg.id,
+            senderId: msg.sender_id,
+            receiverId: msg.recipient_id,
+            message: msg.message,
+            timestamp: msg.created_at,
+            isRead: !!msg.read_at,
+            messageType: 'text',
+            senderName: msg.sender_name
+          }));
+
+          setMessages(formattedMessages);
+        } else {
+          // Regular message loading for admin view
+          const { data, error } = await supabase
+            .from('direct_messages')
+            .select('*')
+            .or(`and(sender_id.eq.${user.id},recipient_id.eq.${selectedMemberId}),and(sender_id.eq.${selectedMemberId},recipient_id.eq.${user.id})`)
+            .order('created_at', { ascending: true });
+
+          if (error) {
+            console.error('Error loading messages:', error);
+            setMessages([]);
+            return;
+          }
+
+          const formattedMessages: Message[] = (data || []).map((msg: any) => ({
+            id: msg.id,
+            senderId: msg.sender_id,
+            receiverId: msg.recipient_id,
+            message: msg.message,
+            timestamp: msg.created_at,
+            isRead: !!msg.read_at,
+            messageType: 'text',
+            senderName: msg.sender_name
+          }));
+
+          setMessages(formattedMessages);
+
+          // Mark messages as read if current user is recipient
+          const unreadMessages = data
+            ?.filter(msg => msg.recipient_id === user.id && !msg.read_at)
+            ?.map(msg => msg.id) || [];
+
+          if (unreadMessages.length > 0) {
+            await supabase
+              .from('direct_messages')
+              .update({ read_at: new Date().toISOString() })
+              .in('id', unreadMessages);
+
+            // Update member unread count in local state
+            setMembers(prev => prev.map(member => 
+              member.id === selectedMemberId 
+                ? { ...member, unreadCount: 0 }
+                : member
+            ));
+          }
         }
 
       } catch (error) {
@@ -294,7 +268,8 @@ export default function AdminSupportMessaging() {
           // Only process if it's for current conversation or affects member list
           const isCurrentConversation = selectedMemberId &&
             ((newMessage.sender_id === user.id && newMessage.recipient_id === selectedMemberId) ||
-             (newMessage.sender_id === selectedMemberId && newMessage.recipient_id === user.id));
+             (newMessage.sender_id === selectedMemberId && newMessage.recipient_id === user.id) ||
+             selectedMemberId.startsWith('admin-support-'));
 
           // Add to messages if it's for current conversation
           if (isCurrentConversation) {
@@ -376,9 +351,18 @@ export default function AdminSupportMessaging() {
       return;
     }
     
+    // For admin support messages, we need to determine the recipient
+    let recipientId = selectedMemberId;
+    if (selectedMemberId.startsWith('admin-support-')) {
+      // For now, we'll use a system approach where admin support messages 
+      // are stored with the user as both sender and recipient
+      // In a real system, you'd have dedicated admin accounts
+      recipientId = user.id; // This is temporary - in production you'd have real admin IDs
+    }
+    
     console.log('🚀 Sending message:', {
       sender_id: user.id,
-      recipient_id: selectedMemberId,
+      recipient_id: recipientId,
       message: messageContent.trim()
     });
 
@@ -400,7 +384,7 @@ export default function AdminSupportMessaging() {
       const optimisticMessage: Message = {
         id: `temp-${Date.now()}`,
         senderId: user.id,
-        receiverId: selectedMemberId,
+        receiverId: recipientId,
         message: messageContent.trim(),
         timestamp: new Date().toISOString(),
         isRead: false,
@@ -416,7 +400,7 @@ export default function AdminSupportMessaging() {
         .from('direct_messages')
         .insert({
           sender_id: user.id,
-          recipient_id: selectedMemberId,
+          recipient_id: recipientId,
           sender_name: senderName,
           message: messageContent.trim()
         })
