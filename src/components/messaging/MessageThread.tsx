@@ -85,9 +85,9 @@ export default function MessageThread({
   };
 
   return (
-    <div className="flex flex-col h-full bg-card border border-border rounded-lg">
+    <div className="flex flex-col h-full bg-slate-600 border border-border rounded-lg">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border bg-muted/50">
+      <div className="flex items-center justify-between p-4 border-b border-border bg-slate-700/80">
         <div className="flex items-center gap-3">
           <div className="relative">
             <Avatar className="h-10 w-10">
@@ -101,8 +101,8 @@ export default function MessageThread({
             )}
           </div>
           <div>
-            <h3 className="font-semibold text-foreground">{recipientName}</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-semibold text-white">{recipientName}</h3>
+            <p className="text-sm text-slate-300">
               {isOnline ? 'Online' : 'Offline'}
             </p>
           </div>
@@ -195,7 +195,7 @@ export default function MessageThread({
       </ScrollArea>
 
       {/* Message Input */}
-      <div className="p-4 border-t border-border">
+      <div className="p-4 border-t border-border bg-slate-700/80">
         <div className="flex items-end gap-2">
           <div className="flex-1">
             <Input
