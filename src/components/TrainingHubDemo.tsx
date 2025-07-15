@@ -28,6 +28,7 @@ import {
   Star,
   ChevronRight
 } from 'lucide-react';
+import { useMemberCount } from '@/hooks/useMemberCount';
 
 interface TrainingHubDemoProps {
   currentStep: number;
@@ -37,6 +38,7 @@ interface TrainingHubDemoProps {
 export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps) => {
   const [activeTab, setActiveTab] = useState('discussions');
   const [demoStep, setDemoStep] = useState(0);
+  const { memberCount, loading } = useMemberCount();
 
   const tabs = [
     { id: 'discussions', label: 'Discussions', icon: MessageSquare },
@@ -666,7 +668,9 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-400">Total Members</span>
-                  <Badge className="bg-cyan-500/20 text-cyan-300">181</Badge>
+                  <Badge className="bg-cyan-500/20 text-cyan-300">
+                    {loading ? '...' : memberCount}
+                  </Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-400">Online Now</span>
