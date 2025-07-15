@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -13,7 +13,7 @@ import {
   Pin,
   Star
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { useMemberCount } from '@/hooks/useMemberCount';
 
 interface CommunityDemoProps {
   currentStep: number;
@@ -21,44 +21,7 @@ interface CommunityDemoProps {
 }
 
 export const CommunityDemo = ({ currentStep, isRunning }: CommunityDemoProps) => {
-  const [memberCount, setMemberCount] = useState(0);
-
-  useEffect(() => {
-    fetchMemberCount();
-  }, []);
-
-  const fetchMemberCount = async () => {
-    try {
-      console.log('Fetching member count...');
-      
-      // Try to get the count using the count option
-      const { count, error } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true });
-
-      console.log('Count result:', { count, error });
-
-      if (error) {
-        console.error('Error fetching member count:', error);
-        // Fallback: try to get actual data and count it
-        const { data: profiles, error: dataError } = await supabase
-          .from('profiles')
-          .select('id');
-        
-        console.log('Fallback data result:', { profiles, dataError });
-        
-        if (!dataError && profiles) {
-          console.log('Setting member count to:', profiles.length);
-          setMemberCount(profiles.length);
-        }
-      } else if (count !== null) {
-        console.log('Setting member count to:', count);
-        setMemberCount(count);
-      }
-    } catch (error) {
-      console.error('Error fetching member count:', error);
-    }
-  };
+  const { memberCount, loading } = useMemberCount();
 
   return (
     <Card className="bg-slate-800/50 border-cyan-500/20 animate-fade-in">
@@ -276,7 +239,9 @@ export const CommunityDemo = ({ currentStep, isRunning }: CommunityDemoProps) =>
         {/* Community Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
           <div className="bg-slate-700/30 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-cyan-400">{memberCount}</div>
+            <div className="text-2xl font-bold text-cyan-400">
+              {loading ? '...' : memberCount.toLocaleString()}
+            </div>
             <div className="text-sm text-gray-400">Active Members</div>
           </div>
           <div className="bg-slate-700/30 rounded-lg p-4 text-center">
