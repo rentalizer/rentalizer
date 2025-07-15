@@ -131,7 +131,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     }
   }, []);
 
-  // Fetch discussions from database
+  // Fetch discussions from database with proper sorting
   const fetchDiscussions = useCallback(async () => {
     console.log('🔄 Fetching discussions from database...');
     
@@ -139,6 +139,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       const { data, error } = await supabase
         .from('discussions')
         .select('*')
+        .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -167,6 +168,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       }));
 
       console.log('✅ Formatted discussions:', formattedDiscussions.length);
+      console.log('📌 Pinned discussions:', formattedDiscussions.filter(d => d.isPinned).length);
       setDiscussionsList(formattedDiscussions);
     } catch (error) {
       console.error('❌ Exception fetching discussions:', error);
@@ -238,30 +240,14 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     };
   }, [user, profile, isAdmin, userProfiles, getInitials]);
 
-  // Memoized filtered discussions with enhanced sorting
+  // Since we're already sorting in the database query, we don't need complex sorting here
   const filteredDiscussions = useMemo(() => {
     console.log('🔍 Filtering discussions. Total discussions:', discussionsList.length);
+    const pinnedCount = discussionsList.filter(d => d.isPinned).length;
+    console.log('📌 Pinned posts:', pinnedCount, 'Regular posts:', discussionsList.length - pinnedCount);
+    console.log('📌 First 3 posts order:', discussionsList.slice(0, 3).map(d => ({ title: d.title.substring(0, 30), isPinned: d.isPinned })));
     
-    const sorted = discussionsList
-      .sort((a, b) => {
-        // First priority: pinned posts go to top
-        if (a.isPinned && !b.isPinned) return -1;
-        if (!a.isPinned && b.isPinned) return 1;
-        
-        // Second priority: among pinned posts, sort by creation date (newest first)
-        if (a.isPinned && b.isPinned) {
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        }
-        
-        // Third priority: among non-pinned posts, sort by creation date (newest first)
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      });
-    
-    const pinnedCount = sorted.filter(d => d.isPinned).length;
-    console.log('📌 Pinned posts:', pinnedCount, 'Regular posts:', sorted.length - pinnedCount);
-    console.log('📌 First 3 posts order:', sorted.slice(0, 3).map(d => ({ title: d.title.substring(0, 30), isPinned: d.isPinned })));
-    
-    return sorted;
+    return discussionsList; // Already sorted from database
   }, [discussionsList]);
 
   const handleLike = useCallback((discussionId: string) => {
@@ -334,16 +320,8 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         return;
       }
 
-      // Update local state immediately to trigger re-render and re-sort
-      setDiscussionsList(prev => {
-        const updated = prev.map(d => 
-          d.id === discussionId 
-            ? { ...d, isPinned: newPinnedStatus }
-            : d
-        );
-        console.log('📌 Updated discussions list with new pin status');
-        return updated;
-      });
+      // Refresh the discussions list to get proper sorting
+      await fetchDiscussions();
 
       toast({
         title: newPinnedStatus ? "Post Pinned" : "Post Unpinned",
@@ -361,7 +339,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         variant: "destructive"
       });
     }
-  }, [isAdmin, discussionsList, toast]);
+  }, [isAdmin, discussionsList, toast, fetchDiscussions]);
 
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
     console.log('🗑️ ADMIN DELETING DISCUSSION:', discussionId);
