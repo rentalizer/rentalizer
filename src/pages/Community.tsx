@@ -30,10 +30,7 @@ import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
 import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { CommunityLeaderboard } from '@/components/community/CommunityLeaderboard';
 import { NewsFeed } from '@/components/community/NewsFeed';
-import { AskRichieChat } from '@/components/AskRichieChat';
 import { MemberAskRichie } from '@/components/MemberAskRichie';
-import { MarketFinderDemo } from '@/components/MarketFinderDemo';
-import { PropertyFinderDemo } from '@/components/PropertyFinderDemo';
 import { ContactChat } from '@/components/ContactChat';
 import { AccessGate } from '@/components/AccessGate';
 import { MembersList } from '@/components/MembersList';
@@ -456,11 +453,15 @@ const Community = () => {
           </TabsContent>
 
           <TabsContent value="propertyfinder" className="mt-8">
-            <PropertyFinderDemo />
+            <div className="text-center py-8">
+              <p className="text-gray-400">Property Finder coming soon...</p>
+            </div>
           </TabsContent>
 
           <TabsContent value="marketfinder" className="mt-8">
-            <MarketFinderDemo />
+            <div className="text-center py-8">
+              <p className="text-gray-400">Market Finder coming soon...</p>
+            </div>
           </TabsContent>
 
           <TabsContent value="propertymanagement" className="mt-8">
@@ -726,7 +727,7 @@ const Community = () => {
       </div>
 
       
-      <AskRichieChat />
+      
       
       {/* Ask Richie Chat Dialog for Members */}
       <Dialog open={isChatOpen} onOpenChange={setChatOpen}>
