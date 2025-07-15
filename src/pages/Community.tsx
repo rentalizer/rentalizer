@@ -355,6 +355,17 @@ const Community = () => {
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
             </TabsTrigger>
+            <TabsTrigger value="dmadmin" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+              <MessageSquare className="h-5 w-5 mr-2" />
+              DM Admin
+              {unreadCount > 0 && (
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                  <span className="text-xs text-white font-semibold">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                </div>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               AI Richie
@@ -448,6 +459,29 @@ const Community = () => {
                   paybackMonths={paybackMonths}
                   cashOnCashReturn={cashOnCashReturn}
                 />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="dmadmin" className="mt-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-cyan-500/30 rounded-xl p-8 backdrop-blur-sm">
+                <div className="text-center mb-8">
+                  <MessageSquare className="h-20 w-20 text-cyan-400 mx-auto mb-6" />
+                  <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+                    Direct Message Admin
+                  </h2>
+                  <p className="text-xl text-gray-300 mb-6 leading-relaxed">
+                    Get instant support from our admin team. Click the button below to start a conversation.
+                  </p>
+                </div>
+                
+                <div className="text-center">
+                  <AdminChatButton />
+                  <p className="text-sm text-gray-400 mt-4">
+                    Available 24/7 • Instant messaging • Real-time support
+                  </p>
+                </div>
               </div>
             </div>
           </TabsContent>
