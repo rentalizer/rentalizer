@@ -95,8 +95,8 @@ export default function DirectMessageChat({ isOpen, onClose }: DirectMessageChat
     setLoading(true);
     
     try {
-      // Get admin users to send message to
-      let recipientId = user.id; // Default fallback
+      // Determine recipient based on user role
+      let recipientId: string;
       
       if (!isAdmin) {
         // If user is not admin, find an admin to send message to
@@ -108,11 +108,35 @@ export default function DirectMessageChat({ isOpen, onClose }: DirectMessageChat
           
         if (adminUsers && adminUsers.length > 0) {
           recipientId = adminUsers[0].user_id;
+        } else {
+          toast({
+            title: "Error",
+            description: "No admin available to receive messages",
+            variant: "destructive"
+          });
+          setLoading(false);
+          return;
         }
       } else {
-        // If admin is sending message, they need to specify recipient
-        // For now, we'll just use the current user for testing
-        recipientId = user.id;
+        // If admin is sending message, find a non-admin user or another admin
+        // For simplicity, let's find the first non-admin user from profiles
+        const { data: users } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .neq('user_id', user.id)
+          .limit(1);
+          
+        if (users && users.length > 0) {
+          recipientId = users[0].user_id;
+        } else {
+          toast({
+            title: "Error",
+            description: "No users available to send messages to",
+            variant: "destructive"
+          });
+          setLoading(false);
+          return;
+        }
       }
 
       const { error } = await supabase
