@@ -400,35 +400,64 @@ export default function AdminSupportMessaging() {
   if (!isAdmin) {
     // For members, find the first admin to chat with
     useEffect(() => {
-      if (!user || isAdmin) return;
+      if (!user || isAdmin || selectedMemberId) return;
+
+      console.log('🔍 Member finding admin to chat with...');
 
       const findAdminAndLoadMessages = async () => {
         try {
+          setLoading(true);
+          
           // Find first admin user
-          const { data: adminRoles } = await supabase
+          const { data: adminRoles, error: adminError } = await supabase
             .from('user_roles')
             .select('user_id')
             .eq('role', 'admin')
             .limit(1);
 
+          if (adminError) {
+            console.error('❌ Error finding admin:', adminError);
+            toast({
+              title: "Error",
+              description: "Could not find admin to chat with",
+              variant: "destructive"
+            });
+            return;
+          }
+
           if (adminRoles && adminRoles.length > 0) {
             const adminId = adminRoles[0].user_id;
+            console.log('✅ Found admin:', adminId);
             setSelectedMemberId(adminId);
+          } else {
+            console.log('❌ No admin found');
+            toast({
+              title: "No admin available",
+              description: "Please try again later",
+              variant: "destructive"
+            });
           }
         } catch (error) {
-          console.error('Error finding admin:', error);
+          console.error('❌ Error in findAdminAndLoadMessages:', error);
+          toast({
+            title: "Error",
+            description: "Failed to connect to admin support",
+            variant: "destructive"
+          });
+        } finally {
+          setLoading(false);
         }
       };
 
       findAdminAndLoadMessages();
-    }, [user, isAdmin]);
+    }, [user, isAdmin, selectedMemberId]);
 
     return (
       <div className="h-[600px] max-w-4xl mx-auto">
         <div className="bg-slate-700/50 border border-border rounded-lg p-6 mb-4">
           <div className="flex items-center gap-3 mb-4">
             <MessageSquare className="h-6 w-6 text-primary" />
-            <h2 className="text-xl font-semibold text-white">Admin Support</h2>
+            <h2 className="text-xl font-semibold text-white">Contact Admin Support</h2>
             {totalUnread > 0 && (
               <Badge variant="destructive">{totalUnread}</Badge>
             )}
@@ -438,7 +467,12 @@ export default function AdminSupportMessaging() {
           </p>
         </div>
 
-        {selectedMemberId ? (
+        {loading ? (
+          <div className="bg-slate-800/90 rounded-lg p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+            <p className="text-slate-300">Connecting to admin support...</p>
+          </div>
+        ) : selectedMemberId ? (
           <MessageThread
             messages={messages}
             currentUserId={user.id}
@@ -449,7 +483,7 @@ export default function AdminSupportMessaging() {
           />
         ) : (
           <div className="bg-slate-800/90 rounded-lg p-8 text-center">
-            <p className="text-slate-300">Loading chat...</p>
+            <p className="text-slate-300">Unable to connect to admin support. Please try refreshing the page.</p>
           </div>
         )}
       </div>
