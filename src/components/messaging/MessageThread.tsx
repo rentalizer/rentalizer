@@ -54,9 +54,10 @@ export default function MessageThread({
   }, [messages, isTyping]);
 
   const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
+    const trimmed = newMessage.trim();
+    if (!trimmed) return;
     
-    onSendMessage(newMessage.trim());
+    onSendMessage(trimmed);
     setNewMessage('');
   };
 
@@ -113,7 +114,7 @@ export default function MessageThread({
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4">
+      <ScrollArea className="flex-1 p-4 bg-slate-800/50">
         <div className="space-y-4">
           {messages.map((message) => {
             const isOwn = message.senderId === currentUserId;
@@ -137,17 +138,17 @@ export default function MessageThread({
                     className={`p-3 rounded-lg ${
                       isOwn
                         ? 'bg-primary text-primary-foreground ml-auto'
-                        : 'bg-muted text-muted-foreground'
+                        : 'bg-slate-700 text-white border border-slate-600'
                     }`}
                   >
                     {!isOwn && (
-                      <p className="text-xs font-medium mb-1 opacity-70">
+                      <p className="text-xs font-medium mb-1 text-slate-300">
                         {message.senderName}
                       </p>
                     )}
                     <p className="text-sm leading-relaxed">{message.message}</p>
                   </div>
-                  <div className={`flex items-center gap-2 mt-1 text-xs text-muted-foreground ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`flex items-center gap-2 mt-1 text-xs text-slate-400 ${isOwn ? 'justify-end' : 'justify-start'}`}>
                     <span>
                       {formatDistanceToNow(new Date(message.timestamp), { addSuffix: true })}
                     </span>
@@ -180,11 +181,11 @@ export default function MessageThread({
                   {recipientName.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
-              <div className="bg-muted p-3 rounded-lg">
+              <div className="bg-slate-700 border border-slate-600 p-3 rounded-lg">
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" />
-                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
-                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                  <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" />
+                  <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
+                  <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
                 </div>
               </div>
             </div>
@@ -203,7 +204,7 @@ export default function MessageThread({
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Type your message..."
-              className="resize-none bg-background"
+              className="resize-none bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
               disabled={isUploading}
             />
           </div>

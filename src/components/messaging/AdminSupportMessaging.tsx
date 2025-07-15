@@ -117,25 +117,27 @@ export default function AdminSupportMessaging() {
 
   // Load messages for selected conversation
   useEffect(() => {
-    if (!user || !selectedMemberId) return;
+    if (!user || !selectedMemberId) {
+      setMessages([]);
+      return;
+    }
 
     const loadMessages = async () => {
       try {
+        setLoading(true);
         const { data, error } = await supabase
           .from('direct_messages')
-          .select(`
-            *,
-            profiles!direct_messages_sender_id_fkey(display_name, avatar_url)
-          `)
+          .select('*')
           .or(`and(sender_id.eq.${user.id},recipient_id.eq.${selectedMemberId}),and(sender_id.eq.${selectedMemberId},recipient_id.eq.${user.id})`)
           .order('created_at', { ascending: true });
 
         if (error) {
           console.error('Error loading messages:', error);
+          setMessages([]);
           return;
         }
 
-        const formattedMessages: Message[] = data.map((msg: any) => ({
+        const formattedMessages: Message[] = (data || []).map((msg: any) => ({
           id: msg.id,
           senderId: msg.sender_id,
           receiverId: msg.recipient_id,
@@ -143,26 +145,35 @@ export default function AdminSupportMessaging() {
           timestamp: msg.created_at,
           isRead: !!msg.read_at,
           messageType: 'text',
-          senderName: msg.sender_name,
-          senderAvatar: msg.profiles?.avatar_url
+          senderName: msg.sender_name
         }));
 
         setMessages(formattedMessages);
 
         // Mark messages as read if current user is recipient
         const unreadMessages = data
-          .filter(msg => msg.recipient_id === user.id && !msg.read_at)
-          .map(msg => msg.id);
+          ?.filter(msg => msg.recipient_id === user.id && !msg.read_at)
+          ?.map(msg => msg.id) || [];
 
         if (unreadMessages.length > 0) {
           await supabase
             .from('direct_messages')
             .update({ read_at: new Date().toISOString() })
             .in('id', unreadMessages);
+
+          // Update member unread count in local state
+          setMembers(prev => prev.map(member => 
+            member.id === selectedMemberId 
+              ? { ...member, unreadCount: 0 }
+              : member
+          ));
         }
 
       } catch (error) {
         console.error('Error in loadMessages:', error);
+        setMessages([]);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -186,12 +197,13 @@ export default function AdminSupportMessaging() {
         (payload) => {
           const newMessage = payload.new as any;
           
-          // Add to messages if it's for current conversation
-          if (
-            selectedMemberId &&
+          // Only process if it's for current conversation or affects member list
+          const isCurrentConversation = selectedMemberId &&
             ((newMessage.sender_id === user.id && newMessage.recipient_id === selectedMemberId) ||
-             (newMessage.sender_id === selectedMemberId && newMessage.recipient_id === user.id))
-          ) {
+             (newMessage.sender_id === selectedMemberId && newMessage.recipient_id === user.id));
+
+          // Add to messages if it's for current conversation
+          if (isCurrentConversation) {
             const formattedMessage: Message = {
               id: newMessage.id,
               senderId: newMessage.sender_id,
@@ -203,10 +215,14 @@ export default function AdminSupportMessaging() {
               senderName: newMessage.sender_name
             };
             
-            setMessages(prev => [...prev, formattedMessage]);
+            // Only add if not already in state (avoid duplicates)
+            setMessages(prev => {
+              const exists = prev.some(msg => msg.id === formattedMessage.id);
+              return exists ? prev : [...prev, formattedMessage];
+            });
           }
 
-          // Update members list if admin
+          // Update members list for admin view
           if (isAdmin && newMessage.sender_id !== user.id) {
             setMembers(prev => prev.map(member => {
               if (member.id === newMessage.sender_id) {
@@ -225,6 +241,25 @@ export default function AdminSupportMessaging() {
           }
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'direct_messages',
+          filter: `or(sender_id.eq.${user.id},recipient_id.eq.${user.id})`
+        },
+        (payload) => {
+          const updatedMessage = payload.new as any;
+          
+          // Update read status in local state
+          setMessages(prev => prev.map(msg => 
+            msg.id === updatedMessage.id 
+              ? { ...msg, isRead: !!updatedMessage.read_at }
+              : msg
+          ));
+        }
+      )
       .subscribe();
 
     return () => {
@@ -233,17 +268,31 @@ export default function AdminSupportMessaging() {
   }, [user, selectedMemberId, isAdmin]);
 
   const handleSendMessage = async (messageContent: string) => {
-    if (!user || !selectedMemberId) return;
+    if (!user || !selectedMemberId || !messageContent.trim()) return;
 
     try {
-      const { error } = await supabase
+      // Get sender profile info for display name
+      const { data: senderProfile } = await supabase
+        .from('profiles')
+        .select('display_name, first_name, last_name')
+        .eq('user_id', user.id)
+        .single();
+
+      const senderName = senderProfile?.display_name || 
+        `${senderProfile?.first_name || ''} ${senderProfile?.last_name || ''}`.trim() ||
+        user.email?.split('@')[0] || 'User';
+
+      // Insert message
+      const { data: newMessage, error } = await supabase
         .from('direct_messages')
         .insert({
           sender_id: user.id,
           recipient_id: selectedMemberId,
-          sender_name: user.email?.split('@')[0] || 'User',
-          message: messageContent
-        });
+          sender_name: senderName,
+          message: messageContent.trim()
+        })
+        .select()
+        .single();
 
       if (error) {
         console.error('Error sending message:', error);
@@ -252,7 +301,25 @@ export default function AdminSupportMessaging() {
           description: error.message,
           variant: "destructive"
         });
+        return;
       }
+
+      // Add message to local state immediately for better UX
+      if (newMessage) {
+        const formattedMessage: Message = {
+          id: newMessage.id,
+          senderId: newMessage.sender_id,
+          receiverId: newMessage.recipient_id,
+          message: newMessage.message,
+          timestamp: newMessage.created_at,
+          isRead: false,
+          messageType: 'text',
+          senderName: newMessage.sender_name
+        };
+        
+        setMessages(prev => [...prev, formattedMessage]);
+      }
+
     } catch (error) {
       console.error('Error in handleSendMessage:', error);
       toast({
@@ -283,29 +350,60 @@ export default function AdminSupportMessaging() {
 
   // Member view - simple chat with admin
   if (!isAdmin) {
+    // For members, find the first admin to chat with
+    useEffect(() => {
+      if (!user || isAdmin) return;
+
+      const findAdminAndLoadMessages = async () => {
+        try {
+          // Find first admin user
+          const { data: adminRoles } = await supabase
+            .from('user_roles')
+            .select('user_id')
+            .eq('role', 'admin')
+            .limit(1);
+
+          if (adminRoles && adminRoles.length > 0) {
+            const adminId = adminRoles[0].user_id;
+            setSelectedMemberId(adminId);
+          }
+        } catch (error) {
+          console.error('Error finding admin:', error);
+        }
+      };
+
+      findAdminAndLoadMessages();
+    }, [user, isAdmin]);
+
     return (
       <div className="h-[600px] max-w-4xl mx-auto">
-        <div className="bg-card border border-border rounded-lg p-6 mb-4">
+        <div className="bg-slate-700/50 border border-border rounded-lg p-6 mb-4">
           <div className="flex items-center gap-3 mb-4">
             <MessageSquare className="h-6 w-6 text-primary" />
-            <h2 className="text-xl font-semibold">Admin Support</h2>
+            <h2 className="text-xl font-semibold text-white">Admin Support</h2>
             {totalUnread > 0 && (
               <Badge variant="destructive">{totalUnread}</Badge>
             )}
           </div>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-slate-300 mb-4">
             Need help? Send a message to our admin team and we'll get back to you as soon as possible.
           </p>
         </div>
 
-        <MessageThread
-          messages={messages}
-          currentUserId={user.id}
-          isTyping={isTyping}
-          onSendMessage={handleSendMessage}
-          recipientName="Admin Support"
-          isOnline={true}
-        />
+        {selectedMemberId ? (
+          <MessageThread
+            messages={messages}
+            currentUserId={user.id}
+            isTyping={isTyping}
+            onSendMessage={handleSendMessage}
+            recipientName="Admin Support"
+            isOnline={true}
+          />
+        ) : (
+          <div className="bg-slate-800/90 rounded-lg p-8 text-center">
+            <p className="text-slate-300">Loading chat...</p>
+          </div>
+        )}
       </div>
     );
   }
