@@ -15,10 +15,10 @@ export default function AdminSupportButton({ unreadCount = 0 }: AdminSupportButt
 
   if (isOpen) {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-background rounded-lg w-full max-w-6xl h-[80vh] flex flex-col">
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-card border-2 border-border shadow-2xl rounded-xl w-full max-w-6xl h-[80vh] flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-border">
+          <div className="flex items-center justify-between p-4 border-b-2 border-border bg-muted/20 rounded-t-xl">
             <div className="flex items-center gap-3">
               <MessageSquare className="h-5 w-5 text-primary" />
               <h2 className="text-lg font-semibold">
@@ -32,13 +32,14 @@ export default function AdminSupportButton({ unreadCount = 0 }: AdminSupportButt
               variant="ghost"
               size="sm"
               onClick={() => setIsOpen(false)}
+              className="hover:bg-destructive/20"
             >
               <X className="h-4 w-4" />
             </Button>
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden bg-background rounded-b-xl">
             <AdminSupportMessaging />
           </div>
         </div>
