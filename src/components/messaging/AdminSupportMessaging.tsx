@@ -117,57 +117,99 @@ export default function AdminSupportMessaging() {
     loadMembers();
   }, [user, isAdmin]);
 
-  // For members, find admin to connect with
+  // For members, find admin to connect with - IMPROVED LOGIC
   useEffect(() => {
     if (!user || isAdmin || selectedMemberId) return;
 
     const findAdminToConnect = async () => {
       try {
+        setConnectingToAdmin(true);
         console.log('🔍 Member finding admin to chat with...');
         
-        // Find first admin user
+        // First, try to find an existing conversation with an admin
+        const { data: existingMessages } = await supabase
+          .from('direct_messages')
+          .select('sender_id, recipient_id')
+          .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (existingMessages && existingMessages.length > 0) {
+          // Get all user IDs from existing conversations
+          const conversationUserIds = new Set<string>();
+          existingMessages.forEach(msg => {
+            if (msg.sender_id !== user.id) conversationUserIds.add(msg.sender_id);
+            if (msg.recipient_id !== user.id) conversationUserIds.add(msg.recipient_id);
+          });
+
+          // Check if any of these users are admins
+          if (conversationUserIds.size > 0) {
+            const { data: adminRoles } = await supabase
+              .from('user_roles')
+              .select('user_id')
+              .eq('role', 'admin')
+              .in('user_id', Array.from(conversationUserIds));
+
+            if (adminRoles && adminRoles.length > 0) {
+              const existingAdminId = adminRoles[0].user_id;
+              console.log('✅ Found existing admin conversation:', existingAdminId);
+              setSelectedMemberId(existingAdminId);
+              setConnectingToAdmin(false);
+              return;
+            }
+          }
+        }
+
+        // If no existing conversation, find any available admin
         const { data: adminRoles, error: adminError } = await supabase
           .from('user_roles')
           .select('user_id')
           .eq('role', 'admin')
-          .limit(1);
+          .limit(5); // Get multiple admins to choose from
 
         if (adminError) {
           console.error('❌ Error finding admin:', adminError);
           toast({
-            title: "Error",
-            description: "Could not find admin to chat with",
+            title: "Connection Error",
+            description: "Could not connect to admin support. Please try again later.",
             variant: "destructive"
           });
           return;
         }
 
         if (adminRoles && adminRoles.length > 0) {
+          // Choose the first available admin (you could implement more sophisticated logic here)
           const adminId = adminRoles[0].user_id;
-          console.log('✅ Found admin:', adminId);
+          console.log('✅ Connected to admin:', adminId);
           setSelectedMemberId(adminId);
+          
+          toast({
+            title: "Connected to Admin Support",
+            description: "You are now connected to our admin team. Send your message below.",
+          });
         } else {
           console.log('❌ No admin found');
           toast({
-            title: "No admin available",
-            description: "Please try again later",
+            title: "Admin Unavailable",
+            description: "No admin is currently available. Please try again later or contact us directly.",
             variant: "destructive"
           });
         }
       } catch (error) {
         console.error('❌ Error in findAdminToConnect:', error);
         toast({
-          title: "Error",
-          description: "Failed to connect to admin support",
+          title: "Connection Failed",
+          description: "Failed to connect to admin support. Please try again.",
           variant: "destructive"
         });
       } finally {
+        setConnectingToAdmin(false);
         setLoading(false);
       }
     };
 
     findAdminToConnect();
-  }, [user, isAdmin, selectedMemberId]);
+  }, [user, isAdmin, selectedMemberId, toast]);
 
   // Load messages for selected conversation
   useEffect(() => {
@@ -328,7 +370,7 @@ export default function AdminSupportMessaging() {
       });
       toast({
         title: "Cannot send message",
-        description: "Please make sure you're logged in and have selected a recipient.",
+        description: "Please make sure you're connected to admin support and have entered a message.",
         variant: "destructive"
       });
       return;
@@ -386,8 +428,8 @@ export default function AdminSupportMessaging() {
         // Remove optimistic message on error
         setMessages(prev => prev.filter(msg => msg.id !== optimisticMessage.id));
         toast({
-          title: "Error sending message",
-          description: error.message,
+          title: "Message Failed",
+          description: error.message || "Failed to send message. Please try again.",
           variant: "destructive"
         });
         return;
@@ -416,7 +458,7 @@ export default function AdminSupportMessaging() {
 
       toast({
         title: "Message sent!",
-        description: "Your message has been delivered.",
+        description: "Your message has been delivered to admin support.",
       });
 
     } catch (error) {
@@ -424,8 +466,8 @@ export default function AdminSupportMessaging() {
       // Remove optimistic message on error
       setMessages(prev => prev.filter(msg => msg.id !== `temp-${Date.now()}`));
       toast({
-        title: "Error sending message",
-        description: "Failed to send message. Please try again.",
+        title: "Message Failed",
+        description: "Failed to send message. Please check your connection and try again.",
         variant: "destructive"
       });
     }
@@ -444,12 +486,14 @@ export default function AdminSupportMessaging() {
     );
   }
 
-  if (loading) {
+  if (loading || connectingToAdmin) {
     return (
       <div className="flex items-center justify-center h-64 bg-slate-800/90 rounded-lg">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-white">Loading messages...</p>
+          <p className="text-white">
+            {connectingToAdmin ? 'Connecting to admin support...' : 'Loading messages...'}
+          </p>
         </div>
       </div>
     );
@@ -470,6 +514,11 @@ export default function AdminSupportMessaging() {
           <p className="text-slate-300 mb-4">
             Need help? Send a message to our admin team and we'll get back to you as soon as possible.
           </p>
+          {selectedMemberId && (
+            <p className="text-green-400 text-sm">
+              ✅ Connected to admin support - you can now send messages below
+            </p>
+          )}
         </div>
 
         {selectedMemberId ? (
@@ -485,6 +534,9 @@ export default function AdminSupportMessaging() {
           <div className="bg-slate-800/90 rounded-lg p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
             <p className="text-slate-300">Connecting to admin support...</p>
+            <p className="text-slate-400 text-sm mt-2">
+              If this takes too long, please refresh the page and try again
+            </p>
           </div>
         )}
       </div>
