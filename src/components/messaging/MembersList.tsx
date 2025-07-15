@@ -58,7 +58,7 @@ export default function MembersList({
   });
 
   return (
-    <div className="w-80 bg-muted/30 border-l border-border flex flex-col h-full">
+    <div className="w-80 bg-background border-l border-border flex flex-col h-full">
       {/* Header */}
       <div className="p-4 border-b border-border bg-card/50">
         <div className="flex items-center justify-between mb-3">
