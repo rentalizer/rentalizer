@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -399,13 +400,13 @@ export default function AdminSupportMessaging() {
   if (!isAdmin) {
     // For members, find the first admin to chat with
     useEffect(() => {
-      if (!user || isAdmin || selectedMemberId) return;
+      if (!user || isAdmin || selectedMemberId || loading) return;
 
       console.log('🔍 Member finding admin to chat with...');
 
-      const findAdminAndLoadMessages = async () => {
+      const findAdminAndConnect = async () => {
         try {
-          setLoading(true);
+          setConnectingToAdmin(true);
           
           // Find first admin user
           const { data: adminRoles, error: adminError } = await supabase
@@ -426,7 +427,7 @@ export default function AdminSupportMessaging() {
 
           if (adminRoles && adminRoles.length > 0) {
             const adminId = adminRoles[0].user_id;
-            console.log('✅ Found admin:', adminId);
+            console.log('✅ Found admin, connecting to:', adminId);
             setSelectedMemberId(adminId);
           } else {
             console.log('❌ No admin found');
@@ -437,19 +438,19 @@ export default function AdminSupportMessaging() {
             });
           }
         } catch (error) {
-          console.error('❌ Error in findAdminAndLoadMessages:', error);
+          console.error('❌ Error in findAdminAndConnect:', error);
           toast({
             title: "Error",
             description: "Failed to connect to admin support",
             variant: "destructive"
           });
         } finally {
-          setLoading(false);
+          setConnectingToAdmin(false);
         }
       };
 
-      findAdminAndLoadMessages();
-    }, [user, isAdmin, selectedMemberId]);
+      findAdminAndConnect();
+    }, [user, isAdmin, selectedMemberId, loading]);
 
     return (
       <div className="h-[600px] max-w-4xl mx-auto">
@@ -466,7 +467,7 @@ export default function AdminSupportMessaging() {
           </p>
         </div>
 
-        {loading ? (
+        {connectingToAdmin ? (
           <div className="bg-slate-800/90 rounded-lg p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
             <p className="text-slate-300">Connecting to admin support...</p>
