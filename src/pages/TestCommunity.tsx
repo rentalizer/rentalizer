@@ -13,6 +13,7 @@ import { BuildOutSection } from '@/components/calculator/BuildOutSection';
 import { ExpensesSection } from '@/components/calculator/ExpensesSection';
 import { NetProfitSection } from '@/components/calculator/NetProfitSection';
 import { exportCalculatorToCSV } from '@/utils/calculatorExport';
+import { useMemberCount } from '@/hooks/useMemberCount';
 
 import { Footer } from '@/components/Footer';
 import { TopNavBarTest } from '@/components/TopNavBarTest';
@@ -71,6 +72,7 @@ export interface CalculatorData {
 const Community = () => {
   const { user, isLoading } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const { memberCount, loading } = useMemberCount();
   
   // Check if we're in Lovable environment (bypass auth for development)
   const isLovableEnv = window.location.hostname.includes('lovableproject.com') || 
@@ -368,7 +370,72 @@ const Community = () => {
 
           {/* Tab Content */}
           <TabsContent value="discussions" className="mt-8">
-            <GroupDiscussions isDayMode={isDayMode} />
+            <div className="flex">
+              {/* Main Content Area */}
+              <div className="flex-1">
+                <GroupDiscussions isDayMode={isDayMode} />
+              </div>
+
+              {/* Sidebar */}
+              <div className="w-80 border-l border-slate-700 p-6 space-y-6 ml-6">
+                {/* Community Stats */}
+                <Card className={`border transition-all duration-300 ${
+                  isDayMode 
+                    ? 'bg-white/80 border-slate-200' 
+                    : 'bg-slate-800/50 border-slate-700'
+                }`}>
+                  <CardHeader>
+                    <CardTitle className={`text-lg flex items-center gap-2 ${
+                      isDayMode ? 'text-slate-800' : 'text-white'
+                    }`}>
+                      <Users className={`h-5 w-5 ${isDayMode ? 'text-cyan-700' : 'text-cyan-400'}`} />
+                      Members
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className={`${isDayMode ? 'text-slate-600' : 'text-gray-400'}`}>Total Members</span>
+                      <Badge className={`${
+                        isDayMode 
+                          ? 'bg-cyan-100 text-cyan-800' 
+                          : 'bg-cyan-500/20 text-cyan-300'
+                      }`}>
+                        {loading ? '...' : memberCount}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className={`${isDayMode ? 'text-slate-600' : 'text-gray-400'}`}>Online Now</span>
+                      <Badge className={`${
+                        isDayMode 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-green-500/20 text-green-300'
+                      }`}>
+                        15
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Industry News Feed */}
+                <Card className={`border transition-all duration-300 ${
+                  isDayMode 
+                    ? 'bg-white/80 border-slate-200' 
+                    : 'bg-slate-800/50 border-slate-700'
+                }`}>
+                  <CardHeader>
+                    <CardTitle className={`text-lg flex items-center gap-2 ${
+                      isDayMode ? 'text-slate-800' : 'text-white'
+                    }`}>
+                      <Newspaper className={`h-5 w-5 ${isDayMode ? 'text-cyan-700' : 'text-cyan-400'}`} />
+                      Industry News Feed
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <NewsFeed />
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </TabsContent>
           
           <TabsContent value="calendar" className="mt-8">
