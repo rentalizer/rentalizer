@@ -17,7 +17,7 @@ export const useUnreadMessages = () => {
       // Always fetch fresh data from the server, bypassing any cache
       const { data, error } = await supabase
         .from('direct_messages')
-        .select('id', { count: 'exact' })
+        .select('id, message, sender_id, sender_name, created_at, read_at')
         .eq('recipient_id', user.id)
         .is('read_at', null);
 
@@ -27,7 +27,26 @@ export const useUnreadMessages = () => {
       }
 
       const count = data?.length || 0;
-      console.log('Fetched unread count:', count);
+      
+      // DEBUG: Log detailed information about unread messages
+      console.log('🔍 UNREAD MESSAGES DEBUG:');
+      console.log(`📊 Total unread count: ${count}`);
+      console.log(`👤 Current user ID: ${user.id}`);
+      
+      if (data && data.length > 0) {
+        console.log('📨 Unread messages details:');
+        data.forEach((msg, index) => {
+          console.log(`  ${index + 1}. ID: ${msg.id}`);
+          console.log(`     From: ${msg.sender_name} (${msg.sender_id})`);
+          console.log(`     Message: "${msg.message.substring(0, 50)}${msg.message.length > 50 ? '...' : ''}"`);
+          console.log(`     Created: ${msg.created_at}`);
+          console.log(`     Read at: ${msg.read_at}`);
+          console.log('     ---');
+        });
+      } else {
+        console.log('✅ No unread messages found in database');
+      }
+      
       setUnreadCount(count);
     } catch (error) {
       console.error('Error fetching unread messages:', error);
