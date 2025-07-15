@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -384,17 +385,6 @@ export default function AdminSupportMessaging() {
     );
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64 bg-slate-800/90 rounded-lg">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-          <p className="text-white">Loading messages...</p>
-        </div>
-      </div>
-    );
-  }
-
   // Member view - simple chat with admin
   if (!isAdmin) {
     // For members, find the first admin to chat with
@@ -416,9 +406,11 @@ export default function AdminSupportMessaging() {
 
           if (adminError) {
             console.error('❌ Error finding admin:', adminError);
+            // Set loading to false even on error so member can see the interface
+            setLoading(false);
             toast({
-              title: "Error",
-              description: "Could not find admin to chat with",
+              title: "Connection Issue",
+              description: "Unable to connect to admin support at the moment. Please try again later.",
               variant: "destructive"
             });
             return;
@@ -430,20 +422,16 @@ export default function AdminSupportMessaging() {
             setSelectedMemberId(adminId);
           } else {
             console.log('❌ No admin found');
-            toast({
-              title: "No admin available",
-              description: "Please try again later",
-              variant: "destructive"
-            });
+            // Still set loading to false so member can see the interface
+            setLoading(false);
+            // Don't show error toast, just let them use the interface
           }
         } catch (error) {
           console.error('❌ Error in findAdminAndLoadMessages:', error);
-          toast({
-            title: "Error",
-            description: "Failed to connect to admin support",
-            variant: "destructive"
-          });
+          // Set loading to false on error so member can see the interface
+          setLoading(false);
         } finally {
+          // Always set loading to false after the attempt
           setLoading(false);
         }
       };
@@ -471,7 +459,7 @@ export default function AdminSupportMessaging() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
             <p className="text-slate-300">Connecting to admin support...</p>
           </div>
-        ) : selectedMemberId ? (
+        ) : (
           <MessageThread
             messages={messages}
             currentUserId={user.id}
@@ -480,10 +468,6 @@ export default function AdminSupportMessaging() {
             recipientName="Admin Support"
             isOnline={true}
           />
-        ) : (
-          <div className="bg-slate-800/90 rounded-lg p-8 text-center">
-            <p className="text-slate-300">Unable to connect to admin support. Please try refreshing the page.</p>
-          </div>
         )}
       </div>
     );
