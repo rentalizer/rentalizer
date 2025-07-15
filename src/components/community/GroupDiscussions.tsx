@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 // Extend Window interface for Calendly
@@ -243,12 +242,17 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const filteredDiscussions = useMemo(() => {
     console.log('🔍 Filtering discussions. Total discussions:', discussionsList.length);
     
-    return discussionsList
+    const sorted = discussionsList
       .sort((a, b) => {
         if (a.isPinned && !b.isPinned) return -1;
         if (!a.isPinned && b.isPinned) return 1;
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
+    
+    const pinnedCount = sorted.filter(d => d.isPinned).length;
+    console.log('📌 Pinned posts:', pinnedCount, 'Regular posts:', sorted.length - pinnedCount);
+    
+    return sorted;
   }, [discussionsList]);
 
   const handleLike = useCallback((discussionId: string) => {
@@ -458,9 +462,14 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           {/* Header with Post Input */}
           <CommunityHeader onPostCreated={handlePostCreated} isDayMode={isDayMode} />
 
-          {/* Debug Info */}
+          {/* Enhanced Debug Info */}
           <div className="text-xs text-gray-500 p-2 bg-slate-800 rounded">
-            Debug: Showing {filteredDiscussions.length} discussions
+            Debug: Showing {filteredDiscussions.length} discussions 
+            {filteredDiscussions.filter(d => d.isPinned).length > 0 && (
+              <span className="text-yellow-400 ml-2">
+                ({filteredDiscussions.filter(d => d.isPinned).length} pinned at top)
+              </span>
+            )}
           </div>
 
           {/* Discussion Posts */}
