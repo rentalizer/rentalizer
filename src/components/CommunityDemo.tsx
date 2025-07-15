@@ -29,12 +29,31 @@ export const CommunityDemo = ({ currentStep, isRunning }: CommunityDemoProps) =>
 
   const fetchMemberCount = async () => {
     try {
-      const { data: profiles, error } = await supabase
+      console.log('Fetching member count...');
+      
+      // Try to get the count using the count option
+      const { count, error } = await supabase
         .from('profiles')
-        .select('id', { count: 'exact' });
+        .select('*', { count: 'exact', head: true });
 
-      if (!error && profiles) {
-        setMemberCount(profiles.length);
+      console.log('Count result:', { count, error });
+
+      if (error) {
+        console.error('Error fetching member count:', error);
+        // Fallback: try to get actual data and count it
+        const { data: profiles, error: dataError } = await supabase
+          .from('profiles')
+          .select('id');
+        
+        console.log('Fallback data result:', { profiles, dataError });
+        
+        if (!dataError && profiles) {
+          console.log('Setting member count to:', profiles.length);
+          setMemberCount(profiles.length);
+        }
+      } else if (count !== null) {
+        console.log('Setting member count to:', count);
+        setMemberCount(count);
       }
     } catch (error) {
       console.error('Error fetching member count:', error);
