@@ -1,4 +1,3 @@
-
 // Community Component - Fixed TopNavBar issue
 import React, { useState, useEffect } from 'react';
 
@@ -684,16 +683,12 @@ const Community = () => {
         </Tabs>
       </div>
 
-      
-      
-      
       {/* Ask Richie Chat Dialog for Members */}
       <Dialog open={isChatOpen} onOpenChange={setChatOpen}>
         <DialogContent className="max-w-4xl h-[700px] bg-slate-900 border-cyan-500/20 p-0">
           <MemberAskRichie />
         </DialogContent>
       </Dialog>
-
 
       {/* Members List Dialog */}
       <MembersList 
@@ -703,7 +698,6 @@ const Community = () => {
           console.log('Message member:', member);
           // Handle messaging logic here if needed
         }}
-        totalMembers={memberCount}
       />
 
       <ProfileEditor
