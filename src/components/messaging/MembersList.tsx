@@ -58,9 +58,9 @@ export default function MembersList({
   });
 
   return (
-    <div className="w-80 bg-card border-l border-border flex flex-col h-full">
+    <div className="w-80 bg-muted/30 border-l border-border flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-border">
+      <div className="p-4 border-b border-border bg-card/50">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold text-foreground">Members</h2>
           {onStartNewConversation && (
@@ -97,8 +97,8 @@ export default function MembersList({
               <div
                 key={member.id}
                 onClick={() => onMemberSelect(member.id)}
-                className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted/50 ${
-                  selectedMemberId === member.id ? 'bg-muted' : ''
+                className={`p-3 rounded-lg cursor-pointer transition-colors hover:bg-card/80 ${
+                  selectedMemberId === member.id ? 'bg-primary/10 border border-primary/20' : 'hover:bg-card/60'
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -167,7 +167,7 @@ export default function MembersList({
       </ScrollArea>
 
       {/* Footer Stats */}
-      <div className="p-4 border-t border-border bg-muted/50">
+      <div className="p-4 border-t border-border bg-card/50">
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span>{members.length} member{members.length !== 1 ? 's' : ''}</span>
           <span>

@@ -312,9 +312,9 @@ export default function AdminSupportMessaging() {
 
   // Admin view - full messaging interface
   return (
-    <div className="h-[600px] flex bg-background border border-border rounded-lg overflow-hidden">
+    <div className="h-[600px] flex bg-card border border-border rounded-lg overflow-hidden shadow-lg">
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col bg-background">
         {selectedMember ? (
           <MessageThread
             messages={messages}
@@ -326,9 +326,9 @@ export default function AdminSupportMessaging() {
             isOnline={selectedMember.isOnline}
           />
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-muted/20">
-            <div className="text-center">
-              <Users className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+          <div className="flex-1 flex items-center justify-center bg-muted/10 border-r border-border">
+            <div className="text-center p-8">
+              <Users className="h-16 w-16 mx-auto mb-4 text-muted-foreground/70" />
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 Admin Support Center
               </h3>
