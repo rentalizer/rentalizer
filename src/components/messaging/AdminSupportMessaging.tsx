@@ -395,61 +395,62 @@ export default function AdminSupportMessaging() {
     );
   }
 
-  // Member view - simple chat with admin
-  if (!isAdmin) {
-    // For members, find the first admin to chat with
-    useEffect(() => {
-      if (!user || isAdmin || selectedMemberId) return;
+  // For members, find the first admin to chat with
+  useEffect(() => {
+    if (!user || isAdmin || selectedMemberId) return;
 
-      console.log('🔍 Member finding admin to chat with...');
+    console.log('🔍 Member finding admin to chat with...');
 
-      const findAdminAndLoadMessages = async () => {
-        try {
-          setLoading(true);
-          
-          // Find first admin user
-          const { data: adminRoles, error: adminError } = await supabase
-            .from('user_roles')
-            .select('user_id')
-            .eq('role', 'admin')
-            .limit(1);
+    const findAdminAndLoadMessages = async () => {
+      try {
+        setLoading(true);
+        
+        // Find first admin user
+        const { data: adminRoles, error: adminError } = await supabase
+          .from('user_roles')
+          .select('user_id')
+          .eq('role', 'admin')
+          .limit(1);
 
-          if (adminError) {
-            console.error('❌ Error finding admin:', adminError);
-            toast({
-              title: "Error",
-              description: "Could not find admin to chat with",
-              variant: "destructive"
-            });
-            return;
-          }
-
-          if (adminRoles && adminRoles.length > 0) {
-            const adminId = adminRoles[0].user_id;
-            console.log('✅ Found admin:', adminId);
-            setSelectedMemberId(adminId);
-          } else {
-            console.log('❌ No admin found');
-            toast({
-              title: "No admin available",
-              description: "Please try again later",
-              variant: "destructive"
-            });
-          }
-        } catch (error) {
-          console.error('❌ Error in findAdminAndLoadMessages:', error);
+        if (adminError) {
+          console.error('❌ Error finding admin:', adminError);
           toast({
             title: "Error",
-            description: "Failed to connect to admin support",
+            description: "Could not find admin to chat with",
             variant: "destructive"
           });
-        } finally {
-          setLoading(false);
+          return;
         }
-      };
 
-      findAdminAndLoadMessages();
-    }, [user, isAdmin, selectedMemberId]);
+        if (adminRoles && adminRoles.length > 0) {
+          const adminId = adminRoles[0].user_id;
+          console.log('✅ Found admin:', adminId);
+          setSelectedMemberId(adminId);
+        } else {
+          console.log('❌ No admin found');
+          toast({
+            title: "No admin available",
+            description: "Please try again later",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error('❌ Error in findAdminAndLoadMessages:', error);
+        toast({
+          title: "Error",
+          description: "Failed to connect to admin support",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    findAdminAndLoadMessages();
+  }, [user, isAdmin, selectedMemberId]);
+
+  // Member view - simple chat with admin
+  if (!isAdmin) {
 
     return (
       <div className="h-[600px] max-w-4xl mx-auto">
