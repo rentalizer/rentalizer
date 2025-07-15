@@ -314,7 +314,7 @@ export default function AdminSupportMessaging() {
   return (
     <div className="h-[600px] flex bg-card border border-border rounded-lg overflow-hidden shadow-lg">
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-muted/50">
+      <div className="flex-1 flex flex-col bg-background/95">
         {selectedMember ? (
           <MessageThread
             messages={messages}
@@ -326,7 +326,7 @@ export default function AdminSupportMessaging() {
             isOnline={selectedMember.isOnline}
           />
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-muted/50 border-r border-border">
+          <div className="flex-1 flex items-center justify-center bg-background border-r-2 border-border">
             <div className="text-center p-8">
               <Users className="h-16 w-16 mx-auto mb-4 text-muted-foreground/70" />
               <h3 className="text-lg font-semibold text-foreground mb-2">
