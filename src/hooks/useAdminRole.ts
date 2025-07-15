@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,8 +44,9 @@ export const useAdminRole = () => {
           .eq('role', 'admin')
           .maybeSingle();
         
-        setIsAdmin(!!roleData);
-        console.log('🔐 Production admin check result:', !!roleData);
+        const hasAdminRole = !!roleData;
+        setIsAdmin(hasAdminRole);
+        console.log('🔐 Production admin check result:', hasAdminRole);
       } catch (error) {
         console.error('Error checking admin role:', error);
         setIsAdmin(false);

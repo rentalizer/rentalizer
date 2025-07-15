@@ -34,7 +34,10 @@ export default function AdminSupportMessaging() {
 
   // Load members (for admin view)
   useEffect(() => {
-    if (!user || !isAdmin) return;
+    if (!user || !isAdmin) {
+      setLoading(false);
+      return;
+    }
 
     console.log('🔧 AdminSupportMessaging: Starting member load for admin user:', user.id);
 
@@ -54,6 +57,7 @@ export default function AdminSupportMessaging() {
         if (error) {
           console.error('❌ Error loading members:', error);
           console.error('Full error details:', error.message, error.details, error.hint);
+          setLoading(false);
           return;
         }
 
@@ -447,7 +451,6 @@ export default function AdminSupportMessaging() {
       // This allows members to send support messages even if no admin users exist in the DB yet
       const supportAdminId = '00000000-0000-0000-0000-000000000001'; // Default support ID
       setSelectedMemberId(supportAdminId);
-      setLoading(false);
     }, [user, isAdmin, selectedMemberId]);
 
     return (
