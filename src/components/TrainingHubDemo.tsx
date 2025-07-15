@@ -147,7 +147,7 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
   ];
 
   const stats = [
-    { label: "Active Members", value: "2,341", change: "+12%" },
+    { label: "Active Members", value: loading ? "..." : memberCount.toLocaleString(), change: "+12%" },
     { label: "Properties Analyzed", value: "15,678", change: "+8%" },
     { label: "Success Stories", value: "892", change: "+15%" },
     { label: "Training Hours", value: "4,521", change: "+22%" }
