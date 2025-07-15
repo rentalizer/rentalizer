@@ -95,9 +95,25 @@ export default function DirectMessageChat({ isOpen, onClose }: DirectMessageChat
     setLoading(true);
     
     try {
-      // Simplified recipient logic - in development, messages go to current user
-      // In production with multiple users, this would be more sophisticated
-      const recipientId = user.id;
+      // Get admin users to send message to
+      let recipientId = user.id; // Default fallback
+      
+      if (!isAdmin) {
+        // If user is not admin, find an admin to send message to
+        const { data: adminUsers } = await supabase
+          .from('user_roles')
+          .select('user_id')
+          .eq('role', 'admin')
+          .limit(1);
+          
+        if (adminUsers && adminUsers.length > 0) {
+          recipientId = adminUsers[0].user_id;
+        }
+      } else {
+        // If admin is sending message, they need to specify recipient
+        // For now, we'll just use the current user for testing
+        recipientId = user.id;
+      }
 
       const { error } = await supabase
         .from('direct_messages')
