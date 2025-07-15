@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper, User, Building, TrendingUp, Settings } from 'lucide-react';
 import AdminChatButton from '@/components/AdminChatButton';
+import DirectMessageChat from '@/components/DirectMessageChat';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
@@ -84,6 +85,7 @@ const Community = () => {
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [profileEditorOpen, setProfileEditorOpen] = useState(false);
+  const [directMessageChatOpen, setDirectMessageChatOpen] = useState(false);
   const [userIsAdmin, setUserIsAdmin] = useState(false);
   const [adminCheckLoading, setAdminCheckLoading] = useState(true);
 
@@ -151,6 +153,15 @@ const Community = () => {
 
     checkAdminStatus();
   }, [user, isAdmin]);
+  
+  // Auto-open DirectMessageChat when dmadmin tab is selected
+  useEffect(() => {
+    if (activeTab === 'dmadmin') {
+      setDirectMessageChatOpen(true);
+      // Reset to discussions tab after opening chat
+      setActiveTab('discussions');
+    }
+  }, [activeTab]);
   
   // Update URL hash when tab changes
   useEffect(() => {
@@ -463,28 +474,6 @@ const Community = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="dmadmin" className="mt-8">
-            <div className="max-w-4xl mx-auto">
-              <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 border border-cyan-500/30 rounded-xl p-8 backdrop-blur-sm">
-                <div className="text-center mb-8">
-                  <MessageSquare className="h-20 w-20 text-cyan-400 mx-auto mb-6" />
-                  <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
-                    Direct Message Admin
-                  </h2>
-                  <p className="text-xl text-gray-300 mb-6 leading-relaxed">
-                    Get instant support from our admin team. Click the button below to start a conversation.
-                  </p>
-                </div>
-                
-                <div className="text-center">
-                  <AdminChatButton />
-                  <p className="text-sm text-gray-400 mt-4">
-                    Available 24/7 • Instant messaging • Real-time support
-                  </p>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
 
           <TabsContent value="propertyfinder" className="mt-8">
             <div className="text-center py-8">
@@ -801,6 +790,10 @@ const Community = () => {
   return (
     <AccessGate title="Training Dashboard" subtitle="Access your account">
       <CommunityContent />
+      <DirectMessageChat 
+        isOpen={directMessageChatOpen} 
+        onClose={() => setDirectMessageChatOpen(false)} 
+      />
     </AccessGate>
   );
 };
