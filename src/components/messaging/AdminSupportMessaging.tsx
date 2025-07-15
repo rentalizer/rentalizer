@@ -28,6 +28,7 @@ export default function AdminSupportMessaging() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [connectingToAdmin, setConnectingToAdmin] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
 
   // Load members (for admin view)
@@ -124,7 +125,7 @@ export default function AdminSupportMessaging() {
 
     const loadMessages = async () => {
       try {
-        setLoading(true);
+        console.log('📨 Loading messages for conversation:', { userId: user.id, selectedMemberId });
         const { data, error } = await supabase
           .from('direct_messages')
           .select('*')
@@ -172,8 +173,6 @@ export default function AdminSupportMessaging() {
       } catch (error) {
         console.error('Error in loadMessages:', error);
         setMessages([]);
-      } finally {
-        setLoading(false);
       }
     };
 
