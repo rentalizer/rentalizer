@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -19,7 +20,7 @@ interface Conversation {
 
 export default function AdminSupportMessaging() {
   const { user } = useAuth();
-  const { isAdmin, loading: adminLoading } = useAdminRole();
+  const { isAdmin } = useAdminRole();
   const { toast } = useToast();
   
   const [members, setMembers] = useState<Member[]>([]);
@@ -31,96 +32,43 @@ export default function AdminSupportMessaging() {
   const [connectingToAdmin, setConnectingToAdmin] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
 
-  console.log('🔧 AdminSupportMessaging render state:', {
-    user: user?.id,
-    isAdmin,
-    adminLoading,
-    loading,
-    membersCount: members.length,
-    selectedMemberId
-  });
-
   // Load members (for admin view)
   useEffect(() => {
-    if (!user || adminLoading) {
-      console.log('⏳ Waiting for user or admin loading to complete...');
-      return;
-    }
-
-    if (!isAdmin) {
-      console.log('👤 Non-admin user, setting loading to false');
-      setLoading(false);
-      return;
-    }
+    if (!user || !isAdmin) return;
 
     console.log('🔧 AdminSupportMessaging: Starting member load for admin user:', user.id);
 
     const loadMembers = async () => {
       try {
         console.log('🔍 Loading profiles...');
-        
-        // Check if we're in development mode
-        const isDev = window.location.hostname.includes('lovable.app') || 
-                     window.location.hostname.includes('localhost') ||
-                     user.id === '00000000-0000-0000-0000-000000000001';
+        const { data: profiles, error } = await supabase
+          .from('profiles')
+          .select(`
+            user_id,
+            display_name,
+            first_name,
+            last_name,
+            avatar_url
+          `);
 
-        let profiles;
-        
-        if (isDev) {
-          // In development, create mock data for testing
-          console.log('🔧 Development mode - creating mock members');
-          profiles = [
-            {
-              user_id: 'dev-user-1',
-              display_name: 'Test User 1',
-              first_name: 'Test',
-              last_name: 'User',
-              avatar_url: null
-            },
-            {
-              user_id: 'dev-user-2', 
-              display_name: 'Test User 2',
-              first_name: 'Demo',
-              last_name: 'Member',
-              avatar_url: null
-            }
-          ];
-        } else {
-          // In production, load real profiles
-          const { data: profilesData, error } = await supabase
-            .from('profiles')
-            .select(`
-              user_id,
-              display_name,
-              first_name,
-              last_name,
-              avatar_url
-            `);
-
-          if (error) {
-            console.error('❌ Error loading members:', error);
-            setLoading(false);
-            return;
-          }
-          
-          profiles = profilesData || [];
+        if (error) {
+          console.error('❌ Error loading members:', error);
+          console.error('Full error details:', error.message, error.details, error.hint);
+          return;
         }
 
         console.log('✅ Profiles loaded:', profiles?.length || 0, 'profiles');
 
-        // Get user roles to identify admins (skip in dev mode)
-        let userRoles = [];
-        if (!isDev) {
-          const { data: rolesData, error: rolesError } = await supabase
-            .from('user_roles')
-            .select('user_id, role');
+        // Get user roles to identify admins
+        console.log('🔍 Loading user roles...');
+        const { data: userRoles, error: rolesError } = await supabase
+          .from('user_roles')
+          .select('user_id, role');
 
-          if (rolesError) {
-            console.error('❌ Error loading user roles:', rolesError);
-          } else {
-            console.log('✅ User roles loaded:', rolesData?.length || 0, 'roles');
-            userRoles = rolesData || [];
-          }
+        if (rolesError) {
+          console.error('❌ Error loading user roles:', rolesError);
+        } else {
+          console.log('✅ User roles loaded:', userRoles?.length || 0, 'roles');
         }
 
         // Load conversations for each member
@@ -133,34 +81,29 @@ export default function AdminSupportMessaging() {
                 role => role.user_id === profile.user_id && role.role === 'admin'
               );
 
-              // Get latest message with this member (skip in dev mode for now)
-              let latestMessage = null;
-              let unreadCount = 0;
-              
-              if (!isDev) {
-                try {
-                  const { data: messageData } = await supabase
-                    .from('direct_messages')
-                    .select('*')
-                    .or(`and(sender_id.eq.${user.id},recipient_id.eq.${profile.user_id}),and(sender_id.eq.${profile.user_id},recipient_id.eq.${user.id})`)
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
+              // Get latest message with this member
+              const { data: latestMessage, error: messageError } = await supabase
+                .from('direct_messages')
+                .select('*')
+                .or(`and(sender_id.eq.${user.id},recipient_id.eq.${profile.user_id}),and(sender_id.eq.${profile.user_id},recipient_id.eq.${user.id})`)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
 
-                  latestMessage = messageData;
+              if (messageError && messageError.code !== 'PGRST116') {
+                console.error(`❌ Error loading latest message for ${profile.user_id}:`, messageError);
+              }
 
-                  // Count unread messages from this member
-                  const { count } = await supabase
-                    .from('direct_messages')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('sender_id', profile.user_id)
-                    .eq('recipient_id', user.id)
-                    .is('read_at', null);
+              // Count unread messages from this member
+              const { count: unreadCount, error: countError } = await supabase
+                .from('direct_messages')
+                .select('*', { count: 'exact', head: true })
+                .eq('sender_id', profile.user_id)
+                .eq('recipient_id', user.id)
+                .is('read_at', null);
 
-                  unreadCount = count || 0;
-                } catch (error) {
-                  console.error(`❌ Error loading data for ${profile.user_id}:`, error);
-                }
+              if (countError) {
+                console.error(`❌ Error counting unread messages for ${profile.user_id}:`, countError);
               }
 
               return {
@@ -169,7 +112,7 @@ export default function AdminSupportMessaging() {
                 email: profile.user_id, // We don't have email in profiles, using user_id as fallback
                 avatar: profile.avatar_url,
                 isOnline: false, // TODO: Implement presence
-                unreadCount: unreadCount,
+                unreadCount: unreadCount || 0,
                 isAdmin: isUserAdmin || false,
                 lastMessage: latestMessage ? {
                   content: latestMessage.message,
@@ -197,7 +140,7 @@ export default function AdminSupportMessaging() {
     };
 
     loadMembers();
-  }, [user, isAdmin, adminLoading]);
+  }, [user, isAdmin]);
 
   // Load messages for selected conversation
   useEffect(() => {
@@ -209,41 +152,6 @@ export default function AdminSupportMessaging() {
     const loadMessages = async () => {
       try {
         console.log('📨 Loading messages for conversation:', { userId: user.id, selectedMemberId });
-        
-        // Check if we're in development mode
-        const isDev = window.location.hostname.includes('lovable.app') || 
-                     window.location.hostname.includes('localhost') ||
-                     user.id === '00000000-0000-0000-0000-000000000001';
-        
-        if (isDev) {
-          // In development, show mock messages
-          console.log('🔧 Development mode - showing mock messages');
-          const mockMessages: Message[] = [
-            {
-              id: 'mock-1',
-              senderId: selectedMemberId,
-              receiverId: user.id,
-              message: 'Hello admin, I need help with my account.',
-              timestamp: new Date(Date.now() - 60000).toISOString(),
-              isRead: false,
-              messageType: 'text',
-              senderName: 'Test User'
-            },
-            {
-              id: 'mock-2',
-              senderId: user.id,
-              receiverId: selectedMemberId,
-              message: 'Hi! I\'m here to help. What specific issue are you experiencing?',
-              timestamp: new Date(Date.now() - 30000).toISOString(),
-              isRead: true,
-              messageType: 'text',
-              senderName: 'Admin'
-            }
-          ];
-          setMessages(mockMessages);
-          return;
-        }
-
         const { data, error } = await supabase
           .from('direct_messages')
           .select('*')
@@ -402,34 +310,6 @@ export default function AdminSupportMessaging() {
     });
 
     try {
-      // Check if we're in development mode
-      const isDev = window.location.hostname.includes('lovable.app') || 
-                   window.location.hostname.includes('localhost') ||
-                   user.id === '00000000-0000-0000-0000-000000000001';
-      
-      if (isDev) {
-        // In development, add mock message to local state
-        console.log('🔧 Development mode - adding mock message');
-        const mockMessage: Message = {
-          id: `dev-${Date.now()}`,
-          senderId: user.id,
-          receiverId: selectedMemberId,
-          message: messageContent.trim(),
-          timestamp: new Date().toISOString(),
-          isRead: false,
-          messageType: 'text',
-          senderName: 'Admin'
-        };
-        
-        setMessages(prev => [...prev, mockMessage]);
-        
-        toast({
-          title: "Message sent! (Development Mode)",
-          description: "Your message has been added locally for testing.",
-        });
-        return;
-      }
-
       // Get sender profile info for display name
       const { data: senderProfile } = await supabase
         .from('profiles')
@@ -523,7 +403,6 @@ export default function AdminSupportMessaging() {
   console.log('🎯 AdminSupportMessaging render state:', {
     user: user?.id,
     isAdmin,
-    adminLoading,
     loading,
     membersCount: members.length,
     selectedMemberId,
@@ -542,7 +421,7 @@ export default function AdminSupportMessaging() {
     );
   }
 
-  if (adminLoading || loading) {
+  if (loading) {
     console.log('⏳ Still loading, showing loading state');
     return (
       <div className="flex items-center justify-center h-64 bg-slate-800/90 rounded-lg">
