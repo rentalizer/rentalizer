@@ -21,6 +21,7 @@ import { BuildOutSection } from '@/components/calculator/BuildOutSection';
 import { ExpensesSection } from '@/components/calculator/ExpensesSection';
 import { NetProfitSection } from '@/components/calculator/NetProfitSection';
 import { exportCalculatorToCSV } from '@/utils/calculatorExport';
+import { useMemberCount } from '@/hooks/useMemberCount';
 
 import { Footer } from '@/components/Footer';
 import { CommunityCalendar } from '@/components/community/CommunityCalendar';
@@ -73,6 +74,8 @@ export interface CalculatorData {
 }
 
 const Community = () => {
+  const { memberCount } = useMemberCount();
+  
   // Get initial tab from URL hash or default to discussions
   const getInitialTab = () => {
     const hash = window.location.hash.substring(1);
@@ -301,6 +304,14 @@ const Community = () => {
             <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight py-2">
               Training Dashboard
             </h1>
+          </div>
+          
+          {/* Member Count Display */}
+          <div className="flex items-center justify-center gap-2 mt-4 mb-6">
+            <div className="bg-slate-700/30 rounded-lg px-4 py-2 border border-cyan-500/20">
+              <span className="text-cyan-400 font-semibold text-lg">{memberCount}</span>
+              <span className="text-gray-400 ml-2">Active Members</span>
+            </div>
           </div>
           
           {/* Admin Chat Button */}
