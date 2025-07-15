@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 // Extend Window interface for Calendly
@@ -163,7 +162,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         timeAgo: formatTimeAgo(discussion.created_at),
         created_at: discussion.created_at,
         user_id: discussion.user_id,
-        isPinned: false,
+        isPinned: discussion.is_pinned || false,
         isLiked: false,
         isMockData: false
       }));
@@ -289,6 +288,64 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     setNewComment('');
   }, [newComment, selectedDiscussion, getUserName, getUserInitials]);
 
+  const handlePinToggle = useCallback(async (discussionId: string) => {
+    console.log('📌 Toggling pin status for discussion:', discussionId);
+    
+    if (!isAdmin) {
+      console.log('❌ User is not admin, cannot pin/unpin');
+      return;
+    }
+
+    const discussion = discussionsList.find(d => d.id === discussionId);
+    if (!discussion) {
+      console.log('❌ Discussion not found');
+      return;
+    }
+
+    try {
+      const newPinnedStatus = !discussion.isPinned;
+      
+      // Update database
+      const { error } = await supabase
+        .from('discussions')
+        .update({ is_pinned: newPinnedStatus })
+        .eq('id', discussionId);
+
+      if (error) {
+        console.error('❌ Error updating pin status:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update pin status",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Update local state
+      setDiscussionsList(prev => prev.map(d => 
+        d.id === discussionId 
+          ? { ...d, isPinned: newPinnedStatus }
+          : d
+      ));
+
+      toast({
+        title: newPinnedStatus ? "Post Pinned" : "Post Unpinned",
+        description: newPinnedStatus 
+          ? "This post will appear at the top of the discussions" 
+          : "This post will no longer be pinned",
+      });
+
+      console.log('✅ Pin status updated successfully');
+    } catch (error) {
+      console.error('❌ Exception updating pin status:', error);
+      toast({
+        title: "Error",
+        description: "There was an error updating the pin status",
+        variant: "destructive"
+      });
+    }
+  }, [isAdmin, discussionsList, toast]);
+
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
     console.log('🗑️ ADMIN DELETING DISCUSSION:', discussionId);
     console.log('🗑️ Current discussions count BEFORE deletion:', discussionsList.length);
@@ -364,6 +421,11 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     if (user && discussion.user_id === user.id) return true;
     return false;
   }, [isAdmin, user]);
+
+  const canPin = useCallback((discussion: Discussion) => {
+    // Only admins can pin/unpin posts
+    return isAdmin;
+  }, [isAdmin]);
 
   const getTruncatedContent = useCallback((content: string, maxLength: number = 150) => {
     if (content.length <= maxLength) return content;
@@ -444,9 +506,21 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                           
                           {/* Pin Icon and Options Menu */}
                           <div className="flex items-center gap-2">
-                            {/* Pin Icon for Admin Posts */}
-                            {isAdminPost(discussion) && (
-                              <Pin className="h-4 w-4 text-yellow-400" />
+                            {/* Pin Icon for Admin Posts - now clickable */}
+                            {canPin(discussion) && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handlePinToggle(discussion.id)}
+                                className={`h-8 w-8 p-0 transition-colors ${
+                                  discussion.isPinned 
+                                    ? 'text-yellow-400 hover:text-yellow-500' 
+                                    : 'text-gray-400 hover:text-yellow-400'
+                                }`}
+                                title={discussion.isPinned ? 'Unpin post' : 'Pin post'}
+                              >
+                                <Pin className="h-4 w-4" />
+                              </Button>
                             )}
                             
                             {/* Options Menu */}
@@ -672,4 +746,3 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     </div>
   );
 };
-
