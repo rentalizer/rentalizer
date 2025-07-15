@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -13,6 +13,7 @@ import {
   Pin,
   Star
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CommunityDemoProps {
   currentStep: number;
@@ -20,6 +21,26 @@ interface CommunityDemoProps {
 }
 
 export const CommunityDemo = ({ currentStep, isRunning }: CommunityDemoProps) => {
+  const [memberCount, setMemberCount] = useState(0);
+
+  useEffect(() => {
+    fetchMemberCount();
+  }, []);
+
+  const fetchMemberCount = async () => {
+    try {
+      const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact' });
+
+      if (!error && profiles) {
+        setMemberCount(profiles.length);
+      }
+    } catch (error) {
+      console.error('Error fetching member count:', error);
+    }
+  };
+
   return (
     <Card className="bg-slate-800/50 border-cyan-500/20 animate-fade-in">
       <CardHeader>
@@ -236,7 +257,7 @@ export const CommunityDemo = ({ currentStep, isRunning }: CommunityDemoProps) =>
         {/* Community Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
           <div className="bg-slate-700/30 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-cyan-400">1,247</div>
+            <div className="text-2xl font-bold text-cyan-400">{memberCount}</div>
             <div className="text-sm text-gray-400">Active Members</div>
           </div>
           <div className="bg-slate-700/30 rounded-lg p-4 text-center">
