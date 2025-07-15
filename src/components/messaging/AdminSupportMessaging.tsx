@@ -276,10 +276,11 @@ export default function AdminSupportMessaging() {
       });
       return;
     }
-    console.log('Sending message:', {
-      user_id: user.id,
-      selectedMemberId,
-      messageContent: messageContent.trim()
+    
+    console.log('🚀 Sending message:', {
+      sender_id: user.id,
+      recipient_id: selectedMemberId,
+      message: messageContent.trim()
     });
 
     try {
@@ -294,7 +295,24 @@ export default function AdminSupportMessaging() {
         `${senderProfile?.first_name || ''} ${senderProfile?.last_name || ''}`.trim() ||
         user.email?.split('@')[0] || 'User';
 
-      // Insert message
+      console.log('👤 Sender name resolved:', senderName);
+
+      // Create optimistic message first for immediate UI feedback
+      const optimisticMessage: Message = {
+        id: `temp-${Date.now()}`,
+        senderId: user.id,
+        receiverId: selectedMemberId,
+        message: messageContent.trim(),
+        timestamp: new Date().toISOString(),
+        isRead: false,
+        messageType: 'text',
+        senderName: senderName
+      };
+
+      // Add to UI immediately
+      setMessages(prev => [...prev, optimisticMessage]);
+
+      // Insert message to database
       const { data: newMessage, error } = await supabase
         .from('direct_messages')
         .insert({
@@ -307,7 +325,9 @@ export default function AdminSupportMessaging() {
         .single();
 
       if (error) {
-        console.error('Error sending message:', error);
+        console.error('❌ Error sending message:', error);
+        // Remove optimistic message on error
+        setMessages(prev => prev.filter(msg => msg.id !== optimisticMessage.id));
         toast({
           title: "Error sending message",
           description: error.message,
@@ -316,7 +336,9 @@ export default function AdminSupportMessaging() {
         return;
       }
 
-      // Add message to local state immediately for better UX
+      console.log('✅ Message sent successfully:', newMessage);
+
+      // Replace optimistic message with real message
       if (newMessage) {
         const formattedMessage: Message = {
           id: newMessage.id,
@@ -329,8 +351,16 @@ export default function AdminSupportMessaging() {
           senderName: newMessage.sender_name
         };
         
-        setMessages(prev => [...prev, formattedMessage]);
+        // Replace the optimistic message with the real one
+        setMessages(prev => prev.map(msg => 
+          msg.id === optimisticMessage.id ? formattedMessage : msg
+        ));
       }
+
+      toast({
+        title: "Message sent!",
+        description: "Your message has been delivered.",
+      });
 
     } catch (error) {
       console.error('Error in handleSendMessage:', error);
