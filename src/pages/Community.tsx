@@ -30,10 +30,8 @@ import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
 import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { CommunityLeaderboard } from '@/components/community/CommunityLeaderboard';
 import { NewsFeed } from '@/components/community/NewsFeed';
-import SimplifiedChat from '@/components/SimplifiedChat';
 import { AskRichieChat } from '@/components/AskRichieChat';
 import { MemberAskRichie } from '@/components/MemberAskRichie';
-import { AdminSupportChat } from '@/components/AdminSupportChat';
 import { MarketFinderDemo } from '@/components/MarketFinderDemo';
 import { PropertyFinderDemo } from '@/components/PropertyFinderDemo';
 import { ContactChat } from '@/components/ContactChat';
@@ -86,7 +84,6 @@ const Community = () => {
   
   const [activeTab, setActiveTab] = useState(getInitialTab());
   const [isChatOpen, setChatOpen] = useState(false);
-  const [isAdminSupportOpen, setAdminSupportOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [profileEditorOpen, setProfileEditorOpen] = useState(false);
@@ -357,20 +354,6 @@ const Community = () => {
               <Video className="h-5 w-5 mr-2" />
               Training
             </TabsTrigger>
-            <button 
-              onClick={() => setAdminSupportOpen(true)}
-              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-cyan-300 hover:bg-cyan-600/10 transition-colors relative"
-            >
-              <MessageSquare className="h-5 w-5 mr-2" />
-              DM Admin
-              {unreadCount > 0 && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-xs text-white font-semibold">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                </div>
-              )}
-            </button>
             <TabsTrigger value="calculator" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
@@ -752,12 +735,6 @@ const Community = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Admin Support Chat Dialog */}
-      <Dialog open={isAdminSupportOpen} onOpenChange={setAdminSupportOpen}>
-        <DialogContent className="max-w-4xl h-[700px] bg-slate-900 border-cyan-500/20 p-0">
-          <AdminSupportChat />
-        </DialogContent>
-      </Dialog>
 
       {/* Members List Dialog */}
       <MembersList 
