@@ -89,17 +89,6 @@ const Community = () => {
   const [userIsAdmin, setUserIsAdmin] = useState(false);
   const [adminCheckLoading, setAdminCheckLoading] = useState(true);
 
-  // Calendly demo booking function
-  const bookDemo = () => {
-    console.log('📅 Book Demo clicked - opening Calendly popup');
-    
-    if (window.Calendly) {
-      // @ts-ignore
-      window.Calendly.initPopupWidget({
-        url: 'https://calendly.com/richies-schedule/scale'
-      });
-    }
-  };
   const [showPricingOverlay, setShowPricingOverlay] = useState(false);
   const { toast } = useToast();
   const { isAdmin } = useAdminRole();
@@ -326,14 +315,6 @@ const Community = () => {
           {/* Admin Chat Button */}
           <div className="flex items-center justify-center gap-4 mt-4">
             <AdminChatButton />
-            <Button
-              onClick={bookDemo}
-              className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white"
-              size="sm"
-            >
-              <Calendar className="h-4 w-4 mr-2" />
-              Book Demo
-            </Button>
           </div>
         </div>
 
