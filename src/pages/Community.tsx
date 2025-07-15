@@ -143,14 +143,6 @@ const Community = () => {
     checkAdminStatus();
   }, [user, isAdmin]);
   
-  // Auto-open DirectMessageChat when dmadmin tab is selected
-  useEffect(() => {
-    if (activeTab === 'dmadmin') {
-      setDirectMessageChatOpen(true);
-      // Reset to discussions tab after opening chat
-      setActiveTab('discussions');
-    }
-  }, [activeTab]);
   
   // Update URL hash when tab changes
   useEffect(() => {
@@ -329,14 +321,7 @@ const Community = () => {
         )}
 
         {/* Navigation Tabs */}
-        <Tabs value={activeTab} onValueChange={(value) => {
-          if (value === 'dmadmin') {
-            setDirectMessageChatOpen(true);
-            // Don't change the active tab, keep it as is or reset to discussions
-            return;
-          }
-          setActiveTab(value);
-        }} className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="flex w-full bg-slate-800/50 border border-cyan-500/20 justify-evenly h-14 p-2">
             <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Users className="h-5 w-5 mr-2" />
@@ -353,17 +338,6 @@ const Community = () => {
             <TabsTrigger value="calculator" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
-            </TabsTrigger>
-            <TabsTrigger value="dmadmin" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-              <MessageSquare className="h-5 w-5 mr-2" />
-              DM Admin
-              {unreadCount > 0 && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                  <span className="text-xs text-white font-semibold">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                </div>
-              )}
             </TabsTrigger>
             <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
