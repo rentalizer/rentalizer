@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 // Extend Window interface for Calendly
@@ -423,9 +422,9 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   }, [isAdmin, user]);
 
   const canPin = useCallback((discussion: Discussion) => {
-    // Only admins can pin/unpin posts
-    return isAdmin;
-  }, [isAdmin]);
+    // Only admins can pin/unpin posts AND the post must be from an admin
+    return isAdmin && isAdminPost(discussion);
+  }, [isAdmin, isAdminPost]);
 
   const getTruncatedContent = useCallback((content: string, maxLength: number = 150) => {
     if (content.length <= maxLength) return content;
@@ -506,7 +505,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                           
                           {/* Pin Icon and Options Menu */}
                           <div className="flex items-center gap-2">
-                            {/* Pin Icon for Admin Posts - now clickable */}
+                            {/* Pin Icon for Admin Posts Only */}
                             {canPin(discussion) && (
                               <Button
                                 variant="ghost"
