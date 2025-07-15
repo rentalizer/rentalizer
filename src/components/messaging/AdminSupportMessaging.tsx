@@ -28,16 +28,12 @@ export default function AdminSupportMessaging() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [memberLoading, setMemberLoading] = useState(false);
   const [connectingToAdmin, setConnectingToAdmin] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
 
   // Load members (for admin view)
   useEffect(() => {
-    if (!user || !isAdmin) {
-      setLoading(false); // Don't keep loading for non-admin users
-      return;
-    }
+    if (!user || !isAdmin) return;
 
     const loadMembers = async () => {
       try {
@@ -407,7 +403,7 @@ export default function AdminSupportMessaging() {
 
     const findAdminAndLoadMessages = async () => {
       try {
-        setMemberLoading(true);
+        setLoading(true);
         
         // Find first admin user
         const { data: adminRoles, error: adminError } = await supabase
@@ -446,7 +442,7 @@ export default function AdminSupportMessaging() {
           variant: "destructive"
         });
       } finally {
-        setMemberLoading(false);
+        setLoading(false);
       }
     };
 
@@ -471,7 +467,7 @@ export default function AdminSupportMessaging() {
           </p>
         </div>
 
-        {memberLoading ? (
+        {loading ? (
           <div className="bg-slate-800/90 rounded-lg p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
             <p className="text-slate-300">Connecting to admin support...</p>
