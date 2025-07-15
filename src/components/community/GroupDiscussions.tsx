@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 // Extend Window interface for Calendly
@@ -513,7 +514,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                                 onClick={() => handlePinToggle(discussion.id)}
                                 className={`h-8 w-8 p-0 transition-colors ${
                                   discussion.isPinned 
-                                    ? 'text-yellow-400 hover:text-yellow-500' 
+                                    ? 'text-yellow-400 hover:text-yellow-300' 
                                     : 'text-gray-400 hover:text-yellow-400'
                                 }`}
                                 title={discussion.isPinned ? 'Unpin post' : 'Pin post'}
