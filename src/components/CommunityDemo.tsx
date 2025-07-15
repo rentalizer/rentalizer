@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -369,7 +370,7 @@ export const CommunityDemo = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-gray-400">Total Members</span>
                     <Badge className="bg-cyan-500/20 text-cyan-300">
-                      {loading ? 'Loading...' : memberCount.toLocaleString()}
+                      {loading ? '...' : memberCount.toLocaleString()}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between">
