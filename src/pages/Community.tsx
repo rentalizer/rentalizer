@@ -1,3 +1,4 @@
+
 // Community Component - Fixed TopNavBar issue
 import React, { useState, useEffect } from 'react';
 
@@ -74,7 +75,7 @@ export interface CalculatorData {
 }
 
 const Community = () => {
-  const { memberCount } = useMemberCount();
+  const { memberCount, loading } = useMemberCount();
   
   // Get initial tab from URL hash or default to discussions
   const getInitialTab = () => {
@@ -304,6 +305,16 @@ const Community = () => {
             <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight py-2">
               Training Dashboard
             </h1>
+          </div>
+          
+          {/* Total Members Count */}
+          <div className="mb-4">
+            <div className="inline-flex items-center gap-2 bg-slate-800/50 border border-cyan-500/30 rounded-lg px-4 py-2">
+              <Users className="h-5 w-5 text-cyan-400" />
+              <span className="text-lg font-semibold text-white">
+                Total Members: {loading ? '...' : memberCount}
+              </span>
+            </div>
           </div>
           
           {/* Admin Chat Button */}
