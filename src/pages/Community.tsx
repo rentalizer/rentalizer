@@ -1,3 +1,4 @@
+
 // Community Component - Fixed TopNavBar issue
 import React, { useState, useEffect } from 'react';
 
@@ -21,6 +22,7 @@ import { BuildOutSection } from '@/components/calculator/BuildOutSection';
 import { ExpensesSection } from '@/components/calculator/ExpensesSection';
 import { NetProfitSection } from '@/components/calculator/NetProfitSection';
 import { exportCalculatorToCSV } from '@/utils/calculatorExport';
+import { useMemberCount } from '@/hooks/useMemberCount';
 
 import { Footer } from '@/components/Footer';
 import { CommunityCalendar } from '@/components/community/CommunityCalendar';
@@ -73,6 +75,8 @@ export interface CalculatorData {
 }
 
 const Community = () => {
+  const { memberCount } = useMemberCount();
+  
   // Get initial tab from URL hash or default to discussions
   const getInitialTab = () => {
     const hash = window.location.hash.substring(1);
@@ -699,6 +703,7 @@ const Community = () => {
           console.log('Message member:', member);
           // Handle messaging logic here if needed
         }}
+        totalMembers={memberCount}
       />
 
       <ProfileEditor
