@@ -27,7 +27,7 @@ export default function AdminSupportMessaging() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [connectingToAdmin, setConnectingToAdmin] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
 
@@ -35,7 +35,6 @@ export default function AdminSupportMessaging() {
   useEffect(() => {
     if (!user || !isAdmin) return;
 
-    setLoading(true); // Set loading when starting to load members
     const loadMembers = async () => {
       try {
         const { data: profiles, error } = await supabase
@@ -398,8 +397,6 @@ export default function AdminSupportMessaging() {
 
   // Member view - simple chat with admin
   if (!isAdmin) {
-    console.log('🧑‍💼 Rendering member view. User:', user?.id, 'isAdmin:', isAdmin, 'selectedMemberId:', selectedMemberId);
-    
     // For members, find the first admin to chat with
     useEffect(() => {
       if (!user || isAdmin || selectedMemberId) return;
@@ -408,7 +405,7 @@ export default function AdminSupportMessaging() {
 
       const findAdminAndLoadMessages = async () => {
         try {
-          setConnectingToAdmin(true);
+          setLoading(true);
           
           // Find first admin user
           const { data: adminRoles, error: adminError } = await supabase
@@ -447,7 +444,7 @@ export default function AdminSupportMessaging() {
             variant: "destructive"
           });
         } finally {
-          setConnectingToAdmin(false);
+          setLoading(false);
         }
       };
 
@@ -469,7 +466,7 @@ export default function AdminSupportMessaging() {
           </p>
         </div>
 
-        {connectingToAdmin ? (
+        {loading ? (
           <div className="bg-slate-800/90 rounded-lg p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
             <p className="text-slate-300">Connecting to admin support...</p>
