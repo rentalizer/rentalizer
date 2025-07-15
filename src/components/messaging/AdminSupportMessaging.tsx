@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -123,63 +124,6 @@ export default function AdminSupportMessaging() {
 
     loadMembers();
   }, [user, isAdmin]);
-
-  // Find admin for member view
-  useEffect(() => {
-    if (!user || isAdmin) {
-      return;
-    }
-
-    console.log('🔍 Member finding admin to chat with...');
-
-    const findAdminAndSetup = async () => {
-      try {
-        setLoading(true);
-        
-        // Find first admin user
-        const { data: adminRoles, error: adminError } = await supabase
-          .from('user_roles')
-          .select('user_id')
-          .eq('role', 'admin')
-          .limit(1);
-
-        if (adminError) {
-          console.error('❌ Error finding admin:', adminError);
-          toast({
-            title: "Connection Issue",
-            description: "Unable to connect to admin support at the moment. Please try again later.",
-            variant: "destructive"
-          });
-          setLoading(false);
-          return;
-        }
-
-        if (adminRoles && adminRoles.length > 0) {
-          const adminId = adminRoles[0].user_id;
-          console.log('✅ Found admin:', adminId);
-          setSelectedMemberId(adminId);
-        } else {
-          console.log('❌ No admin found');
-          toast({
-            title: "No Admin Available",
-            description: "No admin support is currently available. Please try again later.",
-            variant: "destructive"
-          });
-        }
-      } catch (error) {
-        console.error('❌ Error in findAdminAndSetup:', error);
-        toast({
-          title: "Error",
-          description: "Failed to connect to admin support. Please try again.",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    findAdminAndSetup();
-  }, [user, isAdmin, toast]);
 
   // Load messages for selected conversation
   useEffect(() => {
@@ -457,7 +401,7 @@ export default function AdminSupportMessaging() {
 
   const selectedMember = members.find(m => m.id === selectedMemberId);
 
-  // Member view - simple chat with admin
+  // Member view - simple loading message
   if (!isAdmin) {
     return (
       <div className="h-[600px] max-w-4xl mx-auto">
@@ -465,40 +409,11 @@ export default function AdminSupportMessaging() {
           <div className="flex items-center gap-3 mb-4">
             <MessageSquare className="h-6 w-6 text-primary" />
             <h2 className="text-xl font-semibold text-white">Contact Admin Support</h2>
-            {totalUnread > 0 && (
-              <Badge variant="destructive">{totalUnread}</Badge>
-            )}
           </div>
-          <p className="text-slate-300 mb-4">
-            Need help? Send a message to our admin team and we'll get back to you as soon as possible.
+          <p className="text-slate-300">
+            Loading messages...
           </p>
         </div>
-
-        {loading ? (
-          <div className="bg-slate-800/90 rounded-lg p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-            <p className="text-slate-300">Connecting to admin support...</p>
-          </div>
-        ) : selectedMemberId ? (
-          <MessageThread
-            messages={messages}
-            currentUserId={user.id}
-            isTyping={isTyping}
-            onSendMessage={handleSendMessage}
-            recipientName="Admin Support"
-            isOnline={true}
-          />
-        ) : (
-          <div className="bg-slate-800/90 rounded-lg p-8 text-center">
-            <MessageSquare className="h-16 w-16 mx-auto mb-4 text-muted-foreground/70" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              Admin Support Unavailable
-            </h3>
-            <p className="text-muted-foreground">
-              Admin support is currently unavailable. Please try again later.
-            </p>
-          </div>
-        )}
       </div>
     );
   }
@@ -553,3 +468,4 @@ export default function AdminSupportMessaging() {
     </div>
   );
 }
+
