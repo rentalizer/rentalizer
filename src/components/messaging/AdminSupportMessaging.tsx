@@ -268,7 +268,19 @@ export default function AdminSupportMessaging() {
   }, [user, selectedMemberId, isAdmin]);
 
   const handleSendMessage = async (messageContent: string) => {
-    if (!user || !selectedMemberId || !messageContent.trim()) return;
+    if (!user || !selectedMemberId || !messageContent.trim()) {
+      toast({
+        title: "Cannot send message",
+        description: "Please make sure you're logged in and have selected a recipient.",
+        variant: "destructive"
+      });
+      return;
+    }
+    console.log('Sending message:', {
+      user_id: user.id,
+      selectedMemberId,
+      messageContent: messageContent.trim()
+    });
 
     try {
       // Get sender profile info for display name
@@ -334,16 +346,22 @@ export default function AdminSupportMessaging() {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <p className="text-muted-foreground">Please log in to access messaging.</p>
+      <div className="flex items-center justify-center h-64 bg-slate-800/90 rounded-lg">
+        <div className="text-center">
+          <p className="text-white text-lg mb-2">Please log in to access messaging</p>
+          <p className="text-slate-300 text-sm">You need to be authenticated to send and receive messages.</p>
+        </div>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex items-center justify-center h-64 bg-slate-800/90 rounded-lg">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-white">Loading messages...</p>
+        </div>
       </div>
     );
   }

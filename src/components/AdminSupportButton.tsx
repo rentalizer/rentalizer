@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { MessageSquare, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import AdminSupportMessaging from './messaging/AdminSupportMessaging';
 import { useAdminRole } from '@/hooks/useAdminRole';
+import { useAuth } from '@/contexts/AuthContext';
+import AdminSupportMessaging from './messaging/AdminSupportMessaging';
 
 interface AdminSupportButtonProps {
   unreadCount?: number;
@@ -12,6 +13,12 @@ interface AdminSupportButtonProps {
 export default function AdminSupportButton({ unreadCount = 0 }: AdminSupportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { isAdmin } = useAdminRole();
+  const { user } = useAuth();
+
+  // Don't show the button if user is not authenticated
+  if (!user) {
+    return null;
+  }
 
   if (isOpen) {
     return (
@@ -46,6 +53,7 @@ export default function AdminSupportButton({ unreadCount = 0 }: AdminSupportButt
       </div>
     );
   }
+
 
   return (
     <Button
