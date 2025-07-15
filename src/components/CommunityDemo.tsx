@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -141,7 +142,7 @@ export const CommunityDemo = () => {
   ];
 
   const stats = [
-    { label: "Active Members", value: loading ? "..." : memberCount.toLocaleString(), change: "+12%" },
+    { label: "Active Members", value: "181", change: "+12%" },
     { label: "Properties Analyzed", value: "15,678", change: "+8%" },
     { label: "Success Stories", value: "892", change: "+15%" },
     { label: "Training Hours", value: "4,521", change: "+22%" }
@@ -321,6 +322,21 @@ export const CommunityDemo = () => {
                       </CardContent>
                     </Card>
                   ))}
+                </div>
+              </TabsContent>
+
+              {/* Calendar Tab */}
+              <TabsContent value="calendar" className="mt-0">
+                <div className="text-center py-12">
+                  <Calendar className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold text-white mb-4">Training Calendar</h3>
+                  <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
+                    Stay up-to-date with live training sessions, Q&A calls, and community events. 
+                    Never miss an opportunity to learn and grow your business.
+                  </p>
+                  <Button size="lg" className="bg-cyan-600 hover:bg-cyan-500">
+                    View Full Calendar
+                  </Button>
                 </div>
               </TabsContent>
 
