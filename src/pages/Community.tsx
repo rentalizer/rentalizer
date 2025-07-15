@@ -87,7 +87,6 @@ const Community = () => {
   const [directMessageChatOpen, setDirectMessageChatOpen] = useState(false);
   const [userIsAdmin, setUserIsAdmin] = useState(false);
   const [adminCheckLoading, setAdminCheckLoading] = useState(true);
-  const [memberCount, setMemberCount] = useState(0);
 
   const [showPricingOverlay, setShowPricingOverlay] = useState(false);
   const { toast } = useToast();
@@ -100,41 +99,6 @@ const Community = () => {
   const isLovableEnv = window.location.hostname.includes('lovableproject.com') || 
                        window.location.search.includes('__lovable_token') ||
                        window.location.hostname === 'localhost';
-  
-  // Fetch member count from Supabase
-  useEffect(() => {
-    const fetchMemberCount = async () => {
-      try {
-        console.log('Fetching member count from Community page...');
-        
-        const { count, error } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true });
-
-        console.log('Member count result:', { count, error });
-
-        if (error) {
-          console.error('Error fetching member count:', error);
-          // Fallback: try to get actual data and count it
-          const { data: profiles, error: dataError } = await supabase
-            .from('profiles')
-            .select('id');
-          
-          if (!dataError && profiles) {
-            console.log('Setting member count from fallback to:', profiles.length);
-            setMemberCount(profiles.length);
-          }
-        } else if (count !== null) {
-          console.log('Setting member count to:', count);
-          setMemberCount(count);
-        }
-      } catch (error) {
-        console.error('Error fetching member count:', error);
-      }
-    };
-
-    fetchMemberCount();
-  }, []);
   
   // Enhanced admin check that works on live site
   useEffect(() => {
@@ -339,26 +303,6 @@ const Community = () => {
             </h1>
           </div>
           
-          {/* Community Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 mb-8">
-            <div className="bg-slate-700/30 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-cyan-400">{memberCount}</div>
-              <div className="text-sm text-gray-400">Active Members</div>
-            </div>
-            <div className="bg-slate-700/30 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-purple-400">3,892</div>
-              <div className="text-sm text-gray-400">Deals Closed</div>
-            </div>
-            <div className="bg-slate-700/30 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-blue-400">$12.4M</div>
-              <div className="text-sm text-gray-400">Revenue Generated</div>
-            </div>
-            <div className="bg-slate-700/30 rounded-lg p-4 text-center">
-              <div className="text-2xl font-bold text-orange-400">847</div>
-              <div className="text-sm text-gray-400">Success Stories</div>
-            </div>
-          </div>
-          
           {/* Admin Chat Button */}
           <div className="flex items-center justify-center gap-4 mt-4">
             <AdminChatButton />
@@ -424,7 +368,6 @@ const Community = () => {
             <VideoLibrary />
           </TabsContent>
 
-
           <TabsContent value="calculator" className="mt-8">
             <div className="space-y-6">
               <div className="text-center mb-6">
@@ -484,7 +427,6 @@ const Community = () => {
               </div>
             </div>
           </TabsContent>
-
 
           <TabsContent value="propertyfinder" className="mt-8">
             <div className="text-center py-8">
