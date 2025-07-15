@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import AdminSupportButton from '@/components/AdminSupportButton';
 
 export const TopNavBar = () => {
   const { user, signOut, isLoading } = useAuth();
@@ -90,6 +91,7 @@ export const TopNavBar = () => {
           <div className="flex items-center space-x-4">
             {user && (
               <>
+                 <AdminSupportButton />
                  <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
                    Menu
                  </Button>

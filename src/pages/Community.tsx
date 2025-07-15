@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper, User, Building, TrendingUp, Settings } from 'lucide-react';
 import AdminChatButton from '@/components/AdminChatButton';
-import DirectMessageChat from '@/components/DirectMessageChat';
+import AdminSupportMessaging from '@/components/messaging/AdminSupportMessaging';
 import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
@@ -778,10 +778,24 @@ const Community = () => {
   return (
     <AccessGate title="Training Dashboard" subtitle="Access your account">
       <CommunityContent />
-      <DirectMessageChat 
-        isOpen={directMessageChatOpen} 
-        onClose={() => setDirectMessageChatOpen(false)} 
-      />
+      {directMessageChatOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-background rounded-lg w-full max-w-6xl h-[80vh] flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h2 className="text-lg font-semibold">Admin Support</h2>
+              <button 
+                onClick={() => setDirectMessageChatOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <AdminSupportMessaging />
+            </div>
+          </div>
+        </div>
+      )}
     </AccessGate>
   );
 };
