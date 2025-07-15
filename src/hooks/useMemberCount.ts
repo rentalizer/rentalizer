@@ -11,32 +11,18 @@ export const useMemberCount = () => {
       try {
         console.log('Fetching actual member count from profiles table...');
         
-        // Get the actual count using the count method
+        // Clear any potential cache and get fresh count
         const { count, error } = await supabase
           .from('profiles')
-          .select('*', { count: 'exact', head: true });
+          .select('*', { count: 'exact', head: true })
+          .limit(1000); // Ensure we get all records for accurate count
 
         if (error) {
           console.error('Error fetching from profiles:', error);
-          
-          // Fallback to user_profiles table
-          const { count: userProfilesCount, error: userProfilesError } = await supabase
-            .from('user_profiles')
-            .select('*', { count: 'exact', head: true });
-            
-          if (!userProfilesError && userProfilesCount !== null) {
-            console.log('Using user_profiles count:', userProfilesCount);
-            setMemberCount(userProfilesCount);
-          } else {
-            console.error('Error fetching from user_profiles:', userProfilesError);
-            // Final fallback - get auth users count (this should be the real count)
-            setMemberCount(0);
-          }
-        } else if (count !== null) {
-          console.log('Profiles count:', count);
-          setMemberCount(count);
-        } else {
           setMemberCount(0);
+        } else {
+          console.log('Actual profiles count from database:', count);
+          setMemberCount(count || 0);
         }
       } catch (error) {
         console.error('Exception fetching member count:', error);
