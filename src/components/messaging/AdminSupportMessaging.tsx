@@ -27,23 +27,15 @@ export default function AdminSupportMessaging() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isTyping, setIsTyping] = useState(false);
-  const [loading, setLoading] = useState(false); // Start with false, set true only when needed
+  const [loading, setLoading] = useState(false);
   const [connectingToAdmin, setConnectingToAdmin] = useState(false);
   const [totalUnread, setTotalUnread] = useState(0);
-
-  // Initialize loading state based on user role
-  useEffect(() => {
-    if (user && isAdmin) {
-      setLoading(true); // Admins need to load members list
-    } else if (user && !isAdmin) {
-      setConnectingToAdmin(true); // Members need to connect to admin
-    }
-  }, [user, isAdmin]);
 
   // Load members (for admin view)
   useEffect(() => {
     if (!user || !isAdmin) return;
 
+    setLoading(true); // Set loading when starting to load members
     const loadMembers = async () => {
       try {
         const { data: profiles, error } = await supabase
