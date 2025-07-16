@@ -43,7 +43,7 @@ const Members = () => {
     try {
       setLoading(true);
       
-      // Get all profiles (admins can see all members)
+      // Get all profiles - show everyone, not just complete profiles
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
@@ -291,7 +291,7 @@ const Members = () => {
           <div className="text-center py-12">
             <Users className="h-16 w-16 text-gray-600 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-400 mb-2">No members yet</h3>
-            <p className="text-gray-500">Members will appear here once they complete their profiles</p>
+            <p className="text-gray-500">No members found in the community</p>
           </div>
         )}
       </div>
