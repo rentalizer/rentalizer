@@ -77,12 +77,14 @@ export const TopNavBar = () => {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 text-sm">
                   <User className="h-4 w-4 text-cyan-400" />
-                  <Link 
-                    to="/profile-setup" 
-                    className="text-cyan-300 hover:text-cyan-200 transition-colors cursor-pointer underline-offset-4 hover:underline font-medium relative z-20 block py-1 px-1"
-                  >
-                    {user.email}
-                  </Link>
+                  <div className="relative z-50">
+                    <Link 
+                      to="/profile-setup" 
+                      className="text-cyan-300 hover:text-cyan-200 transition-colors cursor-pointer underline-offset-4 hover:underline font-medium block py-1 px-1"
+                    >
+                      {user.email}
+                    </Link>
+                  </div>
                   <Badge variant="outline" className="bg-blue-900/30 border-blue-500/30 text-blue-300 text-xs px-2 py-0 ml-2">
                     Pro
                   </Badge>
