@@ -79,7 +79,7 @@ export const TopNavBar = () => {
                   <User className="h-4 w-4 text-cyan-400" />
                   <Link 
                     to="/profile-setup" 
-                    className="text-cyan-300 hover:text-cyan-200 transition-colors cursor-pointer underline-offset-4 hover:underline font-medium relative z-10"
+                    className="text-cyan-300 hover:text-cyan-200 transition-colors cursor-pointer underline-offset-4 hover:underline font-medium relative z-20 block py-1 px-1"
                   >
                     {user.email}
                   </Link>
