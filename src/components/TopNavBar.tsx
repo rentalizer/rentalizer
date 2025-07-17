@@ -26,18 +26,6 @@ export const TopNavBar = () => {
 
   const navigationItems = [
     {
-      name: 'Today',
-      path: '/',
-    },
-    {
-      name: 'Calendar',
-      path: '/calendar',
-    },
-    {
-      name: 'Listings',
-      path: '/listings',
-    },
-    {
       name: 'Messages',
       path: '/messages',
       hasNotification: true
