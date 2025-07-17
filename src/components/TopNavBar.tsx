@@ -82,7 +82,7 @@ export const TopNavBar = () => {
                       to="/profile-setup" 
                       className="text-cyan-300 hover:text-cyan-200 transition-colors cursor-pointer underline-offset-4 hover:underline font-medium block py-1 px-1"
                     >
-                      {user.email}
+                      My Profile
                     </Link>
                   </div>
                   <Badge variant="outline" className="bg-blue-900/30 border-blue-500/30 text-blue-300 text-xs px-2 py-0 ml-2">
