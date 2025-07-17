@@ -55,7 +55,7 @@ export const TopNavBar = () => {
           {/* Left side - Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <BarChart3 className="h-8 w-8 text-red-500" />
+              <BarChart3 className="h-8 w-8 text-cyan-400" />
             </Link>
           </div>
 
@@ -91,23 +91,16 @@ export const TopNavBar = () => {
           <div className="flex items-center space-x-4">
             {user && (
               <>
-                 <AdminSupportButton />
-                 <Button variant="ghost" size="sm" className="text-gray-300 hover:text-cyan-400">
-                   Menu
-                 </Button>
+                 <span className="text-cyan-400 font-medium">{user.email}</span>
+                 <span className="text-gray-300">Pro</span>
                  <Button
-                   onClick={() => {
-                     console.log('Profile button clicked, navigating to /profile-setup');
-                     navigate('/profile-setup');
-                   }}
-                   variant="ghost"
+                   onClick={handleSignOut}
+                   variant="outline"
                    size="sm"
-                   className="flex items-center space-x-2 text-gray-300 hover:text-cyan-400 hover:bg-slate-700 cursor-pointer transition-colors"
+                   className="border-gray-600 text-gray-300 hover:bg-slate-700 hover:text-cyan-400 flex items-center gap-2"
                  >
-                   <span className="hidden sm:inline font-medium">{user.email}</span>
-                   <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center">
-                     <User className="h-4 w-4 text-white" />
-                   </div>
+                   <LogOut className="h-4 w-4" />
+                   Sign Out
                  </Button>
               </>
             )}
