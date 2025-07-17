@@ -24,7 +24,6 @@ import { exportCalculatorToCSV } from '@/utils/calculatorExport';
 import { useMemberCount } from '@/hooks/useMemberCount';
 
 import { Footer } from '@/components/Footer';
-import { TopNavBar } from '@/components/TopNavBar';
 import { CommunityCalendar } from '@/components/community/CommunityCalendar';
 import { MessageThreads } from '@/components/community/MessageThreads';
 import { GroupDiscussions } from '@/components/community/GroupDiscussions';
@@ -712,7 +711,6 @@ const Community = () => {
   if (isLovableEnv) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-        <TopNavBar />
         <CommunityContent />
         <Footer />
       </div>
