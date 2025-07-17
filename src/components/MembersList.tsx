@@ -61,7 +61,7 @@ export const MembersList: React.FC<MembersListProps> = ({ open, onOpenChange, on
   const fetchMembers = async () => {
     setLoading(true);
     try {
-      // Fetch all profiles
+      // Fetch all profiles 
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('user_id, display_name, first_name, last_name, avatar_url, created_at')
@@ -97,19 +97,21 @@ export const MembersList: React.FC<MembersListProps> = ({ open, onOpenChange, on
       // Create a map of user_id to email
       const emailMap = new Map(userProfiles?.map(up => [up.id, up.email]) || []);
 
-      // Map profiles with real email addresses
-      const membersList: Member[] = profiles?.map(profile => {
-        return {
-          id: profile.user_id,
-          email: emailMap.get(profile.user_id) || 'No email available',
-          display_name: profile.display_name,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          avatar_url: profile.avatar_url,
-          created_at: profile.created_at,
-          is_admin: adminUserIds.has(profile.user_id)
-        };
-      }) || [];
+      // Map profiles - only include those with email addresses (real members)
+      const membersList: Member[] = profiles
+        ?.filter(profile => emailMap.has(profile.user_id))
+        ?.map(profile => {
+          return {
+            id: profile.user_id,
+            email: emailMap.get(profile.user_id) || 'No email available',
+            display_name: profile.display_name,
+            first_name: profile.first_name,
+            last_name: profile.last_name,
+            avatar_url: profile.avatar_url,
+            created_at: profile.created_at,
+            is_admin: adminUserIds.has(profile.user_id)
+          };
+        }) || [];
 
       setMembers(membersList);
     } catch (error) {

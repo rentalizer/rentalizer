@@ -11,11 +11,10 @@ export const useMemberCount = () => {
       try {
         console.log('Fetching actual member count from profiles table...');
         
-        // Clear any potential cache and get fresh count
+        // Get count of user_profiles (real members with emails)
         const { count, error } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .limit(1000); // Ensure we get all records for accurate count
+          .from('user_profiles')
+          .select('*', { count: 'exact', head: true });
 
         if (error) {
           console.error('Error fetching from profiles:', error);
@@ -34,17 +33,17 @@ export const useMemberCount = () => {
 
     fetchMemberCount();
 
-    // Set up real-time subscription to update count when profiles change
+    // Set up real-time subscription to update count when user_profiles change
     const channel = supabase
-      .channel('profiles-changes')
+      .channel('user-profiles-changes')
       .on('postgres_changes', 
         { 
           event: '*', 
           schema: 'public', 
-          table: 'profiles' 
+          table: 'user_profiles' 
         }, 
         () => {
-          console.log('Profiles table changed, refetching count...');
+          console.log('User profiles table changed, refetching count...');
           fetchMemberCount();
         }
       )
