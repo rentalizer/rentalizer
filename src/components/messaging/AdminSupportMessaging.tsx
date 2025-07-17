@@ -133,7 +133,7 @@ export default function AdminSupportMessaging() {
   useEffect(() => {
     if (!user || isAdmin || selectedMemberId) return;
 
-    console.log('🔍 Member finding admin to chat with...');
+    
 
     const findAdminAndLoadMessages = async () => {
       try {
@@ -159,14 +159,11 @@ export default function AdminSupportMessaging() {
 
         if (adminRoles && adminRoles.length > 0) {
           const adminId = adminRoles[0].user_id;
-          console.log('✅ Found admin:', adminId);
           setSelectedMemberId(adminId);
         } else {
-          console.log('❌ No admin found');
           setLoading(false);
         }
       } catch (error) {
-        console.error('❌ Error in findAdminAndLoadMessages:', error);
         setLoading(false);
       } finally {
         setLoading(false);

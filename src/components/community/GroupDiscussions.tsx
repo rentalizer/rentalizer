@@ -287,16 +287,12 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   }, [newComment, selectedDiscussion, getUserName, getUserInitials]);
 
   const handlePinToggle = useCallback(async (discussionId: string) => {
-    console.log('📌 Toggling pin status for discussion:', discussionId);
-    
     if (!isAdmin) {
-      console.log('❌ User is not admin, cannot pin/unpin');
       return;
     }
 
     const discussion = discussionsList.find(d => d.id === discussionId);
     if (!discussion) {
-      console.log('❌ Discussion not found');
       return;
     }
 
@@ -341,14 +337,8 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   }, [isAdmin, discussionsList, toast, fetchDiscussions]);
 
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
-    console.log('🗑️ ADMIN DELETING DISCUSSION:', discussionId);
-    console.log('🗑️ Current discussions count BEFORE deletion:', discussionsList.length);
-    console.log('🗑️ Current user ID:', user?.id);
-    console.log('🗑️ Admin status:', isAdmin);
-    
     try {
       // First delete from database to ensure admin permissions work
-      console.log('🗑️ Attempting database deletion...');
       const { data, error } = await supabase
         .from('discussions')
         .delete()

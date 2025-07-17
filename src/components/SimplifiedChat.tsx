@@ -37,7 +37,6 @@ export default function SimplifiedChat() {
       
       // If current user is admin (including development mode), always include them
       if (isAdmin) {
-        console.log('✅ Current user is admin, using them as admin user:', user.id);
         setAdminUsers([user.id]);
         return;
       }
