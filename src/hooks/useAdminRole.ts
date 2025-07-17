@@ -11,20 +11,6 @@ export const useAdminRole = () => {
 
   useEffect(() => {
     const checkAdminRole = async () => {
-      // ALWAYS check development environment FIRST - before any user checks
-      const hostname = window.location.hostname;
-      const url = window.location.href;
-      const isLovableDev = hostname.includes('lovable.app') || hostname.includes('localhost') || hostname.includes('127.0.0.1') || url.includes('lovable');
-      
-      console.log('🔍 Hostname:', hostname, 'URL:', url, 'Is Lovable Dev:', isLovableDev);
-      
-      if (isLovableDev) {
-        console.log('✅ LOVABLE DEVELOPMENT - GRANTING ADMIN ACCESS');
-        setIsAdmin(true);
-        setLoading(false);
-        return;
-      }
-      
       console.log('🔍 Checking admin role for user:', user?.id, 'email:', user?.email);
       
       if (!user) {
@@ -34,7 +20,7 @@ export const useAdminRole = () => {
         return;
       }
 
-      // In production, check actual admin role in database
+      // Check actual admin role in database
       try {
         const { data: roleData } = await supabase
           .from('user_roles')
@@ -44,7 +30,7 @@ export const useAdminRole = () => {
           .maybeSingle();
         
         setIsAdmin(!!roleData);
-        console.log('🔐 Production admin check result:', !!roleData);
+        console.log('🔐 Admin check result:', !!roleData);
       } catch (error) {
         console.error('Error checking admin role:', error);
         setIsAdmin(false);
