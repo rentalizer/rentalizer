@@ -61,14 +61,14 @@ export const MembersList: React.FC<MembersListProps> = ({ open, onOpenChange, on
   const fetchMembers = async () => {
     setLoading(true);
     try {
-      // Fetch all profiles 
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, display_name, first_name, last_name, avatar_url, created_at')
+      // Fetch all user_profiles (primary source of members)
+      const { data: userProfiles, error: userProfilesError } = await supabase
+        .from('user_profiles')
+        .select('id, email, created_at')
         .order('created_at', { ascending: false });
 
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
+      if (userProfilesError) {
+        console.error('Error fetching user profiles:', userProfilesError);
         toast({
           title: "Error fetching members",
           description: "Failed to load member list",
@@ -77,13 +77,13 @@ export const MembersList: React.FC<MembersListProps> = ({ open, onOpenChange, on
         return;
       }
 
-      // Fetch all user_profiles to get emails
-      const { data: userProfiles, error: userProfilesError } = await supabase
-        .from('user_profiles')
-        .select('id, email');
+      // Fetch profiles for additional info (optional)
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, display_name, first_name, last_name, avatar_url');
 
-      if (userProfilesError) {
-        console.error('Error fetching user profiles:', userProfilesError);
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
       }
 
       // Get admin roles
@@ -94,24 +94,23 @@ export const MembersList: React.FC<MembersListProps> = ({ open, onOpenChange, on
 
       const adminUserIds = new Set(adminRoles?.map(role => role.user_id) || []);
 
-      // Create a map of user_id to email
-      const emailMap = new Map(userProfiles?.map(up => [up.id, up.email]) || []);
+      // Create a map of user_id to profile data
+      const profileMap = new Map(profiles?.map(profile => [profile.user_id, profile]) || []);
 
-      // Map profiles - only include those with email addresses (real members)
-      const membersList: Member[] = profiles
-        ?.filter(profile => emailMap.has(profile.user_id))
-        ?.map(profile => {
-          return {
-            id: profile.user_id,
-            email: emailMap.get(profile.user_id) || 'No email available',
-            display_name: profile.display_name,
-            first_name: profile.first_name,
-            last_name: profile.last_name,
-            avatar_url: profile.avatar_url,
-            created_at: profile.created_at,
-            is_admin: adminUserIds.has(profile.user_id)
-          };
-        }) || [];
+      // Map user_profiles as primary source
+      const membersList: Member[] = userProfiles?.map(userProfile => {
+        const profile = profileMap.get(userProfile.id);
+        return {
+          id: userProfile.id,
+          email: userProfile.email,
+          display_name: profile?.display_name,
+          first_name: profile?.first_name,
+          last_name: profile?.last_name,
+          avatar_url: profile?.avatar_url,
+          created_at: userProfile.created_at,
+          is_admin: adminUserIds.has(userProfile.id)
+        };
+      }) || [];
 
       setMembers(membersList);
     } catch (error) {
