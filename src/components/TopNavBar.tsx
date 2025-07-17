@@ -24,13 +24,7 @@ export const TopNavBar = () => {
     }
   };
 
-  const navigationItems = [
-    {
-      name: 'Messages',
-      path: '/messages',
-      hasNotification: true
-    }
-  ];
+  const navigationItems: any[] = [];
 
   const isActiveTab = (path: string) => {
     return location.pathname === path;
