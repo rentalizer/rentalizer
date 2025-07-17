@@ -24,6 +24,7 @@ import { CommunityHeader } from '@/components/community/CommunityHeader';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { useMemberCount } from '@/hooks/useMemberCount';
+import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 
 interface Discussion {
   id: string;
@@ -65,10 +66,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [userProfiles, setUserProfiles] = useState<{[key: string]: UserProfile}>({});
   const { memberCount, loading: memberCountLoading } = useMemberCount();
-  const [communityStats, setCommunityStats] = useState({
-    onlineUsers: 35,
-    adminCount: 2
-  });
+  const { onlineCount, adminNames, loading: onlineLoading } = useOnlineUsers();
   const [showMembersList, setShowMembersList] = useState(false);
 
   // Check if user needs to set up profile
@@ -695,9 +693,20 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                    </Badge>
                 </div>
                <div className="flex justify-between items-center">
-                 <span className="text-gray-400">Online Now</span>
+                 {isAdmin ? (
+                   <div className="flex flex-col">
+                     <span className="text-gray-400">Online Now</span>
+                     {adminNames.length > 0 && (
+                       <span className="text-xs text-green-300">
+                         Admins: {adminNames.join(', ')}
+                       </span>
+                     )}
+                   </div>
+                 ) : (
+                   <span className="text-gray-400">Online Now</span>
+                 )}
                  <Badge className="bg-green-600/20 text-green-300 border-green-500/30">
-                   {communityStats.onlineUsers}
+                   {onlineLoading ? '...' : onlineCount}
                  </Badge>
                </div>
              </CardContent>
