@@ -73,10 +73,10 @@ export const useOnlineUsers = () => {
         setLoading(false);
       })
       .on('presence', { event: 'join' }, ({ newPresences }) => {
-        console.log('User joined:', newPresences);
+        // User joined
       })
       .on('presence', { event: 'leave' }, ({ leftPresences }) => {
-        console.log('User left:', leftPresences);
+        // User left
       });
 
     // Subscribe and track presence
