@@ -7,14 +7,9 @@ export const useAdminRole = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  console.log('🔧 useAdminRole current state:', { isAdmin, loading });
-
   useEffect(() => {
     const checkAdminRole = async () => {
-      console.log('🔍 Checking admin role for user:', user?.id, 'email:', user?.email);
-      
       if (!user) {
-        console.log('❌ No user found, setting isAdmin to false');
         setIsAdmin(false);
         setLoading(false);
         return;
@@ -30,9 +25,7 @@ export const useAdminRole = () => {
           .maybeSingle();
         
         setIsAdmin(!!roleData);
-        console.log('🔐 Admin check result:', !!roleData);
       } catch (error) {
-        console.error('Error checking admin role:', error);
         setIsAdmin(false);
       }
       
