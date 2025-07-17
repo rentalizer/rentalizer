@@ -49,7 +49,7 @@ export const TopNavBar = () => {
   };
 
   return (
-    <div className="w-full bg-white border-b border-gray-200">
+    <div className="w-full bg-slate-800 border-b border-slate-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left side - Logo */}
@@ -71,8 +71,8 @@ export const TopNavBar = () => {
                     to={item.path}
                     className={`relative flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                       isActive
-                        ? 'text-gray-900 border-b-2 border-gray-900'
-                        : 'text-gray-600 hover:text-gray-900'
+                        ? 'text-cyan-400 border-b-2 border-cyan-400'
+                        : 'text-gray-300 hover:text-cyan-400'
                     }`}
                   >
                     {item.name}
@@ -92,7 +92,7 @@ export const TopNavBar = () => {
             {user && (
               <>
                  <AdminSupportButton />
-                 <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                 <Button variant="ghost" size="sm" className="text-gray-300 hover:text-cyan-400">
                    Menu
                  </Button>
                  <Button
@@ -102,7 +102,7 @@ export const TopNavBar = () => {
                    }}
                    variant="ghost"
                    size="sm"
-                   className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 cursor-pointer transition-colors"
+                   className="flex items-center space-x-2 text-gray-300 hover:text-cyan-400 hover:bg-slate-700 cursor-pointer transition-colors"
                  >
                    <span className="hidden sm:inline font-medium">{user.email}</span>
                    <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center">
