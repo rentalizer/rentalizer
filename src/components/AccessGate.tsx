@@ -43,11 +43,10 @@ export const AccessGate: React.FC<AccessGateProps> = ({
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [signupLoading, setSignupLoading] = useState(false);
 
-  // If user is authenticated, show the protected content with TopNavBar
+  // If user is authenticated, show the protected content without TopNavBar
   if (user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-        <TopNavBar />
         {children}
       </div>
     );
