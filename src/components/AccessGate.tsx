@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Upload, User, Ticket, Lock } from 'lucide-react';
-import { TopNavBar } from '@/components/TopNavBar';
+
 import { Footer } from '@/components/Footer';
 
 interface AccessGateProps {
@@ -155,7 +155,7 @@ export const AccessGate: React.FC<AccessGateProps> = ({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-      <TopNavBar />
+      
       
       {/* Blurred background content */}
       <div className="absolute inset-0 overflow-hidden">
