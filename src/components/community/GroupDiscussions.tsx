@@ -23,6 +23,7 @@ import { MembersList } from '@/components/MembersList';
 import { CommunityHeader } from '@/components/community/CommunityHeader';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
+import { useMemberCount } from '@/hooks/useMemberCount';
 
 interface Discussion {
   id: string;
@@ -63,8 +64,8 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [userProfiles, setUserProfiles] = useState<{[key: string]: UserProfile}>({});
+  const { memberCount, loading: memberCountLoading } = useMemberCount();
   const [communityStats, setCommunityStats] = useState({
-    totalMembers: 181,
     onlineUsers: 35,
     adminCount: 2
   });
@@ -689,9 +690,9 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                   ) : (
                     <span className="text-gray-400">Total Members</span>
                   )}
-                  <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
-                    {communityStats.totalMembers}
-                  </Badge>
+                   <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
+                     {memberCountLoading ? '...' : memberCount}
+                   </Badge>
                 </div>
                <div className="flex justify-between items-center">
                  <span className="text-gray-400">Online Now</span>
