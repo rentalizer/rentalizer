@@ -442,15 +442,6 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           {/* Header with Post Input */}
           <CommunityHeader onPostCreated={handlePostCreated} isDayMode={isDayMode} />
 
-          {/* Enhanced Debug Info */}
-          <div className="text-xs text-gray-500 p-2 bg-slate-800 rounded">
-            Debug: Showing {filteredDiscussions.length} discussions 
-            {filteredDiscussions.filter(d => d.isPinned).length > 0 && (
-              <span className="text-yellow-400 ml-2">
-                ({filteredDiscussions.filter(d => d.isPinned).length} pinned at top)
-              </span>
-            )}
-          </div>
 
           {/* Discussion Posts */}
           <div className="space-y-4">
