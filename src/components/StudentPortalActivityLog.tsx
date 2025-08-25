@@ -171,6 +171,148 @@ const mockActivityData: ActivityEntry[] = [
     completed: true
   },
   
+  // Pavlos Michaels - Accelerator Pro Program
+  {
+    id: 'pm1',
+    type: 'module',
+    title: 'Accelerator Pro: Advanced Real Estate Analytics',
+    description: 'Market analysis dashboard mastery completed with 96% score',
+    date: '2025-01-22',
+    serverID: 'srv-us-west-1-prod-807',
+    pdfFile: 'Advanced Analytics Mastery Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'pm2',
+    type: 'module',
+    title: 'Accelerator Pro: Property Investment Strategies',
+    description: 'ROI optimization workshop completed',
+    date: '2025-01-20',
+    serverID: 'srv-us-central-2-prod-808',
+    pdfFile: 'ROI Optimization Strategies.pdf',
+    completed: true
+  },
+  {
+    id: 'pm3',
+    type: 'module',
+    title: 'Accelerator Pro: Market Intelligence Systems',
+    description: 'Automated reporting system configured',
+    date: '2025-01-18',
+    serverID: 'srv-us-east-2-prod-809',
+    pdfFile: 'Market Intelligence Setup Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'pm4',
+    type: 'module',
+    title: 'Accelerator Pro: Portfolio Management',
+    description: 'Multi-property portfolio analysis completed',
+    date: '2025-01-15',
+    serverID: 'srv-us-west-1-prod-807',
+    pdfFile: 'Portfolio Management Strategies.pdf',
+    completed: true
+  },
+  {
+    id: 'pm5',
+    type: 'achievement',
+    title: 'Accelerator Pro: Data Integration Mastery',
+    description: 'API integration certification earned',
+    date: '2025-01-12',
+    serverID: 'srv-us-central-2-prod-808',
+    pdfFile: 'Data Integration Certification.pdf',
+    completed: true
+  },
+  {
+    id: 'pm6',
+    type: 'module',
+    title: 'Accelerator Pro: Advanced Financial Modeling',
+    description: 'Complex financial scenarios analysis completed',
+    date: '2025-01-10',
+    serverID: 'srv-us-east-2-prod-809',
+    pdfFile: 'Advanced Financial Modeling Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'pm7',
+    type: 'module',
+    title: 'Accelerator Pro: Machine Learning Applications',
+    description: 'Predictive analytics model training completed',
+    date: '2025-01-08',
+    serverID: 'srv-us-west-1-prod-807',
+    pdfFile: 'ML Applications in Real Estate.pdf',
+    completed: true
+  },
+  {
+    id: 'pm8',
+    type: 'module',
+    title: 'Accelerator Pro: Risk Assessment Framework',
+    description: 'Advanced risk modeling workshop attended',
+    date: '2025-01-05',
+    serverID: 'srv-us-central-2-prod-808',
+    pdfFile: 'Risk Assessment Mastery Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'pm9',
+    type: 'module',
+    title: 'Accelerator Pro: Market Trend Analysis',
+    description: 'Trend prediction algorithms implemented',
+    date: '2025-01-03',
+    serverID: 'srv-us-east-2-prod-809',
+    pdfFile: 'Market Trend Analysis Tools.pdf',
+    completed: true
+  },
+  {
+    id: 'pm10',
+    type: 'module',
+    title: 'Accelerator Pro: Competitive Intelligence',
+    description: 'Market competitor analysis framework mastered',
+    date: '2024-12-28',
+    serverID: 'srv-us-west-1-prod-807',
+    pdfFile: 'Competitive Intelligence Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'pm11',
+    type: 'module',
+    title: 'Accelerator Pro: Investment Optimization',
+    description: 'Portfolio optimization algorithms configured',
+    date: '2024-12-25',
+    serverID: 'srv-us-central-2-prod-808',
+    pdfFile: 'Investment Optimization Manual.pdf',
+    completed: true
+  },
+  {
+    id: 'pm12',
+    type: 'module',
+    title: 'Accelerator Pro: Data Visualization Mastery',
+    description: 'Advanced dashboard creation completed',
+    date: '2024-12-22',
+    serverID: 'srv-us-east-2-prod-809',
+    pdfFile: 'Data Visualization Pro Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'pm13',
+    type: 'module',
+    title: 'Accelerator Pro: Automation Systems',
+    description: 'Workflow automation setup completed',
+    date: '2024-12-18',
+    serverID: 'srv-us-west-1-prod-807',
+    pdfFile: 'Automation Systems Manual.pdf',
+    completed: true
+  },
+  {
+    id: 'pm14',
+    type: 'achievement',
+    title: 'Accelerator Pro Program',
+    description: 'Successfully enrolled and payment confirmed ($1,000.00 USD)',
+    date: '2024-12-15',
+    serverID: 'srv-us-central-2-prod-808',
+    pdfFile: 'Accelerator Pro Welcome Package.pdf',
+    completed: true
+  },
+  
   // Lindsay Sherman - Original entries
   {
     id: '1',
@@ -277,9 +419,10 @@ const mockActivityData: ActivityEntry[] = [
 const mockStudents = [
   { id: '1', name: 'Lindsay Sherman', email: 'dutchess0085@gmail.com', progress: 100 },
   { id: '2', name: 'Tiffany Worthy', email: 'tiffany1990worthy@yahoo.com', progress: 100 },
-  { id: '3', name: 'Alex Johnson', email: 'alex.johnson@email.com', progress: 85 },
-  { id: '4', name: 'Sarah Wilson', email: 'sarah.wilson@email.com', progress: 72 },
-  { id: '5', name: 'Mike Davis', email: 'mike.davis@email.com', progress: 90 },
+  { id: '3', name: 'Pavlos Michaels', email: 'pavlos.michaels4@gmail.com', progress: 95 },
+  { id: '4', name: 'Alex Johnson', email: 'alex.johnson@email.com', progress: 85 },
+  { id: '5', name: 'Sarah Wilson', email: 'sarah.wilson@email.com', progress: 72 },
+  { id: '6', name: 'Mike Davis', email: 'mike.davis@email.com', progress: 90 },
 ];
 
 export const StudentPortalActivityLog = () => {
@@ -292,9 +435,10 @@ export const StudentPortalActivityLog = () => {
   const filterTabs = ['All Activity', 'Module', 'Achievement'];
   
   const filteredActivities = mockActivityData.filter(activity => {
-    // Filter by student - only show Tiffany's activities when she's selected
+    // Filter by student
     if (selectedStudent === '2' && !activity.id.startsWith('tw')) return false;
-    if (selectedStudent !== '2' && activity.id.startsWith('tw')) return false;
+    if (selectedStudent === '3' && !activity.id.startsWith('pm')) return false;
+    if (selectedStudent !== '2' && selectedStudent !== '3' && (activity.id.startsWith('tw') || activity.id.startsWith('pm'))) return false;
     
     // Filter by activity type
     if (activeFilter === 'All Activity') return true;
@@ -374,7 +518,7 @@ export const StudentPortalActivityLog = () => {
               </div>
               
               <div className="text-right text-sm">
-                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '2' ? '2025-05-21' : '2024-08-01'}</span></div>
+                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '2' ? '2025-05-21' : selectedStudent === '3' ? '2024-12-15' : '2024-08-01'}</span></div>
                 <div className="text-gray-400">Progress: <span className="text-white">{currentStudent.progress}%</span></div>
               </div>
             </div>
