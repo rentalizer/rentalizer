@@ -443,7 +443,10 @@ export const StudentPortalActivityLog = () => {
     // Filter by activity type
     if (activeFilter === 'All Activity') return true;
     return activity.type.toLowerCase() === activeFilter.toLowerCase();
-  }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }).sort((a, b) => {
+    // Sort by date: oldest first (ascending order)
+    return new Date(a.date).getTime() - new Date(b.date).getTime();
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
