@@ -177,7 +177,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'module',
     title: 'Accelerator Pro: Advanced Real Estate Analytics',
     description: 'Market analysis dashboard mastery completed with 96% score',
-    date: '2025-01-22',
+    date: '2025-08-22',
     serverID: 'srv-us-west-1-prod-807',
     pdfFile: 'Advanced Analytics Mastery Guide.pdf',
     completed: true
@@ -187,7 +187,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'module',
     title: 'Accelerator Pro: Property Investment Strategies',
     description: 'ROI optimization workshop completed',
-    date: '2025-01-20',
+    date: '2025-08-20',
     serverID: 'srv-us-central-2-prod-808',
     pdfFile: 'ROI Optimization Strategies.pdf',
     completed: true
@@ -197,7 +197,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'module',
     title: 'Accelerator Pro: Market Intelligence Systems',
     description: 'Automated reporting system configured',
-    date: '2025-01-18',
+    date: '2025-08-18',
     serverID: 'srv-us-east-2-prod-809',
     pdfFile: 'Market Intelligence Setup Guide.pdf',
     completed: true
@@ -207,7 +207,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'module',
     title: 'Accelerator Pro: Portfolio Management',
     description: 'Multi-property portfolio analysis completed',
-    date: '2025-01-15',
+    date: '2025-08-15',
     serverID: 'srv-us-west-1-prod-807',
     pdfFile: 'Portfolio Management Strategies.pdf',
     completed: true
@@ -217,7 +217,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'achievement',
     title: 'Accelerator Pro: Data Integration Mastery',
     description: 'API integration certification earned',
-    date: '2025-01-12',
+    date: '2025-08-12',
     serverID: 'srv-us-central-2-prod-808',
     pdfFile: 'Data Integration Certification.pdf',
     completed: true
@@ -227,7 +227,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'module',
     title: 'Accelerator Pro: Advanced Financial Modeling',
     description: 'Complex financial scenarios analysis completed',
-    date: '2025-01-10',
+    date: '2025-08-10',
     serverID: 'srv-us-east-2-prod-809',
     pdfFile: 'Advanced Financial Modeling Guide.pdf',
     completed: true
@@ -237,7 +237,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'module',
     title: 'Accelerator Pro: Machine Learning Applications',
     description: 'Predictive analytics model training completed',
-    date: '2025-01-08',
+    date: '2025-08-08',
     serverID: 'srv-us-west-1-prod-807',
     pdfFile: 'ML Applications in Real Estate.pdf',
     completed: true
@@ -247,7 +247,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'module',
     title: 'Accelerator Pro: Risk Assessment Framework',
     description: 'Advanced risk modeling workshop attended',
-    date: '2025-01-05',
+    date: '2025-08-05',
     serverID: 'srv-us-central-2-prod-808',
     pdfFile: 'Risk Assessment Mastery Guide.pdf',
     completed: true
@@ -257,7 +257,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'module',
     title: 'Accelerator Pro: Market Trend Analysis',
     description: 'Trend prediction algorithms implemented',
-    date: '2025-01-03',
+    date: '2025-08-03',
     serverID: 'srv-us-east-2-prod-809',
     pdfFile: 'Market Trend Analysis Tools.pdf',
     completed: true
@@ -267,7 +267,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'module',
     title: 'Accelerator Pro: Competitive Intelligence',
     description: 'Market competitor analysis framework mastered',
-    date: '2024-12-28',
+    date: '2025-07-28',
     serverID: 'srv-us-west-1-prod-807',
     pdfFile: 'Competitive Intelligence Guide.pdf',
     completed: true
@@ -277,7 +277,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'module',
     title: 'Accelerator Pro: Investment Optimization',
     description: 'Portfolio optimization algorithms configured',
-    date: '2024-12-25',
+    date: '2025-07-25',
     serverID: 'srv-us-central-2-prod-808',
     pdfFile: 'Investment Optimization Manual.pdf',
     completed: true
@@ -287,7 +287,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'module',
     title: 'Accelerator Pro: Data Visualization Mastery',
     description: 'Advanced dashboard creation completed',
-    date: '2024-12-22',
+    date: '2025-07-22',
     serverID: 'srv-us-east-2-prod-809',
     pdfFile: 'Data Visualization Pro Guide.pdf',
     completed: true
@@ -297,7 +297,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'module',
     title: 'Accelerator Pro: Automation Systems',
     description: 'Workflow automation setup completed',
-    date: '2024-12-18',
+    date: '2025-07-18',
     serverID: 'srv-us-west-1-prod-807',
     pdfFile: 'Automation Systems Manual.pdf',
     completed: true
@@ -307,7 +307,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'achievement',
     title: 'Accelerator Pro Program',
     description: 'Successfully enrolled and payment confirmed ($1,000.00 USD)',
-    date: '2024-12-15',
+    date: '2025-07-12',
     serverID: 'srv-us-central-2-prod-808',
     pdfFile: 'Accelerator Pro Welcome Package.pdf',
     completed: true
@@ -518,7 +518,7 @@ export const StudentPortalActivityLog = () => {
               </div>
               
               <div className="text-right text-sm">
-                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '2' ? '2025-05-21' : selectedStudent === '3' ? '2024-12-15' : '2024-08-01'}</span></div>
+                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '2' ? '2025-05-21' : selectedStudent === '3' ? '2025-07-12' : '2024-08-01'}</span></div>
                 <div className="text-gray-400">Progress: <span className="text-white">{currentStudent.progress}%</span></div>
               </div>
             </div>
