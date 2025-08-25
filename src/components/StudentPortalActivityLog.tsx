@@ -223,16 +223,6 @@ const mockActivityData: ActivityEntry[] = [
     completed: true
   },
   {
-    id: 'pm6',
-    type: 'module',
-    title: 'Accelerator Pro: Advanced Financial Modeling',
-    description: 'Complex financial scenarios analysis completed',
-    date: '2025-08-10',
-    serverID: 'srv-us-east-2-prod-809',
-    pdfFile: 'Advanced Financial Modeling Guide.pdf',
-    completed: true
-  },
-  {
     id: 'pm7',
     type: 'module',
     title: 'Accelerator Pro: Machine Learning Applications',
@@ -240,26 +230,6 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-08-08',
     serverID: 'srv-us-west-1-prod-807',
     pdfFile: 'ML Applications in Real Estate.pdf',
-    completed: true
-  },
-  {
-    id: 'pm8',
-    type: 'module',
-    title: 'Accelerator Pro: Risk Assessment Framework',
-    description: 'Advanced risk modeling workshop attended',
-    date: '2025-08-05',
-    serverID: 'srv-us-central-2-prod-808',
-    pdfFile: 'Risk Assessment Mastery Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'pm9',
-    type: 'module',
-    title: 'Accelerator Pro: Market Trend Analysis',
-    description: 'Trend prediction algorithms implemented',
-    date: '2025-08-03',
-    serverID: 'srv-us-east-2-prod-809',
-    pdfFile: 'Market Trend Analysis Tools.pdf',
     completed: true
   },
   {
@@ -419,7 +389,7 @@ const mockActivityData: ActivityEntry[] = [
 const mockStudents = [
   { id: '1', name: 'Lindsay Sherman', email: 'dutchess0085@gmail.com', progress: 100 },
   { id: '2', name: 'Tiffany Worthy', email: 'tiffany1990worthy@yahoo.com', progress: 100 },
-  { id: '3', name: 'Pavlos Michaels', email: 'pavlos.michaels4@gmail.com', progress: 95 },
+  { id: '3', name: 'Pavlos Michaels', email: 'pavlos.michaels4@gmail.com', progress: 86 },
   { id: '4', name: 'Alex Johnson', email: 'alex.johnson@email.com', progress: 85 },
   { id: '5', name: 'Sarah Wilson', email: 'sarah.wilson@email.com', progress: 72 },
   { id: '6', name: 'Mike Davis', email: 'mike.davis@email.com', progress: 90 },
