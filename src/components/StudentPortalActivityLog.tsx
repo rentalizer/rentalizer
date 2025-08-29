@@ -19,27 +19,7 @@ interface ActivityEntry {
 }
 
 const mockActivityData: ActivityEntry[] = [
-  // Sanyo 6677 - Accelerator Pro Program (Access terminated Aug 6, 2025)
-  {
-    id: 'sy1',
-    type: 'module',
-    title: 'Account Status Update',
-    description: 'ACCESS TERMINATED - Payment overdue (3 days to respond)',
-    date: '2025-08-06',
-    serverID: 'srv-billing-system-001',
-    pdfFile: 'Account Suspension Notice.pdf',
-    completed: false
-  },
-  {
-    id: 'sy2',
-    type: 'module',
-    title: 'Accelerator Pro: Payment Processing',
-    description: 'Payment of $2,000.00 USD successfully processed',
-    date: '2025-08-04',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Payment Confirmation Receipt.pdf',
-    completed: true
-  },
+  // Sanyo 6677 - Accelerator Pro Program
   {
     id: 'sy3',
     type: 'module',
@@ -125,7 +105,7 @@ const mockActivityData: ActivityEntry[] = [
     type: 'module',
     title: 'Accelerator Pro: Payment Processing',
     description: 'First payment of $2,000.00 USD successfully processed',
-    date: '2025-07-04',
+    date: '2025-08-04',
     serverID: 'srv-billing-system-001',
     pdfFile: 'Payment Confirmation Receipt.pdf',
     completed: true
