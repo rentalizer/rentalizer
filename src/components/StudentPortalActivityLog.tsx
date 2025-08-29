@@ -19,6 +19,128 @@ interface ActivityEntry {
 }
 
 const mockActivityData: ActivityEntry[] = [
+  // Sanyo 6677 - Accelerator Pro Program (Access terminated Aug 6, 2025)
+  {
+    id: 'sy1',
+    type: 'module',
+    title: 'Account Status Update',
+    description: 'ACCESS TERMINATED - Payment overdue (3 days to respond)',
+    date: '2025-08-06',
+    serverID: 'srv-billing-system-001',
+    pdfFile: 'Account Suspension Notice.pdf',
+    completed: false
+  },
+  {
+    id: 'sy2',
+    type: 'module',
+    title: 'Accelerator Pro: Payment Processing',
+    description: 'Payment of $2,000.00 USD successfully processed',
+    date: '2025-08-04',
+    serverID: 'srv-us-west-1-prod-810',
+    pdfFile: 'Payment Confirmation Receipt.pdf',
+    completed: true
+  },
+  {
+    id: 'sy3',
+    type: 'module',
+    title: 'Accelerator Pro: Portfolio Analysis',
+    description: 'Multi-property portfolio framework completed',
+    date: '2025-08-02',
+    serverID: 'srv-us-central-2-prod-811',
+    pdfFile: 'Portfolio Analysis Framework.pdf',
+    completed: true
+  },
+  {
+    id: 'sy4',
+    type: 'module',
+    title: 'Accelerator Pro: Market Intelligence',
+    description: 'Advanced market research techniques mastered',
+    date: '2025-07-30',
+    serverID: 'srv-us-east-2-prod-812',
+    pdfFile: 'Market Intelligence Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'sy5',
+    type: 'module',
+    title: 'Accelerator Pro: Investment Strategies',
+    description: 'ROI optimization strategies completed',
+    date: '2025-07-28',
+    serverID: 'srv-us-west-1-prod-810',
+    pdfFile: 'Investment Strategy Optimization.pdf',
+    completed: true
+  },
+  {
+    id: 'sy6',
+    type: 'module',
+    title: 'Accelerator Pro: Data Analytics',
+    description: 'Advanced analytics dashboard setup completed',
+    date: '2025-07-25',
+    serverID: 'srv-us-central-2-prod-811',
+    pdfFile: 'Analytics Dashboard Setup Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'sy7',
+    type: 'achievement',
+    title: 'Accelerator Pro: Module 1 Completion',
+    description: 'Fundamentals certification earned with 87% score',
+    date: '2025-07-22',
+    serverID: 'srv-us-east-2-prod-812',
+    pdfFile: 'Module 1 Completion Certificate.pdf',
+    completed: true
+  },
+  {
+    id: 'sy8',
+    type: 'module',
+    title: 'Accelerator Pro: Property Evaluation',
+    description: 'Property evaluation framework completed',
+    date: '2025-07-18',
+    serverID: 'srv-us-west-1-prod-810',
+    pdfFile: 'Property Evaluation Methods.pdf',
+    completed: true
+  },
+  {
+    id: 'sy9',
+    type: 'module',
+    title: 'Accelerator Pro: Market Research',
+    description: 'Market research methodology workshop attended',
+    date: '2025-07-15',
+    serverID: 'srv-us-central-2-prod-811',
+    pdfFile: 'Market Research Methodology.pdf',
+    completed: true
+  },
+  {
+    id: 'sy10',
+    type: 'module',
+    title: 'Accelerator Pro: Financial Modeling',
+    description: 'Financial modeling basics completed',
+    date: '2025-07-12',
+    serverID: 'srv-us-east-2-prod-812',
+    pdfFile: 'Financial Modeling Basics.pdf',
+    completed: true
+  },
+  {
+    id: 'sy11',
+    type: 'module',
+    title: 'Accelerator Pro: Payment Processing',
+    description: 'First payment of $2,000.00 USD successfully processed',
+    date: '2025-07-04',
+    serverID: 'srv-billing-system-001',
+    pdfFile: 'Payment Confirmation Receipt.pdf',
+    completed: true
+  },
+  {
+    id: 'sy12',
+    type: 'achievement',
+    title: 'Accelerator Pro Program',
+    description: 'Successfully enrolled and payment plan setup (2 monthly payments of $2,000.00 USD)',
+    date: '2025-07-04',
+    serverID: 'srv-us-west-1-prod-810',
+    pdfFile: 'Accelerator Pro Welcome Package.pdf',
+    completed: true
+  },
+
   // Tiffany Worthy - Arbitrage Accelerator Program
   {
     id: 'tw1',
@@ -393,6 +515,7 @@ const mockStudents = [
   { id: '4', name: 'Alex Johnson', email: 'alex.johnson@email.com', progress: 85 },
   { id: '5', name: 'Sarah Wilson', email: 'sarah.wilson@email.com', progress: 72 },
   { id: '6', name: 'Mike Davis', email: 'mike.davis@email.com', progress: 90 },
+  { id: '7', name: 'Sanyo 6677', email: 'sanyo.6677@gmail.com', progress: 65 },
 ];
 
 export const StudentPortalActivityLog = () => {
@@ -408,7 +531,8 @@ export const StudentPortalActivityLog = () => {
     // Filter by student
     if (selectedStudent === '2' && !activity.id.startsWith('tw')) return false;
     if (selectedStudent === '3' && !activity.id.startsWith('pm')) return false;
-    if (selectedStudent !== '2' && selectedStudent !== '3' && (activity.id.startsWith('tw') || activity.id.startsWith('pm'))) return false;
+    if (selectedStudent === '7' && !activity.id.startsWith('sy')) return false;
+    if (!['2', '3', '7'].includes(selectedStudent) && (activity.id.startsWith('tw') || activity.id.startsWith('pm') || activity.id.startsWith('sy'))) return false;
     
     // Filter by activity type
     if (activeFilter === 'All Activity') return true;
@@ -491,7 +615,7 @@ export const StudentPortalActivityLog = () => {
               </div>
               
               <div className="text-right text-sm">
-                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '2' ? '2025-05-21' : selectedStudent === '3' ? '2025-07-12' : '2024-08-01'}</span></div>
+                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '2' ? '2025-05-21' : selectedStudent === '3' ? '2025-07-12' : selectedStudent === '7' ? '2025-07-04' : '2024-08-01'}</span></div>
                 <div className="text-gray-400">Progress: <span className="text-white">{currentStudent.progress}%</span></div>
               </div>
             </div>
