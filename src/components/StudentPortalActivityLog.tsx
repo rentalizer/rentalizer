@@ -515,7 +515,7 @@ const mockStudents = [
   { id: '4', name: 'Alex Johnson', email: 'alex.johnson@email.com', progress: 85 },
   { id: '5', name: 'Sarah Wilson', email: 'sarah.wilson@email.com', progress: 72 },
   { id: '6', name: 'Mike Davis', email: 'mike.davis@email.com', progress: 90 },
-  { id: '7', name: 'Sanyo 6677', email: 'sanyo.6677@gmail.com', progress: 65 },
+  { id: '7', name: 'Sanyo Mathew', email: 'sanyo.6677@gmail.com', progress: 65 },
 ];
 
 export const StudentPortalActivityLog = () => {
