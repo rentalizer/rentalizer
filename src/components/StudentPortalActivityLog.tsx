@@ -19,6 +19,58 @@ interface ActivityEntry {
 }
 
 const mockActivityData: ActivityEntry[] = [
+  // Vinod Kumar - Accelerator Pro Program
+  {
+    id: 'vk1',
+    type: 'module',
+    title: 'Accelerator Pro: Payment Processing',
+    description: 'Payment of $1,000.00 USD successfully processed',
+    date: '2025-07-19',
+    serverID: 'srv-billing-system-001',
+    pdfFile: 'Payment Confirmation Receipt.pdf',
+    completed: true
+  },
+  {
+    id: 'vk2',
+    type: 'module',
+    title: 'Accelerator Pro: Account Setup Complete',
+    description: 'Student account successfully created and activated',
+    date: '2025-07-19',
+    serverID: 'srv-us-west-1-prod-810',
+    pdfFile: 'Account Setup Confirmation.pdf',
+    completed: true
+  },
+  {
+    id: 'vk3',
+    type: 'module',
+    title: 'Module 1: Foundation Strategies',
+    description: 'Content download: 100% complete',
+    date: '2025-07-20',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Foundation Strategies.pdf',
+    completed: true
+  },
+  {
+    id: 'vk4',
+    type: 'module',
+    title: 'Module 2: Market Analysis Techniques',
+    description: 'Content download: 100% complete',
+    date: '2025-07-22',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Market Analysis Techniques.pdf',
+    completed: true
+  },
+  {
+    id: 'vk5',
+    type: 'module',
+    title: 'Module 3: Advanced Investment Strategies',
+    description: 'Content download: 100% complete',
+    date: '2025-07-25',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Advanced Investment Strategies.pdf',
+    completed: true
+  },
+  
   // Sanyo 6677 - Accelerator Pro Program
   {
     id: 'sy3',
@@ -496,6 +548,7 @@ const mockStudents = [
   { id: '5', name: 'Sarah Wilson', email: 'sarah.wilson@email.com', progress: 100 },
   { id: '6', name: 'Mike Davis', email: 'mike.davis@email.com', progress: 100 },
   { id: '7', name: 'Sanyo Mathew', email: 'sanyo.6677@gmail.com', progress: 100 },
+  { id: '8', name: 'Vinod Kumar', email: 'vinodkhatri@hotmail.com', progress: 100 },
 ];
 
 export const StudentPortalActivityLog = () => {
@@ -512,7 +565,8 @@ export const StudentPortalActivityLog = () => {
     if (selectedStudent === '2' && !activity.id.startsWith('tw')) return false;
     if (selectedStudent === '3' && !activity.id.startsWith('pm')) return false;
     if (selectedStudent === '7' && !activity.id.startsWith('sy')) return false;
-    if (!['2', '3', '7'].includes(selectedStudent) && (activity.id.startsWith('tw') || activity.id.startsWith('pm') || activity.id.startsWith('sy'))) return false;
+    if (selectedStudent === '8' && !activity.id.startsWith('vk')) return false;
+    if (!['2', '3', '7', '8'].includes(selectedStudent) && (activity.id.startsWith('tw') || activity.id.startsWith('pm') || activity.id.startsWith('sy') || activity.id.startsWith('vk'))) return false;
     
     // Filter by activity type
     if (activeFilter === 'All Activity') return true;
