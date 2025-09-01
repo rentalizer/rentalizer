@@ -23,169 +23,159 @@ const mockActivityData: ActivityEntry[] = [
   {
     id: 'vk1',
     type: 'module',
-    title: 'Accelerator Pro: Payment Processing',
-    description: 'Payment of $1,000.00 USD successfully processed',
-    date: '2025-07-19',
-    serverID: 'srv-billing-system-001',
-    pdfFile: 'Payment Confirmation Receipt.pdf',
-    completed: true
-  },
-  {
-    id: 'vk2',
-    type: 'module',
     title: 'Accelerator Pro: Account Setup Complete',
     description: 'Student account successfully created and activated',
-    date: '2025-07-19',
+    date: '2025-06-19',
     serverID: 'srv-us-west-1-prod-810',
     pdfFile: 'Account Setup Confirmation.pdf',
     completed: true
   },
   {
-    id: 'vk3',
+    id: 'vk2',
     type: 'module',
     title: 'Module 1: Foundation Strategies',
     description: 'Content download: 100% complete',
-    date: '2025-07-20',
+    date: '2025-06-20',
     serverID: 'srv-content-delivery-005',
     pdfFile: 'Foundation Strategies.pdf',
     completed: true
   },
   {
-    id: 'vk4',
+    id: 'vk3',
     type: 'module',
     title: 'Module 2: Market Analysis Techniques',
     description: 'Content download: 100% complete',
-    date: '2025-07-22',
+    date: '2025-06-22',
     serverID: 'srv-content-delivery-005',
     pdfFile: 'Market Analysis Techniques.pdf',
     completed: true
   },
   {
-    id: 'vk5',
+    id: 'vk4',
     type: 'module',
     title: 'Module 3: Advanced Investment Strategies',
     description: 'Content download: 100% complete',
-    date: '2025-07-25',
+    date: '2025-06-25',
     serverID: 'srv-content-delivery-005',
     pdfFile: 'Advanced Investment Strategies.pdf',
     completed: true
   },
   {
-    id: 'vk6',
+    id: 'vk5',
     type: 'module',
     title: 'Module 4: Portfolio Management',
     description: 'Content download: 100% complete',
-    date: '2025-07-28',
+    date: '2025-06-28',
     serverID: 'srv-content-delivery-005',
     pdfFile: 'Portfolio Management Guide.pdf',
     completed: true
   },
   {
-    id: 'vk7',
+    id: 'vk6',
     type: 'assignment',
     title: 'Portfolio Analysis Assignment',
     description: 'Submitted portfolio analysis for review',
-    date: '2025-08-01',
+    date: '2025-07-01',
     serverID: 'srv-us-west-1-prod-810',
     pdfFile: 'Portfolio Analysis Submission.pdf',
     completed: true
   },
   {
-    id: 'vk8',
+    id: 'vk7',
     type: 'module',
     title: 'Module 5: Risk Management Strategies',
     description: 'Content download: 100% complete',
-    date: '2025-08-03',
+    date: '2025-07-03',
     serverID: 'srv-content-delivery-005',
     pdfFile: 'Risk Management Strategies.pdf',
     completed: true
   },
   {
-    id: 'vk9',
+    id: 'vk8',
     type: 'assignment',
     title: 'Risk Assessment Workshop',
     description: 'Attended live workshop and completed exercises',
-    date: '2025-08-05',
+    date: '2025-07-05',
     serverID: 'srv-us-central-2-prod-811',
     pdfFile: 'Risk Assessment Workshop Materials.pdf',
     completed: true
   },
   {
-    id: 'vk10',
+    id: 'vk9',
     type: 'module',
     title: 'Module 6: Market Analysis Deep Dive',
     description: 'Content download: 100% complete',
-    date: '2025-08-08',
+    date: '2025-07-08',
     serverID: 'srv-content-delivery-005',
     pdfFile: 'Market Analysis Deep Dive.pdf',
     completed: true
   },
   {
-    id: 'vk11',
+    id: 'vk10',
     type: 'achievement',
     title: 'Mid-Program Milestone',
     description: 'Achieved 75% program completion with 89% average score',
-    date: '2025-08-10',
+    date: '2025-07-10',
     serverID: 'srv-us-east-2-prod-812',
     pdfFile: 'Mid-Program Achievement Certificate.pdf',
     completed: true
   },
   {
-    id: 'vk12',
+    id: 'vk11',
     type: 'module',
     title: 'Module 7: Advanced Analytics',
     description: 'Content download: 100% complete',
-    date: '2025-08-12',
+    date: '2025-07-12',
     serverID: 'srv-content-delivery-005',
     pdfFile: 'Advanced Analytics Techniques.pdf',
     completed: true
   },
   {
-    id: 'vk13',
+    id: 'vk12',
     type: 'assignment',
     title: 'Market Research Case Study',
     description: 'Completed comprehensive market analysis project',
-    date: '2025-08-15',
+    date: '2025-07-15',
     serverID: 'srv-us-west-1-prod-810',
     pdfFile: 'Market Research Case Study Results.pdf',
     completed: true
   },
   {
-    id: 'vk14',
+    id: 'vk13',
     type: 'module',
     title: 'Module 8: Property Evaluation Mastery',
     description: 'Content download: 100% complete',
-    date: '2025-08-18',
+    date: '2025-07-18',
     serverID: 'srv-content-delivery-005',
     pdfFile: 'Property Evaluation Mastery Guide.pdf',
     completed: true
   },
   {
-    id: 'vk15',
+    id: 'vk14',
     type: 'feedback',
     title: 'Instructor Feedback Session',
     description: 'Participated in one-on-one mentoring session',
-    date: '2025-08-20',
+    date: '2025-07-20',
     serverID: 'srv-us-central-2-prod-811',
     pdfFile: 'Mentoring Session Notes.pdf',
     completed: true
   },
   {
-    id: 'vk16',
+    id: 'vk15',
     type: 'module',
     title: 'Module 9: Investment Optimization',
     description: 'Content download: 100% complete',
-    date: '2025-08-22',
+    date: '2025-07-22',
     serverID: 'srv-content-delivery-005',
     pdfFile: 'Investment Optimization Strategies.pdf',
     completed: true
   },
   {
-    id: 'vk17',
+    id: 'vk16',
     type: 'assignment',
     title: 'Final Project Phase 1',
     description: 'Submitted initial project proposal and analysis',
-    date: '2025-08-25',
+    date: '2025-07-25',
     serverID: 'srv-us-east-2-prod-812',
     pdfFile: 'Final Project Phase 1 Submission.pdf',
     completed: true
@@ -769,7 +759,7 @@ export const StudentPortalActivityLog = () => {
               </div>
               
               <div className="text-right text-sm">
-                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '2' ? '2025-05-21' : selectedStudent === '3' ? '2025-07-12' : selectedStudent === '7' ? '2025-07-04' : selectedStudent === '8' ? '2025-07-19' : '2024-08-01'}</span></div>
+                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '2' ? '2025-05-21' : selectedStudent === '3' ? '2025-07-12' : selectedStudent === '7' ? '2025-07-04' : selectedStudent === '8' ? '2025-06-19' : '2024-08-01'}</span></div>
                 <div className="text-gray-400">Progress: <span className="text-white">{currentStudent.progress}%</span></div>
               </div>
             </div>
