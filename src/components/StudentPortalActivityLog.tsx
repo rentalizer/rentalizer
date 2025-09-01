@@ -180,6 +180,126 @@ const mockActivityData: ActivityEntry[] = [
     pdfFile: 'Final Project Phase 1 Submission.pdf',
     completed: true
   },
+  {
+    id: 'vk17',
+    type: 'module',
+    title: 'Module 10: Advanced Market Strategies',
+    description: 'Content download: 100% complete',
+    date: '2025-07-28',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Advanced Market Strategies Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'vk18',
+    type: 'assignment',
+    title: 'Market Analysis Capstone',
+    description: 'Comprehensive market analysis project submitted',
+    date: '2025-08-01',
+    serverID: 'srv-us-west-1-prod-810',
+    pdfFile: 'Market Analysis Capstone Project.pdf',
+    completed: true
+  },
+  {
+    id: 'vk19',
+    type: 'module',
+    title: 'Module 11: Professional Presentation Skills',
+    description: 'Content download: 100% complete',
+    date: '2025-08-03',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Professional Presentation Mastery.pdf',
+    completed: true
+  },
+  {
+    id: 'vk20',
+    type: 'feedback',
+    title: 'Industry Expert Review Session',
+    description: 'Participated in expert panel discussion and Q&A',
+    date: '2025-08-05',
+    serverID: 'srv-us-central-2-prod-811',
+    pdfFile: 'Expert Panel Session Notes.pdf',
+    completed: true
+  },
+  {
+    id: 'vk21',
+    type: 'assignment',
+    title: 'Final Project Phase 2',
+    description: 'Advanced analysis and implementation strategy completed',
+    date: '2025-08-08',
+    serverID: 'srv-us-east-2-prod-812',
+    pdfFile: 'Final Project Phase 2 Submission.pdf',
+    completed: true
+  },
+  {
+    id: 'vk22',
+    type: 'module',
+    title: 'Module 12: Graduation Preparation',
+    description: 'Content download: 100% complete',
+    date: '2025-08-10',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Graduation Preparation Checklist.pdf',
+    completed: true
+  },
+  {
+    id: 'vk23',
+    type: 'achievement',
+    title: 'Program Excellence Award',
+    description: 'Achieved outstanding performance with 95% overall score',
+    date: '2025-08-12',
+    serverID: 'srv-us-west-1-prod-810',
+    pdfFile: 'Program Excellence Certificate.pdf',
+    completed: true
+  },
+  {
+    id: 'vk24',
+    type: 'assignment',
+    title: 'Final Comprehensive Exam',
+    description: 'Completed comprehensive examination with distinction',
+    date: '2025-08-15',
+    serverID: 'srv-us-east-2-prod-812',
+    pdfFile: 'Comprehensive Exam Results.pdf',
+    completed: true
+  },
+  {
+    id: 'vk25',
+    type: 'feedback',
+    title: 'Final Mentorship Session',
+    description: 'Completed final one-on-one mentorship review',
+    date: '2025-08-18',
+    serverID: 'srv-us-central-2-prod-811',
+    pdfFile: 'Final Mentorship Review.pdf',
+    completed: true
+  },
+  {
+    id: 'vk26',
+    type: 'assignment',
+    title: 'Portfolio Presentation',
+    description: 'Delivered final portfolio presentation to review board',
+    date: '2025-08-20',
+    serverID: 'srv-us-west-1-prod-810',
+    pdfFile: 'Portfolio Presentation Materials.pdf',
+    completed: true
+  },
+  {
+    id: 'vk27',
+    type: 'achievement',
+    title: 'Program Graduation',
+    description: 'Successfully completed Accelerator Pro Program with honors',
+    date: '2025-08-22',
+    serverID: 'srv-us-east-2-prod-812',
+    pdfFile: 'Graduation Certificate.pdf',
+    completed: true
+  },
+  {
+    id: 'vk28',
+    type: 'module',
+    title: 'Post-Graduation Resources',
+    description: 'Continuing education resources and alumni network access granted',
+    date: '2025-08-25',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Alumni Resources Package.pdf',
+    completed: true
+  },
   
   // Sanyo 6677 - Accelerator Pro Program
   {
