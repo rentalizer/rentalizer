@@ -70,6 +70,126 @@ const mockActivityData: ActivityEntry[] = [
     pdfFile: 'Advanced Investment Strategies.pdf',
     completed: true
   },
+  {
+    id: 'vk6',
+    type: 'module',
+    title: 'Module 4: Portfolio Management',
+    description: 'Content download: 100% complete',
+    date: '2025-07-28',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Portfolio Management Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'vk7',
+    type: 'assignment',
+    title: 'Portfolio Analysis Assignment',
+    description: 'Submitted portfolio analysis for review',
+    date: '2025-08-01',
+    serverID: 'srv-us-west-1-prod-810',
+    pdfFile: 'Portfolio Analysis Submission.pdf',
+    completed: true
+  },
+  {
+    id: 'vk8',
+    type: 'module',
+    title: 'Module 5: Risk Management Strategies',
+    description: 'Content download: 100% complete',
+    date: '2025-08-03',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Risk Management Strategies.pdf',
+    completed: true
+  },
+  {
+    id: 'vk9',
+    type: 'assignment',
+    title: 'Risk Assessment Workshop',
+    description: 'Attended live workshop and completed exercises',
+    date: '2025-08-05',
+    serverID: 'srv-us-central-2-prod-811',
+    pdfFile: 'Risk Assessment Workshop Materials.pdf',
+    completed: true
+  },
+  {
+    id: 'vk10',
+    type: 'module',
+    title: 'Module 6: Market Analysis Deep Dive',
+    description: 'Content download: 100% complete',
+    date: '2025-08-08',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Market Analysis Deep Dive.pdf',
+    completed: true
+  },
+  {
+    id: 'vk11',
+    type: 'achievement',
+    title: 'Mid-Program Milestone',
+    description: 'Achieved 75% program completion with 89% average score',
+    date: '2025-08-10',
+    serverID: 'srv-us-east-2-prod-812',
+    pdfFile: 'Mid-Program Achievement Certificate.pdf',
+    completed: true
+  },
+  {
+    id: 'vk12',
+    type: 'module',
+    title: 'Module 7: Advanced Analytics',
+    description: 'Content download: 100% complete',
+    date: '2025-08-12',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Advanced Analytics Techniques.pdf',
+    completed: true
+  },
+  {
+    id: 'vk13',
+    type: 'assignment',
+    title: 'Market Research Case Study',
+    description: 'Completed comprehensive market analysis project',
+    date: '2025-08-15',
+    serverID: 'srv-us-west-1-prod-810',
+    pdfFile: 'Market Research Case Study Results.pdf',
+    completed: true
+  },
+  {
+    id: 'vk14',
+    type: 'module',
+    title: 'Module 8: Property Evaluation Mastery',
+    description: 'Content download: 100% complete',
+    date: '2025-08-18',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Property Evaluation Mastery Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'vk15',
+    type: 'feedback',
+    title: 'Instructor Feedback Session',
+    description: 'Participated in one-on-one mentoring session',
+    date: '2025-08-20',
+    serverID: 'srv-us-central-2-prod-811',
+    pdfFile: 'Mentoring Session Notes.pdf',
+    completed: true
+  },
+  {
+    id: 'vk16',
+    type: 'module',
+    title: 'Module 9: Investment Optimization',
+    description: 'Content download: 100% complete',
+    date: '2025-08-22',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Investment Optimization Strategies.pdf',
+    completed: true
+  },
+  {
+    id: 'vk17',
+    type: 'assignment',
+    title: 'Final Project Phase 1',
+    description: 'Submitted initial project proposal and analysis',
+    date: '2025-08-25',
+    serverID: 'srv-us-east-2-prod-812',
+    pdfFile: 'Final Project Phase 1 Submission.pdf',
+    completed: true
+  },
   
   // Sanyo 6677 - Accelerator Pro Program
   {
