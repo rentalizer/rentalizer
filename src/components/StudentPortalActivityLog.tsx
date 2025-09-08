@@ -306,9 +306,9 @@ const mockActivityData: ActivityEntry[] = [
     id: 'mf1',
     type: 'achievement',
     title: 'Arbitrage Accelerator: Account Setup Complete',
-    description: 'Student account successfully created and payment processed ($1,000 USD)',
+    description: 'Student account successfully created and activated',
     date: '2025-07-23',
-    serverID: 'srv-billing-system-001',
+    serverID: 'srv-us-west-1-prod-810',
     pdfFile: 'Account Setup Confirmation.pdf',
     completed: true
   },
