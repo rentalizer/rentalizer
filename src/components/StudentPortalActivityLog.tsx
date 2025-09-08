@@ -941,6 +941,7 @@ const mockStudents = [
   { id: '6', name: 'Mike Davis', email: 'mike.davis@email.com', progress: 100 },
   { id: '7', name: 'Sanyo Mathew', email: 'sanyo.6677@gmail.com', progress: 100 },
   { id: '8', name: 'Vinod Kumar', email: 'vinodkhatri@hotmail.com', progress: 100 },
+  { id: '9', name: 'Mary Fofanah', email: 'maryfofanah18@gmail.com', progress: 100 },
 ];
 
 export const StudentPortalActivityLog = () => {
@@ -958,7 +959,8 @@ export const StudentPortalActivityLog = () => {
     if (selectedStudent === '3' && !activity.id.startsWith('pm')) return false;
     if (selectedStudent === '7' && !activity.id.startsWith('sy')) return false;
     if (selectedStudent === '8' && !activity.id.startsWith('vk')) return false;
-    if (!['2', '3', '7', '8'].includes(selectedStudent) && (activity.id.startsWith('tw') || activity.id.startsWith('pm') || activity.id.startsWith('sy') || activity.id.startsWith('vk'))) return false;
+    if (selectedStudent === '9' && !activity.id.startsWith('mf')) return false;
+    if (!['2', '3', '7', '8', '9'].includes(selectedStudent) && (activity.id.startsWith('tw') || activity.id.startsWith('pm') || activity.id.startsWith('sy') || activity.id.startsWith('vk') || activity.id.startsWith('mf'))) return false;
     
     // Filter by activity type
     if (activeFilter === 'All Activity') return true;
