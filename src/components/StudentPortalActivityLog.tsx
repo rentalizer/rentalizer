@@ -300,6 +300,168 @@ const mockActivityData: ActivityEntry[] = [
     pdfFile: 'Alumni Resources Package.pdf',
     completed: true
   },
+
+  // Mary Fofanah - Arbitrage Accelerator Program
+  {
+    id: 'mf1',
+    type: 'achievement',
+    title: 'Arbitrage Accelerator: Account Setup Complete',
+    description: 'Student account successfully created and payment processed ($1,000 USD)',
+    date: '2025-07-23',
+    serverID: 'srv-billing-system-001',
+    pdfFile: 'Account Setup Confirmation.pdf',
+    completed: true
+  },
+  {
+    id: 'mf2',
+    type: 'module',
+    title: 'Module 1: Arbitrage Fundamentals',
+    description: 'Welcome module and program overview completed',
+    date: '2025-07-24',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Arbitrage Fundamentals Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'mf3',
+    type: 'module',
+    title: 'Module 2: Market Research Basics',
+    description: 'Content download: 100% complete',
+    date: '2025-07-26',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Market Research Basics.pdf',
+    completed: true
+  },
+  {
+    id: 'mf4',
+    type: 'assignment',
+    title: 'Market Analysis Exercise',
+    description: 'First assignment submitted for review',
+    date: '2025-07-28',
+    serverID: 'srv-us-west-1-prod-810',
+    pdfFile: 'Market Analysis Exercise Submission.pdf',
+    completed: true
+  },
+  {
+    id: 'mf5',
+    type: 'module',
+    title: 'Module 3: Property Evaluation Methods',
+    description: 'Content download: 100% complete',
+    date: '2025-07-30',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Property Evaluation Methods.pdf',
+    completed: true
+  },
+  {
+    id: 'mf6',
+    type: 'feedback',
+    title: 'Instructor Feedback Session',
+    description: 'One-on-one mentoring session with program instructor',
+    date: '2025-08-01',
+    serverID: 'srv-us-central-2-prod-811',
+    pdfFile: 'Mentoring Session Notes.pdf',
+    completed: true
+  },
+  {
+    id: 'mf7',
+    type: 'module',
+    title: 'Module 4: Advanced Sourcing Strategies',
+    description: 'Content download: 100% complete',
+    date: '2025-08-03',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Advanced Sourcing Strategies.pdf',
+    completed: true
+  },
+  {
+    id: 'mf8',
+    type: 'assignment',
+    title: 'Property Sourcing Project',
+    description: 'Comprehensive sourcing strategy project submitted',
+    date: '2025-08-05',
+    serverID: 'srv-us-west-1-prod-810',
+    pdfFile: 'Property Sourcing Project.pdf',
+    completed: true
+  },
+  {
+    id: 'mf9',
+    type: 'module',
+    title: 'Module 5: Deal Analysis and ROI Calculation',
+    description: 'Content download: 100% complete',
+    date: '2025-08-07',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Deal Analysis and ROI Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'mf10',
+    type: 'achievement',
+    title: 'Mid-Program Milestone',
+    description: 'Achieved 60% program completion with 92% average score',
+    date: '2025-08-10',
+    serverID: 'srv-us-east-2-prod-812',
+    pdfFile: 'Mid-Program Achievement Certificate.pdf',
+    completed: true
+  },
+  {
+    id: 'mf11',
+    type: 'module',
+    title: 'Module 6: Risk Management and Mitigation',
+    description: 'Content download: 100% complete',
+    date: '2025-08-12',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Risk Management Guide.pdf',
+    completed: true
+  },
+  {
+    id: 'mf12',
+    type: 'assignment',
+    title: 'Risk Assessment Case Study',
+    description: 'Completed comprehensive risk analysis project',
+    date: '2025-08-15',
+    serverID: 'srv-us-west-1-prod-810',
+    pdfFile: 'Risk Assessment Case Study.pdf',
+    completed: true
+  },
+  {
+    id: 'mf13',
+    type: 'module',
+    title: 'Module 7: Scaling and Automation',
+    description: 'Content download: 100% complete',
+    date: '2025-08-17',
+    serverID: 'srv-content-delivery-005',
+    pdfFile: 'Scaling and Automation Strategies.pdf',
+    completed: true
+  },
+  {
+    id: 'mf14',
+    type: 'feedback',
+    title: 'Progress Review Session',
+    description: 'Advanced mentoring session with industry expert',
+    date: '2025-08-19',
+    serverID: 'srv-us-central-2-prod-811',
+    pdfFile: 'Progress Review Session Notes.pdf',
+    completed: true
+  },
+  {
+    id: 'mf15',
+    type: 'assignment',
+    title: 'Final Capstone Project',
+    description: 'Comprehensive arbitrage business plan submitted',
+    date: '2025-08-22',
+    serverID: 'srv-us-east-2-prod-812',
+    pdfFile: 'Final Capstone Project.pdf',
+    completed: true
+  },
+  {
+    id: 'mf16',
+    type: 'achievement',
+    title: 'Program Completion Certificate',
+    description: 'Successfully completed Arbitrage Accelerator Program with honors',
+    date: '2025-08-25',
+    serverID: 'srv-us-east-2-prod-812',
+    pdfFile: 'Program Completion Certificate.pdf',
+    completed: true
+  },
   
   // Sanyo 6677 - Accelerator Pro Program
   {
