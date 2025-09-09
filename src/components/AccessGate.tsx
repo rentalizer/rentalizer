@@ -28,24 +28,6 @@ export const AccessGate: React.FC<AccessGateProps> = ({
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   
-  // Check if we're in Lovable development environment
-  const hostname = window.location.hostname;
-  const url = window.location.href;
-  const isLovableDev = hostname.includes('lovable.app') || 
-                       hostname.includes('localhost') || 
-                       hostname.includes('127.0.0.1') || 
-                       url.includes('lovable');
-  
-  // Bypass authentication in Lovable development
-  if (isLovableDev) {
-    console.log('🚀 LOVABLE DEV - Bypassing AccessGate authentication');
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-        {children}
-      </div>
-    );
-  }
-  
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');

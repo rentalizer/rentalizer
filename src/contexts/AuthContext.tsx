@@ -222,9 +222,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const isLovableDev = hostname.includes('lovable.app') || hostname.includes('localhost') || hostname.includes('127.0.0.1') || url.includes('lovable');
     
     if (isLovableDev) {
-      console.log('🚀 LOVABLE DEVELOPMENT - Using real auth (bypassed auth disabled)');
-      // Don't bypass auth in development - use real authentication
-      // This ensures RLS policies work correctly
+      console.log('🚀 LOVABLE DEVELOPMENT - BYPASSING AUTH');
+      // Set a mock user for development with a proper UUID
+      setUser({
+        id: '00000000-0000-0000-0000-000000000001', // Valid UUID for development
+        email: 'dev@example.com',
+        subscription_status: 'active',
+        subscription_tier: 'Premium'
+      });
+      setIsLoading(false);
+      return;
     }
     
     console.log('🌐 Using real authentication only');
