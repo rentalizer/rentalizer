@@ -37,20 +37,30 @@ serve(async (req) => {
     // Create Supabase client
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get request body with API provider preference
-    const { city, propertyType = '2', bathrooms = '2', apiProvider = 'airdna', userApiKeys } = await req.json();
+    // Get user's API keys if authenticated
+    const authHeader = req.headers.get('Authorization');
+    let userApiKeys = null;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.slice(7);
+      const { data: { user } } = await supabase.auth.getUser(token);
+      
+      if (user) {
+        const { data: apiKeys } = await supabase
+          .from('user_api_keys')
+          .select('airdna_api_key, rental_api_key')
+          .eq('user_id', user.id)
+          .single();
+        
+        userApiKeys = apiKeys;
+      }
+    }
 
-    // Determine which API to use based on user preference and available keys
-    const useAirDNA = apiProvider === 'airdna' && (userApiKeys?.airdnaApiKey || Deno.env.get('AIRDNA_API_KEY'));
-    const useRentCast = apiProvider === 'rentcast' && (userApiKeys?.rentcastApiKey || Deno.env.get('RENTCAST_API_KEY'));
+    // Get the AirDNA API key (user's key or system key)
+    const airdnaApiKey = userApiKeys?.airdna_api_key || Deno.env.get('AIRDNA_API_KEY');
+    console.log('AirDNA API key available:', !!airdnaApiKey);
 
-    console.log('API provider preference:', apiProvider);
-    console.log('Using AirDNA:', useAirDNA);
-    console.log('Using RentCast:', useRentCast);
-
-    if (useAirDNA) {
-      const airdnaApiKey = userApiKeys?.airdnaApiKey || Deno.env.get('AIRDNA_API_KEY');
-      console.log('AirDNA API key available:', !!airdnaApiKey);
+    if (airdnaApiKey) {
       try {
         // Call AirDNA Rentalizer API for real data
         console.log(`Calling AirDNA API for ${formattedCity}...`);
@@ -157,94 +167,6 @@ serve(async (req) => {
         }
       } catch (error) {
         console.error('Error calling AirDNA API:', error);
-      }
-    } else if (useRentCast) {
-      const rentcastApiKey = userApiKeys?.rentcastApiKey || Deno.env.get('RENTCAST_API_KEY');
-      console.log('RentCast API key available:', !!rentcastApiKey);
-
-      try {
-        console.log(`Calling RentCast API for ${formattedCity}...`);
-        const rentcastUrl = `https://rentcast-rental-listings.p.rapidapi.com/listings?city=${encodeURIComponent(city)}&state=&limit=50`;
-        
-        const rentcastResponse = await fetch(rentcastUrl, {
-          method: 'GET',
-          headers: {
-            'X-RapidAPI-Key': rentcastApiKey,
-            'X-RapidAPI-Host': 'rentcast-rental-listings.p.rapidapi.com'
-          }
-        });
-
-        console.log('RentCast API response status:', rentcastResponse.status);
-
-        if (rentcastResponse.ok) {
-          const rentcastData = await rentcastResponse.json();
-          console.log('RentCast data received:', rentcastData.length, 'properties');
-
-          // Process RentCast data to create market analysis
-          if (rentcastData && rentcastData.length > 0) {
-            const neighborhoods = await generateRealNeighborhoods(city);
-            const submarketData = [];
-
-            // Group properties by neighborhoods and calculate averages
-            const neighborhoodGroups = new Map();
-            
-            rentcastData.forEach((property: any) => {
-              if (property.bedrooms === parseInt(propertyType) && property.bathrooms === parseInt(bathrooms)) {
-                const randomNeighborhood = neighborhoods[Math.floor(Math.random() * neighborhoods.length)];
-                if (!neighborhoodGroups.has(randomNeighborhood)) {
-                  neighborhoodGroups.set(randomNeighborhood, []);
-                }
-                neighborhoodGroups.get(randomNeighborhood).push(property);
-              }
-            });
-
-            // Calculate market metrics for each neighborhood
-            neighborhoods.forEach((neighborhood, index) => {
-              const properties = neighborhoodGroups.get(neighborhood) || [];
-              const avgRent = properties.length > 0 
-                ? Math.round(properties.reduce((sum: number, prop: any) => sum + (prop.price || 0), 0) / properties.length)
-                : 2000 + Math.floor(Math.random() * 1500); // Fallback average
-
-              // Estimate STR revenue (typically 1.2-2x monthly rent)
-              const strRevenue = Math.round(avgRent * (1.2 + Math.random() * 0.8) * 12);
-              const multiple = strRevenue / (avgRent * 12);
-
-              if (multiple >= 1.2) {
-                submarketData.push({
-                  submarket: neighborhood,
-                  strRevenue,
-                  medianRent: avgRent,
-                  multiple: Number(multiple.toFixed(2))
-                });
-              }
-            });
-
-            const filteredResults = submarketData
-              .sort((a, b) => b.multiple - a.multiple)
-              .slice(0, 8);
-
-            console.log(`Processed ${filteredResults.length} submarkets from RentCast data`);
-
-            if (filteredResults.length > 0) {
-              return new Response(
-                JSON.stringify({
-                  submarkets: filteredResults,
-                  city: city,
-                  propertyType,
-                  bathrooms,
-                  dataSource: 'rentcast_real_data'
-                }),
-                {
-                  headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-                }
-              );
-            }
-          }
-        } else {
-          console.error('RentCast API error:', rentcastResponse.status, rentcastResponse.statusText);
-        }
-      } catch (error) {
-        console.error('Error calling RentCast API:', error);
       }
     }
 
