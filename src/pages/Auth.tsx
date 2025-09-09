@@ -32,7 +32,7 @@ export const Auth = () => {
 
   // Redirect if already authenticated
   if (user) {
-    return <Navigate to="/community" replace />;
+    return <Navigate to="/markets" replace />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -79,7 +79,7 @@ export const Auth = () => {
       return;
     }
 
-    if (promoCode.toUpperCase() !== 'T6MEM') {
+    if (promoCode && promoCode.toUpperCase() !== 'T6MEM') {
       toast({
         title: "Invalid promo code",
         description: "Please enter a valid promo code to sign up",
@@ -104,9 +104,7 @@ export const Auth = () => {
       await signUp(signupEmail, signupPassword, {
         displayName,
         firstName,
-        lastName,
-        bio,
-        avatarFile
+        lastName
       });
       toast({
         title: "Welcome!",
@@ -139,143 +137,145 @@ export const Auth = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-slate-800/50 border-cyan-500/20">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl text-white">Community Access</CardTitle>
-          <p className="text-gray-400">Join our vibrant community of rental entrepreneurs</p>
+          <CardTitle className="text-2xl text-white">Market Intelligence Access</CardTitle>
+          <p className="text-gray-400">Sign in to save your API keys and access market data</p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSignup} className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="first-name" className="text-gray-300">
-                  First Name
-                </Label>
-                <Input
-                  id="first-name"
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="bg-slate-700/50 border-cyan-500/20 text-white"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="last-name" className="text-gray-300">
-                  Last Name
-                </Label>
-                <Input
-                  id="last-name"
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="bg-slate-700/50 border-cyan-500/20 text-white"
-                  required
-                />
-              </div>
-            </div>
+          <Tabs defaultValue="login" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-slate-700/50">
+              <TabsTrigger value="login" className="text-gray-300 data-[state=active]:text-white data-[state=active]:bg-cyan-600">
+                Login
+              </TabsTrigger>
+              <TabsTrigger value="signup" className="text-gray-300 data-[state=active]:text-white data-[state=active]:bg-cyan-600">
+                Sign Up
+              </TabsTrigger>
+            </TabsList>
             
-            <div className="space-y-2">
-              <Label htmlFor="signup-email" className="text-gray-300">Email</Label>
-              <Input
-                id="signup-email"
-                type="email"
-                value={signupEmail}
-                onChange={(e) => setSignupEmail(e.target.value)}
-                className="bg-slate-700/50 border-cyan-500/20 text-white"
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="signup-password" className="text-gray-300">Password</Label>
-              <div className="relative">
-                <Input
-                  id="signup-password"
-                  type={showPassword ? "text" : "password"}
-                  value={signupPassword}
-                  onChange={(e) => setSignupPassword(e.target.value)}
-                  className="bg-slate-700/50 border-cyan-500/20 text-white pr-10"
-                  required
-                  minLength={6}
-                />
+            <TabsContent value="login" className="mt-6">
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="login-email" className="text-gray-300">Email</Label>
+                  <Input
+                    id="login-email"
+                    type="email"
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    className="bg-slate-700/50 border-cyan-500/20 text-white"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="login-password" className="text-gray-300">Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      className="bg-slate-700/50 border-cyan-500/20 text-white pr-10"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+                
                 <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
-                  onClick={() => setShowPassword(!showPassword)}
+                  type="submit"
+                  disabled={loginLoading}
+                  className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {loginLoading ? 'Signing in...' : 'Sign In'}
                 </Button>
-              </div>
-              <p className="text-xs text-gray-400">Password must be at least 6 characters long</p>
-            </div>
+              </form>
+            </TabsContent>
 
-            <div className="space-y-2">
-              <Label htmlFor="avatar-upload" className="text-gray-300 flex items-center gap-2">
-                <Upload className="h-4 w-4" />
-                Upload Your Image *
-              </Label>
-              <div className="border-2 border-dashed border-cyan-500/30 rounded-lg p-4 hover:border-cyan-500/50 transition-colors">
-                <input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
-                  className="hidden"
-                  required
-                />
-                <label
-                  htmlFor="avatar-upload"
-                  className="cursor-pointer flex flex-col items-center gap-2 text-gray-400 hover:text-gray-300"
+            <TabsContent value="signup" className="mt-6">
+              <form onSubmit={handleSignup} className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="first-name" className="text-gray-300">
+                      First Name
+                    </Label>
+                    <Input
+                      id="first-name"
+                      type="text"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="bg-slate-700/50 border-cyan-500/20 text-white"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="last-name" className="text-gray-300">
+                      Last Name
+                    </Label>
+                    <Input
+                      id="last-name"
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      className="bg-slate-700/50 border-cyan-500/20 text-white"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="signup-email" className="text-gray-300">Email</Label>
+                  <Input
+                    id="signup-email"
+                    type="email"
+                    value={signupEmail}
+                    onChange={(e) => setSignupEmail(e.target.value)}
+                    className="bg-slate-700/50 border-cyan-500/20 text-white"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="signup-password" className="text-gray-300">Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="signup-password"
+                      type={showPassword ? "text" : "password"}
+                      value={signupPassword}
+                      onChange={(e) => setSignupPassword(e.target.value)}
+                      className="bg-slate-700/50 border-cyan-500/20 text-white pr-10"
+                      required
+                      minLength={6}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-400">Password must be at least 6 characters long</p>
+                </div>
+                
+                <Button
+                  type="submit"
+                  disabled={signupLoading}
+                  className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
                 >
-                  {avatarFile ? (
-                    <span className="text-cyan-300">{avatarFile.name}</span>
-                  ) : (
-                    <>
-                      <Upload className="h-6 w-6" />
-                      <span className="text-sm">Click to upload profile image</span>
-                    </>
-                  )}
-                </label>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="bio" className="text-gray-300">Tell The Community About Yourself *</Label>
-              <Textarea
-                id="bio"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                className="bg-slate-700/50 border-cyan-500/20 text-white resize-none"
-                placeholder="Share a bit about yourself, your interests, and what brings you to our community..."
-                rows={3}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="promo-code" className="text-gray-300 flex items-center gap-2">
-                <Ticket className="h-4 w-4" />
-                Promo Code
-              </Label>
-              <Input
-                id="promo-code"
-                type="text"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                className="bg-slate-700/50 border-cyan-500/20 text-white"
-                required
-              />
-            </div>
-            
-            <Button
-              type="submit"
-              disabled={signupLoading}
-              className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
-            >
-              {signupLoading ? 'Creating account...' : 'Create Account'}
-            </Button>
-          </form>
+                  {signupLoading ? 'Creating account...' : 'Create Account'}
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
           
         </CardContent>
       </Card>

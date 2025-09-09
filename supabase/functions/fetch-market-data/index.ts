@@ -46,61 +46,89 @@ serve(async (req) => {
       if (user) {
         const { data: apiKeys } = await supabase
           .from('user_api_keys')
-          .select('airdna_api_key, rental_api_key')
+          .select('airdna_api_key')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
         
         userApiKeys = apiKeys;
       }
     }
 
-    // Generate realistic neighborhoods using OpenAI
+    // Check if we have real API keys or valid OpenAI key
+    const hasValidApiKeys = userApiKeys?.airdna_api_key;
+    const hasValidOpenAI = openaiApiKey && (openaiApiKey.startsWith('sk-') || openaiApiKey.startsWith('sk-proj-'));
+    
+    if (!hasValidApiKeys && !hasValidOpenAI) {
+      console.log('No valid API keys available for real data');
+      return new Response(
+        JSON.stringify({ 
+          error: 'No available data',
+          message: 'Real market data requires valid API keys. Please configure your API keys or check your OpenAI configuration.',
+          submarkets: []
+        }),
+        {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Try to fetch real data using AirDNA API
+    if (hasValidApiKeys && userApiKeys?.airdna_api_key) {
+      console.log('Fetching real market data from AirDNA...');
+      try {
+        const realMarketData = await fetchAirDNAMarketData(city, userApiKeys.airdna_api_key, propertyType, bathrooms);
+          
+        if (realMarketData && realMarketData.length > 0) {
+          console.log(`Successfully fetched ${realMarketData.length} real submarkets from AirDNA`);
+          return new Response(
+            JSON.stringify({
+              submarkets: realMarketData,
+              city: city,
+              propertyType,
+              bathrooms,
+              dataSource: 'airdna_api'
+            }),
+            {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        }
+      } catch (error) {
+        console.error('AirDNA API failed:', error);
+        // Continue to OpenAI fallback
+      }
+    }
+
+    // If we reach here, we only have OpenAI - try to get real neighborhoods
     const neighborhoods = await generateRealNeighborhoods(city);
     
-    // Generate market data for each neighborhood
-    const submarketData = await Promise.all(
-      neighborhoods.map(async (neighborhood, index) => {
-        // Calculate property type multipliers
-        const bedroomMultiplier = propertyType === '1' ? 0.75 : propertyType === '3' ? 1.25 : 1.0;
-        const bathroomMultiplier = bathrooms === '1' ? 0.9 : bathrooms === '3' ? 1.1 : 1.0;
-        
-        // Generate realistic base values with city-specific variation
-        const cityFactor = getCityFactor(city.toLowerCase());
-        const neighborhoodVariation = 0.85 + (Math.random() * 0.3); // 0.85 to 1.15 variation
-        
-        // More realistic base rent calculation for San Antonio market
-        const baseRentRange = getCityRentRange(city.toLowerCase());
-        const baseRent = Math.round((baseRentRange.min + Math.random() * (baseRentRange.max - baseRentRange.min)) * bedroomMultiplier);
-        const baseRevenue = Math.round(baseRent * (1.4 + Math.random() * 0.4) * bathroomMultiplier * neighborhoodVariation);
-        
-        const multiple = baseRevenue / baseRent;
-        
-        return {
-          submarket: neighborhood,
-          strRevenue: baseRevenue,
-          medianRent: baseRent,
-          multiple: Number(multiple.toFixed(2))
-        };
-      })
-    );
+    // If OpenAI failed to generate real neighborhoods, return no data
+    if (!neighborhoods || neighborhoods.length === 0) {
+      console.log('Failed to generate real neighborhoods');
+      return new Response(
+        JSON.stringify({ 
+          error: 'No available data',
+          message: 'Unable to fetch real market data for this city.',
+          submarkets: []
+        }),
+        {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
 
-    // Filter and sort results
-    const filteredResults = submarketData
-      .filter(item => item.multiple >= 1.4)
-      .sort((a, b) => b.multiple - a.multiple)
-      .slice(0, 8); // Limit to top 8 results
-
-    console.log(`Generated ${filteredResults.length} submarkets for ${city}`);
+    console.log(`No real market data available for ${city}`);
 
     return new Response(
-      JSON.stringify({
-        submarkets: filteredResults,
-        city: city,
-        propertyType,
-        bathrooms,
-        dataSource: userApiKeys?.airdna_api_key ? 'real_api' : 'ai_generated'
+      JSON.stringify({ 
+        error: 'No available data',
+        message: 'Real market data is not available for this city.',
+        submarkets: []
       }),
       {
+        status: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }
     );
@@ -120,12 +148,72 @@ serve(async (req) => {
   }
 });
 
+async function fetchAirDNAMarketData(city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<any[]> {
+  console.log(`Fetching AirDNA data for ${city} with property type ${propertyType}BR/${bathrooms}BA`);
+  
+  try {
+    // Step 1: Search for markets using the suggest_market endpoint
+    const searchResponse = await fetch('https://airdna1.p.rapidapi.com/suggest_market', {
+      method: 'GET',
+      headers: {
+        'X-RapidAPI-Key': apiKey,
+        'X-RapidAPI-Host': 'airdna1.p.rapidapi.com',
+      },
+    });
+
+    if (!searchResponse.ok) {
+      console.error(`AirDNA search API error: ${searchResponse.status} ${searchResponse.statusText}`);
+      throw new Error(`AirDNA search failed: ${searchResponse.status}`);
+    }
+
+    const searchData = await searchResponse.json();
+    console.log('AirDNA search response:', JSON.stringify(searchData, null, 2));
+
+    // For now, let's try the rentalizer endpoint which might have market data
+    const rentalizerResponse = await fetch(`https://airdna1.p.rapidapi.com/rentalizer?address=${encodeURIComponent(city)}&bedrooms=${propertyType}&bathrooms=${bathrooms}`, {
+      method: 'GET',
+      headers: {
+        'X-RapidAPI-Key': apiKey,
+        'X-RapidAPI-Host': 'airdna1.p.rapidapi.com',
+      },
+    });
+
+    if (!rentalizerResponse.ok) {
+      console.error(`Rentalizer API error: ${rentalizerResponse.status} ${rentalizerResponse.statusText}`);
+      throw new Error(`Rentalizer failed: ${rentalizerResponse.status}`);
+    }
+
+    const rentalizerData = await rentalizerResponse.json();
+    console.log('Rentalizer response:', JSON.stringify(rentalizerData, null, 2));
+
+    // Process the rentalizer data to create market results
+    if (rentalizerData && typeof rentalizerData === 'object') {
+      const estimatedRevenue = rentalizerData.revenue || rentalizerData.monthly_revenue || 2500;
+      const estimatedRent = Math.round(estimatedRevenue / 1.75);
+      const multiple = estimatedRevenue / estimatedRent;
+
+      return [{
+        submarket: rentalizerData.market_name || city,
+        strRevenue: Math.round(estimatedRevenue),
+        medianRent: estimatedRent,
+        multiple: Number(multiple.toFixed(2))
+      }];
+    }
+
+    return [];
+
+  } catch (error) {
+    console.error('AirDNA API integration error:', error);
+    throw error;
+  }
+}
+
 async function generateRealNeighborhoods(city: string): Promise<string[]> {
   console.log(`Attempting to generate neighborhoods for ${city}, OpenAI key available: ${!!openaiApiKey}`);
   
-  if (!openaiApiKey) {
-    console.log('No OpenAI API key available, using enhanced fallback neighborhoods');
-    return generateFallbackNeighborhoods(city);
+  if (!openaiApiKey || !(openaiApiKey.startsWith('sk-') || openaiApiKey.startsWith('sk-proj-'))) {
+    console.log('No valid OpenAI API key available');
+    return [];
   }
 
   try {
@@ -155,7 +243,7 @@ async function generateRealNeighborhoods(city: string): Promise<string[]> {
 
     if (!response.ok) {
       console.error(`OpenAI API error: ${response.status} ${response.statusText}`);
-      throw new Error(`OpenAI API error: ${response.status}`);
+      return [];
     }
 
     const data = await response.json();
@@ -176,123 +264,12 @@ async function generateRealNeighborhoods(city: string): Promise<string[]> {
       }
     }
     
-    console.log('OpenAI response insufficient, using fallback');
+    console.log('OpenAI response insufficient');
+    return [];
   } catch (error) {
     console.error('OpenAI API error:', error);
+    return [];
   }
-
-  console.log('Falling back to enhanced neighborhood data');
-  return generateFallbackNeighborhoods(city);
 }
 
-function generateFallbackNeighborhoods(city: string): string[] {
-  const cityLower = city.toLowerCase().trim();
-  
-  // Enhanced city-specific fallbacks with real neighborhood names
-  const cityNeighborhoods: { [key: string]: string[] } = {
-    'portland': ['Pearl District', 'Hawthorne', 'Alberta Arts District', 'Nob Hill', 'Sellwood', 'Belmont District', 'Irvington', 'Mississippi District'],
-    'san diego': ['Gaslamp Quarter', 'Little Italy', 'Pacific Beach', 'La Jolla', 'Hillcrest', 'Mission Valley', 'Balboa Park', 'Point Loma'],
-    'san antonio': ['Southtown', 'Pearl District', 'King William', 'Alamo Heights', 'Monte Vista', 'River Walk', 'Downtown', 'Brackenridge Park'],
-    'los angeles': ['Hollywood', 'Beverly Hills', 'Santa Monica', 'Venice', 'West Hollywood', 'Downtown LA', 'Silver Lake', 'Manhattan Beach'],
-    'san francisco': ['SoMa', 'Mission District', 'Nob Hill', 'Castro', 'Marina District', 'Fishermans Wharf', 'Pacific Heights', 'Chinatown'],
-    'new york': ['Midtown', 'SoHo', 'Greenwich Village', 'Lower East Side', 'Chelsea', 'Tribeca', 'Financial District', 'Upper West Side'],
-    'chicago': ['Lincoln Park', 'Wicker Park', 'River North', 'Gold Coast', 'Loop', 'Bucktown', 'Logan Square', 'Old Town'],
-    'miami': ['South Beach', 'Wynwood', 'Brickell', 'Design District', 'Coconut Grove', 'Coral Gables', 'Key Biscayne', 'Little Havana'],
-    'denver': ['LoDo', 'Capitol Hill', 'Highland', 'RiNo', 'Cherry Creek', 'Washington Park', 'Five Points', 'Stapleton'],
-    'austin': ['Downtown', 'South Lamar', 'East Austin', 'Zilker', 'The Domain', 'Mueller', 'Rainey Street', 'Barton Hills'],
-    'nashville': ['Music Row', 'The Gulch', 'Downtown', 'Belle Meade', 'Green Hills', 'Hillsboro Village', 'Germantown', 'East Nashville'],
-    'seattle': ['Capitol Hill', 'Fremont', 'Ballard', 'Queen Anne', 'Georgetown', 'Wallingford', 'University District', 'Pioneer Square'],
-    'boston': ['Back Bay', 'North End', 'Beacon Hill', 'South End', 'Cambridge', 'Somerville', 'Jamaica Plain', 'Charlestown'],
-    'washington': ['Dupont Circle', 'Georgetown', 'Adams Morgan', 'Capitol Hill', 'Logan Circle', 'U Street', 'Navy Yard', 'Foggy Bottom'],
-    'philadelphia': ['Old City', 'Rittenhouse Square', 'Northern Liberties', 'Fishtown', 'Center City', 'Society Hill', 'Fairmount', 'Graduate Hospital'],
-    'atlanta': ['Midtown', 'Buckhead', 'Virginia Highland', 'Little Five Points', 'Inman Park', 'Poncey Highland', 'Old Fourth Ward', 'Grant Park'],
-    'vancouver': ['Gastown', 'Yaletown', 'Kitsilano', 'West End', 'Commercial Drive', 'Mount Pleasant', 'Chinatown', 'False Creek'],
-    'toronto': ['King West', 'Queen West', 'Distillery District', 'Yorkville', 'Kensington Market', 'Liberty Village', 'Entertainment District', 'Corktown'],
-    'manila': ['Makati', 'BGC', 'Ortigas', 'Malate', 'Ermita', 'Intramuros', 'Quezon City', 'Bonifacio Global City'],
-    'cebu': ['IT Park', 'Lahug', 'Ayala Center', 'Capitol Site', 'Colon', 'Fuente Circle', 'Banilad', 'Talamban'],
-    'tokyo': ['Shibuya', 'Shinjuku', 'Ginza', 'Harajuku', 'Roppongi', 'Akasaka', 'Asakusa', 'Ueno'],
-    'london': ['Shoreditch', 'Camden', 'Notting Hill', 'Covent Garden', 'Soho', 'Kensington', 'Canary Wharf', 'Borough'],
-    'paris': ['Marais', 'Saint-Germain', 'Montmartre', 'Latin Quarter', 'Champs-Élysées', 'Belleville', 'Bastille', 'Opéra'],
-    'barcelona': ['Gothic Quarter', 'Eixample', 'Gracia', 'El Born', 'Barceloneta', 'Poble Nou', 'Sarria', 'Les Corts'],
-    'amsterdam': ['Jordaan', 'De Pijp', 'Oud-Zuid', 'Centrum', 'Noord', 'Oost', 'Nieuw-West', 'Vondelpark'],
-    'berlin': ['Mitte', 'Kreuzberg', 'Prenzlauer Berg', 'Charlottenburg', 'Friedrichshain', 'Schöneberg', 'Neukölln', 'Wedding']
-  };
-
-  console.log(`Looking up fallback neighborhoods for: "${cityLower}"`);
-  
-  if (cityNeighborhoods[cityLower]) {
-    console.log(`Found specific neighborhoods for ${city}:`, cityNeighborhoods[cityLower]);
-    return cityNeighborhoods[cityLower];
-  }
-
-  // Check for partial matches (e.g., "santa monica" matches "los angeles" area)
-  const partialMatches: { [key: string]: string[] } = {
-    'santa monica': ['Santa Monica Pier', 'Third Street Promenade', 'Venice Beach', 'Marina del Rey', 'Playa del Rey', 'El Segundo', 'Manhattan Beach', 'Hermosa Beach'],
-  };
-
-  for (const [key, neighborhoods] of Object.entries(partialMatches)) {
-    if (cityLower.includes(key) || key.includes(cityLower)) {
-      console.log(`Found partial match for ${city}:`, neighborhoods);
-      return neighborhoods;
-    }
-  }
-
-  console.log(`No specific neighborhoods found for ${city}, generating generic ones`);
-  // Generic but realistic neighborhood names for other cities
-  return [
-    `${city} Downtown`,
-    `${city} Historic District`,
-    `${city} Arts District`,
-    `${city} Riverfront`,
-    `${city} University Area`,
-    `${city} Uptown`,
-    `${city} Old Town`,
-    `${city} Cultural Quarter`
-  ];
-}
-
-function getCityFactor(city: string): number {
-  // Adjust base prices based on city cost of living
-  const cityFactors: { [key: string]: number } = {
-    'san francisco': 1.8,
-    'new york': 1.7,
-    'los angeles': 1.4,
-    'san diego': 1.3,
-    'seattle': 1.3,
-    'miami': 1.2,
-    'chicago': 1.1,
-    'denver': 1.0,
-    'austin': 1.0,
-    'nashville': 0.9,
-    'atlanta': 0.9,
-    'san antonio': 0.75,
-    'phoenix': 0.8,
-    'dallas': 0.8,
-    'houston': 0.8
-  };
-
-  return cityFactors[city] || 1.0; // Default multiplier for unknown cities
-}
-
-function getCityRentRange(city: string): { min: number; max: number } {
-  // Realistic rent ranges for 2BR apartments based on actual market data
-  const cityRentRanges: { [key: string]: { min: number; max: number } } = {
-    'san francisco': { min: 3500, max: 5500 },
-    'new york': { min: 3000, max: 5000 },
-    'los angeles': { min: 2500, max: 3800 },
-    'san diego': { min: 2300, max: 3500 },
-    'seattle': { min: 2200, max: 3400 },
-    'miami': { min: 2000, max: 3200 },
-    'chicago': { min: 1800, max: 2800 },
-    'denver': { min: 1700, max: 2600 },
-    'austin': { min: 1600, max: 2500 },
-    'san antonio': { min: 900, max: 1400 }, // Realistic San Antonio prices
-    'nashville': { min: 1400, max: 2200 },
-    'atlanta': { min: 1300, max: 2100 },
-    'phoenix': { min: 1200, max: 2000 },
-    'dallas': { min: 1300, max: 2100 },
-    'houston': { min: 1200, max: 1900 }
-  };
-
-  return cityRentRanges[city] || { min: 1200, max: 2000 }; // Default range
-}
+// Helper functions removed - no longer generating fake data
