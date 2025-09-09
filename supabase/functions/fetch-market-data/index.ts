@@ -190,6 +190,7 @@ function generateFallbackNeighborhoods(city: string): string[] {
   const cityNeighborhoods: { [key: string]: string[] } = {
     'portland': ['Pearl District', 'Hawthorne', 'Alberta Arts District', 'Nob Hill', 'Sellwood', 'Belmont District', 'Irvington', 'Mississippi District'],
     'san diego': ['Gaslamp Quarter', 'Little Italy', 'Pacific Beach', 'La Jolla', 'Hillcrest', 'Mission Valley', 'Balboa Park', 'Point Loma'],
+    'san antonio': ['Southtown', 'Pearl District', 'King William', 'Alamo Heights', 'Monte Vista', 'River Walk', 'Downtown', 'Brackenridge Park'],
     'los angeles': ['Hollywood', 'Beverly Hills', 'Santa Monica', 'Venice', 'West Hollywood', 'Downtown LA', 'Silver Lake', 'Manhattan Beach'],
     'san francisco': ['SoMa', 'Mission District', 'Nob Hill', 'Castro', 'Marina District', 'Fishermans Wharf', 'Pacific Heights', 'Chinatown'],
     'new york': ['Midtown', 'SoHo', 'Greenwich Village', 'Lower East Side', 'Chelsea', 'Tribeca', 'Financial District', 'Upper West Side'],
