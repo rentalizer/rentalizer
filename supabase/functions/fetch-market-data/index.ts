@@ -46,7 +46,7 @@ serve(async (req) => {
       if (user) {
         const { data: apiKeys } = await supabase
           .from('user_api_keys')
-          .select('airdna_api_key, rental_api_key')
+          .select('airdna_api_key')
           .eq('user_id', user.id)
           .maybeSingle();
         
@@ -55,7 +55,7 @@ serve(async (req) => {
     }
 
     // Check if we have real API keys or valid OpenAI key
-    const hasValidApiKeys = userApiKeys?.airdna_api_key || userApiKeys?.rental_api_key;
+    const hasValidApiKeys = userApiKeys?.airdna_api_key;
     const hasValidOpenAI = openaiApiKey && (openaiApiKey.startsWith('sk-') || openaiApiKey.startsWith('sk-proj-'));
     
     if (!hasValidApiKeys && !hasValidOpenAI) {
@@ -77,20 +77,17 @@ serve(async (req) => {
     if (hasValidApiKeys && userApiKeys?.airdna_api_key) {
       console.log('Fetching real market data from AirDNA...');
       try {
-        // Use combined approach if we have both API keys, otherwise just AirDNA
-        const realMarketData = userApiKeys.rental_api_key 
-          ? await fetchCombinedMarketData(city, userApiKeys.airdna_api_key, userApiKeys.rental_api_key, propertyType, bathrooms)
-          : await fetchAirDNAMarketData(city, userApiKeys.airdna_api_key, propertyType, bathrooms);
+        const realMarketData = await fetchAirDNAMarketData(city, userApiKeys.airdna_api_key, propertyType, bathrooms);
           
         if (realMarketData && realMarketData.length > 0) {
-          console.log(`Successfully fetched ${realMarketData.length} real submarkets from APIs`);
+          console.log(`Successfully fetched ${realMarketData.length} real submarkets from AirDNA`);
           return new Response(
             JSON.stringify({
               submarkets: realMarketData,
               city: city,
               propertyType,
               bathrooms,
-              dataSource: userApiKeys.rental_api_key ? 'combined_apis' : 'airdna_api'
+              dataSource: 'airdna_api'
             }),
             {
               headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -98,7 +95,7 @@ serve(async (req) => {
           );
         }
       } catch (error) {
-        console.error('Real APIs failed:', error);
+        console.error('AirDNA API failed:', error);
         // Continue to OpenAI fallback
       }
     }
@@ -151,99 +148,6 @@ serve(async (req) => {
   }
 });
 
-// RentCast API integration for rental data
-async function fetchRentCastRentalData(city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<any[]> {
-  console.log(`Fetching RentCast rental data for ${city}`);
-  
-  try {
-    // RentCast uses zip codes, so we'll need to search by city name first
-    // This is a simplified approach - in production you'd want to get zip codes for the city
-    const searchResponse = await fetch(`https://api.rentcast.io/v1/markets/search?city=${encodeURIComponent(city)}`, {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!searchResponse.ok) {
-      console.error(`RentCast API error: ${searchResponse.status} ${searchResponse.statusText}`);
-      throw new Error(`RentCast search failed: ${searchResponse.status}`);
-    }
-
-    const searchData = await searchResponse.json();
-    console.log('RentCast search response:', JSON.stringify(searchData, null, 2));
-
-    // Extract rental data and format for our use
-    if (searchData && searchData.length > 0) {
-      return searchData.slice(0, 8).map((market: any) => ({
-        submarket: market.name || `${city} Area`,
-        medianRent: market.rent_median || market.rent_average || 0,
-        rentPerSqft: market.rent_per_sqft || 0
-      }));
-    }
-
-    return [];
-  } catch (error) {
-    console.error('RentCast API integration error:', error);
-    throw error;
-  }
-}
-
-// Enhanced AirDNA integration with rental data combination
-async function fetchCombinedMarketData(city: string, airdnaKey: string, rentcastKey: string, propertyType: string, bathrooms: string): Promise<any[]> {
-  console.log(`Fetching combined market data for ${city}`);
-  
-  try {
-    // Fetch both STR data from AirDNA and rental data from RentCast in parallel
-    const [airdnaData, rentalData] = await Promise.all([
-      fetchAirDNAMarketData(city, airdnaKey, propertyType, bathrooms).catch(() => []),
-      rentcastKey ? fetchRentCastRentalData(city, rentcastKey, propertyType, bathrooms).catch(() => []) : []
-    ]);
-
-    console.log(`AirDNA returned ${airdnaData.length} results, RentCast returned ${rentalData.length} results`);
-
-    // If we have both datasets, combine them for more accurate results
-    if (airdnaData.length > 0 && rentalData.length > 0) {
-      // Create a map of rental data by area name for lookup
-      const rentalMap = new Map();
-      rentalData.forEach(rental => {
-        const key = rental.submarket.toLowerCase().trim();
-        rentalMap.set(key, rental.medianRent);
-      });
-
-      // Enhanced AirDNA data with real rental prices where available
-      const combinedData = airdnaData.map(airdata => {
-        const areaKey = airdata.submarket.toLowerCase().trim();
-        const realRent = rentalMap.get(areaKey);
-        
-        if (realRent && realRent > 0) {
-          // Use real rent data for more accurate multiple
-          return {
-            ...airdata,
-            medianRent: realRent,
-            multiple: Number((airdata.strRevenue / realRent).toFixed(2))
-          };
-        }
-        return airdata;
-      });
-
-      return combinedData.sort((a, b) => b.multiple - a.multiple);
-    }
-
-    // Return AirDNA data if that's all we have
-    if (airdnaData.length > 0) {
-      return airdnaData;
-    }
-
-    // If we only have rental data, we can't calculate STR multiples
-    console.log('Only rental data available, cannot calculate STR multiples');
-    return [];
-
-  } catch (error) {
-    console.error('Combined market data fetch error:', error);
-    throw error;
-  }
-}
 async function fetchAirDNAMarketData(city: string, apiKey: string, propertyType: string, bathrooms: string): Promise<any[]> {
   console.log(`Fetching AirDNA data for ${city} with property type ${propertyType}BR/${bathrooms}BA`);
   

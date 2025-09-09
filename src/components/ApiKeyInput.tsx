@@ -8,12 +8,11 @@ import { Key, Eye, EyeOff, Search, Copy, AlertCircle, Check, X, Loader2, TestTub
 import { useToast } from '@/hooks/use-toast';
 
 interface ApiKeyInputProps {
-  onApiKeysChange: (keys: { airdnaApiKey?: string; rentcastApiKey?: string; openaiApiKey?: string }) => void;
+  onApiKeysChange: (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => void;
 }
 
 const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
   const [airdnaKey, setAirdnaKey] = useState('');
-  const [rentcastKey, setRentcastKey] = useState('');
   const [openaiKey, setOpenaiKey] = useState('');
   const [showKeys, setShowKeys] = useState(false);
   const [showStoredKeys, setShowStoredKeys] = useState(false);
@@ -21,12 +20,11 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
   const [testingKeys, setTestingKeys] = useState(false);
   const [keyTestResults, setKeyTestResults] = useState<{[key: string]: 'testing' | 'valid' | 'invalid' | 'untested'}>({
     openai: 'untested',
-    airdna: 'untested',
-    rentcast: 'untested'
+    airdna: 'untested'
   });
   const { toast } = useToast();
 
-  const getKeyStatus = (key: string, keyType: 'openai' | 'airdna' | 'rentcast') => {
+  const getKeyStatus = (key: string, keyType: 'openai' | 'airdna') => {
     if (!key) return 'missing';
     if (key.length < 10) return 'invalid';
     
@@ -64,12 +62,10 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
 
   const handleSaveKeys = () => {
     if (airdnaKey) localStorage.setItem('airdna_api_key', airdnaKey);
-    if (rentcastKey) localStorage.setItem('rentcast_api_key', rentcastKey);
     if (openaiKey) localStorage.setItem('openai_api_key', openaiKey);
     
     onApiKeysChange({
       airdnaApiKey: airdnaKey || undefined,
-      rentcastApiKey: rentcastKey || undefined,
       openaiApiKey: openaiKey || undefined
     });
 
@@ -81,15 +77,12 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
 
   const handleClearKeys = () => {
     setAirdnaKey('');
-    setRentcastKey('');
     setOpenaiKey('');
     localStorage.removeItem('airdna_api_key');
-    localStorage.removeItem('rentcast_api_key');
     localStorage.removeItem('openai_api_key');
     
     onApiKeysChange({
       airdnaApiKey: undefined,
-      rentcastApiKey: undefined,
       openaiApiKey: undefined
     });
 
@@ -147,14 +140,12 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
     setTestingKeys(true);
     setKeyTestResults({
       openai: openaiKey ? 'testing' : 'untested',
-      airdna: airdnaKey ? 'testing' : 'untested',
-      rentcast: rentcastKey ? 'testing' : 'untested'
+      airdna: airdnaKey ? 'testing' : 'untested'
     });
 
     const results: {[key: string]: 'valid' | 'invalid' | 'untested'} = {
       openai: 'untested',
-      airdna: 'untested',
-      rentcast: 'untested'
+      airdna: 'untested'
     };
 
     // Test OpenAI API key
@@ -213,42 +204,6 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
       }
     }
 
-    // Test RentCast API key (if provided)
-    if (rentcastKey) {
-      try {
-        // Test with a simple endpoint - market search for a known city
-        const response = await fetch('https://api.rentcast.io/v1/markets/search?city=Denver', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${rentcastKey}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          results.rentcast = 'valid';
-          toast({
-            title: "✅ RentCast API Key Valid",
-            description: "Your RentCast API key is working correctly.",
-          });
-        } else {
-          results.rentcast = 'invalid';
-          toast({
-            title: "❌ RentCast API Key Invalid",
-            description: "Your RentCast API key failed authentication.",
-            variant: "destructive",
-          });
-        }
-      } catch (error) {
-        console.error('RentCast API test failed:', error);
-        results.rentcast = 'invalid';
-        toast({
-          title: "❌ RentCast API Test Failed",
-          description: "Could not connect to RentCast API.",
-          variant: "destructive",
-        });
-      }
-    }
 
     setKeyTestResults(results);
     setTestingKeys(false);
@@ -264,17 +219,14 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
 
   React.useEffect(() => {
     const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '';
-    const savedRentcastKey = localStorage.getItem('rentcast_api_key') || '';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
     
     setAirdnaKey(savedAirDNAKey);
-    setRentcastKey(savedRentcastKey);
     setOpenaiKey(savedOpenaiKey);
     
-    if (savedAirDNAKey || savedRentcastKey || savedOpenaiKey) {
+    if (savedAirDNAKey || savedOpenaiKey) {
       onApiKeysChange({
         airdnaApiKey: savedAirDNAKey || undefined,
-        rentcastApiKey: savedRentcastKey || undefined,
         openaiApiKey: savedOpenaiKey || undefined
       });
     }
@@ -336,9 +288,9 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
 
             {/* API Key Inputs with Status - Compact */}
             <div className="grid grid-cols-1 gap-3">
-              {/* STR Revenue API Key */}
+              {/* AirDNA API Key */}
               <div className="space-y-1">
-                <label className="text-xs font-medium text-cyan-300">STR Revenue API</label>
+                <label className="text-xs font-medium text-cyan-300">AirDNA API</label>
                 <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
                   {getStatusIcon(getKeyStatus(airdnaKey, 'airdna'))}
                   <div className="flex-1 min-w-0">
@@ -350,7 +302,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
                         setAirdnaKey(e.target.value);
                         setKeyTestResults(prev => ({ ...prev, airdna: 'untested' }));
                       }}
-                      placeholder="Enter your STR Revenue API key"
+                      placeholder="Enter your AirDNA API key"
                       className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
                     />
                   </div>
@@ -359,7 +311,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => copyToClipboard(airdnaKey, 'STR Revenue API')}
+                        onClick={() => copyToClipboard(airdnaKey, 'AirDNA API')}
                         className="h-5 w-5 p-0 text-gray-400 hover:text-white"
                       >
                         <Copy className="h-3 w-3" />
@@ -370,43 +322,9 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
                 </div>
               </div>
 
-              {/* RentCast Rental API Key */}
+              {/* OpenAI API Key */}
               <div className="space-y-1">
-                <label className="text-xs font-medium text-cyan-300">RentCast Rental API</label>
-                <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
-                  {getStatusIcon(getKeyStatus(rentcastKey, 'rentcast'))}
-                  <div className="flex-1 min-w-0">
-                    <Input
-                      id="rentcast-key"
-                      type={showKeys ? "text" : "password"}
-                      value={rentcastKey}
-                      onChange={(e) => {
-                        setRentcastKey(e.target.value);
-                        setKeyTestResults(prev => ({ ...prev, rentcast: 'untested' }));
-                      }}
-                      placeholder="Enter your RentCast API key"
-                      className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {rentcastKey && showKeys && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => copyToClipboard(rentcastKey, 'RentCast API')}
-                        className="h-5 w-5 p-0 text-gray-400 hover:text-white"
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    )}
-                    {getStatusBadge(getKeyStatus(rentcastKey, 'rentcast'))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Rental Rates API Key */}
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-cyan-300">Rental Rates API (OpenAI)</label>
+                <label className="text-xs font-medium text-cyan-300">OpenAI API (Neighborhoods)</label>
                 <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
                   {getStatusIcon(getKeyStatus(openaiKey, 'openai'))}
                   <div className="flex-1 min-w-0">
