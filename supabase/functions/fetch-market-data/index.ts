@@ -54,7 +54,106 @@ serve(async (req) => {
       }
     }
 
-    // Generate realistic neighborhoods using OpenAI
+    // Get the AirDNA API key (user's key or system key)
+    const airdnaApiKey = userApiKeys?.airdna_api_key || Deno.env.get('AIRDNA_API_KEY');
+    console.log('AirDNA API key available:', !!airdnaApiKey);
+
+    if (airdnaApiKey) {
+      try {
+        // Call AirDNA Rentalizer API for real data
+        console.log(`Calling AirDNA API for ${city}...`);
+        const encodedCity = encodeURIComponent(city);
+        const airdnaUrl = `https://airdna1.p.rapidapi.com/rentalizer?address=${encodedCity}&bedrooms=${propertyType}&bathrooms=${bathrooms}&accommodate=${propertyType}`;
+        console.log('Using AirDNA endpoint:', airdnaUrl);
+
+        const airdnaResponse = await fetch(airdnaUrl, {
+          method: 'GET',
+          headers: {
+            'X-RapidAPI-Key': airdnaApiKey,
+            'X-RapidAPI-Host': 'airdna1.p.rapidapi.com'
+          }
+        });
+
+        console.log('AirDNA API response status:', airdnaResponse.status);
+
+        if (airdnaResponse.ok) {
+          const airdnaData = await airdnaResponse.json();
+          console.log('AirDNA data received:', JSON.stringify(airdnaData, null, 2));
+
+          // Process real AirDNA data
+          const submarketData = [];
+
+          if (airdnaData.data?.property_statistics?.revenue?.ltm && airdnaData.data?.comps) {
+            // Main property data
+            const mainRevenue = airdnaData.data.property_statistics.revenue.ltm;
+            const mainAdr = airdnaData.data.property_statistics.adr?.ltm || 150;
+            const estimatedRent = Math.round(mainAdr * 30 * 0.7); // Estimate monthly rent from ADR
+            
+            if (estimatedRent > 0) {
+              const multiple = mainRevenue / (estimatedRent * 12); // Annual multiple
+              if (multiple >= 1.4) {
+                submarketData.push({
+                  submarket: airdnaData.data.combined_market_info?.airdna_submarket_name || city,
+                  strRevenue: Math.round(mainRevenue),
+                  medianRent: estimatedRent,
+                  multiple: Number(multiple.toFixed(2))
+                });
+              }
+            }
+
+            // Process comparable properties
+            airdnaData.data.comps.forEach((comp, index) => {
+              if (comp.stats?.adr?.ltm && comp.title) {
+                const compAdr = comp.stats.adr.ltm;
+                const estimatedMonthlyRent = Math.round(compAdr * 30 * 0.7);
+                const estimatedAnnualRevenue = Math.round(compAdr * 30 * 12 * 0.4); // Assume 40% occupancy
+                
+                if (estimatedMonthlyRent > 0) {
+                  const multiple = estimatedAnnualRevenue / (estimatedMonthlyRent * 12);
+                  if (multiple >= 1.4) {
+                    submarketData.push({
+                      submarket: comp.title.substring(0, 50) + (comp.title.length > 50 ? '...' : ''),
+                      strRevenue: estimatedAnnualRevenue,
+                      medianRent: estimatedMonthlyRent,
+                      multiple: Number(multiple.toFixed(2))
+                    });
+                  }
+                }
+              }
+            });
+          }
+
+          // Sort by multiple and limit results
+          const filteredResults = submarketData
+            .sort((a, b) => b.multiple - a.multiple)
+            .slice(0, 8);
+
+          console.log(`Processed ${filteredResults.length} real submarkets from AirDNA`);
+
+          if (filteredResults.length > 0) {
+            return new Response(
+              JSON.stringify({
+                submarkets: filteredResults,
+                city: city,
+                propertyType,
+                bathrooms,
+                dataSource: 'airdna_real_data'
+              }),
+              {
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+              }
+            );
+          }
+        } else {
+          console.error('AirDNA API error:', airdnaResponse.status, airdnaResponse.statusText);
+        }
+      } catch (error) {
+        console.error('Error calling AirDNA API:', error);
+      }
+    }
+
+    // Fallback: Generate realistic neighborhoods using OpenAI
+    console.log('Using AI-generated fallback data');
     const neighborhoods = await generateRealNeighborhoods(city);
     
     // Generate market data for each neighborhood
@@ -68,7 +167,7 @@ serve(async (req) => {
         const cityFactor = getCityFactor(city.toLowerCase());
         const neighborhoodVariation = 0.85 + (Math.random() * 0.3); // 0.85 to 1.15 variation
         
-        // More realistic base rent calculation for San Antonio market
+        // More realistic base rent calculation
         const baseRentRange = getCityRentRange(city.toLowerCase());
         const baseRent = Math.round((baseRentRange.min + Math.random() * (baseRentRange.max - baseRentRange.min)) * bedroomMultiplier);
         const baseRevenue = Math.round(baseRent * (1.4 + Math.random() * 0.4) * bathroomMultiplier * neighborhoodVariation);
@@ -98,7 +197,7 @@ serve(async (req) => {
         city: city,
         propertyType,
         bathrooms,
-        dataSource: userApiKeys?.airdna_api_key ? 'real_api' : 'ai_generated'
+        dataSource: 'ai_generated'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
