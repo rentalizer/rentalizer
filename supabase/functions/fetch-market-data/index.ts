@@ -54,15 +54,46 @@ serve(async (req) => {
       // Try to fetch real AirDNA data
       console.log(`Calling AirDNA API for ${city}...`);
       
-      const airdnaResponse = await fetch(`https://airdna1.p.rapidapi.com/suggest_market?query=${encodeURIComponent(city)}`, {
-        method: 'GET',
-        headers: {
-          'X-RapidAPI-Key': airdnaApiKey,
-          'X-RapidAPI-Host': 'airdna1.p.rapidapi.com'
+      // Try multiple AirDNA endpoints to find working one
+      let airdnaResponse;
+      let endpoint = '';
+      
+      // Try market overview endpoint first
+      try {
+        endpoint = `https://airdna1.p.rapidapi.com/market_overview?location=${encodeURIComponent(city)}`;
+        console.log(`Trying endpoint: ${endpoint}`);
+        
+        airdnaResponse = await fetch(endpoint, {
+          method: 'GET',
+          headers: {
+            'X-RapidAPI-Key': airdnaApiKey,
+            'X-RapidAPI-Host': 'airdna1.p.rapidapi.com'
+          }
+        });
+        
+        console.log(`Market overview response status: ${airdnaResponse.status}`);
+        
+        if (!airdnaResponse.ok) {
+          // Try alternative endpoint
+          endpoint = `https://airdna1.p.rapidapi.com/property_search?city=${encodeURIComponent(city)}&bedrooms=${propertyType}&bathrooms=${bathrooms}`;
+          console.log(`Trying alternative endpoint: ${endpoint}`);
+          
+          airdnaResponse = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+              'X-RapidAPI-Key': airdnaApiKey,
+              'X-RapidAPI-Host': 'airdna1.p.rapidapi.com'
+            }
+          });
+          
+          console.log(`Property search response status: ${airdnaResponse.status}`);
         }
-      });
+      } catch (fetchError) {
+        console.error('Error making AirDNA API request:', fetchError);
+        throw fetchError;
+      }
 
-      console.log(`AirDNA API response status: ${airdnaResponse.status}`);
+      console.log(`Final AirDNA API response status: ${airdnaResponse.status}`);
 
       if (!airdnaResponse.ok) {
         console.error(`AirDNA API error: ${airdnaResponse.status} ${airdnaResponse.statusText}`);
