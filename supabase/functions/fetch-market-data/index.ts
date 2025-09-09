@@ -80,29 +80,42 @@ serve(async (req) => {
           const airdnaData = await airdnaResponse.json();
           console.log('AirDNA data received:', JSON.stringify(airdnaData, null, 2));
 
-          // Process real AirDNA data
+          // Process real AirDNA data with detailed logging
           const submarketData = [];
+          console.log('Processing AirDNA data structure:', {
+            hasPropertyStats: !!airdnaData.data?.property_statistics,
+            hasRevenue: !!airdnaData.data?.property_statistics?.revenue?.ltm,
+            hasAdr: !!airdnaData.data?.property_statistics?.adr?.ltm,
+            hasComps: !!airdnaData.data?.comps,
+            compsLength: airdnaData.data?.comps?.length || 0
+          });
 
           if (airdnaData.data?.property_statistics) {
             const mainRevenue = airdnaData.data.property_statistics.revenue?.ltm;
             const mainAdr = airdnaData.data.property_statistics.adr?.ltm;
             const occupancy = airdnaData.data.property_statistics.occupancy?.ltm || 0.4;
             
-            // Main submarket from the searched location
-            if (mainRevenue && mainAdr) {
-              const estimatedRent = Math.round(mainAdr * 30 * 0.65); // More conservative rent estimate
+            console.log('Main property stats:', { mainRevenue, mainAdr, occupancy });
+            
+            // Main submarket from the searched location - always add if we have revenue
+            if (mainRevenue) {
+              const estimatedRent = mainAdr ? Math.round(mainAdr * 30 * 0.65) : Math.round(mainRevenue / 12 / 1.5);
               const multiple = mainRevenue / (estimatedRent * 12);
               
+              console.log('Adding main submarket:', { mainRevenue, estimatedRent, multiple });
+              
               submarketData.push({
-                submarket: airdnaData.data.combined_market_info?.airdna_submarket_name || city,
+                submarket: airdnaData.data.combined_market_info?.airdna_submarket_name || `${city} Main Area`,
                 strRevenue: Math.round(mainRevenue),
                 medianRent: estimatedRent,
                 multiple: Number(multiple.toFixed(2))
               });
             }
 
-            // Process comparable properties with more flexible criteria
+            // Process comparable properties with very flexible criteria
             if (airdnaData.data.comps && Array.isArray(airdnaData.data.comps)) {
+              console.log(`Processing ${airdnaData.data.comps.length} comparable properties`);
+              
               airdnaData.data.comps.forEach((comp, index) => {
                 if (comp.stats?.adr?.ltm && comp.title) {
                   const compAdr = comp.stats.adr.ltm;
@@ -112,8 +125,16 @@ serve(async (req) => {
                   if (estimatedMonthlyRent > 0 && estimatedAnnualRevenue > 0) {
                     const multiple = estimatedAnnualRevenue / (estimatedMonthlyRent * 12);
                     
-                    // More lenient filtering - include properties with multiple >= 1.2
-                    if (multiple >= 1.2) {
+                    console.log(`Comp ${index}:`, { 
+                      title: comp.title.substring(0, 30), 
+                      compAdr, 
+                      estimatedMonthlyRent, 
+                      estimatedAnnualRevenue, 
+                      multiple 
+                    });
+                    
+                    // Very lenient filtering - include almost all properties
+                    if (multiple >= 1.0) {
                       const cleanTitle = comp.title.replace(/\n/g, ' ').trim();
                       const submarketName = cleanTitle.length > 40 
                         ? cleanTitle.substring(0, 40) + '...' 
@@ -131,10 +152,10 @@ serve(async (req) => {
               });
             }
 
-            // If we have few results, add the market info as a submarket
-            if (submarketData.length < 3 && airdnaData.data.combined_market_info?.airdna_market_name) {
-              const marketRevenue = mainRevenue || 30000;
-              const marketRent = Math.round(marketRevenue / 12 / 1.6);
+            // Always add market info if available
+            if (airdnaData.data.combined_market_info?.airdna_market_name) {
+              const marketRevenue = mainRevenue || 35000;
+              const marketRent = Math.round(marketRevenue / 12 / 1.5);
               
               submarketData.push({
                 submarket: airdnaData.data.combined_market_info.airdna_market_name,
@@ -144,6 +165,8 @@ serve(async (req) => {
               });
             }
           }
+
+          console.log(`Total submarkets processed: ${submarketData.length}`);
 
           // Sort by multiple and limit results
           const filteredResults = submarketData
