@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Key, Eye, EyeOff, Search, Copy, AlertCircle, Check, X } from 'lucide-react';
+import { Key, Eye, EyeOff, Search, Copy, AlertCircle, Check, X, Loader2, TestTube } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ApiKeyInputProps {
@@ -17,17 +17,31 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
   const [showKeys, setShowKeys] = useState(false);
   const [showStoredKeys, setShowStoredKeys] = useState(false);
   const [foundKeys, setFoundKeys] = useState<{[key: string]: string}>({});
+  const [testingKeys, setTestingKeys] = useState(false);
+  const [keyTestResults, setKeyTestResults] = useState<{[key: string]: 'testing' | 'valid' | 'invalid' | 'untested'}>({
+    openai: 'untested',
+    airdna: 'untested'
+  });
   const { toast } = useToast();
 
-  const getKeyStatus = (key: string) => {
+  const getKeyStatus = (key: string, keyType: 'openai' | 'airdna') => {
     if (!key) return 'missing';
     if (key.length < 10) return 'invalid';
+    
+    const testResult = keyTestResults[keyType];
+    if (testResult === 'testing') return 'testing';
+    if (testResult === 'valid') return 'verified';
+    if (testResult === 'invalid') return 'failed';
+    
     return 'active';
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'active': return <Check className="h-3 w-3 text-green-500" />;
+      case 'verified': return <Check className="h-3 w-3 text-green-500" />;
+      case 'active': return <Check className="h-3 w-3 text-blue-500" />;
+      case 'testing': return <Loader2 className="h-3 w-3 text-blue-500 animate-spin" />;
+      case 'failed': return <X className="h-3 w-3 text-red-500" />;
       case 'invalid': return <AlertCircle className="h-3 w-3 text-yellow-500" />;
       case 'missing': return <X className="h-3 w-3 text-red-500" />;
       default: return <X className="h-3 w-3 text-gray-500" />;
@@ -36,7 +50,10 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'active': return <Badge className="bg-green-600 text-white text-xs px-1.5 py-0.5">Active</Badge>;
+      case 'verified': return <Badge className="bg-green-600 text-white text-xs px-1.5 py-0.5">✓ Verified</Badge>;
+      case 'active': return <Badge className="bg-blue-600 text-white text-xs px-1.5 py-0.5">Ready</Badge>;
+      case 'testing': return <Badge className="bg-blue-600 text-white text-xs px-1.5 py-0.5">Testing...</Badge>;
+      case 'failed': return <Badge className="bg-red-600 text-white text-xs px-1.5 py-0.5">✗ Failed</Badge>;
       case 'invalid': return <Badge className="bg-yellow-600 text-white text-xs px-1.5 py-0.5">Invalid</Badge>;
       case 'missing': return <Badge className="bg-red-600 text-white text-xs px-1.5 py-0.5">Missing</Badge>;
       default: return <Badge className="bg-gray-600 text-white text-xs px-1.5 py-0.5">Unknown</Badge>;
@@ -119,6 +136,86 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
     }
   };
 
+  const testApiKeys = async () => {
+    setTestingKeys(true);
+    setKeyTestResults({
+      openai: openaiKey ? 'testing' : 'untested',
+      airdna: airdnaKey ? 'testing' : 'untested'
+    });
+
+    const results: {[key: string]: 'valid' | 'invalid' | 'untested'} = {
+      openai: 'untested',
+      airdna: 'untested'
+    };
+
+    // Test OpenAI API key
+    if (openaiKey) {
+      try {
+        const response = await fetch('https://api.openai.com/v1/models', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${openaiKey}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          results.openai = 'valid';
+          toast({
+            title: "✅ OpenAI API Key Valid",
+            description: "Your OpenAI API key is working correctly.",
+          });
+        } else {
+          results.openai = 'invalid';
+          toast({
+            title: "❌ OpenAI API Key Invalid",
+            description: "Your OpenAI API key failed authentication.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error('OpenAI API test failed:', error);
+        results.openai = 'invalid';
+        toast({
+          title: "❌ OpenAI API Test Failed",
+          description: "Could not connect to OpenAI API.",
+          variant: "destructive",
+        });
+      }
+    }
+
+    // Test AirDNA API key (if provided)
+    if (airdnaKey) {
+      // Note: This is a placeholder - you would need the actual AirDNA API endpoint
+      // For now, just check if it looks like a valid API key format
+      if (airdnaKey.length > 20) {
+        results.airdna = 'valid';
+        toast({
+          title: "ℹ️ AirDNA API Key Format Valid",
+          description: "Key format appears correct (actual API test not implemented).",
+        });
+      } else {
+        results.airdna = 'invalid';
+        toast({
+          title: "❌ AirDNA API Key Invalid",
+          description: "API key format appears incorrect.",
+          variant: "destructive",
+        });
+      }
+    }
+
+    setKeyTestResults(results);
+    setTestingKeys(false);
+
+    const validCount = Object.values(results).filter(result => result === 'valid').length;
+    const totalTested = Object.values(results).filter(result => result !== 'untested').length;
+    
+    toast({
+      title: `API Test Complete`,
+      description: `${validCount} of ${totalTested} API keys verified successfully.`,
+    });
+  };
+
   React.useEffect(() => {
     const savedAirDNAKey = localStorage.getItem('airdna_api_key') || '';
     const savedOpenaiKey = localStorage.getItem('openai_api_key') || '';
@@ -188,70 +285,76 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
             </div>
           )}
 
-          {/* API Key Inputs with Status - Compact */}
-          <div className="grid grid-cols-1 gap-3">
-            {/* STR Revenue API Key */}
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-cyan-300">STR Revenue API</label>
-              <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
-                {getStatusIcon(getKeyStatus(airdnaKey))}
-                <div className="flex-1 min-w-0">
-                  <Input
-                    id="airdna-key"
-                    type={showKeys ? "text" : "password"}
-                    value={airdnaKey}
-                    onChange={(e) => setAirdnaKey(e.target.value)}
-                    placeholder="Enter your STR Revenue API key"
-                    className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
-                  />
-                </div>
-                <div className="flex items-center gap-1">
-                  {airdnaKey && showKeys && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => copyToClipboard(airdnaKey, 'STR Revenue API')}
-                      className="h-5 w-5 p-0 text-gray-400 hover:text-white"
-                    >
-                      <Copy className="h-3 w-3" />
-                    </Button>
-                  )}
-                  {getStatusBadge(getKeyStatus(airdnaKey))}
+            {/* API Key Inputs with Status - Compact */}
+            <div className="grid grid-cols-1 gap-3">
+              {/* STR Revenue API Key */}
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-cyan-300">STR Revenue API</label>
+                <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
+                  {getStatusIcon(getKeyStatus(airdnaKey, 'airdna'))}
+                  <div className="flex-1 min-w-0">
+                    <Input
+                      id="airdna-key"
+                      type={showKeys ? "text" : "password"}
+                      value={airdnaKey}
+                      onChange={(e) => {
+                        setAirdnaKey(e.target.value);
+                        setKeyTestResults(prev => ({ ...prev, airdna: 'untested' }));
+                      }}
+                      placeholder="Enter your STR Revenue API key"
+                      className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                    />
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {airdnaKey && showKeys && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => copyToClipboard(airdnaKey, 'STR Revenue API')}
+                        className="h-5 w-5 p-0 text-gray-400 hover:text-white"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    )}
+                    {getStatusBadge(getKeyStatus(airdnaKey, 'airdna'))}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Rental Rates API Key */}
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-cyan-300">Rental Rates API</label>
-              <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
-                {getStatusIcon(getKeyStatus(openaiKey))}
-                <div className="flex-1 min-w-0">
-                  <Input
-                    id="openai-key"
-                    type={showKeys ? "text" : "password"}
-                    value={openaiKey}
-                    onChange={(e) => setOpenaiKey(e.target.value)}
-                    placeholder="Enter your Rental Rates API key"
-                    className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
-                  />
-                </div>
-                <div className="flex items-center gap-1">
-                  {openaiKey && showKeys && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => copyToClipboard(openaiKey, 'Rental Rates API')}
-                      className="h-5 w-5 p-0 text-gray-400 hover:text-white"
-                    >
-                      <Copy className="h-3 w-3" />
-                    </Button>
-                  )}
-                  {getStatusBadge(getKeyStatus(openaiKey))}
+              {/* Rental Rates API Key */}
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-cyan-300">Rental Rates API (OpenAI)</label>
+                <div className="flex items-center gap-2 p-2 bg-gray-800/30 rounded-md">
+                  {getStatusIcon(getKeyStatus(openaiKey, 'openai'))}
+                  <div className="flex-1 min-w-0">
+                    <Input
+                      id="openai-key"
+                      type={showKeys ? "text" : "password"}
+                      value={openaiKey}
+                      onChange={(e) => {
+                        setOpenaiKey(e.target.value);
+                        setKeyTestResults(prev => ({ ...prev, openai: 'untested' }));
+                      }}
+                      placeholder="Enter your OpenAI API key"
+                      className="h-6 text-xs bg-gray-700/50 border-gray-600 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 placeholder:text-gray-500"
+                    />
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {openaiKey && showKeys && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => copyToClipboard(openaiKey, 'OpenAI API')}
+                        className="h-5 w-5 p-0 text-gray-400 hover:text-white"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    )}
+                    {getStatusBadge(getKeyStatus(openaiKey, 'openai'))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
           <div className="flex items-center justify-between flex-wrap gap-2">
             <Button
@@ -266,6 +369,25 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
             </Button>
 
             <div className="flex gap-2">
+              <Button
+                onClick={testApiKeys}
+                disabled={testingKeys || (!airdnaKey && !openaiKey)}
+                size="sm"
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-xs px-2 py-1 h-6"
+              >
+                {testingKeys ? (
+                  <>
+                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                    Testing...
+                  </>
+                ) : (
+                  <>
+                    <TestTube className="h-3 w-3 mr-1" />
+                    Test Keys
+                  </>
+                )}
+              </Button>
+              
               <Button
                 onClick={handleClearKeys}
                 variant="outline"
@@ -290,7 +412,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
               <strong>Environment:</strong> {window.location.hostname === 'localhost' ? 'Preview/Development' : 'Production'}
             </div>
             <div className="text-xs text-blue-400 mt-1">
-              Click "Find All Keys" to search for all stored API keys in your browser
+              Click "Test Keys" to verify your API keys are working correctly
             </div>
           </div>
         </div>
