@@ -102,6 +102,15 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
       return;
     }
 
+    // Debug authentication state
+    console.log('Current user:', user);
+    console.log('User ID:', user.id);
+    
+    // Check if we can authenticate with Supabase
+    const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
+    console.log('Supabase current user:', currentUser);
+    console.log('Auth error:', authError);
+
     setSaving(true);
     try {
       const { error } = await supabase
@@ -111,9 +120,14 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
             user_id: user.id,
             airdna_api_key: airdnaKey.trim()
           }
-        ]);
+        ], {
+          onConflict: 'user_id'
+        });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error details:', error);
+        throw error;
+      }
 
       toast({
         title: "✅ API Key Saved",
@@ -259,9 +273,18 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
         <div className="space-y-3">
           {!user && (
             <div className="bg-yellow-900/30 p-3 rounded-lg border border-yellow-500/30">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-yellow-400" />
-                <p className="text-yellow-300 text-sm">Please log in to save API keys to your account.</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-yellow-400" />
+                  <p className="text-yellow-300 text-sm">Please log in to save API keys to your account.</p>
+                </div>
+                <Button
+                  onClick={() => window.location.href = '/auth'}
+                  size="sm"
+                  className="bg-cyan-600 hover:bg-cyan-500 text-white text-xs px-3 py-1 h-7"
+                >
+                  Login / Sign Up
+                </Button>
               </div>
             </div>
           )}
