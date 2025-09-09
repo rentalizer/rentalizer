@@ -179,18 +179,13 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
     setKeyTestResults(prev => ({ ...prev, airdna: 'testing' }));
 
     try {
-      // Test AirDNA API via RapidAPI with a simple search
-      const response = await fetch('https://airdna1.p.rapidapi.com/v1/market/search', {
-        method: 'POST',
+      // Test RapidAPI AirDNA with available endpoints
+      const response = await fetch('https://airdna1.p.rapidapi.com/suggest_market', {
+        method: 'GET',
         headers: {
           'X-RapidAPI-Key': airdnaKey,
           'X-RapidAPI-Host': 'airdna1.p.rapidapi.com',
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          search_term: 'New York',
-          pagination: { page_size: 1, offset: 0 }
-        }),
       });
 
       if (response.ok) {
