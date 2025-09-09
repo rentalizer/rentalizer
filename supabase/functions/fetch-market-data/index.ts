@@ -105,14 +105,46 @@ serve(async (req) => {
       }
 
       // Process AirDNA data to match our expected format
-      const submarkets = airdnaData.data.slice(0, 8).map((market: any) => ({
-        submarket: market.name || market.market_name || 'Unknown Area',
-        strRevenue: Math.round(market.monthly_revenue || market.revenue || 0),
-        medianRent: Math.round(market.monthly_rent || market.rent || 0),
-        multiple: market.revenue && market.rent ? 
-          Math.round((market.revenue / market.rent) * 100) / 100 : 
-          0
-      })).filter((market: any) => market.strRevenue > 0 && market.medianRent > 0 && market.multiple >= 1.0);
+      const submarkets = [];
+      
+      if (airdnaData && airdnaData.data) {
+        // Handle different AirDNA response formats
+        const data = Array.isArray(airdnaData.data) ? airdnaData.data : [airdnaData.data];
+        
+        data.slice(0, 8).forEach((item: any, index: number) => {
+          const submarket = {
+            submarket: item.market_name || item.neighborhood || item.area || `${city} Area ${index + 1}`,
+            strRevenue: Math.round(item.monthly_revenue || item.revenue || item.rental_income || 0),
+            medianRent: Math.round(item.monthly_rent || item.rent || item.long_term_rent || 0),
+            multiple: 0
+          };
+          
+          // Calculate multiple if we have both values
+          if (submarket.strRevenue > 0 && submarket.medianRent > 0) {
+            submarket.multiple = Math.round((submarket.strRevenue / submarket.medianRent) * 100) / 100;
+          }
+          
+          // Only include submarkets with valid data and good multiple
+          if (submarket.strRevenue > 0 && submarket.medianRent > 0 && submarket.multiple >= 1.0) {
+            submarkets.push(submarket);
+          }
+        });
+      } else if (airdnaData && (airdnaData.monthly_revenue || airdnaData.revenue)) {
+        // Handle single property response
+        const submarket = {
+          submarket: airdnaData.market_name || airdnaData.neighborhood || `${city} Market`,
+          strRevenue: Math.round(airdnaData.monthly_revenue || airdnaData.revenue || 0),
+          medianRent: Math.round(airdnaData.monthly_rent || airdnaData.rent || airdnaData.long_term_rent || 0),
+          multiple: 0
+        };
+        
+        if (submarket.strRevenue > 0 && submarket.medianRent > 0) {
+          submarket.multiple = Math.round((submarket.strRevenue / submarket.medianRent) * 100) / 100;
+          if (submarket.multiple >= 1.0) {
+            submarkets.push(submarket);
+          }
+        }
+      }
 
       console.log(`Processed ${submarkets.length} real submarkets from AirDNA`);
 
