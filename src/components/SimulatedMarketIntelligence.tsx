@@ -86,6 +86,11 @@ export const SimulatedMarketIntelligence = () => {
         throw new Error(response.error.message);
       }
 
+      // Check if data is AI generated (fake data)
+      if (response.data?.dataSource === 'ai_generated') {
+        throw new Error('Only generated data available');
+      }
+
       return response.data?.submarkets || [];
     } catch (error) {
       console.error('Real API fetch failed:', error);
@@ -131,32 +136,14 @@ export const SimulatedMarketIntelligence = () => {
     } catch (error) {
       console.error('Market analysis failed:', error);
       
-      // Fallback to mock data if real API fails
       toast({
-        title: "Using Demo Data",
-        description: "Real data unavailable, showing demo results for San Diego.",
+        title: "No Data Available",
+        description: "Unable to fetch real market data for this city.",
+        variant: "destructive",
       });
       
-      const cityKey = targetCity.toLowerCase().trim();
-      let baseData = simulatedData[cityKey] || simulatedData['san diego'];
-      
-      const bedroomMultiplier = propertyType === '1' ? 0.8 : propertyType === '3' ? 1.2 : 1;
-      const bathroomMultiplier = bathrooms === '1' ? 0.9 : bathrooms === '3' ? 1.1 : 1;
-      
-      const fallbackData = baseData.map((item) => {
-        const baseRevenue = item.strRevenue * bedroomMultiplier * bathroomMultiplier;
-        const strRevenue = Math.round(baseRevenue + (Math.random() * 200 - 100));
-        const multiple = strRevenue / item.medianRent;
-        
-        return {
-          ...item,
-          strRevenue,
-          multiple
-        };
-      }).sort((a, b) => b.multiple - a.multiple);
-
-      setSubmarketData(fallbackData);
-      setCityName(targetCity);
+      setSubmarketData([]);
+      setCityName('');
     } finally {
       setIsLoading(false);
     }
@@ -335,7 +322,7 @@ export const SimulatedMarketIntelligence = () => {
       </Card>
 
       {/* Results Section */}
-      {submarketData.length > 0 && (
+      {submarketData.length > 0 ? (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
@@ -401,6 +388,20 @@ export const SimulatedMarketIntelligence = () => {
             </CardContent>
           </Card>
         </div>
+      ) : cityName && (
+        <Card className="shadow-2xl border border-red-500/20 bg-gray-900/80 backdrop-blur-lg w-full mx-auto">
+          <CardContent className="pt-8 pb-8">
+            <div className="text-center">
+              <div className="mb-4">
+                <Eye className="h-12 w-12 text-red-400 mx-auto" />
+              </div>
+              <h3 className="text-xl font-semibold text-red-300 mb-2">No Data Available</h3>
+              <p className="text-gray-400">
+                Unable to fetch real market data for {cityName}. Please check your API keys or try a different city.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
