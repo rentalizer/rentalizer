@@ -32,41 +32,7 @@ export const SimulatedMarketIntelligence = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [apiKeys, setApiKeys] = useState<{ airdnaApiKey?: string; openaiApiKey?: string }>({});
 
-  // Mock market data for different cities with realistic revenue
-  const simulatedData: { [key: string]: SubmarketData[] } = {
-    'nashville': [
-      { submarket: "Hillcrest", strRevenue: 7019, medianRent: 3800, multiple: 1.85 },
-      { submarket: "Pacific Beach", strRevenue: 7232, medianRent: 4000, multiple: 1.81 },
-      { submarket: "La Jolla", strRevenue: 8672, medianRent: 4800, multiple: 1.81 },
-      { submarket: "Gaslamp Quarter", strRevenue: 7443, medianRent: 4200, multiple: 1.77 },
-      { submarket: "Mission Valley", strRevenue: 6185, medianRent: 3500, multiple: 1.77 },
-      { submarket: "Little Italy", strRevenue: 7850, medianRent: 4500, multiple: 1.74 }
-    ],
-    'san diego': [
-      { submarket: "Gaslamp Quarter", strRevenue: 7415, medianRent: 4200, multiple: 1.77 },
-      { submarket: "Little Italy", strRevenue: 7948, medianRent: 4500, multiple: 1.77 },
-      { submarket: "Hillcrest", strRevenue: 7076, medianRent: 3800, multiple: 1.86 },
-      { submarket: "Mission Valley", strRevenue: 6125, medianRent: 3500, multiple: 1.75 },
-      { submarket: "La Jolla", strRevenue: 8640, medianRent: 4800, multiple: 1.80 },
-      { submarket: "Pacific Beach", strRevenue: 7200, medianRent: 4000, multiple: 1.80 }
-    ],
-    'denver': [
-      { submarket: "LoDo", strRevenue: 5040, medianRent: 2800, multiple: 1.80 },
-      { submarket: "Capitol Hill", strRevenue: 4320, medianRent: 2400, multiple: 1.80 },
-      { submarket: "Highland", strRevenue: 4680, medianRent: 2600, multiple: 1.80 },
-      { submarket: "RiNo", strRevenue: 4860, medianRent: 2700, multiple: 1.80 },
-      { submarket: "Cherry Creek", strRevenue: 5760, medianRent: 3200, multiple: 1.80 },
-      { submarket: "Washington Park", strRevenue: 5220, medianRent: 2900, multiple: 1.80 }
-    ],
-    'austin': [
-      { submarket: "Downtown", strRevenue: 4680, medianRent: 2600, multiple: 1.80 },
-      { submarket: "South Lamar", strRevenue: 4140, medianRent: 2300, multiple: 1.80 },
-      { submarket: "East Austin", strRevenue: 3780, medianRent: 2100, multiple: 1.80 },
-      { submarket: "Zilker", strRevenue: 5040, medianRent: 2800, multiple: 1.80 },
-      { submarket: "The Domain", strRevenue: 4320, medianRent: 2400, multiple: 1.80 },
-      { submarket: "Mueller", strRevenue: 3960, medianRent: 2200, multiple: 1.80 }
-    ]
-  };
+  // No longer using simulated data - removed mock data object
 
   const fetchRealMarketData = async () => {
     try {
@@ -131,32 +97,15 @@ export const SimulatedMarketIntelligence = () => {
     } catch (error) {
       console.error('Market analysis failed:', error);
       
-      // Fallback to mock data if real API fails
-      toast({
-        title: "Using Demo Data",
-        description: "Real data unavailable, showing demo results for San Diego.",
-      });
-      
-      const cityKey = targetCity.toLowerCase().trim();
-      let baseData = simulatedData[cityKey] || simulatedData['san diego'];
-      
-      const bedroomMultiplier = propertyType === '1' ? 0.8 : propertyType === '3' ? 1.2 : 1;
-      const bathroomMultiplier = bathrooms === '1' ? 0.9 : bathrooms === '3' ? 1.1 : 1;
-      
-      const fallbackData = baseData.map((item) => {
-        const baseRevenue = item.strRevenue * bedroomMultiplier * bathroomMultiplier;
-        const strRevenue = Math.round(baseRevenue + (Math.random() * 200 - 100));
-        const multiple = strRevenue / item.medianRent;
-        
-        return {
-          ...item,
-          strRevenue,
-          multiple
-        };
-      }).sort((a, b) => b.multiple - a.multiple);
-
-      setSubmarketData(fallbackData);
+      // Clear any existing data and show no data available message
+      setSubmarketData([]);
       setCityName(targetCity);
+      
+      toast({
+        title: "No Available Data",
+        description: "Unable to fetch market data for this city. Please try another city or check your API keys.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -333,6 +282,38 @@ export const SimulatedMarketIntelligence = () => {
           }} />
         </CardContent>
       </Card>
+
+      {/* No Data Available State */}
+      {submarketData.length === 0 && cityName && (
+        <Card className="shadow-2xl border border-red-500/20 bg-gray-900/80 backdrop-blur-lg w-full mx-auto">
+          <CardContent className="pt-6 pb-6 text-center">
+            <div className="flex flex-col items-center space-y-4">
+              <Eye className="h-12 w-12 text-red-400" />
+              <h3 className="text-xl font-semibold text-red-300">No Available Data</h3>
+              <p className="text-gray-400 max-w-md">
+                Unable to fetch market data for <span className="text-red-300 font-medium">{cityName}</span>. 
+                Please try another city or check your API configuration.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* No Data Available State */}
+      {submarketData.length === 0 && cityName && (
+        <Card className="shadow-2xl border border-red-500/20 bg-gray-900/80 backdrop-blur-lg w-full mx-auto">
+          <CardContent className="pt-6 pb-6 text-center">
+            <div className="flex flex-col items-center space-y-4">
+              <Eye className="h-12 w-12 text-red-400" />
+              <h3 className="text-xl font-semibold text-red-300">No Available Data</h3>
+              <p className="text-gray-400 max-w-md">
+                Unable to fetch market data for <span className="text-red-300 font-medium">{cityName}</span>. 
+                Please try another city or check your API configuration.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Results Section */}
       {submarketData.length > 0 && (
