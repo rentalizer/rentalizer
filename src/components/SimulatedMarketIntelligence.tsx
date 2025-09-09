@@ -30,7 +30,7 @@ export const SimulatedMarketIntelligence = () => {
   const [propertyType, setPropertyType] = useState<string>('2');
   const [bathrooms, setBathrooms] = useState<string>('2');
   const [isLoading, setIsLoading] = useState(false);
-  const [apiKeys, setApiKeys] = useState<{ airdnaApiKey?: string; openaiApiKey?: string }>({});
+  const [apiKeys, setApiKeys] = useState<{ airdnaApiKey?: string; rentcastApiKey?: string; openaiApiKey?: string }>({});
 
   // No longer using simulated data - removed mock data object
 
