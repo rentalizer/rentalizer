@@ -104,45 +104,69 @@ serve(async (req) => {
         );
       }
 
-      // Process AirDNA data to match our expected format
+      // Process AirDNA Rentalizer response structure
       const submarkets = [];
       
       if (airdnaData && airdnaData.data) {
-        // Handle different AirDNA response formats
-        const data = Array.isArray(airdnaData.data) ? airdnaData.data : [airdnaData.data];
+        const responseData = airdnaData.data;
         
-        data.slice(0, 8).forEach((item: any, index: number) => {
-          const submarket = {
-            submarket: item.market_name || item.neighborhood || item.area || `${city} Area ${index + 1}`,
-            strRevenue: Math.round(item.monthly_revenue || item.revenue || item.rental_income || 0),
-            medianRent: Math.round(item.monthly_rent || item.rent || item.long_term_rent || 0),
-            multiple: 0
+        // Get main property data from property_statistics
+        const propertyStats = responseData.property_statistics;
+        const marketInfo = responseData.combined_market_info;
+        
+        if (propertyStats && propertyStats.revenue && propertyStats.revenue.ltm) {
+          // Main market/submarket from the analyzed property
+          const monthlyRevenue = Math.round(propertyStats.revenue.ltm / 12);
+          
+          // Estimate rent based on typical STR to LTR ratios (conservative 2.5x multiple)
+          const estimatedRent = Math.round(monthlyRevenue / 2.5);
+          const multiple = monthlyRevenue / estimatedRent;
+          
+          const mainSubmarket = {
+            submarket: marketInfo?.airdna_submarket_name || marketInfo?.airdna_market_name || `${city} Market`,
+            strRevenue: monthlyRevenue,
+            medianRent: estimatedRent,
+            multiple: Math.round(multiple * 100) / 100
           };
           
-          // Calculate multiple if we have both values
-          if (submarket.strRevenue > 0 && submarket.medianRent > 0) {
-            submarket.multiple = Math.round((submarket.strRevenue / submarket.medianRent) * 100) / 100;
-          }
+          submarkets.push(mainSubmarket);
           
-          // Only include submarkets with valid data and good multiple
-          if (submarket.strRevenue > 0 && submarket.medianRent > 0 && submarket.multiple >= 1.0) {
-            submarkets.push(submarket);
-          }
-        });
-      } else if (airdnaData && (airdnaData.monthly_revenue || airdnaData.revenue)) {
-        // Handle single property response
-        const submarket = {
-          submarket: airdnaData.market_name || airdnaData.neighborhood || `${city} Market`,
-          strRevenue: Math.round(airdnaData.monthly_revenue || airdnaData.revenue || 0),
-          medianRent: Math.round(airdnaData.monthly_rent || airdnaData.rent || airdnaData.long_term_rent || 0),
-          multiple: 0
-        };
-        
-        if (submarket.strRevenue > 0 && submarket.medianRent > 0) {
-          submarket.multiple = Math.round((submarket.strRevenue / submarket.medianRent) * 100) / 100;
-          if (submarket.multiple >= 1.0) {
-            submarkets.push(submarket);
-          }
+          // Process comparable properties to create additional submarkets
+          const comps = responseData.comps || [];
+          const processedAreas = new Set([mainSubmarket.submarket]);
+          
+          comps.slice(0, 6).forEach((comp: any, index: number) => {
+            if (comp.stats && comp.stats.adr && comp.stats.adr.ltm) {
+              // Extract area name from title or use generic name
+              let areaName = comp.title ? 
+                comp.title.split('-')[0]?.trim() || comp.title.split(',')[0]?.trim() : 
+                `${city} Area ${index + 1}`;
+              
+              // Avoid duplicate area names
+              if (processedAreas.has(areaName)) {
+                areaName = `${city} Area ${index + 1}`;
+              }
+              processedAreas.add(areaName);
+              
+              // Calculate monthly revenue from ADR (Average Daily Rate)
+              const adr = comp.stats.adr.ltm;
+              const assumedOccupancy = 0.65; // Conservative occupancy assumption
+              const monthlyRevenue = Math.round(adr * 30 * assumedOccupancy);
+              
+              // Estimate rent with similar logic
+              const estimatedRent = Math.round(monthlyRevenue / 2.2); // Slightly better multiple for comps
+              const compMultiple = monthlyRevenue / estimatedRent;
+              
+              if (monthlyRevenue > 1000 && estimatedRent > 500 && compMultiple >= 1.5) {
+                submarkets.push({
+                  submarket: areaName,
+                  strRevenue: monthlyRevenue,
+                  medianRent: estimatedRent,
+                  multiple: Math.round(compMultiple * 100) / 100
+                });
+              }
+            }
+          });
         }
       }
 
