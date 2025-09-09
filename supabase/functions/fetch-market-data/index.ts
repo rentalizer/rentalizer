@@ -415,6 +415,12 @@ function generateFallbackNeighborhoods(city: string): string[] {
   }
 
   console.log(`No specific neighborhoods found for ${city}, generating generic ones`);
+  
+  // Basic validation to detect obviously invalid city names
+  if (isInvalidCityName(city)) {
+    throw new Error('Invalid city name provided');
+  }
+  
   // Generic but realistic neighborhood names for other cities
   return [
     `${city} Downtown`,
@@ -488,4 +494,49 @@ function hashString(str: string): number {
 function seededRandom(seed: number): number {
   const x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
+}
+
+function isInvalidCityName(city: string): boolean {
+  // Check for obviously invalid patterns
+  const cityLower = city.toLowerCase().trim();
+  
+  // Check if it's too short or too long
+  if (cityLower.length < 2 || cityLower.length > 50) {
+    return true;
+  }
+  
+  // Check for random character patterns (more than 3 consecutive same characters)
+  if (/(.)\1{3,}/.test(cityLower)) {
+    return true;
+  }
+  
+  // Check for excessive consonants without vowels (more than 4 consecutive consonants)
+  if (/[bcdfghjklmnpqrstvwxyz]{5,}/.test(cityLower)) {
+    return true;
+  }
+  
+  // Check for random-looking patterns (alternating consonants/vowels excessively)
+  const consonantVowelPattern = /^([bcdfghjklmnpqrstvwxyz][aeiou]){4,}$|^([aeiou][bcdfghjklmnpqrstvwxyz]){4,}$/;
+  if (consonantVowelPattern.test(cityLower)) {
+    return true;
+  }
+  
+  // Check for keyboard mashing patterns
+  const keyboardPatterns = [
+    'qwerty', 'asdf', 'zxcv', 'qaz', 'wsx', 'edc', 'rfv', 'tgb', 'yhn', 'ujm',
+    'aqzz', 'wsxx', 'edcc', 'rfvv', 'tgbb', 'yhnn', 'ujmm', 'ikk', 'oll', 'p;;'
+  ];
+  
+  for (const pattern of keyboardPatterns) {
+    if (cityLower.includes(pattern)) {
+      return true;
+    }
+  }
+  
+  // Check for random number/letter combinations
+  if (/\d/.test(cityLower) && !/^[a-z\s]+\d+$/.test(cityLower)) {
+    return true;
+  }
+  
+  return false;
 }
