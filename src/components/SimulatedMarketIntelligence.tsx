@@ -21,10 +21,11 @@ import { fetchMarketData } from '@/services/marketDataService';
 import { ApiKeyInput } from '@/components/ApiKeyInput';
 import { ApiProviderSelector } from '@/components/ApiProviderSelector';
 import { useToast } from '@/hooks/use-toast';
+import { EdgeFunctionResponse, MarketAnalysisResult } from '@/types';
 
 export const SimulatedMarketIntelligence: React.FC = () => {
   const { toast } = useToast();
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<MarketAnalysisResult[]>([]);
   const [city, setCity] = useState('');
   const [propertyType, setPropertyType] = useState('2');
   const [bathrooms, setBathrooms] = useState('2');

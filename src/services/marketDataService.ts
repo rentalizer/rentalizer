@@ -1,5 +1,5 @@
 
-import { CityMarketData, STRData, RentData } from '@/types';
+import { CityMarketData, STRData, RentData, EdgeFunctionResponse } from '@/types';
 
 const getBedroomMultiplier = (propertyType: string): number => {
   switch (propertyType) {
@@ -281,66 +281,34 @@ Verify your data against RentCafe.com, Zumper.com, and Rentometer.com as the pri
 
 export const fetchMarketData = async (
   city: string,
-  apiConfig: { airdnaApiKey?: string; openaiApiKey?: string },
-  propertyType: string = '2',
-  bathrooms: string = '1'
-): Promise<CityMarketData> => {
-  console.log(`🔍 Fetching market data for ${city} (${propertyType}BR/${bathrooms}BA properties)`);
-  console.log('🔑 API Configuration:', {
-    hasAirDNAKey: !!(apiConfig.airdnaApiKey && apiConfig.airdnaApiKey.trim()),
-    hasOpenAIKey: !!(apiConfig.openaiApiKey && apiConfig.openaiApiKey.trim())
-  });
+  propertyType: string,
+  bathrooms: string,
+  apiProvider: 'airdna' | 'rentcast' = 'airdna',
+  userApiKeys?: { airdnaApiKey?: string; rentcastApiKey?: string; openaiApiKey?: string }
+): Promise<EdgeFunctionResponse> => {
+  console.log('Calling edge function with:', { city, propertyType, bathrooms, apiProvider });
 
   try {
-    let strData: STRData[] = [];
-    let rentData: RentData[] = [];
-
-    // Fetch STR data - only real data, no fallbacks
-    const strResult = await fetchAirDNAData(city, apiConfig.airdnaApiKey || '', propertyType, bathrooms);
-    if (strResult) {
-      strData = strResult;
-      console.log('✅ Using REAL STR data from AirDNA API');
-    } else {
-      console.log('❌ STR API failed - will show "NA" for STR revenue');
-      // Create placeholder data with "NA" indicators
-      const cityKey = city.toLowerCase();
-      const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Area`];
-      strData = neighborhoods.slice(0, 6).map(neighborhood => ({
-        submarket: neighborhood,
-        revenue: 0 // Will be displayed as "NA"
-      }));
-    }
-
-    // Fetch rent data - only real data, no fallbacks
-    const rentResult = await fetchOpenAIRentData(city, apiConfig.openaiApiKey || '', propertyType, bathrooms);
-    if (rentResult) {
-      rentData = rentResult;
-      console.log('✅ Using REAL rent data from OpenAI API');
-    } else {
-      console.log('❌ Rent API failed - will show "NA" for rent data');
-      // Create placeholder data with "NA" indicators
-      const cityKey = city.toLowerCase();
-      const neighborhoods = REAL_NEIGHBORHOODS[cityKey] || [`${city} Area`];
-      rentData = neighborhoods.slice(0, 6).map(neighborhood => ({
-        submarket: neighborhood,
-        rent: 0 // Will be displayed as "NA"
-      }));
-    }
-
-    console.log(`📊 Market data compilation complete for ${city}:`, {
-      strSubmarkets: strData.length,
-      rentSubmarkets: rentData.length,
-      strDataSource: strResult ? 'Real AirDNA API' : 'API Failed - Showing NA',
-      rentDataSource: rentResult ? 'Real OpenAI API' : 'API Failed - Showing NA'
+    const { supabase } = await import('@/integrations/supabase/client');
+    
+    const { data, error } = await supabase.functions.invoke('fetch-market-data', {
+      body: {
+        city,
+        propertyType,
+        bathrooms,
+        apiProvider,
+        userApiKeys
+      }
     });
 
-    return {
-      strData,
-      rentData
-    };
+    if (error) {
+      console.error('Edge function error:', error);
+      throw error;
+    }
 
+    return data;
   } catch (error) {
-    console.error('❌ Failed to fetch market data:', error);
+    console.error('Error calling edge function:', error);
     throw error;
   }
 };
