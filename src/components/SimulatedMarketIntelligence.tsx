@@ -11,6 +11,7 @@ import { BarChart3, MapPin, Search, Loader2, Map, Table2, Download, Satellite, E
 import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
 import { useToast } from '@/hooks/use-toast';
+import { ApiKeyInput } from '@/components/ApiKeyInput';
 
 interface SubmarketData {
   submarket: string;
@@ -283,6 +284,13 @@ export const SimulatedMarketIntelligence = () => {
               </Button>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* API Key Configuration */}
+      <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg w-full mx-auto">
+        <CardContent className="pt-6">
+          <ApiKeyInput onApiKeysChange={(keys) => console.log('API Keys updated:', keys)} />
         </CardContent>
       </Card>
 

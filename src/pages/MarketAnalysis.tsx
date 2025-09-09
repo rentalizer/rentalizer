@@ -8,7 +8,6 @@ import { Footer } from '@/components/Footer';
 import { useNavigate } from 'react-router-dom';
 import { SimulatedMarketIntelligence } from '@/components/SimulatedMarketIntelligence';
 import { AccessGate } from '@/components/AccessGate';
-import { ApiKeyInput } from '@/components/ApiKeyInput';
 
 const MarketAnalysis = () => {
   const navigate = useNavigate();
@@ -34,11 +33,6 @@ const MarketAnalysis = () => {
                 Market Intelligence
               </h1>
             </div>
-          </div>
-
-          {/* API Key Configuration */}
-          <div className="mb-8">
-            <ApiKeyInput onApiKeysChange={(keys) => console.log('API Keys updated:', keys)} />
           </div>
 
           {/* Simulated Market Intelligence Component */}
