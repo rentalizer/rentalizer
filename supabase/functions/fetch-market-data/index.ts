@@ -30,7 +30,9 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Fetching market data for: ${city}, ${propertyType}BR/${bathrooms}BA`);
+    // Improve city formatting for better API results
+    const formattedCity = formatCityForAPI(city);
+    console.log(`Fetching market data for: ${formattedCity}, ${propertyType}BR/${bathrooms}BA`);
 
     // Create Supabase client
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
@@ -61,8 +63,8 @@ serve(async (req) => {
     if (airdnaApiKey) {
       try {
         // Call AirDNA Rentalizer API for real data
-        console.log(`Calling AirDNA API for ${city}...`);
-        const encodedCity = encodeURIComponent(city);
+        console.log(`Calling AirDNA API for ${formattedCity}...`);
+        const encodedCity = encodeURIComponent(formattedCity);
         const airdnaUrl = `https://airdna1.p.rapidapi.com/rentalizer?address=${encodedCity}&bedrooms=${propertyType}&bathrooms=${bathrooms}&accommodate=${propertyType}`;
         console.log('Using AirDNA endpoint:', airdnaUrl);
 
@@ -173,16 +175,21 @@ serve(async (req) => {
             .sort((a, b) => b.multiple - a.multiple)
             .slice(0, 8);
 
-          console.log(`Processed ${filteredResults.length} real submarkets from AirDNA`);
+          console.log(`Processed ${filteredResults.length} real submarkets from AirDNA for ${city}`);
 
           if (filteredResults.length > 0) {
+            // Validate that we got data for the right city
+            const actualLocation = airdnaData.data.property_details?.address_lookup || 'Unknown';
+            console.log(`AirDNA returned data for: ${actualLocation}`);
+            
             return new Response(
               JSON.stringify({
                 submarkets: filteredResults,
-                city: city,
+                city: city, // Use the original searched city
                 propertyType,
                 bathrooms,
-                dataSource: 'airdna_real_data'
+                dataSource: 'airdna_real_data',
+                actualLocation: actualLocation // Include what AirDNA actually found
               }),
               {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -239,7 +246,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         submarkets: filteredResults,
-        city: city,
+        city: city, // Use the original searched city
         propertyType,
         bathrooms,
         dataSource: 'ai_generated'
@@ -263,6 +270,38 @@ serve(async (req) => {
     );
   }
 });
+
+function formatCityForAPI(city: string): string {
+  const cityLower = city.toLowerCase().trim();
+  
+  // Major cities that should include state for clarity
+  const majorCities: { [key: string]: string } = {
+    'denver': 'Denver, CO',
+    'atlanta': 'Atlanta, GA', 
+    'austin': 'Austin, TX',
+    'boston': 'Boston, MA',
+    'chicago': 'Chicago, IL',
+    'dallas': 'Dallas, TX',
+    'houston': 'Houston, TX',
+    'las vegas': 'Las Vegas, NV',
+    'los angeles': 'Los Angeles, CA',
+    'miami': 'Miami, FL',
+    'nashville': 'Nashville, TN',
+    'new orleans': 'New Orleans, LA',
+    'new york': 'New York, NY',
+    'orlando': 'Orlando, FL',
+    'philadelphia': 'Philadelphia, PA',
+    'phoenix': 'Phoenix, AZ',
+    'portland': 'Portland, OR',
+    'san antonio': 'San Antonio, TX',
+    'san diego': 'San Diego, CA',
+    'san francisco': 'San Francisco, CA',
+    'seattle': 'Seattle, WA',
+    'washington': 'Washington, DC'
+  };
+
+  return majorCities[cityLower] || city;
+}
 
 async function generateRealNeighborhoods(city: string): Promise<string[]> {
   console.log(`Attempting to generate neighborhoods for ${city}, OpenAI key available: ${!!openaiApiKey}`);
