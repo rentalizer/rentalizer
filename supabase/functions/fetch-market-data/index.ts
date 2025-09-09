@@ -66,10 +66,12 @@ serve(async (req) => {
         
         // Generate realistic base values with city-specific variation
         const cityFactor = getCityFactor(city.toLowerCase());
-        const neighborhoodVariation = 0.8 + (Math.random() * 0.4); // 0.8 to 1.2 variation
+        const neighborhoodVariation = 0.85 + (Math.random() * 0.3); // 0.85 to 1.15 variation
         
-        const baseRent = Math.round((1800 + Math.random() * 2200) * cityFactor * bedroomMultiplier);
-        const baseRevenue = Math.round(baseRent * (1.6 + Math.random() * 0.8) * bathroomMultiplier * neighborhoodVariation);
+        // More realistic base rent calculation for San Antonio market
+        const baseRentRange = getCityRentRange(city.toLowerCase());
+        const baseRent = Math.round((baseRentRange.min + Math.random() * (baseRentRange.max - baseRentRange.min)) * bedroomMultiplier);
+        const baseRevenue = Math.round(baseRent * (1.4 + Math.random() * 0.4) * bathroomMultiplier * neighborhoodVariation);
         
         const multiple = baseRevenue / baseRent;
         
@@ -263,10 +265,34 @@ function getCityFactor(city: string): number {
     'austin': 1.0,
     'nashville': 0.9,
     'atlanta': 0.9,
+    'san antonio': 0.75,
     'phoenix': 0.8,
     'dallas': 0.8,
     'houston': 0.8
   };
 
   return cityFactors[city] || 1.0; // Default multiplier for unknown cities
+}
+
+function getCityRentRange(city: string): { min: number; max: number } {
+  // Realistic rent ranges for 2BR apartments based on actual market data
+  const cityRentRanges: { [key: string]: { min: number; max: number } } = {
+    'san francisco': { min: 3500, max: 5500 },
+    'new york': { min: 3000, max: 5000 },
+    'los angeles': { min: 2500, max: 3800 },
+    'san diego': { min: 2300, max: 3500 },
+    'seattle': { min: 2200, max: 3400 },
+    'miami': { min: 2000, max: 3200 },
+    'chicago': { min: 1800, max: 2800 },
+    'denver': { min: 1700, max: 2600 },
+    'austin': { min: 1600, max: 2500 },
+    'san antonio': { min: 900, max: 1400 }, // Realistic San Antonio prices
+    'nashville': { min: 1400, max: 2200 },
+    'atlanta': { min: 1300, max: 2100 },
+    'phoenix': { min: 1200, max: 2000 },
+    'dallas': { min: 1300, max: 2100 },
+    'houston': { min: 1200, max: 1900 }
+  };
+
+  return cityRentRanges[city] || { min: 1200, max: 2000 }; // Default range
 }
