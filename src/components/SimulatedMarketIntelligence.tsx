@@ -83,6 +83,10 @@ export const SimulatedMarketIntelligence = () => {
       });
 
       if (response.error) {
+        // Check if it's an invalid city error (status 400)
+        if (response.error.message?.includes('Please enter a valid city name')) {
+          return null; // Return null for invalid cities
+        }
         throw new Error(response.error.message);
       }
 
@@ -119,6 +123,17 @@ export const SimulatedMarketIntelligence = () => {
       // Simulate API loading time
       await new Promise(resolve => setTimeout(resolve, 2500));
       processedData = await fetchRealMarketData();
+
+      // Check if no data returned (invalid city)
+      if (processedData === null) {
+        toast({
+          title: "Invalid City",
+          description: "Please enter a valid city name.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
 
       setSubmarketData(processedData);
       setCityName(targetCity);
