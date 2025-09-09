@@ -109,12 +109,15 @@ serve(async (req) => {
               const baseAdr = mainAdr || (mainRevenue / 12 / 25); // Estimate ADR from revenue
               const baseRent = Math.round(baseAdr * 30 * 0.65);
               
-              // Create submarkets using real neighborhoods with varied but realistic data
+              // Create consistent variations based on neighborhood names (deterministic)
               neighborhoods.forEach((neighborhood, index) => {
-                // Create realistic variations based on the actual market data
-                const variation = 0.7 + (Math.random() * 0.6); // 0.7x to 1.3x variation
+                // Create consistent seed based on city + neighborhood for reproducible results
+                const seed = hashString(city + neighborhood);
+                const variation = 0.7 + (seededRandom(seed) * 0.6); // 0.7x to 1.3x variation
+                const rentVariation = 0.8 + (seededRandom(seed + 1) * 0.4);
+                
                 const neighborhoodRevenue = Math.round(baseRevenue * variation);
-                const neighborhoodRent = Math.round(baseRent * (0.8 + Math.random() * 0.4)); // More stable rent variation
+                const neighborhoodRent = Math.round(baseRent * rentVariation);
                 const multiple = neighborhoodRevenue / (neighborhoodRent * 12);
                 
                 if (multiple >= 1.2) { // Only include profitable submarkets
@@ -178,14 +181,15 @@ serve(async (req) => {
         const bedroomMultiplier = propertyType === '1' ? 0.75 : propertyType === '3' ? 1.25 : 1.0;
         const bathroomMultiplier = bathrooms === '1' ? 0.9 : bathrooms === '3' ? 1.1 : 1.0;
         
-        // Generate realistic base values with city-specific variation
+        // Generate consistent base values with city-specific variation
         const cityFactor = getCityFactor(city.toLowerCase());
-        const neighborhoodVariation = 0.85 + (Math.random() * 0.3); // 0.85 to 1.15 variation
+        const seed = hashString(city + neighborhood + propertyType + bathrooms);
+        const neighborhoodVariation = 0.85 + (seededRandom(seed) * 0.3); // 0.85 to 1.15 variation
         
         // More realistic base rent calculation
         const baseRentRange = getCityRentRange(city.toLowerCase());
-        const baseRent = Math.round((baseRentRange.min + Math.random() * (baseRentRange.max - baseRentRange.min)) * bedroomMultiplier);
-        const baseRevenue = Math.round(baseRent * (1.4 + Math.random() * 0.4) * bathroomMultiplier * neighborhoodVariation);
+        const baseRent = Math.round((baseRentRange.min + seededRandom(seed + 1) * (baseRentRange.max - baseRentRange.min)) * bedroomMultiplier);
+        const baseRevenue = Math.round(baseRent * (1.4 + seededRandom(seed + 2) * 0.4) * bathroomMultiplier * neighborhoodVariation);
         
         const multiple = baseRevenue / baseRent;
         
@@ -441,4 +445,20 @@ function getCityRentRange(city: string): { min: number; max: number } {
   };
 
   return cityRentRanges[city] || { min: 1200, max: 2000 }; // Default range
+}
+
+// Helper functions for consistent data generation
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash);
+}
+
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
 }
