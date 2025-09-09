@@ -11,7 +11,7 @@ interface ApiKeyInputProps {
   onApiKeysChange: (keys: { airdnaApiKey?: string; openaiApiKey?: string }) => void;
 }
 
-export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
+const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
   const [airdnaKey, setAirdnaKey] = useState('');
   const [openaiKey, setOpenaiKey] = useState('');
   const [showKeys, setShowKeys] = useState(false);
@@ -298,3 +298,5 @@ export const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => 
     </Card>
   );
 };
+
+export { ApiKeyInput };
