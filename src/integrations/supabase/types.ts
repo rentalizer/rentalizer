@@ -151,6 +151,7 @@ export type Database = {
       }
       direct_messages: {
         Row: {
+          conversation_id: string | null
           created_at: string | null
           id: string
           message: string
@@ -160,6 +161,7 @@ export type Database = {
           sender_name: string
         }
         Insert: {
+          conversation_id?: string | null
           created_at?: string | null
           id?: string
           message: string
@@ -169,6 +171,7 @@ export type Database = {
           sender_name: string
         }
         Update: {
+          conversation_id?: string | null
           created_at?: string | null
           id?: string
           message?: string
@@ -971,6 +974,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_api_keys: {
+        Row: {
+          airdna_api_key: string | null
+          created_at: string | null
+          id: string
+          rental_api_key: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          airdna_api_key?: string | null
+          created_at?: string | null
+          id?: string
+          rental_api_key?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          airdna_api_key?: string | null
+          created_at?: string | null
+          id?: string
+          rental_api_key?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           created_at: string | null
@@ -1000,19 +1030,19 @@ export type Database = {
           created_at: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string
           role: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1122,6 +1152,10 @@ export type Database = {
           title: string
           url: string
         }[]
+      }
+      normalize_pair_uuid: {
+        Args: { a: string; b: string }
+        Returns: string
       }
       sparsevec_out: {
         Args: { "": unknown }
