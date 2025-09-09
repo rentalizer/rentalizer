@@ -180,7 +180,7 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
 
     try {
       // Test AirDNA API via RapidAPI with a simple search
-      const response = await fetch('https://airdna1.p.rapidapi.com/api/enterprise/v2/market/search', {
+      const response = await fetch('https://airdna1.p.rapidapi.com/v1/market/search', {
         method: 'POST',
         headers: {
           'X-RapidAPI-Key': airdnaKey,

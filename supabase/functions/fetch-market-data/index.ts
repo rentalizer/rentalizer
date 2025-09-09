@@ -153,7 +153,7 @@ async function fetchAirDNAMarketData(city: string, apiKey: string, propertyType:
   
   try {
     // Step 1: Search for markets/submarkets in the city
-    const searchResponse = await fetch('https://airdna1.p.rapidapi.com/api/enterprise/v2/market/search', {
+    const searchResponse = await fetch('https://airdna1.p.rapidapi.com/v1/market/search', {
       method: 'POST',
       headers: {
         'X-RapidAPI-Key': apiKey,
@@ -202,8 +202,8 @@ async function fetchAirDNAMarketData(city: string, apiKey: string, propertyType:
       try {
         const isSubmarket = market.type === 'submarket';
         const endpoint = isSubmarket 
-          ? `https://airdna1.p.rapidapi.com/api/enterprise/v2/submarket/${market.id}/revenue`
-          : `https://airdna1.p.rapidapi.com/api/enterprise/v2/market/${market.id}/revenue`;
+          ? `https://airdna1.p.rapidapi.com/v1/submarket/${market.id}/revenue`
+          : `https://airdna1.p.rapidapi.com/v1/market/${market.id}/revenue`;
 
         // Create filters for property type and bathrooms
         const filters = [];
