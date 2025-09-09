@@ -414,12 +414,15 @@ function generateFallbackNeighborhoods(city: string): string[] {
     }
   }
 
-  console.log(`No specific neighborhoods found for ${city}, generating generic ones`);
+  console.log(`No specific neighborhoods found for ${city}, checking if valid city name`);
   
   // Basic validation to detect obviously invalid city names
   if (isInvalidCityName(city)) {
+    console.log(`City name "${city}" detected as invalid, throwing error`);
     throw new Error('Invalid city name provided');
   }
+  
+  console.log(`City name "${city}" passed validation, generating generic neighborhoods`);
   
   // Generic but realistic neighborhood names for other cities
   return [
@@ -505,26 +508,36 @@ function isInvalidCityName(city: string): boolean {
     return true;
   }
   
-  // Check for random character patterns (more than 3 consecutive same characters)
-  if (/(.)\1{3,}/.test(cityLower)) {
+  // Check for more than 2 consecutive same characters
+  if (/(.)\1{2,}/.test(cityLower)) {
     return true;
   }
   
-  // Check for excessive consonants without vowels (more than 4 consecutive consonants)
-  if (/[bcdfghjklmnpqrstvwxyz]{5,}/.test(cityLower)) {
+  // Check for excessive consonants without vowels (more than 3 consecutive consonants)
+  if (/[bcdfghjklmnpqrstvwxyz]{4,}/.test(cityLower)) {
     return true;
   }
   
-  // Check for random-looking patterns (alternating consonants/vowels excessively)
-  const consonantVowelPattern = /^([bcdfghjklmnpqrstvwxyz][aeiou]){4,}$|^([aeiou][bcdfghjklmnpqrstvwxyz]){4,}$/;
-  if (consonantVowelPattern.test(cityLower)) {
+  // Check for lack of vowels (cities need vowels)
+  const vowelCount = (cityLower.match(/[aeiou]/g) || []).length;
+  const consonantCount = (cityLower.match(/[bcdfghjklmnpqrstvwxyz]/g) || []).length;
+  
+  // If more than 70% consonants and longer than 4 chars, likely gibberish
+  if (cityLower.length > 4 && consonantCount > vowelCount * 2.3) {
     return true;
   }
   
-  // Check for keyboard mashing patterns
+  // Check for random-looking patterns (repeating 2-char patterns)
+  if (/(..).*\1.*\1/.test(cityLower) && cityLower.length > 6) {
+    return true;
+  }
+  
+  // Check for keyboard mashing patterns (expanded list)
   const keyboardPatterns = [
     'qwerty', 'asdf', 'zxcv', 'qaz', 'wsx', 'edc', 'rfv', 'tgb', 'yhn', 'ujm',
-    'aqzz', 'wsxx', 'edcc', 'rfvv', 'tgbb', 'yhnn', 'ujmm', 'ikk', 'oll', 'p;;'
+    'qwe', 'asd', 'zxc', 'wer', 'sdf', 'xcv', 'ert', 'dfg', 'cvb', 'rty',
+    'fgh', 'vbn', 'tyu', 'ghj', 'bnm', 'yui', 'hjk', 'uio', 'jkl', 'iop',
+    'aqz', 'wsxe', 'edcr', 'rfvt', 'tgby', 'yhnu', 'ujmi', 'ikol', 'olp'
   ];
   
   for (const pattern of keyboardPatterns) {
@@ -533,9 +546,37 @@ function isInvalidCityName(city: string): boolean {
     }
   }
   
-  // Check for random number/letter combinations
-  if (/\d/.test(cityLower) && !/^[a-z\s]+\d+$/.test(cityLower)) {
+  // Check for alternating patterns that look random
+  if (/^([bcdfghjklmnpqrstvwxyz][aeiou]){3,}[bcdfghjklmnpqrstvwxyz]?$/.test(cityLower) && cityLower.length > 8) {
     return true;
+  }
+  
+  // Check for numbers mixed with letters in weird ways
+  if (/\d/.test(cityLower) && !/^[a-z\s]+([\s-]?\d+)?$/.test(cityLower)) {
+    return true;
+  }
+  
+  // Check for patterns that look like random string generation
+  // No common city name patterns (common endings, etc.)
+  const commonCityEndings = ['ville', 'town', 'city', 'berg', 'burg', 'ford', 'port', 'ton', 'field', 'wood', 'land', 'dale', 'view', 'side', 'hill', 'vale', 'ham', 'shire', 'chester', 'minster'];
+  const commonCityPrefixes = ['san', 'saint', 'st', 'new', 'old', 'north', 'south', 'east', 'west', 'upper', 'lower', 'great', 'little', 'mount', 'fort', 'lake', 'river', 'glen'];
+  
+  const hasCommonEnding = commonCityEndings.some(ending => cityLower.endsWith(ending));
+  const hasCommonPrefix = commonCityPrefixes.some(prefix => cityLower.startsWith(prefix + ' ') || cityLower.startsWith(prefix));
+  
+  // If it's long and has no common city patterns, likely gibberish
+  if (cityLower.length > 8 && !hasCommonEnding && !hasCommonPrefix && !/\s/.test(cityLower)) {
+    // Additional check: does it have realistic letter distribution?
+    const letterFreq = {};
+    for (const char of cityLower) {
+      letterFreq[char] = (letterFreq[char] || 0) + 1;
+    }
+    
+    // If any letter appears more than 1/3 of the time, suspicious
+    const maxFreq = Math.max(...Object.values(letterFreq));
+    if (maxFreq > cityLower.length / 3) {
+      return true;
+    }
   }
   
   return false;
