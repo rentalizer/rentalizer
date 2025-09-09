@@ -11,6 +11,8 @@ import { BarChart3, MapPin, Search, Loader2, Map, Table2, Download, Satellite, E
 import { ResultsTable } from '@/components/ResultsTable';
 import { MapView } from '@/components/MapView';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from "@/integrations/supabase/client";
+import { ApiKeyInput } from '@/components/ApiKeyInput';
 
 interface SubmarketData {
   submarket: string;
@@ -28,6 +30,7 @@ export const SimulatedMarketIntelligence = () => {
   const [propertyType, setPropertyType] = useState<string>('2');
   const [bathrooms, setBathrooms] = useState<string>('2');
   const [isLoading, setIsLoading] = useState(false);
+  const [apiKeys, setApiKeys] = useState<{ airdnaApiKey?: string; openaiApiKey?: string }>({});
 
   // Mock market data for different cities with realistic revenue
   const simulatedData: { [key: string]: SubmarketData[] } = {
@@ -65,6 +68,31 @@ export const SimulatedMarketIntelligence = () => {
     ]
   };
 
+  const fetchRealMarketData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const authHeader = user ? `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}` : undefined;
+
+      const response = await supabase.functions.invoke('fetch-market-data', {
+        body: {
+          city: targetCity,
+          propertyType,
+          bathrooms
+        },
+        headers: authHeader ? { Authorization: authHeader } : {}
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      return response.data?.submarkets || [];
+    } catch (error) {
+      console.error('Real API fetch failed:', error);
+      throw error;
+    }
+  };
+
   const handleMarketAnalysis = async () => {
     if (!targetCity.trim()) {
       toast({
@@ -77,33 +105,20 @@ export const SimulatedMarketIntelligence = () => {
 
     setIsLoading(true);
     
-    // Simulate API loading time
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
     try {
-      const cityKey = targetCity.toLowerCase().trim();
-      let baseData = simulatedData[cityKey] || simulatedData['san diego'];
-      
-      // Apply property type and bathroom multipliers
-      const bedroomMultiplier = propertyType === '1' ? 0.8 : propertyType === '3' ? 1.2 : 1;
-      const bathroomMultiplier = bathrooms === '1' ? 0.9 : bathrooms === '3' ? 1.1 : 1;
-      
-      // Generate realistic revenue data with multipliers
-      const processedData = baseData.map((item) => {
-        // Calculate realistic STR revenue with property type multipliers
-        const baseRevenue = item.strRevenue * bedroomMultiplier * bathroomMultiplier;
-        const strRevenue = Math.round(baseRevenue + (Math.random() * 200 - 100));
-        const multiple = strRevenue / item.medianRent;
-        
-        return {
-          ...item,
-          strRevenue,
-          multiple
-        };
-      });
+      let processedData: SubmarketData[];
 
-      // Sort by multiple (highest first)
-      processedData.sort((a, b) => b.multiple - a.multiple);
+      // Always try to fetch real data first
+      toast({
+        title: "Fetching Market Data",
+        description: apiKeys.airdnaApiKey && apiKeys.openaiApiKey 
+          ? "Using your API keys to get real market data..." 
+          : "Generating realistic market data with AI...",
+      });
+      
+      // Simulate API loading time
+      await new Promise(resolve => setTimeout(resolve, 2500));
+      processedData = await fetchRealMarketData();
 
       setSubmarketData(processedData);
       setCityName(targetCity);
@@ -114,11 +129,34 @@ export const SimulatedMarketIntelligence = () => {
       });
 
     } catch (error) {
+      console.error('Market analysis failed:', error);
+      
+      // Fallback to mock data if real API fails
       toast({
-        title: "Analysis Failed",
-        description: "Unable to complete market analysis.",
-        variant: "destructive",
+        title: "Using Demo Data",
+        description: "Real data unavailable, showing demo results for San Diego.",
       });
+      
+      const cityKey = targetCity.toLowerCase().trim();
+      let baseData = simulatedData[cityKey] || simulatedData['san diego'];
+      
+      const bedroomMultiplier = propertyType === '1' ? 0.8 : propertyType === '3' ? 1.2 : 1;
+      const bathroomMultiplier = bathrooms === '1' ? 0.9 : bathrooms === '3' ? 1.1 : 1;
+      
+      const fallbackData = baseData.map((item) => {
+        const baseRevenue = item.strRevenue * bedroomMultiplier * bathroomMultiplier;
+        const strRevenue = Math.round(baseRevenue + (Math.random() * 200 - 100));
+        const multiple = strRevenue / item.medianRent;
+        
+        return {
+          ...item,
+          strRevenue,
+          multiple
+        };
+      }).sort((a, b) => b.multiple - a.multiple);
+
+      setSubmarketData(fallbackData);
+      setCityName(targetCity);
     } finally {
       setIsLoading(false);
     }
@@ -283,6 +321,16 @@ export const SimulatedMarketIntelligence = () => {
               </Button>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* API Key Configuration */}
+      <Card className="shadow-2xl border border-cyan-500/20 bg-gray-900/80 backdrop-blur-lg w-full mx-auto">
+        <CardContent className="pt-6">
+          <ApiKeyInput onApiKeysChange={(keys) => {
+            setApiKeys(keys);
+            console.log('API Keys updated:', keys);
+          }} />
         </CardContent>
       </Card>
 
