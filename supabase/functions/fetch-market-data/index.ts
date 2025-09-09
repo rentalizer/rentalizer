@@ -172,7 +172,8 @@ serve(async (req) => {
 
     // Fallback: Generate realistic neighborhoods using OpenAI
     console.log('Using AI-generated fallback data');
-    const neighborhoods = await generateRealNeighborhoods(city);
+    try {
+      const neighborhoods = await generateRealNeighborhoods(city);
     
     // Generate market data for each neighborhood
     const submarketData = await Promise.all(
@@ -210,18 +211,32 @@ serve(async (req) => {
 
     console.log(`Generated ${filteredResults.length} submarkets for ${city}`);
 
-    return new Response(
-      JSON.stringify({
-        submarkets: filteredResults,
-        city: city, // Use the original searched city
-        propertyType,
-        bathrooms,
-        dataSource: 'ai_generated'
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      return new Response(
+        JSON.stringify({
+          submarkets: filteredResults,
+          city: city, // Use the original searched city
+          propertyType,
+          bathrooms,
+          dataSource: 'ai_generated'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Invalid city name provided') {
+        return new Response(JSON.stringify({
+          error: 'Please enter a valid city name. The location you entered does not appear to be a recognized city.',
+          city,
+          propertyType,
+          bathrooms
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
-    );
+      console.error('Error generating AI neighborhoods:', error);
+    }
 
   } catch (error) {
     console.error('Error in fetch-market-data function:', error);
@@ -312,8 +327,20 @@ async function generateRealNeighborhoods(city: string): Promise<string[]> {
     console.log('OpenAI response received:', JSON.stringify(data, null, 2));
     
     if (data.choices && data.choices[0]?.message?.content) {
-      const neighborhoods = data.choices[0].message.content
-        .trim()
+      const content = data.choices[0].message.content.trim();
+      
+      // Check if OpenAI indicates it's not a valid city
+      if (content.toLowerCase().includes('not a recognized city') || 
+          content.toLowerCase().includes('not a valid city') ||
+          content.toLowerCase().includes('please provide') ||
+          content.toLowerCase().includes('i\'m sorry') ||
+          content.toLowerCase().includes('cannot find') ||
+          content.toLowerCase().includes('doesn\'t appear to be')) {
+        console.log('OpenAI indicates invalid city name');
+        throw new Error('Invalid city name provided');
+      }
+      
+      const neighborhoods = content
         .split('\n')
         .map((name: string) => name.trim())
         .filter((name: string) => name.length > 0 && !name.match(/^\d+\./) && !name.includes('•'))
