@@ -153,10 +153,11 @@ async function fetchAirDNAMarketData(city: string, apiKey: string, propertyType:
   
   try {
     // Step 1: Search for markets/submarkets in the city
-    const searchResponse = await fetch('https://api.airdna.co/api/enterprise/v2/market/search', {
+    const searchResponse = await fetch('https://airdna1.p.rapidapi.com/api/enterprise/v2/market/search', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'X-RapidAPI-Key': apiKey,
+        'X-RapidAPI-Host': 'airdna1.p.rapidapi.com',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -201,8 +202,8 @@ async function fetchAirDNAMarketData(city: string, apiKey: string, propertyType:
       try {
         const isSubmarket = market.type === 'submarket';
         const endpoint = isSubmarket 
-          ? `https://api.airdna.co/api/enterprise/v2/submarket/${market.id}/revenue`
-          : `https://api.airdna.co/api/enterprise/v2/market/${market.id}/revenue`;
+          ? `https://airdna1.p.rapidapi.com/api/enterprise/v2/submarket/${market.id}/revenue`
+          : `https://airdna1.p.rapidapi.com/api/enterprise/v2/market/${market.id}/revenue`;
 
         // Create filters for property type and bathrooms
         const filters = [];
@@ -228,7 +229,8 @@ async function fetchAirDNAMarketData(city: string, apiKey: string, propertyType:
         const revenueResponse = await fetch(endpoint, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${apiKey}`,
+            'X-RapidAPI-Key': apiKey,
+            'X-RapidAPI-Host': 'airdna1.p.rapidapi.com',
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({

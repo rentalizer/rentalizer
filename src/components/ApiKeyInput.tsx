@@ -179,11 +179,12 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
     setKeyTestResults(prev => ({ ...prev, airdna: 'testing' }));
 
     try {
-      // Test AirDNA API with a simple search
-      const response = await fetch('https://api.airdna.co/api/enterprise/v2/market/search', {
+      // Test AirDNA API via RapidAPI with a simple search
+      const response = await fetch('https://airdna1.p.rapidapi.com/api/enterprise/v2/market/search', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${airdnaKey}`,
+          'X-RapidAPI-Key': airdnaKey,
+          'X-RapidAPI-Host': 'airdna1.p.rapidapi.com',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -195,9 +196,23 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
       if (response.ok) {
         toast({
           title: "✅ AirDNA API Connection Successful",
-          description: "Your AirDNA API key is working correctly.",
+          description: "Your RapidAPI AirDNA key is working correctly.",
         });
         setKeyTestResults(prev => ({ ...prev, airdna: 'valid' }));
+      } else if (response.status === 401) {
+        toast({
+          title: "❌ Invalid API Key",
+          description: "Please check your RapidAPI AirDNA subscription key.",
+          variant: "destructive"
+        });
+        setKeyTestResults(prev => ({ ...prev, airdna: 'invalid' }));
+      } else if (response.status === 403) {
+        toast({
+          title: "❌ Access Forbidden",
+          description: "Please check your RapidAPI subscription status.",
+          variant: "destructive"
+        });
+        setKeyTestResults(prev => ({ ...prev, airdna: 'invalid' }));
       } else {
         toast({
           title: "❌ AirDNA API Connection Failed",
@@ -282,12 +297,12 @@ const ApiKeyInput: React.FC<ApiKeyInputProps> = ({ onApiKeysChange }) => {
               <p className="text-xs text-gray-400">
                 Get your API key from{" "}
                 <a 
-                  href="https://www.airdna.co/api" 
+                  href="https://rapidapi.com/airdna/api/airdna1/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="text-cyan-400 hover:underline"
                 >
-                  AirDNA API Dashboard
+                  RapidAPI AirDNA
                 </a>
               </p>
             </div>
