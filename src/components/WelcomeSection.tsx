@@ -23,8 +23,7 @@ export const WelcomeSection = () => {
 
       <div className="mb-12 px-4">
         <div className="text-lg text-gray-300 max-w-4xl mx-auto leading-relaxed">
-          Rentalizer is an AI-powered training platform built to help you launch and grow a rental arbitrage business. 
-          Everything you need, all in one place.
+          Rentalizer is an AI-powered training platform built to help you launch and grow a rental arbitrage business.
         </div>
       </div>
     </div>
