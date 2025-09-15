@@ -85,18 +85,16 @@ export const AskRichieChat = () => {
     return null;
   }
 
-  // Check lead usage for rate limiting
+  // Check lead usage for rate limiting using secure edge function
   const checkLeadUsage = async (leadCaptureId: string) => {
     try {
-      const { data: lead, error } = await supabase
-        .from('lead_captures')
-        .select('total_questions_asked')
-        .eq('id', leadCaptureId)
-        .single();
+      const { data, error } = await supabase.functions.invoke('check-lead-usage', {
+        body: { leadCaptureId }
+      });
 
       if (error) throw error;
       
-      const remaining = Math.max(0, 10 - (lead?.total_questions_asked || 0));
+      const remaining = data?.remaining || 0;
       setQuestionsRemaining(remaining);
       return remaining;
     } catch (error) {

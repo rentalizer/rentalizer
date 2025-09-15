@@ -979,7 +979,6 @@ export type Database = {
           airdna_api_key: string | null
           created_at: string | null
           id: string
-          rental_api_key: string | null
           updated_at: string | null
           user_id: string | null
         }
@@ -987,7 +986,6 @@ export type Database = {
           airdna_api_key?: string | null
           created_at?: string | null
           id?: string
-          rental_api_key?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
@@ -995,7 +993,6 @@ export type Database = {
           airdna_api_key?: string | null
           created_at?: string | null
           id?: string
-          rental_api_key?: string | null
           updated_at?: string | null
           user_id?: string | null
         }
