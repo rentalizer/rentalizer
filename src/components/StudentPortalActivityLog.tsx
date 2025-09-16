@@ -3,931 +3,141 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, User, CheckCircle, Download, Filter } from 'lucide-react';
+import { ArrowLeft, User, CheckCircle, Download, Filter, BookOpen, Trophy, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface ActivityEntry {
   id: string;
-  type: 'module' | 'assignment' | 'feedback' | 'achievement';
+  type: 'module' | 'assignment' | 'quiz' | 'achievement';
   title: string;
   description: string;
   date: string;
-  serverID: string;
-  pdfFile: string;
+  material: string;
   completed: boolean;
   score?: string;
+  duration?: string;
 }
 
 const mockActivityData: ActivityEntry[] = [
-  // Vinod Kumar - Accelerator Pro Program
+  // Student Learning Activities - Vinod Kumar
   {
     id: 'vk1',
-    type: 'module',
-    title: 'Accelerator Pro: Account Setup Complete',
-    description: 'Student account successfully created and activated',
+    type: 'achievement',
+    title: 'Welcome to Rentalizer Academy',
+    description: 'Successfully enrolled in Accelerator Pro Program',
     date: '2025-06-19',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Account Setup Confirmation.pdf',
-    completed: true
+    material: 'Welcome Package.pdf',
+    completed: true,
+    duration: '15 min'
   },
   {
     id: 'vk2',
     type: 'module',
     title: 'Module 1: Foundation Strategies',
-    description: 'Content download: 100% complete',
+    description: 'Completed all lessons and video content',
     date: '2025-06-20',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Foundation Strategies.pdf',
-    completed: true
+    material: 'Foundation Strategies Guide.pdf',
+    completed: true,
+    duration: '2.5 hours'
   },
   {
     id: 'vk3',
     type: 'module',
     title: 'Module 2: Market Analysis Techniques',
-    description: 'Content download: 100% complete',
+    description: 'Finished market research fundamentals',
     date: '2025-06-22',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Market Analysis Techniques.pdf',
-    completed: true
+    material: 'Market Analysis Workbook.pdf',
+    completed: true,
+    duration: '3 hours'
   },
   {
     id: 'vk4',
-    type: 'module',
-    title: 'Module 3: Advanced Investment Strategies',
-    description: 'Content download: 100% complete',
-    date: '2025-06-25',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Advanced Investment Strategies.pdf',
-    completed: true
+    type: 'assignment',
+    title: 'Market Research Assignment',
+    description: 'Submitted local market analysis report',
+    date: '2025-06-24',
+    material: 'Assignment Submission.pdf',
+    completed: true,
+    score: '95%'
   },
   {
     id: 'vk5',
-    type: 'module',
-    title: 'Module 4: Portfolio Management',
-    description: 'Content download: 100% complete',
-    date: '2025-06-28',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Portfolio Management Guide.pdf',
-    completed: true
+    type: 'quiz',
+    title: 'Foundation Knowledge Quiz',
+    description: 'Passed comprehensive knowledge assessment',
+    date: '2025-06-25',
+    material: 'Quiz Results.pdf',
+    completed: true,
+    score: '88%'
   },
   {
     id: 'vk6',
-    type: 'assignment',
-    title: 'Portfolio Analysis Assignment',
-    description: 'Submitted portfolio analysis for review',
-    date: '2025-07-01',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Portfolio Analysis Submission.pdf',
-    completed: true
+    type: 'module',
+    title: 'Module 3: Property Acquisition',
+    description: 'Completed property finding strategies',
+    date: '2025-06-28',
+    material: 'Property Acquisition Guide.pdf',
+    completed: true,
+    duration: '4 hours'
   },
   {
     id: 'vk7',
-    type: 'module',
-    title: 'Module 5: Risk Management Strategies',
-    description: 'Content download: 100% complete',
-    date: '2025-07-03',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Risk Management Strategies.pdf',
-    completed: true
-  },
-  {
-    id: 'vk8',
-    type: 'assignment',
-    title: 'Risk Assessment Workshop',
-    description: 'Attended live workshop and completed exercises',
-    date: '2025-07-05',
-    serverID: 'srv-us-central-2-prod-811',
-    pdfFile: 'Risk Assessment Workshop Materials.pdf',
-    completed: true
-  },
-  {
-    id: 'vk9',
-    type: 'module',
-    title: 'Module 6: Market Analysis Deep Dive',
-    description: 'Content download: 100% complete',
-    date: '2025-07-08',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Market Analysis Deep Dive.pdf',
-    completed: true
-  },
-  {
-    id: 'vk10',
     type: 'achievement',
-    title: 'Mid-Program Milestone',
-    description: 'Achieved 75% program completion with 89% average score',
-    date: '2025-07-10',
-    serverID: 'srv-us-east-2-prod-812',
-    pdfFile: 'Mid-Program Achievement Certificate.pdf',
-    completed: true
-  },
-  {
-    id: 'vk11',
-    type: 'module',
-    title: 'Module 7: Advanced Analytics',
-    description: 'Content download: 100% complete',
-    date: '2025-07-12',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Advanced Analytics Techniques.pdf',
-    completed: true
-  },
-  {
-    id: 'vk12',
-    type: 'assignment',
-    title: 'Market Research Case Study',
-    description: 'Completed comprehensive market analysis project',
-    date: '2025-07-15',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Market Research Case Study Results.pdf',
-    completed: true
-  },
-  {
-    id: 'vk13',
-    type: 'module',
-    title: 'Module 8: Property Evaluation Mastery',
-    description: 'Content download: 100% complete',
-    date: '2025-07-18',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Property Evaluation Mastery Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'vk14',
-    type: 'feedback',
-    title: 'Instructor Feedback Session',
-    description: 'Participated in one-on-one mentoring session',
-    date: '2025-07-20',
-    serverID: 'srv-us-central-2-prod-811',
-    pdfFile: 'Mentoring Session Notes.pdf',
-    completed: true
-  },
-  {
-    id: 'vk15',
-    type: 'module',
-    title: 'Module 9: Investment Optimization',
-    description: 'Content download: 100% complete',
-    date: '2025-07-22',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Investment Optimization Strategies.pdf',
-    completed: true
-  },
-  {
-    id: 'vk16',
-    type: 'assignment',
-    title: 'Final Project Phase 1',
-    description: 'Submitted initial project proposal and analysis',
-    date: '2025-07-25',
-    serverID: 'srv-us-east-2-prod-812',
-    pdfFile: 'Final Project Phase 1 Submission.pdf',
-    completed: true
-  },
-  {
-    id: 'vk17',
-    type: 'module',
-    title: 'Module 10: Advanced Market Strategies',
-    description: 'Content download: 100% complete',
-    date: '2025-07-28',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Advanced Market Strategies Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'vk18',
-    type: 'assignment',
-    title: 'Market Analysis Capstone',
-    description: 'Comprehensive market analysis project submitted',
-    date: '2025-08-01',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Market Analysis Capstone Project.pdf',
-    completed: true
-  },
-  {
-    id: 'vk19',
-    type: 'module',
-    title: 'Module 11: Professional Presentation Skills',
-    description: 'Content download: 100% complete',
-    date: '2025-08-03',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Professional Presentation Mastery.pdf',
-    completed: true
-  },
-  {
-    id: 'vk20',
-    type: 'feedback',
-    title: 'Industry Expert Review Session',
-    description: 'Participated in expert panel discussion and Q&A',
-    date: '2025-08-05',
-    serverID: 'srv-us-central-2-prod-811',
-    pdfFile: 'Expert Panel Session Notes.pdf',
-    completed: true
-  },
-  {
-    id: 'vk21',
-    type: 'assignment',
-    title: 'Final Project Phase 2',
-    description: 'Advanced analysis and implementation strategy completed',
-    date: '2025-08-08',
-    serverID: 'srv-us-east-2-prod-812',
-    pdfFile: 'Final Project Phase 2 Submission.pdf',
-    completed: true
-  },
-  {
-    id: 'vk22',
-    type: 'module',
-    title: 'Module 12: Graduation Preparation',
-    description: 'Content download: 100% complete',
-    date: '2025-08-10',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Graduation Preparation Checklist.pdf',
-    completed: true
-  },
-  {
-    id: 'vk23',
-    type: 'achievement',
-    title: 'Program Excellence Award',
-    description: 'Achieved outstanding performance with 95% overall score',
-    date: '2025-08-12',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Program Excellence Certificate.pdf',
-    completed: true
-  },
-  {
-    id: 'vk24',
-    type: 'assignment',
-    title: 'Final Comprehensive Exam',
-    description: 'Completed comprehensive examination with distinction',
-    date: '2025-08-15',
-    serverID: 'srv-us-east-2-prod-812',
-    pdfFile: 'Comprehensive Exam Results.pdf',
-    completed: true
-  },
-  {
-    id: 'vk25',
-    type: 'feedback',
-    title: 'Final Mentorship Session',
-    description: 'Completed final one-on-one mentorship review',
-    date: '2025-08-18',
-    serverID: 'srv-us-central-2-prod-811',
-    pdfFile: 'Final Mentorship Review.pdf',
-    completed: true
-  },
-  {
-    id: 'vk26',
-    type: 'assignment',
-    title: 'Portfolio Presentation',
-    description: 'Delivered final portfolio presentation to review board',
-    date: '2025-08-20',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Portfolio Presentation Materials.pdf',
-    completed: true
-  },
-  {
-    id: 'vk27',
-    type: 'achievement',
-    title: 'Program Graduation',
-    description: 'Successfully completed Accelerator Pro Program with honors',
-    date: '2025-08-22',
-    serverID: 'srv-us-east-2-prod-812',
-    pdfFile: 'Graduation Certificate.pdf',
-    completed: true
-  },
-  {
-    id: 'vk28',
-    type: 'module',
-    title: 'Post-Graduation Resources',
-    description: 'Continuing education resources and alumni network access granted',
-    date: '2025-08-25',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Alumni Resources Package.pdf',
-    completed: true
-  },
-
-  // Mary Fofanah - Arbitrage Accelerator Program
-  {
-    id: 'mf1',
-    type: 'achievement',
-    title: 'Arbitrage Accelerator: Account Setup Complete',
-    description: 'Student account successfully created and activated',
-    date: '2025-07-23',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Account Setup Confirmation.pdf',
-    completed: true
-  },
-  {
-    id: 'mf2',
-    type: 'module',
-    title: 'Module 1: Arbitrage Fundamentals',
-    description: 'Welcome module and program overview completed',
-    date: '2025-07-24',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Arbitrage Fundamentals Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'mf3',
-    type: 'module',
-    title: 'Module 2: Market Research Basics',
-    description: 'Content download: 100% complete',
-    date: '2025-07-26',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Market Research Basics.pdf',
-    completed: true
-  },
-  {
-    id: 'mf4',
-    type: 'assignment',
-    title: 'Market Analysis Exercise',
-    description: 'First assignment submitted for review',
-    date: '2025-07-28',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Market Analysis Exercise Submission.pdf',
-    completed: true
-  },
-  {
-    id: 'mf5',
-    type: 'module',
-    title: 'Module 3: Property Evaluation Methods',
-    description: 'Content download: 100% complete',
-    date: '2025-07-30',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Property Evaluation Methods.pdf',
-    completed: true
-  },
-  {
-    id: 'mf6',
-    type: 'feedback',
-    title: 'Instructor Feedback Session',
-    description: 'One-on-one mentoring session with program instructor',
-    date: '2025-08-01',
-    serverID: 'srv-us-central-2-prod-811',
-    pdfFile: 'Mentoring Session Notes.pdf',
-    completed: true
-  },
-  {
-    id: 'mf7',
-    type: 'module',
-    title: 'Module 4: Advanced Sourcing Strategies',
-    description: 'Content download: 100% complete',
-    date: '2025-08-03',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Advanced Sourcing Strategies.pdf',
-    completed: true
-  },
-  {
-    id: 'mf8',
-    type: 'assignment',
-    title: 'Property Sourcing Project',
-    description: 'Comprehensive sourcing strategy project submitted',
-    date: '2025-08-05',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Property Sourcing Project.pdf',
-    completed: true
-  },
-  {
-    id: 'mf9',
-    type: 'module',
-    title: 'Module 5: Deal Analysis and ROI Calculation',
-    description: 'Content download: 100% complete',
-    date: '2025-08-07',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Deal Analysis and ROI Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'mf10',
-    type: 'achievement',
-    title: 'Mid-Program Milestone',
-    description: 'Achieved 60% program completion with 92% average score',
-    date: '2025-08-10',
-    serverID: 'srv-us-east-2-prod-812',
-    pdfFile: 'Mid-Program Achievement Certificate.pdf',
-    completed: true
-  },
-  {
-    id: 'mf11',
-    type: 'module',
-    title: 'Module 6: Risk Management and Mitigation',
-    description: 'Content download: 100% complete',
-    date: '2025-08-12',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Risk Management Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'mf12',
-    type: 'assignment',
-    title: 'Risk Assessment Case Study',
-    description: 'Completed comprehensive risk analysis project',
-    date: '2025-08-15',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Risk Assessment Case Study.pdf',
-    completed: true
-  },
-  {
-    id: 'mf13',
-    type: 'module',
-    title: 'Module 7: Scaling and Automation',
-    description: 'Content download: 100% complete',
-    date: '2025-08-17',
-    serverID: 'srv-content-delivery-005',
-    pdfFile: 'Scaling and Automation Strategies.pdf',
-    completed: true
-  },
-  {
-    id: 'mf14',
-    type: 'feedback',
-    title: 'Progress Review Session',
-    description: 'Advanced mentoring session with industry expert',
-    date: '2025-08-19',
-    serverID: 'srv-us-central-2-prod-811',
-    pdfFile: 'Progress Review Session Notes.pdf',
-    completed: true
-  },
-  {
-    id: 'mf15',
-    type: 'assignment',
-    title: 'Final Capstone Project',
-    description: 'Comprehensive arbitrage business plan submitted',
-    date: '2025-08-22',
-    serverID: 'srv-us-east-2-prod-812',
-    pdfFile: 'Final Capstone Project.pdf',
-    completed: true
-  },
-  {
-    id: 'mf16',
-    type: 'achievement',
-    title: 'Program Completion Certificate',
-    description: 'Successfully completed Arbitrage Accelerator Program with honors',
-    date: '2025-08-25',
-    serverID: 'srv-us-east-2-prod-812',
-    pdfFile: 'Program Completion Certificate.pdf',
-    completed: true
-  },
-  
-  // Sanyo 6677 - Accelerator Pro Program
-  {
-    id: 'sy3',
-    type: 'module',
-    title: 'Accelerator Pro: Portfolio Analysis',
-    description: 'Multi-property portfolio framework completed',
-    date: '2025-08-02',
-    serverID: 'srv-us-central-2-prod-811',
-    pdfFile: 'Portfolio Analysis Framework.pdf',
-    completed: true
-  },
-  {
-    id: 'sy4',
-    type: 'module',
-    title: 'Accelerator Pro: Market Intelligence',
-    description: 'Advanced market research techniques mastered',
-    date: '2025-07-30',
-    serverID: 'srv-us-east-2-prod-812',
-    pdfFile: 'Market Intelligence Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'sy5',
-    type: 'module',
-    title: 'Accelerator Pro: Investment Strategies',
-    description: 'ROI optimization strategies completed',
-    date: '2025-07-28',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Investment Strategy Optimization.pdf',
-    completed: true
-  },
-  {
-    id: 'sy6',
-    type: 'module',
-    title: 'Accelerator Pro: Data Analytics',
-    description: 'Advanced analytics dashboard setup completed',
-    date: '2025-07-25',
-    serverID: 'srv-us-central-2-prod-811',
-    pdfFile: 'Analytics Dashboard Setup Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'sy7',
-    type: 'achievement',
-    title: 'Accelerator Pro: Module 1 Completion',
-    description: 'Fundamentals certification earned with 87% score',
-    date: '2025-07-22',
-    serverID: 'srv-us-east-2-prod-812',
-    pdfFile: 'Module 1 Completion Certificate.pdf',
-    completed: true
-  },
-  {
-    id: 'sy8',
-    type: 'module',
-    title: 'Accelerator Pro: Property Evaluation',
-    description: 'Property evaluation framework completed',
-    date: '2025-07-18',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Property Evaluation Methods.pdf',
-    completed: true
-  },
-  {
-    id: 'sy9',
-    type: 'module',
-    title: 'Accelerator Pro: Market Research',
-    description: 'Market research methodology workshop attended',
-    date: '2025-07-15',
-    serverID: 'srv-us-central-2-prod-811',
-    pdfFile: 'Market Research Methodology.pdf',
-    completed: true
-  },
-  {
-    id: 'sy10',
-    type: 'module',
-    title: 'Accelerator Pro: Financial Modeling',
-    description: 'Financial modeling basics completed',
-    date: '2025-07-12',
-    serverID: 'srv-us-east-2-prod-812',
-    pdfFile: 'Financial Modeling Basics.pdf',
-    completed: true
-  },
-  {
-    id: 'sy11',
-    type: 'module',
-    title: 'Accelerator Pro: Payment Processing',
-    description: 'First payment of $2,000.00 USD successfully processed',
-    date: '2025-08-04',
-    serverID: 'srv-billing-system-001',
-    pdfFile: 'Payment Confirmation Receipt.pdf',
-    completed: true
-  },
-  {
-    id: 'sy12',
-    type: 'achievement',
-    title: 'Accelerator Pro Program',
-    description: 'Successfully enrolled and payment plan setup (2 monthly payments of $2,000.00 USD)',
-    date: '2025-07-04',
-    serverID: 'srv-us-west-1-prod-810',
-    pdfFile: 'Accelerator Pro Welcome Package.pdf',
-    completed: true
-  },
-
-  // Tiffany Worthy - Arbitrage Accelerator Program
-  {
-    id: 'tw1',
-    type: 'module',
-    title: 'Module 4: Advanced Arbitrage Strategies',
-    description: 'Final assessment completed with 94% score',
-    date: '2025-07-02',
-    serverID: 'srv-us-west-1-prod-805',
-    pdfFile: 'Advanced Arbitrage Mastery Checklist.pdf',
-    completed: true
-  },
-  {
-    id: 'tw2',
-    type: 'module',
-    title: 'Module 4: Advanced Arbitrage Strategies',
-    description: 'Risk management strategies implemented',
+    title: 'First Month Milestone',
+    description: 'Completed first month of accelerator program',
     date: '2025-07-01',
-    serverID: 'srv-us-central-2-prod-806',
-    pdfFile: 'Risk Management Implementation Guide.pdf',
+    material: 'Milestone Certificate.pdf',
     completed: true
   },
-  {
-    id: 'tw3',
-    type: 'module',
-    title: 'Module 4: Advanced Arbitrage Strategies',
-    description: 'Risk management workshop attended',
-    date: '2025-06-30',
-    serverID: 'srv-us-east-2-prod-804',
-    pdfFile: 'Risk Management Strategies Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'tw4',
-    type: 'module',
-    title: 'Module 3: Market Analysis Techniques',
-    description: 'Advanced analysis methods completed',
-    date: '2025-06-28',
-    serverID: 'srv-us-west-1-prod-805',
-    pdfFile: 'Advanced Analysis Methods Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'tw5',
-    type: 'module',
-    title: 'Module 3: Market Analysis Techniques',
-    description: 'Competitive analysis case study completed',
-    date: '2025-06-25',
-    serverID: 'srv-us-central-2-prod-806',
-    pdfFile: 'Competitive Analysis Framework.pdf',
-    completed: true
-  },
-  {
-    id: 'tw6',
-    type: 'module',
-    title: 'Module 3: Market Analysis Techniques',
-    description: 'Data visualization techniques mastered',
-    date: '2025-06-22',
-    serverID: 'srv-us-east-2-prod-804',
-    pdfFile: 'Data Visualization Mastery Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'tw7',
-    type: 'module',
-    title: 'Module 2: Property Sourcing Automation',
-    description: 'Automation scripts deployment successful',
-    date: '2025-06-18',
-    serverID: 'srv-us-west-1-prod-805',
-    pdfFile: 'Automation Scripts Package.pdf',
-    completed: true
-  },
-  {
-    id: 'tw8',
-    type: 'module',
-    title: 'Module 2: Property Sourcing Automation',
-    description: 'API integration workshop completed',
-    date: '2025-06-15',
-    serverID: 'srv-us-central-2-prod-806',
-    pdfFile: 'API Integration Manual.pdf',
-    completed: true
-  },
-  {
-    id: 'tw9',
-    type: 'achievement',
-    title: 'Module 2: Property Sourcing Automation',
-    description: 'Certification earned with distinction',
-    date: '2025-06-12',
-    serverID: 'srv-us-east-2-prod-804',
-    pdfFile: 'Automation Certification.pdf',
-    completed: true
-  },
-  {
-    id: 'tw10',
-    type: 'module',
-    title: 'Module 1: Arbitrage Fundamentals',
-    description: 'Financial modeling techniques completed',
-    date: '2025-06-08',
-    serverID: 'srv-us-west-1-prod-805',
-    pdfFile: 'Financial Modeling Mastery Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'tw11',
-    type: 'module',
-    title: 'Module 1: Arbitrage Fundamentals',
-    description: 'Legal compliance training completed',
-    date: '2025-06-05',
-    serverID: 'srv-us-central-2-prod-806',
-    pdfFile: 'Legal Compliance Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'tw12',
-    type: 'module',
-    title: 'Module 1: Arbitrage Fundamentals',
-    description: 'Market research methodology mastered',
-    date: '2025-05-28',
-    serverID: 'srv-us-east-2-prod-804',
-    pdfFile: 'Market Research Methodology.pdf',
-    completed: true
-  },
-  {
-    id: 'tw13',
-    type: 'module',
-    title: 'Module 1: Arbitrage Fundamentals',
-    description: 'Market research techniques completed',
-    date: '2025-05-25',
-    serverID: 'srv-us-west-1-prod-805',
-    pdfFile: 'Market Research Mastery Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'tw14',
-    type: 'module',
-    title: 'Module 1: Arbitrage Fundamentals',
-    description: 'Introduction video watched and quiz passed',
-    date: '2025-05-22',
-    serverID: 'srv-us-central-2-prod-806',
-    pdfFile: 'Arbitrage Basics Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'tw15',
-    type: 'achievement',
-    title: 'Arbitrage Accelerator Program',
-    description: 'Successfully enrolled and payment confirmed',
-    date: '2025-05-21',
-    serverID: 'srv-us-west-1-prod-805',
-    pdfFile: 'Arbitrage Accelerator Welcome Package.pdf',
-    completed: true
-  },
-  
-  // Pavlos Michaels - Accelerator Pro Program
-  {
-    id: 'pm1',
-    type: 'module',
-    title: 'Accelerator Pro: Advanced Real Estate Analytics',
-    description: 'Market analysis dashboard mastery completed with 96% score',
-    date: '2025-08-22',
-    serverID: 'srv-us-west-1-prod-807',
-    pdfFile: 'Advanced Analytics Mastery Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'pm2',
-    type: 'module',
-    title: 'Accelerator Pro: Property Investment Strategies',
-    description: 'ROI optimization workshop completed',
-    date: '2025-08-20',
-    serverID: 'srv-us-central-2-prod-808',
-    pdfFile: 'ROI Optimization Strategies.pdf',
-    completed: true
-  },
-  {
-    id: 'pm3',
-    type: 'module',
-    title: 'Accelerator Pro: Market Intelligence Systems',
-    description: 'Automated reporting system configured',
-    date: '2025-08-18',
-    serverID: 'srv-us-east-2-prod-809',
-    pdfFile: 'Market Intelligence Setup Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'pm4',
-    type: 'module',
-    title: 'Accelerator Pro: Portfolio Management',
-    description: 'Multi-property portfolio analysis completed',
-    date: '2025-08-15',
-    serverID: 'srv-us-west-1-prod-807',
-    pdfFile: 'Portfolio Management Strategies.pdf',
-    completed: true
-  },
-  {
-    id: 'pm5',
-    type: 'achievement',
-    title: 'Accelerator Pro: Data Integration Mastery',
-    description: 'API integration certification earned',
-    date: '2025-08-12',
-    serverID: 'srv-us-central-2-prod-808',
-    pdfFile: 'Data Integration Certification.pdf',
-    completed: true
-  },
-  {
-    id: 'pm7',
-    type: 'module',
-    title: 'Accelerator Pro: Machine Learning Applications',
-    description: 'Predictive analytics model training completed',
-    date: '2025-08-08',
-    serverID: 'srv-us-west-1-prod-807',
-    pdfFile: 'ML Applications in Real Estate.pdf',
-    completed: true
-  },
-  {
-    id: 'pm10',
-    type: 'module',
-    title: 'Accelerator Pro: Competitive Intelligence',
-    description: 'Market competitor analysis framework mastered',
-    date: '2025-07-28',
-    serverID: 'srv-us-west-1-prod-807',
-    pdfFile: 'Competitive Intelligence Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'pm11',
-    type: 'module',
-    title: 'Accelerator Pro: Investment Optimization',
-    description: 'Portfolio optimization algorithms configured',
-    date: '2025-07-25',
-    serverID: 'srv-us-central-2-prod-808',
-    pdfFile: 'Investment Optimization Manual.pdf',
-    completed: true
-  },
-  {
-    id: 'pm12',
-    type: 'module',
-    title: 'Accelerator Pro: Data Visualization Mastery',
-    description: 'Advanced dashboard creation completed',
-    date: '2025-07-22',
-    serverID: 'srv-us-east-2-prod-809',
-    pdfFile: 'Data Visualization Pro Guide.pdf',
-    completed: true
-  },
-  {
-    id: 'pm13',
-    type: 'module',
-    title: 'Accelerator Pro: Automation Systems',
-    description: 'Workflow automation setup completed',
-    date: '2025-07-18',
-    serverID: 'srv-us-west-1-prod-807',
-    pdfFile: 'Automation Systems Manual.pdf',
-    completed: true
-  },
-  {
-    id: 'pm14',
-    type: 'achievement',
-    title: 'Accelerator Pro Program',
-    description: 'Successfully enrolled and payment confirmed ($1,000.00 USD)',
-    date: '2025-07-12',
-    serverID: 'srv-us-central-2-prod-808',
-    pdfFile: 'Accelerator Pro Welcome Package.pdf',
-    completed: true
-  },
-  
-  // Lindsay Sherman - Original entries
+
+  // Default student activities
   {
     id: '1',
     type: 'module',
-    title: 'Module 4: Manage Properties',
-    description: 'Final assessment completed',
-    date: '2024-09-28',
-    serverID: 'srv-us-east-1-prod-801',
-    pdfFile: 'Automation Templates & Scaling Checklist.pdf',
-    completed: true
+    title: 'Module 1: Getting Started',
+    description: 'Introduction to rental arbitrage fundamentals',
+    date: '2024-08-01',
+    material: 'Getting Started Guide.pdf',
+    completed: true,
+    duration: '1.5 hours'
   },
   {
     id: '2',
     type: 'module',
-    title: 'Module 4: Manage Properties',
-    description: '98% completion score',
-    date: '2024-09-27',
-    serverID: 'srv-us-west-2-prod-803',
-    pdfFile: 'Housekeeper Hiring Guide.pdf',
-    completed: true
+    title: 'Module 2: Market Research',
+    description: 'Learn to identify profitable markets',
+    date: '2024-08-15',
+    material: 'Market Research Toolkit.pdf',
+    completed: true,
+    duration: '2 hours'
   },
   {
     id: '3',
-    type: 'module',
-    title: 'Module 4: Manage Properties',
-    description: 'Practical exercise submitted',
-    date: '2024-09-26',
-    serverID: 'srv-us-central-1-prod-802',
-    pdfFile: 'VA Hiring & Training Manual.pdf',
-    completed: true
+    type: 'assignment',
+    title: 'Market Analysis Project',
+    description: 'Analyze your local rental market',
+    date: '2024-08-20',
+    material: 'Project Submission.pdf',
+    completed: true,
+    score: '92%'
   },
   {
     id: '4',
-    type: 'module',
-    title: 'Module 4: Manage Properties',
-    description: 'Case study analysis',
-    date: '2024-09-25',
-    serverID: 'srv-us-east-1-prod-801',
-    pdfFile: 'Remote Hosting Strategies.pdf',
-    completed: true
+    type: 'quiz',
+    title: 'Foundation Quiz',
+    description: 'Test your understanding of basics',
+    date: '2024-08-25',
+    material: 'Quiz Report.pdf',
+    completed: true,
+    score: '85%'
   },
   {
     id: '5',
-    type: 'module',
-    title: 'Module 4: Manage Properties',
-    description: 'Strategy workshop attended',
-    date: '2024-09-24',
-    serverID: 'srv-us-west-2-prod-803',
-    pdfFile: 'Mid-Term Rental Strategy Guide.pdf',
-    completed: true
-  },
-  {
-    id: '6',
-    type: 'module',
-    title: 'Module 4: Manage Properties',
-    description: 'Optimization checklist completed',
-    date: '2024-09-23',
-    serverID: 'srv-eu-west-1-prod-801',
-    pdfFile: 'Property Optimization Checklist.pdf',
-    completed: true
-  },
-  {
-    id: '7',
-    type: 'module',
-    title: 'Module 4: Manage Properties',
-    description: 'Photography portfolio submitted',
-    date: '2024-09-22',
-    serverID: 'srv-us-central-1-prod-802',
-    pdfFile: 'Design & Photography Guide.pdf',
-    completed: true
-  },
-  {
-    id: '8',
-    type: 'module',
-    title: 'Module 3: Acquire Properties',
-    description: 'Business expansion plan created',
-    date: '2024-09-20',
-    serverID: 'srv-us-west-2-prod-803',
-    pdfFile: 'Growth Planning Template.pdf',
-    completed: true
-  },
-  {
-    id: '9',
-    type: 'module',
-    title: 'Module 3: Acquire Properties',
-    description: 'Negotiation strategies mastered',
-    date: '2024-09-19',
-    serverID: 'srv-us-central-1-prod-802',
-    pdfFile: 'Rent Concessions Negotiation Guide.pdf',
-    completed: true
-  },
-  {
-    id: '10',
-    type: 'module',
-    title: 'Module 3: Acquire Properties',
-    description: 'Application process optimized',
-    date: '2024-09-18',
-    serverID: 'srv-us-east-1-prod-801',
-    pdfFile: 'Rental Application Checklist.pdf',
+    type: 'achievement',
+    title: 'Foundation Complete',
+    description: 'Successfully mastered the fundamentals',
+    date: '2024-09-01',
+    material: 'Achievement Badge.pdf',
     completed: true
   }
 ];
@@ -951,23 +161,19 @@ export const StudentPortalActivityLog = () => {
   
   const currentStudent = mockStudents.find(s => s.id === selectedStudent) || mockStudents[0];
   
-  const filterTabs = ['All Activity', 'Module', 'Achievement'];
+  const filterTabs = ['All Activity', 'Module', 'Assignment', 'Quiz', 'Achievement'];
   
   const filteredActivities = mockActivityData.filter(activity => {
-    // Filter by student
-    if (selectedStudent === '2' && !activity.id.startsWith('tw')) return false;
-    if (selectedStudent === '3' && !activity.id.startsWith('pm')) return false;
-    if (selectedStudent === '7' && !activity.id.startsWith('sy')) return false;
+    // Filter by student - show default activities for most students, specific activities for certain students
     if (selectedStudent === '8' && !activity.id.startsWith('vk')) return false;
-    if (selectedStudent === '9' && !activity.id.startsWith('mf')) return false;
-    if (!['2', '3', '7', '8', '9'].includes(selectedStudent) && (activity.id.startsWith('tw') || activity.id.startsWith('pm') || activity.id.startsWith('sy') || activity.id.startsWith('vk') || activity.id.startsWith('mf'))) return false;
+    if (selectedStudent !== '8' && activity.id.startsWith('vk')) return false;
     
     // Filter by activity type
     if (activeFilter === 'All Activity') return true;
     return activity.type.toLowerCase() === activeFilter.toLowerCase();
   }).sort((a, b) => {
-    // Sort by date: oldest first (ascending order)
-    return new Date(a.date).getTime() - new Date(b.date).getTime();
+    // Sort by date: newest first (descending order)
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 
   return (
@@ -983,7 +189,7 @@ export const StudentPortalActivityLog = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          <h1 className="text-2xl font-bold text-white">Server Activity Log</h1>
+          <h1 className="text-2xl font-bold text-white">Student Learning Log</h1>
         </div>
 
         {/* Student Selection */}
@@ -1018,7 +224,7 @@ export const StudentPortalActivityLog = () => {
               </div>
               
               <div className="text-right">
-                <p className="text-gray-300 text-sm mb-1">Content Download Progress</p>
+                <p className="text-gray-300 text-sm mb-1">Course Progress</p>
                 <div className="text-3xl font-bold text-white">{currentStudent.progress}%</div>
               </div>
             </div>
@@ -1043,7 +249,7 @@ export const StudentPortalActivityLog = () => {
               </div>
               
               <div className="text-right text-sm">
-                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '2' ? '2025-05-21' : selectedStudent === '3' ? '2025-07-12' : selectedStudent === '7' ? '2025-07-04' : selectedStudent === '8' ? '2025-06-19' : '2024-08-01'}</span></div>
+                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '8' ? '2025-06-19' : '2024-08-01'}</span></div>
                 <div className="text-gray-400">Progress: <span className="text-white">{currentStudent.progress}%</span></div>
               </div>
             </div>
@@ -1060,10 +266,14 @@ export const StudentPortalActivityLog = () => {
               size="sm"
               onClick={() => setActiveFilter(tab)}
               className={activeFilter === tab 
-                ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                : "border-gray-600 text-gray-300 hover:bg-gray-800"
+                ? "bg-primary hover:bg-primary/90 text-primary-foreground" 
+                : "border-border text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               }
             >
+              {tab === 'Module' && <BookOpen className="h-3 w-3 mr-1" />}
+              {tab === 'Achievement' && <Trophy className="h-3 w-3 mr-1" />}
+              {tab === 'Assignment' && <FileText className="h-3 w-3 mr-1" />}
+              {tab === 'Quiz' && <FileText className="h-3 w-3 mr-1" />}
               {tab}
             </Button>
           ))}
@@ -1086,21 +296,33 @@ export const StudentPortalActivityLog = () => {
                       <div className="flex items-center gap-4 text-sm">
                         <Badge variant="outline" className={
                           activity.type === 'achievement' ? "border-purple-500/30 text-purple-300 bg-purple-500/10" :
+                          activity.type === 'assignment' ? "border-orange-500/30 text-orange-300 bg-orange-500/10" :
+                          activity.type === 'quiz' ? "border-green-500/30 text-green-300 bg-green-500/10" :
                           "border-blue-500/30 text-blue-300 bg-blue-500/10"
                         }>
                           {activity.type}
                         </Badge>
                         <span className="text-gray-400">{activity.date}</span>
-                        <span className="text-gray-500">Server ID:</span>
-                        <span className="text-gray-400 font-mono text-xs">{activity.serverID}</span>
+                        {activity.score && (
+                          <>
+                            <span className="text-gray-500">Score:</span>
+                            <span className="text-green-400 font-medium">{activity.score}</span>
+                          </>
+                        )}
+                        {activity.duration && (
+                          <>
+                            <span className="text-gray-500">Duration:</span>
+                            <span className="text-gray-400 text-xs">{activity.duration}</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-green-400" />
-                      <span className="text-green-400">{activity.pdfFile}</span>
+                      <FileText className="h-4 w-4 text-blue-400" />
+                      <span className="text-blue-400">{activity.material}</span>
                     </div>
                     <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-300">
                       <Download className="h-4 w-4" />
