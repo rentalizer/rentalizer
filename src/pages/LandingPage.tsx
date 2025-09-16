@@ -160,18 +160,28 @@ const LandingPage = () => {
                   </Button>
                 </div>
               ) : (
-                <LoginDialog 
-                  trigger={
-                    <Button 
-                      variant="outline"
-                      size="lg"
-                      className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 px-6 py-3"
-                    >
-                      <LogIn className="h-4 w-4 mr-2" />
-                      Login
-                    </Button>
-                  }
-                />
+                <div className="flex items-center gap-3">
+                  <Button
+                    onClick={() => navigate('/signup')}
+                    variant="default"
+                    size="lg"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3"
+                  >
+                    Sign Up
+                  </Button>
+                  <LoginDialog 
+                    trigger={
+                      <Button 
+                        variant="outline"
+                        size="lg"
+                        className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 px-6 py-3"
+                      >
+                        <LogIn className="h-4 w-4 mr-2" />
+                        Login
+                      </Button>
+                    }
+                  />
+                </div>
               )}
             </nav>
           </div>

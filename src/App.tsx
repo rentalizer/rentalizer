@@ -43,6 +43,7 @@ import GuideBook from "./pages/GuideBook";
 import GuideBook2 from "./pages/GuideBook2";
 import GuestGuide from "./pages/GuestGuide";
 import { Auth } from "./pages/Auth";
+import SignUp from "./pages/SignUp";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,7 @@ const AppRoutes = () => (
     <Route path="/members" element={<Members />} />
     <Route path="/profile-setup" element={<ProfileSetup />} />
     <Route path="/auth" element={<Auth />} />
+    <Route path="/signup" element={<SignUp />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
     <Route path="/terms-of-service" element={<TermsOfService />} />
