@@ -3,20 +3,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, User, CheckCircle, Download, Filter, BookOpen, Trophy, FileText } from 'lucide-react';
+import { ArrowLeft, User, CheckCircle, Download, Filter, BookOpen, Trophy, FileText, Play, File } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface ActivityEntry {
   id: string;
-  type: 'module' | 'assignment' | 'quiz' | 'achievement';
+  type: 'module' | 'assignment' | 'quiz' | 'achievement' | 'video' | 'document';
   title: string;
   description: string;
   date: string;
   material: string;
+  materialType: 'pdf' | 'video' | 'document';
   completed: boolean;
   score?: string;
   duration?: string;
   serverID: string;
+  category?: string;
+  views?: number;
 }
 
 const mockActivityData: ActivityEntry[] = [
@@ -28,72 +31,115 @@ const mockActivityData: ActivityEntry[] = [
     description: 'Successfully purchased and enrolled in Accelerator (presale $2,500)',
     date: '2025-06-18',
     material: 'Program Access Confirmation.pdf',
+    materialType: 'pdf',
     completed: true,
     duration: '5 min',
     serverID: 'srv-us-west-1-prod-810'
   },
   {
     id: 'tm2',
-    type: 'module',
-    title: 'Accelerator Orientation',
-    description: 'Completed program introduction and setup',
+    type: 'video',
+    title: 'Accelerator Orientation Video',
+    description: 'Watched complete program introduction and setup',
     date: '2025-06-18',
-    material: 'Accelerator Welcome Kit.pdf',
+    material: 'Accelerator Welcome Orientation',
+    materialType: 'video',
     completed: true,
-    duration: '30 min',
-    serverID: 'srv-content-delivery-005'
+    duration: '32:15',
+    serverID: 'srv-content-delivery-005',
+    category: 'Business Formation',
+    views: 1
   },
   {
     id: 'tm3',
-    type: 'module',
-    title: 'Advanced Market Analysis',
-    description: 'Mastered professional market evaluation techniques',
+    type: 'video',
+    title: 'Market Research Overview',
+    description: 'Completed advanced market evaluation training',
     date: '2025-06-20',
-    material: 'Advanced Market Analysis Toolkit.pdf',
+    material: 'Market Research Overview',
+    materialType: 'video',
     completed: true,
-    duration: '4 hours',
-    serverID: 'srv-content-delivery-005'
+    duration: '28:45',
+    serverID: 'srv-content-delivery-005',
+    category: 'Market Research',
+    views: 2
   },
   {
     id: 'tm4',
-    type: 'module',
-    title: 'Property Acquisition Masterclass',
-    description: 'Learned advanced negotiation and acquisition strategies',
-    date: '2025-06-22',
-    material: 'Acquisition Masterclass Materials.pdf',
+    type: 'video',
+    title: 'Competitor Analysis Deep Dive',
+    description: 'Mastered competitive analysis techniques',
+    date: '2025-06-21',
+    material: 'Competitor Analysis',
+    materialType: 'video',
     completed: true,
-    duration: '6 hours',
-    serverID: 'srv-content-delivery-007'
+    duration: '35:20',
+    serverID: 'srv-content-delivery-007',
+    category: 'Market Research',
+    views: 1
   },
   {
     id: 'tm5',
+    type: 'video',
+    title: 'Property Acquisitions Overview',
+    description: 'Learned comprehensive acquisition strategies',
+    date: '2025-06-22',
+    material: 'Property Acquisitions Overview',
+    materialType: 'video',
+    completed: true,
+    duration: '38:45',
+    serverID: 'srv-content-delivery-007',
+    category: 'Property Acquisitions',
+    views: 3
+  },
+  {
+    id: 'tm6',
     type: 'assignment',
     title: 'Live Deal Analysis',
     description: 'Analyzed real properties with mentor guidance',
     date: '2025-06-25',
     material: 'Live Deal Analysis Report.pdf',
+    materialType: 'pdf',
     completed: true,
     score: '97%',
     serverID: 'srv-us-central-2-prod-811'
   },
   {
-    id: 'tm6',
-    type: 'module',
-    title: 'Scaling Your Business',
-    description: 'Advanced strategies for business growth',
-    date: '2025-06-28',
-    material: 'Business Scaling Blueprint.pdf',
+    id: 'tm7',
+    type: 'video',
+    title: 'Property Listing Optimization',
+    description: 'Advanced listing optimization strategies',
+    date: '2025-06-26',
+    material: 'Property Listing Optimization',
+    materialType: 'video',
     completed: true,
-    duration: '5 hours',
-    serverID: 'srv-content-delivery-009'
+    duration: '25:12',
+    serverID: 'srv-content-delivery-009',
+    category: 'Property Management',
+    views: 1
   },
   {
-    id: 'tm7',
+    id: 'tm8',
+    type: 'video',
+    title: 'Hiring Your VA',
+    description: 'Complete guide to virtual assistant recruitment',
+    date: '2025-06-28',
+    material: 'Hiring Your VA',
+    materialType: 'video',
+    completed: true,
+    duration: '42:15',
+    serverID: 'srv-content-delivery-009',
+    category: 'Operations',
+    views: 1
+  },
+  {
+    id: 'tm9',
     type: 'quiz',
     title: 'Accelerator Mastery Assessment',
     description: 'Comprehensive evaluation of advanced concepts',
     date: '2025-07-01',
     material: 'Mastery Assessment Results.pdf',
+    materialType: 'pdf',
     completed: true,
     score: '94%',
     serverID: 'srv-us-east-1-prod-802'
@@ -107,31 +153,38 @@ const mockActivityData: ActivityEntry[] = [
     description: 'Successfully enrolled in Accelerator Pro Program',
     date: '2025-06-19',
     material: 'Welcome Package.pdf',
+    materialType: 'pdf',
     completed: true,
     duration: '15 min',
     serverID: 'srv-us-west-1-prod-810'
   },
   {
     id: 'vk2',
-    type: 'module',
-    title: 'Module 1: Foundation Strategies',
-    description: 'Completed all lessons and video content',
+    type: 'video',
+    title: 'Foundation Business Formation',
+    description: 'Watched complete business setup training',
     date: '2025-06-20',
-    material: 'Foundation Strategies Guide.pdf',
+    material: 'Business Formation Basics',
+    materialType: 'video',
     completed: true,
-    duration: '2.5 hours',
-    serverID: 'srv-content-delivery-005'
+    duration: '45:30',
+    serverID: 'srv-content-delivery-005',
+    category: 'Business Formation',
+    views: 1
   },
   {
     id: 'vk3',
-    type: 'module',
-    title: 'Module 2: Market Analysis Techniques',
-    description: 'Finished market research fundamentals',
+    type: 'video',
+    title: 'Market Research Fundamentals',
+    description: 'Completed market research methodology training',
     date: '2025-06-22',
-    material: 'Market Analysis Workbook.pdf',
+    material: 'Market Research Fundamentals',
+    materialType: 'video',
     completed: true,
-    duration: '3 hours',
-    serverID: 'srv-content-delivery-006'
+    duration: '33:18',
+    serverID: 'srv-content-delivery-006',
+    category: 'Market Research',
+    views: 2
   },
   {
     id: 'vk4',
@@ -140,6 +193,7 @@ const mockActivityData: ActivityEntry[] = [
     description: 'Submitted local market analysis report',
     date: '2025-06-24',
     material: 'Assignment Submission.pdf',
+    materialType: 'pdf',
     completed: true,
     score: '95%',
     serverID: 'srv-us-central-1-prod-803'
@@ -151,28 +205,47 @@ const mockActivityData: ActivityEntry[] = [
     description: 'Passed comprehensive knowledge assessment',
     date: '2025-06-25',
     material: 'Quiz Results.pdf',
+    materialType: 'pdf',
     completed: true,
     score: '88%',
     serverID: 'srv-us-east-1-prod-801'
   },
   {
     id: 'vk6',
-    type: 'module',
-    title: 'Module 3: Property Acquisition',
-    description: 'Completed property finding strategies',
+    type: 'video',
+    title: 'Property Acquisition Strategies',
+    description: 'Learned property finding and evaluation methods',
     date: '2025-06-28',
-    material: 'Property Acquisition Guide.pdf',
+    material: 'Property Acquisition Masterclass',
+    materialType: 'video',
     completed: true,
-    duration: '4 hours',
-    serverID: 'srv-content-delivery-008'
+    duration: '36:40',
+    serverID: 'srv-content-delivery-008',
+    category: 'Property Acquisitions',
+    views: 1
   },
   {
     id: 'vk7',
+    type: 'video',
+    title: 'Hiring Your Housekeeper',
+    description: 'Operations training for property management',
+    date: '2025-06-30',
+    material: 'Hiring Your Housekeeper',
+    materialType: 'video',
+    completed: true,
+    duration: '31:30',
+    serverID: 'srv-content-delivery-008',
+    category: 'Property Management',
+    views: 1
+  },
+  {
+    id: 'vk8',
     type: 'achievement',
     title: 'First Month Milestone',
     description: 'Completed first month of accelerator program',
     date: '2025-07-01',
     material: 'Milestone Certificate.pdf',
+    materialType: 'pdf',
     completed: true,
     serverID: 'srv-us-west-2-prod-804'
   },
@@ -180,25 +253,29 @@ const mockActivityData: ActivityEntry[] = [
   // Default student activities
   {
     id: '1',
-    type: 'module',
-    title: 'Module 1: Getting Started',
-    description: 'Introduction to rental arbitrage fundamentals',
+    type: 'document',
+    title: 'Getting Started Guide',
+    description: 'Read introduction to rental arbitrage fundamentals',
     date: '2024-08-01',
     material: 'Getting Started Guide.pdf',
+    materialType: 'pdf',
     completed: true,
     duration: '1.5 hours',
     serverID: 'srv-content-delivery-001'
   },
   {
     id: '2',
-    type: 'module',
-    title: 'Module 2: Market Research',
-    description: 'Learn to identify profitable markets',
+    type: 'video',
+    title: 'Market Research Basics',
+    description: 'Watched foundational market research training',
     date: '2024-08-15',
-    material: 'Market Research Toolkit.pdf',
+    material: 'Market Research Basics',
+    materialType: 'video',
     completed: true,
-    duration: '2 hours',
-    serverID: 'srv-content-delivery-002'
+    duration: '24:30',
+    serverID: 'srv-content-delivery-002',
+    category: 'Market Research',
+    views: 1
   },
   {
     id: '3',
@@ -207,6 +284,7 @@ const mockActivityData: ActivityEntry[] = [
     description: 'Analyze your local rental market',
     date: '2024-08-20',
     material: 'Project Submission.pdf',
+    materialType: 'pdf',
     completed: true,
     score: '92%',
     serverID: 'srv-us-central-1-prod-800'
@@ -218,6 +296,7 @@ const mockActivityData: ActivityEntry[] = [
     description: 'Test your understanding of basics',
     date: '2024-08-25',
     material: 'Quiz Report.pdf',
+    materialType: 'pdf',
     completed: true,
     score: '85%',
     serverID: 'srv-us-east-1-prod-799'
@@ -229,6 +308,7 @@ const mockActivityData: ActivityEntry[] = [
     description: 'Successfully mastered the fundamentals',
     date: '2024-09-01',
     material: 'Achievement Badge.pdf',
+    materialType: 'pdf',
     completed: true,
     serverID: 'srv-us-west-2-prod-798'
   }
@@ -254,7 +334,7 @@ export const StudentPortalActivityLog = () => {
   
   const currentStudent = mockStudents.find(s => s.id === selectedStudent) || mockStudents[0];
   
-  const filterTabs = ['All Activity', 'Module', 'Assignment', 'Quiz', 'Achievement'];
+  const filterTabs = ['All Activity', 'Module', 'Assignment', 'Quiz', 'Achievement', 'Video', 'Document'];
   
   const filteredActivities = mockActivityData.filter(activity => {
     // Filter by student - show specific activities for each student
@@ -368,6 +448,8 @@ export const StudentPortalActivityLog = () => {
               {tab === 'Achievement' && <Trophy className="h-3 w-3 mr-1" />}
               {tab === 'Assignment' && <FileText className="h-3 w-3 mr-1" />}
               {tab === 'Quiz' && <FileText className="h-3 w-3 mr-1" />}
+              {tab === 'Video' && <Play className="h-3 w-3 mr-1" />}
+              {tab === 'Document' && <File className="h-3 w-3 mr-1" />}
               {tab}
             </Button>
           ))}
@@ -392,6 +474,8 @@ export const StudentPortalActivityLog = () => {
                           activity.type === 'achievement' ? "border-purple-500/30 text-purple-300 bg-purple-500/10" :
                           activity.type === 'assignment' ? "border-orange-500/30 text-orange-300 bg-orange-500/10" :
                           activity.type === 'quiz' ? "border-green-500/30 text-green-300 bg-green-500/10" :
+                          activity.type === 'video' ? "border-red-500/30 text-red-300 bg-red-500/10" :
+                          activity.type === 'document' ? "border-yellow-500/30 text-yellow-300 bg-yellow-500/10" :
                           "border-blue-500/30 text-blue-300 bg-blue-500/10"
                         }>
                           {activity.type}
@@ -399,6 +483,18 @@ export const StudentPortalActivityLog = () => {
                         <span className="text-gray-400">{activity.date}</span>
                         <span className="text-gray-500">Server ID:</span>
                         <span className="text-gray-400 font-mono text-xs">{activity.serverID}</span>
+                        {activity.category && (
+                          <>
+                            <span className="text-gray-500">Category:</span>
+                            <span className="text-cyan-400 text-xs">{activity.category}</span>
+                          </>
+                        )}
+                        {activity.views && (
+                          <>
+                            <span className="text-gray-500">Views:</span>
+                            <span className="text-gray-400 text-xs">{activity.views}</span>
+                          </>
+                        )}
                         {activity.score && (
                           <>
                             <span className="text-gray-500">Score:</span>
@@ -417,8 +513,14 @@ export const StudentPortalActivityLog = () => {
                   
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2 text-sm">
-                      <FileText className="h-4 w-4 text-blue-400" />
-                      <span className="text-blue-400">{activity.material}</span>
+                      {activity.materialType === 'video' ? (
+                        <Play className="h-4 w-4 text-red-400" />
+                      ) : (
+                        <FileText className="h-4 w-4 text-blue-400" />
+                      )}
+                      <span className={activity.materialType === 'video' ? "text-red-400" : "text-blue-400"}>
+                        {activity.material}
+                      </span>
                     </div>
                     <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-300">
                       <Download className="h-4 w-4" />
