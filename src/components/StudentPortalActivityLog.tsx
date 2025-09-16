@@ -16,6 +16,7 @@ interface ActivityEntry {
   completed: boolean;
   score?: string;
   duration?: string;
+  serverID: string;
 }
 
 const mockActivityData: ActivityEntry[] = [
@@ -28,7 +29,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-06-18',
     material: 'Program Access Confirmation.pdf',
     completed: true,
-    duration: '5 min'
+    duration: '5 min',
+    serverID: 'srv-us-west-1-prod-810'
   },
   {
     id: 'tm2',
@@ -38,7 +40,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-06-18',
     material: 'Accelerator Welcome Kit.pdf',
     completed: true,
-    duration: '30 min'
+    duration: '30 min',
+    serverID: 'srv-content-delivery-005'
   },
   {
     id: 'tm3',
@@ -48,7 +51,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-06-20',
     material: 'Advanced Market Analysis Toolkit.pdf',
     completed: true,
-    duration: '4 hours'
+    duration: '4 hours',
+    serverID: 'srv-content-delivery-005'
   },
   {
     id: 'tm4',
@@ -58,7 +62,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-06-22',
     material: 'Acquisition Masterclass Materials.pdf',
     completed: true,
-    duration: '6 hours'
+    duration: '6 hours',
+    serverID: 'srv-content-delivery-007'
   },
   {
     id: 'tm5',
@@ -68,7 +73,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-06-25',
     material: 'Live Deal Analysis Report.pdf',
     completed: true,
-    score: '97%'
+    score: '97%',
+    serverID: 'srv-us-central-2-prod-811'
   },
   {
     id: 'tm6',
@@ -78,7 +84,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-06-28',
     material: 'Business Scaling Blueprint.pdf',
     completed: true,
-    duration: '5 hours'
+    duration: '5 hours',
+    serverID: 'srv-content-delivery-009'
   },
   {
     id: 'tm7',
@@ -88,7 +95,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-07-01',
     material: 'Mastery Assessment Results.pdf',
     completed: true,
-    score: '94%'
+    score: '94%',
+    serverID: 'srv-us-east-1-prod-802'
   },
 
   // Student Learning Activities - Vinod Kumar
@@ -100,7 +108,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-06-19',
     material: 'Welcome Package.pdf',
     completed: true,
-    duration: '15 min'
+    duration: '15 min',
+    serverID: 'srv-us-west-1-prod-810'
   },
   {
     id: 'vk2',
@@ -110,7 +119,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-06-20',
     material: 'Foundation Strategies Guide.pdf',
     completed: true,
-    duration: '2.5 hours'
+    duration: '2.5 hours',
+    serverID: 'srv-content-delivery-005'
   },
   {
     id: 'vk3',
@@ -120,7 +130,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-06-22',
     material: 'Market Analysis Workbook.pdf',
     completed: true,
-    duration: '3 hours'
+    duration: '3 hours',
+    serverID: 'srv-content-delivery-006'
   },
   {
     id: 'vk4',
@@ -130,7 +141,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-06-24',
     material: 'Assignment Submission.pdf',
     completed: true,
-    score: '95%'
+    score: '95%',
+    serverID: 'srv-us-central-1-prod-803'
   },
   {
     id: 'vk5',
@@ -140,7 +152,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-06-25',
     material: 'Quiz Results.pdf',
     completed: true,
-    score: '88%'
+    score: '88%',
+    serverID: 'srv-us-east-1-prod-801'
   },
   {
     id: 'vk6',
@@ -150,7 +163,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2025-06-28',
     material: 'Property Acquisition Guide.pdf',
     completed: true,
-    duration: '4 hours'
+    duration: '4 hours',
+    serverID: 'srv-content-delivery-008'
   },
   {
     id: 'vk7',
@@ -159,7 +173,8 @@ const mockActivityData: ActivityEntry[] = [
     description: 'Completed first month of accelerator program',
     date: '2025-07-01',
     material: 'Milestone Certificate.pdf',
-    completed: true
+    completed: true,
+    serverID: 'srv-us-west-2-prod-804'
   },
 
   // Default student activities
@@ -171,7 +186,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2024-08-01',
     material: 'Getting Started Guide.pdf',
     completed: true,
-    duration: '1.5 hours'
+    duration: '1.5 hours',
+    serverID: 'srv-content-delivery-001'
   },
   {
     id: '2',
@@ -181,7 +197,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2024-08-15',
     material: 'Market Research Toolkit.pdf',
     completed: true,
-    duration: '2 hours'
+    duration: '2 hours',
+    serverID: 'srv-content-delivery-002'
   },
   {
     id: '3',
@@ -191,7 +208,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2024-08-20',
     material: 'Project Submission.pdf',
     completed: true,
-    score: '92%'
+    score: '92%',
+    serverID: 'srv-us-central-1-prod-800'
   },
   {
     id: '4',
@@ -201,7 +219,8 @@ const mockActivityData: ActivityEntry[] = [
     date: '2024-08-25',
     material: 'Quiz Report.pdf',
     completed: true,
-    score: '85%'
+    score: '85%',
+    serverID: 'srv-us-east-1-prod-799'
   },
   {
     id: '5',
@@ -210,7 +229,8 @@ const mockActivityData: ActivityEntry[] = [
     description: 'Successfully mastered the fundamentals',
     date: '2024-09-01',
     material: 'Achievement Badge.pdf',
-    completed: true
+    completed: true,
+    serverID: 'srv-us-west-2-prod-798'
   }
 ];
 
@@ -377,6 +397,8 @@ export const StudentPortalActivityLog = () => {
                           {activity.type}
                         </Badge>
                         <span className="text-gray-400">{activity.date}</span>
+                        <span className="text-gray-500">Server ID:</span>
+                        <span className="text-gray-400 font-mono text-xs">{activity.serverID}</span>
                         {activity.score && (
                           <>
                             <span className="text-gray-500">Score:</span>
