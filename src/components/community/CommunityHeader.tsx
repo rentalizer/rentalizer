@@ -500,6 +500,16 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
   const handleSubmitPost = async () => {
     if (!newPost.trim() || isSubmitting) return;
     
+    // Check if user is authenticated
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to create a post",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
@@ -530,6 +540,15 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
         contentWithMedia = `${contentWithMedia}\n\n${photoLink}`;
       }
       
+      console.log('Creating discussion with data:', {
+        title: postTitleToUse,
+        content: contentWithMedia,
+        author_name: getUserName(),
+        category: 'General',
+        user_id: user.id,
+        author_avatar: profile?.avatar_url
+      });
+      
       const { data, error } = await supabase
         .from('discussions')
         .insert({
@@ -537,12 +556,18 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
           content: contentWithMedia,
           author_name: getUserName(),
           category: 'General',
-          user_id: user?.id
+          user_id: user.id,
+          author_avatar: profile?.avatar_url
         })
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database error creating discussion:', error);
+        throw error;
+      }
+      
+      console.log('Discussion created successfully:', data);
 
       const attachmentCount = uploadedFiles.length + (videoUpload?.uploaded ? 1 : 0) + (photoUpload?.uploaded ? 1 : 0);
       toast({
