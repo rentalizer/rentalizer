@@ -19,6 +19,78 @@ interface ActivityEntry {
 }
 
 const mockActivityData: ActivityEntry[] = [
+  // Accelerator Program Activities - Takeisha Moore
+  {
+    id: 'tm1',
+    type: 'achievement',
+    title: 'Accelerator Program Access Granted',
+    description: 'Successfully purchased and enrolled in Accelerator (presale $2,500)',
+    date: '2025-06-18',
+    material: 'Program Access Confirmation.pdf',
+    completed: true,
+    duration: '5 min'
+  },
+  {
+    id: 'tm2',
+    type: 'module',
+    title: 'Accelerator Orientation',
+    description: 'Completed program introduction and setup',
+    date: '2025-06-18',
+    material: 'Accelerator Welcome Kit.pdf',
+    completed: true,
+    duration: '30 min'
+  },
+  {
+    id: 'tm3',
+    type: 'module',
+    title: 'Advanced Market Analysis',
+    description: 'Mastered professional market evaluation techniques',
+    date: '2025-06-20',
+    material: 'Advanced Market Analysis Toolkit.pdf',
+    completed: true,
+    duration: '4 hours'
+  },
+  {
+    id: 'tm4',
+    type: 'module',
+    title: 'Property Acquisition Masterclass',
+    description: 'Learned advanced negotiation and acquisition strategies',
+    date: '2025-06-22',
+    material: 'Acquisition Masterclass Materials.pdf',
+    completed: true,
+    duration: '6 hours'
+  },
+  {
+    id: 'tm5',
+    type: 'assignment',
+    title: 'Live Deal Analysis',
+    description: 'Analyzed real properties with mentor guidance',
+    date: '2025-06-25',
+    material: 'Live Deal Analysis Report.pdf',
+    completed: true,
+    score: '97%'
+  },
+  {
+    id: 'tm6',
+    type: 'module',
+    title: 'Scaling Your Business',
+    description: 'Advanced strategies for business growth',
+    date: '2025-06-28',
+    material: 'Business Scaling Blueprint.pdf',
+    completed: true,
+    duration: '5 hours'
+  },
+  {
+    id: 'tm7',
+    type: 'quiz',
+    title: 'Accelerator Mastery Assessment',
+    description: 'Comprehensive evaluation of advanced concepts',
+    date: '2025-07-01',
+    material: 'Mastery Assessment Results.pdf',
+    completed: true,
+    score: '94%'
+  },
+
   // Student Learning Activities - Vinod Kumar
   {
     id: 'vk1',
@@ -144,14 +216,15 @@ const mockActivityData: ActivityEntry[] = [
 
 const mockStudents = [
   { id: '1', name: 'Lindsay Sherman', email: 'dutchess0085@gmail.com', progress: 100 },
-  { id: '2', name: 'Tiffany Worthy', email: 'tiffany1990worthy@yahoo.com', progress: 100 },
-  { id: '3', name: 'Pavlos Michaels', email: 'pavlos.michaels4@gmail.com', progress: 100 },
-  { id: '4', name: 'Alex Johnson', email: 'alex.johnson@email.com', progress: 100 },
-  { id: '5', name: 'Sarah Wilson', email: 'sarah.wilson@email.com', progress: 100 },
-  { id: '6', name: 'Mike Davis', email: 'mike.davis@email.com', progress: 100 },
-  { id: '7', name: 'Sanyo Mathew', email: 'sanyo.6677@gmail.com', progress: 100 },
-  { id: '8', name: 'Vinod Kumar', email: 'vinodkhatri@hotmail.com', progress: 100 },
-  { id: '9', name: 'Mary Fofanah', email: 'maryfofanah18@gmail.com', progress: 100 },
+  { id: '2', name: 'Takeisha Moore', email: 'takeisha.moore@metrobrokers.com', progress: 100 },
+  { id: '3', name: 'Tiffany Worthy', email: 'tiffany1990worthy@yahoo.com', progress: 100 },
+  { id: '4', name: 'Pavlos Michaels', email: 'pavlos.michaels4@gmail.com', progress: 100 },
+  { id: '5', name: 'Alex Johnson', email: 'alex.johnson@email.com', progress: 100 },
+  { id: '6', name: 'Sarah Wilson', email: 'sarah.wilson@email.com', progress: 100 },
+  { id: '7', name: 'Mike Davis', email: 'mike.davis@email.com', progress: 100 },
+  { id: '8', name: 'Sanyo Mathew', email: 'sanyo.6677@gmail.com', progress: 100 },
+  { id: '9', name: 'Vinod Kumar', email: 'vinodkhatri@hotmail.com', progress: 100 },
+  { id: '10', name: 'Mary Fofanah', email: 'maryfofanah18@gmail.com', progress: 100 },
 ];
 
 export const StudentPortalActivityLog = () => {
@@ -164,9 +237,10 @@ export const StudentPortalActivityLog = () => {
   const filterTabs = ['All Activity', 'Module', 'Assignment', 'Quiz', 'Achievement'];
   
   const filteredActivities = mockActivityData.filter(activity => {
-    // Filter by student - show default activities for most students, specific activities for certain students
-    if (selectedStudent === '8' && !activity.id.startsWith('vk')) return false;
-    if (selectedStudent !== '8' && activity.id.startsWith('vk')) return false;
+    // Filter by student - show specific activities for each student
+    if (selectedStudent === '2' && !activity.id.startsWith('tm')) return false; // Takeisha Moore - Accelerator
+    if (selectedStudent === '9' && !activity.id.startsWith('vk')) return false; // Vinod Kumar
+    if (!['2', '9'].includes(selectedStudent) && (activity.id.startsWith('tm') || activity.id.startsWith('vk'))) return false;
     
     // Filter by activity type
     if (activeFilter === 'All Activity') return true;
@@ -249,7 +323,7 @@ export const StudentPortalActivityLog = () => {
               </div>
               
               <div className="text-right text-sm">
-                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '8' ? '2025-06-19' : '2024-08-01'}</span></div>
+                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '2' ? '2025-06-18' : selectedStudent === '9' ? '2025-06-19' : '2024-08-01'}</span></div>
                 <div className="text-gray-400">Progress: <span className="text-white">{currentStudent.progress}%</span></div>
               </div>
             </div>
