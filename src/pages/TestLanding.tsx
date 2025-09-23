@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar as CalendarIcon, Star, X, Video, FileText, Bot, LogOut } from 'lucide-react';
+import newLogo from '@/assets/new-logo.png';
 import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { MarketIntelligenceDemo } from '@/components/MarketIntelligenceDemo';
@@ -139,7 +140,7 @@ const TestLanding = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <BarChart3 className="h-8 w-8 text-cyan-400 neon-text" />
+              <img src={newLogo} alt="Rentalizer Logo" className="h-8 w-8" />
             </div>
 
             {/* Navigation */}
@@ -199,7 +200,7 @@ const TestLanding = () => {
           {/* Main Content */}
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-4 mb-6">
-              <BarChart3 className="h-16 w-16 text-cyan-400 neon-text" />
+              <img src={newLogo} alt="Rentalizer Logo" className="h-16 w-16" />
               <div className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 {texts.mainTitle}
               </div>
