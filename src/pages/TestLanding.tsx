@@ -140,7 +140,7 @@ const TestLanding = () => {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <img src={newLogo} alt="Rentalizer Logo" className="h-8 w-8" />
+              <img src={newLogo} alt="Rentalizer Logo" className="h-8 w-8 drop-shadow-[0_0_10px_rgba(34,211,238,0.6)] brightness-110" />
             </div>
 
             {/* Navigation */}
@@ -200,7 +200,7 @@ const TestLanding = () => {
           {/* Main Content */}
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-4 mb-6">
-              <img src={newLogo} alt="Rentalizer Logo" className="h-16 w-16" />
+              <img src={newLogo} alt="Rentalizer Logo" className="h-16 w-16 drop-shadow-[0_0_20px_rgba(34,211,238,0.7)] brightness-110" />
               <div className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 {texts.mainTitle}
               </div>
