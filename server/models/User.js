@@ -34,6 +34,11 @@ const userSchema = new mongoose.Schema({
     trim: true,
     maxlength: [500, 'Bio cannot exceed 500 characters']
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin', 'superadmin'],
+    default: 'user'
+  },
   isActive: {
     type: Boolean,
     default: true
