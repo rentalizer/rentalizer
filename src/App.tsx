@@ -10,7 +10,6 @@ import LandingPage from "./pages/LandingPage";
 import DemoGate from "./pages/DemoGate";
 import CalculatorGate from "./pages/CalculatorGate";
 import Calc from "./pages/Calc";
-import Login from "./pages/Login";
 import MarketAnalysis from "./pages/MarketAnalysis";
 import ResetPassword from "./pages/ResetPassword";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -37,7 +36,9 @@ const queryClient = new QueryClient();
 const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<LandingPage />} />
-    <Route path="/login" element={<Login />} />
+    <Route path="/auth" element={<Auth />} />
+    <Route path="/auth/login" element={<Auth />} />
+    <Route path="/auth/signup" element={<Auth />} />
     <Route path="/dashboard" element={<Index />} />
     <Route path="/demo" element={<DemoGate />} />
     <Route path="/listings" element={<ListingsGate />} />
@@ -54,8 +55,6 @@ const AppRoutes = () => (
     <Route path="/admin/richie" element={<RichieAdmin />} />
     <Route path="/members" element={<Members />} />
     <Route path="/profile-setup" element={<ProfileSetup />} />
-    {/* <Route path="/auth" element={<Auth />} /> */}
-    <Route path="/signup" element={<Auth />} />
     <Route path="/reset-password" element={<ResetPassword />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
     <Route path="/terms-of-service" element={<TermsOfService />} />
