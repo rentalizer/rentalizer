@@ -1,19 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface User {
-  id: string;
-  email: string;
-  subscription_status: 'active' | 'inactive' | 'trial';
-  subscription_tier?: string | null;
-}
-
-interface Profile {
-  id: string;
-  user_id: string;
-  display_name: string | null;
-  avatar_url: string | null;
-}
+import { apiService, User } from '@/services/api';
+import { Profile, createProfileFromUser } from '@/utils/authHelpers';
 
 interface AuthContextType {
   user: User | null;
@@ -22,13 +10,9 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, profileData?: { displayName?: string; firstName?: string; lastName?: string; bio?: string; avatarFile?: File }) => Promise<void>;
   signOut: () => Promise<void>;
-  isSubscribed: boolean;
-  hasEssentialsAccess: boolean;
-  hasCompleteAccess: boolean;
-  checkSubscription: () => Promise<void>;
-  upgradeSubscription: () => Promise<void>;
-  manageSubscription: () => Promise<void>;
-  updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>;
+  updateProfile: (updates: Partial<Profile>) => Promise<{ error: Error | null }>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  deleteAccount: (password: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,200 +26,149 @@ export const useAuth = () => {
 };
 
 
-const sendNewUserNotification = async (userEmail: string, userId: string) => {
-  console.log('Mock sending new user notification for:', userEmail, userId);
-  // Mock notification - no actual sending
-};
-
-const createUserProfile = async (userId: string, email: string) => {
-  console.log('Mock creating user profile for:', email, userId);
-  // Mock profile creation - no actual creation
-};
-
-// Mock authentication credentials
-const MOCK_CREDENTIALS = {
-  admin: {
-    email: 'admin@rentalizer.com',
-    password: 'admin123',
-    id: '00000000-0000-0000-0000-000000000001',
-    subscription_status: 'active' as const,
-    subscription_tier: 'Premium'
-  },
-  user: {
-    email: 'user@rentalizer.com', 
-    password: 'user123',
-    id: '00000000-0000-0000-0000-000000000002',
-    subscription_status: 'active' as const,
-    subscription_tier: 'Basic'
-  }
-};
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasLoggedOut, setHasLoggedOut] = useState(false);
 
-  const fetchProfile = async (userId: string) => {
-    console.log('🔍 Mock fetching profile for user:', userId);
-    // Mock profile - already set in signIn/signUp
-  };
-
-  const checkSubscription = async () => {
-    console.log('🔄 Mock subscription check');
-    // Mock subscription - already set in user object
-  };
-
-  const upgradeSubscription = async () => {
-    console.log('🔄 Mock upgrade subscription');
-    // Mock upgrade - open a mock checkout page
-    window.open('https://checkout.stripe.com/mock-checkout', '_blank');
-  };
-
-  const manageSubscription = async () => {
-    console.log('🔄 Mock manage subscription');
-    // Mock customer portal
-    window.open('https://billing.stripe.com/mock-portal', '_blank');
-  };
-
+  // Initialize authentication state
   useEffect(() => {
-    console.log('🔄 AuthProvider initializing...');
-    
-    // Check if we're in Lovable development environment
-    const hostname = window.location.hostname;
-    const url = window.location.href;
-    const isLovableDev = hostname.includes('lovable.app') || hostname.includes('localhost') || hostname.includes('127.0.0.1') || url.includes('lovable');
-    
-    if (isLovableDev) {
-      console.log('🚀 LOVABLE DEVELOPMENT - MOCK AUTH ENABLED');
-      // Don't auto-login, let users see login/signup pages
-      setIsLoading(false);
-      return;
-    }
-    
-    console.log('🌐 Using real authentication only');
-    
-    const initTimeout = setTimeout(() => {
-      console.log('⏰ Auth initialization timeout, setting loading to false');
-      setIsLoading(false);
-    }, 5000);
-
-    // Mock auth state change - no real subscription needed
-    console.log('🔔 Mock auth state initialized');
-    clearTimeout(initTimeout);
-    setIsLoading(false);
-
-    // Mock initial session - no real session needed
-    console.log('📡 Mock initial session loaded');
-
-    return () => {
-      console.log('🧹 Cleaning up mock auth');
-      clearTimeout(initTimeout);
+    const initializeAuth = async () => {
+      try {
+        console.log('🔄 AuthProvider initializing...');
+        
+        // Check if user has a valid token
+        const token = apiService.getAuthToken();
+        if (token) {
+          // Try to fetch user profile to validate token
+          try {
+            const response = await apiService.getProfile();
+            setUser(response.user);
+            setProfile(createProfileFromUser(response.user));
+            console.log('✅ User authenticated from token');
+          } catch (error) {
+            // Token is invalid, remove it
+            console.log('❌ Invalid token, removing from storage');
+            apiService.removeAuthToken();
+          }
+        }
+      } catch (error) {
+        console.error('❌ Auth initialization error:', error);
+        apiService.removeAuthToken();
+      } finally {
+        setIsLoading(false);
+      }
     };
+
+    initializeAuth();
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    console.log('🔑 Starting mock sign in for:', email);
+    console.log('🔑 Starting sign in for:', email);
     
-    // Simulate loading delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Check against mock credentials
-    const credentials = Object.values(MOCK_CREDENTIALS).find(
-      cred => cred.email === email && cred.password === password
-    );
-    
-    if (!credentials) {
-      console.error('❌ Mock sign in error: Invalid credentials');
-      throw new Error('Invalid login credentials');
+    try {
+      const response = await apiService.login({ email, password });
+      
+      // Store token and user data
+      apiService.setAuthToken(response.token);
+      setUser(response.user);
+      setProfile(createProfileFromUser(response.user));
+      
+      console.log('✅ Sign in successful for:', email);
+    } catch (error) {
+      console.error('❌ Sign in error:', error);
+      throw error;
     }
-    
-    // Set the user
-    setUser(credentials);
-    
-    // Create mock profile
-    const mockProfile: Profile = {
-      id: credentials.id,
-      user_id: credentials.id,
-      display_name: email.split('@')[0],
-      avatar_url: null
-    };
-    setProfile(mockProfile);
-
-    console.log('✅ Mock sign in successful for:', email);
   };
 
   const signUp = async (email: string, password: string, profileData?: { displayName?: string; firstName?: string; lastName?: string; bio?: string; avatarFile?: File }) => {
-    console.log('📝 Starting mock sign up for:', email);
+    console.log('📝 Starting sign up for:', email);
     
-    // Simulate loading delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Check if email already exists in mock credentials
-    const existingUser = Object.values(MOCK_CREDENTIALS).find(cred => cred.email === email);
-    if (existingUser) {
-      throw new Error('User already exists');
+    try {
+      const response = await apiService.register({
+        email,
+        password,
+        firstName: profileData?.firstName,
+        lastName: profileData?.lastName
+      });
+      
+      // Store token and user data
+      apiService.setAuthToken(response.token);
+      setUser(response.user);
+      setProfile(createProfileFromUser(response.user));
+      
+      console.log('✅ Sign up successful for:', email);
+    } catch (error) {
+      console.error('❌ Sign up error:', error);
+      throw error;
     }
-    
-    // Create new mock user
-    const newUserId = `mock-user-${Date.now()}`;
-    const newUser: User = {
-      id: newUserId,
-      email,
-      subscription_status: 'trial',
-      subscription_tier: 'Basic'
-    };
-    
-    // Set the user
-    setUser(newUser);
-    
-    // Create mock profile
-    const mockProfile: Profile = {
-      id: newUserId,
-      user_id: newUserId,
-      display_name: profileData?.displayName || email.split('@')[0],
-      avatar_url: null
-    };
-    setProfile(mockProfile);
-
-    console.log('✅ Mock sign up successful for:', email);
   };
 
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return { error: new Error('No user logged in') };
     
-    // Mock profile update
-    console.log('📝 Mock profile update:', updates);
-    setProfile(prev => prev ? { ...prev, ...updates } : null);
-    
-    return { error: null };
+    try {
+      const response = await apiService.updateProfile({
+        firstName: updates.display_name?.split(' ')[0],
+        lastName: updates.display_name?.split(' ').slice(1).join(' ')
+      });
+      
+      setUser(response.user);
+      setProfile(createProfileFromUser(response.user));
+      
+      return { error: null };
+    } catch (error) {
+      console.error('❌ Profile update error:', error);
+      return { error };
+    }
+  };
+
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    try {
+      await apiService.changePassword({ currentPassword, newPassword });
+      console.log('✅ Password changed successfully');
+    } catch (error) {
+      console.error('❌ Password change error:', error);
+      throw error;
+    }
+  };
+
+  const deleteAccount = async (password: string) => {
+    try {
+      await apiService.deleteAccount(password);
+      
+      // Clear local state and storage
+      setUser(null);
+      setProfile(null);
+      apiService.removeAuthToken();
+      
+      console.log('✅ Account deleted successfully');
+    } catch (error) {
+      console.error('❌ Account deletion error:', error);
+      throw error;
+    }
   };
 
   const signOut = async () => {
-    console.log('🚪 Mock AuthContext: Starting signOut process');
+    console.log('🚪 Starting signOut process');
     
-    // Clear local state
+    try {
+      await apiService.logout();
+    } catch (error) {
+      console.warn('⚠️ Logout request failed:', error);
+    }
+    
+    // Clear local state and storage
     setUser(null);
     setProfile(null);
-    
-    // Clear storage
-    try {
-      localStorage.clear();
-      sessionStorage.clear();
-      console.log('🧹 Mock AuthContext: Cleared all storage');
-    } catch (e) {
-      console.warn('⚠️ Mock AuthContext: Could not clear storage:', e);
-    }
+    apiService.removeAuthToken();
     
     // Redirect to login page
     window.location.href = '/auth/login';
     
-    console.log('✅ Mock AuthContext: SignOut completed successfully');
+    console.log('✅ SignOut completed successfully');
   };
-
-  const isSubscribed = user?.subscription_status === 'active';
-  const hasEssentialsAccess = isSubscribed && (user?.subscription_tier === 'Professional' || user?.subscription_tier === 'Premium' || user?.subscription_tier === 'Enterprise');
-  const hasCompleteAccess = isSubscribed && (user?.subscription_tier === 'Premium' || user?.subscription_tier === 'Enterprise');
 
   const value = {
     user,
@@ -244,16 +177,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signIn,
     signUp,
     signOut,
-    isSubscribed,
-    hasEssentialsAccess,
-    hasCompleteAccess,
-    checkSubscription,
-    upgradeSubscription,
     updateProfile,
-    manageSubscription
+    changePassword,
+    deleteAccount
   };
 
-  console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user, 'isSubscribed:', isSubscribed, 'tier:', user?.subscription_tier);
+  console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user);
 
   if (isLoading) {
     return (
