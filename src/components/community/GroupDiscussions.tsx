@@ -41,6 +41,7 @@ interface Discussion {
   isLiked?: boolean;
   user_id?: string;
   isMockData?: boolean;
+  isAdmin?: boolean;
 }
 
 interface UserProfile {
@@ -130,49 +131,135 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     }
   }, []);
 
-  // Fetch discussions from database with proper sorting
+  // Mock discussions data with different users including admin
+  const mockDiscussions = useMemo(() => [
+    {
+      id: 'mock-1',
+      title: 'Welcome to the Rentalizer Community! 🏠',
+      content: 'Hey everyone! Welcome to our amazing community of rental entrepreneurs. I\'m excited to see all the great discussions and insights we\'ll be sharing here. Feel free to introduce yourself and share your rental investment journey!',
+      author: 'Richie (Admin)',
+      avatar: 'RA',
+      category: 'General',
+      likes: 24,
+      comments: 3,
+      timeAgo: '2 hours ago',
+      created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      user_id: '00000000-0000-0000-0000-000000000001', // Admin user ID
+      isPinned: true,
+      isLiked: false,
+      isMockData: true,
+      isAdmin: true
+    },
+    {
+      id: 'mock-2',
+      title: 'First Property Analysis - Need Advice!',
+      content: 'Hi everyone! I\'m looking at my first rental property and could use some advice. It\'s a 3BR/2BA single-family home in a decent neighborhood. The numbers look good on paper, but I\'m nervous about the market timing. Any experienced investors have thoughts on current market conditions?',
+      author: 'Sarah Johnson',
+      avatar: 'SJ',
+      category: 'Investment Advice',
+      likes: 12,
+      comments: 2,
+      timeAgo: '4 hours ago',
+      created_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+      user_id: '00000000-0000-0000-0000-000000000003',
+      isPinned: false,
+      isLiked: false,
+      isMockData: true
+    },
+    {
+      id: 'mock-3',
+      title: 'Property Management Software Recommendations?',
+      content: 'What property management software do you all use? I\'m managing 8 units now and my Excel spreadsheets are getting out of hand. Looking for something that can handle tenant communication, rent collection, and maintenance requests. Budget is around $50-100/month.',
+      author: 'Mike Chen',
+      avatar: 'MC',
+      category: 'Tools & Technology',
+      likes: 18,
+      comments: 2,
+      timeAgo: '6 hours ago',
+      created_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+      user_id: '00000000-0000-0000-0000-000000000004',
+      isPinned: false,
+      isLiked: false,
+      isMockData: true
+    },
+    {
+      id: 'mock-4',
+      title: 'Success Story: Bought My 5th Property! 🎉',
+      content: 'Just closed on my 5th rental property today! Started with one duplex 3 years ago and now I have 5 units generating $8,500/month in rental income. The key was finding the right market and being patient with the numbers. Thanks to this community for all the advice along the way!',
+      author: 'Jessica Martinez',
+      avatar: 'JM',
+      category: 'Success Stories',
+      likes: 32,
+      comments: 2,
+      timeAgo: '1 day ago',
+      created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+      user_id: '00000000-0000-0000-0000-000000000005',
+      isPinned: false,
+      isLiked: false,
+      isMockData: true
+    },
+    {
+      id: 'mock-5',
+      title: 'Market Analysis: Phoenix vs Austin - Which is Better?',
+      content: 'I\'m considering expanding to either Phoenix or Austin and would love to hear from investors in those markets. What are the current cap rates, vacancy rates, and growth projections? Also, how are the local regulations and landlord-tenant laws? Any insights would be greatly appreciated!',
+      author: 'David Thompson',
+      avatar: 'DT',
+      category: 'Market Analysis',
+      likes: 15,
+      comments: 2,
+      timeAgo: '2 days ago',
+      created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      user_id: '00000000-0000-0000-0000-000000000006',
+      isPinned: false,
+      isLiked: false,
+      isMockData: true
+    }
+  ], []);
+
+  // Mock comments for discussions
+  const mockComments = useMemo(() => ({
+    'mock-1': [
+      { id: 'c1', author: 'Sarah Johnson', avatar: 'SJ', content: 'Thanks for the warm welcome! Excited to be part of this community.', timeAgo: '1 hour ago' },
+      { id: 'c2', author: 'Mike Chen', avatar: 'MC', content: 'Great to have everyone here! Looking forward to learning and sharing.', timeAgo: '45 min ago' },
+      { id: 'c3', author: 'Jessica Martinez', avatar: 'JM', content: 'This is going to be an amazing resource for all of us!', timeAgo: '30 min ago' }
+    ],
+    'mock-2': [
+      { id: 'c4', author: 'Mike Chen', avatar: 'MC', content: 'Congrats on taking the first step! What\'s the purchase price and expected rent?', timeAgo: '3 hours ago' },
+      { id: 'c5', author: 'David Thompson', avatar: 'DT', content: 'I\'d recommend running the numbers through the 1% rule first.', timeAgo: '2 hours ago' }
+    ],
+    'mock-3': [
+      { id: 'c6', author: 'Sarah Johnson', avatar: 'SJ', content: 'I use Rent Manager - it\'s been great for tenant communication!', timeAgo: '5 hours ago' },
+      { id: 'c7', author: 'Jessica Martinez', avatar: 'JM', content: 'Check out Buildium too, fits your budget perfectly.', timeAgo: '4 hours ago' }
+    ],
+    'mock-4': [
+      { id: 'c8', author: 'Sarah Johnson', avatar: 'SJ', content: 'Amazing milestone! What was your strategy for finding properties?', timeAgo: '20 hours ago' },
+      { id: 'c9', author: 'Mike Chen', avatar: 'MC', content: 'Congratulations! That\'s inspiring for new investors like me.', timeAgo: '18 hours ago' }
+    ],
+    'mock-5': [
+      { id: 'c10', author: 'Sarah Johnson', avatar: 'SJ', content: 'Phoenix has better cap rates right now, but Austin has more growth potential.', timeAgo: '1 day ago' },
+      { id: 'c11', author: 'Jessica Martinez', avatar: 'JM', content: 'Consider the tax implications too - Texas has no state income tax!', timeAgo: '23 hours ago' }
+    ]
+  }), []);
+
+  // Fetch discussions with mock data
   const fetchDiscussions = useCallback(async () => {
-    console.log('🔄 Fetching discussions from database...');
+    console.log('🔄 Loading mock discussions data...');
     
     try {
-      const { data, error } = await supabase
-        .from('discussions')
-        .select('*')
-        .order('is_pinned', { ascending: false })
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('❌ Error fetching discussions:', error);
-        return;
-      }
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      console.log('📥 Raw data from database:', data?.length || 0, 'discussions');
+      console.log('📥 Mock discussions loaded:', mockDiscussions.length, 'discussions');
+      console.log('📌 Pinned discussions:', mockDiscussions.filter(d => d.isPinned).length);
       
-      // Convert database format to component format
-      const formattedDiscussions = (data || []).map(discussion => ({
-        id: discussion.id,
-        title: discussion.title,
-        content: discussion.content,
-        author: discussion.author_name,
-        avatar: getInitials(discussion.author_name),
-        category: discussion.category,
-        likes: discussion.likes_count || 0,
-        comments: discussion.comments_count || 0,
-        timeAgo: formatTimeAgo(discussion.created_at),
-        created_at: discussion.created_at,
-        user_id: discussion.user_id,
-        isPinned: discussion.is_pinned || false,
-        isLiked: false,
-        isMockData: false
-      }));
-
-      console.log('✅ Formatted discussions:', formattedDiscussions.length);
-      console.log('📌 Pinned discussions:', formattedDiscussions.filter(d => d.isPinned).length);
-      setDiscussionsList(formattedDiscussions);
+      setDiscussionsList(mockDiscussions);
+      
+      // Set mock comments
+      setComments(mockComments);
     } catch (error) {
-      console.error('❌ Exception fetching discussions:', error);
+      console.error('❌ Exception loading mock discussions:', error);
     }
-  }, [getInitials]);
+  }, [mockDiscussions, mockComments]);
 
   const formatTimeAgo = useCallback((dateString: string) => {
     const date = new Date(dateString);
@@ -473,6 +560,11 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                           <div className="flex items-center gap-2">
                             {discussion.isPinned && <Pin className="h-4 w-4 text-yellow-400" />}
                             <span className="text-cyan-300 font-medium">{profileInfo.display_name}</span>
+                            {discussion.isAdmin && (
+                              <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
+                                Admin
+                              </Badge>
+                            )}
                             <span className="text-gray-400">•</span>
                             <span className="text-gray-400 text-sm">{discussion.timeAgo}</span>
                             <span className="text-gray-400">•</span>

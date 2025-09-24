@@ -377,7 +377,7 @@ export const SubscriptionPricing = ({ onUpgrade }: SubscriptionPricingProps) => 
           ) : (
             <Crown className="h-5 w-5 mr-2" />
           )}
-          {isLoading ? 'Processing...' : !user ? 'Sign In to Upgrade' : (promoDiscount === 100 ? 'Start Free Trial' : 
+          {isLoading ? 'Processing...' : !user ? 'Login to Upgrade' : (promoDiscount === 100 ? 'Start Free Trial' : 
             `Upgrade to ${selectedPlan === 'essentials' ? 'Market Insights + Calculator' : 'All-In-One System'}`)}
         </Button>
 

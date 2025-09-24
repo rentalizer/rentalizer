@@ -340,14 +340,11 @@ const DemoGate = () => {
                       <div className="flex items-center gap-2 text-cyan-300 justify-center mb-2">
                         {isSignUp ? <UserPlus className="h-5 w-5" /> : <LogIn className="h-5 w-5" />}
                         <h1 className="text-xl font-semibold">
-                          {isSignUp ? 'Sign Up for Demo Access' : 'Sign In to View Demo'}
+                          Community Access
                         </h1>
                       </div>
                       <p className="text-gray-400 text-sm">
-                        {isSignUp 
-                          ? 'Create your account to access the demo'
-                          : 'Access your account to view the demo'
-                        }
+                        Join our vibrant community of rental entrepreneurs
                       </p>
                     </div>
                     

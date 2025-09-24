@@ -320,14 +320,11 @@ const CalculatorGate = () => {
                       <div className="flex items-center gap-2 text-cyan-300 justify-center mb-2">
                         {isSignUp ? <UserPlus className="h-5 w-5" /> : <LogIn className="h-5 w-5" />}
                         <h1 className="text-xl font-semibold">
-                          {isSignUp ? 'Sign Up for Calculator Access' : 'Sign In to Use Calculator'}
+                          Community Access
                         </h1>
                       </div>
                       <p className="text-gray-400 text-sm">
-                        {isSignUp 
-                          ? 'Create your account to access the ROI calculator'
-                          : 'Access your account to use the calculator'
-                        }
+                        Join our vibrant community of rental entrepreneurs
                       </p>
                     </div>
                     

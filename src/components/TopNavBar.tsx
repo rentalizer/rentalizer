@@ -36,7 +36,7 @@ export const TopNavBar = () => {
         <div className="flex items-center justify-between">
           {/* Left side - Logo */}
           <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center">
+            <Link to={user ? "/dashboard" : "/"} className="flex items-center">
               <BarChart3 className="h-8 w-8 text-cyan-400" style={{
                 filter: 'drop-shadow(0 0 6px rgba(6, 182, 212, 1)) drop-shadow(0 0 12px rgba(6, 182, 212, 0.9)) drop-shadow(0 0 18px rgba(6, 182, 212, 0.8)) drop-shadow(0 0 24px rgba(6, 182, 212, 0.7)) drop-shadow(0 0 30px rgba(6, 182, 212, 0.6)) drop-shadow(0 0 36px rgba(6, 182, 212, 0.5))'
               }} />
@@ -82,7 +82,7 @@ export const TopNavBar = () => {
                       to="/profile-setup" 
                       className="text-cyan-300 hover:text-cyan-200 transition-colors cursor-pointer underline-offset-4 hover:underline font-medium block py-1 px-1"
                     >
-                      My Profile
+                      {user?.email || 'Profile'}
                     </Link>
                   </div>
                   <Badge variant="outline" className="bg-blue-900/30 border-blue-500/30 text-blue-300 text-xs px-2 py-0 ml-2">

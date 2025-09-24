@@ -169,7 +169,7 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
             ) : (
               <>
                 <LogIn className="h-5 w-5" />
-                Sign In to Rentalizer
+                Sign In
               </>
             )}
           </DialogTitle>

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface User {
   id: string;
@@ -225,6 +226,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (e) {
       console.warn('⚠️ Mock AuthContext: Could not clear storage:', e);
     }
+    
+    // Redirect to login page
+    window.location.href = '/auth/login';
     
     console.log('✅ Mock AuthContext: SignOut completed successfully');
   };
