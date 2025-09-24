@@ -103,7 +103,7 @@ const Community = () => {
                        window.location.search.includes('__lovable_token') ||
                        window.location.hostname === 'localhost';
   
-  // Mock admin check - replace with real API call later
+  // Check admin status based on user role
   useEffect(() => {
     const checkAdminStatus = () => {
       if (!user) {
@@ -112,17 +112,14 @@ const Community = () => {
         return;
       }
 
-      // Simulate loading delay
-      setTimeout(() => {
-        // Mock admin status - you can change this to true/false for testing
-        const mockIsAdmin = true; // Set to false to test non-admin behavior
-        setUserIsAdmin(mockIsAdmin);
-        setAdminCheckLoading(false);
-      }, 300);
+      // Check if user has admin or superadmin role
+      const isAdminUser = user.role === 'admin' || user.role === 'superadmin';
+      setUserIsAdmin(isAdminUser);
+      setAdminCheckLoading(false);
     };
 
     checkAdminStatus();
-  }, [user, isAdmin]);
+  }, [user]);
   
   
   // Update URL hash when tab changes

@@ -47,6 +47,7 @@ export interface User {
   email: string;
   firstName?: string;
   lastName?: string;
+  role?: string;
   isActive: boolean;
   lastLogin?: string;
   createdAt: string;
