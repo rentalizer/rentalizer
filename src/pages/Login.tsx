@@ -20,7 +20,7 @@ const Login = () => {
   const [showCalendar, setShowCalendar] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const redirectTo = searchParams.get('redirect') || '/calc';
+  const redirectTo = searchParams.get('redirect') || '/dashboard';
 
   // Redirect if already logged in
   useEffect(() => {

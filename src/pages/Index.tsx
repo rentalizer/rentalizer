@@ -39,12 +39,7 @@ const Index = () => {
   const [promoCode, setPromoCode] = useState('');
   const [signupLoading, setSignupLoading] = useState(false);
 
-  // Redirect authenticated users to community
-  useEffect(() => {
-    if (user && !isLoading) {
-      navigate('/community');
-    }
-  }, [user, isLoading, navigate]);
+  // No automatic redirect - let users stay on dashboard if they want
 
   // Load Calendly script when component mounts
   useEffect(() => {

@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 
 interface Profile {
   user_id: string;
@@ -18,69 +17,33 @@ export const useProfile = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async () => {
+  const fetchProfile = () => {
     if (!user) {
       setProfile(null);
       setLoading(false);
       return;
     }
 
-    try {
-      console.log('🔍 Fetching profile for user:', user.id);
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      console.log('📊 Profile query result:', { data, error });
-
-      if (error) {
-        console.error('Error fetching profile:', error);
-        
-        // Create a default profile structure if none exists
-        const defaultProfile: Profile = {
-          user_id: user.id,
-          display_name: user.email?.split('@')[0] || null,
-          first_name: null,
-          last_name: null,
-          bio: null,
-          avatar_url: null,
-          profile_complete: false
-        };
-        setProfile(defaultProfile);
-      } else {
-        // Use the fetched profile or create default if data is null
-        const profileData: Profile = data || {
-          user_id: user.id,
-          display_name: user.email?.split('@')[0] || null,
-          first_name: null,
-          last_name: null,
-          bio: null,
-          avatar_url: null,
-          profile_complete: false
-        };
-        
-        console.log('✅ Profile loaded successfully:', profileData);
-        setProfile(profileData);
-      }
-    } catch (error) {
-      console.error('Exception fetching profile:', error);
-      // Create a fallback profile even on exception
-      const fallbackProfile: Profile = {
+    console.log('🔍 Fetching profile for user:', user.id);
+    
+    // Simulate loading delay
+    setTimeout(() => {
+      // Mock profile data
+      const mockProfile: Profile = {
         user_id: user.id,
-        display_name: user.email?.split('@')[0] || null,
-        first_name: null,
-        last_name: null,
-        bio: null,
+        display_name: user.email?.split('@')[0] || 'Dev User',
+        first_name: 'Dev',
+        last_name: 'User',
+        bio: 'Rental arbitrage enthusiast and developer',
         avatar_url: null,
-        profile_complete: false
+        profile_complete: true
       };
-      setProfile(fallbackProfile);
-    } finally {
+      
+      console.log('📊 Profile query result:', { data: mockProfile, error: null });
+      console.log('✅ Profile loaded successfully:', mockProfile);
+      setProfile(mockProfile);
       setLoading(false);
-    }
+    }, 400);
   };
 
   const updateProfile = (newProfile: Profile) => {

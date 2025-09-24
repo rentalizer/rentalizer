@@ -29,7 +29,7 @@ export default function SignUp() {
   // Redirect if already authenticated
   React.useEffect(() => {
     if (user) {
-      navigate('/community');
+      navigate('/dashboard');
     }
   }, [user, navigate]);
 
@@ -118,10 +118,10 @@ export default function SignUp() {
         title: "Account created successfully!",
         description: "Welcome to Rentalizer! Please check your email to verify your account.",
       });
-      navigate('/community');
-    } catch (error: any) {
+      navigate('/dashboard');
+    } catch (error: unknown) {
       console.error('Sign up error:', error);
-      const errorMessage = error?.message || "An unexpected error occurred. Please try again.";
+      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred. Please try again.";
       toast({
         title: "Sign up failed",
         description: errorMessage,

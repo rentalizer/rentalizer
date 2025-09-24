@@ -42,7 +42,6 @@ import { useAdminRole } from '@/hooks/useAdminRole';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 
 export interface CalculatorData {
   // Comps
@@ -104,43 +103,22 @@ const Community = () => {
                        window.location.search.includes('__lovable_token') ||
                        window.location.hostname === 'localhost';
   
-  // Enhanced admin check that works on live site
+  // Mock admin check - replace with real API call later
   useEffect(() => {
-    const checkAdminStatus = async () => {
+    const checkAdminStatus = () => {
       if (!user) {
         setUserIsAdmin(false);
         setAdminCheckLoading(false);
         return;
       }
 
-      try {
-        // First check using the hook
-        if (isAdmin) {
-          setUserIsAdmin(true);
-          setAdminCheckLoading(false);
-          return;
-        }
-
-        // Direct database check as fallback
-        const { data: roles, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .eq('role', 'admin')
-          .limit(1);
-
-        if (error) {
-          console.error('Error checking admin status:', error);
-          setUserIsAdmin(false);
-        } else {
-          setUserIsAdmin(roles && roles.length > 0);
-        }
-      } catch (error) {
-        console.error('Exception checking admin status:', error);
-        setUserIsAdmin(false);
-      }
-      
-      setAdminCheckLoading(false);
+      // Simulate loading delay
+      setTimeout(() => {
+        // Mock admin status - you can change this to true/false for testing
+        const mockIsAdmin = true; // Set to false to test non-admin behavior
+        setUserIsAdmin(mockIsAdmin);
+        setAdminCheckLoading(false);
+      }, 300);
     };
 
     checkAdminStatus();
@@ -270,21 +248,17 @@ const Community = () => {
         description: "Opening Stripe checkout...",
       });
 
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          plan: plan,
-          billing: 'monthly' // Default to monthly
-        }
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        // Open Stripe checkout in a new tab
-        window.open(data.url, '_blank');
-      } else {
-        throw new Error('No checkout URL received');
-      }
+      // Mock checkout - replace with real API call later
+      setTimeout(() => {
+        // Mock checkout URL - replace with real Stripe checkout URL
+        const mockCheckoutUrl = 'https://checkout.stripe.com/mock-checkout';
+        window.open(mockCheckoutUrl, '_blank');
+        
+        toast({
+          title: "Checkout Opened",
+          description: "Mock checkout page opened in new tab",
+        });
+      }, 500);
     } catch (error) {
       console.error('Checkout error:', error);
       toast({

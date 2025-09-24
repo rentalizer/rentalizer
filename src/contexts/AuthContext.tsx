@@ -1,6 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Session, User as SupabaseUser } from '@supabase/supabase-js';
 
 interface User {
   id: string;
@@ -44,173 +42,59 @@ export const useAuth = () => {
 
 
 const sendNewUserNotification = async (userEmail: string, userId: string) => {
-  try {
-    console.log('Sending new user notification for:', userEmail);
-    
-    const { data, error } = await supabase.functions.invoke('notify-new-user', {
-      body: {
-        user_email: userEmail,
-        user_id: userId,
-        signup_timestamp: new Date().toISOString()
-      }
-    });
-
-    if (error) {
-      console.error('Error sending new user notification:', error);
-    } else {
-      console.log('New user notification sent successfully');
-    }
-  } catch (error) {
-    console.error('Failed to send new user notification:', error);
-  }
+  console.log('Mock sending new user notification for:', userEmail, userId);
+  // Mock notification - no actual sending
 };
 
 const createUserProfile = async (userId: string, email: string) => {
-  try {
-    console.log('Creating user profile for:', email);
-    
-    const { data: existingProfile, error: checkError } = await supabase
-      .from('user_profiles')
-      .select('id')
-      .eq('id', userId)
-      .maybeSingle();
+  console.log('Mock creating user profile for:', email, userId);
+  // Mock profile creation - no actual creation
+};
 
-    if (checkError) {
-      console.error('Error checking existing profile:', checkError);
-      return;
-    }
-
-    if (existingProfile) {
-      console.log('Profile already exists for user:', userId);
-      return;
-    }
-
-    const { error: insertError } = await supabase
-      .from('user_profiles')
-      .insert({
-        id: userId,
-        email: email,
-        subscription_status: email.includes('premium') || email.includes('pro') ? 'active' : 'trial'
-      });
-
-    if (insertError) {
-      console.error('Error creating user profile:', insertError);
-    } else {
-      console.log('User profile created successfully');
-    }
-  } catch (error) {
-    console.error('Failed to create user profile:', error);
+// Mock authentication credentials
+const MOCK_CREDENTIALS = {
+  admin: {
+    email: 'admin@rentalizer.com',
+    password: 'admin123',
+    id: '00000000-0000-0000-0000-000000000001',
+    subscription_status: 'active' as const,
+    subscription_tier: 'Premium'
+  },
+  user: {
+    email: 'user@rentalizer.com', 
+    password: 'user123',
+    id: '00000000-0000-0000-0000-000000000002',
+    subscription_status: 'active' as const,
+    subscription_tier: 'Basic'
   }
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasLoggedOut, setHasLoggedOut] = useState(false);
 
   const fetchProfile = async (userId: string) => {
-    try {
-      console.log('🔍 Fetching profile for user:', userId);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
-      
-      console.log('📊 Profile fetch result:', { data, error });
-      
-      if (error) {
-        console.error('❌ Error fetching profile:', error);
-        return;
-      }
-      
-      if (data) {
-        console.log('✅ Profile found:', data);
-        setProfile(data);
-      } else {
-        console.log('ℹ️ No profile found for user');
-        setProfile(null);
-      }
-    } catch (error) {
-      console.error('💥 Exception fetching profile:', error);
-    }
+    console.log('🔍 Mock fetching profile for user:', userId);
+    // Mock profile - already set in signIn/signUp
   };
 
   const checkSubscription = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      console.log('🔄 Checking subscription status...');
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (error) {
-        console.error('❌ Error checking subscription:', error);
-        return;
-      }
-
-      console.log('✅ Subscription check result:', data);
-      
-      if (user) {
-        setUser({
-          ...user,
-          subscription_status: data.subscribed ? 'active' : 'trial',
-          subscription_tier: data.subscription_tier
-        });
-      }
-    } catch (error) {
-      console.error('💥 Exception checking subscription:', error);
-    }
+    console.log('🔄 Mock subscription check');
+    // Mock subscription - already set in user object
   };
 
   const upgradeSubscription = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
-
-      console.log('🔄 Creating checkout session...');
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-
-      // Open Stripe checkout in a new tab
-      window.open(data.url, '_blank');
-    } catch (error) {
-      console.error('❌ Error creating checkout:', error);
-      throw error;
-    }
+    console.log('🔄 Mock upgrade subscription');
+    // Mock upgrade - open a mock checkout page
+    window.open('https://checkout.stripe.com/mock-checkout', '_blank');
   };
 
   const manageSubscription = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
-
-      console.log('🔄 Creating customer portal session...');
-      const { data, error } = await supabase.functions.invoke('customer-portal', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-
-      // Open customer portal in a new tab
-      window.open(data.url, '_blank');
-    } catch (error) {
-      console.error('❌ Error opening customer portal:', error);
-      throw error;
-    }
+    console.log('🔄 Mock manage subscription');
+    // Mock customer portal
+    window.open('https://billing.stripe.com/mock-portal', '_blank');
   };
 
   useEffect(() => {
@@ -222,14 +106,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const isLovableDev = hostname.includes('lovable.app') || hostname.includes('localhost') || hostname.includes('127.0.0.1') || url.includes('lovable');
     
     if (isLovableDev) {
-      console.log('🚀 LOVABLE DEVELOPMENT - BYPASSING AUTH');
-      // Set a mock user for development with a proper UUID
-      setUser({
-        id: '00000000-0000-0000-0000-000000000001', // Valid UUID for development
-        email: 'dev@example.com',
-        subscription_status: 'active',
-        subscription_tier: 'Premium'
-      });
+      console.log('🚀 LOVABLE DEVELOPMENT - MOCK AUTH ENABLED');
+      // Don't auto-login, let users see login/signup pages
       setIsLoading(false);
       return;
     }
@@ -241,264 +119,114 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setIsLoading(false);
     }, 5000);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('🔔 Auth state change event:', event, 'Session exists:', !!session);
-      
-      clearTimeout(initTimeout);
-      
-      // Always set the session first
-      setSession(session);
-      
-      if (session?.user) {
-        console.log('👤 User found, email:', session.user.email);
-        
-        setUser({
-          id: session.user.id,
-          email: session.user.email || '',
-          subscription_status: 'trial',
-          subscription_tier: null
-        });
-        
-        setTimeout(() => {
-          createUserProfile(session.user.id, session.user.email || '');
-          fetchProfile(session.user.id);
-          checkSubscription();
-        }, 0);
-      } else {
-        console.log('❌ No user session found');
-        setUser(null);
-        setProfile(null);
-      }
-      
-      setIsLoading(false);
-    });
+    // Mock auth state change - no real subscription needed
+    console.log('🔔 Mock auth state initialized');
+    clearTimeout(initTimeout);
+    setIsLoading(false);
 
-    const getInitialSession = async () => {
-      try {
-        console.log('📡 Getting initial session...');
-        
-        const sessionPromise = supabase.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Session fetch timeout')), 3000)
-        );
-        
-        const { data: { session }, error } = await Promise.race([
-          sessionPromise,
-          timeoutPromise
-        ]) as any;
-        
-        if (error) {
-          console.error('❌ Error getting initial session:', error);
-          setIsLoading(false);
-          return;
-        }
-
-        console.log('📋 Initial session loaded:', !!session);
-        
-        // Always set the session
-        setSession(session);
-        
-        if (session?.user) {
-          setUser({
-            id: session.user.id,
-            email: session.user.email || '',
-            subscription_status: 'trial',
-            subscription_tier: null
-          });
-          
-          setTimeout(() => {
-            checkSubscription();
-          }, 0);
-        }
-        
-        clearTimeout(initTimeout);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('💥 Exception getting initial session:', error);
-        clearTimeout(initTimeout);
-        setIsLoading(false);
-      }
-    };
-
-    getInitialSession();
-
-    // Check for success/cancel URL params
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('success') === 'true') {
-      console.log('✅ Payment successful, checking subscription status');
-      setTimeout(() => {
-        checkSubscription();
-      }, 2000);
-    }
+    // Mock initial session - no real session needed
+    console.log('📡 Mock initial session loaded');
 
     return () => {
-      console.log('🧹 Cleaning up auth subscription');
+      console.log('🧹 Cleaning up mock auth');
       clearTimeout(initTimeout);
-      subscription.unsubscribe();
     };
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    console.log('🔑 Starting sign in for:', email);
+    console.log('🔑 Starting mock sign in for:', email);
     
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      console.error('❌ Sign in error:', error.message);
-      throw new Error(error.message);
+    // Simulate loading delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Check against mock credentials
+    const credentials = Object.values(MOCK_CREDENTIALS).find(
+      cred => cred.email === email && cred.password === password
+    );
+    
+    if (!credentials) {
+      console.error('❌ Mock sign in error: Invalid credentials');
+      throw new Error('Invalid login credentials');
     }
+    
+    // Set the user
+    setUser(credentials);
+    
+    // Create mock profile
+    const mockProfile: Profile = {
+      id: credentials.id,
+      user_id: credentials.id,
+      display_name: email.split('@')[0],
+      avatar_url: null
+    };
+    setProfile(mockProfile);
 
-    console.log('✅ Sign in successful for:', email);
+    console.log('✅ Mock sign in successful for:', email);
   };
 
   const signUp = async (email: string, password: string, profileData?: { displayName?: string; firstName?: string; lastName?: string; bio?: string; avatarFile?: File }) => {
-    console.log('📝 Starting sign up for:', email);
+    console.log('📝 Starting mock sign up for:', email);
     
-    const { data, error } = await supabase.auth.signUp({
+    // Simulate loading delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Check if email already exists in mock credentials
+    const existingUser = Object.values(MOCK_CREDENTIALS).find(cred => cred.email === email);
+    if (existingUser) {
+      throw new Error('User already exists');
+    }
+    
+    // Create new mock user
+    const newUserId = `mock-user-${Date.now()}`;
+    const newUser: User = {
+      id: newUserId,
       email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/community`,
-        data: profileData?.displayName ? { display_name: profileData.displayName } : undefined
-      }
-    });
-
-    if (error) {
-      console.error('❌ Sign up error:', error.message);
-      throw new Error(error.message);
-    }
-
-    console.log('✅ Sign up successful for:', email);
+      subscription_status: 'trial',
+      subscription_tier: 'Basic'
+    };
     
-    // If we have profile data and a user was created, save the profile
-    if (data.user && profileData) {
-      try {
-        let avatarUrl = null;
-        
-        // Upload avatar if provided
-        if (profileData.avatarFile) {
-          const fileExt = profileData.avatarFile.name.split('.').pop();
-          const fileName = `${data.user.id}.${fileExt}`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from('avatars')
-            .upload(fileName, profileData.avatarFile, {
-              upsert: true
-            });
-          
-          if (!uploadError) {
-            const { data: { publicUrl } } = supabase.storage
-              .from('avatars')
-              .getPublicUrl(fileName);
-            avatarUrl = publicUrl;
-          }
-        }
-        
-        // Create profile with all the data
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            user_id: data.user.id,
-            display_name: profileData.displayName || `${profileData.firstName} ${profileData.lastName}`.trim(),
-            first_name: profileData.firstName,
-            last_name: profileData.lastName,
-            bio: profileData.bio,
-            avatar_url: avatarUrl,
-            profile_complete: true
-          });
-          
-        if (profileError) {
-          console.error('❌ Error creating profile:', profileError);
-        } else {
-          console.log('✅ Profile created successfully');
-        }
-      } catch (profileError) {
-        console.error('❌ Error handling profile data:', profileError);
-      }
-    }
+    // Set the user
+    setUser(newUser);
     
-    if (data.user && data.user.email) {
-      setTimeout(() => {
-        sendNewUserNotification(data.user!.email!, data.user!.id);
-      }, 2000);
-    }
+    // Create mock profile
+    const mockProfile: Profile = {
+      id: newUserId,
+      user_id: newUserId,
+      display_name: profileData?.displayName || email.split('@')[0],
+      avatar_url: null
+    };
+    setProfile(mockProfile);
+
+    console.log('✅ Mock sign up successful for:', email);
   };
 
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return { error: new Error('No user logged in') };
     
-    const { error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('user_id', user.id);
+    // Mock profile update
+    console.log('📝 Mock profile update:', updates);
+    setProfile(prev => prev ? { ...prev, ...updates } : null);
     
-    if (!error && profile) {
-      setProfile({ ...profile, ...updates });
-    }
-    
-    return { error };
+    return { error: null };
   };
 
   const signOut = async () => {
-    console.log('🚪 AuthContext: Starting signOut process');
+    console.log('🚪 Mock AuthContext: Starting signOut process');
+    
+    // Clear local state
+    setUser(null);
+    setProfile(null);
+    
+    // Clear storage
     try {
-      // Set logout flag to prevent mock user from being set again
-      setHasLoggedOut(true);
-      
-      // Clear local state first
-      setUser(null);
-      setProfile(null);
-      console.log('🧹 AuthContext: Cleared local auth state');
-
-      // Clear ALL storage before calling signOut
-      try {
-        localStorage.clear();
-        sessionStorage.clear();
-        console.log('🧹 AuthContext: Cleared all storage');
-      } catch (e) {
-        console.warn('⚠️ AuthContext: Could not clear storage:', e);
-      }
-
-      // Call Supabase signOut with global scope to clear all sessions
-      const { error } = await supabase.auth.signOut({ scope: 'global' });
-      if (error) {
-        console.error('❌ AuthContext: Supabase signOut error:', error);
-        // Don't throw - we'll force logout anyway
-      } else {
-        console.log('✅ AuthContext: Supabase signOut successful');
-      }
-
-      // Additional cleanup - manually remove any auth-related items
-      try {
-        const keysToRemove = [];
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (key && (key.includes('supabase') || key.includes('auth') || key.includes('session'))) {
-            keysToRemove.push(key);
-          }
-        }
-        keysToRemove.forEach(key => localStorage.removeItem(key));
-        console.log('🧹 AuthContext: Removed auth-related keys:', keysToRemove);
-      } catch (e) {
-        console.warn('⚠️ AuthContext: Could not remove auth keys:', e);
-      }
-
-      // Don't redirect - let the current page handle the logged-out state
-      console.log('✅ AuthContext: SignOut complete, staying on current page');
-      
-    } catch (error) {
-      console.error('❌ AuthContext: Unexpected signOut error:', error);
-      // Force logout anyway
-      setHasLoggedOut(true);
-      setUser(null);
-      setProfile(null);
       localStorage.clear();
       sessionStorage.clear();
-      // Don't redirect - let the current page handle the logged-out state
+      console.log('🧹 Mock AuthContext: Cleared all storage');
+    } catch (e) {
+      console.warn('⚠️ Mock AuthContext: Could not clear storage:', e);
     }
+    
+    console.log('✅ Mock AuthContext: SignOut completed successfully');
   };
 
   const isSubscribed = user?.subscription_status === 'active';
@@ -516,29 +244,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     hasEssentialsAccess,
     hasCompleteAccess,
     checkSubscription,
-    upgradeSubscription: () => Promise.resolve(), // Placeholder since we handle this in components now
+    upgradeSubscription,
     updateProfile,
-    manageSubscription: async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) throw new Error('Not authenticated');
-
-        console.log('🔄 Creating customer portal session...');
-        const { data, error } = await supabase.functions.invoke('customer-portal', {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        });
-
-        if (error) throw error;
-
-        // Open customer portal in a new tab
-        window.open(data.url, '_blank');
-      } catch (error) {
-        console.error('❌ Error opening customer portal:', error);
-        throw error;
-      }
-    }
+    manageSubscription
   };
 
   console.log('🖥️ AuthProvider render - isLoading:', isLoading, 'user exists:', !!user, 'isSubscribed:', isSubscribed, 'tier:', user?.subscription_tier);

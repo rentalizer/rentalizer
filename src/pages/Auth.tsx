@@ -32,7 +32,7 @@ export const Auth = () => {
 
   // Redirect if already authenticated
   if (user) {
-    return <Navigate to="/community" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
