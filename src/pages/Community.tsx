@@ -1,5 +1,5 @@
 // Community Component - Fixed TopNavBar issue
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 // Extend Window interface for Calendly
 declare global {
@@ -73,7 +73,7 @@ export interface CalculatorData {
   furnishingsPSF: number;
 }
 
-const Community = () => {
+const Community = React.memo(() => {
   const { memberCount, loading } = useMemberCount();
   
   // Get initial tab from URL hash or default to discussions
@@ -88,8 +88,6 @@ const Community = () => {
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [profileEditorOpen, setProfileEditorOpen] = useState(false);
   const [directMessageChatOpen, setDirectMessageChatOpen] = useState(false);
-  const [userIsAdmin, setUserIsAdmin] = useState(false);
-  const [adminCheckLoading, setAdminCheckLoading] = useState(true);
 
   const [showPricingOverlay, setShowPricingOverlay] = useState(false);
   const { toast } = useToast();
@@ -103,28 +101,24 @@ const Community = () => {
                        window.location.search.includes('__lovable_token') ||
                        window.location.hostname === 'localhost';
   
-  // Check admin status based on user role
-  useEffect(() => {
-    const checkAdminStatus = () => {
-      if (!user) {
-        setUserIsAdmin(false);
-        setAdminCheckLoading(false);
-        return;
-      }
+  // Check admin status based on user role - optimized to run only once
+  const userIsAdmin = useMemo(() => {
+    if (!user) return false;
+    return user.role === 'admin' || user.role === 'superadmin';
+  }, [user?.role]); // Only depend on the role, not the entire user object
 
-      // Check if user has admin or superadmin role
-      const isAdminUser = user.role === 'admin' || user.role === 'superadmin';
-      setUserIsAdmin(isAdminUser);
-      setAdminCheckLoading(false);
-    };
-
-    checkAdminStatus();
+  const adminCheckLoading = useMemo(() => {
+    return !user; // Only loading if user is not loaded yet
   }, [user]);
   
   
-  // Update URL hash when tab changes
+  // Update URL hash when tab changes - debounced to prevent excessive updates
   useEffect(() => {
-    window.location.hash = activeTab;
+    const timeoutId = setTimeout(() => {
+      window.location.hash = activeTab;
+    }, 100); // Small delay to prevent excessive hash updates
+
+    return () => clearTimeout(timeoutId);
   }, [activeTab]);
   
   // Calculator state
@@ -713,7 +707,8 @@ const Community = () => {
       )}
     </AccessGate>
   );
-};
+});
 
-// Admin button removed for security
+Community.displayName = 'Community';
+
 export default Community;

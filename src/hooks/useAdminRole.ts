@@ -1,26 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const useAdminRole = () => {
   const { user } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const checkAdminRole = () => {
-      if (!user) {
-        setIsAdmin(false);
-        setLoading(false);
-        return;
-      }
+  const isAdmin = useMemo(() => {
+    if (!user) return false;
+    return user.role === 'admin' || user.role === 'superadmin';
+  }, [user?.role]); // Only depend on the role, not the entire user object
 
-      // Check if user has admin or superadmin role from our custom backend
-      const isAdminUser = user.role === 'admin' || user.role === 'superadmin';
-      setIsAdmin(isAdminUser);
-      setLoading(false);
-    };
-
-    checkAdminRole();
+  const loading = useMemo(() => {
+    return !user; // Only loading if user is not loaded yet
   }, [user]);
 
   return { isAdmin, loading };
