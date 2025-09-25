@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Paperclip, Image, Video, Smile, AtSign, X, Check, AlertCircle, Play, Pause } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { apiService } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 
 interface CommunityHeaderProps {
@@ -551,29 +551,18 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
         content: contentWithMedia,
         author_name: getUserName(),
         category: 'General',
-        user_id: user.id,
         author_avatar: user?.profilePicture
       });
       
-      const { data, error } = await supabase
-        .from('discussions')
-        .insert({
-          title: postTitleToUse,
-          content: contentWithMedia,
-          author_name: getUserName(),
-          category: 'General',
-          user_id: user.id,
-          author_avatar: user?.profilePicture
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Database error creating discussion:', error);
-        throw error;
-      }
+      const response = await apiService.createDiscussion({
+        title: postTitleToUse,
+        content: contentWithMedia,
+        author_name: getUserName(),
+        category: 'General',
+        author_avatar: user?.profilePicture
+      });
       
-      console.log('Discussion created successfully:', data);
+      console.log('Discussion created successfully:', response.data);
 
       const attachmentCount = uploadedFiles.length + (videoUpload?.uploaded ? 1 : 0) + (photoUpload?.uploaded ? 1 : 0);
       toast({

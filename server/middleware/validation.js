@@ -101,11 +101,81 @@ const validateLogin = [
   handleValidationErrors
 ];
 
+// Discussion validation rules
+const validateDiscussion = [
+  body('title')
+    .trim()
+    .isLength({ min: 1, max: 200 })
+    .withMessage('Title must be between 1 and 200 characters'),
+  body('content')
+    .trim()
+    .isLength({ min: 1, max: 5000 })
+    .withMessage('Content must be between 1 and 5000 characters'),
+  body('author_name')
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .withMessage('Author name must be between 1 and 100 characters'),
+  body('author_avatar')
+    .optional()
+    .custom((value) => {
+      if (!value) return true; // Allow empty values
+      // Check if it's a valid URL or base64 data URL
+      if (value.startsWith('data:image/') || value.startsWith('http')) {
+        return true;
+      }
+      throw new Error('Author avatar must be a valid URL or base64 data URL');
+    }),
+  body('category')
+    .optional()
+    .isIn(['General', 'Market Analysis', 'Property Management', 'Investment Strategies', 'Legal & Compliance', 'Technology', 'Networking', 'Success Stories', 'Q&A'])
+    .withMessage('Invalid category'),
+  body('tags')
+    .optional()
+    .isArray()
+    .withMessage('Tags must be an array'),
+  body('tags.*')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage('Each tag must be between 1 and 50 characters'),
+  handleValidationErrors
+];
+
+// Discussion update validation rules (more lenient)
+const validateDiscussionUpdate = [
+  body('title')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 200 })
+    .withMessage('Title must be between 1 and 200 characters'),
+  body('content')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 5000 })
+    .withMessage('Content must be between 1 and 5000 characters'),
+  body('category')
+    .optional()
+    .isIn(['General', 'Market Analysis', 'Property Management', 'Investment Strategies', 'Legal & Compliance', 'Technology', 'Networking', 'Success Stories', 'Q&A'])
+    .withMessage('Invalid category'),
+  body('tags')
+    .optional()
+    .isArray()
+    .withMessage('Tags must be an array'),
+  body('tags.*')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage('Each tag must be between 1 and 50 characters'),
+  handleValidationErrors
+];
+
 module.exports = {
   validateRegistration,
   validateLogin,
   validateProfileUpdate,
   validatePasswordChange,
   validateAccountDeletion,
+  validateDiscussion,
+  validateDiscussionUpdate,
   handleValidationErrors
 };

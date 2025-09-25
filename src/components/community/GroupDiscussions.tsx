@@ -16,7 +16,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileSetup } from '@/components/ProfileSetup';
 import { useAdminRole } from '@/hooks/useAdminRole';
-import { apiService } from '@/services/api';
+import { apiService, type Discussion } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 import { NewsFeed } from '@/components/community/NewsFeed';
 import { MembersList } from '@/components/MembersList';
@@ -26,7 +26,8 @@ import { Input } from '@/components/ui/input';
 import { useMemberCount } from '@/hooks/useMemberCount';
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 
-interface Discussion {
+// Frontend Discussion interface (transformed from backend)
+interface DiscussionType {
   id: string;
   title: string;
   content: string;
@@ -38,10 +39,25 @@ interface Discussion {
   timeAgo: string;
   created_at: string;
   isPinned?: boolean;
-  isLiked?: boolean;
-  user_id?: string;
-  isMockData?: boolean;
+  isLiked: boolean;
+  user_id: string;
   isAdmin?: boolean;
+  // Backend fields for transformation
+  _id: string;
+  author_name: string;
+  author_avatar?: string;
+  comments_count: number;
+  is_pinned: boolean;
+  is_admin_post: boolean;
+  // Additional backend fields
+  views_count: number;
+  liked_by: string[];
+  tags: string[];
+  attachments: any[];
+  is_active: boolean;
+  last_activity: string;
+  updatedAt: string;
+  createdAt: string;
 }
 
 interface UserProfile {
@@ -59,8 +75,10 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const { isAdmin } = useAdminRole();
   const { toast } = useToast();
   
-  const [discussionsList, setDiscussionsList] = useState<Discussion[]>([]);
-  const [selectedDiscussion, setSelectedDiscussion] = useState<Discussion | null>(null);
+  const [discussionsList, setDiscussionsList] = useState<DiscussionType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [likingPosts, setLikingPosts] = useState<Set<string>>(new Set());
+  const [selectedDiscussion, setSelectedDiscussion] = useState<DiscussionType | null>(null);
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<{[key: string]: {id: string; author: string; avatar: string; content: string; timeAgo: string;}[]}>({});
   const [editingPost, setEditingPost] = useState<string | null>(null);
@@ -104,7 +122,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   }, [profile?.display_name, user?.email, getInitials]);
 
   // Check if a discussion is from an admin
-  const isAdminPost = useCallback((discussion: Discussion) => {
+  const isAdminPost = useCallback((discussion: DiscussionType) => {
     // Check if the author name contains "(Admin)" or if the user_id matches current admin user
     return discussion.author.includes('(Admin)') || 
            (user && discussion.user_id === user.id && isAdmin);
@@ -244,25 +262,60 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     ]
   }), []);
 
-  // Fetch discussions with mock data
+  // Fetch discussions from backend API
   const fetchDiscussions = useCallback(async () => {
-    console.log('🔄 Loading mock discussions data...');
+    console.log('🔄 Loading discussions from backend...');
+    setLoading(true);
     
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300));
+      const response = await apiService.getDiscussions({
+        page: 1,
+        limit: 50,
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
+      });
       
-      console.log('📥 Mock discussions loaded:', mockDiscussions.length, 'discussions');
-      console.log('📌 Pinned discussions:', mockDiscussions.filter(d => d.isPinned).length);
+      console.log('📥 Discussions loaded:', response.data.length, 'discussions');
+      console.log('📌 Pinned discussions:', response.data.filter(d => d.is_pinned).length);
       
-      setDiscussionsList(mockDiscussions);
+      // Transform backend data to match frontend expectations
+      const transformedDiscussions = response.data.map(discussion => {
+        const isLiked = user ? discussion.liked_by.includes(user.id) : false;
+        console.log(`🔍 Discussion "${discussion.title}":`, {
+          liked_by: discussion.liked_by,
+          current_user_id: user?.id,
+          isLiked: isLiked
+        });
+        
+        return {
+          ...discussion,
+          id: discussion._id,
+          author: discussion.author_name,
+          avatar: discussion.author_avatar || '',
+          comments: discussion.comments_count,
+          timeAgo: discussion.timeAgo,
+          isPinned: discussion.is_pinned,
+          isLiked: isLiked,
+          isAdmin: discussion.is_admin_post,
+          created_at: discussion.createdAt
+        };
+      });
       
-      // Set mock comments
+      setDiscussionsList(transformedDiscussions);
+      
+      // Set mock comments for now (we'll implement comments API later)
       setComments(mockComments);
     } catch (error) {
-      console.error('❌ Exception loading mock discussions:', error);
+      console.error('❌ Exception loading discussions:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load discussions. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
-  }, [mockDiscussions, mockComments]);
+  }, [toast, user]);
 
   const formatTimeAgo = useCallback((dateString: string) => {
     const date = new Date(dateString);
@@ -341,17 +394,45 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     return discussionsList; // Already sorted from database
   }, [discussionsList]);
 
-  const handleLike = useCallback((discussionId: string) => {
-    setDiscussionsList(prev => prev.map(discussion => 
-      discussion.id === discussionId
-        ? { 
-            ...discussion, 
-            isLiked: !discussion.isLiked,
-            likes: discussion.isLiked ? discussion.likes - 1 : discussion.likes + 1
-          }
-        : discussion
-    ));
-  }, []);
+  const handleLike = useCallback(async (discussionId: string) => {
+    // Prevent multiple clicks while processing
+    if (likingPosts.has(discussionId)) return;
+    
+    try {
+      // Add to loading state
+      setLikingPosts(prev => new Set(prev).add(discussionId));
+      
+      // Call the backend API to like/unlike the discussion
+      const response = await apiService.likeDiscussion(discussionId);
+      
+      // Update local state with the response from backend
+      setDiscussionsList(prev => prev.map(discussion => 
+        discussion.id === discussionId
+          ? { 
+              ...discussion, 
+              isLiked: response.data.isLiked,
+              likes: response.data.likesCount
+            }
+          : discussion
+      ));
+      
+      console.log('✅ Like status updated:', response.data);
+    } catch (error) {
+      console.error('❌ Error updating like status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update like status. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      // Remove from loading state
+      setLikingPosts(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(discussionId);
+        return newSet;
+      });
+    }
+  }, [toast, likingPosts]);
 
   const handleAddComment = useCallback(async () => {
     if (!newComment.trim() || !selectedDiscussion) return;
@@ -392,27 +473,15 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       const newPinnedStatus = !discussion.isPinned;
       
       // Update database first
-      const { error } = await supabase
-        .from('discussions')
-        .update({ is_pinned: newPinnedStatus })
-        .eq('id', discussionId);
-
-      if (error) {
-        console.error('❌ Error updating pin status:', error);
-        toast({
-          title: "Error",
-          description: "Failed to update pin status",
-          variant: "destructive"
-        });
-        return;
-      }
+      const response = await apiService.pinDiscussion(discussionId);
+      const actualPinnedStatus = response.data.isPinned;
 
       // Refresh the discussions list to get proper sorting
       await fetchDiscussions();
 
       toast({
-        title: newPinnedStatus ? "Post Pinned" : "Post Unpinned",
-        description: newPinnedStatus 
+        title: actualPinnedStatus ? "Post Pinned" : "Post Unpinned",
+        description: actualPinnedStatus 
           ? "This post will now appear at the top of the discussions" 
           : "This post will no longer be pinned",
       });
@@ -430,43 +499,9 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
     try {
-      // First delete from database to ensure admin permissions work
-      const { data, error } = await supabase
-        .from('discussions')
-        .delete()
-        .eq('id', discussionId)
-        .select();
-        
-      console.log('🗑️ Delete response data:', data);
-      console.log('🗑️ Delete response error:', error);
-        
-      if (error) {
-        console.error('❌ Database deletion failed:', error);
-        console.error('❌ Error details:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint
-        });
-        toast({
-          title: "Error",
-          description: `Failed to delete discussion: ${error.message}`,
-          variant: "destructive"
-        });
-        return;
-      }
-
-      if (!data || data.length === 0) {
-        console.warn('⚠️ No rows were deleted - discussion may not exist or permission denied');
-        toast({
-          title: "Warning", 
-          description: "No discussion was deleted. It may not exist or you may not have permission.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      console.log('✅ Database deletion successful - deleted rows:', data.length);
+      // Delete from database
+      const response = await apiService.deleteDiscussion(discussionId);
+      console.log('🗑️ Delete response:', response);
 
       // After successful database deletion, update UI
       setDiscussionsList(prevDiscussions => {
@@ -498,7 +533,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     return false;
   }, [isAdmin, user]);
 
-  const canPin = useCallback((discussion: Discussion) => {
+  const canPin = useCallback((discussion: DiscussionType) => {
     // Only admins can pin/unpin posts AND the post must be from an admin
     return isAdmin && isAdminPost(discussion);
   }, [isAdmin, isAdminPost]);
@@ -537,7 +572,19 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
           {/* Discussion Posts */}
           <div className="space-y-4">
-            {filteredDiscussions.map((discussion) => {
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+                <span className="ml-2 text-cyan-300">Loading discussions...</span>
+              </div>
+            ) : filteredDiscussions.length === 0 ? (
+              <div className="text-center py-8">
+                <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-300 mb-2">No discussions yet</h3>
+                <p className="text-gray-400">Be the first to start a conversation!</p>
+              </div>
+            ) : (
+              filteredDiscussions.map((discussion) => {
               const profileInfo = getProfileInfo(discussion.user_id, discussion.author);
               
               return (
@@ -659,10 +706,11 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                             variant="ghost" 
                             size="sm" 
                             onClick={() => handleLike(discussion.id)}
-                            className={`flex items-center gap-2 hover:bg-red-500/10 transition-colors ${discussion.isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'}`}
+                            disabled={likingPosts.has(discussion.id)}
+                            className={`flex items-center gap-2 hover:bg-red-500/10 transition-colors ${discussion.isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'} ${likingPosts.has(discussion.id) ? 'opacity-50 cursor-not-allowed' : ''}`}
                           >
                             <Heart className={`h-4 w-4 ${discussion.isLiked ? 'fill-current' : ''}`} />
-                            {discussion.likes}
+                            {likingPosts.has(discussion.id) ? '...' : discussion.likes}
                           </Button>
                           
                           <Dialog>
@@ -739,7 +787,8 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                   </CardContent>
                 </Card>
               );
-            })}
+            })
+            )}
           </div>
         </div>
       </div>

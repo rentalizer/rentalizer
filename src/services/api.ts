@@ -86,6 +86,108 @@ export interface ChangePasswordRequest {
   newPassword: string;
 }
 
+// Discussion types
+export interface Discussion {
+  _id: string;
+  title: string;
+  content: string;
+  author_name: string;
+  author_avatar?: string;
+  category: string;
+  user_id: string;
+  is_pinned: boolean;
+  is_admin_post: boolean;
+  likes: number;
+  comments_count: number;
+  views_count: number;
+  liked_by: string[];
+  tags: string[];
+  attachments: Array<{
+    type: 'image' | 'video' | 'document';
+    url: string;
+    filename: string;
+    size: number;
+  }>;
+  is_active: boolean;
+  last_activity: string;
+  createdAt: string;
+  updatedAt: string;
+  timeAgo: string;
+  isLiked: boolean;
+  user_id: {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    email: string;
+    profilePicture?: string;
+    role?: string;
+  };
+}
+
+export interface CreateDiscussionRequest {
+  title: string;
+  content: string;
+  author_name?: string;
+  author_avatar?: string;
+  category?: string;
+  tags?: string[];
+}
+
+export interface UpdateDiscussionRequest {
+  title?: string;
+  content?: string;
+  category?: string;
+  tags?: string[];
+}
+
+export interface DiscussionResponse {
+  success: boolean;
+  message: string;
+  data: Discussion;
+}
+
+export interface DiscussionsResponse {
+  success: boolean;
+  message: string;
+  data: Discussion[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
+export interface DiscussionStats {
+  totalDiscussions: number;
+  totalLikes: number;
+  totalComments: number;
+  totalViews: number;
+  pinnedDiscussions: number;
+  adminDiscussions: number;
+}
+
+export interface LikeResponse {
+  success: boolean;
+  message: string;
+  data: {
+    discussion: Discussion;
+    isLiked: boolean;
+    likesCount: number;
+  };
+}
+
+export interface PinResponse {
+  success: boolean;
+  message: string;
+  data: {
+    discussion: Discussion;
+    isPinned: boolean;
+  };
+}
+
 // API Service Class
 class ApiService {
   // Authentication endpoints
@@ -165,6 +267,168 @@ class ApiService {
   async healthCheck(): Promise<{ message: string; timestamp: string }> {
     try {
       const response = await api.get<{ message: string; timestamp: string }>('/health');
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Discussion endpoints
+  async createDiscussion(data: CreateDiscussionRequest): Promise<DiscussionResponse> {
+    try {
+      const response = await api.post<DiscussionResponse>('/discussions', data);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async getDiscussions(params?: {
+    page?: number;
+    limit?: number;
+    category?: string;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: string;
+  }): Promise<DiscussionsResponse> {
+    try {
+      const response = await api.get<DiscussionsResponse>('/discussions', { params });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async getDiscussionById(id: string): Promise<DiscussionResponse> {
+    try {
+      const response = await api.get<DiscussionResponse>(`/discussions/${id}`);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async updateDiscussion(id: string, data: UpdateDiscussionRequest): Promise<DiscussionResponse> {
+    try {
+      const response = await api.put<DiscussionResponse>(`/discussions/${id}`, data);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async deleteDiscussion(id: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await api.delete<{ success: boolean; message: string }>(`/discussions/${id}`);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async likeDiscussion(id: string): Promise<LikeResponse> {
+    try {
+      const response = await api.post<LikeResponse>(`/discussions/${id}/like`);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async pinDiscussion(id: string): Promise<PinResponse> {
+    try {
+      const response = await api.post<PinResponse>(`/discussions/${id}/pin`);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async getDiscussionStats(): Promise<{ success: boolean; message: string; data: DiscussionStats }> {
+    try {
+      const response = await api.get<{ success: boolean; message: string; data: DiscussionStats }>('/discussions/stats');
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async getPopularDiscussions(limit: number = 5): Promise<{ success: boolean; message: string; data: Discussion[] }> {
+    try {
+      const response = await api.get<{ success: boolean; message: string; data: Discussion[] }>('/discussions/popular', {
+        params: { limit }
+      });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async searchDiscussions(query: string, params?: {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: string;
+  }): Promise<DiscussionsResponse> {
+    try {
+      const response = await api.get<DiscussionsResponse>('/discussions/search', {
+        params: { q: query, ...params }
+      });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async getDiscussionsByCategory(category: string, params?: {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: string;
+  }): Promise<DiscussionsResponse> {
+    try {
+      const response = await api.get<DiscussionsResponse>(`/discussions/category/${category}`, { params });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async getUserDiscussions(userId: string, params?: {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: string;
+  }): Promise<DiscussionsResponse> {
+    try {
+      const response = await api.get<DiscussionsResponse>(`/discussions/user/${userId}`, { params });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async getMyDiscussions(params?: {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: string;
+  }): Promise<DiscussionsResponse> {
+    try {
+      const response = await api.get<DiscussionsResponse>('/discussions/my', { params });
       return response.data;
     } catch (error) {
       this.handleError(error);
