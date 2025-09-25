@@ -11,7 +11,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Users, MessageCircle, Heart, Pin, TrendingUp, Calendar, Edit, Trash2, Send, MoreHorizontal, BarChart3 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Users, MessageCircle, Heart, Pin, TrendingUp, Calendar, Edit, Trash2, Send, MoreHorizontal, BarChart3, Check, X } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileSetup } from '@/components/ProfileSetup';
@@ -21,8 +23,6 @@ import { useToast } from '@/hooks/use-toast';
 import { NewsFeed } from '@/components/community/NewsFeed';
 import { MembersList } from '@/components/MembersList';
 import { CommunityHeader } from '@/components/community/CommunityHeader';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
 import { useMemberCount } from '@/hooks/useMemberCount';
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 
@@ -84,6 +84,8 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [comments, setComments] = useState<{[key: string]: {id: string; author: string; avatar: string; content: string; timeAgo: string;}[]}>({});
   const [editingPost, setEditingPost] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
+  const [editTitle, setEditTitle] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [userProfiles, setUserProfiles] = useState<{[key: string]: UserProfile}>({});
@@ -570,6 +572,88 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     }
   }, [isAdmin, discussionsList, toast, fetchDiscussions, pinningPosts]);
 
+  const canEditOrDelete = useCallback((discussion: Discussion) => {
+    // Admins can edit/delete any post
+    if (isAdmin) return true;
+    // Users can only edit/delete their own posts
+    if (user && discussion.user_id === user.id) return true;
+    return false;
+  }, [isAdmin, user]);
+
+  const handleStartEdit = useCallback((discussion: DiscussionType) => {
+    // Double-check permissions before starting edit
+    if (!canEditOrDelete(discussion)) {
+      toast({
+        title: "Access Denied",
+        description: "You can only edit your own posts",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setEditingPost(discussion.id);
+    setEditTitle(discussion.title);
+    setEditContent(discussion.content);
+  }, [canEditOrDelete, toast]);
+
+  const handleCancelEdit = useCallback(() => {
+    setEditingPost(null);
+    setEditTitle('');
+    setEditContent('');
+    setSavingEdit(false);
+  }, []);
+
+  const handleSaveEdit = useCallback(async (discussionId: string) => {
+    if (!editTitle.trim() || !editContent.trim()) {
+      toast({
+        title: "Error",
+        description: "Title and content are required",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setSavingEdit(true);
+    
+    try {
+      // Call the backend API to update the discussion
+      const response = await apiService.updateDiscussion(discussionId, {
+        title: editTitle.trim(),
+        content: editContent.trim()
+      });
+
+      // Update local state with the response
+      setDiscussionsList(prev => prev.map(discussion => 
+        discussion.id === discussionId
+          ? { 
+              ...discussion, 
+              title: response.data.title,
+              content: response.data.content
+            }
+          : discussion
+      ));
+
+      // Clear edit state
+      handleCancelEdit();
+
+      toast({
+        title: "Post Updated",
+        description: "Your post has been successfully updated",
+      });
+
+      console.log('✅ Post updated successfully:', response.data);
+    } catch (error) {
+      console.error('❌ Error updating post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update post. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setSavingEdit(false);
+    }
+  }, [editTitle, editContent, toast, handleCancelEdit]);
+
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
     try {
       // Delete from database
@@ -597,14 +681,6 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       });
     }
   }, [toast, user?.id, isAdmin, discussionsList.length]);
-
-  const canEditOrDelete = useCallback((discussion: Discussion) => {
-    // Admins can edit/delete any post
-    if (isAdmin) return true;
-    // Users can only edit/delete their own posts
-    if (user && discussion.user_id === user.id) return true;
-    return false;
-  }, [isAdmin, user]);
 
   const canPin = useCallback((discussion: DiscussionType) => {
     // Only admins can pin/unpin posts (any post, not just admin posts)
@@ -733,10 +809,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="bg-slate-800 border-gray-700">
                                   <DropdownMenuItem 
-                                    onClick={() => {
-                                      setEditingPost(discussion.id);
-                                      setEditContent(discussion.content);
-                                    }}
+                                    onClick={() => handleStartEdit(discussion)}
                                     className="text-gray-300 hover:text-white hover:bg-slate-700 cursor-pointer"
                                   >
                                     <Edit className="h-4 w-4 mr-2" />
@@ -758,25 +831,83 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                           </div>
                         </div>
 
-                        <h3 className={`text-xl font-semibold mb-3 ${isDayMode ? 'text-slate-700' : 'text-white'}`}>
-                          {discussion.title}
-                        </h3>
+                        {/* Title and Content - Edit Mode or View Mode */}
+                        {editingPost === discussion.id ? (
+                          <div className="space-y-4 mb-4">
+                            <div className="flex items-center gap-2 text-sm text-cyan-400">
+                              <Edit className="h-4 w-4" />
+                              <span>Editing post...</span>
+                            </div>
+                            <Input
+                              value={editTitle}
+                              onChange={(e) => setEditTitle(e.target.value)}
+                              placeholder="Post title..."
+                              className="bg-slate-700/50 border-gray-600 text-white placeholder-gray-400"
+                              disabled={savingEdit}
+                            />
+                            <Textarea
+                              value={editContent}
+                              onChange={(e) => setEditContent(e.target.value)}
+                              placeholder="What's on your mind?"
+                              className="bg-slate-700/50 border-gray-600 text-white placeholder-gray-400 min-h-[120px] resize-none"
+                              disabled={savingEdit}
+                            />
+                            <div className="flex items-center gap-2">
+                              <Button
+                                onClick={() => handleSaveEdit(discussion.id)}
+                                disabled={savingEdit || !editTitle.trim() || !editContent.trim()}
+                                size="sm"
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                              >
+                                {savingEdit ? (
+                                  <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                    Saving...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Check className="h-4 w-4 mr-2" />
+                                    Save
+                                  </>
+                                )}
+                              </Button>
+                              <Button
+                                onClick={handleCancelEdit}
+                                disabled={savingEdit}
+                                variant="outline"
+                                size="sm"
+                                className="border-gray-600 text-gray-300 hover:bg-slate-700"
+                              >
+                                <X className="h-4 w-4 mr-2" />
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <h3 className={`text-xl font-semibold mb-3 ${isDayMode ? 'text-slate-700' : 'text-white'}`}>
+                              {discussion.title}
+                            </h3>
 
-                        <div 
-                          className={`mb-4 leading-relaxed whitespace-pre-wrap cursor-pointer transition-colors ${
-                            isDayMode ? 'text-slate-600 hover:text-slate-700' : 'text-gray-300 hover:text-gray-200'
-                          }`}
-                          onClick={() => setExpandedPost(expandedPost === discussion.id ? null : discussion.id)}
-                        >
-                          {expandedPost === discussion.id ? discussion.content : getTruncatedContent(discussion.content)}
-                          {discussion.content.length > 150 && expandedPost !== discussion.id && (
-                            <span className="text-cyan-400 ml-2 font-medium">Read more</span>
-                          )}
-                          {expandedPost === discussion.id && discussion.content.length > 150 && (
-                            <span className="text-cyan-400 ml-2 font-medium">Show less</span>
-                          )}
-                        </div>
+                            <div 
+                              className={`mb-4 leading-relaxed whitespace-pre-wrap cursor-pointer transition-colors ${
+                                isDayMode ? 'text-slate-600 hover:text-slate-700' : 'text-gray-300 hover:text-gray-200'
+                              }`}
+                              onClick={() => setExpandedPost(expandedPost === discussion.id ? null : discussion.id)}
+                            >
+                              {expandedPost === discussion.id ? discussion.content : getTruncatedContent(discussion.content)}
+                              {discussion.content.length > 150 && expandedPost !== discussion.id && (
+                                <span className="text-cyan-400 ml-2 font-medium">Read more</span>
+                              )}
+                              {expandedPost === discussion.id && discussion.content.length > 150 && (
+                                <span className="text-cyan-400 ml-2 font-medium">Show less</span>
+                              )}
+                            </div>
+                          </>
+                        )}
 
+                        {/* Action Buttons - Only show when not editing */}
+                        {editingPost !== discussion.id && (
                         <div className="flex items-center gap-6">
                           <Button 
                             variant="ghost" 
@@ -858,6 +989,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                             </DialogContent>
                           </Dialog>
                         </div>
+                        )}
                       </div>
                     </div>
                   </CardContent>
