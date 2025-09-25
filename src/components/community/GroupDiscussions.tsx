@@ -78,6 +78,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [discussionsList, setDiscussionsList] = useState<DiscussionType[]>([]);
   const [loading, setLoading] = useState(true);
   const [likingPosts, setLikingPosts] = useState<Set<string>>(new Set());
+  const [pinningPosts, setPinningPosts] = useState<Set<string>>(new Set());
   const [selectedDiscussion, setSelectedDiscussion] = useState<DiscussionType | null>(null);
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<{[key: string]: {id: string; author: string; avatar: string; content: string; timeAgo: string;}[]}>({});
@@ -270,9 +271,8 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     try {
       const response = await apiService.getDiscussions({
         page: 1,
-        limit: 50,
-        sortBy: 'createdAt',
-        sortOrder: 'desc'
+        limit: 50
+        // Remove server-side sorting since we're doing it locally
       });
       
       console.log('📥 Discussions loaded:', response.data.length, 'discussions');
@@ -384,14 +384,26 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     };
   }, [user, profile, isAdmin, userProfiles, getInitials]);
 
-  // Since we're already sorting in the database query, we don't need complex sorting here
+  // Sort discussions locally: pinned posts first, then by creation date
   const filteredDiscussions = useMemo(() => {
-    console.log('🔍 Filtering discussions. Total discussions:', discussionsList.length);
-    const pinnedCount = discussionsList.filter(d => d.isPinned).length;
-    console.log('📌 Pinned posts:', pinnedCount, 'Regular posts:', discussionsList.length - pinnedCount);
-    console.log('📌 First 3 posts order:', discussionsList.slice(0, 3).map(d => ({ title: d.title.substring(0, 30), isPinned: d.isPinned })));
+    console.log('🔍 Filtering and sorting discussions. Total discussions:', discussionsList.length);
     
-    return discussionsList; // Already sorted from database
+    const sortedDiscussions = [...discussionsList].sort((a, b) => {
+      // First, sort by pinned status (pinned posts first)
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      
+      // If both have same pinned status, sort by creation date (newest first)
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return dateB - dateA;
+    });
+    
+    const pinnedCount = sortedDiscussions.filter(d => d.isPinned).length;
+    console.log('📌 Pinned posts:', pinnedCount, 'Regular posts:', sortedDiscussions.length - pinnedCount);
+    console.log('📌 First 3 posts order:', sortedDiscussions.slice(0, 3).map(d => ({ title: d.title.substring(0, 30), isPinned: d.isPinned })));
+    
+    return sortedDiscussions;
   }, [discussionsList]);
 
   const handleLike = useCallback(async (discussionId: string) => {
@@ -492,7 +504,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   }, [newComment, selectedDiscussion, getUserName, getUserInitials]);
 
   const handlePinToggle = useCallback(async (discussionId: string) => {
-    if (!isAdmin) {
+    if (!isAdmin || pinningPosts.has(discussionId)) {
       return;
     }
 
@@ -501,15 +513,29 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       return;
     }
 
+    // Optimistic update - update UI immediately
+    const optimisticPinnedStatus = !discussion.isPinned;
+    
+    setDiscussionsList(prev => prev.map(d => 
+      d.id === discussionId
+        ? { ...d, isPinned: optimisticPinnedStatus }
+        : d
+    ));
+
     try {
-      const newPinnedStatus = !discussion.isPinned;
+      // Add to loading state
+      setPinningPosts(prev => new Set(prev).add(discussionId));
       
-      // Update database first
+      // Call the backend API
       const response = await apiService.pinDiscussion(discussionId);
       const actualPinnedStatus = response.data.isPinned;
 
-      // Refresh the discussions list to get proper sorting
-      await fetchDiscussions();
+      // Update with actual response from backend
+      setDiscussionsList(prev => prev.map(d => 
+        d.id === discussionId
+          ? { ...d, isPinned: actualPinnedStatus }
+          : d
+      ));
 
       toast({
         title: actualPinnedStatus ? "Post Pinned" : "Post Unpinned",
@@ -521,13 +547,28 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       console.log('✅ Pin status updated successfully');
     } catch (error) {
       console.error('❌ Exception updating pin status:', error);
+      
+      // Rollback optimistic update on error
+      setDiscussionsList(prev => prev.map(d => 
+        d.id === discussionId
+          ? { ...d, isPinned: discussion.isPinned }
+          : d
+      ));
+      
       toast({
         title: "Error",
         description: "There was an error updating the pin status",
         variant: "destructive"
       });
+    } finally {
+      // Remove from loading state
+      setPinningPosts(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(discussionId);
+        return newSet;
+      });
     }
-  }, [isAdmin, discussionsList, toast, fetchDiscussions]);
+  }, [isAdmin, discussionsList, toast, fetchDiscussions, pinningPosts]);
 
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
     try {
@@ -566,9 +607,9 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   }, [isAdmin, user]);
 
   const canPin = useCallback((discussion: DiscussionType) => {
-    // Only admins can pin/unpin posts AND the post must be from an admin
-    return isAdmin && isAdminPost(discussion);
-  }, [isAdmin, isAdminPost]);
+    // Only admins can pin/unpin posts (any post, not just admin posts)
+    return isAdmin;
+  }, [isAdmin]);
 
   const getTruncatedContent = useCallback((content: string, maxLength: number = 150) => {
     if (content.length <= maxLength) return content;
@@ -620,7 +661,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
               const profileInfo = getProfileInfo(discussion.user_id, discussion.author);
               
               return (
-                <Card key={discussion.id} className="bg-slate-800/50 border-gray-700/50 hover:bg-slate-800/70 transition-colors">
+                <Card key={discussion.id} className="bg-slate-800/50 border-gray-700/50 hover:bg-slate-800/70 transition-all duration-300 ease-in-out">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       {/* User Avatar */}
@@ -668,14 +709,17 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handlePinToggle(discussion.id)}
-                                className={`h-8 w-8 p-0 transition-colors ${
+                                disabled={pinningPosts.has(discussion.id)}
+                                className={`h-8 w-8 p-0 transition-all duration-200 ${
                                   discussion.isPinned 
                                     ? 'text-yellow-400 hover:text-yellow-300' 
                                     : 'text-gray-400 hover:text-yellow-400'
-                                }`}
+                                } ${pinningPosts.has(discussion.id) ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 title={discussion.isPinned ? 'Unpin post' : 'Pin post'}
                               >
-                                <Pin className="h-4 w-4" />
+                                <Pin className={`h-4 w-4 transition-transform duration-200 ${
+                                  discussion.isPinned ? 'scale-110' : 'hover:scale-105'
+                                }`} />
                               </Button>
                             )}
                             
