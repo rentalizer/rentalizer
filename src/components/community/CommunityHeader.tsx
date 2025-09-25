@@ -10,6 +10,8 @@ import { Paperclip, Image, Video, Smile, AtSign, X, Check, AlertCircle, Play, Pa
 import { useAuth } from '@/contexts/AuthContext';
 import { apiService } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useProfile } from '@/hooks/useProfile';
 
 interface CommunityHeaderProps {
   onPostCreated: () => void;
@@ -44,6 +46,7 @@ interface PhotoUpload {
 
 export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated, isDayMode = false }) => {
   const { user, profile } = useAuth();
+  const { profile: supabaseProfile } = useProfile();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
@@ -60,7 +63,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
   const [photoUpload, setPhotoUpload] = useState<PhotoUpload | null>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
-  const getUserAvatar = () => user?.profilePicture || null;
+  const getUserAvatar = () => supabaseProfile?.avatar_url || user?.profilePicture || null;
   const getUserName = () => {
     if (user?.firstName && user?.lastName) {
       return `${user.firstName} ${user.lastName}`;

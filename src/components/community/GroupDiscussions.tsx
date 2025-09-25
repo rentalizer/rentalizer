@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 // Extend Window interface for Calendly
 declare global {
   interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Calendly: any;
   }
 }
@@ -25,6 +26,7 @@ import { MembersList } from '@/components/MembersList';
 import { CommunityHeader } from '@/components/community/CommunityHeader';
 import { useMemberCount } from '@/hooks/useMemberCount';
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
+import { useProfile } from '@/hooks/useProfile';
 
 // Frontend Discussion interface (transformed from backend)
 interface DiscussionType {
@@ -53,7 +55,7 @@ interface DiscussionType {
   views_count: number;
   liked_by: string[];
   tags: string[];
-  attachments: any[];
+  attachments: { type: "video" | "image" | "document"; url: string; filename: string; size: number; }[];
   is_active: boolean;
   last_activity: string;
   updatedAt: string;
@@ -72,6 +74,7 @@ interface UserProfile {
 
 export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean }) => {
   const { user, profile } = useAuth();
+  const { profile: supabaseProfile } = useProfile();
   const { isAdmin } = useAdminRole();
   const { toast } = useToast();
   
@@ -148,7 +151,14 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           role: user.role
         };
         setUserProfiles(profilesMap);
-        console.log('✅ User profiles loaded:', profilesMap);
+        console.log('✅ User profiles loaded:', {
+          userId: user.id,
+          hasProfilePicture: !!user.profilePicture,
+          profilePicture: user.profilePicture,
+          profilesMap
+        });
+      } else {
+        console.log('⚠️ No user data available for fetchUserProfiles');
       }
     } catch (error) {
       console.error('Exception fetching user profiles:', error);
@@ -317,7 +327,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     } finally {
       setLoading(false);
     }
-  }, [toast, user]);
+  }, [toast, user, mockComments]);
 
   const formatTimeAgo = useCallback((dateString: string) => {
     const date = new Date(dateString);
@@ -329,18 +339,28 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     return `${Math.floor(diffInMinutes / 1440)}d ago`;
   }, []);
 
-  // Initialize data - ONLY fetch once on mount
+  // Initialize data - fetch when user data is available
   useEffect(() => {
-    fetchUserProfiles();
-    fetchDiscussions();
-  }, []); // Empty dependency array - only run once on mount
+    if (user) {
+      fetchUserProfiles();
+      fetchDiscussions();
+    }
+  }, [user, fetchUserProfiles, fetchDiscussions]); // Depend on user to ensure profile data is loaded
 
   // Fixed profile info function - this was the source of the bug
   const getProfileInfo = useCallback((userId: string | undefined, authorName: string) => {
-    console.log('🔍 Getting profile info for:', { userId, authorName, currentUserId: user?.id });
+    console.log('🔍 Getting profile info for:', { 
+      userId, 
+      authorName, 
+      currentUserId: user?.id,
+      userProfilePicture: user?.profilePicture,
+      userProfilesCount: Object.keys(userProfiles).length,
+      userProfiles: userProfiles
+    });
     
     // For posts without a user_id, use the author name and generate initials
     if (!userId) {
+      console.log('⚠️ No userId provided, using author name fallback');
       return {
         avatar_url: null,
         display_name: authorName,
@@ -348,18 +368,23 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       };
     }
 
-    // For the current user's posts, use their current profile from the auth context
+    // For the current user's posts, use their current profile from the auth context and backend
     if (user && user.id === userId) {
-      const currentDisplayName = profile?.display_name || user.email?.split('@')[0] || authorName;
+      // Use backend profile data if available, fallback to auth context user data
+      const profilePicture = supabaseProfile?.avatar_url || user.profilePicture;
+      const currentDisplayName = supabaseProfile?.display_name || profile?.display_name || user.email?.split('@')[0] || authorName;
       const finalDisplayName = isAdmin ? `${currentDisplayName} (Admin)` : currentDisplayName;
       
       console.log('✅ Using current user profile:', { 
         displayName: finalDisplayName, 
-        avatarUrl: user.profilePicture 
+        avatarUrl: profilePicture,
+        hasProfilePicture: !!profilePicture,
+        supabaseProfile: supabaseProfile,
+        backendProfile: user.profilePicture
       });
       
       return {
-        avatar_url: user.profilePicture,
+        avatar_url: profilePicture || null,
         display_name: finalDisplayName,
         initials: getInitials(currentDisplayName)
       };
@@ -371,20 +396,28 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       const displayName = userProfile.firstName && userProfile.lastName 
         ? `${userProfile.firstName} ${userProfile.lastName}`
         : userProfile.email?.split('@')[0] || authorName;
+      
+      console.log('✅ Using user profile from map:', { 
+        displayName, 
+        avatarUrl: userProfile.profilePicture,
+        hasProfilePicture: !!userProfile.profilePicture
+      });
+      
       return {
-        avatar_url: userProfile.profilePicture,
+        avatar_url: userProfile.profilePicture || null,
         display_name: displayName,
         initials: getInitials(displayName)
       };
     }
     
     // Fallback to author name and initials
+    console.log('⚠️ No profile found, using author name fallback');
     return {
       avatar_url: null,
       display_name: authorName,
       initials: getInitials(authorName)
     };
-  }, [user, profile, isAdmin, userProfiles, getInitials]);
+  }, [user, profile, supabaseProfile, isAdmin, userProfiles, getInitials]);
 
   // Sort discussions locally: pinned posts first, then by creation date
   const filteredDiscussions = useMemo(() => {
@@ -570,7 +603,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         return newSet;
       });
     }
-  }, [isAdmin, discussionsList, toast, fetchDiscussions, pinningPosts]);
+  }, [isAdmin, discussionsList, toast, pinningPosts]);
 
   const canEditOrDelete = useCallback((discussion: Discussion) => {
     // Admins can edit/delete any post
@@ -680,7 +713,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         variant: "destructive"
       });
     }
-  }, [toast, user?.id, isAdmin, discussionsList.length]);
+  }, [toast]);
 
   const canPin = useCallback((discussion: DiscussionType) => {
     // Only admins can pin/unpin posts (any post, not just admin posts)
@@ -700,6 +733,16 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
   // Debug render
   console.log('🎨 RENDERING GroupDiscussions with', filteredDiscussions.length, 'discussions');
+
+  // Don't render until user data is available
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400"></div>
+        <span className="ml-2 text-cyan-300">Loading user data...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex gap-6">
@@ -741,18 +784,32 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4">
                       {/* User Avatar */}
-                      <Avatar className="w-12 h-12 flex-shrink-0">
-                        {profileInfo.avatar_url ? (
-                          <AvatarImage 
-                            src={profileInfo.avatar_url} 
-                            alt={`${discussion.author}'s avatar`}
-                            className="object-cover w-full h-full"
-                          />
-                        ) : null}
-                        <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
-                          {profileInfo.initials}
-                        </AvatarFallback>
-                      </Avatar>
+                      <div className="flex flex-col items-center">
+                        <Avatar className="w-12 h-12 flex-shrink-0">
+                          {profileInfo.avatar_url ? (
+                            <AvatarImage 
+                              src={profileInfo.avatar_url} 
+                              alt={`${discussion.author}'s avatar`}
+                              className="object-cover w-full h-full"
+                            />
+                          ) : null}
+                          <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
+                            {profileInfo.initials}
+                          </AvatarFallback>
+                        </Avatar>
+                        {/* Show upload hint for current user's posts without profile picture */}
+                        {user && user.id === discussion.user_id && !profileInfo.avatar_url && (
+                          <div className="mt-1">
+                            <a 
+                              href="/profile-setup" 
+                              className="text-xs text-cyan-400 hover:text-cyan-300 underline"
+                              title="Upload a profile picture"
+                            >
+                              📷
+                            </a>
+                          </div>
+                        )}
+                      </div>
 
                       {/* Post Content */}
                       <div className="flex-1 min-w-0">
