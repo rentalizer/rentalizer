@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MessageSquare, Search, Trash2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { apiService } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -24,47 +24,40 @@ export const MessageThreads = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [profiles, setProfiles] = useState<{ [key: string]: { avatar_url: string | null; display_name: string | null; first_name: string | null; last_name: string | null } }>({});
+  const [profiles, setProfiles] = useState<{ [key: string]: { profilePicture?: string; firstName?: string; lastName?: string; email: string } }>({});
   const { toast } = useToast();
   const { user } = useAuth();
   const { isAdmin } = useAdminRole();
 
-  useEffect(() => {
-    fetchMessages();
-  }, []);
-
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
-      // Fetch direct messages
-      const { data: messagesData, error: messagesError } = await supabase
-        .from('direct_messages')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (messagesError) throw messagesError;
-      
-      // Get unique user IDs from messages
-      const userIds = [...new Set(messagesData?.map(msg => msg.sender_id) || [])];
-      
-      // Fetch profiles for these users if any exist
-      let profilesMap: { [key: string]: any } = {};
-      if (userIds.length > 0) {
-        const { data: profilesData, error: profilesError } = await supabase
-          .from('profiles')
-          .select('user_id, avatar_url, display_name, first_name, last_name')
-          .in('user_id', userIds);
-
-        if (!profilesError && profilesData) {
-          profilesMap = profilesData.reduce((acc, profile) => {
-            acc[profile.user_id] = profile;
-            return acc;
-          }, {} as { [key: string]: any });
-          setProfiles(profilesMap);
+      // For now, we'll use mock data since we don't have a direct messages endpoint yet
+      // In the future, you can add an endpoint to fetch direct messages
+      const mockMessages: DirectMessage[] = [
+        {
+          id: '1',
+          sender_id: user?.id || 'current-user',
+          recipient_id: 'admin-user',
+          sender_name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.email?.split('@')[0] || 'You',
+          message: 'Welcome to the community! Feel free to ask any questions.',
+          created_at: new Date().toISOString(),
+          read_at: null
         }
+      ];
+      
+      // Set up profiles map with current user
+      const profilesMap: { [key: string]: { profilePicture?: string; firstName?: string; lastName?: string; email: string } } = {};
+      if (user) {
+        profilesMap[user.id] = {
+          profilePicture: user.profilePicture,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email
+        };
       }
-
-      console.log('Direct messages data:', messagesData);
-      setMessages(messagesData || []);
+      
+      setProfiles(profilesMap);
+      setMessages(mockMessages);
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast({
@@ -75,24 +68,22 @@ export const MessageThreads = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, toast]);
+
+  useEffect(() => {
+    fetchMessages();
+  }, [fetchMessages]);
 
   const deleteMessage = async (messageId: string) => {
     try {
-      const { error } = await supabase
-        .from('direct_messages')
-        .delete()
-        .eq('id', messageId);
-
-      if (error) throw error;
+      // For now, just remove from local state since we're using mock data
+      // In the future, you can add an endpoint to delete messages
+      setMessages(prev => prev.filter(msg => msg.id !== messageId));
 
       toast({
         title: "Message Deleted",
         description: "The message has been removed successfully.",
       });
-
-      // Refresh messages
-      fetchMessages();
     } catch (error) {
       console.error('Error deleting message:', error);
       toast({
@@ -167,7 +158,7 @@ export const MessageThreads = () => {
                 {/* Avatar */}
                 <Avatar className="w-12 h-12 flex-shrink-0">
                   <AvatarImage 
-                    src={profiles[message.sender_id]?.avatar_url || ''} 
+                    src={profiles[message.sender_id]?.profilePicture || ''} 
                     alt={message.sender_name}
                   />
                   <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">

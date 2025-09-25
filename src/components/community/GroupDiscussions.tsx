@@ -16,7 +16,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileSetup } from '@/components/ProfileSetup';
 import { useAdminRole } from '@/hooks/useAdminRole';
-import { supabase } from '@/integrations/supabase/client';
+import { apiService } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 import { NewsFeed } from '@/components/community/NewsFeed';
 import { MembersList } from '@/components/MembersList';
@@ -45,11 +45,13 @@ interface Discussion {
 }
 
 interface UserProfile {
-  user_id: string;
-  avatar_url: string | null;
-  display_name: string | null;
-  first_name: string | null;
-  last_name: string | null;
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  profilePicture?: string;
+  bio?: string;
+  role?: string;
 }
 
 export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean }) => {
@@ -108,28 +110,29 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
            (user && discussion.user_id === user.id && isAdmin);
   }, [user, isAdmin]);
 
-  // Fetch user profiles
+  // Fetch user profiles from custom backend
   const fetchUserProfiles = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('user_id, avatar_url, display_name, first_name, last_name');
-
-      if (error) {
-        console.error('Error fetching profiles:', error);
-        return;
+      // For now, we'll use the current user's profile from auth context
+      // In the future, you might want to add an endpoint to fetch all user profiles
+      if (user) {
+        const profilesMap: {[key: string]: UserProfile} = {};
+        profilesMap[user.id] = {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          profilePicture: user.profilePicture,
+          bio: user.bio,
+          role: user.role
+        };
+        setUserProfiles(profilesMap);
+        console.log('✅ User profiles loaded:', profilesMap);
       }
-
-      const profilesMap: {[key: string]: UserProfile} = {};
-      data?.forEach(profile => {
-        profilesMap[profile.user_id] = profile;
-      });
-      
-      setUserProfiles(profilesMap);
     } catch (error) {
       console.error('Exception fetching user profiles:', error);
     }
-  }, []);
+  }, [user]);
 
   // Mock discussions data with different users including admin
   const mockDiscussions = useMemo(() => [
@@ -297,11 +300,11 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       
       console.log('✅ Using current user profile:', { 
         displayName: finalDisplayName, 
-        avatarUrl: profile?.avatar_url 
+        avatarUrl: user.profilePicture 
       });
       
       return {
-        avatar_url: profile?.avatar_url,
+        avatar_url: user.profilePicture,
         display_name: finalDisplayName,
         initials: getInitials(currentDisplayName)
       };
@@ -310,9 +313,11 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     // For other users, get their profile from the profiles map
     const userProfile = userProfiles[userId];
     if (userProfile) {
-      const displayName = userProfile.display_name || userProfile.first_name || authorName;
+      const displayName = userProfile.firstName && userProfile.lastName 
+        ? `${userProfile.firstName} ${userProfile.lastName}`
+        : userProfile.email?.split('@')[0] || authorName;
       return {
-        avatar_url: userProfile.avatar_url,
+        avatar_url: userProfile.profilePicture,
         display_name: displayName,
         initials: getInitials(displayName)
       };

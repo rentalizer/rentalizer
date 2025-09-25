@@ -59,8 +59,13 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
   const [photoUpload, setPhotoUpload] = useState<PhotoUpload | null>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
-  const getUserAvatar = () => profile?.avatar_url || null;
-  const getUserName = () => profile?.display_name || user?.email?.split('@')[0] || 'Anonymous User';
+  const getUserAvatar = () => user?.profilePicture || null;
+  const getUserName = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    return user?.email?.split('@')[0] || 'Anonymous User';
+  };
   const getUserInitials = () => {
     const name = getUserName();
     return name
@@ -546,7 +551,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
         author_name: getUserName(),
         category: 'General',
         user_id: user.id,
-        author_avatar: profile?.avatar_url
+        author_avatar: user?.profilePicture
       });
       
       const { data, error } = await supabase
@@ -557,7 +562,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
           author_name: getUserName(),
           category: 'General',
           user_id: user.id,
-          author_avatar: profile?.avatar_url
+          author_avatar: user?.profilePicture
         })
         .select()
         .single();
