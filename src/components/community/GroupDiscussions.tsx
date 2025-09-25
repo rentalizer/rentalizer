@@ -398,14 +398,34 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     // Prevent multiple clicks while processing
     if (likingPosts.has(discussionId)) return;
     
+    // Find the current discussion to get the current state
+    const currentDiscussion = discussionsList.find(d => d.id === discussionId);
+    if (!currentDiscussion) return;
+    
+    // Optimistic update - update UI immediately
+    const optimisticIsLiked = !currentDiscussion.isLiked;
+    const optimisticLikes = optimisticIsLiked 
+      ? currentDiscussion.likes + 1 
+      : Math.max(0, currentDiscussion.likes - 1);
+    
+    setDiscussionsList(prev => prev.map(discussion => 
+      discussion.id === discussionId
+        ? { 
+            ...discussion, 
+            isLiked: optimisticIsLiked,
+            likes: optimisticLikes
+          }
+        : discussion
+    ));
+    
     try {
-      // Add to loading state
+      // Add to loading state (for preventing multiple clicks)
       setLikingPosts(prev => new Set(prev).add(discussionId));
       
       // Call the backend API to like/unlike the discussion
       const response = await apiService.likeDiscussion(discussionId);
       
-      // Update local state with the response from backend
+      // Update with actual response from backend (in case of any discrepancies)
       setDiscussionsList(prev => prev.map(discussion => 
         discussion.id === discussionId
           ? { 
@@ -419,6 +439,18 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       console.log('✅ Like status updated:', response.data);
     } catch (error) {
       console.error('❌ Error updating like status:', error);
+      
+      // Rollback optimistic update on error
+      setDiscussionsList(prev => prev.map(discussion => 
+        discussion.id === discussionId
+          ? { 
+              ...discussion, 
+              isLiked: currentDiscussion.isLiked,
+              likes: currentDiscussion.likes
+            }
+          : discussion
+      ));
+      
       toast({
         title: "Error",
         description: "Failed to update like status. Please try again.",
@@ -432,7 +464,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         return newSet;
       });
     }
-  }, [toast, likingPosts]);
+  }, [toast, likingPosts, discussionsList]);
 
   const handleAddComment = useCallback(async () => {
     if (!newComment.trim() || !selectedDiscussion) return;
@@ -707,10 +739,10 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                             size="sm" 
                             onClick={() => handleLike(discussion.id)}
                             disabled={likingPosts.has(discussion.id)}
-                            className={`flex items-center gap-2 hover:bg-red-500/10 transition-colors ${discussion.isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'} ${likingPosts.has(discussion.id) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex items-center gap-2 hover:bg-red-500/10 transition-all duration-200 ${discussion.isLiked ? 'text-red-400' : 'text-gray-400 hover:text-red-400'} ${likingPosts.has(discussion.id) ? 'opacity-50 cursor-not-allowed' : ''}`}
                           >
-                            <Heart className={`h-4 w-4 ${discussion.isLiked ? 'fill-current' : ''}`} />
-                            {likingPosts.has(discussion.id) ? '...' : discussion.likes}
+                            <Heart className={`h-4 w-4 transition-transform duration-200 ${discussion.isLiked ? 'fill-current scale-110' : 'hover:scale-105'}`} />
+                            {discussion.likes}
                           </Button>
                           
                           <Dialog>
