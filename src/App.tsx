@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SmartRedirect } from "@/components/SmartRedirect";
+import { AuthGuard } from "@/components/AuthGuard";
 import React, { lazy, Suspense } from "react";
 
 // Lazy load all page components for better performance with error handling
@@ -64,32 +65,35 @@ const AppRoutes = () => (
   <ErrorBoundary>
     <Suspense fallback={<PageLoader />}>
       <Routes>
+        {/* Public routes - accessible to everyone */}
         <Route path="/" element={<SmartRedirect><LandingPage /></SmartRedirect>} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/auth/login" element={<Auth />} />
         <Route path="/auth/signup" element={<Auth />} />
-        <Route path="/dashboard" element={<Index />} />
-        <Route path="/demo" element={<DemoGate />} />
-        <Route path="/listings" element={<ListingsGate />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/markets" element={<MarketAnalysis />} />
-        <Route path="/calculator" element={<CalculatorGate />} />
-        <Route path="/calc" element={<Calc />} />
-        <Route path="/properties" element={<AcquisitionsAgent />} />
-        <Route path="/community" element={<CommunityGate />} />
-        <Route path="/leaderboard" element={<FullLeaderboard />} />
-        <Route path="/pms" element={<PMS />} />
-        <Route path="/student_log" element={<StudentLog />} />
-        <Route path="/admin/members" element={<AdminMembers />} />
-        <Route path="/admin/richie" element={<RichieAdmin />} />
-        <Route path="/members" element={<Members />} />
-        <Route path="/profile-setup" element={<ProfileSetup />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
-        <Route path="/Guide-Book" element={<GuideBook />} />
-        <Route path="/Guide-Book2" element={<GuideBook2 />} />
         <Route path="/guide/:slug" element={<GuestGuide />} />
+        
+        {/* Protected routes - require authentication */}
+        <Route path="/dashboard" element={<AuthGuard><Index /></AuthGuard>} />
+        <Route path="/demo" element={<AuthGuard><DemoGate /></AuthGuard>} />
+        <Route path="/listings" element={<AuthGuard><ListingsGate /></AuthGuard>} />
+        <Route path="/pricing" element={<AuthGuard><Pricing /></AuthGuard>} />
+        <Route path="/markets" element={<AuthGuard><MarketAnalysis /></AuthGuard>} />
+        <Route path="/calculator" element={<AuthGuard><CalculatorGate /></AuthGuard>} />
+        <Route path="/calc" element={<AuthGuard><Calc /></AuthGuard>} />
+        <Route path="/properties" element={<AuthGuard><AcquisitionsAgent /></AuthGuard>} />
+        <Route path="/community" element={<AuthGuard><CommunityGate /></AuthGuard>} />
+        <Route path="/leaderboard" element={<AuthGuard><FullLeaderboard /></AuthGuard>} />
+        <Route path="/pms" element={<AuthGuard><PMS /></AuthGuard>} />
+        <Route path="/student_log" element={<AuthGuard><StudentLog /></AuthGuard>} />
+        <Route path="/admin/members" element={<AuthGuard><AdminMembers /></AuthGuard>} />
+        <Route path="/admin/richie" element={<AuthGuard><RichieAdmin /></AuthGuard>} />
+        <Route path="/members" element={<AuthGuard><Members /></AuthGuard>} />
+        <Route path="/profile-setup" element={<AuthGuard><ProfileSetup /></AuthGuard>} />
+        <Route path="/reset-password" element={<AuthGuard><ResetPassword /></AuthGuard>} />
+        <Route path="/Guide-Book" element={<AuthGuard><GuideBook /></AuthGuard>} />
+        <Route path="/Guide-Book2" element={<AuthGuard><GuideBook2 /></AuthGuard>} />
       </Routes>
     </Suspense>
   </ErrorBoundary>
