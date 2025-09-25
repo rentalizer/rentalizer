@@ -134,13 +134,13 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
            (user && discussion.user_id === user.id && isAdmin);
   }, [user, isAdmin]);
 
-  // Fetch user profiles from custom backend
+  // Fetch user profiles from discussions data
   const fetchUserProfiles = useCallback(async () => {
     try {
-      // For now, we'll use the current user's profile from auth context
-      // In the future, you might want to add an endpoint to fetch all user profiles
+      const profilesMap: {[key: string]: UserProfile} = {};
+      
+      // Add current user's profile from auth context
       if (user) {
-        const profilesMap: {[key: string]: UserProfile} = {};
         profilesMap[user.id] = {
           id: user.id,
           email: user.email,
@@ -150,20 +150,36 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           bio: user.bio,
           role: user.role
         };
-        setUserProfiles(profilesMap);
-        console.log('✅ User profiles loaded:', {
-          userId: user.id,
-          hasProfilePicture: !!user.profilePicture,
-          profilePicture: user.profilePicture,
-          profilesMap
-        });
-      } else {
-        console.log('⚠️ No user data available for fetchUserProfiles');
       }
+      
+      // Extract user profiles from discussions data
+      discussionsList.forEach(discussion => {
+        if (discussion.user_id && typeof discussion.user_id === 'object') {
+          const userId = (discussion.user_id as any)._id || (discussion.user_id as any).id;
+          if (userId && !profilesMap[userId]) {
+            profilesMap[userId] = {
+              id: userId,
+              email: (discussion.user_id as any).email || '',
+              firstName: (discussion.user_id as any).firstName || '',
+              lastName: (discussion.user_id as any).lastName || '',
+              profilePicture: (discussion.user_id as any).profilePicture || null,
+              bio: (discussion.user_id as any).bio || '',
+              role: (discussion.user_id as any).role || 'user'
+            };
+          }
+        }
+      });
+      
+      setUserProfiles(profilesMap);
+      console.log('✅ User profiles loaded:', {
+        totalProfiles: Object.keys(profilesMap).length,
+        currentUserId: user?.id,
+        profilesWithPictures: Object.values(profilesMap).filter(p => p.profilePicture).length
+      });
     } catch (error) {
       console.error('Exception fetching user profiles:', error);
     }
-  }, [user]);
+  }, [user, discussionsList]);
 
   // Mock discussions data with different users including admin
   const mockDiscussions = useMemo(() => [
@@ -340,10 +356,16 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   // Initialize data - fetch when user data is available
   useEffect(() => {
     if (user) {
-      fetchUserProfiles();
       fetchDiscussions();
     }
-  }, [user, fetchUserProfiles, fetchDiscussions]); // Depend on user to ensure profile data is loaded
+  }, [user, fetchDiscussions]); // Depend on user to ensure profile data is loaded
+
+  // Fetch user profiles after discussions are loaded
+  useEffect(() => {
+    if (user && discussionsList.length > 0) {
+      fetchUserProfiles();
+    }
+  }, [user, discussionsList, fetchUserProfiles]);
 
   // Fixed profile info function - this was the source of the bug
   const getProfileInfo = useCallback((userId: string | undefined, authorName: string) => {
@@ -379,6 +401,13 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
     // For other users, get their profile from the profiles map
     const userProfile = userProfiles[discussionUserId];
+    console.log('🔍 Looking up user profile:', {
+      discussionUserId,
+      userProfile,
+      userProfilesKeys: Object.keys(userProfiles),
+      hasProfilePicture: userProfile?.profilePicture
+    });
+    
     if (userProfile) {
       const displayName = userProfile.firstName && userProfile.lastName 
         ? `${userProfile.firstName} ${userProfile.lastName}`
