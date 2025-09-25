@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { SmartRedirect } from "@/components/SmartRedirect";
 import React, { lazy, Suspense } from "react";
 
 // Lazy load all page components for better performance with error handling
@@ -63,7 +64,7 @@ const AppRoutes = () => (
   <ErrorBoundary>
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<SmartRedirect><LandingPage /></SmartRedirect>} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/auth/login" element={<Auth />} />
         <Route path="/auth/signup" element={<Auth />} />
