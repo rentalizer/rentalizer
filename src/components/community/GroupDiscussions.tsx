@@ -293,13 +293,8 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       // Transform backend data to match frontend expectations
       const transformedDiscussions = response.data.map(discussion => {
         const isLiked = user ? discussion.liked_by.includes(user.id) : false;
-        console.log(`🔍 Discussion "${discussion.title}":`, {
-          liked_by: discussion.liked_by,
-          current_user_id: user?.id,
-          isLiked: isLiked
-        });
         
-        return {
+        const transformed = {
           ...discussion,
           id: discussion._id,
           author: discussion.author_name,
@@ -311,6 +306,9 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           isAdmin: discussion.is_admin_post,
           created_at: discussion.createdAt
         };
+        
+        
+        return transformed;
       });
       
       setDiscussionsList(transformedDiscussions);
@@ -349,18 +347,9 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
   // Fixed profile info function - this was the source of the bug
   const getProfileInfo = useCallback((userId: string | undefined, authorName: string) => {
-    console.log('🔍 Getting profile info for:', { 
-      userId, 
-      authorName, 
-      currentUserId: user?.id,
-      userProfilePicture: user?.profilePicture,
-      userProfilesCount: Object.keys(userProfiles).length,
-      userProfiles: userProfiles
-    });
     
     // For posts without a user_id, use the author name and generate initials
     if (!userId) {
-      console.log('⚠️ No userId provided, using author name fallback');
       return {
         avatar_url: null,
         display_name: authorName,
@@ -369,19 +358,17 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     }
 
     // For the current user's posts, use their current profile from the auth context and backend
-    if (user && user.id === userId) {
+    // Handle both populated user object and string user_id
+    const discussionUserId = userId && typeof userId === 'object' 
+      ? (userId as any)._id || (userId as any).id
+      : userId;
+    
+    if (user && user.id === discussionUserId) {
       // Use backend profile data if available, fallback to auth context user data
       const profilePicture = supabaseProfile?.avatar_url || user.profilePicture;
       const currentDisplayName = supabaseProfile?.display_name || profile?.display_name || user.email?.split('@')[0] || authorName;
       const finalDisplayName = isAdmin ? `${currentDisplayName} (Admin)` : currentDisplayName;
       
-      console.log('✅ Using current user profile:', { 
-        displayName: finalDisplayName, 
-        avatarUrl: profilePicture,
-        hasProfilePicture: !!profilePicture,
-        supabaseProfile: supabaseProfile,
-        backendProfile: user.profilePicture
-      });
       
       return {
         avatar_url: profilePicture || null,
@@ -391,17 +378,12 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     }
 
     // For other users, get their profile from the profiles map
-    const userProfile = userProfiles[userId];
+    const userProfile = userProfiles[discussionUserId];
     if (userProfile) {
       const displayName = userProfile.firstName && userProfile.lastName 
         ? `${userProfile.firstName} ${userProfile.lastName}`
         : userProfile.email?.split('@')[0] || authorName;
       
-      console.log('✅ Using user profile from map:', { 
-        displayName, 
-        avatarUrl: userProfile.profilePicture,
-        hasProfilePicture: !!userProfile.profilePicture
-      });
       
       return {
         avatar_url: userProfile.profilePicture || null,
@@ -411,7 +393,6 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     }
     
     // Fallback to author name and initials
-    console.log('⚠️ No profile found, using author name fallback');
     return {
       avatar_url: null,
       display_name: authorName,
@@ -606,10 +587,16 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   }, [isAdmin, discussionsList, toast, pinningPosts]);
 
   const canEditOrDelete = useCallback((discussion: Discussion) => {
+    // Handle both populated user object and string user_id
+    const discussionUserId = discussion.user_id && typeof discussion.user_id === 'object' 
+      ? (discussion.user_id as any)._id || (discussion.user_id as any).id
+      : discussion.user_id;
+    
+    
     // Admins can edit/delete any post
     if (isAdmin) return true;
     // Users can only edit/delete their own posts
-    if (user && discussion.user_id === user.id) return true;
+    if (user && discussionUserId === user.id) return true;
     return false;
   }, [isAdmin, user]);
 
