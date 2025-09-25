@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Paperclip, Image, Video, Smile, AtSign, X, Check, AlertCircle, Play, Pause } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -629,7 +630,14 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
             </Avatar>
             <div className="flex-1 space-y-4">
               <div>
-                <label className="text-gray-400 text-sm font-medium mb-2 block">Title</label>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-cyan-300 font-medium">{getUserName()}</span>
+                  {user?.role === 'admin' || user?.role === 'superadmin' ? (
+                    <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
+                      Admin
+                    </Badge>
+                  ) : null}
+                </div>
                 <Input
                   placeholder="Write a title..."
                   value={postTitle}
