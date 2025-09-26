@@ -23,6 +23,7 @@ import { apiService, type Discussion } from '@/services/api';
 import { NewsFeed } from '@/components/community/NewsFeed';
 import { MembersList } from '@/components/MembersList';
 import { CommunityHeader } from '@/components/community/CommunityHeader';
+import { CommentsDialog } from '@/components/community/CommentsDialog';
 import { useMemberCount } from '@/hooks/useMemberCount';
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 import { useProfile } from '@/hooks/useProfile';
@@ -40,7 +41,7 @@ interface PopulatedUser {
 }
 
 // Frontend Discussion interface (transformed from backend)
-interface DiscussionType {
+export interface DiscussionType {
   id: string;
   title: string;
   content: string;
@@ -965,74 +966,16 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                             {discussion.likes}
                           </Button>
                           
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                onClick={() => setSelectedDiscussion(discussion)}
-                                className="flex items-center gap-2 text-gray-400 hover:bg-blue-500/10 hover:text-blue-300 transition-colors"
-                              >
-                                <MessageCircle className="h-4 w-4" />
-                                {discussion.comments}
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[80vh] overflow-y-auto">
-                              <DialogHeader>
-                                <DialogTitle className="text-white">Comments - {discussion.title}</DialogTitle>
-                              </DialogHeader>
-                              
-                              <div className="space-y-4 max-h-96 overflow-y-auto">
-                                {comments[discussion.id]?.map((comment) => (
-                                  <div key={comment.id} className="flex items-start gap-3">
-                                    <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                                      {comment.avatar}
-                                    </div>
-                                    <div className="flex-1">
-                                      <div className="flex items-center gap-2 mb-1">
-                                        <span className="text-cyan-300 font-medium text-sm">{comment.author}</span>
-                                        <span className="text-gray-400 text-xs">{comment.timeAgo}</span>
-                                      </div>
-                                      <p className="text-gray-300 text-sm">{comment.content}</p>
-                                    </div>
-                                  </div>
-                                )) || (
-                                  <p className="text-gray-400 text-center py-8">No comments yet. Be the first to comment!</p>
-                                )}
-                              </div>
-                              
-                              <div className="flex items-start gap-3 mt-4 pt-4 border-t border-gray-700">
-                                <Avatar className="w-8 h-8 flex-shrink-0">
-                                  {getUserAvatar() ? (
-                                    <AvatarImage 
-                                      src={getUserAvatar()!} 
-                                      alt="Your avatar"
-                                      className="object-cover w-full h-full"
-                                    />
-                                  ) : (
-                                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold text-sm">
-                                      {getUserInitials()}
-                                    </AvatarFallback>
-                                  )}
-                                </Avatar>
-                                <div className="flex-1 flex gap-2">
-                                  <Textarea
-                                    placeholder="Write a comment..."
-                                    value={newComment}
-                                    onChange={(e) => setNewComment(e.target.value)}
-                                    className="flex-1 bg-slate-700/50 border-gray-600 text-white placeholder-gray-400 min-h-[80px]"
-                                  />
-                                  <Button
-                                    onClick={handleAddComment}
-                                    disabled={!newComment.trim()}
-                                    className="bg-cyan-600 hover:bg-cyan-700 text-white self-end"
-                                  >
-                                    <Send className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+                          <CommentsDialog
+                            discussion={discussion}
+                            comments={comments[discussion.id] || []}
+                            newComment={newComment}
+                            onCommentChange={setNewComment}
+                            onAddComment={handleAddComment}
+                            onDiscussionSelect={setSelectedDiscussion}
+                            getUserAvatar={getUserAvatar}
+                            getUserInitials={getUserInitials}
+                          />
                         </div>
                         )}
                       </div>
