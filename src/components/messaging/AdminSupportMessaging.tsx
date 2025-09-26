@@ -171,7 +171,7 @@ export default function AdminSupportMessaging() {
     };
 
     findAdminAndLoadMessages();
-  }, [user, isAdmin, selectedMemberId, toast]);
+  }, [user, isAdmin, selectedMemberId]);
 
   // Load messages for selected conversation
   useEffect(() => {

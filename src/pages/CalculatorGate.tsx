@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Calculator as CalculatorIcon, ArrowLeft, LogIn, User, Lock, UserPlus } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { TopNavBarTest } from '@/components/TopNavBarTest';
 import { Footer } from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,7 +12,6 @@ import CalculatorPage from './Calculator';
 
 const CalculatorGate = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { user, isLoading } = useAuth();
   
   // State for the auth overlay form
@@ -64,10 +62,7 @@ const CalculatorGate = () => {
         url: 'https://calendly.com/richies-schedule/scale'
       });
     } else {
-      toast({
-        title: "Loading Calendar",
-        description: "Please wait while we load the calendar widget...",
-      });
+      console.log("Loading Calendar: Please wait while we load the calendar widget...");
       // Retry after a short delay
       setTimeout(() => {
         // @ts-ignore
@@ -87,20 +82,12 @@ const CalculatorGate = () => {
     if (isSubmitting) return;
     
     if (!email || !password) {
-      toast({
-        title: "Missing Information",
-        description: "Please enter both email and password.",
-        variant: "destructive",
-      });
+      console.log("Missing Information: Please enter both email and password.");
       return;
     }
 
     if (password.length < 6) {
-      toast({
-        title: "Password Too Short",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive",
-      });
+      console.log("Password Too Short: Password must be at least 6 characters long.");
       return;
     }
 
@@ -127,15 +114,9 @@ const CalculatorGate = () => {
         }
 
         if (data.user && !data.session) {
-          toast({
-            title: "Account Created",
-            description: "Please check your email to verify your account.",
-          });
+          console.log("Account Created: Please check your email to verify your account.");
         } else if (data.session) {
-          toast({
-            title: "Account Created",
-            description: "Welcome to Rentalizer! You now have Pro access.",
-          });
+          console.log("Account Created: Welcome to Rentalizer! You now have Pro access.");
         }
 
         // Create user profile with Pro status for valid promo code users
@@ -169,10 +150,7 @@ const CalculatorGate = () => {
           throw new Error(error.message);
         }
 
-        toast({
-          title: "Signed In",
-          description: "Welcome back!",
-        });
+        console.log("Signed In: Welcome back!");
       }
       
     } catch (error: any) {
@@ -190,11 +168,7 @@ const CalculatorGate = () => {
         errorMessage = error.message;
       }
       
-      toast({
-        title: "Authentication Failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      console.log("Authentication Failed:", errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -204,11 +178,7 @@ const CalculatorGate = () => {
     e.preventDefault();
     
     if (!forgotPasswordEmail.trim()) {
-      toast({
-        title: "Missing Email",
-        description: "Please enter your email address.",
-        variant: "destructive",
-      });
+      console.log("Missing Email: Please enter your email address.");
       return;
     }
 
@@ -223,20 +193,13 @@ const CalculatorGate = () => {
         throw error;
       }
 
-      toast({
-        title: "Reset Email Sent",
-        description: "Check your email for password reset instructions.",
-      });
+      console.log("Reset Email Sent: Check your email for password reset instructions.");
 
       setShowForgotPassword(false);
       setForgotPasswordEmail('');
     } catch (error: any) {
       console.error('Password reset error:', error);
-      toast({
-        title: "Reset Failed",
-        description: error.message || "Failed to send reset email.",
-        variant: "destructive",
-      });
+      console.log("Reset Failed:", error.message || "Failed to send reset email.");
     } finally {
       setIsSubmitting(false);
     }

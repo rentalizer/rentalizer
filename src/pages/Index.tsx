@@ -15,12 +15,10 @@ import { WelcomeSection } from '@/components/WelcomeSection';
 import { FeaturesGrid } from '@/components/FeaturesGrid';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
 import { BarChart3, Calendar } from 'lucide-react';
 
 const Index = () => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   // No automatic redirect - let users stay on dashboard if they want

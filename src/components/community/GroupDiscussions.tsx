@@ -20,7 +20,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ProfileSetup } from '@/components/ProfileSetup';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { apiService, type Discussion } from '@/services/api';
-import { useToast } from '@/hooks/use-toast';
 import { NewsFeed } from '@/components/community/NewsFeed';
 import { MembersList } from '@/components/MembersList';
 import { CommunityHeader } from '@/components/community/CommunityHeader';
@@ -76,7 +75,6 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const { user, profile } = useAuth();
   const { profile: supabaseProfile } = useProfile();
   const { isAdmin } = useAdminRole();
-  const { toast } = useToast();
   
   const [discussionsList, setDiscussionsList] = useState<DiscussionType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -333,15 +331,11 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       setComments(mockComments);
     } catch (error) {
       console.error('❌ Exception loading discussions:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load discussions. Please try again.",
-        variant: "destructive"
-      });
+      console.log("Error: Failed to load discussions. Please try again.");
     } finally {
       setLoading(false);
     }
-  }, [toast, user, mockComments]);
+  }, [user, mockComments]);
 
   const formatTimeAgo = useCallback((dateString: string) => {
     const date = new Date(dateString);
@@ -508,11 +502,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           : discussion
       ));
       
-      toast({
-        title: "Error",
-        description: "Failed to update like status. Please try again.",
-        variant: "destructive"
-      });
+      console.log("Error: Failed to update like status. Please try again.");
     } finally {
       // Remove from loading state
       setLikingPosts(prev => {
@@ -521,7 +511,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         return newSet;
       });
     }
-  }, [toast, likingPosts, discussionsList]);
+  }, [likingPosts, discussionsList]);
 
   const handleAddComment = useCallback(async () => {
     if (!newComment.trim() || !selectedDiscussion) return;
@@ -582,12 +572,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           : d
       ));
 
-      toast({
-        title: actualPinnedStatus ? "Post Pinned" : "Post Unpinned",
-        description: actualPinnedStatus 
-          ? "This post will now appear at the top of the discussions" 
-          : "This post will no longer be pinned",
-      });
+      console.log(actualPinnedStatus ? "Post Pinned: This post will now appear at the top of the discussions" : "Post Unpinned: This post will no longer be pinned");
 
       console.log('✅ Pin status updated successfully');
     } catch (error) {
@@ -600,11 +585,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           : d
       ));
       
-      toast({
-        title: "Error",
-        description: "There was an error updating the pin status",
-        variant: "destructive"
-      });
+      console.log("Error: There was an error updating the pin status");
     } finally {
       // Remove from loading state
       setPinningPosts(prev => {
@@ -613,7 +594,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         return newSet;
       });
     }
-  }, [isAdmin, discussionsList, toast, pinningPosts]);
+  }, [isAdmin, discussionsList, pinningPosts]);
 
   const canEditOrDelete = useCallback((discussion: Discussion) => {
     // Handle both populated user object and string user_id
@@ -632,18 +613,14 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const handleStartEdit = useCallback((discussion: DiscussionType) => {
     // Double-check permissions before starting edit
     if (!canEditOrDelete(discussion)) {
-      toast({
-        title: "Access Denied",
-        description: "You can only edit your own posts",
-        variant: "destructive"
-      });
+      console.log("Access Denied: You can only edit your own posts");
       return;
     }
     
     setEditingPost(discussion.id);
     setEditTitle(discussion.title);
     setEditContent(discussion.content);
-  }, [canEditOrDelete, toast]);
+  }, [canEditOrDelete]);
 
   const handleCancelEdit = useCallback(() => {
     setEditingPost(null);
@@ -654,11 +631,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
   const handleSaveEdit = useCallback(async (discussionId: string) => {
     if (!editTitle.trim() || !editContent.trim()) {
-      toast({
-        title: "Error",
-        description: "Title and content are required",
-        variant: "destructive"
-      });
+      console.log("Error: Title and content are required");
       return;
     }
 
@@ -685,23 +658,16 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       // Clear edit state
       handleCancelEdit();
 
-      toast({
-        title: "Post Updated",
-        description: "Your post has been successfully updated",
-      });
+      console.log("Post Updated: Your post has been successfully updated");
 
       console.log('✅ Post updated successfully:', response.data);
     } catch (error) {
       console.error('❌ Error updating post:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update post. Please try again.",
-        variant: "destructive"
-      });
+      console.log("Error: Failed to update post. Please try again.");
     } finally {
       setSavingEdit(false);
     }
-  }, [editTitle, editContent, toast, handleCancelEdit]);
+  }, [editTitle, editContent, handleCancelEdit]);
 
   const handleDeleteDiscussion = useCallback(async (discussionId: string) => {
     try {
@@ -716,20 +682,13 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         return newDiscussions;
       });
 
-      toast({
-        title: "Discussion Deleted",
-        description: "Discussion has been permanently removed.",
-      });
+      console.log("Discussion Deleted: Discussion has been permanently removed.");
 
     } catch (error) {
       console.error('❌ Exception during deletion:', error);
-      toast({
-        title: "Error",
-        description: "There was an error deleting the discussion.",
-        variant: "destructive"
-      });
+      console.log("Error: There was an error deleting the discussion.");
     }
-  }, [toast]);
+  }, []);
 
   const canPin = useCallback((discussion: DiscussionType) => {
     // Only admins can pin/unpin posts (any post, not just admin posts)
@@ -1155,10 +1114,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         open={showMembersList}
         onOpenChange={setShowMembersList}
         onMessageMember={(memberId, memberName) => {
-          toast({
-            title: "Message Member",
-            description: `Starting conversation with ${memberName}`,
-          });
+          console.log("Message Member: Starting conversation with", memberName);
         }}
       />
     </div>

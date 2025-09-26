@@ -68,7 +68,7 @@ export const MessageThreads = () => {
     } finally {
       setLoading(false);
     }
-  }, [user, toast]);
+  }, [user]);
 
   useEffect(() => {
     fetchMessages();

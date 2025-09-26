@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Calculator as CalculatorIcon, ArrowLeft, RotateCcw, Download, LogIn, User, Lock, UserPlus, Ticket } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
 import { ExpensesSection } from '@/components/calculator/ExpensesSection';
@@ -48,7 +47,6 @@ export interface CalculatorData {
 
 const Calculator = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { user, isLoading, signIn } = useAuth();
   
   // State for the auth overlay form
@@ -125,10 +123,7 @@ const Calculator = () => {
         url: 'https://calendly.com/richies-schedule/scale'
       });
     } else {
-      toast({
-        title: "Loading Calendar",
-        description: "Please wait while we load the calendar widget...",
-      });
+      console.log("Loading Calendar: Please wait while we load the calendar widget...");
       // Retry after a short delay
       setTimeout(() => {
         // @ts-ignore
@@ -148,20 +143,12 @@ const Calculator = () => {
     if (isSubmitting) return;
     
     if (!email || !password) {
-      toast({
-        title: "Missing Information",
-        description: "Please enter both email and password.",
-        variant: "destructive",
-      });
+      console.log("Missing Information: Please enter both email and password.");
       return;
     }
 
     if (password.length < 6) {
-      toast({
-        title: "Password Too Short",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive",
-      });
+      console.log("Password Too Short: Password must be at least 6 characters long.");
       return;
     }
 
@@ -194,16 +181,10 @@ const Calculator = () => {
 
         if (data.user && !data.session) {
           console.log('📬 User created but email confirmation required');
-          toast({
-            title: "Account Created",
-            description: "Please check your email (including spam folder) to verify your account. You may need to wait a few minutes.",
-          });
+          console.log("Account Created: Please check your email (including spam folder) to verify your account. You may need to wait a few minutes.");
         } else if (data.session) {
           console.log('✅ User created and automatically signed in');
-          toast({
-            title: "Account Created",
-            description: "Welcome to Rentalizer! You now have Pro access.",
-          });
+          console.log("Account Created: Welcome to Rentalizer! You now have Pro access.");
         }
 
         // Create user profile with Pro status for valid promo code users
@@ -234,10 +215,7 @@ const Calculator = () => {
         
         await signIn(email, password);
 
-        toast({
-          title: "Signed In",
-          description: "Welcome back!",
-        });
+        console.log("Signed In: Welcome back!");
         
         // Reset form
         setEmail('');
@@ -260,11 +238,7 @@ const Calculator = () => {
         errorMessage = error.message;
       }
       
-      toast({
-        title: "Authentication Failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      console.log("Authentication Failed:", errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -519,7 +493,6 @@ const Calculator = () => {
 // Authenticated Calculator Component
 const AuthenticatedCalculator = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   
   const initialData: CalculatorData = {
     address: '',
@@ -587,10 +560,7 @@ const AuthenticatedCalculator = () => {
 
   const clearAllData = () => {
     setData({ ...initialData });
-    toast({
-      title: "Calculator Cleared",
-      description: "All data has been reset. You can start over with a fresh calculation.",
-    });
+    console.log("Calculator Cleared: All data has been reset. You can start over with a fresh calculation.");
   };
 
   const downloadData = () => {
@@ -606,10 +576,7 @@ const AuthenticatedCalculator = () => {
     
     exportCalculatorToCSV(data, calculatedValues);
     
-    toast({
-      title: "Data Downloaded",
-      description: "Your calculator data has been exported to a CSV file.",
-    });
+    console.log("Data Downloaded: Your calculator data has been exported to a CSV file.");
   };
 
   return (

@@ -9,7 +9,6 @@ import { Progress } from '@/components/ui/progress';
 import { Paperclip, Image, Video, Smile, AtSign, X, Check, AlertCircle, Play, Pause } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiService } from '@/services/api';
-import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfile } from '@/hooks/useProfile';
 
@@ -47,7 +46,6 @@ interface PhotoUpload {
 export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated, isDayMode = false }) => {
   const { user, profile } = useAuth();
   const { profile: supabaseProfile } = useProfile();
-  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
@@ -325,11 +323,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
     const validFiles = files.filter(file => {
       // Limit file size to 10MB
       if (file.size > 10 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: `${file.name} is larger than 10MB`,
-          variant: "destructive"
-        });
+        console.log("File too large:", `${file.name} is larger than 10MB`);
         return false;
       }
       return true;
@@ -339,11 +333,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
     // Check if user is authenticated before proceeding
     if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to upload files",
-        variant: "destructive"
-      });
+      console.log("Authentication required: Please sign in to upload files");
       return;
     }
 
@@ -377,32 +367,20 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
     // Check file type
     const validVideoTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/webm', 'video/quicktime'];
     if (!validVideoTypes.includes(videoFile.type)) {
-      toast({
-        title: "Invalid file type",
-        description: "Please select a valid video file (.mp4, .mov, .avi, .webm)",
-        variant: "destructive"
-      });
+      console.log("Invalid file type: Please select a valid video file (.mp4, .mov, .avi, .webm)");
       return;
     }
 
     // Check file size (1GB limit)
     const maxSize = 1024 * 1024 * 1024; // 1GB in bytes
     if (videoFile.size > maxSize) {
-      toast({
-        title: "File too large",
-        description: "Video file must be smaller than 1GB",
-        variant: "destructive"
-      });
+      console.log("File too large: Video file must be smaller than 1GB");
       return;
     }
 
     // Check if user is authenticated
     if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to upload videos",
-        variant: "destructive"
-      });
+      console.log("Authentication required: Please sign in to upload videos");
       return;
     }
 
@@ -434,32 +412,20 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
     // Check file type
     const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!validImageTypes.includes(photoFile.type)) {
-      toast({
-        title: "Invalid file type",
-        description: "Please select a valid image file (.jpg, .jpeg, .png, .gif, .webp)",
-        variant: "destructive"
-      });
+      console.log("Invalid file type: Please select a valid image file (.jpg, .jpeg, .png, .gif, .webp)");
       return;
     }
 
     // Check file size (5MB limit)
     const maxSize = 5 * 1024 * 1024; // 5MB in bytes
     if (photoFile.size > maxSize) {
-      toast({
-        title: "File too large",
-        description: "Photo file must be smaller than 5MB",
-        variant: "destructive"
-      });
+      console.log("File too large: Photo file must be smaller than 5MB");
       return;
     }
 
     // Check if user is authenticated
     if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to upload photos",
-        variant: "destructive"
-      });
+      console.log("Authentication required: Please sign in to upload photos");
       return;
     }
 
@@ -511,11 +477,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
     
     // Check if user is authenticated
     if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to create a post",
-        variant: "destructive"
-      });
+      console.log("Authentication required: Please sign in to create a post");
       return;
     }
     
@@ -568,12 +530,9 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       console.log('Discussion created successfully:', response.data);
 
       const attachmentCount = uploadedFiles.length + (videoUpload?.uploaded ? 1 : 0) + (photoUpload?.uploaded ? 1 : 0);
-      toast({
-        title: "Post created!",
-        description: attachmentCount > 0 
-          ? `Your post has been shared with ${attachmentCount} attachment(s)`
-          : "Your post has been shared with the community"
-      });
+      console.log("Post created:", attachmentCount > 0 
+        ? `Your post has been shared with ${attachmentCount} attachment(s)`
+        : "Your post has been shared with the community");
 
       setNewPost('');
       setPostTitle('');
@@ -586,11 +545,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       
     } catch (error) {
       console.error('Exception creating post:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create post. Please try again.",
-        variant: "destructive"
-      });
+      console.log("Error: Failed to create post. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

@@ -15,7 +15,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper, User, Building, TrendingUp, Settings } from 'lucide-react';
 import AdminChatButton from '@/components/AdminChatButton';
 import AdminSupportMessaging from '@/components/messaging/AdminSupportMessaging';
-import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
 import { ExpensesSection } from '@/components/calculator/ExpensesSection';
@@ -90,7 +89,6 @@ const Community = React.memo(() => {
   const [directMessageChatOpen, setDirectMessageChatOpen] = useState(false);
 
   const [showPricingOverlay, setShowPricingOverlay] = useState(false);
-  const { toast } = useToast();
   const { isAdmin } = useAdminRole();
   const { unreadCount } = useUnreadMessages();
   const { user } = useAuth();
@@ -198,10 +196,7 @@ const Community = React.memo(() => {
 
   const clearCalculatorData = () => {
     setCalculatorData({ ...initialData });
-    toast({
-      title: "Calculator Cleared",
-      description: "All data has been reset.",
-    });
+    console.log("Calculator Cleared: All data has been reset.");
   };
 
   const downloadCalculatorData = () => {
@@ -217,27 +212,17 @@ const Community = React.memo(() => {
     
     exportCalculatorToCSV(calculatorData, calculatedValues);
     
-    toast({
-      title: "Data Downloaded",
-      description: "Your calculator data has been exported to a CSV file.",
-    });
+    console.log("Data Downloaded: Your calculator data has been exported to a CSV file.");
   };
 
   const handleCheckout = async (plan: string) => {
     if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to subscribe.",
-        variant: "destructive",
-      });
+      console.log("Authentication Required: Please log in to subscribe.");
       return;
     }
 
     try {
-      toast({
-        title: "Redirecting to Checkout",
-        description: "Opening Stripe checkout...",
-      });
+      console.log("Redirecting to Checkout: Opening Stripe checkout...");
 
       // Mock checkout - replace with real API call later
       setTimeout(() => {
@@ -245,18 +230,11 @@ const Community = React.memo(() => {
         const mockCheckoutUrl = 'https://checkout.stripe.com/mock-checkout';
         window.open(mockCheckoutUrl, '_blank');
         
-        toast({
-          title: "Checkout Opened",
-          description: "Mock checkout page opened in new tab",
-        });
+        console.log("Checkout Opened: Mock checkout page opened in new tab");
       }, 500);
     } catch (error) {
       console.error('Checkout error:', error);
-      toast({
-        title: "Checkout Failed",
-        description: error instanceof Error ? error.message : "Failed to start checkout process",
-        variant: "destructive",
-      });
+      console.log("Checkout Failed:", error instanceof Error ? error.message : "Failed to start checkout process");
     }
   };
 

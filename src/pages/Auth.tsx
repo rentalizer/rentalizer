@@ -7,12 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Upload, User, Ticket, LogIn, UserPlus } from 'lucide-react';
 
 export const Auth = () => {
   const { user, signIn, signUp, isLoading } = useAuth();
-  const { toast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -63,11 +61,7 @@ export const Auth = () => {
     e.preventDefault();
     
     if (!loginEmail.trim() || !loginPassword.trim()) {
-      toast({
-        title: "Missing fields",
-        description: "Please enter both email and password",
-        variant: "destructive"
-      });
+      console.log("Missing fields: Please enter both email and password");
       return;
     }
 
@@ -75,17 +69,10 @@ export const Auth = () => {
 
     try {
       await signIn(loginEmail, loginPassword);
-      toast({
-        title: "Welcome back!",
-        description: "You have been signed in successfully"
-      });
+      console.log("Welcome back! You have been signed in successfully");
     } catch (error) {
       console.error('Login error:', error);
-      toast({
-        title: "Login failed",
-        description: error instanceof Error ? error.message : "Failed to sign in",
-        variant: "destructive"
-      });
+      console.log("Login failed:", error instanceof Error ? error.message : "Failed to sign in");
     } finally {
       setLoginLoading(false);
     }
@@ -95,22 +82,14 @@ export const Auth = () => {
     e.preventDefault();
     
     if (!signupEmail.trim() || !signupPassword.trim() || !firstName.trim() || !lastName.trim()) {
-      toast({
-        title: "Missing fields",
-        description: "Please fill in first name, last name, email, and password",
-        variant: "destructive"
-      });
+      console.log("Missing fields: Please fill in first name, last name, email, and password");
       return;
     }
 
     // Promo code validation removed for backend integration
 
     if (signupPassword.length < 6) {
-      toast({
-        title: "Password too short",
-        description: "Password must be at least 6 characters long",
-        variant: "destructive"
-      });
+      console.log("Password too short: Password must be at least 6 characters long");
       return;
     }
 
@@ -123,17 +102,10 @@ export const Auth = () => {
         firstName,
         lastName
       });
-      toast({
-        title: "Welcome!",
-        description: "Your account has been created successfully. Please check your email to verify your account."
-      });
+      console.log("Welcome! Your account has been created successfully. Please check your email to verify your account.");
     } catch (error) {
       console.error('Signup error:', error);
-      toast({
-        title: "Signup failed",
-        description: error instanceof Error ? error.message : "Failed to create account",
-        variant: "destructive"
-      });
+      console.log("Signup failed:", error instanceof Error ? error.message : "Failed to create account");
     } finally {
       setSignupLoading(false);
     }

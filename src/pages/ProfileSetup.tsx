@@ -8,7 +8,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { User, Upload, Save } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiService } from '@/services/api';
 import { useNavigate } from 'react-router-dom';
@@ -30,7 +29,6 @@ const ProfileSetup = () => {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [profileComplete, setProfileComplete] = useState(false);
 
@@ -93,11 +91,7 @@ const ProfileSetup = () => {
       setUploading(true);
 
       if (!event.target.files || event.target.files.length === 0) {
-        toast({
-          title: "No file selected",
-          description: "Please select an image to upload",
-          variant: "destructive",
-        });
+        console.log("No file selected: Please select an image to upload");
         return;
       }
 
@@ -105,21 +99,13 @@ const ProfileSetup = () => {
       
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Invalid file type",
-          description: "Please select an image file",
-          variant: "destructive",
-        });
+        console.log("Invalid file type: Please select an image file");
         return;
       }
 
       // Validate file size (max 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Please select an image smaller than 2MB",
-          variant: "destructive",
-        });
+        console.log("File too large: Please select an image smaller than 2MB");
         return;
       }
 
@@ -130,27 +116,16 @@ const ProfileSetup = () => {
         // Only store if it's a reasonable size (less than 1MB base64)
         if (result.length < 1000000) {
           setAvatarUrl(result);
-          toast({
-            title: "Success",
-            description: "Profile photo selected",
-          });
+          console.log("Success: Profile photo selected");
         } else {
-          toast({
-            title: "File too large",
-            description: "Please select a smaller image",
-            variant: "destructive",
-          });
+          console.log("File too large: Please select a smaller image");
         }
       };
       reader.readAsDataURL(file);
       
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      toast({
-        title: "Error",
-        description: "Failed to upload avatar",
-        variant: "destructive",
-      });
+      console.log("Error: Failed to upload avatar");
     } finally {
       setUploading(false);
     }
@@ -159,22 +134,14 @@ const ProfileSetup = () => {
   const onSubmit = async (data: ProfileFormData) => {
     if (!user) {
       console.error('❌ No user found when trying to save profile');
-      toast({
-        title: "Authentication Error", 
-        description: "Please sign in again to save your profile",
-        variant: "destructive",
-      });
+      console.log("Authentication Error: Please sign in again to save your profile");
       return;
     }
 
     console.log('🔍 User found:', user.id, user.email);
 
     if (!data.first_name.trim() || !data.last_name.trim()) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in first name and last name",
-        variant: "destructive",
-      });
+      console.log("Missing Information: Please fill in first name and last name");
       return;
     }
 
@@ -193,10 +160,7 @@ const ProfileSetup = () => {
       });
 
       console.log('✅ Profile updated successfully!', response);
-      toast({
-        title: "Success!",
-        description: "Your profile has been updated successfully",
-      });
+      console.log("Success: Your profile has been updated successfully");
 
       navigate('/community');
     } catch (error: any) {
@@ -209,11 +173,7 @@ const ProfileSetup = () => {
         errorMessage = error.message;
       }
       
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      console.log("Error:", errorMessage);
     }
   };
 
