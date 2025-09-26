@@ -21,7 +21,7 @@ const TermsOfService = lazy(() => import("./pages/TermsOfService").catch(() => (
 const Pricing = lazy(() => import("./pages/Pricing").catch(() => ({ default: () => <div>Error loading page</div> })));
 const ListingsGate = lazy(() => import("./pages/ListingsGate").catch(() => ({ default: () => <div>Error loading page</div> })));
 const AcquisitionsAgent = lazy(() => import("./pages/AcquisitionsAgent").catch(() => ({ default: () => <div>Error loading page</div> })));
-const Community = lazy(() => import("./pages/Community").catch(() => ({ default: () => <div>Error loading page</div> })));
+const Community = lazy(() => import("./pages/Community").then(module => ({ default: module.default })).catch(() => ({ default: React.memo(() => <div>Error loading page</div>) })));
 const CommunityGate = lazy(() => import("./pages/CommunityGate").catch(() => ({ default: () => <div>Error loading page</div> })));
 const FullLeaderboard = lazy(() => import("./pages/FullLeaderboard").catch(() => ({ default: () => <div>Error loading page</div> })));
 const PMS = lazy(() => import("./pages/PMS").catch(() => ({ default: () => <div>Error loading page</div> })));
@@ -40,7 +40,7 @@ const queryClient = new QueryClient({
     queries: {
       // Reduce unnecessary refetches
       staleTime: 5 * 60 * 1000, // 5 minutes
-      cacheTime: 10 * 60 * 1000, // 10 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       retry: 1,
