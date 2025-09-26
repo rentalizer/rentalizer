@@ -27,6 +27,18 @@ import { useMemberCount } from '@/hooks/useMemberCount';
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 import { useProfile } from '@/hooks/useProfile';
 
+// Type for user objects that could be populated or just strings
+interface PopulatedUser {
+  _id?: string;
+  id?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  profilePicture?: string | null;
+  bio?: string;
+  role?: string;
+}
+
 // Frontend Discussion interface (transformed from backend)
 interface DiscussionType {
   id: string;
@@ -153,16 +165,17 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       // Extract user profiles from discussions data
       discussionsList.forEach(discussion => {
         if (discussion.user_id && typeof discussion.user_id === 'object') {
-          const userId = (discussion.user_id as any)._id || (discussion.user_id as any).id;
+          const userObj = discussion.user_id as PopulatedUser;
+          const userId = userObj._id || userObj.id;
           if (userId && !profilesMap[userId]) {
             profilesMap[userId] = {
               id: userId,
-              email: (discussion.user_id as any).email || '',
-              firstName: (discussion.user_id as any).firstName || '',
-              lastName: (discussion.user_id as any).lastName || '',
-              profilePicture: (discussion.user_id as any).profilePicture || null,
-              bio: (discussion.user_id as any).bio || '',
-              role: (discussion.user_id as any).role || 'user'
+              email: userObj.email || '',
+              firstName: userObj.firstName || '',
+              lastName: userObj.lastName || '',
+              profilePicture: userObj.profilePicture || null,
+              bio: userObj.bio || '',
+              role: userObj.role || 'user'
             };
           }
         }
@@ -376,7 +389,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     // For the current user's posts, use their current profile from the auth context and backend
     // Handle both populated user object and string user_id
     const discussionUserId = userId && typeof userId === 'object' 
-      ? (userId as any)._id || (userId as any).id
+      ? (userId as PopulatedUser)._id || (userId as PopulatedUser).id
       : userId;
     
     if (user && user.id === discussionUserId) {
@@ -599,7 +612,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const canEditOrDelete = useCallback((discussion: Discussion) => {
     // Handle both populated user object and string user_id
     const discussionUserId = discussion.user_id && typeof discussion.user_id === 'object' 
-      ? (discussion.user_id as any)._id || (discussion.user_id as any).id
+      ? (discussion.user_id as PopulatedUser)._id || (discussion.user_id as PopulatedUser).id
       : discussion.user_id;
     
     
