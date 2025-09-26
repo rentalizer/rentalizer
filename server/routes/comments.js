@@ -125,4 +125,14 @@ router.post('/:commentId/moderate',
   commentController.moderateComment
 );
 
+/**
+ * @route   POST /api/comments/recalculate-counts
+ * @desc    Recalculate comment counts for all discussions (admin only)
+ * @access  Private (Admin)
+ */
+router.post('/recalculate-counts', 
+  authenticateToken, 
+  commentController.recalculateCommentCounts
+);
+
 module.exports = router;

@@ -54,8 +54,8 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
         </DialogHeader>
         
         <div className="space-y-4 max-h-96 overflow-y-auto">
-          {comments?.map((comment) => (
-            <div key={comment.id} className="flex items-start gap-3">
+          {comments?.map((comment, index) => (
+            <div key={comment.id || `${comment.author}-${index}`} className="flex items-start gap-3">
               <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                 {comment.avatar}
               </div>

@@ -29,8 +29,8 @@ class CommentService {
     const sort = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
 
     const comments = await Comment.find(query)
-      .populate('user', 'display_name email avatar_url role')
-      .populate('reactions.user', 'display_name avatar_url')
+      .populate('user', 'firstName lastName email profilePicture role')
+      .populate('reactions.user', 'firstName lastName profilePicture')
       .sort(sort)
       .skip(skip)
       .limit(limit)

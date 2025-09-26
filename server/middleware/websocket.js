@@ -73,6 +73,12 @@ class CommentHandler {
       await comment.save();
       await comment.populate('user', 'display_name email avatar_url role');
 
+      // Update discussion's comment count
+      await Discussion.findByIdAndUpdate(discussionId, {
+        $inc: { comments_count: 1 },
+        last_activity: new Date()
+      });
+
       // Broadcast to all users in the discussion room
       this.io.to(`discussion_${discussionId}`).emit('new_comment', {
         comment: comment.toPublicJSON(),
@@ -164,6 +170,12 @@ class CommentHandler {
       comment.isDeleted = true;
       comment.deletedAt = new Date();
       await comment.save();
+
+      // Update discussion's comment count
+      await Discussion.findByIdAndUpdate(comment.discussion, {
+        $inc: { comments_count: -1 },
+        last_activity: new Date()
+      });
 
       // Broadcast deletion
       this.io.to(`discussion_${comment.discussion}`).emit('comment_deleted', {
@@ -261,7 +273,7 @@ const setupWebSocketHandlers = (io) => {
       }
 
       const decoded = jwt.verify(token, JWT_SECRET);
-      const user = await User.findById(decoded.userId).select('display_name email avatar_url role');
+      const user = await User.findById(decoded.userId).select('firstName lastName email profilePicture role');
       
       if (!user) {
         return next(new Error('Authentication error: User not found'));
@@ -270,6 +282,10 @@ const setupWebSocketHandlers = (io) => {
       socket.userId = decoded.userId;
       socket.user = user;
       socket.userRole = user.role;
+      const computedName = (user.firstName || user.lastName)
+        ? `${user.firstName || ''} ${user.lastName || ''}`.trim()
+        : (user.email ? user.email.split('@')[0] : 'User');
+      socket.userDisplayName = computedName;
       
       next();
     } catch (error) {
@@ -279,7 +295,7 @@ const setupWebSocketHandlers = (io) => {
   });
 
   io.on('connection', (socket) => {
-    console.log(`User ${socket.user.display_name} connected via WebSocket`);
+    console.log(`User ${socket.userDisplayName} connected via WebSocket`);
 
     // Join discussion room
     socket.on('join_discussion', (data) => {
@@ -287,7 +303,7 @@ const setupWebSocketHandlers = (io) => {
       socket.join(`discussion_${discussionId}`);
       roomManager.joinRoom(socket.id, discussionId);
       
-      console.log(`User ${socket.user.display_name} joined discussion ${discussionId}`);
+      console.log(`User ${socket.userDisplayName} joined discussion ${discussionId}`);
       
       // Notify others in the room
       socket.to(`discussion_${discussionId}`).emit('user_joined', {
@@ -303,7 +319,7 @@ const setupWebSocketHandlers = (io) => {
       socket.leave(`discussion_${discussionId}`);
       roomManager.leaveRoom(socket.id, discussionId);
       
-      console.log(`User ${socket.user.display_name} left discussion ${discussionId}`);
+      console.log(`User ${socket.userDisplayName} left discussion ${discussionId}`);
       
       // Notify others in the room
       socket.to(`discussion_${discussionId}`).emit('user_left', {
@@ -349,7 +365,7 @@ const setupWebSocketHandlers = (io) => {
 
     // Handle disconnection
     socket.on('disconnect', () => {
-      console.log(`User ${socket.user.display_name} disconnected`);
+      console.log(`User ${socket.userDisplayName} disconnected`);
       roomManager.removeSocket(socket.id);
     });
 

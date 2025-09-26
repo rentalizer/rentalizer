@@ -19,7 +19,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileSetup } from '@/components/ProfileSetup';
 import { useAdminRole } from '@/hooks/useAdminRole';
-import { apiService, type Discussion } from '@/services/api';
+import { apiService, type Discussion, type Comment as ApiComment } from '@/services/api';
+import { getSocket, joinDiscussionRoom, leaveDiscussionRoom } from '@/services/socket';
 import { NewsFeed } from '@/components/community/NewsFeed';
 import { MembersList } from '@/components/MembersList';
 import { CommunityHeader } from '@/components/community/CommunityHeader';
@@ -96,6 +97,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [selectedDiscussion, setSelectedDiscussion] = useState<DiscussionType | null>(null);
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState<{[key: string]: {id: string; author: string; avatar: string; content: string; timeAgo: string;}[]}>({});
+  const [loadedDiscussionIds, setLoadedDiscussionIds] = useState<Set<string>>(new Set());
   const [editingPost, setEditingPost] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
   const [editTitle, setEditTitle] = useState('');
@@ -278,30 +280,29 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     }
   ], []);
 
-  // Mock comments for discussions
-  const mockComments = useMemo(() => ({
-    'mock-1': [
-      { id: 'c1', author: 'Sarah Johnson', avatar: 'SJ', content: 'Thanks for the warm welcome! Excited to be part of this community.', timeAgo: '1 hour ago' },
-      { id: 'c2', author: 'Mike Chen', avatar: 'MC', content: 'Great to have everyone here! Looking forward to learning and sharing.', timeAgo: '45 min ago' },
-      { id: 'c3', author: 'Jessica Martinez', avatar: 'JM', content: 'This is going to be an amazing resource for all of us!', timeAgo: '30 min ago' }
-    ],
-    'mock-2': [
-      { id: 'c4', author: 'Mike Chen', avatar: 'MC', content: 'Congrats on taking the first step! What\'s the purchase price and expected rent?', timeAgo: '3 hours ago' },
-      { id: 'c5', author: 'David Thompson', avatar: 'DT', content: 'I\'d recommend running the numbers through the 1% rule first.', timeAgo: '2 hours ago' }
-    ],
-    'mock-3': [
-      { id: 'c6', author: 'Sarah Johnson', avatar: 'SJ', content: 'I use Rent Manager - it\'s been great for tenant communication!', timeAgo: '5 hours ago' },
-      { id: 'c7', author: 'Jessica Martinez', avatar: 'JM', content: 'Check out Buildium too, fits your budget perfectly.', timeAgo: '4 hours ago' }
-    ],
-    'mock-4': [
-      { id: 'c8', author: 'Sarah Johnson', avatar: 'SJ', content: 'Amazing milestone! What was your strategy for finding properties?', timeAgo: '20 hours ago' },
-      { id: 'c9', author: 'Mike Chen', avatar: 'MC', content: 'Congratulations! That\'s inspiring for new investors like me.', timeAgo: '18 hours ago' }
-    ],
-    'mock-5': [
-      { id: 'c10', author: 'Sarah Johnson', avatar: 'SJ', content: 'Phoenix has better cap rates right now, but Austin has more growth potential.', timeAgo: '1 day ago' },
-      { id: 'c11', author: 'Jessica Martinez', avatar: 'JM', content: 'Consider the tax implications too - Texas has no state income tax!', timeAgo: '23 hours ago' }
-    ]
-  }), []);
+  // Time ago helper must be defined before being referenced
+  const formatTimeAgo = useCallback((dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+    return `${Math.floor(diffInMinutes / 1440)}d ago`;
+  }, []);
+
+  // Map backend comment to UI comment
+  const mapApiCommentToUi = useCallback((c: ApiComment) => {
+    const userObj: any = c.user || {};
+    const authorName: string = userObj.display_name || userObj.email?.split('@')[0] || 'User';
+    return {
+      id: c.id,
+      author: authorName,
+      avatar: getInitials(authorName),
+      content: c.content,
+      timeAgo: formatTimeAgo(c.createdAt)
+    };
+  }, [getInitials, formatTimeAgo]);
 
   // Fetch discussions from backend API
   const fetchDiscussions = useCallback(async () => {
@@ -335,31 +336,91 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           created_at: discussion.createdAt
         };
         
-        
+        console.log('📊 Discussion', discussion._id, 'comment count from backend:', discussion.comments_count);
         return transformed;
       });
       
       setDiscussionsList(transformedDiscussions);
-      
-      // Set mock comments for now (we'll implement comments API later)
-      setComments(mockComments);
     } catch (error) {
       console.error('❌ Exception loading discussions:', error);
       console.log("Error: Failed to load discussions. Please try again.");
     } finally {
       setLoading(false);
     }
-  }, [user, mockComments]);
+  }, [user]);
 
-  const formatTimeAgo = useCallback((dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-    return `${Math.floor(diffInMinutes / 1440)}d ago`;
-  }, []);
+  // Load comments when a discussion is selected
+  useEffect(() => {
+    if (!selectedDiscussion) return;
+
+    const discussionId = selectedDiscussion.id;
+
+    const load = async () => {
+      try {
+        // Avoid reloading if already loaded in this session
+        if (!loadedDiscussionIds.has(discussionId)) {
+          const res = await apiService.getCommentsForDiscussion(discussionId, { page: 1, limit: 100, sortOrder: 'asc' });
+          const list = res.data.map(mapApiCommentToUi);
+          console.log('📥 Loaded comments for discussion', discussionId, ':', list.length, 'comments');
+          setComments(prev => ({ ...prev, [discussionId]: list }));
+          setLoadedDiscussionIds(prev => new Set(prev).add(discussionId));
+        }
+      } catch (e) {
+        console.error('Failed to load comments', e);
+      }
+    };
+
+    load();
+
+    // Join WS room and subscribe to events
+    joinDiscussionRoom(discussionId);
+    const socket = getSocket();
+
+    const onNew = (payload: { comment: ApiComment; discussionId: string }) => {
+      if (payload.discussionId !== discussionId) return;
+      const ui = mapApiCommentToUi(payload.comment);
+      let appended = false;
+      setComments(prev => {
+        const list = prev[discussionId] || [];
+        if (list.some(c => c.id === ui.id)) return prev;
+        appended = true;
+        return { ...prev, [discussionId]: [...list, ui] };
+      });
+      if (appended) {
+        setDiscussionsList(prev => prev.map(d => d.id === discussionId ? { ...d, comments: d.comments + 1 } : d));
+      }
+    };
+
+    const onUpdated = (payload: { comment: ApiComment; discussionId: string }) => {
+      if (payload.discussionId !== discussionId) return;
+      const ui = mapApiCommentToUi(payload.comment);
+      setComments(prev => ({
+        ...prev,
+        [discussionId]: (prev[discussionId] || []).map(c => c.id === ui.id ? ui : c)
+      }));
+    };
+
+    const onDeleted = (payload: { commentId: string; discussionId: string }) => {
+      if (payload.discussionId !== discussionId) return;
+      setComments(prev => ({
+        ...prev,
+        [discussionId]: (prev[discussionId] || []).filter(c => c.id !== payload.commentId)
+      }));
+      setDiscussionsList(prev => prev.map(d => d.id === discussionId ? { ...d, comments: Math.max(0, d.comments - 1) } : d));
+    };
+
+    socket.on('new_comment', onNew);
+    socket.on('comment_updated', onUpdated);
+    socket.on('comment_deleted', onDeleted);
+
+    return () => {
+      socket.off('new_comment', onNew);
+      socket.off('comment_updated', onUpdated);
+      socket.off('comment_deleted', onDeleted);
+      leaveDiscussionRoom(discussionId);
+    };
+  }, [selectedDiscussion, mapApiCommentToUi, loadedDiscussionIds]);
+
 
   // Initialize data - fetch when user data is available
   useEffect(() => {
@@ -529,28 +590,16 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
   const handleAddComment = useCallback(async () => {
     if (!newComment.trim() || !selectedDiscussion) return;
-
-    const comment = {
-      id: String(Date.now()),
-      author: getUserName(),
-      avatar: getUserInitials(),
-      content: newComment,
-      timeAgo: 'now'
-    };
-    
-    setComments(prev => ({
-      ...prev,
-      [selectedDiscussion.id]: [...(prev[selectedDiscussion.id] || []), comment]
-    }));
-    
-    setDiscussionsList(prev => prev.map(d => 
-      d.id === selectedDiscussion.id 
-        ? { ...d, comments: d.comments + 1 }
-        : d
-    ));
-    
-    setNewComment('');
-  }, [newComment, selectedDiscussion, getUserName, getUserInitials]);
+    const discussionId = selectedDiscussion.id;
+    const content = newComment.trim();
+    try {
+      await apiService.createComment(discussionId, content);
+      // Do not mutate local comments or counts here; rely on 'new_comment' WS event
+      setNewComment('');
+    } catch (e) {
+      console.error('Failed to create comment', e);
+    }
+  }, [newComment, selectedDiscussion]);
 
   const handlePinToggle = useCallback(async (discussionId: string) => {
     if (!isAdmin || pinningPosts.has(discussionId)) {

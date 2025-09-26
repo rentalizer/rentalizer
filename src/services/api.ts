@@ -188,6 +188,60 @@ export interface PinResponse {
   };
 }
 
+// Comment types
+export interface CommentUserRef {
+  _id?: string;
+  id?: string;
+  display_name?: string;
+  email?: string;
+  avatar_url?: string | null;
+}
+
+export interface CommentReaction {
+  user: string | CommentUserRef;
+  type: 'like' | 'love' | 'laugh' | 'angry' | 'sad';
+}
+
+export interface Comment {
+  id: string;
+  discussion: string;
+  user: string | CommentUserRef;
+  content: string;
+  reactions?: CommentReaction[];
+  reactionCounts?: Record<string, number>;
+  totalReactions?: number;
+  isEdited?: boolean;
+  editedAt?: string | null;
+  isDeleted?: boolean;
+  isModerated?: boolean;
+  moderationReason?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GetCommentsResponse {
+  success: boolean;
+  message: string;
+  data: Comment[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalComments: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
+export interface ReactToCommentResponse {
+  success: boolean;
+  message: string;
+  data: {
+    reactionType: 'like' | 'love' | 'laugh' | 'angry' | 'sad';
+    isReacted: boolean;
+    reactionCounts: Record<string, number>;
+  };
+}
+
 // API Service Class
 class ApiService {
   // Authentication endpoints
@@ -429,6 +483,99 @@ class ApiService {
   }): Promise<DiscussionsResponse> {
     try {
       const response = await api.get<DiscussionsResponse>('/discussions/my', { params });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // ===== Comments endpoints =====
+  // Types for comments
+  async getCommentsForDiscussion(
+    discussionId: string,
+    params?: {
+      page?: number;
+      limit?: number;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+    }
+  ): Promise<GetCommentsResponse> {
+    try {
+      const response = await api.get<GetCommentsResponse>(`/comments/discussion/${discussionId}`, {
+        params,
+      });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async createComment(
+    discussionId: string,
+    content: string
+  ): Promise<{ success: boolean; message: string; data: Comment }> {
+    try {
+      const response = await api.post<{ success: boolean; message: string; data: Comment }>(
+        `/comments/discussion/${discussionId}`,
+        { content }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async updateComment(
+    commentId: string,
+    content: string
+  ): Promise<{ success: boolean; message: string; data: Comment }> {
+    try {
+      const response = await api.put<{ success: boolean; message: string; data: Comment }>(
+        `/comments/${commentId}`,
+        { content }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async deleteComment(commentId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await api.delete<{ success: boolean; message: string }>(`/comments/${commentId}`);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async reactToComment(
+    commentId: string,
+    reactionType: 'like' | 'love' | 'laugh' | 'angry' | 'sad'
+  ): Promise<ReactToCommentResponse> {
+    try {
+      const response = await api.post<ReactToCommentResponse>(`/comments/${commentId}/react`, {
+        reactionType,
+      });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async getCommentStats(
+    discussionId: string
+  ): Promise<{ success: boolean; message: string; data: { totalComments: number; reactionStats: Record<string, number>; discussionId: string } }> {
+    try {
+      const response = await api.get<{ success: boolean; message: string; data: { totalComments: number; reactionStats: Record<string, number>; discussionId: string } }>(
+        `/comments/stats/${discussionId}`
+      );
       return response.data;
     } catch (error) {
       this.handleError(error);

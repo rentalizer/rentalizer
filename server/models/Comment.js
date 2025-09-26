@@ -121,8 +121,8 @@ commentSchema.statics.getCommentsByDiscussion = async function(discussionId, opt
     discussion: discussionId,
     isDeleted: false
   })
-  .populate('user', 'display_name email avatar_url role')
-  .populate('reactions.user', 'display_name avatar_url')
+  .populate('user', 'firstName lastName email profilePicture role')
+  .populate('reactions.user', 'firstName lastName profilePicture')
   .sort(sort)
   .skip(skip)
   .limit(limit)

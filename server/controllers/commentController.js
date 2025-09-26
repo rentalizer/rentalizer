@@ -93,7 +93,13 @@ const createComment = async (req, res) => {
     });
 
     await comment.save();
-    await comment.populate('user', 'display_name email avatar_url role');
+    await comment.populate('user', 'firstName lastName email profilePicture role');
+
+    // Update discussion's comment count
+    await Discussion.findByIdAndUpdate(discussionId, {
+      $inc: { comments_count: 1 },
+      last_activity: new Date()
+    });
 
     // Emit real-time event via WebSocket
     const io = req.app.get('io');
@@ -226,6 +232,12 @@ const deleteComment = async (req, res) => {
     comment.isDeleted = true;
     comment.deletedAt = new Date();
     await comment.save();
+
+    // Update discussion's comment count
+    await Discussion.findByIdAndUpdate(comment.discussion, {
+      $inc: { comments_count: -1 },
+      last_activity: new Date()
+    });
 
     // Emit real-time event via WebSocket
     const io = req.app.get('io');
@@ -465,6 +477,42 @@ const moderateComment = async (req, res) => {
   }
 };
 
+// Recalculate comment counts for all discussions (utility function)
+const recalculateCommentCounts = async (req, res) => {
+  try {
+    const discussions = await Discussion.find({});
+    let updatedCount = 0;
+
+    for (const discussion of discussions) {
+      const actualCount = await Comment.countDocuments({
+        discussion: discussion._id,
+        isDeleted: false
+      });
+
+      if (discussion.comments_count !== actualCount) {
+        await Discussion.findByIdAndUpdate(discussion._id, {
+          comments_count: actualCount
+        });
+        updatedCount++;
+        console.log(`Updated discussion ${discussion._id}: ${discussion.comments_count} -> ${actualCount}`);
+      }
+    }
+
+    res.json({
+      success: true,
+      message: `Recalculated comment counts for ${updatedCount} discussions`,
+      data: { updatedCount }
+    });
+  } catch (error) {
+    console.error('Error recalculating comment counts:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
 module.exports = {
   getCommentsByDiscussion,
   createComment,
@@ -472,5 +520,6 @@ module.exports = {
   deleteComment,
   reactToComment,
   getCommentStats,
-  moderateComment
+  moderateComment,
+  recalculateCommentCounts
 };
