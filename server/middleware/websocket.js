@@ -71,7 +71,7 @@ class CommentHandler {
       });
 
       await comment.save();
-      await comment.populate('user', 'display_name email avatar_url role');
+      await comment.populate('user', 'firstName lastName email profilePicture role');
 
       // Update discussion's comment count
       await Discussion.findByIdAndUpdate(discussionId, {
@@ -103,7 +103,7 @@ class CommentHandler {
       const { commentId, content } = data;
       const userId = socket.userId;
 
-      const comment = await Comment.findById(commentId).populate('user', 'display_name email avatar_url role');
+      const comment = await Comment.findById(commentId).populate('user', 'firstName lastName email profilePicture role');
       if (!comment) {
         socket.emit('error', { message: 'Comment not found' });
         return;

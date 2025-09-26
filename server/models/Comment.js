@@ -117,7 +117,7 @@ commentSchema.statics.getCommentsByDiscussion = async function(discussionId, opt
   const skip = (page - 1) * limit;
   const sort = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
 
-  return await this.find({
+  const comments = await this.find({
     discussion: discussionId,
     isDeleted: false
   })
@@ -127,6 +127,17 @@ commentSchema.statics.getCommentsByDiscussion = async function(discussionId, opt
   .skip(skip)
   .limit(limit)
   .lean();
+
+  // Transform the lean results to include id field and virtual fields
+  return comments.map(comment => ({
+    ...comment,
+    id: comment._id,
+    reactionCounts: comment.reactions ? comment.reactions.reduce((counts, reaction) => {
+      counts[reaction.type] = (counts[reaction.type] || 0) + 1;
+      return counts;
+    }, {}) : {},
+    totalReactions: comment.reactions ? comment.reactions.length : 0
+  }));
 };
 
 // Static method to get comment statistics

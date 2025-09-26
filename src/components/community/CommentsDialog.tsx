@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { MessageCircle, Send } from 'lucide-react';
+import { MessageCircle, Send, Edit, Trash2, Check, X, MoreHorizontal } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DiscussionType } from './GroupDiscussions';
+import { useAuth } from '@/contexts/AuthContext';
+import { apiService } from '@/services/api';
+import { getSocket } from '@/services/socket';
 
 interface Comment {
   id: string;
@@ -12,6 +16,9 @@ interface Comment {
   content: string;
   timeAgo: string;
   avatar: string;
+  userId?: string;
+  isEdited?: boolean;
+  editedAt?: string;
 }
 
 interface CommentsDialogProps {
@@ -23,6 +30,8 @@ interface CommentsDialogProps {
   onDiscussionSelect: (discussion: DiscussionType) => void;
   getUserAvatar: () => string | null;
   getUserInitials: () => string;
+  onCommentUpdate?: (commentId: string, content: string) => void;
+  onCommentDelete?: (commentId: string) => void;
 }
 
 export const CommentsDialog: React.FC<CommentsDialogProps> = ({
@@ -33,8 +42,84 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
   onAddComment,
   onDiscussionSelect,
   getUserAvatar,
-  getUserInitials
+  getUserInitials,
+  onCommentUpdate,
+  onCommentDelete
 }) => {
+  const { user } = useAuth();
+  const [editingComment, setEditingComment] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [deletingComment, setDeletingComment] = useState<string | null>(null);
+
+  // Check if current user can edit/delete a comment
+  const canEditOrDelete = useCallback((comment: Comment) => {
+    if (!user) return false;
+    // User can edit/delete their own comments
+    return comment.userId === user.id;
+  }, [user]);
+
+  // Handle starting edit
+  const handleStartEdit = useCallback((comment: Comment) => {
+    const normalizedId = (comment as any).id || (comment as any)._id;
+    console.log('🔍 Starting edit for comment:', comment);
+    console.log('🔍 Comment ID (normalized):', normalizedId);
+    setEditingComment(normalizedId);
+    setEditContent(comment.content);
+  }, []);
+
+  // Handle canceling edit
+  const handleCancelEdit = useCallback(() => {
+    setEditingComment(null);
+    setEditContent('');
+    setSavingEdit(false);
+  }, []);
+
+  // Handle saving edit
+  const handleSaveEdit = useCallback(async () => {
+    if (!editContent.trim() || !editingComment) return;
+    
+    const commentId = editingComment;
+    console.log('💾 Saving edit for comment ID:', commentId);
+    console.log('💾 Edit content:', editContent.trim());
+    
+    setSavingEdit(true);
+    try {
+      // Update via API
+      await apiService.updateComment(commentId, editContent.trim());
+      
+      // Call parent callback if provided
+      if (onCommentUpdate) {
+        onCommentUpdate(commentId, editContent.trim());
+      }
+      
+      handleCancelEdit();
+    } catch (error) {
+      console.error('Failed to update comment:', error);
+    } finally {
+      setSavingEdit(false);
+    }
+  }, [editContent, onCommentUpdate]);
+
+  // Handle deleting comment
+  const handleDeleteComment = useCallback(async (commentId: string) => {
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+    
+    setDeletingComment(commentId);
+    try {
+      // Delete via API
+      await apiService.deleteComment(commentId);
+      
+      // Call parent callback if provided
+      if (onCommentDelete) {
+        onCommentDelete(commentId);
+      }
+    } catch (error) {
+      console.error('Failed to delete comment:', error);
+    } finally {
+      setDeletingComment(null);
+    }
+  }, [onCommentDelete]);
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -60,11 +145,91 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
                 {comment.avatar}
               </div>
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-cyan-300 font-medium text-sm">{comment.author}</span>
-                  <span className="text-gray-400 text-xs">{comment.timeAgo}</span>
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-cyan-300 font-medium text-sm">{comment.author}</span>
+                    <span className="text-gray-400 text-xs">{comment.timeAgo}</span>
+                    {comment.isEdited && (
+                      <span className="text-gray-500 text-xs">(edited)</span>
+                    )}
+                  </div>
+                  
+                  {/* Edit/Delete Menu - Only show for comment author */}
+                  {canEditOrDelete(comment) && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 w-6 p-0 text-gray-400 hover:text-white"
+                          disabled={savingEdit || deletingComment === comment.id}
+                        >
+                          <MoreHorizontal className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-slate-800 border-gray-700">
+                        <DropdownMenuItem 
+                          onClick={() => handleStartEdit(comment)}
+                          className="text-gray-300 hover:text-white hover:bg-slate-700 cursor-pointer"
+                        >
+                          <Edit className="h-3 w-3 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => handleDeleteComment(comment.id)}
+                          className="text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
+                        >
+                          <Trash2 className="h-3 w-3 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </div>
-                <p className="text-gray-300 text-sm">{comment.content}</p>
+                
+                {/* Comment Content - Edit Mode or View Mode */}
+                {editingComment === comment.id ? (
+                  <div className="space-y-2">
+                    <Textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      className="bg-slate-700/50 border-gray-600 text-white placeholder-gray-400 min-h-[60px] text-sm"
+                      disabled={savingEdit}
+                    />
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={handleSaveEdit}
+                        disabled={savingEdit || !editContent.trim()}
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white h-6 px-2 text-xs"
+                      >
+                        {savingEdit ? (
+                          <>
+                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Check className="h-3 w-3 mr-1" />
+                            Save
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        onClick={handleCancelEdit}
+                        disabled={savingEdit}
+                        variant="outline"
+                        size="sm"
+                        className="border-gray-600 text-gray-300 hover:bg-slate-700 h-6 px-2 text-xs"
+                      >
+                        <X className="h-3 w-3 mr-1" />
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-gray-300 text-sm">{comment.content}</p>
+                )}
               </div>
             </div>
           )) || (

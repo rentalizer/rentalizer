@@ -294,13 +294,23 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   // Map backend comment to UI comment
   const mapApiCommentToUi = useCallback((c: ApiComment) => {
     const userObj: any = c.user || {};
-    const authorName: string = userObj.display_name || userObj.email?.split('@')[0] || 'User';
+    // Handle both old and new user field formats
+    const authorName: string = userObj.display_name || 
+      (userObj.firstName && userObj.lastName ? `${userObj.firstName} ${userObj.lastName}` : '') ||
+      userObj.email?.split('@')[0] || 
+      'User';
+    // Normalize id from various possible fields
+    const normalizedId = (c as any).id || (c as any)._id || (typeof (c as any)._id === 'object' && (c as any)._id?.toString ? (c as any)._id.toString() : undefined);
+    const userId = typeof userObj === 'string' ? userObj : (userObj._id || userObj.id);
     return {
-      id: c.id,
+      id: normalizedId,
       author: authorName,
       avatar: getInitials(authorName),
       content: c.content,
-      timeAgo: formatTimeAgo(c.createdAt)
+      timeAgo: formatTimeAgo(c.createdAt),
+      userId: userId,
+      isEdited: c.isEdited || false,
+      editedAt: c.editedAt
     };
   }, [getInitials, formatTimeAgo]);
 
@@ -360,8 +370,10 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         // Avoid reloading if already loaded in this session
         if (!loadedDiscussionIds.has(discussionId)) {
           const res = await apiService.getCommentsForDiscussion(discussionId, { page: 1, limit: 100, sortOrder: 'asc' });
+          console.log('📥 Raw comments from API:', res.data);
           const list = res.data.map(mapApiCommentToUi);
-          console.log('📥 Loaded comments for discussion', discussionId, ':', list.length, 'comments');
+          console.log('📥 Mapped comments for discussion', discussionId, ':', list.length, 'comments');
+          console.log('📥 First comment sample:', list[0]);
           setComments(prev => ({ ...prev, [discussionId]: list }));
           setLoadedDiscussionIds(prev => new Set(prev).add(discussionId));
         }
@@ -378,7 +390,9 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
     const onNew = (payload: { comment: ApiComment; discussionId: string }) => {
       if (payload.discussionId !== discussionId) return;
+      console.log('🆕 New comment from WebSocket:', payload.comment);
       const ui = mapApiCommentToUi(payload.comment);
+      console.log('🆕 Mapped comment:', ui);
       let appended = false;
       setComments(prev => {
         const list = prev[discussionId] || [];
@@ -600,6 +614,39 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       console.error('Failed to create comment', e);
     }
   }, [newComment, selectedDiscussion]);
+
+  // Handle comment update
+  const handleCommentUpdate = useCallback((commentId: string, content: string) => {
+    if (!selectedDiscussion) return;
+    const discussionId = selectedDiscussion.id;
+    
+    setComments(prev => ({
+      ...prev,
+      [discussionId]: (prev[discussionId] || []).map(comment => 
+        comment.id === commentId 
+          ? { ...comment, content, isEdited: true }
+          : comment
+      )
+    }));
+  }, [selectedDiscussion]);
+
+  // Handle comment delete
+  const handleCommentDelete = useCallback((commentId: string) => {
+    if (!selectedDiscussion) return;
+    const discussionId = selectedDiscussion.id;
+    
+    setComments(prev => ({
+      ...prev,
+      [discussionId]: (prev[discussionId] || []).filter(comment => comment.id !== commentId)
+    }));
+    
+    // Update discussion comment count
+    setDiscussionsList(prev => prev.map(d => 
+      d.id === discussionId 
+        ? { ...d, comments: Math.max(0, d.comments - 1) }
+        : d
+    ));
+  }, [selectedDiscussion]);
 
   const handlePinToggle = useCallback(async (discussionId: string) => {
     if (!isAdmin || pinningPosts.has(discussionId)) {
@@ -1024,6 +1071,8 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                             onDiscussionSelect={setSelectedDiscussion}
                             getUserAvatar={getUserAvatar}
                             getUserInitials={getUserInitials}
+                            onCommentUpdate={handleCommentUpdate}
+                            onCommentDelete={handleCommentDelete}
                           />
                         </div>
                         )}

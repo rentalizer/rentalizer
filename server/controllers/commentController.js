@@ -143,7 +143,7 @@ const updateComment = async (req, res) => {
     const userId = req.user.id;
 
     // Find comment
-    const comment = await Comment.findById(commentId).populate('user', 'display_name email avatar_url role');
+    const comment = await Comment.findById(commentId).populate('user', 'firstName lastName email profilePicture role');
     if (!comment) {
       return res.status(404).json({
         success: false,
