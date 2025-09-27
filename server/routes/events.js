@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const EventController = require('../controllers/eventController');
-const auth = require('../middleware/auth');
-const admin = require('../middleware/admin');
+const { authenticateToken } = require('../middleware/auth');
+const { requireAdmin } = require('../middleware/admin');
 const {
   validateCreateEvent,
   validateUpdateEvent,
@@ -48,15 +48,15 @@ router.get('/:id',
 
 // POST /api/events - Create new event (Admin only)
 router.post('/',
-  auth,
-  admin,
+  authenticateToken,
+  requireAdmin,
   validateCreateEvent,
   EventController.createEvent
 );
 
 // PUT /api/events/:id - Update event
 router.put('/:id',
-  auth,
+  authenticateToken,
   validateEventId,
   validateUpdateEvent,
   EventController.updateEvent
@@ -64,7 +64,7 @@ router.put('/:id',
 
 // DELETE /api/events/:id - Delete event
 router.delete('/:id',
-  auth,
+  authenticateToken,
   validateEventId,
   EventController.deleteEvent
 );
@@ -79,13 +79,13 @@ router.get('/:id/calendar-links',
 
 // POST /api/events/export/ical - Export events as iCal
 router.post('/export/ical',
-  auth,
+  authenticateToken,
   EventController.exportEventsAsICal
 );
 
 // GET /api/events/integration/status - Get calendar integration status
 router.get('/integration/status',
-  auth,
+  authenticateToken,
   EventController.getCalendarIntegrationStatus
 );
 
@@ -93,7 +93,7 @@ router.get('/integration/status',
 
 // POST /api/events/:id/invite - Send invitations to users
 router.post('/:id/invite',
-  auth,
+  authenticateToken,
   validateEventId,
   validateEventInvitation,
   EventController.inviteUsers
@@ -107,7 +107,7 @@ router.get('/:id/attendees',
 
 // POST /api/events/:id/rsvp - RSVP to an event
 router.post('/:id/rsvp',
-  auth,
+  authenticateToken,
   validateEventId,
   validateRSVP,
   EventController.rsvpToEvent
@@ -121,7 +121,7 @@ router.get('/:id/stats',
 
 // GET /api/events/invitations/my - Get user's event invitations
 router.get('/invitations/my',
-  auth,
+  authenticateToken,
   EventController.getUserInvitations
 );
 
