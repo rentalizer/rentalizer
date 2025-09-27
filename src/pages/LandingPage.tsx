@@ -13,7 +13,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart3, ArrowRight, LogIn, MapPin, Building, DollarSign, Users, TrendingUp, Calculator, Search, Home, Brain, Target, MessageSquare, Calendar as CalendarIcon, Star, X, Video, FileText, Bot, LogOut } from 'lucide-react';
-import { LoginDialog } from '@/components/LoginDialog';
 import { Footer } from '@/components/Footer';
 import { MarketIntelligenceDemo } from '@/components/MarketIntelligenceDemo';
 import { AcquisitionsCRMDemo } from '@/components/AcquisitionsCRMDemo';
@@ -162,25 +161,22 @@ const LandingPage = () => {
               ) : (
                 <div className="flex items-center gap-3">
                   <Button
-                    onClick={() => navigate('/signup')}
+                    onClick={() => navigate('/auth/signup')}
                     variant="default"
                     size="lg"
                     className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3"
                   >
                     Sign Up
                   </Button>
-                  <LoginDialog 
-                    trigger={
-                      <Button 
-                        variant="outline"
-                        size="lg"
-                        className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 px-6 py-3"
-                      >
-                        <LogIn className="h-4 w-4 mr-2" />
-                        Login
-                      </Button>
-                    }
-                  />
+                  <Button
+                    onClick={() => navigate('/auth/login')}
+                    variant="outline"
+                    size="lg"
+                    className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 px-6 py-3"
+                  >
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Login
+                  </Button>
                 </div>
               )}
             </nav>

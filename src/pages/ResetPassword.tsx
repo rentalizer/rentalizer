@@ -110,7 +110,7 @@ export const ResetPassword = () => {
     };
 
     validateToken();
-  }, [searchParams, toast]);
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

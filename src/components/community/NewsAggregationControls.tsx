@@ -3,13 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RefreshCw, Rss, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { useAdminRole } from '@/hooks/useAdminRole';
 
 export const NewsAggregationControls = () => {
   const [isAggregating, setIsAggregating] = useState(false);
   const [lastRun, setLastRun] = useState<string | null>(null);
-  const { toast } = useToast();
   const { isAdmin } = useAdminRole();
 
   if (!isAdmin) {
@@ -35,10 +33,7 @@ export const NewsAggregationControls = () => {
       
       setLastRun(new Date().toLocaleString());
       
-      toast({
-        title: "News Aggregation Complete",
-        description: `Successfully processed feeds. ${data?.totalNewArticles || 0} new articles added.`,
-      });
+      console.log("News Aggregation Complete:", `Successfully processed feeds. ${data?.totalNewArticles || 0} new articles added.`);
 
       // Refresh the page to show new articles
       setTimeout(() => {
@@ -47,11 +42,7 @@ export const NewsAggregationControls = () => {
       
     } catch (error) {
       console.error('Error triggering aggregation:', error);
-      toast({
-        title: "Aggregation Failed",
-        description: "Failed to aggregate news feeds. Check console for details.",
-        variant: "destructive",
-      });
+      console.log("Aggregation Failed: Failed to aggregate news feeds. Check console for details.");
     } finally {
       setIsAggregating(false);
     }

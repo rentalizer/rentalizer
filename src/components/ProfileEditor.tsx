@@ -7,7 +7,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
@@ -44,7 +43,6 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
   onProfileUpdate 
 }) => {
   const { user } = useAuth();
-  const { toast } = useToast();
   const { profile: currentProfile, loading: profileLoading, updateProfile } = useProfile();
   
   const [uploading, setUploading] = useState(false);
@@ -82,11 +80,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
     const file = event.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: "Error",
-          description: "Image must be less than 5MB",
-          variant: "destructive"
-        });
+        console.log("Error: Image must be less than 5MB");
         return;
       }
 
@@ -119,11 +113,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
       return publicUrl;
     } catch (error) {
       console.error('Exception uploading avatar:', error);
-      toast({
-        title: "Error",
-        description: "Failed to upload avatar",
-        variant: "destructive"
-      });
+      console.log("Error: Failed to upload avatar");
       return null;
     } finally {
       setUploading(false);
@@ -133,11 +123,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
   // Save profile changes
   const onSubmit = async (data: ProfileFormData) => {
     if (!user) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to update your profile",
-        variant: "destructive"
-      });
+      console.log("Error: You must be logged in to update your profile");
       return;
     }
 
@@ -179,10 +165,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
 
       console.log('✅ Profile saved successfully:', savedProfile);
 
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-      });
+      console.log("Success: Profile updated successfully");
 
       // Update local profile state
       setAvatarFile(null);
@@ -198,11 +181,7 @@ export const ProfileEditor: React.FC<ProfileEditorProps> = ({
       
     } catch (error: any) {
       console.error('Exception saving profile:', error);
-      toast({
-        title: "Error",
-        description: `Failed to save profile: ${error.message || 'Unknown error'}`,
-        variant: "destructive"
-      });
+      console.log("Error:", `Failed to save profile: ${error.message || 'Unknown error'}`);
     }
   };
 

@@ -6,8 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Users, ArrowLeft, LogIn, User, Lock, UserPlus, Ticket, Upload } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { TopNavBarTest } from '@/components/TopNavBarTest';
 
 import { Footer } from '@/components/Footer';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,7 +13,6 @@ import Community from './Community';
 
 const CommunityGate = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { user, isLoading } = useAuth();
   const { isAdmin, loading: adminLoading } = useAdminRole();
   
@@ -67,10 +64,7 @@ const CommunityGate = () => {
         url: 'https://calendly.com/richies-schedule/scale'
       });
     } else {
-      toast({
-        title: "Loading Calendar",
-        description: "Please wait while we load the calendar widget...",
-      });
+      console.log("Loading Calendar: Please wait while we load the calendar widget...");
       // Retry after a short delay
       setTimeout(() => {
         // @ts-ignore
@@ -90,20 +84,12 @@ const CommunityGate = () => {
     if (isSubmitting) return;
     
     if (!email || !password) {
-      toast({
-        title: "Missing Information",
-        description: "Please enter both email and password.",
-        variant: "destructive",
-      });
+      console.log("Missing Information: Please enter both email and password.");
       return;
     }
 
     if (password.length < 6) {
-      toast({
-        title: "Password Too Short",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive",
-      });
+      console.log("Password Too Short: Password must be at least 6 characters long.");
       return;
     }
 
@@ -136,16 +122,10 @@ const CommunityGate = () => {
 
         if (data.user && !data.session) {
           console.log('📬 User created but email confirmation required');
-          toast({
-            title: "Account Created",
-            description: "Please check your email (including spam folder) to verify your account. You may need to wait a few minutes.",
-          });
+          console.log("Account Created: Please check your email (including spam folder) to verify your account. You may need to wait a few minutes.");
         } else if (data.session) {
           console.log('✅ User created and automatically signed in');
-          toast({
-            title: "Account Created",
-            description: "Welcome to Rentalizer! You now have Pro access.",
-          });
+          console.log("Account Created: Welcome to Rentalizer! You now have Pro access.");
         }
 
         // Create user profile with Pro status for valid promo code users
@@ -184,10 +164,7 @@ const CommunityGate = () => {
           throw new Error(error.message);
         }
 
-        toast({
-          title: "Signed In",
-          description: "Welcome back!",
-        });
+        console.log("Signed In: Welcome back!");
       }
       
     } catch (error: any) {
@@ -205,11 +182,7 @@ const CommunityGate = () => {
         errorMessage = error.message;
       }
       
-      toast({
-        title: "Authentication Failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      console.log("Authentication Failed:", errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -219,11 +192,7 @@ const CommunityGate = () => {
     e.preventDefault();
     
     if (!forgotPasswordEmail.trim()) {
-      toast({
-        title: "Missing Email",
-        description: "Please enter your email address.",
-        variant: "destructive",
-      });
+      console.log("Missing Email: Please enter your email address.");
       return;
     }
 
@@ -238,20 +207,13 @@ const CommunityGate = () => {
         throw error;
       }
 
-      toast({
-        title: "Reset Email Sent",
-        description: "Check your email for password reset instructions.",
-      });
+      console.log("Reset Email Sent: Check your email for password reset instructions.");
 
       setShowForgotPassword(false);
       setForgotPasswordEmail('');
     } catch (error: any) {
       console.error('Password reset error:', error);
-      toast({
-        title: "Reset Failed",
-        description: error.message || "Failed to send reset email.",
-        variant: "destructive",
-      });
+      console.log("Reset Failed:", error.message || "Failed to send reset email.");
     } finally {
       setIsSubmitting(false);
     }
@@ -273,7 +235,6 @@ const CommunityGate = () => {
   if (user || isAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
-        <TopNavBarTest />
         <Community />
       </div>
     );
@@ -354,14 +315,11 @@ const CommunityGate = () => {
                       <div className="flex items-center gap-2 text-cyan-300 justify-center mb-2">
                         {isSignUp ? <UserPlus className="h-5 w-5" /> : <LogIn className="h-5 w-5" />}
                         <h1 className="text-xl font-semibold">
-                          {isSignUp ? 'Sign Up for Rentalizer' : 'Sign In to Rentalizer'}
+                          Community Access
                         </h1>
                       </div>
                       <p className="text-gray-400 text-sm">
-                        {isSignUp 
-                          ? 'Create your account'
-                          : 'Access your account'
-                        }
+                        Join our vibrant community of rental entrepreneurs
                       </p>
                     </div>
                     

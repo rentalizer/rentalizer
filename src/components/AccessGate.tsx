@@ -22,7 +22,7 @@ interface AccessGateProps {
 export const AccessGate: React.FC<AccessGateProps> = ({ 
   children, 
   title = "Training & Community Hub",
-  subtitle = "Access your account"
+  subtitle = "Join our vibrant community of rental entrepreneurs"
 }) => {
   const { user, signIn, signUp, isLoading } = useAuth();
   const { toast } = useToast();
@@ -196,8 +196,8 @@ export const AccessGate: React.FC<AccessGateProps> = ({
               {/* Sign In Tab */}
               <TabsContent value="signin">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-xl text-cyan-300 text-center">Sign In to Rentalizer</CardTitle>
-                  <p className="text-gray-400 text-center">Access your account</p>
+                  <CardTitle className="text-xl text-cyan-300 text-center">Community Access</CardTitle>
+                  <p className="text-gray-400 text-center">Join our vibrant community of rental entrepreneurs</p>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleLogin} className="space-y-4">

@@ -1,0 +1,34 @@
+// API Configuration
+export const API_CONFIG = {
+  // Base URL for the API
+  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  
+  // Timeout for requests (in milliseconds)
+  TIMEOUT: 10000,
+  
+  // Default headers
+  DEFAULT_HEADERS: {
+    'Content-Type': 'application/json',
+  },
+  
+  // Endpoints
+  ENDPOINTS: {
+    AUTH: {
+      REGISTER: '/auth/register',
+      LOGIN: '/auth/login',
+      LOGOUT: '/auth/logout',
+      REFRESH: '/auth/refresh',
+    },
+    USER: {
+      PROFILE: '/user/profile',
+      UPDATE_PROFILE: '/user/profile',
+      CHANGE_PASSWORD: '/user/change-password',
+      DELETE_ACCOUNT: '/user/account',
+    },
+    HEALTH: '/health',
+  },
+};
+
+// Environment check
+export const isDevelopment = import.meta.env.DEV;
+export const isProduction = import.meta.env.PROD;

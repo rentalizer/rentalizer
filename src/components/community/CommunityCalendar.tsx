@@ -61,40 +61,174 @@ export const CommunityCalendar = () => {
   // State for events
   const [events, setEvents] = useState<Event[]>([]);
 
-  // Fetch events from database
+  // Mock events data for September 2025
+  const mockEvents = [
+    {
+      id: 'mock-1',
+      title: 'September Market Outlook',
+      date: new Date(2025, 8, 3), // September 3, 2025
+      time: '2:00 PM',
+      type: 'webinar' as const,
+      description: 'Join us for a comprehensive look at the September real estate market trends and investment opportunities.',
+      location: 'Zoom Meeting',
+      duration: '1.5 hours',
+      zoomLink: 'https://zoom.us/j/123456789',
+      attendees: '48',
+      isRecurring: false,
+      remindMembers: true
+    },
+    {
+      id: 'mock-2',
+      title: 'Property Analysis Masterclass',
+      date: new Date(2025, 8, 7), // September 7, 2025
+      time: '10:00 AM',
+      type: 'workshop' as const,
+      description: 'Advanced property analysis techniques including cash flow modeling, ROI calculations, and market comparison methods.',
+      location: 'Zoom Meeting',
+      duration: '3 hours',
+      zoomLink: 'https://zoom.us/j/987654321',
+      attendees: '32',
+      isRecurring: false,
+      remindMembers: true
+    },
+    {
+      id: 'mock-3',
+      title: 'Weekly Community Check-in',
+      date: new Date(2025, 8, 9), // September 9, 2025
+      time: '6:00 PM',
+      type: 'discussion' as const,
+      description: 'Weekly community check-in where members share updates, ask questions, and support each other.',
+      location: 'Zoom Meeting',
+      duration: '1 hour',
+      zoomLink: 'https://zoom.us/j/456789123',
+      attendees: '28',
+      isRecurring: true,
+      remindMembers: false
+    },
+    {
+      id: 'mock-4',
+      title: 'New Member Orientation',
+      date: new Date(2025, 8, 12), // September 12, 2025
+      time: '3:00 PM',
+      type: 'training' as const,
+      description: 'Welcome session for new members. Learn about community resources and get started on your rental investment journey.',
+      location: 'Zoom Meeting',
+      duration: '1 hour',
+      zoomLink: 'https://zoom.us/j/789123456',
+      attendees: '18',
+      isRecurring: true,
+      remindMembers: false
+    },
+    {
+      id: 'mock-5',
+      title: 'Tax Planning for Q4',
+      date: new Date(2025, 8, 14), // September 14, 2025
+      time: '1:00 PM',
+      type: 'webinar' as const,
+      description: 'Strategic tax planning session for the fourth quarter. Learn how to optimize your rental property tax strategy.',
+      location: 'Zoom Meeting',
+      duration: '1.5 hours',
+      zoomLink: 'https://zoom.us/j/321654987',
+      attendees: '52',
+      isRecurring: false,
+      remindMembers: true
+    },
+    {
+      id: 'mock-6',
+      title: 'Property Management Excellence',
+      date: new Date(2025, 8, 17), // September 17, 2025
+      time: '2:00 PM',
+      type: 'training' as const,
+      description: 'Advanced property management strategies including tenant retention, maintenance optimization, and cost control.',
+      location: 'Zoom Meeting',
+      duration: '2 hours',
+      zoomLink: 'https://zoom.us/j/654321987',
+      attendees: '38',
+      isRecurring: false,
+      remindMembers: true
+    },
+    {
+      id: 'mock-7',
+      title: 'Market Analysis Deep Dive',
+      date: new Date(2025, 8, 19), // September 19, 2025
+      time: '7:30 PM',
+      type: 'webinar' as const,
+      description: 'Advanced market analysis techniques and tools for identifying the best investment opportunities in today\'s market.',
+      location: 'Zoom Meeting',
+      duration: '1.5 hours',
+      zoomLink: 'https://zoom.us/j/147258369',
+      attendees: '45',
+      isRecurring: false,
+      remindMembers: true
+    },
+    {
+      id: 'mock-8',
+      title: 'Weekly Community Check-in',
+      date: new Date(2025, 8, 23), // September 23, 2025
+      time: '6:00 PM',
+      type: 'discussion' as const,
+      description: 'Weekly community check-in where members share updates, ask questions, and support each other.',
+      location: 'Zoom Meeting',
+      duration: '1 hour',
+      zoomLink: 'https://zoom.us/j/369258147',
+      attendees: '31',
+      isRecurring: true,
+      remindMembers: false
+    },
+    {
+      id: 'mock-9',
+      title: 'Creative Financing Strategies',
+      date: new Date(2025, 8, 25), // September 25, 2025
+      time: '1:00 PM',
+      type: 'workshop' as const,
+      description: 'Explore creative financing options including seller financing, partnerships, and alternative lending solutions.',
+      location: 'Zoom Meeting',
+      duration: '2.5 hours',
+      zoomLink: 'https://zoom.us/j/852741963',
+      attendees: '29',
+      isRecurring: false,
+      remindMembers: true
+    },
+    {
+      id: 'mock-10',
+      title: 'Legal Updates & Compliance',
+      date: new Date(2025, 8, 28), // September 28, 2025
+      time: '3:00 PM',
+      type: 'webinar' as const,
+      description: 'Stay updated on the latest legal changes affecting rental property investors and landlord-tenant laws.',
+      location: 'Zoom Meeting',
+      duration: '1 hour',
+      zoomLink: 'https://zoom.us/j/963852741',
+      attendees: '41',
+      isRecurring: false,
+      remindMembers: true
+    },
+    {
+      id: 'mock-11',
+      title: 'Portfolio Optimization Workshop',
+      date: new Date(2025, 8, 30), // September 30, 2025
+      time: '2:00 PM',
+      type: 'workshop' as const,
+      description: 'Learn how to optimize your rental portfolio for maximum returns and risk management.',
+      location: 'Zoom Meeting',
+      duration: '2 hours',
+      zoomLink: 'https://zoom.us/j/741852963',
+      attendees: '35',
+      isRecurring: false,
+      remindMembers: true
+    }
+  ];
+
+  // Load mock events
   const fetchEvents = async () => {
     try {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*')
-        .order('event_date', { ascending: true });
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      if (error) throw error;
-      
-      // Convert database events to frontend format with proper date handling
-      const formattedEvents = data?.map(event => {
-        // Create date object and ensure it's in local timezone
-        const eventDate = new Date(event.event_date + 'T00:00:00');
-        
-        return {
-          id: event.id,
-          title: event.title,
-          date: eventDate,
-          time: event.event_time,
-          type: event.event_type as 'training' | 'webinar' | 'discussion' | 'workshop',
-          description: event.description,
-          location: event.location,
-          duration: event.duration,
-          zoomLink: event.zoom_link,
-          attendees: event.attendees,
-          isRecurring: event.is_recurring,
-          remindMembers: event.remind_members
-        };
-      }) || [];
-      
-      setEvents(formattedEvents);
+      console.log('📅 Loading September 2025 mock calendar events:', mockEvents.length, 'events');
+      setEvents(mockEvents);
     } catch (error) {
-      console.error('Error fetching events:', error);
+      console.error('Error loading mock events:', error);
     }
   };
 
@@ -102,9 +236,8 @@ export const CommunityCalendar = () => {
   React.useEffect(() => {
     fetchEvents();
     
-    // Set the calendar to July 2025 where the event exists
-    const eventMonth = new Date(2025, 6); // July is month 6 (0-indexed)
-    setCurrentMonth(eventMonth);
+    // Set the calendar to current month to show mock events
+    setCurrentMonth(new Date());
   }, []);
 
   const getEventTypeColor = (type: string) => {
@@ -731,13 +864,70 @@ export const CommunityCalendar = () => {
                   >
                     <span className="font-medium">{date.getDate()}</span>
                     {hasEvents && (
-                      <div className="flex gap-1 mt-1">
-                        <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                      <div className="flex gap-1 mt-1 flex-wrap">
+                        {getEventsForDate(date).map((event, eventIndex) => (
+                          <div 
+                            key={eventIndex}
+                            className={`w-2 h-2 rounded-full animate-pulse ${
+                              event.type === 'training' ? 'bg-green-400' :
+                              event.type === 'webinar' ? 'bg-blue-400' :
+                              event.type === 'workshop' ? 'bg-purple-400' :
+                              event.type === 'discussion' ? 'bg-orange-400' :
+                              'bg-cyan-400'
+                            }`}
+                            title={event.title}
+                          ></div>
+                        ))}
                       </div>
                     )}
                   </button>
                 );
               })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Event Type Legend */}
+        <Card className="bg-gradient-to-r from-slate-800/60 to-slate-700/60 border-cyan-500/20">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+              <h3 className="text-cyan-300 font-semibold text-lg">Event Type Legend</h3>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg border border-green-500/20">
+                <div className="w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/30"></div>
+                <div>
+                  <span className="text-green-300 font-medium">Training</span>
+                  <p className="text-green-400/70 text-xs">Skill Development</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg border border-blue-500/20">
+                <div className="w-4 h-4 bg-blue-400 rounded-full animate-pulse shadow-lg shadow-blue-400/30"></div>
+                <div>
+                  <span className="text-blue-300 font-medium">Webinar</span>
+                  <p className="text-blue-400/70 text-xs">Expert Presentation</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg border border-purple-500/20">
+                <div className="w-4 h-4 bg-purple-400 rounded-full animate-pulse shadow-lg shadow-purple-400/30"></div>
+                <div>
+                  <span className="text-purple-300 font-medium">Workshop</span>
+                  <p className="text-purple-400/70 text-xs">Hands-on Learning</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg border border-orange-500/20">
+                <div className="w-4 h-4 bg-orange-400 rounded-full animate-pulse shadow-lg shadow-orange-400/30"></div>
+                <div>
+                  <span className="text-orange-300 font-medium">Discussion</span>
+                  <p className="text-orange-400/70 text-xs">Community Chat</p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 p-3 bg-slate-600/20 rounded-lg border border-gray-600/30">
+              <p className="text-gray-400 text-sm">
+                <span className="text-cyan-300">💡 Tip:</span> Click on any date with colored dots to view event details!
+              </p>
             </div>
           </CardContent>
         </Card>

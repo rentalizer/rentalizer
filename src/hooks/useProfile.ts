@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { apiService } from '@/services/api';
 
 interface Profile {
   user_id: string;
@@ -25,57 +25,44 @@ export const useProfile = () => {
       return;
     }
 
+    console.log('🔍 Fetching profile for user:', user.id);
+    
     try {
-      console.log('🔍 Fetching profile for user:', user.id);
+      // Fetch real profile data from Node.js backend
+      const response = await apiService.getProfile();
+      const backendUser = response.user;
       
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      console.log('📊 Profile query result:', { data, error });
-
-      if (error) {
-        console.error('Error fetching profile:', error);
-        
-        // Create a default profile structure if none exists
-        const defaultProfile: Profile = {
-          user_id: user.id,
-          display_name: user.email?.split('@')[0] || null,
-          first_name: null,
-          last_name: null,
-          bio: null,
-          avatar_url: null,
-          profile_complete: false
-        };
-        setProfile(defaultProfile);
-      } else {
-        // Use the fetched profile or create default if data is null
-        const profileData: Profile = data || {
-          user_id: user.id,
-          display_name: user.email?.split('@')[0] || null,
-          first_name: null,
-          last_name: null,
-          bio: null,
-          avatar_url: null,
-          profile_complete: false
-        };
-        
-        console.log('✅ Profile loaded successfully:', profileData);
-        setProfile(profileData);
-      }
+      // Transform backend user data to Profile interface
+      const profileData: Profile = {
+        user_id: backendUser.id,
+        display_name: backendUser.firstName && backendUser.lastName 
+          ? `${backendUser.firstName} ${backendUser.lastName}`
+          : backendUser.email?.split('@')[0] || 'User',
+        first_name: backendUser.firstName || null,
+        last_name: backendUser.lastName || null,
+        bio: backendUser.bio || null,
+        avatar_url: backendUser.profilePicture || null,
+        profile_complete: !!(backendUser.firstName && backendUser.lastName)
+      };
+      
+      console.log('📊 Profile query result:', { data: profileData, error: null });
+      console.log('✅ Profile loaded successfully:', profileData);
+      console.log('🖼️ Profile picture status:', { 
+        hasProfilePicture: !!profileData.avatar_url, 
+        profilePicture: profileData.avatar_url 
+      });
+      setProfile(profileData);
     } catch (error) {
-      console.error('Exception fetching profile:', error);
-      // Create a fallback profile even on exception
+      console.error('❌ Error fetching profile:', error);
+      // Fallback to user data from auth context
       const fallbackProfile: Profile = {
         user_id: user.id,
-        display_name: user.email?.split('@')[0] || null,
-        first_name: null,
-        last_name: null,
-        bio: null,
-        avatar_url: null,
-        profile_complete: false
+        display_name: user.email?.split('@')[0] || 'User',
+        first_name: user.firstName || null,
+        last_name: user.lastName || null,
+        bio: user.bio || null,
+        avatar_url: user.profilePicture || null,
+        profile_complete: !!(user.firstName && user.lastName)
       };
       setProfile(fallbackProfile);
     } finally {

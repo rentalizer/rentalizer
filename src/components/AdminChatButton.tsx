@@ -1,10 +1,19 @@
 import { useState } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAdminRole } from '@/hooks/useAdminRole';
+import { useAuth } from '@/contexts/AuthContext';
 import AdminSupportMessaging from './messaging/AdminSupportMessaging';
 
 export default function AdminChatButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isAdmin } = useAdminRole();
+  const { user } = useAuth();
+
+  // Don't show the button if user is not authenticated or not an admin
+  if (!user || !isAdmin) {
+    return null;
+  }
 
   return (
     <>

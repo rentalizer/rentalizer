@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,13 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Upload, User, Ticket } from 'lucide-react';
+import { Eye, EyeOff, Upload, User, Ticket, LogIn, UserPlus } from 'lucide-react';
 
 export const Auth = () => {
   const { user, signIn, signUp, isLoading } = useAuth();
-  const { toast } = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [activeTab, setActiveTab] = useState('signup');
   
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
@@ -30,20 +31,37 @@ export const Auth = () => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [signupLoading, setSignupLoading] = useState(false);
 
+  // Set active tab based on route
+  useEffect(() => {
+    if (location.pathname === '/auth/login') {
+      setActiveTab('login');
+    } else if (location.pathname === '/auth/signup') {
+      setActiveTab('signup');
+    } else if (location.pathname === '/auth') {
+      setActiveTab('signup'); // Default to signup for /auth
+    }
+  }, [location.pathname]);
+
+  // Handle tab change and update URL
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    if (value === 'login') {
+      navigate('/auth/login');
+    } else if (value === 'signup') {
+      navigate('/auth/signup');
+    }
+  };
+
   // Redirect if already authenticated
   if (user) {
-    return <Navigate to="/community" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!loginEmail.trim() || !loginPassword.trim()) {
-      toast({
-        title: "Missing fields",
-        description: "Please enter both email and password",
-        variant: "destructive"
-      });
+      console.log("Missing fields: Please enter both email and password");
       return;
     }
 
@@ -51,17 +69,10 @@ export const Auth = () => {
 
     try {
       await signIn(loginEmail, loginPassword);
-      toast({
-        title: "Welcome back!",
-        description: "You have been signed in successfully"
-      });
+      console.log("Welcome back! You have been signed in successfully");
     } catch (error) {
       console.error('Login error:', error);
-      toast({
-        title: "Login failed",
-        description: error instanceof Error ? error.message : "Failed to sign in",
-        variant: "destructive"
-      });
+      console.log("Login failed:", error instanceof Error ? error.message : "Failed to sign in");
     } finally {
       setLoginLoading(false);
     }
@@ -71,29 +82,14 @@ export const Auth = () => {
     e.preventDefault();
     
     if (!signupEmail.trim() || !signupPassword.trim() || !firstName.trim() || !lastName.trim()) {
-      toast({
-        title: "Missing fields",
-        description: "Please fill in all required fields",
-        variant: "destructive"
-      });
+      console.log("Missing fields: Please fill in first name, last name, email, and password");
       return;
     }
 
-    if (promoCode.toUpperCase() !== 'T6MEM') {
-      toast({
-        title: "Invalid promo code",
-        description: "Please enter a valid promo code to sign up",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Promo code validation removed for backend integration
 
     if (signupPassword.length < 6) {
-      toast({
-        title: "Password too short",
-        description: "Password must be at least 6 characters long",
-        variant: "destructive"
-      });
+      console.log("Password too short: Password must be at least 6 characters long");
       return;
     }
 
@@ -104,21 +100,12 @@ export const Auth = () => {
       await signUp(signupEmail, signupPassword, {
         displayName,
         firstName,
-        lastName,
-        bio,
-        avatarFile
+        lastName
       });
-      toast({
-        title: "Welcome!",
-        description: "Your account has been created successfully. Please check your email to verify your account."
-      });
+      console.log("Welcome! Your account has been created successfully. Please check your email to verify your account.");
     } catch (error) {
       console.error('Signup error:', error);
-      toast({
-        title: "Signup failed",
-        description: error instanceof Error ? error.message : "Failed to create account",
-        variant: "destructive"
-      });
+      console.log("Signup failed:", error instanceof Error ? error.message : "Failed to create account");
     } finally {
       setSignupLoading(false);
     }
@@ -143,7 +130,85 @@ export const Auth = () => {
           <p className="text-gray-400">Join our vibrant community of rental entrepreneurs</p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSignup} className="space-y-4">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2 bg-slate-700/50">
+              <TabsTrigger value="login" className="text-gray-300 data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
+                <LogIn className="h-4 w-4 mr-2" />
+                Login
+              </TabsTrigger>
+              <TabsTrigger value="signup" className="text-gray-300 data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
+                <UserPlus className="h-4 w-4 mr-2" />
+                Sign Up
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="login">
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="login-email" className="text-gray-300 flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Email
+                  </Label>
+                  <Input
+                    id="login-email"
+                    type="email"
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    required
+                    disabled={loginLoading}
+                    className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="login-password" className="text-gray-300">Password</Label>
+                  <div className="relative">
+                    <Input
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      required
+                      minLength={6}
+                      disabled={loginLoading}
+                      className="border-cyan-500/30 bg-gray-800/50 text-gray-100 focus:border-cyan-400 focus:ring-cyan-400/20 pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={loginLoading}
+                  className="w-full bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white disabled:opacity-50"
+                >
+                  {loginLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Signing In...
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="h-4 w-4 mr-2" />
+                      Sign In
+                    </>
+                  )}
+                </Button>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="signup">
+              <form onSubmit={handleSignup} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="first-name" className="text-gray-300">
@@ -151,6 +216,7 @@ export const Auth = () => {
                 </Label>
                 <Input
                   id="first-name"
+                  name="first-name"
                   type="text"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
@@ -164,6 +230,7 @@ export const Auth = () => {
                 </Label>
                 <Input
                   id="last-name"
+                  name="last-name"
                   type="text"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
@@ -177,6 +244,7 @@ export const Auth = () => {
               <Label htmlFor="signup-email" className="text-gray-300">Email</Label>
               <Input
                 id="signup-email"
+                name="signup-email"
                 type="email"
                 value={signupEmail}
                 onChange={(e) => setSignupEmail(e.target.value)}
@@ -190,6 +258,7 @@ export const Auth = () => {
               <div className="relative">
                 <Input
                   id="signup-password"
+                  name="signup-password"
                   type={showPassword ? "text" : "password"}
                   value={signupPassword}
                   onChange={(e) => setSignupPassword(e.target.value)}
@@ -210,63 +279,11 @@ export const Auth = () => {
               <p className="text-xs text-gray-400">Password must be at least 6 characters long</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="avatar-upload" className="text-gray-300 flex items-center gap-2">
-                <Upload className="h-4 w-4" />
-                Upload Your Image *
-              </Label>
-              <div className="border-2 border-dashed border-cyan-500/30 rounded-lg p-4 hover:border-cyan-500/50 transition-colors">
-                <input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
-                  className="hidden"
-                  required
-                />
-                <label
-                  htmlFor="avatar-upload"
-                  className="cursor-pointer flex flex-col items-center gap-2 text-gray-400 hover:text-gray-300"
-                >
-                  {avatarFile ? (
-                    <span className="text-cyan-300">{avatarFile.name}</span>
-                  ) : (
-                    <>
-                      <Upload className="h-6 w-6" />
-                      <span className="text-sm">Click to upload profile image</span>
-                    </>
-                  )}
-                </label>
-              </div>
-            </div>
+            {/* Profile picture upload removed - users can add it later in ProfileSetup */}
 
-            <div className="space-y-2">
-              <Label htmlFor="bio" className="text-gray-300">Tell The Community About Yourself *</Label>
-              <Textarea
-                id="bio"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                className="bg-slate-700/50 border-cyan-500/20 text-white resize-none"
-                placeholder="Share a bit about yourself, your interests, and what brings you to our community..."
-                rows={3}
-                required
-              />
-            </div>
+            {/* Bio field removed - users can add it later in ProfileSetup */}
 
-            <div className="space-y-2">
-              <Label htmlFor="promo-code" className="text-gray-300 flex items-center gap-2">
-                <Ticket className="h-4 w-4" />
-                Promo Code
-              </Label>
-              <Input
-                id="promo-code"
-                type="text"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                className="bg-slate-700/50 border-cyan-500/20 text-white"
-                required
-              />
-            </div>
+            {/* Promo code field removed for backend integration */}
             
             <Button
               type="submit"
@@ -275,7 +292,9 @@ export const Auth = () => {
             >
               {signupLoading ? 'Creating account...' : 'Create Account'}
             </Button>
-          </form>
+              </form>
+            </TabsContent>
+          </Tabs>
           
         </CardContent>
       </Card>

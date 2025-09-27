@@ -13,8 +13,8 @@ export default function AdminSupportButton() {
   const { user } = useAuth();
   const { unreadCount } = useUnreadMessages();
 
-  // Don't show the button if user is not authenticated
-  if (!user) {
+  // Don't show the button if user is not authenticated or not an admin
+  if (!user || !isAdmin) {
     return null;
   }
 
@@ -27,7 +27,7 @@ export default function AdminSupportButton() {
             <div className="flex items-center gap-3">
               <MessageSquare className="h-5 w-5 text-primary" />
               <h2 className="text-lg font-semibold">
-                {isAdmin ? 'Admin Support Center' : 'Support Chat'}
+                Admin Support Center
               </h2>
               {unreadCount > 0 && (
                 <Badge variant="destructive">{unreadCount}</Badge>
@@ -60,7 +60,7 @@ export default function AdminSupportButton() {
       className="relative"
     >
       <MessageSquare className="h-4 w-4 mr-2" />
-      {isAdmin ? 'Support Center' : 'Support'}
+      Admin Support
       {unreadCount > 0 && (
         <div className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full min-w-5 h-5 text-xs flex items-center justify-center px-1">
           {unreadCount > 99 ? '99+' : unreadCount}

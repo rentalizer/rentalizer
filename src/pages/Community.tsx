@@ -1,5 +1,5 @@
 // Community Component - Fixed TopNavBar issue
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 // Extend Window interface for Calendly
 declare global {
@@ -15,7 +15,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Calendar, MessageSquare, Users, Book, Video, Bell, Plus, FileText, Calculator, Medal, RotateCcw, Download, Bot, Newspaper, User, Building, TrendingUp, Settings } from 'lucide-react';
 import AdminChatButton from '@/components/AdminChatButton';
 import AdminSupportMessaging from '@/components/messaging/AdminSupportMessaging';
-import { useToast } from '@/hooks/use-toast';
 import { CompsSection } from '@/components/calculator/CompsSection';
 import { BuildOutSection } from '@/components/calculator/BuildOutSection';
 import { ExpensesSection } from '@/components/calculator/ExpensesSection';
@@ -42,7 +41,6 @@ import { useAdminRole } from '@/hooks/useAdminRole';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 
 export interface CalculatorData {
   // Comps
@@ -74,7 +72,7 @@ export interface CalculatorData {
   furnishingsPSF: number;
 }
 
-const Community = () => {
+const Community = React.memo(() => {
   const { memberCount, loading } = useMemberCount();
   
   // Get initial tab from URL hash or default to discussions
@@ -89,11 +87,8 @@ const Community = () => {
   const [calculatorOpen, setCalculatorOpen] = useState(false);
   const [profileEditorOpen, setProfileEditorOpen] = useState(false);
   const [directMessageChatOpen, setDirectMessageChatOpen] = useState(false);
-  const [userIsAdmin, setUserIsAdmin] = useState(false);
-  const [adminCheckLoading, setAdminCheckLoading] = useState(true);
 
   const [showPricingOverlay, setShowPricingOverlay] = useState(false);
-  const { toast } = useToast();
   const { isAdmin } = useAdminRole();
   const { unreadCount } = useUnreadMessages();
   const { user } = useAuth();
@@ -104,52 +99,24 @@ const Community = () => {
                        window.location.search.includes('__lovable_token') ||
                        window.location.hostname === 'localhost';
   
-  // Enhanced admin check that works on live site
-  useEffect(() => {
-    const checkAdminStatus = async () => {
-      if (!user) {
-        setUserIsAdmin(false);
-        setAdminCheckLoading(false);
-        return;
-      }
+  // Check admin status based on user role - optimized to run only once
+  const userIsAdmin = useMemo(() => {
+    if (!user) return false;
+    return user.role === 'admin' || user.role === 'superadmin';
+  }, [user?.role]); // Only depend on the role, not the entire user object
 
-      try {
-        // First check using the hook
-        if (isAdmin) {
-          setUserIsAdmin(true);
-          setAdminCheckLoading(false);
-          return;
-        }
-
-        // Direct database check as fallback
-        const { data: roles, error } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .eq('role', 'admin')
-          .limit(1);
-
-        if (error) {
-          console.error('Error checking admin status:', error);
-          setUserIsAdmin(false);
-        } else {
-          setUserIsAdmin(roles && roles.length > 0);
-        }
-      } catch (error) {
-        console.error('Exception checking admin status:', error);
-        setUserIsAdmin(false);
-      }
-      
-      setAdminCheckLoading(false);
-    };
-
-    checkAdminStatus();
-  }, [user, isAdmin]);
+  const adminCheckLoading = useMemo(() => {
+    return !user; // Only loading if user is not loaded yet
+  }, [user]);
   
   
-  // Update URL hash when tab changes
+  // Update URL hash when tab changes - debounced to prevent excessive updates
   useEffect(() => {
-    window.location.hash = activeTab;
+    const timeoutId = setTimeout(() => {
+      window.location.hash = activeTab;
+    }, 100); // Small delay to prevent excessive hash updates
+
+    return () => clearTimeout(timeoutId);
   }, [activeTab]);
   
   // Calculator state
@@ -229,10 +196,7 @@ const Community = () => {
 
   const clearCalculatorData = () => {
     setCalculatorData({ ...initialData });
-    toast({
-      title: "Calculator Cleared",
-      description: "All data has been reset.",
-    });
+    console.log("Calculator Cleared: All data has been reset.");
   };
 
   const downloadCalculatorData = () => {
@@ -248,50 +212,29 @@ const Community = () => {
     
     exportCalculatorToCSV(calculatorData, calculatedValues);
     
-    toast({
-      title: "Data Downloaded",
-      description: "Your calculator data has been exported to a CSV file.",
-    });
+    console.log("Data Downloaded: Your calculator data has been exported to a CSV file.");
   };
 
   const handleCheckout = async (plan: string) => {
     if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to subscribe.",
-        variant: "destructive",
-      });
+      console.log("Authentication Required: Please log in to subscribe.");
       return;
     }
 
     try {
-      toast({
-        title: "Redirecting to Checkout",
-        description: "Opening Stripe checkout...",
-      });
+      console.log("Redirecting to Checkout: Opening Stripe checkout...");
 
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          plan: plan,
-          billing: 'monthly' // Default to monthly
-        }
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        // Open Stripe checkout in a new tab
-        window.open(data.url, '_blank');
-      } else {
-        throw new Error('No checkout URL received');
-      }
+      // Mock checkout - replace with real API call later
+      setTimeout(() => {
+        // Mock checkout URL - replace with real Stripe checkout URL
+        const mockCheckoutUrl = 'https://checkout.stripe.com/mock-checkout';
+        window.open(mockCheckoutUrl, '_blank');
+        
+        console.log("Checkout Opened: Mock checkout page opened in new tab");
+      }, 500);
     } catch (error) {
       console.error('Checkout error:', error);
-      toast({
-        title: "Checkout Failed",
-        description: error instanceof Error ? error.message : "Failed to start checkout process",
-        variant: "destructive",
-      });
+      console.log("Checkout Failed:", error instanceof Error ? error.message : "Failed to start checkout process");
     }
   };
 
@@ -722,7 +665,7 @@ const Community = () => {
   return (
     <AccessGate title="Training Dashboard" subtitle="Access your account">
       <CommunityContent />
-      {directMessageChatOpen && (
+      {directMessageChatOpen && userIsAdmin && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-background rounded-lg w-full max-w-6xl h-[80vh] flex flex-col">
             <div className="flex items-center justify-between p-4 border-b border-border">
@@ -742,7 +685,8 @@ const Community = () => {
       )}
     </AccessGate>
   );
-};
+});
 
-// Admin button removed for security
+Community.displayName = 'Community';
+
 export default Community;

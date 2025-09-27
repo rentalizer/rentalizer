@@ -8,9 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { User, Upload, Save } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { apiService } from '@/services/api';
 import { useNavigate } from 'react-router-dom';
 import { TopNavBar } from '@/components/TopNavBar';
 import { useForm } from 'react-hook-form';
@@ -30,7 +29,6 @@ const ProfileSetup = () => {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [profileComplete, setProfileComplete] = useState(false);
 
@@ -54,50 +52,35 @@ const ProfileSetup = () => {
   const loadProfile = async () => {
     try {
       console.log('🔍 Loading profile for user:', user?.id);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user?.id)
-        .single();
+      
+      // Load profile from backend API
+      const response = await apiService.getProfile();
+      const profileData = response.user;
 
-      console.log('📊 Profile query result:', { data, error });
+      console.log('📋 Profile data from backend:', profileData);
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error loading profile:', error);
-        return;
-      }
-
-      if (data) {
-        console.log('📋 Profile data found:', data);
-        // If detailed profile exists, use it
-        if (data.first_name || data.last_name) {
-          console.log('✅ Using first_name/last_name from profile');
-          form.reset({
-            first_name: data.first_name || '',
-            last_name: data.last_name || '',
-            bio: data.bio || '',
-          });
-        } else if (data.display_name) {
-          // If only display_name exists, try to split it into first/last
-          console.log('🔄 Splitting display_name into first/last:', data.display_name);
-          const nameParts = data.display_name.split(' ');
-          const firstName = nameParts[0] || '';
-          const lastName = nameParts.slice(1).join(' ') || '';
-          console.log('📝 Setting names - First:', firstName, 'Last:', lastName);
-          form.reset({
-            first_name: firstName,
-            last_name: lastName,
-            bio: data.bio || '',
-          });
-        }
-        setAvatarUrl(data.avatar_url || '');
-        setProfileComplete(data.profile_complete || false);
-        console.log('✨ Profile state updated');
-      } else {
-        console.log('❌ No profile data found');
+      if (profileData) {
+        console.log('📋 Setting form data:', {
+          firstName: profileData.firstName,
+          lastName: profileData.lastName,
+          bio: profileData.bio,
+          profilePicture: profileData.profilePicture ? 'Image loaded' : 'No image'
+        });
+        
+        form.reset({
+          first_name: profileData.firstName || '',
+          last_name: profileData.lastName || '',
+          bio: profileData.bio || '',
+        });
+        
+        // Set avatar URL if available
+        setAvatarUrl(profileData.profilePicture || '');
+        setProfileComplete(!!(profileData.firstName && profileData.lastName));
+        console.log('✨ Profile state updated from backend');
       }
     } catch (error) {
       console.error('Error loading profile:', error);
+      // If profile doesn't exist, that's okay - user can create one
     } finally {
       setLoading(false);
     }
@@ -108,11 +91,7 @@ const ProfileSetup = () => {
       setUploading(true);
 
       if (!event.target.files || event.target.files.length === 0) {
-        toast({
-          title: "No file selected",
-          description: "Please select an image to upload",
-          variant: "destructive",
-        });
+        console.log("No file selected: Please select an image to upload");
         return;
       }
 
@@ -120,43 +99,33 @@ const ProfileSetup = () => {
       
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        toast({
-          title: "Invalid file type",
-          description: "Please select an image file",
-          variant: "destructive",
-        });
+        console.log("Invalid file type: Please select an image file");
         return;
       }
 
-      const fileExt = file.name.split('.').pop();
-      const timestamp = Date.now();
-      const filePath = `${user?.id}/avatar-${timestamp}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, { upsert: true });
-
-      if (uploadError) {
-        throw uploadError;
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        console.log("File too large: Please select an image smaller than 2MB");
+        return;
       }
 
-      const { data } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-      setAvatarUrl(data.publicUrl);
+      // Convert to base64 for storage (you might want to implement proper file upload later)
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        // Only store if it's a reasonable size (less than 1MB base64)
+        if (result.length < 1000000) {
+          setAvatarUrl(result);
+          console.log("Success: Profile photo selected");
+        } else {
+          console.log("File too large: Please select a smaller image");
+        }
+      };
+      reader.readAsDataURL(file);
       
-      toast({
-        title: "Success",
-        description: "Profile photo uploaded successfully",
-      });
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      toast({
-        title: "Error",
-        description: "Failed to upload avatar",
-        variant: "destructive",
-      });
+      console.log("Error: Failed to upload avatar");
     } finally {
       setUploading(false);
     }
@@ -165,78 +134,46 @@ const ProfileSetup = () => {
   const onSubmit = async (data: ProfileFormData) => {
     if (!user) {
       console.error('❌ No user found when trying to save profile');
-      toast({
-        title: "Authentication Error", 
-        description: "Please sign in again to save your profile",
-        variant: "destructive",
-      });
+      console.log("Authentication Error: Please sign in again to save your profile");
       return;
     }
 
     console.log('🔍 User found:', user.id, user.email);
 
-    if (!data.first_name.trim() || !data.last_name.trim() || !avatarUrl) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in first name, last name, and upload a profile picture",
-        variant: "destructive",
-      });
+    if (!data.first_name.trim() || !data.last_name.trim()) {
+      console.log("Missing Information: Please fill in first name and last name");
       return;
     }
 
     try {
-      console.log('💾 Attempting to save profile with data:', {
-        user_id: user.id,
-        first_name: data.first_name.trim(),
-        last_name: data.last_name.trim(),
-        bio: data.bio?.trim() || null,
-        avatar_url: avatarUrl || '',
-        display_name: `${data.first_name.trim()} ${data.last_name.trim()}`,
-        profile_complete: true
+      console.log('💾 Attempting to update profile with data:', {
+        firstName: data.first_name.trim(),
+        lastName: data.last_name.trim(),
       });
 
-      // Use direct Supabase call with explicit auth
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('🔑 Current session:', !!session);
-
-      const { data: savedData, error } = await supabase
-        .from('profiles')
-        .upsert({
-          user_id: user.id,
-          first_name: data.first_name.trim(),
-          last_name: data.last_name.trim(),
-          bio: data.bio?.trim() || null,
-          avatar_url: avatarUrl || '',
-          display_name: `${data.first_name.trim()} ${data.last_name.trim()}`,
-          profile_complete: true
-        }, {
-          onConflict: 'user_id'
-        });
-
-      if (error) {
-        console.error('❌ Supabase error:', error);
-        toast({
-          title: "Database Error",
-          description: `Save failed: ${error.message}`,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      console.log('✅ Profile saved successfully!', savedData);
-      toast({
-        title: "Success!",
-        description: "Your profile has been saved successfully",
+      // Update profile using backend API
+      const response = await apiService.updateProfile({
+        firstName: data.first_name.trim(),
+        lastName: data.last_name.trim(),
+        bio: data.bio?.trim() || '',
+        profilePicture: avatarUrl || '',
       });
+
+      console.log('✅ Profile updated successfully!', response);
+      console.log("Success: Your profile has been updated successfully");
 
       navigate('/community');
     } catch (error: any) {
       console.error('💥 Exception:', error);
-      toast({
-        title: "Error",
-        description: `Unexpected error: ${error.message}`,
-        variant: "destructive",
-      });
+      
+      let errorMessage = 'Failed to update profile';
+      if (error.message.includes('request entity too large')) {
+        errorMessage = 'Profile picture is too large. Please select a smaller image.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      console.log("Error:", errorMessage);
     }
   };
 
@@ -406,7 +343,7 @@ const ProfileSetup = () => {
 
                   <Button
                     type="submit"
-                    disabled={form.formState.isSubmitting || !watchedFirstName.trim() || !watchedLastName.trim() || !avatarUrl}
+                    disabled={form.formState.isSubmitting || !watchedFirstName.trim() || !watchedLastName.trim()}
                     className="w-full bg-cyan-600 hover:bg-cyan-700"
                   >
                     <Save className="h-4 w-4 mr-2" />

@@ -7,7 +7,6 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Camera, Upload } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
 interface ProfileSetupProps {
   onComplete?: () => void;
@@ -15,7 +14,6 @@ interface ProfileSetupProps {
 
 export const ProfileSetup: React.FC<ProfileSetupProps> = ({ onComplete }) => {
   const { user, profile, updateProfile } = useAuth();
-  const { toast } = useToast();
   const [displayName, setDisplayName] = useState(profile?.display_name || '');
   const [isUploading, setIsUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '');
@@ -27,11 +25,7 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({ onComplete }) => {
 
     const file = files[0];
     if (!file.type.startsWith('image/')) {
-      toast({
-        title: "Invalid file type",
-        description: "Please select an image file",
-        variant: "destructive"
-      });
+      console.log("Invalid file type: Please select an image file");
       return;
     }
 
@@ -53,17 +47,10 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({ onComplete }) => {
 
       setAvatarUrl(data.publicUrl);
       
-      toast({
-        title: "Photo uploaded",
-        description: "Your profile photo has been uploaded successfully"
-      });
+      console.log("Photo uploaded: Your profile photo has been uploaded successfully");
     } catch (error) {
       console.error('Error uploading file:', error);
-      toast({
-        title: "Upload failed",
-        description: "Failed to upload profile photo",
-        variant: "destructive"
-      });
+      console.log("Upload failed: Failed to upload profile photo");
     } finally {
       setIsUploading(false);
     }
@@ -71,11 +58,7 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({ onComplete }) => {
 
   const handleSave = async () => {
     if (!displayName.trim()) {
-      toast({
-        title: "Display name required",
-        description: "Please enter a display name",
-        variant: "destructive"
-      });
+      console.log("Display name required: Please enter a display name");
       return;
     }
 
@@ -89,19 +72,12 @@ export const ProfileSetup: React.FC<ProfileSetupProps> = ({ onComplete }) => {
 
       if (error) throw error;
 
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been saved successfully"
-      });
+      console.log("Profile updated: Your profile has been saved successfully");
 
       onComplete?.();
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast({
-        title: "Update failed",
-        description: "Failed to update profile",
-        variant: "destructive"
-      });
+      console.log("Update failed: Failed to update profile");
     } finally {
       setIsSubmitting(false);
     }

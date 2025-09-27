@@ -8,7 +8,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Newspaper, ExternalLink, Calendar, Eye, MousePointer, Pin, Plus, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -44,7 +43,6 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
-  const { toast } = useToast();
   const { isAdmin } = useAdminRole();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -115,11 +113,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
       setNewsItems(data || []);
     } catch (error) {
       console.error('Error fetching news items:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load news items. Please try again.",
-        variant: "destructive",
-      });
+      console.log("Error: Failed to load news items. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -166,27 +160,16 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
 
       await fetchNewsItems();
       
-      toast({
-        title: newsItem.is_pinned ? "Unpinned" : "Pinned",
-        description: `Article ${newsItem.is_pinned ? 'unpinned from' : 'pinned to'} top of feed.`,
-      });
+      console.log(newsItem.is_pinned ? "Unpinned:" : "Pinned:", `Article ${newsItem.is_pinned ? 'unpinned from' : 'pinned to'} top of feed.`);
     } catch (error) {
       console.error('Error toggling pin:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update pin status.",
-        variant: "destructive",
-      });
+      console.log("Error: Failed to update pin status.");
     }
   };
 
   const handleSubmitNews = async () => {
     if (!submitForm.title || !submitForm.url || !submitForm.source) {
-      toast({
-        title: "Error",
-        description: "Title, URL, and source are required.",
-        variant: "destructive",
-      });
+      console.log("Error: Title, URL, and source are required.");
       return;
     }
 
@@ -207,10 +190,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
 
       if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "News item submitted successfully!",
-      });
+      console.log("Success: News item submitted successfully!");
 
       setSubmitForm({
         title: '',
@@ -224,11 +204,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
       await fetchNewsItems();
     } catch (error) {
       console.error('Error submitting news:', error);
-      toast({
-        title: "Error",
-        description: "Failed to submit news item.",
-        variant: "destructive",
-      });
+      console.log("Error: Failed to submit news item.");
     }
   };
 
