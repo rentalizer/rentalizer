@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { MessageCircle, Send, Edit, Trash2, Check, X, MoreHorizontal } from 'lucide-react';
+import { MessageCircle, Send, Edit, Trash2, Check, X, MoreHorizontal, ChevronDown } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DiscussionType } from './GroupDiscussions';
 import { useAuth } from '@/contexts/AuthContext';
@@ -51,6 +51,54 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
   const [editContent, setEditContent] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
   const [deletingComment, setDeletingComment] = useState<string | null>(null);
+  const [showNewMessagesButton, setShowNewMessagesButton] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const commentsEndRef = useRef<HTMLDivElement>(null);
+  const commentsContainerRef = useRef<HTMLDivElement>(null);
+  const previousCommentsLength = useRef(comments.length);
+
+  // Scroll to bottom when comments change
+  const scrollToBottom = useCallback(() => {
+    commentsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setIsAtBottom(true);
+    setShowNewMessagesButton(false);
+  }, []);
+
+  // Check if user is at bottom of scroll
+  const checkIfAtBottom = useCallback(() => {
+    if (!commentsContainerRef.current) return;
+    
+    const { scrollTop, scrollHeight, clientHeight } = commentsContainerRef.current;
+    const threshold = 100; // pixels from bottom
+    const atBottom = scrollHeight - scrollTop - clientHeight < threshold;
+    setIsAtBottom(atBottom);
+  }, []);
+
+  // Handle scroll events
+  const handleScroll = useCallback(() => {
+    checkIfAtBottom();
+  }, [checkIfAtBottom]);
+
+  // Auto-scroll only when dialog opens or user is already at bottom
+  useEffect(() => {
+    const commentsLength = comments.length;
+    const hasNewComments = commentsLength > previousCommentsLength.current;
+    
+    if (hasNewComments) {
+      if (isAtBottom) {
+        // User is at bottom, auto-scroll to show new comments
+        scrollToBottom();
+      } else {
+        // User is not at bottom, show "new messages" button
+        setShowNewMessagesButton(true);
+      }
+    } else if (commentsLength === 0 || previousCommentsLength.current === 0) {
+      // First load or no comments, scroll to bottom
+      scrollToBottom();
+    }
+    
+    previousCommentsLength.current = commentsLength;
+  }, [comments.length, isAtBottom, scrollToBottom]);
 
   // Check if current user can edit/delete a comment
   const canEditOrDelete = useCallback((comment: Comment) => {
@@ -133,12 +181,16 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
           {discussion.comments}
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-white">Comments - {discussion.title}</DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4 max-h-96 overflow-y-auto">
+        <div 
+          ref={commentsContainerRef}
+          className="flex-1 overflow-y-auto space-y-4 min-h-0 relative"
+          onScroll={handleScroll}
+        >
           {comments?.map((comment, index) => (
             <div key={comment.id || `${comment.author}-${index}`} className="flex items-start gap-3">
               <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
@@ -235,9 +287,24 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
           )) || (
             <p className="text-gray-400 text-center py-8">No comments yet. Be the first to comment!</p>
           )}
+          <div ref={commentsEndRef} />
+          
+          {/* New Messages Button */}
+          {showNewMessagesButton && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
+              <Button
+                onClick={scrollToBottom}
+                variant="outline"
+                size="sm"
+                className="bg-slate-800/90 backdrop-blur-sm border-slate-600 text-gray-300 hover:bg-slate-700/90 hover:text-white shadow-md p-2 opacity-80 hover:opacity-100 transition-all duration-200 rounded-full"
+              >
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
         
-        <div className="flex items-start gap-3 mt-4 pt-4 border-t border-gray-700">
+        <div className="flex-shrink-0 flex items-start gap-3 mt-4 pt-4 border-t border-gray-700">
           <Avatar className="w-8 h-8 flex-shrink-0">
             {getUserAvatar() ? (
               <AvatarImage 
