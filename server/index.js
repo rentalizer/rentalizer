@@ -12,6 +12,7 @@ const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 const discussionRoutes = require('./routes/discussions');
 const commentRoutes = require('./routes/comments');
+const eventRoutes = require('./routes/events');
 
 // Import WebSocket setup
 const { setupWebSocketHandlers } = require('./middleware/websocket');
@@ -49,6 +50,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/discussions', discussionRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/events', eventRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
