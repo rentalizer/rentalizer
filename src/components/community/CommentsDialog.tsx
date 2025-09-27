@@ -53,6 +53,7 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
   const [deletingComment, setDeletingComment] = useState<string | null>(null);
   const [showNewMessagesButton, setShowNewMessagesButton] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const commentsEndRef = useRef<HTMLDivElement>(null);
   const commentsContainerRef = useRef<HTMLDivElement>(null);
   const previousCommentsLength = useRef(comments.length);
@@ -79,7 +80,21 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
     checkIfAtBottom();
   }, [checkIfAtBottom]);
 
-  // Auto-scroll only when dialog opens or user is already at bottom
+  // Always scroll to bottom when dialog opens
+  useEffect(() => {
+    if (dialogOpen && comments.length > 0) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    } else if (!dialogOpen) {
+      // Reset state when dialog closes
+      setShowNewMessagesButton(false);
+      setIsAtBottom(true);
+    }
+  }, [dialogOpen, comments.length, scrollToBottom]);
+
+  // Auto-scroll when new comments are added
   useEffect(() => {
     const commentsLength = comments.length;
     const hasNewComments = commentsLength > previousCommentsLength.current;
@@ -92,9 +107,6 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
         // User is not at bottom, show "new messages" button
         setShowNewMessagesButton(true);
       }
-    } else if (commentsLength === 0 || previousCommentsLength.current === 0) {
-      // First load or no comments, scroll to bottom
-      scrollToBottom();
     }
     
     previousCommentsLength.current = commentsLength;
@@ -109,7 +121,7 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
 
   // Handle starting edit
   const handleStartEdit = useCallback((comment: Comment) => {
-    const normalizedId = (comment as any).id || (comment as any)._id;
+    const normalizedId = comment.id || (comment as Comment & { _id?: string })._id;
     console.log('🔍 Starting edit for comment:', comment);
     console.log('🔍 Comment ID (normalized):', normalizedId);
     setEditingComment(normalizedId);
@@ -147,7 +159,7 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
     } finally {
       setSavingEdit(false);
     }
-  }, [editContent, onCommentUpdate]);
+  }, [editContent, editingComment, onCommentUpdate, handleCancelEdit]);
 
   // Handle deleting comment
   const handleDeleteComment = useCallback(async (commentId: string) => {
@@ -169,7 +181,7 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
     }
   }, [onCommentDelete]);
   return (
-    <Dialog>
+    <Dialog onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <Button 
           variant="ghost" 
