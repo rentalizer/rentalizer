@@ -42,16 +42,9 @@ const eventSchema = new mongoose.Schema({
   zoom_link: {
     type: String,
     trim: true,
-    validate: {
-      validator: function(v) {
-        // Only validate if location is Zoom and zoom_link is provided
-        if (this.location === 'Zoom' && v) {
-          return /^https?:\/\/.+/.test(v);
-        }
-        return true;
-      },
-      message: 'Zoom link must be a valid URL'
-    }
+    maxlength: [500, 'Zoom link cannot exceed 500 characters']
+    // Removed URL validation for development flexibility
+    // Users can enter meeting IDs, room names, or full URLs
   },
   event_type: {
     type: String,
@@ -66,8 +59,8 @@ const eventSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Attendees setting is required'],
     enum: {
-      values: ['All members', 'Premium members only', 'Invited members only'],
-      message: 'Attendees must be one of: All members, Premium members only, Invited members only'
+      values: ['All members', 'Premium members', 'Invited only'],
+      message: 'Attendees must be one of: All members, Premium members, Invited only'
     },
     default: 'All members'
   },

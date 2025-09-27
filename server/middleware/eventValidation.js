@@ -66,8 +66,9 @@ const validateCreateEvent = [
     
   body('zoom_link')
     .optional()
-    .isURL()
-    .withMessage('Zoom link must be a valid URL'),
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Zoom link cannot exceed 500 characters'),
     
   body('event_type')
     .optional()
@@ -119,8 +120,12 @@ const validateCreateEvent = [
     
   // Custom validation for zoom_link when location is Zoom
   body().custom((body) => {
-    if (body.location === 'Zoom' && body.zoom_link && !body.zoom_link.startsWith('http')) {
-      throw new Error('Zoom link must be a valid URL when location is Zoom');
+    if (body.location === 'Zoom' && body.zoom_link) {
+      // Allow any non-empty string for zoom_link when location is Zoom
+      // Users can enter meeting IDs, room names, or full URLs
+      if (typeof body.zoom_link !== 'string' || body.zoom_link.trim().length === 0) {
+        throw new Error('Zoom link is required when location is Zoom');
+      }
     }
     return true;
   }),
@@ -178,8 +183,9 @@ const validateUpdateEvent = [
     
   body('zoom_link')
     .optional()
-    .isURL()
-    .withMessage('Zoom link must be a valid URL'),
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage('Zoom link cannot exceed 500 characters'),
     
   body('event_type')
     .optional()

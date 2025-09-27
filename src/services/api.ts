@@ -242,6 +242,153 @@ export interface ReactToCommentResponse {
   };
 }
 
+// Calendar Event types
+export interface Event {
+  _id: string;
+  title: string;
+  description?: string;
+  event_date: string;
+  event_time: string;
+  duration: string;
+  location: string;
+  zoom_link?: string;
+  event_type: 'training' | 'webinar' | 'discussion' | 'workshop';
+  attendees: string;
+  is_recurring: boolean;
+  remind_members: boolean;
+  created_by: {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    email: string;
+    profilePicture?: string;
+  };
+  cover_image?: string;
+  max_attendees?: number;
+  series_id?: string;
+  is_active: boolean;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateEventRequest {
+  title: string;
+  description?: string;
+  event_date: string;
+  event_time: string;
+  duration?: string;
+  location?: string;
+  zoom_link?: string;
+  event_type?: 'training' | 'webinar' | 'discussion' | 'workshop';
+  attendees?: string;
+  is_recurring?: boolean;
+  remind_members?: boolean;
+  max_attendees?: number;
+  cover_image?: string;
+  tags?: string[];
+}
+
+export interface UpdateEventRequest {
+  title?: string;
+  description?: string;
+  event_date?: string;
+  event_time?: string;
+  duration?: string;
+  location?: string;
+  zoom_link?: string;
+  event_type?: 'training' | 'webinar' | 'discussion' | 'workshop';
+  attendees?: string;
+  is_recurring?: boolean;
+  remind_members?: boolean;
+  max_attendees?: number;
+  cover_image?: string;
+  tags?: string[];
+}
+
+export interface EventResponse {
+  success: boolean;
+  message: string;
+  data: Event;
+}
+
+export interface EventsResponse {
+  success: boolean;
+  message: string;
+  data: Event[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
+export interface CalendarLinksResponse {
+  success: boolean;
+  message: string;
+  data: {
+    google: string;
+    outlook: string;
+    yahoo: string;
+    ical: string;
+  };
+}
+
+export interface EventInvitation {
+  _id: string;
+  event: string | Event;
+  user: {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+    email: string;
+    profilePicture?: string;
+  };
+  status: 'pending' | 'accepted' | 'declined' | 'maybe';
+  invited_by: {
+    _id: string;
+    firstName?: string;
+    lastName?: string;
+  };
+  invited_at: string;
+  responded_at?: string;
+  reminder_sent: boolean;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EventInvitationsResponse {
+  success: boolean;
+  message: string;
+  data: EventInvitation[];
+}
+
+export interface InviteUsersRequest {
+  user_ids: string[];
+}
+
+export interface RSVPRequest {
+  status: 'accepted' | 'declined' | 'maybe';
+  notes?: string;
+}
+
+export interface EventStatsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    totalEvents: number;
+    upcomingEvents: number;
+    totalPastEvents: number;
+    byType: Array<{
+      _id: string;
+      count: number;
+      totalAttendees: number;
+    }>;
+  };
+}
+
 // API Service Class
 class ApiService {
   // Authentication endpoints
@@ -622,6 +769,215 @@ class ApiService {
   // Check if user is authenticated
   isAuthenticated(): boolean {
     return !!this.getAuthToken();
+  }
+
+  // ===== Calendar Event endpoints =====
+  
+  // Get all events with filtering and pagination
+  async getEvents(params?: {
+    page?: number;
+    limit?: number;
+    type?: 'training' | 'webinar' | 'discussion' | 'workshop';
+    date_from?: string;
+    date_to?: string;
+    year?: number;
+    month?: number;
+  }): Promise<EventsResponse> {
+    try {
+      const response = await api.get<EventsResponse>('/events', { params });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Get events for a specific month
+  async getEventsForMonth(year: number, month: number): Promise<EventsResponse> {
+    try {
+      const response = await api.get<EventsResponse>(`/events/month/${year}/${month}`);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Get upcoming events
+  async getUpcomingEvents(limit: number = 10): Promise<EventsResponse> {
+    try {
+      const response = await api.get<EventsResponse>('/events/upcoming', {
+        params: { limit }
+      });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Search events
+  async searchEvents(query: string, filters?: {
+    type?: 'training' | 'webinar' | 'discussion' | 'workshop';
+    date_from?: string;
+    date_to?: string;
+  }): Promise<EventsResponse> {
+    try {
+      const response = await api.get<EventsResponse>('/events/search', {
+        params: { q: query, ...filters }
+      });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Get single event by ID
+  async getEventById(id: string): Promise<EventResponse> {
+    try {
+      const response = await api.get<EventResponse>(`/events/${id}`);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Create new event (Admin only)
+  async createEvent(data: CreateEventRequest): Promise<EventResponse> {
+    try {
+      const response = await api.post<EventResponse>('/events', data);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Update event
+  async updateEvent(id: string, data: UpdateEventRequest): Promise<EventResponse> {
+    try {
+      const response = await api.put<EventResponse>(`/events/${id}`, data);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Delete event
+  async deleteEvent(id: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await api.delete<{ success: boolean; message: string }>(`/events/${id}`);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Get event statistics
+  async getEventStats(): Promise<EventStatsResponse> {
+    try {
+      const response = await api.get<EventStatsResponse>('/events/stats');
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Get calendar links for an event
+  async getCalendarLinks(eventId: string): Promise<CalendarLinksResponse> {
+    try {
+      const response = await api.get<CalendarLinksResponse>(`/events/${eventId}/calendar-links`);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Export events as iCal
+  async exportEventsAsICal(eventIds: string[]): Promise<Blob> {
+    try {
+      const response = await api.post('/events/export/ical', { eventIds }, {
+        responseType: 'blob'
+      });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Send invitations to users
+  async inviteUsers(eventId: string, data: InviteUsersRequest): Promise<{ success: boolean; message: string; data: { event: string; invitations_sent: number; total_invited: number } }> {
+    try {
+      const response = await api.post<{ success: boolean; message: string; data: { event: string; invitations_sent: number; total_invited: number } }>(`/events/${eventId}/invite`, data);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Get event attendees
+  async getEventAttendees(eventId: string): Promise<EventInvitationsResponse> {
+    try {
+      const response = await api.get<EventInvitationsResponse>(`/events/${eventId}/attendees`);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // RSVP to an event
+  async rsvpToEvent(eventId: string, data: RSVPRequest): Promise<{ success: boolean; message: string; data: EventInvitation }> {
+    try {
+      const response = await api.post<{ success: boolean; message: string; data: EventInvitation }>(`/events/${eventId}/rsvp`, data);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Get user's event invitations
+  async getUserInvitations(status?: 'pending' | 'accepted' | 'declined' | 'maybe'): Promise<EventInvitationsResponse> {
+    try {
+      const response = await api.get<EventInvitationsResponse>('/events/invitations/my', {
+        params: status ? { status } : {}
+      });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Get event attendance statistics
+  async getEventAttendanceStats(eventId: string): Promise<{ success: boolean; message: string; data: Array<{ _id: string; count: number }> }> {
+    try {
+      const response = await api.get<{ success: boolean; message: string; data: Array<{ _id: string; count: number }> }>(`/events/${eventId}/stats`);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Get calendar integration status
+  async getCalendarIntegrationStatus(): Promise<{ success: boolean; message: string; data: { google: { connected: boolean; lastSync: string | null }; outlook: { connected: boolean; lastSync: string | null }; apple: { connected: boolean; lastSync: string | null } } }> {
+    try {
+      const response = await api.get<{ success: boolean; message: string; data: { google: { connected: boolean; lastSync: string | null }; outlook: { connected: boolean; lastSync: string | null }; apple: { connected: boolean; lastSync: string | null } } }>('/events/integration/status');
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
   }
 }
 

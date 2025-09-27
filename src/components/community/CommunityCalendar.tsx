@@ -16,9 +16,10 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { apiService, Event, CreateEventRequest, UpdateEventRequest } from '@/services/api';
 
-interface Event {
+// Transform backend Event to frontend Event format
+interface FrontendEvent {
   id: string;
   title: string;
   date: Date;
@@ -33,12 +34,51 @@ interface Event {
   remindMembers?: boolean;
 }
 
+// Helper functions to transform between backend and frontend formats
+const transformBackendToFrontend = (backendEvent: Event): FrontendEvent => {
+  // Extract just the date part from the ISO string to avoid timezone issues
+  const dateStr = backendEvent.event_date.split('T')[0]; // Get "2025-09-27" from "2025-09-27T00:00:00.000Z"
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const localDate = new Date(year, month - 1, day); // Create local date (month is 0-indexed)
+  
+  console.log(`Transforming backend event: ${backendEvent.event_date} -> ${dateStr} -> ${localDate.toLocaleDateString()}`);
+  
+  return {
+    id: backendEvent._id,
+    title: backendEvent.title,
+    date: localDate,
+    time: backendEvent.event_time,
+    type: backendEvent.event_type,
+    attendees: backendEvent.attendees,
+    isRecurring: backendEvent.is_recurring,
+    description: backendEvent.description,
+    location: backendEvent.location,
+    duration: backendEvent.duration,
+    zoomLink: backendEvent.zoom_link,
+    remindMembers: backendEvent.remind_members,
+  };
+};
+
+const transformFrontendToBackend = (frontendEvent: any): CreateEventRequest => ({
+  title: frontendEvent.title,
+  description: frontendEvent.description,
+  event_date: `${frontendEvent.date.getFullYear()}-${String(frontendEvent.date.getMonth() + 1).padStart(2, '0')}-${String(frontendEvent.date.getDate()).padStart(2, '0')}`,
+  event_time: frontendEvent.time,
+  duration: frontendEvent.duration,
+  location: frontendEvent.location,
+  zoom_link: frontendEvent.zoomLink,
+  event_type: frontendEvent.event_type || 'workshop', // Use actual event type or default
+  attendees: frontendEvent.attendees,
+  is_recurring: frontendEvent.isRecurring,
+  remind_members: frontendEvent.remindMembers,
+});
+
 export const CommunityCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   // Set current month to show events properly - default to current month
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<FrontendEvent | null>(null);
   const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false);
   const [isEditEventOpen, setIsEditEventOpen] = useState(false);
   const { isAdmin } = useAdminRole();
@@ -53,13 +93,16 @@ export const CommunityCalendar = () => {
     location: 'Zoom',
     zoomLink: '',
     description: '',
+    event_type: 'workshop' as 'training' | 'webinar' | 'discussion' | 'workshop',
     isRecurring: false,
     remindMembers: false,
     attendees: 'All members'
   });
 
   // State for events
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<FrontendEvent[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Mock events data for September 2025
   const mockEvents = [
@@ -219,26 +262,50 @@ export const CommunityCalendar = () => {
     }
   ];
 
-  // Load mock events
+  // Load events from API
   const fetchEvents = async () => {
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300));
+      setLoading(true);
+      setError(null);
       
-      console.log('📅 Loading September 2025 mock calendar events:', mockEvents.length, 'events');
-      setEvents(mockEvents);
+      console.log('📅 Loading calendar events from API...');
+      
+      // Get current month and year
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth() + 1;
+      
+      const response = await apiService.getEventsForMonth(year, month);
+      
+      if (response.success) {
+        const frontendEvents = response.data.map(transformBackendToFrontend);
+        setEvents(frontendEvents);
+        console.log('📅 Loaded', frontendEvents.length, 'events for', year, month);
+        console.log('📅 Events after transformation:', frontendEvents.map(e => ({ 
+          title: e.title, 
+          date: e.date.toLocaleDateString(), 
+          backendDate: response.data.find(be => be._id === e.id)?.event_date 
+        })));
+      } else {
+        throw new Error(response.message || 'Failed to fetch events');
+      }
     } catch (error) {
-      console.error('Error loading mock events:', error);
+      console.error('Error loading events:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load events');
+      
+      // Fallback to mock events for development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📅 Using mock events as fallback');
+        setEvents(mockEvents);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Load events on component mount
+  // Load events on component mount and when month changes
   React.useEffect(() => {
     fetchEvents();
-    
-    // Set the calendar to current month to show mock events
-    setCurrentMonth(new Date());
-  }, []);
+  }, [currentMonth]);
 
   const getEventTypeColor = (type: string) => {
     switch (type) {
@@ -261,9 +328,11 @@ export const CommunityCalendar = () => {
   };
 
   const getEventsForDate = (date: Date) => {
-    return events.filter(event => 
+    const filteredEvents = events.filter(event => 
       event.date.toDateString() === date.toDateString()
     );
+    console.log(`Getting events for date ${date.toDateString()}:`, filteredEvents.map(e => ({ title: e.title, date: e.date.toDateString() })));
+    return filteredEvents;
   };
 
   const selectedDateEvents = selectedDate ? getEventsForDate(selectedDate) : [];
@@ -308,194 +377,73 @@ export const CommunityCalendar = () => {
       return;
     }
     
-    console.log('Creating event with data:', {
-      title: newEvent.title,
-      description: newEvent.description,
-      event_date: newEvent.date.toISOString().split('T')[0],
-      event_time: newEvent.time,
-      duration: newEvent.duration,
-      location: newEvent.location,
-      zoom_link: newEvent.zoomLink,
-      event_type: 'workshop',
-      attendees: newEvent.attendees,
-      is_recurring: newEvent.isRecurring,
-      remind_members: newEvent.remindMembers,
-      created_by: user.id
-    });
-    
     try {
-      console.log('Creating event with date:', newEvent.date.toLocaleDateString(), 'which will be stored as:', newEvent.date.toISOString().split('T')[0]);
+      console.log('Creating event with date:', newEvent.date.toLocaleDateString(), 'which will be stored as:', `${newEvent.date.getFullYear()}-${String(newEvent.date.getMonth() + 1).padStart(2, '0')}-${String(newEvent.date.getDate()).padStart(2, '0')}`);
       
-      const { data, error } = await supabase
-        .from('events')
-        .insert({
-          title: newEvent.title,
-          description: newEvent.description,
-          event_date: newEvent.date.toISOString().split('T')[0],
-          event_time: newEvent.time,
-          duration: newEvent.duration,
-          location: newEvent.location,
-          zoom_link: newEvent.zoomLink,
-          event_type: 'workshop',
-          attendees: newEvent.attendees,
-          is_recurring: newEvent.isRecurring,
-          remind_members: newEvent.remindMembers,
-          created_by: user.id
-        })
-        .select();
-
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-
-      console.log('Event created successfully:', data);
-
-      // If it's a recurring event, create additional weekly events (11 more for total of 12)
-      if (newEvent.isRecurring) {
-        const recurringEvents = [];
+      const eventData = transformFrontendToBackend(newEvent);
+      
+      const response = await apiService.createEvent(eventData);
+      
+      if (response.success) {
+        console.log('Event created successfully:', response.data);
         
-        for (let i = 1; i < 12; i++) {
-          const futureDate = new Date(newEvent.date);
-          futureDate.setDate(futureDate.getDate() + (i * 7)); // Add weeks
-          
-          console.log(`Creating recurring event ${i} for date:`, futureDate.toLocaleDateString(), 'stored as:', futureDate.toISOString().split('T')[0]);
-          
-          recurringEvents.push({
-            title: newEvent.title,
-            description: newEvent.description,
-            event_date: futureDate.toISOString().split('T')[0],
-            event_time: newEvent.time,
-            duration: newEvent.duration,
-            location: newEvent.location,
-            zoom_link: newEvent.zoomLink,
-            event_type: 'workshop',
-            attendees: newEvent.attendees,
-            is_recurring: true,
-            remind_members: newEvent.remindMembers,
-            created_by: user.id
-          });
-        }
-
-        if (recurringEvents.length > 0) {
-          const { error: recurringError } = await supabase
-            .from('events')
-            .insert(recurringEvents);
-          
-          if (recurringError) {
-            console.error('Error creating recurring events:', recurringError);
-            // Don't throw here, the main event was already created successfully
-          } else {
-            console.log(`Created ${recurringEvents.length} additional recurring events`);
-          }
-        }
+        // Refresh events list
+        await fetchEvents();
+        setIsAddEventOpen(false);
+        
+        // Reset form
+        setNewEvent({
+          title: '',
+          date: new Date(),
+          time: '',
+          duration: '1 hour',
+          location: 'Zoom',
+          zoomLink: '',
+          description: '',
+          event_type: 'workshop',
+          isRecurring: false,
+          remindMembers: false,
+          attendees: 'All members'
+        });
+        
+        console.log('Event added successfully');
+      } else {
+        throw new Error(response.message || 'Failed to create event');
       }
-
-      // Refresh events list
-      await fetchEvents();
-      setIsAddEventOpen(false);
-      
-      // Reset form
-      setNewEvent({
-        title: '',
-        date: new Date(),
-        time: '',
-        duration: '1 hour',
-        location: 'Zoom',
-        zoomLink: '',
-        description: '',
-        isRecurring: false,
-        remindMembers: false,
-        attendees: 'All members'
-      });
-      
-      console.log('Event added successfully');
     } catch (error) {
       console.error('Error creating event:', error);
       // Show user-friendly error message
-      alert(`Failed to create event: ${error.message || 'Unknown error'}`);
+      alert(`Failed to create event: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   const handleEditEvent = async () => {
     if (!selectedEvent || !user) return;
     
-    console.log('Editing event with new date:', newEvent.date.toLocaleDateString(), 'stored as:', newEvent.date.toISOString().split('T')[0]);
-    console.log('Original event date was:', selectedEvent.date.toLocaleDateString());
-    
     try {
-      // Update the original event
-      const { error: updateError } = await supabase
-        .from('events')
-        .update({
-          title: newEvent.title,
-          description: newEvent.description,
-          event_date: newEvent.date.toISOString().split('T')[0],
-          event_time: newEvent.time,
-          duration: newEvent.duration,
-          location: newEvent.location,
-          zoom_link: newEvent.zoomLink,
-          event_type: 'workshop',
-          attendees: newEvent.attendees,
-          is_recurring: newEvent.isRecurring,
-          remind_members: newEvent.remindMembers,
-        })
-        .eq('id', selectedEvent.id);
-
-      if (updateError) {
-        console.error('Update error:', updateError);
-        throw updateError;
-      }
-
-      console.log('Event updated successfully, refreshing events...');
-
-      // If making it recurring, create additional weekly events (11 more for total of 12)
-      if (newEvent.isRecurring && !selectedEvent.isRecurring) {
-        const recurringEvents = [];
-        
-        for (let i = 1; i < 12; i++) {
-          const futureDate = new Date(newEvent.date);
-          futureDate.setDate(futureDate.getDate() + (i * 7)); // Add weeks
-          
-          recurringEvents.push({
-            title: newEvent.title,
-            description: newEvent.description,
-            event_date: futureDate.toISOString().split('T')[0],
-            event_time: newEvent.time,
-            duration: newEvent.duration,
-            location: newEvent.location,
-            zoom_link: newEvent.zoomLink,
-            event_type: 'workshop',
-            attendees: newEvent.attendees,
-            is_recurring: true,
-            remind_members: newEvent.remindMembers,
-            created_by: user.id
-          });
-        }
-
-        if (recurringEvents.length > 0) {
-          const { error: recurringError } = await supabase
-            .from('events')
-            .insert(recurringEvents);
-          
-          if (recurringError) {
-            console.error('Error creating recurring events:', recurringError);
-            // Don't throw here, the main event was already updated successfully
-          } else {
-            console.log(`Created ${recurringEvents.length} additional recurring events`);
-          }
-        }
-      }
-
-      // Refresh events list
-      await fetchEvents();
-      setIsEditEventOpen(false);
-      setIsEventDetailsOpen(false);
+      console.log('Editing event with new date:', newEvent.date.toLocaleDateString(), 'stored as:', `${newEvent.date.getFullYear()}-${String(newEvent.date.getMonth() + 1).padStart(2, '0')}-${String(newEvent.date.getDate()).padStart(2, '0')}`);
+      console.log('Original event date was:', selectedEvent.date.toLocaleDateString());
       
-      console.log('Event updated successfully');
+      const eventData = transformFrontendToBackend(newEvent);
+      console.log('Sending event data to backend:', eventData);
+      
+      const response = await apiService.updateEvent(selectedEvent.id, eventData);
+      
+      if (response.success) {
+        console.log('Event updated successfully:', response.data);
+        
+        // Refresh events list
+        await fetchEvents();
+        setIsEditEventOpen(false);
+        setIsEventDetailsOpen(false);
+        
+        console.log('Event updated successfully');
+      } else {
+        throw new Error(response.message || 'Failed to update event');
+      }
     } catch (error) {
       console.error('Error updating event:', error);
-      alert(`Failed to update event: ${error.message || 'Unknown error'}`);
+      alert(`Failed to update event: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -509,30 +457,25 @@ export const CommunityCalendar = () => {
     try {
       console.log('Deleting event:', selectedEvent.id);
       
-      const { error } = await supabase
-        .from('events')
-        .delete()
-        .eq('id', selectedEvent.id);
-
-      if (error) {
-        console.error('Delete error:', error);
-        throw error;
+      const response = await apiService.deleteEvent(selectedEvent.id);
+      
+      if (response.success) {
+        console.log('Event deleted successfully');
+        
+        // Refresh events list
+        await fetchEvents();
+        setIsEditEventOpen(false);
+        setIsEventDetailsOpen(false);
+      } else {
+        throw new Error(response.message || 'Failed to delete event');
       }
-
-      console.log('Event deleted successfully');
-      
-      // Refresh events list
-      await fetchEvents();
-      setIsEditEventOpen(false);
-      setIsEventDetailsOpen(false);
-      
     } catch (error) {
       console.error('Error deleting event:', error);
-      alert(`Failed to delete event: ${error.message || 'Unknown error'}`);
+      alert(`Failed to delete event: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
-  const openEditDialog = (event: Event) => {
+  const openEditDialog = (event: FrontendEvent) => {
     setSelectedEvent(event);
     setNewEvent({
       title: event.title,
@@ -542,6 +485,7 @@ export const CommunityCalendar = () => {
       location: event.location || 'Zoom',
       zoomLink: event.zoomLink || '',
       description: event.description || '',
+      event_type: event.type || 'workshop',
       isRecurring: event.isRecurring || false,
       remindMembers: event.remindMembers || false,
       attendees: String(event.attendees) || 'All members'
@@ -549,35 +493,50 @@ export const CommunityCalendar = () => {
     setIsEditEventOpen(true);
   };
 
-  const addToCalendar = (event: Event) => {
-    const startDate = new Date(event.date);
-    const endDate = new Date(startDate);
-    
-    // Parse duration to add to end time
-    const duration = event.duration || '1 hour';
-    const durationValue = parseInt(duration.split(' ')[0]);
-    const durationUnit = duration.includes('hour') ? 'hours' : 'minutes';
-    
-    if (durationUnit === 'hours') {
-      endDate.setHours(endDate.getHours() + durationValue);
-    } else {
-      endDate.setMinutes(endDate.getMinutes() + durationValue);
+  const addToCalendar = async (event: FrontendEvent) => {
+    try {
+      // Get calendar links from the API
+      const response = await apiService.getCalendarLinks(event.id);
+      
+      if (response.success) {
+        // Open Google Calendar link
+        window.open(response.data.google, '_blank');
+      } else {
+        throw new Error(response.message || 'Failed to generate calendar links');
+      }
+    } catch (error) {
+      console.error('Error getting calendar links:', error);
+      
+      // Fallback to manual URL generation
+      const startDate = new Date(event.date);
+      const endDate = new Date(startDate);
+      
+      // Parse duration to add to end time
+      const duration = event.duration || '1 hour';
+      const durationValue = parseInt(duration.split(' ')[0]);
+      const durationUnit = duration.includes('hour') ? 'hours' : 'minutes';
+      
+      if (durationUnit === 'hours') {
+        endDate.setHours(endDate.getHours() + durationValue);
+      } else {
+        endDate.setMinutes(endDate.getMinutes() + durationValue);
+      }
+      
+      // Format dates for calendar
+      const formatDate = (date: Date) => {
+        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      };
+      
+      const details = [
+        event.description || '',
+        event.location && event.location !== 'Zoom' ? `Location: ${event.location}` : '',
+        event.zoomLink ? `Join: ${event.zoomLink}` : ''
+      ].filter(Boolean).join('\n\n');
+      
+      const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${formatDate(startDate)}/${formatDate(endDate)}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(event.zoomLink || '')}`;
+      
+      window.open(calendarUrl, '_blank');
     }
-    
-    // Format dates for calendar
-    const formatDate = (date: Date) => {
-      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    };
-    
-    const details = [
-      event.description || '',
-      event.location && event.location !== 'Zoom' ? `Location: ${event.location}` : '',
-      event.zoomLink ? `Join: ${event.zoomLink}` : ''
-    ].filter(Boolean).join('\n\n');
-    
-    const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${formatDate(startDate)}/${formatDate(endDate)}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(event.zoomLink || '')}`;
-    
-    window.open(calendarUrl, '_blank');
   };
 
   const handleDayClick = (date: Date) => {
@@ -596,7 +555,15 @@ export const CommunityCalendar = () => {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-cyan-300 flex items-center gap-2">
             Events Calendar
+            {loading && <span className="text-sm text-gray-400">(Loading...)</span>}
           </CardTitle>
+          
+          {/* Error Message */}
+          {error && (
+            <div className="text-red-400 text-sm mb-2">
+              Error: {error}
+            </div>
+          )}
           
           {/* Add Event Dialog - Only visible to admins */}
           {isAdmin && (
@@ -697,6 +664,22 @@ export const CommunityCalendar = () => {
                   </div>
                 </div>
 
+                {/* Event Type */}
+                <div className="space-y-2">
+                  <Label className="text-white">Event Type</Label>
+                  <Select value={newEvent.event_type} onValueChange={(value) => setNewEvent({...newEvent, event_type: value as 'training' | 'webinar' | 'discussion' | 'workshop'})}>
+                    <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-gray-700">
+                      <SelectItem value="training">🟢 Training</SelectItem>
+                      <SelectItem value="webinar">🔵 Webinar</SelectItem>
+                      <SelectItem value="discussion">🟡 Discussion</SelectItem>
+                      <SelectItem value="workshop">🟣 Workshop</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {/* Recurring Event */}
                 <div className="flex items-center space-x-2">
                   <Checkbox 
@@ -724,12 +707,17 @@ export const CommunityCalendar = () => {
                     </Select>
                     
                     {newEvent.location === 'Zoom' && (
-                      <Input
-                        placeholder="Zoom link"
-                        value={newEvent.zoomLink}
-                        onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
-                        className="bg-slate-700 border-gray-600 text-white"
-                      />
+                      <div className="space-y-1">
+                        <Input
+                          placeholder="Meeting ID, room name, or full Zoom URL"
+                          value={newEvent.zoomLink}
+                          onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
+                          className="bg-slate-700 border-gray-600 text-white"
+                        />
+                        <p className="text-xs text-gray-400">
+                          Examples: "123456789", "Room A", or "https://zoom.us/j/123456789"
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -1119,14 +1107,35 @@ export const CommunityCalendar = () => {
                      </Select>
                      
                      {newEvent.location === 'Zoom' && (
-                       <Input
-                         placeholder="Zoom link"
-                         value={newEvent.zoomLink}
-                         onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
-                         className="bg-slate-700 border-gray-600 text-white"
-                       />
+                       <div className="space-y-1">
+                         <Input
+                           placeholder="Meeting ID, room name, or full Zoom URL"
+                           value={newEvent.zoomLink}
+                           onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
+                           className="bg-slate-700 border-gray-600 text-white"
+                         />
+                         <p className="text-xs text-gray-400">
+                           Examples: "123456789", "Room A", or "https://zoom.us/j/123456789"
+                         </p>
+                       </div>
                      )}
                    </div>
+                 </div>
+
+                 {/* Event Type */}
+                 <div className="space-y-2">
+                   <Label className="text-white">Event Type</Label>
+                   <Select value={newEvent.event_type} onValueChange={(value) => setNewEvent({...newEvent, event_type: value as 'training' | 'webinar' | 'discussion' | 'workshop'})}>
+                     <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                       <SelectValue />
+                     </SelectTrigger>
+                     <SelectContent className="bg-slate-800 border-gray-700">
+                       <SelectItem value="training">🟢 Training</SelectItem>
+                       <SelectItem value="webinar">🔵 Webinar</SelectItem>
+                       <SelectItem value="discussion">🟡 Discussion</SelectItem>
+                       <SelectItem value="workshop">🟣 Workshop</SelectItem>
+                     </SelectContent>
+                   </Select>
                  </div>
 
                  {/* Description */}
