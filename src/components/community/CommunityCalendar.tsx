@@ -59,7 +59,21 @@ const transformBackendToFrontend = (backendEvent: Event): FrontendEvent => {
   };
 };
 
-const transformFrontendToBackend = (frontendEvent: any): CreateEventRequest => ({
+interface EventFormData {
+  title: string;
+  date: Date;
+  time: string;
+  duration: string;
+  location: string;
+  zoomLink: string;
+  description: string;
+  event_type: 'training' | 'webinar' | 'discussion' | 'workshop';
+  isRecurring: boolean;
+  remindMembers: boolean;
+  attendees: string;
+}
+
+const transformFrontendToBackend = (frontendEvent: EventFormData): CreateEventRequest => ({
   title: frontendEvent.title,
   description: frontendEvent.description,
   event_date: `${frontendEvent.date.getFullYear()}-${String(frontendEvent.date.getMonth() + 1).padStart(2, '0')}-${String(frontendEvent.date.getDate()).padStart(2, '0')}`,
@@ -68,7 +82,7 @@ const transformFrontendToBackend = (frontendEvent: any): CreateEventRequest => (
   location: frontendEvent.location,
   zoom_link: frontendEvent.zoomLink,
   event_type: frontendEvent.event_type || 'workshop', // Use actual event type or default
-  attendees: frontendEvent.attendees,
+  attendees: String(frontendEvent.attendees),
   is_recurring: frontendEvent.isRecurring,
   remind_members: frontendEvent.remindMembers,
 });
@@ -77,6 +91,16 @@ export const CommunityCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   // Set current month to show events properly - default to current month
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  
+  // Log the initial selected date
+  React.useEffect(() => {
+    console.log('📅 Calendar initialized with selected date:', selectedDate?.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }));
+  }, [selectedDate]);
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<FrontendEvent | null>(null);
   const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false);
@@ -105,7 +129,7 @@ export const CommunityCalendar = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Mock events data for September 2025
-  const mockEvents = [
+  const mockEvents = React.useMemo(() => [
     {
       id: 'mock-1',
       title: 'September Market Outlook',
@@ -260,10 +284,10 @@ export const CommunityCalendar = () => {
       isRecurring: false,
       remindMembers: true
     }
-  ];
+  ], []);
 
   // Load events from API
-  const fetchEvents = async () => {
+  const fetchEvents = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -295,12 +319,12 @@ export const CommunityCalendar = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentMonth, mockEvents]);
 
   // Load events on component mount and when month changes
   React.useEffect(() => {
     fetchEvents();
-  }, [currentMonth]);
+  }, [currentMonth, fetchEvents]);
 
   const getEventTypeColor = (type: string) => {
     switch (type) {
@@ -544,12 +568,40 @@ export const CommunityCalendar = () => {
   };
 
   const handleDayClick = (date: Date) => {
+    console.log('📅 User clicked on date:', date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }));
+    console.log('📅 Date object:', date);
+    console.log('📅 ISO string:', date.toISOString());
+    
     const dayEvents = getEventsForDate(date);
+    console.log('📅 Events for this date:', dayEvents.length, dayEvents);
+    
     if (dayEvents.length > 0) {
       setSelectedEvent(dayEvents[0]); // For now, show first event
       setIsEventDetailsOpen(true);
     }
     setSelectedDate(date);
+  };
+
+  const handleAddEventClick = () => {
+    console.log('📅 Opening add event dialog with selected date:', selectedDate?.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }));
+    
+    // Set the form date to the currently selected date
+    setNewEvent(prev => ({
+      ...prev,
+      date: selectedDate || new Date()
+    }));
+    
+    setIsAddEventOpen(true);
   };
 
   return (
@@ -572,16 +624,17 @@ export const CommunityCalendar = () => {
           {/* Add Event Dialog - Only visible to admins */}
           {isAdmin && (
             <Dialog open={isAddEventOpen} onOpenChange={setIsAddEventOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Event
-                </Button>
-              </DialogTrigger>
-            <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto">
+              <Button 
+                onClick={handleAddEventClick}
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Event
+              </Button>
+            <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="add-event-description">
               <DialogHeader>
                 <DialogTitle className="text-white text-xl">Add event</DialogTitle>
-                <p className="text-gray-400 text-sm">
+                <p id="add-event-description" className="text-gray-400 text-sm">
                   Need ideas? Try one of these fun formats: 
                   <span className="text-blue-400 hover:underline cursor-pointer"> coffee hour</span>,
                   <span className="text-blue-400 hover:underline cursor-pointer"> Q&A</span>,
@@ -926,11 +979,14 @@ export const CommunityCalendar = () => {
         
         {/* Event Details Popup */}
         <Dialog open={isEventDetailsOpen} onOpenChange={setIsEventDetailsOpen}>
-          <DialogContent className="bg-slate-800 border-gray-700 max-w-md">
+          <DialogContent className="bg-slate-800 border-gray-700 max-w-md" aria-describedby="event-details-description">
             <DialogHeader>
               <DialogTitle className="text-white text-xl">
                 {selectedEvent?.title}
               </DialogTitle>
+              <p id="event-details-description" className="text-gray-400 text-sm">
+                View event details, add to calendar, or join the event
+              </p>
             </DialogHeader>
             
             {selectedEvent && (
@@ -1014,9 +1070,12 @@ export const CommunityCalendar = () => {
          {/* Edit Event Dialog - Only visible to admins */}
          {isAdmin && (
            <Dialog open={isEditEventOpen} onOpenChange={setIsEditEventOpen}>
-             <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto">
+             <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="edit-event-description">
                <DialogHeader>
                  <DialogTitle className="text-white text-xl">Edit Event</DialogTitle>
+                 <p id="edit-event-description" className="text-gray-400 text-sm">
+                   Modify event details, update information, or delete the event
+                 </p>
                </DialogHeader>
                
                <div className="space-y-6 mt-6">
