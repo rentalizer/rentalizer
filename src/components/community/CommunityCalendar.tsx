@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -41,7 +41,7 @@ const transformBackendToFrontend = (backendEvent: Event): FrontendEvent => {
   const [year, month, day] = dateStr.split('-').map(Number);
   const localDate = new Date(year, month - 1, day); // Create local date (month is 0-indexed)
   
-  console.log(`Transforming backend event: ${backendEvent.event_date} -> ${dateStr} -> ${localDate.toLocaleDateString()}`);
+  // Debug: console.log(`Transforming backend event: ${backendEvent.event_date} -> ${dateStr} -> ${localDate.toLocaleDateString()}`);
   
   return {
     id: backendEvent._id,
@@ -280,11 +280,6 @@ export const CommunityCalendar = () => {
         const frontendEvents = response.data.map(transformBackendToFrontend);
         setEvents(frontendEvents);
         console.log('📅 Loaded', frontendEvents.length, 'events for', year, month);
-        console.log('📅 Events after transformation:', frontendEvents.map(e => ({ 
-          title: e.title, 
-          date: e.date.toLocaleDateString(), 
-          backendDate: response.data.find(be => be._id === e.id)?.event_date 
-        })));
       } else {
         throw new Error(response.message || 'Failed to fetch events');
       }
@@ -327,12 +322,21 @@ export const CommunityCalendar = () => {
     }
   };
 
+  // Memoized events lookup for better performance
+  const eventsByDate = useMemo(() => {
+    const lookup: { [key: string]: FrontendEvent[] } = {};
+    events.forEach(event => {
+      const dateKey = event.date.toDateString();
+      if (!lookup[dateKey]) {
+        lookup[dateKey] = [];
+      }
+      lookup[dateKey].push(event);
+    });
+    return lookup;
+  }, [events]);
+
   const getEventsForDate = (date: Date) => {
-    const filteredEvents = events.filter(event => 
-      event.date.toDateString() === date.toDateString()
-    );
-    console.log(`Getting events for date ${date.toDateString()}:`, filteredEvents.map(e => ({ title: e.title, date: e.date.toDateString() })));
-    return filteredEvents;
+    return eventsByDate[date.toDateString()] || [];
   };
 
   const selectedDateEvents = selectedDate ? getEventsForDate(selectedDate) : [];
