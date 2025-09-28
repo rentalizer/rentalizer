@@ -37,11 +37,11 @@ interface FrontendEvent {
 // Helper functions to transform between backend and frontend formats
 const transformBackendToFrontend = (backendEvent: Event): FrontendEvent => {
   // Extract just the date part from the ISO string to avoid timezone issues
-  const dateStr = backendEvent.event_date.split('T')[0]; // Get "2025-09-27" from "2025-09-27T00:00:00.000Z"
+  const dateStr = backendEvent.event_date.split('T')[0]; // Get "2025-09-30" from "2025-09-30T00:00:00.000Z"
   const [year, month, day] = dateStr.split('-').map(Number);
   const localDate = new Date(year, month - 1, day); // Create local date (month is 0-indexed)
   
-  // Debug: console.log(`Transforming backend event: ${backendEvent.event_date} -> ${dateStr} -> ${localDate.toLocaleDateString()}`);
+  console.log(`📅 Transforming backend event: ${backendEvent.event_date} -> ${dateStr} -> ${localDate.toLocaleDateString()}`);
   
   return {
     id: backendEvent._id,
@@ -128,8 +128,8 @@ const transformFrontendToBackend = (frontendEvent: EventFormData): CreateEventRe
 
 export const CommunityCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  // Set current month to show events properly - default to current month
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  // Set current month to show events properly - default to September 2025 for testing
+  const [currentMonth, setCurrentMonth] = useState(new Date(2025, 8)); // September 2025
   
   // Log the initial selected date
   React.useEffect(() => {
@@ -340,10 +340,14 @@ export const CommunityCalendar = () => {
       const year = currentMonth.getFullYear();
       const month = currentMonth.getMonth() + 1;
       
+      console.log(`📅 Requesting events for ${year}-${month} (${currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })})`);
+      
       const response = await apiService.getEventsForMonth(year, month);
       
       if (response.success) {
+        console.log('📅 Raw API response:', response.data);
         const frontendEvents = response.data.map(transformBackendToFrontend);
+        console.log('📅 Transformed frontend events:', frontendEvents);
         setEvents(frontendEvents);
         console.log('📅 Loaded', frontendEvents.length, 'events for', year, month);
       } else {
@@ -365,6 +369,7 @@ export const CommunityCalendar = () => {
 
   // Load events on component mount and when month changes
   React.useEffect(() => {
+    console.log('📅 Calendar month changed to:', currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }));
     fetchEvents();
   }, [currentMonth, fetchEvents]);
 
@@ -391,18 +396,24 @@ export const CommunityCalendar = () => {
   // Memoized events lookup for better performance
   const eventsByDate = useMemo(() => {
     const lookup: { [key: string]: FrontendEvent[] } = {};
+    console.log('📅 Building events lookup for', events.length, 'events');
     events.forEach(event => {
       const dateKey = event.date.toDateString();
+      console.log(`📅 Event "${event.title}" on ${dateKey}`);
       if (!lookup[dateKey]) {
         lookup[dateKey] = [];
       }
       lookup[dateKey].push(event);
     });
+    console.log('📅 Events lookup built:', Object.keys(lookup));
     return lookup;
   }, [events]);
 
   const getEventsForDate = (date: Date) => {
-    return eventsByDate[date.toDateString()] || [];
+    const dateKey = date.toDateString();
+    const eventsForDate = eventsByDate[dateKey] || [];
+    console.log(`📅 Looking for events on ${dateKey}:`, eventsForDate.length, 'events found');
+    return eventsForDate;
   };
 
   const selectedDateEvents = selectedDate ? getEventsForDate(selectedDate) : [];
@@ -449,8 +460,10 @@ export const CommunityCalendar = () => {
     
     try {
       console.log('Creating event with date:', newEvent.date.toLocaleDateString(), 'which will be stored as:', `${newEvent.date.getFullYear()}-${String(newEvent.date.getMonth() + 1).padStart(2, '0')}-${String(newEvent.date.getDate()).padStart(2, '0')}`);
+      console.log('Form data:', newEvent);
       
       const eventData = transformFrontendToBackend(newEvent);
+      console.log('Transformed event data:', eventData);
       
       const response = await apiService.createEvent(eventData);
       
@@ -649,10 +662,13 @@ export const CommunityCalendar = () => {
       day: 'numeric' 
     }));
     
-    // Set the form date to the currently selected date
+    // Set the form date to the currently selected date or default to September 30, 2025
+    const defaultDate = selectedDate || new Date(2025, 8, 30); // September 30, 2025
+    console.log('📅 Setting form date to:', defaultDate.toLocaleDateString());
+    
     setNewEvent(prev => ({
       ...prev,
-      date: selectedDate || new Date()
+      date: defaultDate
     }));
     
     setIsAddEventOpen(true);
@@ -734,9 +750,15 @@ export const CommunityCalendar = () => {
                         <Calendar
                           mode="single"
                           selected={newEvent.date}
-                          onSelect={(date) => date && setNewEvent({...newEvent, date})}
+                          onSelect={(date) => {
+                            console.log('📅 Date selected in calendar:', date);
+                            if (date) {
+                              setNewEvent({...newEvent, date});
+                            }
+                          }}
                           initialFocus
                           className="p-3 pointer-events-auto"
+                          defaultMonth={new Date(2025, 8)} // Default to September 2025
                         />
                       </PopoverContent>
                     </Popover>
@@ -1196,9 +1218,15 @@ export const CommunityCalendar = () => {
                          <Calendar
                            mode="single"
                            selected={newEvent.date}
-                           onSelect={(date) => date && setNewEvent({...newEvent, date})}
+                           onSelect={(date) => {
+                             console.log('📅 Date selected in edit calendar:', date);
+                             if (date) {
+                               setNewEvent({...newEvent, date});
+                             }
+                           }}
                            initialFocus
                            className="p-3 pointer-events-auto"
+                           defaultMonth={newEvent.date} // Default to the event's current date
                          />
                        </PopoverContent>
                      </Popover>

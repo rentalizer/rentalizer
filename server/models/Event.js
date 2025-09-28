@@ -173,8 +173,20 @@ eventSchema.statics.getEventsInRange = function(startDate, endDate) {
 // Static method to get events for a specific month
 eventSchema.statics.getEventsForMonth = function(year, month) {
   const startDate = new Date(year, month - 1, 1);
-  const endDate = new Date(year, month, 0);
-  return this.getEventsInRange(startDate, endDate);
+  const endDate = new Date(year, month, 0); // This gives last day of previous month, need to fix
+  // Fix: Get the last day of the current month
+  const lastDayOfMonth = new Date(year, month, 0).getDate();
+  const correctedEndDate = new Date(year, month - 1, lastDayOfMonth, 23, 59, 59, 999);
+  
+  console.log(`📅 getEventsForMonth: Looking for events between ${startDate.toISOString()} and ${correctedEndDate.toISOString()}`);
+  
+  return this.find({
+    event_date: {
+      $gte: startDate,
+      $lte: correctedEndDate
+    },
+    is_active: true
+  }).populate('created_by', 'firstName lastName email profilePicture');
 };
 
 // Pre-save middleware to validate zoom_link when location is Zoom
