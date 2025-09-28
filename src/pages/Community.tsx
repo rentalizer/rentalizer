@@ -134,14 +134,14 @@ const Community = React.memo(() => {
     miscellaneous: 0,
     furnitureRental: 0,
     squareFootage: 0,
-    furnishingsPSF: 0,
+    furnishingsPSF: 8,
   };
   
   const [calculatorData, setCalculatorData] = useState<CalculatorData>(initialData);
   
   // Calculate derived values
   const calculatedFurnishings = Math.round(calculatorData.squareFootage * calculatorData.furnishingsPSF);
-  const cashToLaunch = Math.round(calculatorData.firstMonthRent + calculatorData.securityDeposit + calculatorData.miscellaneous + calculatedFurnishings + calculatorData.furnitureRental);
+  const cashToLaunch = Math.round(calculatorData.firstMonthRent + calculatorData.securityDeposit + calculatorData.miscellaneous + calculatedFurnishings);
   const serviceFeeCalculated = Math.round(calculatorData.rent * 0.029);
   const monthlyExpenses = Math.round(calculatorData.rent + serviceFeeCalculated + calculatorData.maintenance + calculatorData.power + 
                          calculatorData.waterSewer + calculatorData.internet + calculatorData.taxLicense + calculatorData.insurance + 
@@ -340,8 +340,8 @@ const Community = React.memo(() => {
                 </Button>
               </div>
 
-              {/* Calculator Sections */}
-              <div className="grid xl:grid-cols-4 lg:grid-cols-2 grid-cols-1 gap-6">
+              {/* Calculator Sections - Cleaner Grid Layout */}
+              <div className="grid lg:grid-cols-2 xl:grid-cols-4 gap-6 max-w-full">
                 <BuildOutSection 
                   data={calculatorData} 
                   updateData={updateCalculatorData} 
