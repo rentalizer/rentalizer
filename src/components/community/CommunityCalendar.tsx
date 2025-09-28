@@ -63,6 +63,9 @@ interface EventFormData {
   title: string;
   date: Date;
   time: string;
+  hour: string;
+  minute: string;
+  period: string;
   duration: string;
   location: string;
   zoomLink: string;
@@ -73,11 +76,47 @@ interface EventFormData {
   attendees: string;
 }
 
+// Helper functions for time conversion
+const timeToHourMinutePeriod = (timeStr: string) => {
+  if (!timeStr) return { hour: '12', minute: '00', period: 'AM' };
+  
+  const [time, period] = timeStr.split(' ');
+  const [hour, minute] = time.split(':');
+  
+  // Convert 24-hour to 12-hour format
+  let hourNum = parseInt(hour);
+  const newPeriod = hourNum >= 12 ? 'PM' : 'AM';
+  
+  if (hourNum === 0) hourNum = 12;
+  else if (hourNum > 12) hourNum = hourNum - 12;
+  
+  return {
+    hour: hourNum.toString(),
+    minute: minute || '00',
+    period: newPeriod
+  };
+};
+
+const hourMinutePeriodToTime = (hour: string, minute: string, period: string) => {
+  let hourNum = parseInt(hour);
+  
+  if (period === 'PM' && hourNum !== 12) {
+    hourNum += 12;
+  } else if (period === 'AM' && hourNum === 12) {
+    hourNum = 0;
+  }
+  
+  // Ensure minute is padded to 2 digits
+  const paddedMinute = minute.padStart(2, '0');
+  
+  return `${hourNum.toString().padStart(2, '0')}:${paddedMinute}`;
+};
+
 const transformFrontendToBackend = (frontendEvent: EventFormData): CreateEventRequest => ({
   title: frontendEvent.title,
   description: frontendEvent.description,
   event_date: `${frontendEvent.date.getFullYear()}-${String(frontendEvent.date.getMonth() + 1).padStart(2, '0')}-${String(frontendEvent.date.getDate()).padStart(2, '0')}`,
-  event_time: frontendEvent.time,
+  event_time: hourMinutePeriodToTime(frontendEvent.hour, frontendEvent.minute, frontendEvent.period),
   duration: frontendEvent.duration,
   location: frontendEvent.location,
   zoom_link: frontendEvent.zoomLink,
@@ -113,6 +152,9 @@ export const CommunityCalendar = () => {
     title: '',
     date: new Date(),
     time: '',
+    hour: '12',
+    minute: '00',
+    period: 'AM',
     duration: '1 hour',
     location: 'Zoom',
     zoomLink: '',
@@ -400,7 +442,7 @@ export const CommunityCalendar = () => {
       return;
     }
     
-    if (!newEvent.time) {
+    if (!newEvent.hour || !newEvent.minute || !newEvent.period) {
       console.error('Time is required');
       return;
     }
@@ -424,6 +466,9 @@ export const CommunityCalendar = () => {
           title: '',
           date: new Date(),
           time: '',
+          hour: '12',
+          minute: '00',
+          period: 'AM',
           duration: '1 hour',
           location: 'Zoom',
           zoomLink: '',
@@ -447,6 +492,11 @@ export const CommunityCalendar = () => {
 
   const handleEditEvent = async () => {
     if (!selectedEvent || !user) return;
+    
+    if (!newEvent.hour || !newEvent.minute || !newEvent.period) {
+      console.error('Time is required');
+      return;
+    }
     
     try {
       console.log('Editing event with new date:', newEvent.date.toLocaleDateString(), 'stored as:', `${newEvent.date.getFullYear()}-${String(newEvent.date.getMonth() + 1).padStart(2, '0')}-${String(newEvent.date.getDate()).padStart(2, '0')}`);
@@ -505,10 +555,14 @@ export const CommunityCalendar = () => {
 
   const openEditDialog = (event: FrontendEvent) => {
     setSelectedEvent(event);
+    const timeParts = timeToHourMinutePeriod(event.time);
     setNewEvent({
       title: event.title,
       date: event.date,
       time: event.time,
+      hour: timeParts.hour,
+      minute: timeParts.minute,
+      period: timeParts.period,
       duration: event.duration || '1 hour',
       location: event.location || 'Zoom',
       zoomLink: event.zoomLink || '',
@@ -690,18 +744,48 @@ export const CommunityCalendar = () => {
                   
                   <div className="space-y-2">
                     <Label className="text-white">Time</Label>
-                    <Select value={newEvent.time} onValueChange={(value) => setNewEvent({...newEvent, time: value})}>
-                      <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
-                        <SelectValue placeholder="Select time" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-gray-700">
-                        {Array.from({length: 24}, (_, i) => (
-                          <SelectItem key={i} value={`${i.toString().padStart(2, '0')}:00`}>
-                            {i === 0 ? '12:00 AM' : i < 12 ? `${i}:00 AM` : i === 12 ? '12:00 PM' : `${i-12}:00 PM`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="number"
+                        min="1"
+                        max="12"
+                        value={newEvent.hour}
+                        onChange={(e) => {
+                          let hour = e.target.value;
+                          if (hour && parseInt(hour) > 12) {
+                            hour = '12';
+                          }
+                          setNewEvent({...newEvent, hour});
+                        }}
+                        className="bg-slate-700 border-gray-600 text-white w-14 text-center px-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        placeholder="12"
+                      />
+                      <span className="text-white">:</span>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="59"
+                        value={newEvent.minute}
+                        onChange={(e) => {
+                          let minute = e.target.value;
+                          if (minute && parseInt(minute) > 59) {
+                            minute = '59';
+                          }
+                          setNewEvent({...newEvent, minute});
+                        }}
+                        className="bg-slate-700 border-gray-600 text-white w-14 text-center px-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        placeholder="00"
+                      />
+                      <Select value={newEvent.period} onValueChange={(value) => setNewEvent({...newEvent, period: value})}>
+                        <SelectTrigger className="bg-slate-700 border-gray-600 text-white w-16 px-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-gray-700">
+                          <SelectItem value="AM">AM</SelectItem>
+                          <SelectItem value="PM">PM</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                   
                   <div className="space-y-2">
@@ -840,7 +924,7 @@ export const CommunityCalendar = () => {
                   </Button>
                   <Button 
                     onClick={handleAddEvent}
-                    disabled={!newEvent.title || !newEvent.time}
+                    disabled={!newEvent.title || !newEvent.hour || !newEvent.minute || !newEvent.period}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     ADD
@@ -1122,18 +1206,48 @@ export const CommunityCalendar = () => {
                    
                    <div className="space-y-2">
                      <Label className="text-white">Time</Label>
-                     <Select value={newEvent.time} onValueChange={(value) => setNewEvent({...newEvent, time: value})}>
-                       <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
-                         <SelectValue placeholder="Select time" />
-                       </SelectTrigger>
-                       <SelectContent className="bg-slate-800 border-gray-700">
-                         {Array.from({length: 24}, (_, i) => (
-                           <SelectItem key={i} value={`${i.toString().padStart(2, '0')}:00`}>
-                             {i === 0 ? '12:00 AM' : i < 12 ? `${i}:00 AM` : i === 12 ? '12:00 PM' : `${i-12}:00 PM`}
-                           </SelectItem>
-                         ))}
-                       </SelectContent>
-                     </Select>
+                     <div className="flex gap-2 items-center">
+                       <Input
+                         type="number"
+                         min="1"
+                         max="12"
+                         value={newEvent.hour}
+                         onChange={(e) => {
+                           let hour = e.target.value;
+                           if (hour && parseInt(hour) > 12) {
+                             hour = '12';
+                           }
+                           setNewEvent({...newEvent, hour});
+                         }}
+                         className="bg-slate-700 border-gray-600 text-white w-14 text-center px-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                         placeholder="12"
+                       />
+                       <span className="text-white">:</span>
+                       <Input
+                         type="number"
+                         min="0"
+                         max="59"
+                         value={newEvent.minute}
+                         onChange={(e) => {
+                           let minute = e.target.value;
+                           if (minute && parseInt(minute) > 59) {
+                             minute = '59';
+                           }
+                           setNewEvent({...newEvent, minute});
+                         }}
+                         className="bg-slate-700 border-gray-600 text-white w-14 text-center px-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                         placeholder="00"
+                       />
+                       <Select value={newEvent.period} onValueChange={(value) => setNewEvent({...newEvent, period: value})}>
+                         <SelectTrigger className="bg-slate-700 border-gray-600 text-white w-16 px-2">
+                           <SelectValue />
+                         </SelectTrigger>
+                         <SelectContent className="bg-slate-800 border-gray-700">
+                           <SelectItem value="AM">AM</SelectItem>
+                           <SelectItem value="PM">PM</SelectItem>
+                         </SelectContent>
+                       </Select>
+                     </div>
                    </div>
                    
                    <div className="space-y-2">
@@ -1253,7 +1367,7 @@ export const CommunityCalendar = () => {
                      </Button>
                      <Button 
                        onClick={handleEditEvent}
-                       disabled={!newEvent.title || !newEvent.time}
+                       disabled={!newEvent.title || !newEvent.hour || !newEvent.minute || !newEvent.period}
                        className="bg-purple-600 hover:bg-purple-700 text-white"
                      >
                        UPDATE
