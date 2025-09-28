@@ -27,8 +27,9 @@ const validateCreateEvent = [
     .withMessage('Title cannot exceed 100 characters'),
     
   body('description')
-    .optional()
     .trim()
+    .notEmpty()
+    .withMessage('Description is required')
     .isLength({ max: 1000 })
     .withMessage('Description cannot exceed 1000 characters'),
     
@@ -55,23 +56,27 @@ const validateCreateEvent = [
     .withMessage('Event time must be in HH:MM format'),
     
   body('duration')
-    .optional()
+    .notEmpty()
+    .withMessage('Duration is required')
     .isIn(['30 minutes', '1 hour', '1.5 hours', '2 hours', '3 hours'])
     .withMessage('Duration must be one of: 30 minutes, 1 hour, 1.5 hours, 2 hours, 3 hours'),
     
   body('location')
-    .optional()
+    .notEmpty()
+    .withMessage('Location is required')
     .isIn(['Zoom', 'Google Meet', 'Microsoft Teams', 'In Person'])
     .withMessage('Location must be one of: Zoom, Google Meet, Microsoft Teams, In Person'),
     
   body('zoom_link')
-    .optional()
     .trim()
+    .notEmpty()
+    .withMessage('Zoom link is required')
     .isLength({ max: 500 })
     .withMessage('Zoom link cannot exceed 500 characters'),
     
   body('event_type')
-    .optional()
+    .notEmpty()
+    .withMessage('Event type is required')
     .isIn(['training', 'webinar', 'discussion', 'workshop'])
     .withMessage('Event type must be one of: training, webinar, discussion, workshop'),
     

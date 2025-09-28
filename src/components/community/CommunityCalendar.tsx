@@ -448,6 +448,7 @@ export const CommunityCalendar = () => {
       return;
     }
     
+    // Validate all required fields
     if (!newEvent.title.trim()) {
       console.error('Title is required');
       return;
@@ -455,6 +456,32 @@ export const CommunityCalendar = () => {
     
     if (!newEvent.hour || !newEvent.minute || !newEvent.period) {
       console.error('Time is required');
+      return;
+    }
+    
+    if (!newEvent.duration) {
+      console.error('Duration is required');
+      return;
+    }
+    
+    if (!newEvent.event_type) {
+      console.error('Event type is required');
+      return;
+    }
+    
+    if (!newEvent.location) {
+      console.error('Location is required');
+      return;
+    }
+    
+    if (!newEvent.description.trim()) {
+      console.error('Description is required');
+      return;
+    }
+    
+    // Validate zoom_link only if location is Zoom
+    if (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim()) {
+      console.error('Zoom link is required when location is Zoom');
       return;
     }
     
@@ -506,8 +533,40 @@ export const CommunityCalendar = () => {
   const handleEditEvent = async () => {
     if (!selectedEvent || !user) return;
     
+    // Validate all required fields
+    if (!newEvent.title.trim()) {
+      console.error('Title is required');
+      return;
+    }
+    
     if (!newEvent.hour || !newEvent.minute || !newEvent.period) {
       console.error('Time is required');
+      return;
+    }
+    
+    if (!newEvent.duration) {
+      console.error('Duration is required');
+      return;
+    }
+    
+    if (!newEvent.event_type) {
+      console.error('Event type is required');
+      return;
+    }
+    
+    if (!newEvent.location) {
+      console.error('Location is required');
+      return;
+    }
+    
+    if (!newEvent.description.trim()) {
+      console.error('Description is required');
+      return;
+    }
+    
+    // Validate zoom_link only if location is Zoom
+    if (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim()) {
+      console.error('Zoom link is required when location is Zoom');
       return;
     }
     
@@ -716,7 +775,9 @@ export const CommunityCalendar = () => {
               <div className="space-y-6 mt-6">
                 {/* Title */}
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-white">Title</Label>
+                  <Label htmlFor="title" className="text-white">
+                    Title <span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="title"
                     value={newEvent.title}
@@ -732,7 +793,9 @@ export const CommunityCalendar = () => {
                 {/* Date, Time, Duration */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-white">Date</Label>
+                    <Label className="text-white">
+                      Date <span className="text-red-500">*</span>
+                    </Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
@@ -765,7 +828,9 @@ export const CommunityCalendar = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-white">Time</Label>
+                    <Label className="text-white">
+                      Time <span className="text-red-500">*</span>
+                    </Label>
                     <div className="flex gap-2 items-center">
                       <Input
                         type="number"
@@ -811,7 +876,9 @@ export const CommunityCalendar = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-white">Duration</Label>
+                    <Label className="text-white">
+                      Duration <span className="text-red-500">*</span>
+                    </Label>
                     <Select value={newEvent.duration} onValueChange={(value) => setNewEvent({...newEvent, duration: value})}>
                       <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
                         <SelectValue />
@@ -829,7 +896,9 @@ export const CommunityCalendar = () => {
 
                 {/* Event Type */}
                 <div className="space-y-2">
-                  <Label className="text-white">Event Type</Label>
+                  <Label className="text-white">
+                    Event Type <span className="text-red-500">*</span>
+                  </Label>
                   <Select value={newEvent.event_type} onValueChange={(value) => setNewEvent({...newEvent, event_type: value as 'training' | 'webinar' | 'discussion' | 'workshop'})}>
                     <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
                       <SelectValue />
@@ -855,7 +924,9 @@ export const CommunityCalendar = () => {
 
                 {/* Location */}
                 <div className="space-y-4">
-                  <Label className="text-white">Location</Label>
+                  <Label className="text-white">
+                    Location <span className="text-red-500">*</span>
+                  </Label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Select value={newEvent.location} onValueChange={(value) => setNewEvent({...newEvent, location: value})}>
                       <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
@@ -871,6 +942,9 @@ export const CommunityCalendar = () => {
                     
                     {newEvent.location === 'Zoom' && (
                       <div className="space-y-1">
+                        <Label className="text-white">
+                          Zoom Link <span className="text-red-500">*</span>
+                        </Label>
                         <Input
                           placeholder="Meeting ID, room name, or full Zoom URL"
                           value={newEvent.zoomLink}
@@ -887,7 +961,9 @@ export const CommunityCalendar = () => {
 
                 {/* Description */}
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-white">Description</Label>
+                  <Label htmlFor="description" className="text-white">
+                    Description <span className="text-red-500">*</span>
+                  </Label>
                   <Textarea
                     id="description"
                     value={newEvent.description}
@@ -946,7 +1022,7 @@ export const CommunityCalendar = () => {
                   </Button>
                   <Button 
                     onClick={handleAddEvent}
-                    disabled={!newEvent.title || !newEvent.hour || !newEvent.minute || !newEvent.period}
+                    disabled={!newEvent.title.trim() || !newEvent.hour || !newEvent.minute || !newEvent.period || !newEvent.duration || !newEvent.event_type || !newEvent.location || !newEvent.description.trim() || (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim())}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     ADD
@@ -1187,7 +1263,9 @@ export const CommunityCalendar = () => {
                <div className="space-y-6 mt-6">
                  {/* Title */}
                  <div className="space-y-2">
-                   <Label htmlFor="edit-title" className="text-white">Title</Label>
+                   <Label htmlFor="edit-title" className="text-white">
+                     Title <span className="text-red-500">*</span>
+                   </Label>
                    <Input
                      id="edit-title"
                      value={newEvent.title}
@@ -1200,7 +1278,9 @@ export const CommunityCalendar = () => {
                  {/* Date, Time, Duration */}
                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                    <div className="space-y-2">
-                     <Label className="text-white">Date</Label>
+                     <Label className="text-white">
+                       Date <span className="text-red-500">*</span>
+                     </Label>
                      <Popover>
                        <PopoverTrigger asChild>
                          <Button
@@ -1233,7 +1313,9 @@ export const CommunityCalendar = () => {
                    </div>
                    
                    <div className="space-y-2">
-                     <Label className="text-white">Time</Label>
+                     <Label className="text-white">
+                       Time <span className="text-red-500">*</span>
+                     </Label>
                      <div className="flex gap-2 items-center">
                        <Input
                          type="number"
@@ -1279,7 +1361,9 @@ export const CommunityCalendar = () => {
                    </div>
                    
                    <div className="space-y-2">
-                     <Label className="text-white">Duration</Label>
+                     <Label className="text-white">
+                       Duration <span className="text-red-500">*</span>
+                     </Label>
                      <Select value={newEvent.duration} onValueChange={(value) => setNewEvent({...newEvent, duration: value})}>
                        <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
                          <SelectValue />
@@ -1297,7 +1381,9 @@ export const CommunityCalendar = () => {
 
                  {/* Location */}
                  <div className="space-y-4">
-                   <Label className="text-white">Location</Label>
+                   <Label className="text-white">
+                     Location <span className="text-red-500">*</span>
+                   </Label>
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      <Select value={newEvent.location} onValueChange={(value) => setNewEvent({...newEvent, location: value})}>
                        <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
@@ -1329,7 +1415,9 @@ export const CommunityCalendar = () => {
 
                  {/* Event Type */}
                  <div className="space-y-2">
-                   <Label className="text-white">Event Type</Label>
+                   <Label className="text-white">
+                     Event Type <span className="text-red-500">*</span>
+                   </Label>
                    <Select value={newEvent.event_type} onValueChange={(value) => setNewEvent({...newEvent, event_type: value as 'training' | 'webinar' | 'discussion' | 'workshop'})}>
                      <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
                        <SelectValue />
@@ -1345,7 +1433,9 @@ export const CommunityCalendar = () => {
 
                  {/* Description */}
                  <div className="space-y-2">
-                   <Label htmlFor="edit-description" className="text-white">Description</Label>
+                   <Label htmlFor="edit-description" className="text-white">
+                     Description <span className="text-red-500">*</span>
+                   </Label>
                    <Textarea
                      id="edit-description"
                      value={newEvent.description}
@@ -1395,7 +1485,7 @@ export const CommunityCalendar = () => {
                      </Button>
                      <Button 
                        onClick={handleEditEvent}
-                       disabled={!newEvent.title || !newEvent.hour || !newEvent.minute || !newEvent.period}
+                       disabled={!newEvent.title.trim() || !newEvent.hour || !newEvent.minute || !newEvent.period || !newEvent.duration || !newEvent.event_type || !newEvent.location || !newEvent.description.trim() || (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim())}
                        className="bg-purple-600 hover:bg-purple-700 text-white"
                      >
                        UPDATE

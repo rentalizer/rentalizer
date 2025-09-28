@@ -9,6 +9,7 @@ const eventSchema = new mongoose.Schema({
   },
   description: {
     type: String,
+    required: [true, 'Description is required'],
     trim: true,
     maxlength: [1000, 'Description cannot exceed 1000 characters']
   },
@@ -41,6 +42,7 @@ const eventSchema = new mongoose.Schema({
   },
   zoom_link: {
     type: String,
+    required: [true, 'Zoom link is required'],
     trim: true,
     maxlength: [500, 'Zoom link cannot exceed 500 characters']
     // Removed URL validation for development flexibility
