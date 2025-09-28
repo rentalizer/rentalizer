@@ -1,12 +1,6 @@
 // Community Component - Fixed TopNavBar issue
 import React, { useState, useEffect, useMemo } from 'react';
 
-// Extend Window interface for Calendly
-declare global {
-  interface Window {
-    Calendly: any;
-  }
-}
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -103,7 +97,7 @@ const Community = React.memo(() => {
   const userIsAdmin = useMemo(() => {
     if (!user) return false;
     return user.role === 'admin' || user.role === 'superadmin';
-  }, [user?.role]); // Only depend on the role, not the entire user object
+  }, [user]); // Include user dependency as required by exhaustive-deps
 
   const adminCheckLoading = useMemo(() => {
     return !user; // Only loading if user is not loaded yet
@@ -182,14 +176,15 @@ const Community = React.memo(() => {
   }, []);
 
   const updateCalculatorData = (updates: Partial<CalculatorData>) => {
-    const roundedUpdates = Object.entries(updates).reduce((acc, [key, value]) => {
+    const roundedUpdates: Record<string, string | number> = {};
+    
+    Object.entries(updates).forEach(([key, value]) => {
       if (typeof value === 'number') {
-        acc[key] = Math.round(value);
+        roundedUpdates[key] = Math.round(value);
       } else {
-        acc[key] = value;
+        roundedUpdates[key] = value;
       }
-      return acc;
-    }, {} as any);
+    });
     
     setCalculatorData(prev => ({ ...prev, ...roundedUpdates }));
   };
@@ -285,11 +280,11 @@ const Community = React.memo(() => {
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
             </TabsTrigger>
-            <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+            {/* <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               AI Richie
-            </TabsTrigger>
-            <TabsTrigger value="propertyfinder" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+            </TabsTrigger> */}
+            {/* <TabsTrigger value="propertyfinder" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Building size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Property Finder
             </TabsTrigger>
@@ -300,7 +295,7 @@ const Community = React.memo(() => {
             <TabsTrigger value="propertymanagement" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Settings size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Property Management
-            </TabsTrigger>
+            </TabsTrigger> */}
           </TabsList>
 
           {/* Other Tabs */}

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,9 +16,10 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import { apiService, Event, CreateEventRequest, UpdateEventRequest } from '@/services/api';
 
-interface Event {
+// Transform backend Event to frontend Event format
+interface FrontendEvent {
   id: string;
   title: string;
   date: Date;
@@ -33,12 +34,114 @@ interface Event {
   remindMembers?: boolean;
 }
 
+// Helper functions to transform between backend and frontend formats
+const transformBackendToFrontend = (backendEvent: Event): FrontendEvent => {
+  // Extract just the date part from the ISO string to avoid timezone issues
+  const dateStr = backendEvent.event_date.split('T')[0]; // Get "2025-09-30" from "2025-09-30T00:00:00.000Z"
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const localDate = new Date(year, month - 1, day); // Create local date (month is 0-indexed)
+  
+  console.log(`📅 Transforming backend event: ${backendEvent.event_date} -> ${dateStr} -> ${localDate.toLocaleDateString()}`);
+  
+  return {
+    id: backendEvent._id,
+    title: backendEvent.title,
+    date: localDate,
+    time: backendEvent.event_time,
+    type: backendEvent.event_type,
+    attendees: backendEvent.attendees,
+    isRecurring: backendEvent.is_recurring,
+    description: backendEvent.description,
+    location: backendEvent.location,
+    duration: backendEvent.duration,
+    zoomLink: backendEvent.zoom_link,
+    remindMembers: backendEvent.remind_members,
+  };
+};
+
+interface EventFormData {
+  title: string;
+  date: Date;
+  time: string;
+  hour: string;
+  minute: string;
+  period: string;
+  duration: string;
+  location: string;
+  zoomLink: string;
+  description: string;
+  event_type: 'training' | 'webinar' | 'discussion' | 'workshop';
+  isRecurring: boolean;
+  remindMembers: boolean;
+  attendees: string;
+}
+
+// Helper functions for time conversion
+const timeToHourMinutePeriod = (timeStr: string) => {
+  if (!timeStr) return { hour: '12', minute: '00', period: 'AM' };
+  
+  const [time, period] = timeStr.split(' ');
+  const [hour, minute] = time.split(':');
+  
+  // Convert 24-hour to 12-hour format
+  let hourNum = parseInt(hour);
+  const newPeriod = hourNum >= 12 ? 'PM' : 'AM';
+  
+  if (hourNum === 0) hourNum = 12;
+  else if (hourNum > 12) hourNum = hourNum - 12;
+  
+  return {
+    hour: hourNum.toString(),
+    minute: minute || '00',
+    period: newPeriod
+  };
+};
+
+const hourMinutePeriodToTime = (hour: string, minute: string, period: string) => {
+  let hourNum = parseInt(hour);
+  
+  if (period === 'PM' && hourNum !== 12) {
+    hourNum += 12;
+  } else if (period === 'AM' && hourNum === 12) {
+    hourNum = 0;
+  }
+  
+  // Ensure minute is padded to 2 digits
+  const paddedMinute = minute.padStart(2, '0');
+  
+  return `${hourNum.toString().padStart(2, '0')}:${paddedMinute}`;
+};
+
+const transformFrontendToBackend = (frontendEvent: EventFormData): CreateEventRequest => ({
+  title: frontendEvent.title,
+  description: frontendEvent.description,
+  event_date: `${frontendEvent.date.getFullYear()}-${String(frontendEvent.date.getMonth() + 1).padStart(2, '0')}-${String(frontendEvent.date.getDate()).padStart(2, '0')}`,
+  event_time: hourMinutePeriodToTime(frontendEvent.hour, frontendEvent.minute, frontendEvent.period),
+  duration: frontendEvent.duration,
+  location: frontendEvent.location,
+  zoom_link: frontendEvent.zoomLink,
+  event_type: frontendEvent.event_type || 'workshop', // Use actual event type or default
+  attendees: String(frontendEvent.attendees),
+  is_recurring: frontendEvent.isRecurring,
+  remind_members: frontendEvent.remindMembers,
+});
+
 export const CommunityCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  // Set current month to show events properly - default to current month
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  // Set current month to show events properly - default to September 2025 for testing
+  const [currentMonth, setCurrentMonth] = useState(new Date(2025, 8)); // September 2025
+  
+  // Log the initial selected date
+  React.useEffect(() => {
+    console.log('📅 Calendar initialized with selected date:', selectedDate?.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }));
+  }, [selectedDate]);
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<FrontendEvent | null>(null);
   const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false);
   const [isEditEventOpen, setIsEditEventOpen] = useState(false);
   const { isAdmin } = useAdminRole();
@@ -49,20 +152,26 @@ export const CommunityCalendar = () => {
     title: '',
     date: new Date(),
     time: '',
+    hour: '12',
+    minute: '00',
+    period: 'AM',
     duration: '1 hour',
     location: 'Zoom',
     zoomLink: '',
     description: '',
+    event_type: 'workshop' as 'training' | 'webinar' | 'discussion' | 'workshop',
     isRecurring: false,
     remindMembers: false,
     attendees: 'All members'
   });
 
   // State for events
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<FrontendEvent[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Mock events data for September 2025
-  const mockEvents = [
+  const mockEvents = React.useMemo(() => [
     {
       id: 'mock-1',
       title: 'September Market Outlook',
@@ -217,28 +326,52 @@ export const CommunityCalendar = () => {
       isRecurring: false,
       remindMembers: true
     }
-  ];
+  ], []);
 
-  // Load mock events
-  const fetchEvents = async () => {
+  // Load events from API
+  const fetchEvents = React.useCallback(async () => {
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300));
+      setLoading(true);
+      setError(null);
       
-      console.log('📅 Loading September 2025 mock calendar events:', mockEvents.length, 'events');
-      setEvents(mockEvents);
+      console.log('📅 Loading calendar events from API...');
+      
+      // Get current month and year
+      const year = currentMonth.getFullYear();
+      const month = currentMonth.getMonth() + 1;
+      
+      console.log(`📅 Requesting events for ${year}-${month} (${currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })})`);
+      
+      const response = await apiService.getEventsForMonth(year, month);
+      
+      if (response.success) {
+        console.log('📅 Raw API response:', response.data);
+        const frontendEvents = response.data.map(transformBackendToFrontend);
+        console.log('📅 Transformed frontend events:', frontendEvents);
+        setEvents(frontendEvents);
+        console.log('📅 Loaded', frontendEvents.length, 'events for', year, month);
+      } else {
+        throw new Error(response.message || 'Failed to fetch events');
+      }
     } catch (error) {
-      console.error('Error loading mock events:', error);
+      console.error('Error loading events:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load events');
+      
+      // Fallback to mock events for development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('📅 Using mock events as fallback');
+        setEvents(mockEvents);
+      }
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [currentMonth, mockEvents]);
 
-  // Load events on component mount
+  // Load events on component mount and when month changes
   React.useEffect(() => {
+    console.log('📅 Calendar month changed to:', currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }));
     fetchEvents();
-    
-    // Set the calendar to current month to show mock events
-    setCurrentMonth(new Date());
-  }, []);
+  }, [currentMonth, fetchEvents]);
 
   const getEventTypeColor = (type: string) => {
     switch (type) {
@@ -260,10 +393,27 @@ export const CommunityCalendar = () => {
     }
   };
 
+  // Memoized events lookup for better performance
+  const eventsByDate = useMemo(() => {
+    const lookup: { [key: string]: FrontendEvent[] } = {};
+    console.log('📅 Building events lookup for', events.length, 'events');
+    events.forEach(event => {
+      const dateKey = event.date.toDateString();
+      console.log(`📅 Event "${event.title}" on ${dateKey}`);
+      if (!lookup[dateKey]) {
+        lookup[dateKey] = [];
+      }
+      lookup[dateKey].push(event);
+    });
+    console.log('📅 Events lookup built:', Object.keys(lookup));
+    return lookup;
+  }, [events]);
+
   const getEventsForDate = (date: Date) => {
-    return events.filter(event => 
-      event.date.toDateString() === date.toDateString()
-    );
+    const dateKey = date.toDateString();
+    const eventsForDate = eventsByDate[dateKey] || [];
+    console.log(`📅 Looking for events on ${dateKey}:`, eventsForDate.length, 'events found');
+    return eventsForDate;
   };
 
   const selectedDateEvents = selectedDate ? getEventsForDate(selectedDate) : [];
@@ -298,204 +448,152 @@ export const CommunityCalendar = () => {
       return;
     }
     
+    // Validate all required fields
     if (!newEvent.title.trim()) {
       console.error('Title is required');
       return;
     }
     
-    if (!newEvent.time) {
+    if (!newEvent.hour || !newEvent.minute || !newEvent.period) {
       console.error('Time is required');
       return;
     }
     
-    console.log('Creating event with data:', {
-      title: newEvent.title,
-      description: newEvent.description,
-      event_date: newEvent.date.toISOString().split('T')[0],
-      event_time: newEvent.time,
-      duration: newEvent.duration,
-      location: newEvent.location,
-      zoom_link: newEvent.zoomLink,
-      event_type: 'workshop',
-      attendees: newEvent.attendees,
-      is_recurring: newEvent.isRecurring,
-      remind_members: newEvent.remindMembers,
-      created_by: user.id
-    });
+    if (!newEvent.duration) {
+      console.error('Duration is required');
+      return;
+    }
+    
+    if (!newEvent.event_type) {
+      console.error('Event type is required');
+      return;
+    }
+    
+    if (!newEvent.location) {
+      console.error('Location is required');
+      return;
+    }
+    
+    if (!newEvent.description.trim()) {
+      console.error('Description is required');
+      return;
+    }
+    
+    // Validate zoom_link only if location is Zoom
+    if (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim()) {
+      console.error('Zoom link is required when location is Zoom');
+      return;
+    }
     
     try {
-      console.log('Creating event with date:', newEvent.date.toLocaleDateString(), 'which will be stored as:', newEvent.date.toISOString().split('T')[0]);
+      console.log('Creating event with date:', newEvent.date.toLocaleDateString(), 'which will be stored as:', `${newEvent.date.getFullYear()}-${String(newEvent.date.getMonth() + 1).padStart(2, '0')}-${String(newEvent.date.getDate()).padStart(2, '0')}`);
+      console.log('Form data:', newEvent);
       
-      const { data, error } = await supabase
-        .from('events')
-        .insert({
-          title: newEvent.title,
-          description: newEvent.description,
-          event_date: newEvent.date.toISOString().split('T')[0],
-          event_time: newEvent.time,
-          duration: newEvent.duration,
-          location: newEvent.location,
-          zoom_link: newEvent.zoomLink,
-          event_type: 'workshop',
-          attendees: newEvent.attendees,
-          is_recurring: newEvent.isRecurring,
-          remind_members: newEvent.remindMembers,
-          created_by: user.id
-        })
-        .select();
-
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-
-      console.log('Event created successfully:', data);
-
-      // If it's a recurring event, create additional weekly events (11 more for total of 12)
-      if (newEvent.isRecurring) {
-        const recurringEvents = [];
+      const eventData = transformFrontendToBackend(newEvent);
+      console.log('Transformed event data:', eventData);
+      
+      const response = await apiService.createEvent(eventData);
+      
+      if (response.success) {
+        console.log('Event created successfully:', response.data);
         
-        for (let i = 1; i < 12; i++) {
-          const futureDate = new Date(newEvent.date);
-          futureDate.setDate(futureDate.getDate() + (i * 7)); // Add weeks
-          
-          console.log(`Creating recurring event ${i} for date:`, futureDate.toLocaleDateString(), 'stored as:', futureDate.toISOString().split('T')[0]);
-          
-          recurringEvents.push({
-            title: newEvent.title,
-            description: newEvent.description,
-            event_date: futureDate.toISOString().split('T')[0],
-            event_time: newEvent.time,
-            duration: newEvent.duration,
-            location: newEvent.location,
-            zoom_link: newEvent.zoomLink,
-            event_type: 'workshop',
-            attendees: newEvent.attendees,
-            is_recurring: true,
-            remind_members: newEvent.remindMembers,
-            created_by: user.id
-          });
-        }
-
-        if (recurringEvents.length > 0) {
-          const { error: recurringError } = await supabase
-            .from('events')
-            .insert(recurringEvents);
-          
-          if (recurringError) {
-            console.error('Error creating recurring events:', recurringError);
-            // Don't throw here, the main event was already created successfully
-          } else {
-            console.log(`Created ${recurringEvents.length} additional recurring events`);
-          }
-        }
+        // Refresh events list
+        await fetchEvents();
+        setIsAddEventOpen(false);
+        
+        // Reset form
+        setNewEvent({
+          title: '',
+          date: new Date(),
+          time: '',
+          hour: '12',
+          minute: '00',
+          period: 'AM',
+          duration: '1 hour',
+          location: 'Zoom',
+          zoomLink: '',
+          description: '',
+          event_type: 'workshop',
+          isRecurring: false,
+          remindMembers: false,
+          attendees: 'All members'
+        });
+        
+        console.log('Event added successfully');
+      } else {
+        throw new Error(response.message || 'Failed to create event');
       }
-
-      // Refresh events list
-      await fetchEvents();
-      setIsAddEventOpen(false);
-      
-      // Reset form
-      setNewEvent({
-        title: '',
-        date: new Date(),
-        time: '',
-        duration: '1 hour',
-        location: 'Zoom',
-        zoomLink: '',
-        description: '',
-        isRecurring: false,
-        remindMembers: false,
-        attendees: 'All members'
-      });
-      
-      console.log('Event added successfully');
     } catch (error) {
       console.error('Error creating event:', error);
       // Show user-friendly error message
-      alert(`Failed to create event: ${error.message || 'Unknown error'}`);
+      alert(`Failed to create event: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   const handleEditEvent = async () => {
     if (!selectedEvent || !user) return;
     
-    console.log('Editing event with new date:', newEvent.date.toLocaleDateString(), 'stored as:', newEvent.date.toISOString().split('T')[0]);
-    console.log('Original event date was:', selectedEvent.date.toLocaleDateString());
+    // Validate all required fields
+    if (!newEvent.title.trim()) {
+      console.error('Title is required');
+      return;
+    }
+    
+    if (!newEvent.hour || !newEvent.minute || !newEvent.period) {
+      console.error('Time is required');
+      return;
+    }
+    
+    if (!newEvent.duration) {
+      console.error('Duration is required');
+      return;
+    }
+    
+    if (!newEvent.event_type) {
+      console.error('Event type is required');
+      return;
+    }
+    
+    if (!newEvent.location) {
+      console.error('Location is required');
+      return;
+    }
+    
+    if (!newEvent.description.trim()) {
+      console.error('Description is required');
+      return;
+    }
+    
+    // Validate zoom_link only if location is Zoom
+    if (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim()) {
+      console.error('Zoom link is required when location is Zoom');
+      return;
+    }
     
     try {
-      // Update the original event
-      const { error: updateError } = await supabase
-        .from('events')
-        .update({
-          title: newEvent.title,
-          description: newEvent.description,
-          event_date: newEvent.date.toISOString().split('T')[0],
-          event_time: newEvent.time,
-          duration: newEvent.duration,
-          location: newEvent.location,
-          zoom_link: newEvent.zoomLink,
-          event_type: 'workshop',
-          attendees: newEvent.attendees,
-          is_recurring: newEvent.isRecurring,
-          remind_members: newEvent.remindMembers,
-        })
-        .eq('id', selectedEvent.id);
-
-      if (updateError) {
-        console.error('Update error:', updateError);
-        throw updateError;
-      }
-
-      console.log('Event updated successfully, refreshing events...');
-
-      // If making it recurring, create additional weekly events (11 more for total of 12)
-      if (newEvent.isRecurring && !selectedEvent.isRecurring) {
-        const recurringEvents = [];
-        
-        for (let i = 1; i < 12; i++) {
-          const futureDate = new Date(newEvent.date);
-          futureDate.setDate(futureDate.getDate() + (i * 7)); // Add weeks
-          
-          recurringEvents.push({
-            title: newEvent.title,
-            description: newEvent.description,
-            event_date: futureDate.toISOString().split('T')[0],
-            event_time: newEvent.time,
-            duration: newEvent.duration,
-            location: newEvent.location,
-            zoom_link: newEvent.zoomLink,
-            event_type: 'workshop',
-            attendees: newEvent.attendees,
-            is_recurring: true,
-            remind_members: newEvent.remindMembers,
-            created_by: user.id
-          });
-        }
-
-        if (recurringEvents.length > 0) {
-          const { error: recurringError } = await supabase
-            .from('events')
-            .insert(recurringEvents);
-          
-          if (recurringError) {
-            console.error('Error creating recurring events:', recurringError);
-            // Don't throw here, the main event was already updated successfully
-          } else {
-            console.log(`Created ${recurringEvents.length} additional recurring events`);
-          }
-        }
-      }
-
-      // Refresh events list
-      await fetchEvents();
-      setIsEditEventOpen(false);
-      setIsEventDetailsOpen(false);
+      console.log('Editing event with new date:', newEvent.date.toLocaleDateString(), 'stored as:', `${newEvent.date.getFullYear()}-${String(newEvent.date.getMonth() + 1).padStart(2, '0')}-${String(newEvent.date.getDate()).padStart(2, '0')}`);
+      console.log('Original event date was:', selectedEvent.date.toLocaleDateString());
       
-      console.log('Event updated successfully');
+      const eventData = transformFrontendToBackend(newEvent);
+      console.log('Sending event data to backend:', eventData);
+      
+      const response = await apiService.updateEvent(selectedEvent.id, eventData);
+      
+      if (response.success) {
+        console.log('Event updated successfully:', response.data);
+        
+        // Refresh events list
+        await fetchEvents();
+        setIsEditEventOpen(false);
+        setIsEventDetailsOpen(false);
+        
+        console.log('Event updated successfully');
+      } else {
+        throw new Error(response.message || 'Failed to update event');
+      }
     } catch (error) {
       console.error('Error updating event:', error);
-      alert(`Failed to update event: ${error.message || 'Unknown error'}`);
+      alert(`Failed to update event: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -509,39 +607,39 @@ export const CommunityCalendar = () => {
     try {
       console.log('Deleting event:', selectedEvent.id);
       
-      const { error } = await supabase
-        .from('events')
-        .delete()
-        .eq('id', selectedEvent.id);
-
-      if (error) {
-        console.error('Delete error:', error);
-        throw error;
+      const response = await apiService.deleteEvent(selectedEvent.id);
+      
+      if (response.success) {
+        console.log('Event deleted successfully');
+        
+        // Refresh events list
+        await fetchEvents();
+        setIsEditEventOpen(false);
+        setIsEventDetailsOpen(false);
+      } else {
+        throw new Error(response.message || 'Failed to delete event');
       }
-
-      console.log('Event deleted successfully');
-      
-      // Refresh events list
-      await fetchEvents();
-      setIsEditEventOpen(false);
-      setIsEventDetailsOpen(false);
-      
     } catch (error) {
       console.error('Error deleting event:', error);
-      alert(`Failed to delete event: ${error.message || 'Unknown error'}`);
+      alert(`Failed to delete event: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
-  const openEditDialog = (event: Event) => {
+  const openEditDialog = (event: FrontendEvent) => {
     setSelectedEvent(event);
+    const timeParts = timeToHourMinutePeriod(event.time);
     setNewEvent({
       title: event.title,
       date: event.date,
       time: event.time,
+      hour: timeParts.hour,
+      minute: timeParts.minute,
+      period: timeParts.period,
       duration: event.duration || '1 hour',
       location: event.location || 'Zoom',
       zoomLink: event.zoomLink || '',
       description: event.description || '',
+      event_type: event.type || 'workshop',
       isRecurring: event.isRecurring || false,
       remindMembers: event.remindMembers || false,
       attendees: String(event.attendees) || 'All members'
@@ -549,44 +647,90 @@ export const CommunityCalendar = () => {
     setIsEditEventOpen(true);
   };
 
-  const addToCalendar = (event: Event) => {
-    const startDate = new Date(event.date);
-    const endDate = new Date(startDate);
-    
-    // Parse duration to add to end time
-    const duration = event.duration || '1 hour';
-    const durationValue = parseInt(duration.split(' ')[0]);
-    const durationUnit = duration.includes('hour') ? 'hours' : 'minutes';
-    
-    if (durationUnit === 'hours') {
-      endDate.setHours(endDate.getHours() + durationValue);
-    } else {
-      endDate.setMinutes(endDate.getMinutes() + durationValue);
+  const addToCalendar = async (event: FrontendEvent) => {
+    try {
+      // Get calendar links from the API
+      const response = await apiService.getCalendarLinks(event.id);
+      
+      if (response.success) {
+        // Open Google Calendar link
+        window.open(response.data.google, '_blank');
+      } else {
+        throw new Error(response.message || 'Failed to generate calendar links');
+      }
+    } catch (error) {
+      console.error('Error getting calendar links:', error);
+      
+      // Fallback to manual URL generation
+      const startDate = new Date(event.date);
+      const endDate = new Date(startDate);
+      
+      // Parse duration to add to end time
+      const duration = event.duration || '1 hour';
+      const durationValue = parseInt(duration.split(' ')[0]);
+      const durationUnit = duration.includes('hour') ? 'hours' : 'minutes';
+      
+      if (durationUnit === 'hours') {
+        endDate.setHours(endDate.getHours() + durationValue);
+      } else {
+        endDate.setMinutes(endDate.getMinutes() + durationValue);
+      }
+      
+      // Format dates for calendar
+      const formatDate = (date: Date) => {
+        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      };
+      
+      const details = [
+        event.description || '',
+        event.location && event.location !== 'Zoom' ? `Location: ${event.location}` : '',
+        event.zoomLink ? `Join: ${event.zoomLink}` : ''
+      ].filter(Boolean).join('\n\n');
+      
+      const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${formatDate(startDate)}/${formatDate(endDate)}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(event.zoomLink || '')}`;
+      
+      window.open(calendarUrl, '_blank');
     }
-    
-    // Format dates for calendar
-    const formatDate = (date: Date) => {
-      return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-    };
-    
-    const details = [
-      event.description || '',
-      event.location && event.location !== 'Zoom' ? `Location: ${event.location}` : '',
-      event.zoomLink ? `Join: ${event.zoomLink}` : ''
-    ].filter(Boolean).join('\n\n');
-    
-    const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${formatDate(startDate)}/${formatDate(endDate)}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(event.zoomLink || '')}`;
-    
-    window.open(calendarUrl, '_blank');
   };
 
   const handleDayClick = (date: Date) => {
+    console.log('📅 User clicked on date:', date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }));
+    console.log('📅 Date object:', date);
+    console.log('📅 ISO string:', date.toISOString());
+    
     const dayEvents = getEventsForDate(date);
+    console.log('📅 Events for this date:', dayEvents.length, dayEvents);
+    
     if (dayEvents.length > 0) {
       setSelectedEvent(dayEvents[0]); // For now, show first event
       setIsEventDetailsOpen(true);
     }
     setSelectedDate(date);
+  };
+
+  const handleAddEventClick = () => {
+    console.log('📅 Opening add event dialog with selected date:', selectedDate?.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }));
+    
+    // Set the form date to the currently selected date or default to September 30, 2025
+    const defaultDate = selectedDate || new Date(2025, 8, 30); // September 30, 2025
+    console.log('📅 Setting form date to:', defaultDate.toLocaleDateString());
+    
+    setNewEvent(prev => ({
+      ...prev,
+      date: defaultDate
+    }));
+    
+    setIsAddEventOpen(true);
   };
 
   return (
@@ -596,21 +740,30 @@ export const CommunityCalendar = () => {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-cyan-300 flex items-center gap-2">
             Events Calendar
+            {loading && <span className="text-sm text-gray-400">(Loading...)</span>}
           </CardTitle>
+          
+          {/* Error Message */}
+          {error && (
+            <div className="text-red-400 text-sm mb-2">
+              Error: {error}
+            </div>
+          )}
           
           {/* Add Event Dialog - Only visible to admins */}
           {isAdmin && (
             <Dialog open={isAddEventOpen} onOpenChange={setIsAddEventOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Event
-                </Button>
-              </DialogTrigger>
-            <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto">
+              <Button 
+                onClick={handleAddEventClick}
+                className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Event
+              </Button>
+            <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="add-event-description">
               <DialogHeader>
                 <DialogTitle className="text-white text-xl">Add event</DialogTitle>
-                <p className="text-gray-400 text-sm">
+                <p id="add-event-description" className="text-gray-400 text-sm">
                   Need ideas? Try one of these fun formats: 
                   <span className="text-blue-400 hover:underline cursor-pointer"> coffee hour</span>,
                   <span className="text-blue-400 hover:underline cursor-pointer"> Q&A</span>,
@@ -622,7 +775,9 @@ export const CommunityCalendar = () => {
               <div className="space-y-6 mt-6">
                 {/* Title */}
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="text-white">Title</Label>
+                  <Label htmlFor="title" className="text-white">
+                    Title <span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="title"
                     value={newEvent.title}
@@ -638,7 +793,9 @@ export const CommunityCalendar = () => {
                 {/* Date, Time, Duration */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label className="text-white">Date</Label>
+                    <Label className="text-white">
+                      Date <span className="text-red-500">*</span>
+                    </Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
@@ -656,32 +813,72 @@ export const CommunityCalendar = () => {
                         <Calendar
                           mode="single"
                           selected={newEvent.date}
-                          onSelect={(date) => date && setNewEvent({...newEvent, date})}
+                          onSelect={(date) => {
+                            console.log('📅 Date selected in calendar:', date);
+                            if (date) {
+                              setNewEvent({...newEvent, date});
+                            }
+                          }}
                           initialFocus
                           className="p-3 pointer-events-auto"
+                          defaultMonth={new Date(2025, 8)} // Default to September 2025
                         />
                       </PopoverContent>
                     </Popover>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-white">Time</Label>
-                    <Select value={newEvent.time} onValueChange={(value) => setNewEvent({...newEvent, time: value})}>
-                      <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
-                        <SelectValue placeholder="Select time" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-800 border-gray-700">
-                        {Array.from({length: 24}, (_, i) => (
-                          <SelectItem key={i} value={`${i.toString().padStart(2, '0')}:00`}>
-                            {i === 0 ? '12:00 AM' : i < 12 ? `${i}:00 AM` : i === 12 ? '12:00 PM' : `${i-12}:00 PM`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Label className="text-white">
+                      Time <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="number"
+                        min="1"
+                        max="12"
+                        value={newEvent.hour}
+                        onChange={(e) => {
+                          let hour = e.target.value;
+                          if (hour && parseInt(hour) > 12) {
+                            hour = '12';
+                          }
+                          setNewEvent({...newEvent, hour});
+                        }}
+                        className="bg-slate-700 border-gray-600 text-white w-14 text-center px-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        placeholder="12"
+                      />
+                      <span className="text-white">:</span>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="59"
+                        value={newEvent.minute}
+                        onChange={(e) => {
+                          let minute = e.target.value;
+                          if (minute && parseInt(minute) > 59) {
+                            minute = '59';
+                          }
+                          setNewEvent({...newEvent, minute});
+                        }}
+                        className="bg-slate-700 border-gray-600 text-white w-14 text-center px-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        placeholder="00"
+                      />
+                      <Select value={newEvent.period} onValueChange={(value) => setNewEvent({...newEvent, period: value})}>
+                        <SelectTrigger className="bg-slate-700 border-gray-600 text-white w-16 px-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-gray-700">
+                          <SelectItem value="AM">AM</SelectItem>
+                          <SelectItem value="PM">PM</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-white">Duration</Label>
+                    <Label className="text-white">
+                      Duration <span className="text-red-500">*</span>
+                    </Label>
                     <Select value={newEvent.duration} onValueChange={(value) => setNewEvent({...newEvent, duration: value})}>
                       <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
                         <SelectValue />
@@ -697,6 +894,24 @@ export const CommunityCalendar = () => {
                   </div>
                 </div>
 
+                {/* Event Type */}
+                <div className="space-y-2">
+                  <Label className="text-white">
+                    Event Type <span className="text-red-500">*</span>
+                  </Label>
+                  <Select value={newEvent.event_type} onValueChange={(value) => setNewEvent({...newEvent, event_type: value as 'training' | 'webinar' | 'discussion' | 'workshop'})}>
+                    <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-800 border-gray-700">
+                      <SelectItem value="training">🟢 Training</SelectItem>
+                      <SelectItem value="webinar">🔵 Webinar</SelectItem>
+                      <SelectItem value="discussion">🟡 Discussion</SelectItem>
+                      <SelectItem value="workshop">🟣 Workshop</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {/* Recurring Event */}
                 <div className="flex items-center space-x-2">
                   <Checkbox 
@@ -709,7 +924,9 @@ export const CommunityCalendar = () => {
 
                 {/* Location */}
                 <div className="space-y-4">
-                  <Label className="text-white">Location</Label>
+                  <Label className="text-white">
+                    Location <span className="text-red-500">*</span>
+                  </Label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Select value={newEvent.location} onValueChange={(value) => setNewEvent({...newEvent, location: value})}>
                       <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
@@ -724,19 +941,29 @@ export const CommunityCalendar = () => {
                     </Select>
                     
                     {newEvent.location === 'Zoom' && (
-                      <Input
-                        placeholder="Zoom link"
-                        value={newEvent.zoomLink}
-                        onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
-                        className="bg-slate-700 border-gray-600 text-white"
-                      />
+                      <div className="space-y-1">
+                        <Label className="text-white">
+                          Zoom Link <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          placeholder="Meeting ID, room name, or full Zoom URL"
+                          value={newEvent.zoomLink}
+                          onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
+                          className="bg-slate-700 border-gray-600 text-white"
+                        />
+                        <p className="text-xs text-gray-400">
+                          Examples: "123456789", "Room A", or "https://zoom.us/j/123456789"
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>
 
                 {/* Description */}
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-white">Description</Label>
+                  <Label htmlFor="description" className="text-white">
+                    Description <span className="text-red-500">*</span>
+                  </Label>
                   <Textarea
                     id="description"
                     value={newEvent.description}
@@ -795,7 +1022,7 @@ export const CommunityCalendar = () => {
                   </Button>
                   <Button 
                     onClick={handleAddEvent}
-                    disabled={!newEvent.title || !newEvent.time}
+                    disabled={!newEvent.title.trim() || !newEvent.hour || !newEvent.minute || !newEvent.period || !newEvent.duration || !newEvent.event_type || !newEvent.location || !newEvent.description.trim() || (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim())}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     ADD
@@ -934,11 +1161,14 @@ export const CommunityCalendar = () => {
         
         {/* Event Details Popup */}
         <Dialog open={isEventDetailsOpen} onOpenChange={setIsEventDetailsOpen}>
-          <DialogContent className="bg-slate-800 border-gray-700 max-w-md">
+          <DialogContent className="bg-slate-800 border-gray-700 max-w-md" aria-describedby="event-details-description">
             <DialogHeader>
               <DialogTitle className="text-white text-xl">
                 {selectedEvent?.title}
               </DialogTitle>
+              <p id="event-details-description" className="text-gray-400 text-sm">
+                View event details, add to calendar, or join the event
+              </p>
             </DialogHeader>
             
             {selectedEvent && (
@@ -1013,6 +1243,17 @@ export const CommunityCalendar = () => {
                        Edit Event
                      </Button>
                    )}
+                   
+                   {/* Admin Delete Button */}
+                   {isAdmin && (
+                     <Button 
+                       variant="destructive"
+                       className="w-full bg-red-600 hover:bg-red-700 text-white"
+                       onClick={handleDeleteEvent}
+                     >
+                       Delete Event
+                     </Button>
+                   )}
                  </div>
                </div>
              )}
@@ -1022,15 +1263,20 @@ export const CommunityCalendar = () => {
          {/* Edit Event Dialog - Only visible to admins */}
          {isAdmin && (
            <Dialog open={isEditEventOpen} onOpenChange={setIsEditEventOpen}>
-             <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto">
+             <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="edit-event-description">
                <DialogHeader>
                  <DialogTitle className="text-white text-xl">Edit Event</DialogTitle>
+                 <p id="edit-event-description" className="text-gray-400 text-sm">
+                   Modify event details, update information, or delete the event
+                 </p>
                </DialogHeader>
                
                <div className="space-y-6 mt-6">
                  {/* Title */}
                  <div className="space-y-2">
-                   <Label htmlFor="edit-title" className="text-white">Title</Label>
+                   <Label htmlFor="edit-title" className="text-white">
+                     Title <span className="text-red-500">*</span>
+                   </Label>
                    <Input
                      id="edit-title"
                      value={newEvent.title}
@@ -1043,7 +1289,9 @@ export const CommunityCalendar = () => {
                  {/* Date, Time, Duration */}
                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                    <div className="space-y-2">
-                     <Label className="text-white">Date</Label>
+                     <Label className="text-white">
+                       Date <span className="text-red-500">*</span>
+                     </Label>
                      <Popover>
                        <PopoverTrigger asChild>
                          <Button
@@ -1061,32 +1309,72 @@ export const CommunityCalendar = () => {
                          <Calendar
                            mode="single"
                            selected={newEvent.date}
-                           onSelect={(date) => date && setNewEvent({...newEvent, date})}
+                           onSelect={(date) => {
+                             console.log('📅 Date selected in edit calendar:', date);
+                             if (date) {
+                               setNewEvent({...newEvent, date});
+                             }
+                           }}
                            initialFocus
                            className="p-3 pointer-events-auto"
+                           defaultMonth={newEvent.date} // Default to the event's current date
                          />
                        </PopoverContent>
                      </Popover>
                    </div>
                    
                    <div className="space-y-2">
-                     <Label className="text-white">Time</Label>
-                     <Select value={newEvent.time} onValueChange={(value) => setNewEvent({...newEvent, time: value})}>
-                       <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
-                         <SelectValue placeholder="Select time" />
-                       </SelectTrigger>
-                       <SelectContent className="bg-slate-800 border-gray-700">
-                         {Array.from({length: 24}, (_, i) => (
-                           <SelectItem key={i} value={`${i.toString().padStart(2, '0')}:00`}>
-                             {i === 0 ? '12:00 AM' : i < 12 ? `${i}:00 AM` : i === 12 ? '12:00 PM' : `${i-12}:00 PM`}
-                           </SelectItem>
-                         ))}
-                       </SelectContent>
-                     </Select>
+                     <Label className="text-white">
+                       Time <span className="text-red-500">*</span>
+                     </Label>
+                     <div className="flex gap-2 items-center">
+                       <Input
+                         type="number"
+                         min="1"
+                         max="12"
+                         value={newEvent.hour}
+                         onChange={(e) => {
+                           let hour = e.target.value;
+                           if (hour && parseInt(hour) > 12) {
+                             hour = '12';
+                           }
+                           setNewEvent({...newEvent, hour});
+                         }}
+                         className="bg-slate-700 border-gray-600 text-white w-14 text-center px-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                         placeholder="12"
+                       />
+                       <span className="text-white">:</span>
+                       <Input
+                         type="number"
+                         min="0"
+                         max="59"
+                         value={newEvent.minute}
+                         onChange={(e) => {
+                           let minute = e.target.value;
+                           if (minute && parseInt(minute) > 59) {
+                             minute = '59';
+                           }
+                           setNewEvent({...newEvent, minute});
+                         }}
+                         className="bg-slate-700 border-gray-600 text-white w-14 text-center px-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                         placeholder="00"
+                       />
+                       <Select value={newEvent.period} onValueChange={(value) => setNewEvent({...newEvent, period: value})}>
+                         <SelectTrigger className="bg-slate-700 border-gray-600 text-white w-16 px-2">
+                           <SelectValue />
+                         </SelectTrigger>
+                         <SelectContent className="bg-slate-800 border-gray-700">
+                           <SelectItem value="AM">AM</SelectItem>
+                           <SelectItem value="PM">PM</SelectItem>
+                         </SelectContent>
+                       </Select>
+                     </div>
                    </div>
                    
                    <div className="space-y-2">
-                     <Label className="text-white">Duration</Label>
+                     <Label className="text-white">
+                       Duration <span className="text-red-500">*</span>
+                     </Label>
                      <Select value={newEvent.duration} onValueChange={(value) => setNewEvent({...newEvent, duration: value})}>
                        <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
                          <SelectValue />
@@ -1104,7 +1392,9 @@ export const CommunityCalendar = () => {
 
                  {/* Location */}
                  <div className="space-y-4">
-                   <Label className="text-white">Location</Label>
+                   <Label className="text-white">
+                     Location <span className="text-red-500">*</span>
+                   </Label>
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                      <Select value={newEvent.location} onValueChange={(value) => setNewEvent({...newEvent, location: value})}>
                        <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
@@ -1119,19 +1409,44 @@ export const CommunityCalendar = () => {
                      </Select>
                      
                      {newEvent.location === 'Zoom' && (
-                       <Input
-                         placeholder="Zoom link"
-                         value={newEvent.zoomLink}
-                         onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
-                         className="bg-slate-700 border-gray-600 text-white"
-                       />
+                       <div className="space-y-1">
+                         <Input
+                           placeholder="Meeting ID, room name, or full Zoom URL"
+                           value={newEvent.zoomLink}
+                           onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
+                           className="bg-slate-700 border-gray-600 text-white"
+                         />
+                         <p className="text-xs text-gray-400">
+                           Examples: "123456789", "Room A", or "https://zoom.us/j/123456789"
+                         </p>
+                       </div>
                      )}
                    </div>
                  </div>
 
+                 {/* Event Type */}
+                 <div className="space-y-2">
+                   <Label className="text-white">
+                     Event Type <span className="text-red-500">*</span>
+                   </Label>
+                   <Select value={newEvent.event_type} onValueChange={(value) => setNewEvent({...newEvent, event_type: value as 'training' | 'webinar' | 'discussion' | 'workshop'})}>
+                     <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
+                       <SelectValue />
+                     </SelectTrigger>
+                     <SelectContent className="bg-slate-800 border-gray-700">
+                       <SelectItem value="training">🟢 Training</SelectItem>
+                       <SelectItem value="webinar">🔵 Webinar</SelectItem>
+                       <SelectItem value="discussion">🟡 Discussion</SelectItem>
+                       <SelectItem value="workshop">🟣 Workshop</SelectItem>
+                     </SelectContent>
+                   </Select>
+                 </div>
+
                  {/* Description */}
                  <div className="space-y-2">
-                   <Label htmlFor="edit-description" className="text-white">Description</Label>
+                   <Label htmlFor="edit-description" className="text-white">
+                     Description <span className="text-red-500">*</span>
+                   </Label>
                    <Textarea
                      id="edit-description"
                      value={newEvent.description}
@@ -1162,31 +1477,21 @@ export const CommunityCalendar = () => {
                  </div>
 
                  {/* Action Buttons */}
-                 <div className="flex justify-between gap-3 pt-4">
+                 <div className="flex justify-end gap-3 pt-4">
                    <Button 
-                     variant="destructive" 
-                     onClick={handleDeleteEvent}
-                     className="bg-red-600 hover:bg-red-700 text-white"
+                     variant="ghost" 
+                     onClick={() => setIsEditEventOpen(false)}
+                     className="text-gray-400 hover:text-white"
                    >
-                     DELETE
+                     CANCEL
                    </Button>
-                   
-                   <div className="flex gap-3">
-                     <Button 
-                       variant="ghost" 
-                       onClick={() => setIsEditEventOpen(false)}
-                       className="text-gray-400 hover:text-white"
-                     >
-                       CANCEL
-                     </Button>
-                     <Button 
-                       onClick={handleEditEvent}
-                       disabled={!newEvent.title || !newEvent.time}
-                       className="bg-purple-600 hover:bg-purple-700 text-white"
-                     >
-                       UPDATE
-                     </Button>
-                   </div>
+                   <Button 
+                     onClick={handleEditEvent}
+                     disabled={!newEvent.title.trim() || !newEvent.hour || !newEvent.minute || !newEvent.period || !newEvent.duration || !newEvent.event_type || !newEvent.location || !newEvent.description.trim() || (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim())}
+                     className="bg-purple-600 hover:bg-purple-700 text-white"
+                   >
+                     UPDATE
+                   </Button>
                  </div>
                </div>
              </DialogContent>
