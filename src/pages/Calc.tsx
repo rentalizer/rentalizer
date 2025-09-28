@@ -60,10 +60,10 @@ const Calc = () => {
   // Show loading while checking authentication
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="text-muted-foreground text-xl">Loading...</div>
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <div className="text-cyan-300 text-xl">Loading...</div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
         </div>
       </div>
     );
@@ -100,113 +100,112 @@ const Calc = () => {
   
   const [data, setData] = useState<CalculatorData>(initialData);
 
-  // Calculate derived values
+  // Calculate derived values - all rounded to whole numbers except paybackMonths
   const cashToLaunch = Math.round(data.firstMonthRent + data.securityDeposit + data.buildOutMiscellaneous + data.furnishingsCost);
-  const serviceFeeCalculated = Math.round(data.rent * 0.029);
+  const serviceFeeCalculated = Math.round(data.rent * 0.029); // 2.9% of rent, not average comparable
   const monthlyExpenses = Math.round(data.rent + serviceFeeCalculated + data.maintenance + data.power + 
                          data.waterSewer + data.internet + data.taxLicense + data.insurance + 
                          data.software + data.furnitureRental);
   const monthlyRevenue = Math.round(data.averageComparable);
   const netProfitMonthly = Math.round(monthlyRevenue - monthlyExpenses);
   
+  // Payback months calculation with decimals
   const paybackMonths = (cashToLaunch > 0 && netProfitMonthly > 0) 
-    ? cashToLaunch / netProfitMonthly
+    ? cashToLaunch / netProfitMonthly  // Keep as decimal for precision
     : null;
     
   const cashOnCashReturn = cashToLaunch > 0 ? Math.round((netProfitMonthly * 12 / cashToLaunch) * 100) : 0;
 
-  // Helper function to parse and validate numeric input
-  const parseNumericInput = (value: string): number => {
-    const cleaned = value.replace(/[^\d.-]/g, '');
-    const num = parseFloat(cleaned);
-    return isNaN(num) ? 0 : Math.round(Math.abs(num));
-  };
+  // Update service fees when rent changes
+  useEffect(() => {
+    setData(prev => ({
+      ...prev,
+      serviceFees: Math.round(prev.rent * 0.029)
+    }));
+  }, [data.rent]);
 
   const updateData = (updates: Partial<CalculatorData>) => {
-    setData(prev => ({ ...prev, ...updates }));
+    // Round all numerical values to remove decimals
+    const roundedUpdates = Object.entries(updates).reduce((acc, [key, value]) => {
+      if (typeof value === 'number') {
+        acc[key] = Math.round(value);
+      } else {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as any);
+    
+    setData(prev => ({ ...prev, ...roundedUpdates }));
   };
 
   const clearAllData = () => {
     setData(initialData);
     toast({
-      title: "Calculator Reset",
-      description: "All data has been cleared successfully.",
+      title: "Calculator Cleared",
+      description: "All data has been reset. You can start over with a fresh calculation.",
     });
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <TopNavBar />
       
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <Button
-              variant="ghost"
-              onClick={() => navigate('/')}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
-            
-            <Button
-              variant="outline"
-              onClick={clearAllData}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Reset Calculator
-            </Button>
-          </div>
-
-          <div className="text-center space-y-2">
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <CalculatorIcon className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl font-bold text-foreground">STR Calculator</h1>
-            </div>
-            <p className="text-muted-foreground text-lg">
-              Analyze Short-Term Rental Property Profitability
-            </p>
-          </div>
+        <div className="flex items-center justify-between gap-4 mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/')}
+            className="text-gray-400 hover:text-gray-300"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Button>
         </div>
 
-        {/* Calculator Sections */}
-        <div className="space-y-8">
-          {/* Input Sections Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <BuildOutSection 
-              data={data} 
-              updateData={updateData} 
-              cashToLaunch={cashToLaunch}
-              parseNumericInput={parseNumericInput}
-            />
-            
-            <ExpensesSection 
-              data={data} 
-              updateData={updateData} 
-              serviceFeeCalculated={serviceFeeCalculated}
-              monthlyExpenses={monthlyExpenses}
-              parseNumericInput={parseNumericInput}
-            />
-            
-            <CompsSection 
-              data={data} 
-              updateData={updateData}
-              parseNumericInput={parseNumericInput}
-            />
-          </div>
+        <div className="text-center mb-6 bg-slate-700/90 backdrop-blur-lg rounded-lg p-8 border border-gray-500/50">
+          <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center gap-3">
+            <CalculatorIcon className="h-10 w-10 text-cyan-400" />
+            RentalizerCalc
+          </h1>
+          <p className="text-xl text-gray-300 mb-6">
+            Calculate STR Property Profitability & ROI
+          </p>
+          
+          {/* Clear All button centered below subtitle */}
+          <Button
+            variant="outline"
+            onClick={clearAllData}
+            className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 hover:border-cyan-400"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Clear All
+          </Button>
+        </div>
 
-          {/* Results Section */}
-          <div className="max-w-2xl mx-auto">
-            <NetProfitSection 
-              monthlyRevenue={monthlyRevenue}
-              netProfitMonthly={netProfitMonthly}
-              paybackMonths={paybackMonths}
-              cashOnCashReturn={cashOnCashReturn}
-            />
-          </div>
+        {/* Calculator Input Sections - 4x1 Grid Layout */}
+        <div className="grid lg:grid-cols-4 gap-2 max-w-full mx-auto mb-8">
+          {/* 1st - Build Out Costs */}
+          <BuildOutSection data={data} updateData={updateData} cashToLaunch={cashToLaunch} />
+          
+          {/* 2nd - Expenses */}
+          <ExpensesSection 
+            data={data} 
+            updateData={updateData} 
+            serviceFeeCalculated={serviceFeeCalculated}
+            monthlyExpenses={monthlyExpenses}
+          />
+          
+          {/* 3rd - Property Comps */}
+          <CompsSection data={data} updateData={updateData} />
+
+          {/* 4th - Analysis Results */}
+          <NetProfitSection 
+            monthlyRevenue={monthlyRevenue}
+            netProfitMonthly={netProfitMonthly}
+            paybackMonths={paybackMonths}
+            cashOnCashReturn={cashOnCashReturn}
+          />
         </div>
       </div>
 
