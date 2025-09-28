@@ -9,67 +9,71 @@ import { CalculatorData } from '@/pages/Calc';
 interface CompsSectionProps {
   data: CalculatorData;
   updateData: (updates: Partial<CalculatorData>) => void;
+  parseNumericInput: (value: string) => number;
 }
 
 export const CompsSection: React.FC<CompsSectionProps> = ({
   data,
-  updateData
+  updateData,
+  parseNumericInput
 }) => {
   return (
-    <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md">
+    <Card className="h-full">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center justify-center gap-2 text-white text-lg text-center">
-          <MapPin className="h-5 w-5 text-cyan-400" />
-          Property Comps
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <MapPin className="h-5 w-5 text-primary" />
+          Property Details
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label className="text-gray-200 text-center block">Property Address</Label>
-          <Input
-            type="text"
-            value={data.address}
-            onChange={(e) => updateData({ address: e.target.value })}
-            placeholder="Enter property address"
-            className="bg-gray-800/50 border-gray-600 text-gray-100"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-3">
           <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">Bedrooms</Label>
+            <Label className="text-sm font-medium">Property Address</Label>
             <Input
-              type="number"
-              value={data.bedrooms || ''}
-              onChange={(e) => updateData({ bedrooms: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder="2"
-              className="bg-gray-800/50 border-gray-600 text-gray-100"
+              type="text"
+              value={data.address}
+              onChange={(e) => updateData({ address: e.target.value })}
+              placeholder="Enter property address"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-200 text-center block">Bathrooms</Label>
-            <Input
-              type="number"
-              value={data.bathrooms || ''}
-              onChange={(e) => updateData({ bathrooms: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder="2"
-              className="bg-gray-800/50 border-gray-600 text-gray-100"
-            />
-          </div>
-        </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Bedrooms</Label>
+              <Input
+                type="text"
+                value={data.bedrooms || ''}
+                onChange={(e) => updateData({ bedrooms: parseNumericInput(e.target.value) })}
+                placeholder="2"
+              />
+            </div>
 
-        <div className="space-y-2">
-          <Label className="text-gray-200 text-center block">Comparable Properties</Label>
-          <div className="relative">
-            <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              type="number"
-              value={data.averageComparable || ''}
-              onChange={(e) => updateData({ averageComparable: Math.round(parseFloat(e.target.value)) || 0 })}
-              placeholder=""
-              className="pl-10 bg-gray-800/50 border-gray-600 text-gray-100"
-            />
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Bathrooms</Label>
+              <Input
+                type="text"
+                value={data.bathrooms || ''}
+                onChange={(e) => updateData({ bathrooms: parseNumericInput(e.target.value) })}
+                placeholder="2"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Monthly Revenue Estimate</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                value={data.averageComparable || ''}
+                onChange={(e) => updateData({ averageComparable: parseNumericInput(e.target.value) })}
+                placeholder="Enter estimated monthly revenue"
+                className="pl-10"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Based on comparable STR properties in your area
+            </p>
           </div>
         </div>
       </CardContent>
