@@ -280,11 +280,11 @@ const Community = React.memo(() => {
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
             </TabsTrigger>
-            <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+            {/* <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               AI Richie
-            </TabsTrigger>
-            <TabsTrigger value="propertyfinder" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+            </TabsTrigger> */}
+            {/* <TabsTrigger value="propertyfinder" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Building size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Property Finder
             </TabsTrigger>
@@ -295,7 +295,7 @@ const Community = React.memo(() => {
             <TabsTrigger value="propertymanagement" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Settings size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Property Management
-            </TabsTrigger>
+            </TabsTrigger> */}
           </TabsList>
 
           {/* Other Tabs */}
