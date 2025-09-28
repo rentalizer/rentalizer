@@ -1243,6 +1243,17 @@ export const CommunityCalendar = () => {
                        Edit Event
                      </Button>
                    )}
+                   
+                   {/* Admin Delete Button */}
+                   {isAdmin && (
+                     <Button 
+                       variant="destructive"
+                       className="w-full bg-red-600 hover:bg-red-700 text-white"
+                       onClick={handleDeleteEvent}
+                     >
+                       Delete Event
+                     </Button>
+                   )}
                  </div>
                </div>
              )}
@@ -1466,31 +1477,21 @@ export const CommunityCalendar = () => {
                  </div>
 
                  {/* Action Buttons */}
-                 <div className="flex justify-between gap-3 pt-4">
+                 <div className="flex justify-end gap-3 pt-4">
                    <Button 
-                     variant="destructive" 
-                     onClick={handleDeleteEvent}
-                     className="bg-red-600 hover:bg-red-700 text-white"
+                     variant="ghost" 
+                     onClick={() => setIsEditEventOpen(false)}
+                     className="text-gray-400 hover:text-white"
                    >
-                     DELETE
+                     CANCEL
                    </Button>
-                   
-                   <div className="flex gap-3">
-                     <Button 
-                       variant="ghost" 
-                       onClick={() => setIsEditEventOpen(false)}
-                       className="text-gray-400 hover:text-white"
-                     >
-                       CANCEL
-                     </Button>
-                     <Button 
-                       onClick={handleEditEvent}
-                       disabled={!newEvent.title.trim() || !newEvent.hour || !newEvent.minute || !newEvent.period || !newEvent.duration || !newEvent.event_type || !newEvent.location || !newEvent.description.trim() || (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim())}
-                       className="bg-purple-600 hover:bg-purple-700 text-white"
-                     >
-                       UPDATE
-                     </Button>
-                   </div>
+                   <Button 
+                     onClick={handleEditEvent}
+                     disabled={!newEvent.title.trim() || !newEvent.hour || !newEvent.minute || !newEvent.period || !newEvent.duration || !newEvent.event_type || !newEvent.location || !newEvent.description.trim() || (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim())}
+                     className="bg-purple-600 hover:bg-purple-700 text-white"
+                   >
+                     UPDATE
+                   </Button>
                  </div>
                </div>
              </DialogContent>
