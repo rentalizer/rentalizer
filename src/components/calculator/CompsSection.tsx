@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { MapPin, DollarSign, Plus, X } from 'lucide-react';
+import { MapPin, DollarSign, Plus, X, Calculator } from 'lucide-react';
 import { CalculatorData } from '@/pages/Community';
 import { parseNumericInput, formatInputValue } from '@/utils/inputHelpers';
 
@@ -19,17 +19,43 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
 }) => {
   const [newCompValue, setNewCompValue] = useState<string>('');
   const [compValues, setCompValues] = useState<number[]>([]);
+  
+  // Local state for form inputs
+  const [localData, setLocalData] = useState({
+    address: data.address,
+    bedrooms: data.bedrooms,
+    bathrooms: data.bathrooms,
+  });
+
+  // Update local state when props change
+  useEffect(() => {
+    setLocalData({
+      address: data.address,
+      bedrooms: data.bedrooms,
+      bathrooms: data.bathrooms,
+    });
+  }, [data]);
+
+  const handleCalculate = () => {
+    const average = compValues.length > 0 
+      ? Math.round(compValues.reduce((sum, val) => sum + val, 0) / compValues.length)
+      : 0;
+    
+    updateData({
+      ...localData,
+      averageComparable: average
+    });
+  };
+
+  const updateLocalData = (field: string, value: string | number) => {
+    setLocalData(prev => ({ ...prev, [field]: value }));
+  };
 
   const addCompValue = () => {
     const value = parseNumericInput(newCompValue);
     if (value > 0) {
       const updatedValues = [...compValues, value];
       setCompValues(updatedValues);
-      
-      // Calculate average and update data
-      const average = Math.round(updatedValues.reduce((sum, val) => sum + val, 0) / updatedValues.length);
-      updateData({ averageComparable: average });
-      
       setNewCompValue('');
     }
   };
@@ -37,13 +63,6 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
   const removeCompValue = (index: number) => {
     const updatedValues = compValues.filter((_, i) => i !== index);
     setCompValues(updatedValues);
-    
-    if (updatedValues.length > 0) {
-      const average = Math.round(updatedValues.reduce((sum, val) => sum + val, 0) / updatedValues.length);
-      updateData({ averageComparable: average });
-    } else {
-      updateData({ averageComparable: 0 });
-    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -67,8 +86,8 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
             <Label className="text-gray-300 text-sm font-medium mb-2 block">Property Address</Label>
             <Input
               type="text"
-              value={data.address}
-              onChange={(e) => updateData({ address: e.target.value })}
+              value={localData.address}
+              onChange={(e) => updateLocalData('address', e.target.value)}
               placeholder="123 Main St, City, State"
               className="bg-gray-800/60 border-gray-600/50 text-white h-11 text-base focus:border-blue-400/50"
             />
@@ -79,8 +98,8 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
               <Label className="text-gray-300 text-sm font-medium mb-2 block">Bedrooms</Label>
               <Input
                 type="text"
-                value={formatInputValue(data.bedrooms)}
-                onChange={(e) => updateData({ bedrooms: parseNumericInput(e.target.value) })}
+                value={formatInputValue(localData.bedrooms)}
+                onChange={(e) => updateLocalData('bedrooms', parseNumericInput(e.target.value))}
                 placeholder="3"
                 className="bg-gray-800/60 border-gray-600/50 text-white h-11 text-base focus:border-blue-400/50"
               />
@@ -90,8 +109,8 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
               <Label className="text-gray-300 text-sm font-medium mb-2 block">Bathrooms</Label>
               <Input
                 type="text"
-                value={formatInputValue(data.bathrooms)}
-                onChange={(e) => updateData({ bathrooms: parseNumericInput(e.target.value) })}
+                value={formatInputValue(localData.bathrooms)}
+                onChange={(e) => updateLocalData('bathrooms', parseNumericInput(e.target.value))}
                 placeholder="2"
                 className="bg-gray-800/60 border-gray-600/50 text-white h-11 text-base focus:border-blue-400/50"
               />
@@ -149,6 +168,17 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
           )}
         </div>
 
+        {/* Calculate Button */}
+        <div className="flex justify-center">
+          <Button
+            onClick={handleCalculate}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <Calculator className="h-4 w-4 mr-2" />
+            Calculate Revenue
+          </Button>
+        </div>
+
         {/* Revenue Result */}
         <div className="bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-lg p-4 border border-blue-500/30">
           <div className="text-center">
@@ -156,7 +186,10 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
             <div className="flex items-center justify-center gap-2">
               <DollarSign className="h-6 w-6 text-blue-400" />
               <span className="text-3xl font-bold text-blue-400">
-                {Math.round(data.averageComparable).toLocaleString()}
+                {compValues.length > 0 
+                  ? Math.round(compValues.reduce((sum, val) => sum + val, 0) / compValues.length).toLocaleString()
+                  : '0'
+                }
               </span>
             </div>
             {compValues.length > 0 && (

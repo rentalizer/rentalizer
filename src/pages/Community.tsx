@@ -154,13 +154,7 @@ const Community = React.memo(() => {
   const cashOnCashReturn = cashToLaunch > 0 ? Math.round((netProfitMonthly * 12 / cashToLaunch) * 100) : 0;
 
   
-  // Update service fees when rent changes
-  useEffect(() => {
-    setCalculatorData(prev => ({
-      ...prev,
-      serviceFees: Math.round(prev.rent * 0.029)
-    }));
-  }, [calculatorData.rent]);
+  // Note: Service fees are now calculated manually via calculate buttons in each section
 
   // Load Calendly script when component mounts
   useEffect(() => {
@@ -320,7 +314,7 @@ const Community = React.memo(() => {
               </div>
               
               {/* Action buttons */}
-              <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center justify-center gap-4 flex-wrap">
                 <Button
                   variant="outline"
                   onClick={clearCalculatorData}
@@ -338,6 +332,13 @@ const Community = React.memo(() => {
                   <Download className="h-4 w-4 mr-2" />
                   Download Data
                 </Button>
+              </div>
+              
+              {/* Info message */}
+              <div className="text-center">
+                <p className="text-gray-400 text-sm">
+                  💡 Use the "Calculate" buttons in each section after entering your data for accurate results
+                </p>
               </div>
 
               {/* Calculator Sections - Cleaner Grid Layout */}
