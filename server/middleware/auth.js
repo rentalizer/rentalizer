@@ -56,6 +56,23 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
+// Middleware to require admin role
+const requireAdmin = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({ 
+      message: 'Authentication required.' 
+    });
+  }
+  
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ 
+      message: 'Admin access required.' 
+    });
+  }
+  
+  next();
+};
+
 // Generate JWT token
 const generateToken = (userId) => {
   return jwt.sign(
@@ -67,5 +84,6 @@ const generateToken = (userId) => {
 
 module.exports = {
   authenticateToken,
+  requireAdmin,
   generateToken
 };

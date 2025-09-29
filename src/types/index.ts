@@ -25,7 +25,6 @@ export interface Video {
   title: string;
   description: string;
   thumbnail: string;
-  duration: string;
   views: number;
   category: string;
   tags: string[];
@@ -56,7 +55,6 @@ export interface CreateVideoData {
   title: string;
   description: string;
   thumbnail: string;
-  duration: string;
   category: string;
   videoUrl: string;
   tags?: string[];

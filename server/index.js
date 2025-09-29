@@ -14,6 +14,7 @@ const discussionRoutes = require('./routes/discussions');
 const commentRoutes = require('./routes/comments');
 const eventRoutes = require('./routes/events');
 const videoRoutes = require('./routes/videos');
+const uploadRoutes = require('./routes/upload');
 
 // Import WebSocket setup
 const { setupWebSocketHandlers } = require('./middleware/websocket');
@@ -45,6 +46,9 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use(morgan('combined'));
 
+// Serve uploaded files statically
+app.use('/uploads', express.static('uploads'));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
@@ -53,6 +57,7 @@ app.use('/api/discussions', discussionRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/videos', videoRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

@@ -14,6 +14,7 @@ const VIDEO_ENDPOINTS = {
   REORDER: '/videos/reorder',
   STATS: '/videos/admin/stats',
   BULK: '/videos/bulk',
+  UPLOAD_THUMBNAIL: '/upload/thumbnail',
 };
 
 // Create axios instance for video API
@@ -294,6 +295,23 @@ class VideoService {
       bulkData
     );
     return response.data;
+  }
+
+  // Upload thumbnail image
+  async uploadThumbnail(file: File): Promise<AxiosResponse<{ success: boolean; data: { filename: string; path: string; size: number; mimetype: string } }>> {
+    const formData = new FormData();
+    formData.append('thumbnail', file);
+
+    return videoApi.post(VIDEO_ENDPOINTS.UPLOAD_THUMBNAIL, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
+
+  // Delete thumbnail image
+  async deleteThumbnail(filename: string): Promise<AxiosResponse<{ success: boolean; message: string }>> {
+    return videoApi.delete(`/upload/thumbnail/${filename}`);
   }
 }
 

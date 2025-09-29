@@ -180,18 +180,22 @@ const validateVideo = [
     .isLength({ min: 1, max: 1000 })
     .withMessage('Description must be between 1 and 1000 characters'),
   body('thumbnail')
-    .isURL({ protocols: ['http', 'https'] })
-    .withMessage('Thumbnail must be a valid URL')
     .custom((value) => {
-      // Check if it's an image URL (allow query parameters)
-      if (!/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(value)) {
-        throw new Error('Thumbnail must be a valid image URL');
+      // Allow both URLs and file paths
+      if (!value) {
+        throw new Error('Thumbnail is required');
       }
+      
+      // Check if it's a URL or file path
+      const isUrl = /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(value);
+      const isFilePath = /^\/uploads\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(value);
+      
+      if (!isUrl && !isFilePath) {
+        throw new Error('Thumbnail must be a valid image URL or file path');
+      }
+      
       return true;
     }),
-  body('duration')
-    .matches(/^\d{1,2}:\d{2}$/)
-    .withMessage('Duration must be in MM:SS format'),
   body('category')
     .isIn(['Category 1', 'Category 2', 'Category 3'])
     .withMessage('Category must be one of: Category 1, Category 2, Category 3'),
@@ -256,20 +260,19 @@ const validateVideoUpdate = [
     .withMessage('Description must be between 1 and 1000 characters'),
   body('thumbnail')
     .optional()
-    .isURL({ protocols: ['http', 'https'] })
-    .withMessage('Thumbnail must be a valid URL')
     .custom((value) => {
       if (!value) return true; // Allow empty values
-      // Check if it's an image URL (allow query parameters)
-      if (!/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(value)) {
-        throw new Error('Thumbnail must be a valid image URL');
+      
+      // Check if it's a URL or file path
+      const isUrl = /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(value);
+      const isFilePath = /^\/uploads\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(value);
+      
+      if (!isUrl && !isFilePath) {
+        throw new Error('Thumbnail must be a valid image URL or file path');
       }
+      
       return true;
     }),
-  body('duration')
-    .optional()
-    .matches(/^\d{1,2}:\d{2}$/)
-    .withMessage('Duration must be in MM:SS format'),
   body('category')
     .optional()
     .isIn(['Category 1', 'Category 2', 'Category 3'])

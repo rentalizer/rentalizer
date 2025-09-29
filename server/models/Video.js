@@ -35,20 +35,15 @@ const videoSchema = new mongoose.Schema({
   },
   thumbnail: {
     type: String,
-    required: [true, 'Thumbnail URL is required'],
+    required: [true, 'Thumbnail is required'],
     trim: true,
     validate: {
       validator: function(v) {
-        return /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(v);
+        // Allow both URLs and file paths
+        return /^(https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?|^\/uploads\/.+\.(jpg|jpeg|png|gif|webp))$/i.test(v);
       },
-      message: 'Thumbnail must be a valid image URL'
+      message: 'Thumbnail must be a valid image URL or file path'
     }
-  },
-  duration: {
-    type: String,
-    required: [true, 'Video duration is required'],
-    trim: true,
-    match: [/^\d{1,2}:\d{2}$/, 'Duration must be in MM:SS format']
   },
   views: {
     type: Number,

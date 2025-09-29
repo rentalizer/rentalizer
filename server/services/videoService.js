@@ -315,8 +315,16 @@ class VideoService {
 
   // Get video categories
   async getVideoCategories() {
-    const categories = await Video.distinct('category', { isActive: true });
-    return categories.sort();
+    // Get categories from existing videos
+    const existingCategories = await Video.distinct('category', { isActive: true });
+    
+    // Define the allowed categories
+    const allowedCategories = ['Category 1', 'Category 2', 'Category 3'];
+    
+    // Combine existing categories with allowed categories and remove duplicates
+    const allCategories = [...new Set([...existingCategories, ...allowedCategories])];
+    
+    return allCategories.sort();
   }
 }
 

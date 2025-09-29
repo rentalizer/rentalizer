@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Video as VideoIcon, Search, Play, Clock, Eye, Calendar, Star, X, FileText, Download, Plus, Edit, Trash2, GripVertical, Lock, Loader2 } from 'lucide-react';
+import { ImageUpload } from '@/components/ui/ImageUpload';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useAuth } from '@/contexts/AuthContext';
@@ -115,7 +116,7 @@ const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, 
             {/* Thumbnail */}
             <div className="aspect-video bg-slate-700 rounded-t-lg relative overflow-hidden">
               <img
-                src={video.thumbnail}
+                src={video.thumbnail.startsWith('/uploads/') ? `http://localhost:5000${video.thumbnail}` : video.thumbnail}
                 alt={video.title}
                 className={`w-full h-full object-cover transition-all ${!isAuthenticated ? 'filter grayscale opacity-50' : ''}`}
                 onError={(e) => {
@@ -139,10 +140,6 @@ const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, 
                 </div>
               )}
               
-              {/* Duration */}
-              <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                {video.duration}
-              </div>
               
               {/* Live indicator */}
               {video.isLive && (
@@ -221,7 +218,6 @@ export const VideoLibrary = () => {
     title: '',
     description: '',
     thumbnail: '',
-    duration: '',
     category: 'Category 1',
     videoUrl: '',
     tags: [],
@@ -275,9 +271,12 @@ export const VideoLibrary = () => {
   const loadCategories = useCallback(async () => {
     try {
       const response = await videoService.getVideoCategories();
+      console.log('Categories API response:', response.data);
       // If API returns empty categories, use the default categories
       const apiCategories = response.data.length > 0 ? response.data : ['Category 1', 'Category 2', 'Category 3'];
-      setCategories(['all', ...apiCategories]);
+      const finalCategories = ['all', ...apiCategories];
+      console.log('Final categories:', finalCategories);
+      setCategories(finalCategories);
     } catch (error) {
       console.error('Error loading categories:', error);
       // Fallback to default categories if API fails
@@ -427,7 +426,6 @@ export const VideoLibrary = () => {
       title: '',
       description: '',
       thumbnail: '',
-      duration: '',
         category: 'Category 1',
       videoUrl: '',
       tags: [],
@@ -479,7 +477,6 @@ export const VideoLibrary = () => {
       title: video.title,
       description: video.description,
       thumbnail: video.thumbnail,
-      duration: video.duration,
       category: video.category,
       videoUrl: video.videoUrl,
       tags: video.tags,
@@ -510,7 +507,6 @@ export const VideoLibrary = () => {
       title: '',
       description: '',
       thumbnail: '',
-      duration: '',
         category: 'Category 1',
       videoUrl: '',
       tags: [],
@@ -673,26 +669,10 @@ export const VideoLibrary = () => {
                     className="bg-slate-800/50 border-cyan-500/20 text-white"
                   />
                 </div>
-                <div>
-                  <Label htmlFor="thumbnail" className="text-gray-300">Thumbnail URL</Label>
-                  <Input
-                    id="thumbnail"
-                    value={newVideo.thumbnail}
-                    onChange={(e) => setNewVideo({...newVideo, thumbnail: e.target.value})}
-                    placeholder="https://images.unsplash.com/..."
-                    className="bg-slate-800/50 border-cyan-500/20 text-white"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="duration" className="text-gray-300">Duration</Label>
-                  <Input
-                    id="duration"
-                    value={newVideo.duration}
-                    onChange={(e) => setNewVideo({...newVideo, duration: e.target.value})}
-                    placeholder="35:20"
-                    className="bg-slate-800/50 border-cyan-500/20 text-white"
-                  />
-                </div>
+                <ImageUpload
+                  value={newVideo.thumbnail}
+                  onChange={(value) => setNewVideo({...newVideo, thumbnail: value})}
+                />
                 <div>
                   <Label htmlFor="category" className="text-gray-300">Category</Label>
                   <Select value={newVideo.category} onValueChange={(value) => setNewVideo({...newVideo, category: value})}>
@@ -911,6 +891,10 @@ export const VideoLibrary = () => {
                 className="bg-slate-800/50 border-cyan-500/20 text-white"
               />
             </div>
+            <ImageUpload
+              value={newVideo.thumbnail}
+              onChange={(value) => setNewVideo({...newVideo, thumbnail: value})}
+            />
             <div>
               <Label htmlFor="edit-category" className="text-gray-300">Category</Label>
               <Select value={newVideo.category} onValueChange={(value) => setNewVideo({...newVideo, category: value})}>
@@ -1029,7 +1013,6 @@ export const VideoLibrary = () => {
           {selectedVideo && (
             <div className="space-y-4 text-gray-300">
               <div className="flex items-center gap-4 text-xs text-gray-400">
-                <span>{selectedVideo.duration}</span>
                 <span>{selectedVideo.views.toLocaleString()} views</span>
               </div>
               
