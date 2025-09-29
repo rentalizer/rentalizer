@@ -169,6 +169,192 @@ const validateDiscussionUpdate = [
   handleValidationErrors
 ];
 
+// Video validation rules
+const validateVideo = [
+  body('title')
+    .trim()
+    .isLength({ min: 1, max: 200 })
+    .withMessage('Title must be between 1 and 200 characters'),
+  body('description')
+    .trim()
+    .isLength({ min: 1, max: 1000 })
+    .withMessage('Description must be between 1 and 1000 characters'),
+  body('thumbnail')
+    .isURL({ protocols: ['http', 'https'] })
+    .withMessage('Thumbnail must be a valid URL')
+    .custom((value) => {
+      // Check if it's an image URL
+      if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(value)) {
+        throw new Error('Thumbnail must be a valid image URL');
+      }
+      return true;
+    }),
+  body('duration')
+    .matches(/^\d{1,2}:\d{2}$/)
+    .withMessage('Duration must be in MM:SS format'),
+  body('category')
+    .isIn(['Business Formation', 'Market Research', 'Property Acquisitions', 'Operations', 'Property Management'])
+    .withMessage('Category must be one of: Business Formation, Market Research, Property Acquisitions, Operations, Property Management'),
+  body('videoUrl')
+    .isURL({ protocols: ['https'] })
+    .withMessage('Video URL must be a valid HTTPS URL')
+    .custom((value) => {
+      // Check if it's a Loom URL
+      if (!/^https:\/\/www\.loom\.com\/share\/[a-zA-Z0-9]+/.test(value)) {
+        throw new Error('Video URL must be a valid Loom share URL');
+      }
+      return true;
+    }),
+  body('tags')
+    .optional()
+    .isArray()
+    .withMessage('Tags must be an array'),
+  body('tags.*')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage('Each tag must be between 1 and 50 characters'),
+  body('featured')
+    .optional()
+    .isBoolean()
+    .withMessage('Featured must be a boolean value'),
+  body('isLive')
+    .optional()
+    .isBoolean()
+    .withMessage('isLive must be a boolean value'),
+  body('order')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Order must be a non-negative integer'),
+  body('handouts')
+    .optional()
+    .isArray()
+    .withMessage('Handouts must be an array'),
+  body('handouts.*.name')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 200 })
+    .withMessage('Handout name must be between 1 and 200 characters'),
+  body('handouts.*.url')
+    .optional()
+    .isURL({ protocols: ['http', 'https'] })
+    .withMessage('Handout URL must be a valid URL'),
+  handleValidationErrors
+];
+
+// Video update validation rules (more lenient)
+const validateVideoUpdate = [
+  body('title')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 200 })
+    .withMessage('Title must be between 1 and 200 characters'),
+  body('description')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 1000 })
+    .withMessage('Description must be between 1 and 1000 characters'),
+  body('thumbnail')
+    .optional()
+    .isURL({ protocols: ['http', 'https'] })
+    .withMessage('Thumbnail must be a valid URL')
+    .custom((value) => {
+      if (!value) return true; // Allow empty values
+      // Check if it's an image URL
+      if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(value)) {
+        throw new Error('Thumbnail must be a valid image URL');
+      }
+      return true;
+    }),
+  body('duration')
+    .optional()
+    .matches(/^\d{1,2}:\d{2}$/)
+    .withMessage('Duration must be in MM:SS format'),
+  body('category')
+    .optional()
+    .isIn(['Business Formation', 'Market Research', 'Property Acquisitions', 'Operations', 'Property Management'])
+    .withMessage('Category must be one of: Business Formation, Market Research, Property Acquisitions, Operations, Property Management'),
+  body('videoUrl')
+    .optional()
+    .isURL({ protocols: ['https'] })
+    .withMessage('Video URL must be a valid HTTPS URL')
+    .custom((value) => {
+      if (!value) return true; // Allow empty values
+      // Check if it's a Loom URL
+      if (!/^https:\/\/www\.loom\.com\/share\/[a-zA-Z0-9]+/.test(value)) {
+        throw new Error('Video URL must be a valid Loom share URL');
+      }
+      return true;
+    }),
+  body('tags')
+    .optional()
+    .isArray()
+    .withMessage('Tags must be an array'),
+  body('tags.*')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage('Each tag must be between 1 and 50 characters'),
+  body('featured')
+    .optional()
+    .isBoolean()
+    .withMessage('Featured must be a boolean value'),
+  body('isLive')
+    .optional()
+    .isBoolean()
+    .withMessage('isLive must be a boolean value'),
+  body('order')
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage('Order must be a non-negative integer'),
+  body('isActive')
+    .optional()
+    .isBoolean()
+    .withMessage('isActive must be a boolean value'),
+  body('handouts')
+    .optional()
+    .isArray()
+    .withMessage('Handouts must be an array'),
+  body('handouts.*.name')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 200 })
+    .withMessage('Handout name must be between 1 and 200 characters'),
+  body('handouts.*.url')
+    .optional()
+    .isURL({ protocols: ['http', 'https'] })
+    .withMessage('Handout URL must be a valid URL'),
+  handleValidationErrors
+];
+
+// Video reorder validation rules
+const validateVideoReorder = [
+  body('videoOrders')
+    .isArray({ min: 1 })
+    .withMessage('Video orders must be a non-empty array'),
+  body('videoOrders.*.videoId')
+    .isMongoId()
+    .withMessage('Each video ID must be a valid MongoDB ObjectId'),
+  body('videoOrders.*.order')
+    .isInt({ min: 0 })
+    .withMessage('Each order must be a non-negative integer'),
+  handleValidationErrors
+];
+
+// Bulk update validation rules
+const validateBulkUpdate = [
+  body('videoIds')
+    .isArray({ min: 1 })
+    .withMessage('Video IDs must be a non-empty array'),
+  body('videoIds.*')
+    .isMongoId()
+    .withMessage('Each video ID must be a valid MongoDB ObjectId'),
+  body('updateData')
+    .isObject()
+    .withMessage('Update data must be an object'),
+  handleValidationErrors
+];
+
 module.exports = {
   validateRegistration,
   validateLogin,
@@ -177,5 +363,9 @@ module.exports = {
   validateAccountDeletion,
   validateDiscussion,
   validateDiscussionUpdate,
+  validateVideo,
+  validateVideoUpdate,
+  validateVideoReorder,
+  validateBulkUpdate,
   handleValidationErrors
 };
