@@ -79,9 +79,16 @@ class VideoService {
       ];
     }
 
-    // Sort configuration
+    // Sort configuration - prioritize featured videos
     const sortConfig = {};
-    sortConfig[sortBy] = sortOrder === 'desc' ? -1 : 1;
+    
+    // Always sort by featured first (featured videos go to top)
+    sortConfig.featured = -1; // -1 means descending (true comes before false)
+    
+    // Then sort by the requested field
+    if (sortBy !== 'featured') {
+      sortConfig[sortBy] = sortOrder === 'desc' ? -1 : 1;
+    }
 
     const videos = await Video.find(query)
       .populate('createdBy', 'firstName lastName email')
@@ -243,7 +250,7 @@ class VideoService {
   async getFeaturedVideos(limit = 5) {
     return await Video.find({ featured: true, isActive: true })
       .populate('createdBy', 'firstName lastName email')
-      .sort({ order: 1, createdAt: -1 })
+      .sort({ featured: -1, order: 1, createdAt: -1 })
       .limit(limit);
   }
 
@@ -251,7 +258,7 @@ class VideoService {
   async getVideosByCategory(category, limit = 10) {
     return await Video.find({ category, isActive: true })
       .populate('createdBy', 'firstName lastName email')
-      .sort({ order: 1, createdAt: -1 })
+      .sort({ featured: -1, order: 1, createdAt: -1 })
       .limit(limit);
   }
 
@@ -279,7 +286,7 @@ class VideoService {
 
     const videos = await Video.find(query)
       .populate('createdBy', 'firstName lastName email')
-      .sort({ order: 1, createdAt: -1 })
+      .sort({ featured: -1, order: 1, createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
 
