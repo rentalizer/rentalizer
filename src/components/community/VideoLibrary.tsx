@@ -840,16 +840,8 @@ export const VideoLibrary = () => {
       <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
         <DialogContent className="max-w-4xl bg-slate-900 border border-cyan-500/20">
           <DialogHeader>
-            <DialogTitle className="text-cyan-300 flex items-center justify-between">
+            <DialogTitle className="text-cyan-300">
               {selectedVideo?.title}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedVideo(null)}
-                className="text-gray-400 hover:text-white"
-              >
-                <X className="h-4 w-4" />
-              </Button>
             </DialogTitle>
           </DialogHeader>
           
