@@ -137,13 +137,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     }
   };
 
-  const handleUrlChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const url = event.target.value;
-    onChange(url);
-    setPreview(url);
-    setSelectedFile(null);
-    onFileSelect?.(null);
-  };
 
   return (
     <div className={`space-y-4 ${className}`}>
@@ -192,21 +185,6 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         disabled={disabled}
       />
 
-      {/* URL Input */}
-      <div>
-        <Label htmlFor="thumbnail-url" className="text-gray-300 text-sm">
-          Or enter image URL:
-        </Label>
-        <Input
-          id="thumbnail-url"
-          type="url"
-          placeholder="https://example.com/image.jpg"
-          value={value || ''}
-          onChange={handleUrlChange}
-          className="bg-slate-800/50 border-cyan-500/20 text-white mt-1"
-          disabled={disabled}
-        />
-      </div>
 
       {/* Preview */}
       {preview && (
@@ -227,7 +205,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             )}
           </div>
           <p className="text-xs text-gray-400 mt-1">
-            {selectedFile ? `Selected: ${selectedFile.name}` : (value?.startsWith('/uploads/') ? `Uploaded: ${value.split('/').pop()}` : 'Image URL')}
+            {selectedFile ? `Selected: ${selectedFile.name}` : (value?.startsWith('/uploads/') ? `Uploaded: ${value.split('/').pop()}` : 'Image')}
           </p>
         </div>
       )}

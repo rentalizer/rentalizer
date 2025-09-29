@@ -19,10 +19,10 @@ const videoSchema = new mongoose.Schema({
     trim: true,
     validate: {
       validator: function(v) {
-        // Allow both URLs and file paths
-        return /^(https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?|^\/uploads\/.+\.(jpg|jpeg|png|gif|webp))$/i.test(v);
+        // Only allow file paths (uploaded files)
+        return /^\/uploads\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(v);
       },
-      message: 'Thumbnail must be a valid image URL or file path'
+      message: 'Thumbnail must be an uploaded image file'
     }
   },
   views: {

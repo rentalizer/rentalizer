@@ -287,9 +287,7 @@ export const VideoLibrary = () => {
 
   // Load videos on mount
   useEffect(() => {
-    console.log('🎬 Initial video load effect triggered');
     if (!hasInitiallyLoadedRef.current && loadVideosRef.current) {
-      console.log('🎬 Loading videos for the first time');
       loadVideosRef.current();
       hasInitiallyLoadedRef.current = true;
     }
@@ -302,15 +300,10 @@ export const VideoLibrary = () => {
 
   // Handle category and search changes with debouncing
   useEffect(() => {
-    console.log('🔍 Category/search change effect triggered:', { selectedCategory, searchTerm });
     // Skip if we haven't initially loaded yet
-    if (!hasInitiallyLoadedRef.current || !loadVideosRef.current) {
-      console.log('🔍 Skipping - not initially loaded yet');
-      return;
-    }
+    if (!hasInitiallyLoadedRef.current || !loadVideosRef.current) return;
     
     const timeoutId = setTimeout(() => {
-      console.log('🔍 Loading videos with filters:', { selectedCategory, searchTerm });
       loadVideosRef.current!({ 
         category: selectedCategory === 'all' ? undefined : selectedCategory,
         search: searchTerm || undefined

@@ -181,17 +181,15 @@ const validateVideo = [
     .withMessage('Description must be between 1 and 1000 characters'),
   body('thumbnail')
     .custom((value) => {
-      // Allow both URLs and file paths
       if (!value) {
         throw new Error('Thumbnail is required');
       }
       
-      // Check if it's a URL or file path
-      const isUrl = /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(value);
+      // Only allow file paths (uploaded files)
       const isFilePath = /^\/uploads\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(value);
       
-      if (!isUrl && !isFilePath) {
-        throw new Error('Thumbnail must be a valid image URL or file path');
+      if (!isFilePath) {
+        throw new Error('Thumbnail must be an uploaded image file');
       }
       
       return true;
@@ -250,12 +248,11 @@ const validateVideoUpdate = [
     .custom((value) => {
       if (!value) return true; // Allow empty values
       
-      // Check if it's a URL or file path
-      const isUrl = /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(value);
+      // Only allow file paths (uploaded files)
       const isFilePath = /^\/uploads\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(value);
       
-      if (!isUrl && !isFilePath) {
-        throw new Error('Thumbnail must be a valid image URL or file path');
+      if (!isFilePath) {
+        throw new Error('Thumbnail must be an uploaded image file');
       }
       
       return true;
