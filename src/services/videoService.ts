@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import { API_CONFIG } from '@/config/api';
+import { Video, CreateVideoData, UpdateVideoData, VideoFilters } from '@/types';
 
 // Video API endpoints
 const VIDEO_ENDPOINTS = {
@@ -69,59 +70,6 @@ export interface ApiResponse<T> {
   searchTerm?: string;
 }
 
-export interface VideoHandout {
-  name: string;
-  url: string;
-}
-
-export interface Video {
-  _id: string;
-  title: string;
-  description: string;
-  thumbnail: string;
-  duration: string;
-  views: number;
-  category: string;
-  tags: string[];
-  featured: boolean;
-  isLive: boolean;
-  videoUrl: string;
-  handouts: VideoHandout[];
-  order: number;
-  isActive: boolean;
-  createdBy: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  lastModifiedBy?: {
-    _id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-  embedUrl: string;
-}
-
-export interface CreateVideoData {
-  title: string;
-  description: string;
-  thumbnail: string;
-  duration: string;
-  category: string;
-  videoUrl: string;
-  tags?: string[];
-  featured?: boolean;
-  isLive?: boolean;
-  handouts?: VideoHandout[];
-}
-
-export interface UpdateVideoData extends Partial<CreateVideoData> {
-  isActive?: boolean;
-}
 
 export interface VideoOrder {
   videoId: string;

@@ -218,6 +218,8 @@ export const VideoLibrary = () => {
   });
 
   const isMountedRef = useRef(true);
+  const hasInitiallyLoadedRef = useRef(false);
+  const loadVideosRef = useRef<typeof loadVideos>();
 
   // API integration functions
   const loadVideos = useCallback(async (filters?: Partial<VideoFilters>) => {
@@ -259,6 +261,9 @@ export const VideoLibrary = () => {
     }
   }, [toast]);
 
+  // Store the latest loadVideos function in ref
+  loadVideosRef.current = loadVideos;
+
   const loadCategories = useCallback(async () => {
     try {
       const response = await videoService.getVideoCategories();
@@ -275,11 +280,19 @@ export const VideoLibrary = () => {
     }
   }, []);
 
-  // Load data on component mount
+  // Load categories once on mount (categories are static)
   useEffect(() => {
-    loadVideos();
     loadCategories();
-    
+  }, [loadCategories]); // loadCategories is stable (useCallback with empty deps)
+
+  // Load videos on mount
+  useEffect(() => {
+    console.log('🎬 Initial video load effect triggered');
+    if (!hasInitiallyLoadedRef.current && loadVideosRef.current) {
+      console.log('🎬 Loading videos for the first time');
+      loadVideosRef.current();
+      hasInitiallyLoadedRef.current = true;
+    }
     
     // Cleanup function
     return () => {
@@ -287,28 +300,25 @@ export const VideoLibrary = () => {
     };
   }, []); // Empty dependency array - only run on mount
 
-  // Handle category changes
+  // Handle category and search changes with debouncing
   useEffect(() => {
-    loadVideos({ 
-      category: selectedCategory === 'all' ? undefined : selectedCategory,
-      search: searchTerm || undefined
-    });
-  }, [selectedCategory]);
-
-  // Debounced search
-  useEffect(() => {
+    console.log('🔍 Category/search change effect triggered:', { selectedCategory, searchTerm });
+    // Skip if we haven't initially loaded yet
+    if (!hasInitiallyLoadedRef.current || !loadVideosRef.current) {
+      console.log('🔍 Skipping - not initially loaded yet');
+      return;
+    }
+    
     const timeoutId = setTimeout(() => {
-      // Only make API call if there's a search term or if we're not on the default state
-      if (searchTerm || selectedCategory !== 'all') {
-        loadVideos({ 
-          category: selectedCategory === 'all' ? undefined : selectedCategory,
-          search: searchTerm || undefined
-        });
-      }
-    }, 500);
+      console.log('🔍 Loading videos with filters:', { selectedCategory, searchTerm });
+      loadVideosRef.current!({ 
+        category: selectedCategory === 'all' ? undefined : selectedCategory,
+        search: searchTerm || undefined
+      });
+    }, searchTerm ? 500 : 0); // Debounce only for search, immediate for category
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+  }, [selectedCategory, searchTerm]); // No loadVideos dependency needed
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -428,28 +438,31 @@ export const VideoLibrary = () => {
       title: "Video added",
       description: "New video has been added successfully.",
     });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating video:', error);
       
       // Handle authentication errors
-      if (error.response?.status === 401) {
-        toast({
-          title: "Authentication Required",
-          description: "Please log in to create videos. Your session may have expired.",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      // Handle validation errors
-      if (error.response?.status === 400) {
-        const errorMessage = error.response?.data?.message || "Please check your input and try again.";
-        toast({
-          title: "Validation Error",
-          description: errorMessage,
-          variant: "destructive"
-        });
-        return;
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { status?: number; data?: { message?: string } } };
+        if (axiosError.response?.status === 401) {
+          toast({
+            title: "Authentication Required",
+            description: "Please log in to create videos. Your session may have expired.",
+            variant: "destructive"
+          });
+          return;
+        }
+        
+        // Handle validation errors
+        if (axiosError.response?.status === 400) {
+          const errorMessage = axiosError.response?.data?.message || "Please check your input and try again.";
+          toast({
+            title: "Validation Error",
+            description: errorMessage,
+            variant: "destructive"
+          });
+          return;
+        }
       }
       
       // Generic error
