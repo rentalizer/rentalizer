@@ -183,8 +183,8 @@ const validateVideo = [
     .isURL({ protocols: ['http', 'https'] })
     .withMessage('Thumbnail must be a valid URL')
     .custom((value) => {
-      // Check if it's an image URL
-      if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(value)) {
+      // Check if it's an image URL (allow query parameters)
+      if (!/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(value)) {
         throw new Error('Thumbnail must be a valid image URL');
       }
       return true;
@@ -193,8 +193,8 @@ const validateVideo = [
     .matches(/^\d{1,2}:\d{2}$/)
     .withMessage('Duration must be in MM:SS format'),
   body('category')
-    .isIn(['Business Formation', 'Market Research', 'Property Acquisitions', 'Operations', 'Property Management'])
-    .withMessage('Category must be one of: Business Formation, Market Research, Property Acquisitions, Operations, Property Management'),
+    .isIn(['Category 1', 'Category 2', 'Category 3'])
+    .withMessage('Category must be one of: Category 1, Category 2, Category 3'),
   body('videoUrl')
     .isURL({ protocols: ['https'] })
     .withMessage('Video URL must be a valid HTTPS URL')
@@ -260,8 +260,8 @@ const validateVideoUpdate = [
     .withMessage('Thumbnail must be a valid URL')
     .custom((value) => {
       if (!value) return true; // Allow empty values
-      // Check if it's an image URL
-      if (!/\.(jpg|jpeg|png|gif|webp)$/i.test(value)) {
+      // Check if it's an image URL (allow query parameters)
+      if (!/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(value)) {
         throw new Error('Thumbnail must be a valid image URL');
       }
       return true;
@@ -272,8 +272,8 @@ const validateVideoUpdate = [
     .withMessage('Duration must be in MM:SS format'),
   body('category')
     .optional()
-    .isIn(['Business Formation', 'Market Research', 'Property Acquisitions', 'Operations', 'Property Management'])
-    .withMessage('Category must be one of: Business Formation, Market Research, Property Acquisitions, Operations, Property Management'),
+    .isIn(['Category 1', 'Category 2', 'Category 3'])
+    .withMessage('Category must be one of: Category 1, Category 2, Category 3'),
   body('videoUrl')
     .optional()
     .isURL({ protocols: ['https'] })
