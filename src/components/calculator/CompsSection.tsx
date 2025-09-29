@@ -26,6 +26,30 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
 }) => {
   const [newCompValue, setNewCompValue] = useState<string>('');
   const [compValues, setCompValues] = useState<number[]>([]);
+  
+  // Local state for input values to allow continuous typing
+  const [localValues, setLocalValues] = useState({
+    bedrooms: data.bedrooms?.toString() || '',
+    bathrooms: data.bathrooms?.toString() || ''
+  });
+
+  // Helper function to handle input changes
+  const handleInputChange = (field: keyof typeof localValues, value: string) => {
+    setLocalValues(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Helper function to handle input blur (when user finishes typing)
+  const handleInputBlur = (field: keyof typeof localValues) => {
+    const value = localValues[field];
+    if (value === '') {
+      updateData({ [field]: 0 });
+    } else {
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue)) {
+        updateData({ [field]: Math.round(numValue) });
+      }
+    }
+  };
 
   const addCompValue = () => {
     const value = Math.round(parseFloat(newCompValue));
@@ -84,10 +108,12 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
             <Label className="text-gray-200 text-center block text-sm">Bedrooms</Label>
             <Input
               type="number"
-              value={data.bedrooms || ''}
-              onChange={(e) => updateData({ bedrooms: Math.round(parseFloat(e.target.value)) || 0 })}
+              value={localValues.bedrooms}
+              onChange={(e) => handleInputChange('bedrooms', e.target.value)}
+              onBlur={() => handleInputBlur('bedrooms')}
+              onWheel={(e) => e.preventDefault()}
               placeholder=""
-              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
             />
           </div>
 
@@ -95,10 +121,12 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
             <Label className="text-gray-200 text-center block text-sm">Bathrooms</Label>
             <Input
               type="number"
-              value={data.bathrooms || ''}
-              onChange={(e) => updateData({ bathrooms: Math.round(parseFloat(e.target.value)) || 0 })}
+              value={localValues.bathrooms}
+              onChange={(e) => handleInputChange('bathrooms', e.target.value)}
+              onBlur={() => handleInputBlur('bathrooms')}
+              onWheel={(e) => e.preventDefault()}
               placeholder=""
-              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
             />
           </div>
         </div>
@@ -141,8 +169,9 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
                 value={newCompValue}
                 onChange={(e) => setNewCompValue(e.target.value)}
                 onKeyPress={handleKeyPress}
+                onWheel={(e) => e.preventDefault()}
                 placeholder=""
-                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
             <Button

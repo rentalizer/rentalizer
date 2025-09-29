@@ -176,17 +176,7 @@ const Community = React.memo(() => {
   }, []);
 
   const updateCalculatorData = (updates: Partial<CalculatorData>) => {
-    const roundedUpdates: Record<string, string | number> = {};
-    
-    Object.entries(updates).forEach(([key, value]) => {
-      if (typeof value === 'number') {
-        roundedUpdates[key] = Math.round(value);
-      } else {
-        roundedUpdates[key] = value;
-      }
-    });
-    
-    setCalculatorData(prev => ({ ...prev, ...roundedUpdates }));
+    setCalculatorData(prev => ({ ...prev, ...updates }));
   };
 
   const clearCalculatorData = () => {

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,6 +19,36 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
   serviceFeeCalculated,
   monthlyExpenses
 }) => {
+  // Local state for input values to allow continuous typing
+  const [localValues, setLocalValues] = useState({
+    rent: data.rent?.toString() || '',
+    maintenance: data.maintenance?.toString() || '',
+    power: data.power?.toString() || '',
+    waterSewer: data.waterSewer?.toString() || '',
+    internet: data.internet?.toString() || '',
+    taxLicense: data.taxLicense?.toString() || '',
+    insurance: data.insurance?.toString() || '',
+    software: data.software?.toString() || '',
+    furnitureRental: data.furnitureRental?.toString() || ''
+  });
+
+  // Helper function to handle input changes
+  const handleInputChange = (field: keyof typeof localValues, value: string) => {
+    setLocalValues(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Helper function to handle input blur (when user finishes typing)
+  const handleInputBlur = (field: keyof typeof localValues) => {
+    const value = localValues[field];
+    if (value === '') {
+      updateData({ [field]: 0 });
+    } else {
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue)) {
+        updateData({ [field]: Math.round(numValue) });
+      }
+    }
+  };
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md h-full">
       <CardHeader className="pb-4">
@@ -35,10 +65,12 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={data.rent || ''}
-                onChange={(e) => updateData({ rent: Math.round(parseFloat(e.target.value)) || 0 })}
+                value={localValues.rent}
+                onChange={(e) => handleInputChange('rent', e.target.value)}
+                onBlur={() => handleInputBlur('rent')}
+                onWheel={(e) => e.preventDefault()}
                 placeholder=""
-                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
           </div>
@@ -62,10 +94,12 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={data.maintenance || ''}
-                onChange={(e) => updateData({ maintenance: Math.round(parseFloat(e.target.value)) || 0 })}
+                value={localValues.maintenance}
+                onChange={(e) => handleInputChange('maintenance', e.target.value)}
+                onBlur={() => handleInputBlur('maintenance')}
+                onWheel={(e) => e.preventDefault()}
                 placeholder=""
-                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
           </div>
@@ -76,10 +110,12 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={data.power || ''}
-                onChange={(e) => updateData({ power: Math.round(parseFloat(e.target.value)) || 0 })}
+                value={localValues.power}
+                onChange={(e) => handleInputChange('power', e.target.value)}
+                onBlur={() => handleInputBlur('power')}
+                onWheel={(e) => e.preventDefault()}
                 placeholder=""
-                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
           </div>
@@ -90,10 +126,12 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={data.waterSewer || ''}
-                onChange={(e) => updateData({ waterSewer: Math.round(parseFloat(e.target.value)) || 0 })}
+                value={localValues.waterSewer}
+                onChange={(e) => handleInputChange('waterSewer', e.target.value)}
+                onBlur={() => handleInputBlur('waterSewer')}
+                onWheel={(e) => e.preventDefault()}
                 placeholder=""
-                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
           </div>
@@ -104,10 +142,12 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={data.internet || ''}
-                onChange={(e) => updateData({ internet: Math.round(parseFloat(e.target.value)) || 0 })}
+                value={localValues.internet}
+                onChange={(e) => handleInputChange('internet', e.target.value)}
+                onBlur={() => handleInputBlur('internet')}
+                onWheel={(e) => e.preventDefault()}
                 placeholder=""
-                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
           </div>
@@ -118,10 +158,12 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={data.taxLicense || ''}
-                onChange={(e) => updateData({ taxLicense: Math.round(parseFloat(e.target.value)) || 0 })}
+                value={localValues.taxLicense}
+                onChange={(e) => handleInputChange('taxLicense', e.target.value)}
+                onBlur={() => handleInputBlur('taxLicense')}
+                onWheel={(e) => e.preventDefault()}
                 placeholder=""
-                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
           </div>
@@ -132,10 +174,12 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={data.insurance || ''}
-                onChange={(e) => updateData({ insurance: Math.round(parseFloat(e.target.value)) || 0 })}
+                value={localValues.insurance}
+                onChange={(e) => handleInputChange('insurance', e.target.value)}
+                onBlur={() => handleInputBlur('insurance')}
+                onWheel={(e) => e.preventDefault()}
                 placeholder=""
-                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
           </div>
@@ -146,10 +190,12 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={data.software || ''}
-                onChange={(e) => updateData({ software: Math.round(parseFloat(e.target.value)) || 0 })}
+                value={localValues.software}
+                onChange={(e) => handleInputChange('software', e.target.value)}
+                onBlur={() => handleInputBlur('software')}
+                onWheel={(e) => e.preventDefault()}
                 placeholder=""
-                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
           </div>
@@ -160,10 +206,12 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={data.furnitureRental || ''}
-                onChange={(e) => updateData({ furnitureRental: Math.round(parseFloat(e.target.value)) || 0 })}
+                value={localValues.furnitureRental}
+                onChange={(e) => handleInputChange('furnitureRental', e.target.value)}
+                onBlur={() => handleInputBlur('furnitureRental')}
+                onWheel={(e) => e.preventDefault()}
                 placeholder=""
-                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
           </div>

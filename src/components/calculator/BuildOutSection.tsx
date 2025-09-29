@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,7 +17,35 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
   updateData,
   cashToLaunch
 }) => {
+  // Local state for input values to allow continuous typing
+  const [localValues, setLocalValues] = useState({
+    firstMonthRent: data.firstMonthRent?.toString() || '',
+    securityDeposit: data.securityDeposit?.toString() || '',
+    miscellaneous: data.miscellaneous?.toString() || '',
+    squareFootage: data.squareFootage?.toString() || '',
+    furnishingsPSF: data.furnishingsPSF?.toString() || '8',
+    furnitureRental: data.furnitureRental?.toString() || ''
+  });
+
   const calculatedFurnishings = Math.round(data.squareFootage * (data.furnishingsPSF || 8));
+
+  // Helper function to handle input changes
+  const handleInputChange = (field: keyof typeof localValues, value: string) => {
+    setLocalValues(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Helper function to handle input blur (when user finishes typing)
+  const handleInputBlur = (field: keyof typeof localValues) => {
+    const value = localValues[field];
+    if (value === '') {
+      updateData({ [field]: 0 });
+    } else {
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue)) {
+        updateData({ [field]: Math.round(numValue) });
+      }
+    }
+  };
 
   return (
     <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md h-full">
@@ -35,9 +63,11 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={data.firstMonthRent || ''}
-                onChange={(e) => updateData({ firstMonthRent: Math.round(parseFloat(e.target.value)) || 0 })}
-                className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
+                value={localValues.firstMonthRent}
+                onChange={(e) => handleInputChange('firstMonthRent', e.target.value)}
+                onBlur={() => handleInputBlur('firstMonthRent')}
+                onWheel={(e) => e.preventDefault()}
+                className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
           </div>
@@ -48,9 +78,11 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={data.securityDeposit || ''}
-                onChange={(e) => updateData({ securityDeposit: Math.round(parseFloat(e.target.value)) || 0 })}
-                className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
+                value={localValues.securityDeposit}
+                onChange={(e) => handleInputChange('securityDeposit', e.target.value)}
+                onBlur={() => handleInputBlur('securityDeposit')}
+                onWheel={(e) => e.preventDefault()}
+                className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
           </div>
@@ -61,9 +93,11 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
               <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
               <Input
                 type="number"
-                value={data.miscellaneous || ''}
-                onChange={(e) => updateData({ miscellaneous: Math.round(parseFloat(e.target.value)) || 0 })}
-                className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
+                value={localValues.miscellaneous}
+                onChange={(e) => handleInputChange('miscellaneous', e.target.value)}
+                onBlur={() => handleInputBlur('miscellaneous')}
+                onWheel={(e) => e.preventDefault()}
+                className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
           </div>
@@ -78,9 +112,11 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
               <Label className="text-gray-300 text-center block text-sm">Property Size</Label>
               <Input
                 type="number"
-                value={data.squareFootage || ''}
-                onChange={(e) => updateData({ squareFootage: Math.round(parseFloat(e.target.value)) || 0 })}
-                className="bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
+                value={localValues.squareFootage}
+                onChange={(e) => handleInputChange('squareFootage', e.target.value)}
+                onBlur={() => handleInputBlur('squareFootage')}
+                onWheel={(e) => e.preventDefault()}
+                className="bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
 
@@ -90,9 +126,11 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
                 <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
                 <Input
                   type="number"
-                  value={data.furnishingsPSF || 8}
-                  onChange={(e) => updateData({ furnishingsPSF: Math.round(parseFloat(e.target.value)) || 8 })}
-                  className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
+                  value={localValues.furnishingsPSF}
+                  onChange={(e) => handleInputChange('furnishingsPSF', e.target.value)}
+                  onBlur={() => handleInputBlur('furnishingsPSF')}
+                  onWheel={(e) => e.preventDefault()}
+                  className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                 />
               </div>
             </div>
@@ -119,9 +157,11 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
             <DollarSign className="absolute left-2 top-2 h-3 w-3 text-gray-400" />
             <Input
               type="number"
-              value={data.furnitureRental || ''}
-              onChange={(e) => updateData({ furnitureRental: Math.round(parseFloat(e.target.value)) || 0 })}
-              className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full"
+              value={localValues.furnitureRental}
+              onChange={(e) => handleInputChange('furnitureRental', e.target.value)}
+              onBlur={() => handleInputBlur('furnitureRental')}
+              onWheel={(e) => e.preventDefault()}
+              className="pl-6 bg-gray-800/50 border-gray-600 text-gray-100 h-8 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
             />
           </div>
         </div>
