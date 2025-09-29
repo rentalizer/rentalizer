@@ -1,16 +1,23 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { MapPin, DollarSign, Plus, X, Calculator } from 'lucide-react';
-import { CalculatorData } from '@/pages/Community';
-import { parseNumericInput, formatInputValue } from '@/utils/inputHelpers';
+import { MapPin, DollarSign, Plus, X } from 'lucide-react';
+// Define interface locally for this component to avoid breaking other files
+interface LocalCalculatorData {
+  address: string;
+  bedrooms: number;
+  bathrooms: number;
+  averageComparable: number;
+  hasGym?: boolean;
+  hasHotTub?: boolean;
+}
 
 interface CompsSectionProps {
-  data: CalculatorData;
-  updateData: (updates: Partial<CalculatorData>) => void;
+  data: LocalCalculatorData;
+  updateData: (updates: Partial<LocalCalculatorData>) => void;
 }
 
 export const CompsSection: React.FC<CompsSectionProps> = ({
@@ -19,43 +26,17 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
 }) => {
   const [newCompValue, setNewCompValue] = useState<string>('');
   const [compValues, setCompValues] = useState<number[]>([]);
-  
-  // Local state for form inputs
-  const [localData, setLocalData] = useState({
-    address: data.address,
-    bedrooms: data.bedrooms,
-    bathrooms: data.bathrooms,
-  });
-
-  // Update local state when props change
-  useEffect(() => {
-    setLocalData({
-      address: data.address,
-      bedrooms: data.bedrooms,
-      bathrooms: data.bathrooms,
-    });
-  }, [data]);
-
-  const handleCalculate = () => {
-    const average = compValues.length > 0 
-      ? Math.round(compValues.reduce((sum, val) => sum + val, 0) / compValues.length)
-      : 0;
-    
-    updateData({
-      ...localData,
-      averageComparable: average
-    });
-  };
-
-  const updateLocalData = (field: string, value: string | number) => {
-    setLocalData(prev => ({ ...prev, [field]: value }));
-  };
 
   const addCompValue = () => {
-    const value = parseNumericInput(newCompValue);
-    if (value > 0) {
+    const value = Math.round(parseFloat(newCompValue));
+    if (value && value > 0) {
       const updatedValues = [...compValues, value];
       setCompValues(updatedValues);
+      
+      // Calculate average and update data
+      const average = Math.round(updatedValues.reduce((sum, val) => sum + val, 0) / updatedValues.length);
+      updateData({ averageComparable: average });
+      
       setNewCompValue('');
     }
   };
@@ -63,6 +44,13 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
   const removeCompValue = (index: number) => {
     const updatedValues = compValues.filter((_, i) => i !== index);
     setCompValues(updatedValues);
+    
+    if (updatedValues.length > 0) {
+      const average = Math.round(updatedValues.reduce((sum, val) => sum + val, 0) / updatedValues.length);
+      updateData({ averageComparable: average });
+    } else {
+      updateData({ averageComparable: 0 });
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -72,86 +60,109 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
   };
 
   return (
-    <Card className="shadow-lg border-0 bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-md">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center justify-center gap-2 text-white text-xl font-semibold">
-          <MapPin className="h-6 w-6 text-blue-400" />
-          Property & Revenue
+    <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md h-full">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center justify-center gap-2 text-white text-lg text-center">
+          <MapPin className="h-5 w-5 text-cyan-400" />
+          Property
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Property Details */}
-        <div className="space-y-3">
-          <div>
-            <Label className="text-gray-300 text-sm font-medium mb-2 block">Property Address</Label>
+        <div className="space-y-2">
+          <Label className="text-gray-200 text-center block text-sm">Property Address</Label>
+          <Input
+            type="text"
+            value={data.address}
+            onChange={(e) => updateData({ address: e.target.value })}
+            placeholder=""
+            className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Bedrooms</Label>
             <Input
-              type="text"
-              value={localData.address}
-              onChange={(e) => updateLocalData('address', e.target.value)}
-              placeholder="123 Main St, City, State"
-              className="bg-gray-800/60 border-gray-600/50 text-white h-11 text-base focus:border-blue-400/50"
+              type="number"
+              value={data.bedrooms || ''}
+              onChange={(e) => updateData({ bedrooms: Math.round(parseFloat(e.target.value)) || 0 })}
+              placeholder=""
+              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="text-gray-300 text-sm font-medium mb-2 block">Bedrooms</Label>
-              <Input
-                type="text"
-                value={formatInputValue(localData.bedrooms)}
-                onChange={(e) => updateLocalData('bedrooms', parseNumericInput(e.target.value))}
-                placeholder="3"
-                className="bg-gray-800/60 border-gray-600/50 text-white h-11 text-base focus:border-blue-400/50"
-              />
-            </div>
-
-            <div>
-              <Label className="text-gray-300 text-sm font-medium mb-2 block">Bathrooms</Label>
-              <Input
-                type="text"
-                value={formatInputValue(localData.bathrooms)}
-                onChange={(e) => updateLocalData('bathrooms', parseNumericInput(e.target.value))}
-                placeholder="2"
-                className="bg-gray-800/60 border-gray-600/50 text-white h-11 text-base focus:border-blue-400/50"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Bathrooms</Label>
+            <Input
+              type="number"
+              value={data.bathrooms || ''}
+              onChange={(e) => updateData({ bathrooms: Math.round(parseFloat(e.target.value)) || 0 })}
+              placeholder=""
+              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full"
+            />
           </div>
         </div>
 
-        {/* Comparable Properties */}
-        <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-600/30">
-          <Label className="text-gray-300 text-sm font-medium mb-3 block">Add Comparable Properties</Label>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Gym</Label>
+            <select
+              value={data.hasGym ? 'yes' : 'no'}
+              onChange={(e) => updateData({ hasGym: e.target.value === 'yes' })}
+              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full rounded-md px-3"
+            >
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Hot Tub</Label>
+            <select
+              value={data.hasHotTub ? 'yes' : 'no'}
+              onChange={(e) => updateData({ hasHotTub: e.target.value === 'yes' })}
+              className="bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full rounded-md px-3"
+            >
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Comparable Values Section */}
+        <div className="space-y-3">
+          <Label className="text-gray-200 text-center block text-sm">Comparable Property Values</Label>
           
-          <div className="flex gap-2 mb-3">
+          <div className="flex gap-2">
             <div className="relative flex-1">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
-                type="text"
+                type="number"
                 value={newCompValue}
                 onChange={(e) => setNewCompValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="4500"
-                className="pl-9 bg-gray-800/60 border-gray-600/50 text-white h-11 text-base"
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm"
               />
             </div>
             <Button
               onClick={addCompValue}
-              className="h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white"
+              size="sm"
+              className="h-9 px-3 bg-cyan-600 hover:bg-cyan-700 text-white"
             >
-              <Plus className="h-4 w-4 mr-2" />
-              Add
+              <Plus className="h-4 w-4" />
             </Button>
           </div>
 
           {/* Display Added Values */}
           {compValues.length > 0 && (
             <div className="space-y-2">
-              <Label className="text-gray-400 text-xs">Properties Added ({compValues.length})</Label>
-              <div className="max-h-32 overflow-y-auto space-y-1">
+              <Label className="text-gray-300 text-sm">Added Properties ({compValues.length})</Label>
+              <div className="max-h-24 overflow-y-auto space-y-1">
                 {compValues.map((value, index) => (
-                  <div key={index} className="flex items-center justify-between bg-gray-800/40 rounded px-3 py-2">
-                    <span className="text-gray-200 text-sm font-medium">
-                      ${value.toLocaleString()}/month
+                  <div key={index} className="flex items-center justify-between bg-gray-800/30 rounded px-3 py-2">
+                    <span className="text-gray-200 text-sm">
+                      ${value.toLocaleString()}
                     </span>
                     <Button
                       onClick={() => removeCompValue(index)}
@@ -168,36 +179,21 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
           )}
         </div>
 
-        {/* Calculate Button */}
-        <div className="flex justify-center">
-          <Button
-            onClick={handleCalculate}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            <Calculator className="h-4 w-4 mr-2" />
-            Calculate Revenue
-          </Button>
-        </div>
-
-        {/* Revenue Result */}
-        <div className="bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-lg p-4 border border-blue-500/30">
-          <div className="text-center">
-            <Label className="text-blue-300 text-sm font-medium block mb-2">Expected Monthly Revenue</Label>
-            <div className="flex items-center justify-center gap-2">
-              <DollarSign className="h-6 w-6 text-blue-400" />
-              <span className="text-3xl font-bold text-blue-400">
-                {compValues.length > 0 
-                  ? Math.round(compValues.reduce((sum, val) => sum + val, 0) / compValues.length).toLocaleString()
-                  : '0'
-                }
+        <div className="mt-6 p-4 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-lg border border-blue-500/30">
+          <div className="flex items-center justify-between">
+            <Label className="text-blue-300 font-medium">Avg Monthly Revenue</Label>
+            <div className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-blue-400" />
+              <span className="text-2xl font-bold text-blue-400">
+                {Math.round(data.averageComparable).toLocaleString()}
               </span>
             </div>
-            {compValues.length > 0 && (
-              <p className="text-xs text-blue-300/70 mt-2">
-                Average of {compValues.length} comparable {compValues.length === 1 ? 'property' : 'properties'}
-              </p>
-            )}
           </div>
+          {compValues.length > 0 && (
+            <div className="text-xs text-blue-300/70 mt-1">
+              Based on {compValues.length} comparable {compValues.length === 1 ? 'property' : 'properties'}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
