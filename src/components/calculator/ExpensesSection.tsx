@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Receipt, DollarSign } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Receipt, DollarSign, Calculator } from 'lucide-react';
 import { CalculatorData } from '@/pages/Community';
 import { parseNumericInput, formatInputValue } from '@/utils/inputHelpers';
 
@@ -20,6 +21,41 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
   serviceFeeCalculated,
   monthlyExpenses
 }) => {
+  // Local state for form inputs
+  const [localData, setLocalData] = useState({
+    rent: data.rent,
+    maintenance: data.maintenance,
+    power: data.power,
+    waterSewer: data.waterSewer,
+    internet: data.internet,
+    taxLicense: data.taxLicense,
+    insurance: data.insurance,
+    software: data.software,
+    furnitureRental: data.furnitureRental,
+  });
+
+  // Update local state when props change
+  useEffect(() => {
+    setLocalData({
+      rent: data.rent,
+      maintenance: data.maintenance,
+      power: data.power,
+      waterSewer: data.waterSewer,
+      internet: data.internet,
+      taxLicense: data.taxLicense,
+      insurance: data.insurance,
+      software: data.software,
+      furnitureRental: data.furnitureRental,
+    });
+  }, [data]);
+
+  const handleCalculate = () => {
+    updateData(localData);
+  };
+
+  const updateLocalData = (field: string, value: number) => {
+    setLocalData(prev => ({ ...prev, [field]: value }));
+  };
   return (
     <Card className="shadow-lg border-0 bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-md">
       <CardHeader className="pb-3">
@@ -37,8 +73,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
                 type="text"
-                value={formatInputValue(data.rent)}
-                onChange={(e) => updateData({ rent: parseNumericInput(e.target.value) })}
+                value={formatInputValue(localData.rent)}
+                onChange={(e) => updateLocalData('rent', parseNumericInput(e.target.value))}
                 placeholder="2500"
                 className="pl-9 bg-gray-800/60 border-gray-600/50 text-white h-11 text-base focus:border-red-400/50"
               />
@@ -71,8 +107,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
                 <Input
                   type="text"
-                  value={formatInputValue(data.maintenance)}
-                  onChange={(e) => updateData({ maintenance: parseNumericInput(e.target.value) })}
+                  value={formatInputValue(localData.maintenance)}
+                  onChange={(e) => updateLocalData('maintenance', parseNumericInput(e.target.value))}
                   placeholder="150"
                   className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
                 />
@@ -85,8 +121,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
                 <Input
                   type="text"
-                  value={formatInputValue(data.power)}
-                  onChange={(e) => updateData({ power: parseNumericInput(e.target.value) })}
+                  value={formatInputValue(localData.power)}
+                  onChange={(e) => updateLocalData('power', parseNumericInput(e.target.value))}
                   placeholder="100"
                   className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
                 />
@@ -99,8 +135,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
                 <Input
                   type="text"
-                  value={formatInputValue(data.waterSewer)}
-                  onChange={(e) => updateData({ waterSewer: parseNumericInput(e.target.value) })}
+                  value={formatInputValue(localData.waterSewer)}
+                  onChange={(e) => updateLocalData('waterSewer', parseNumericInput(e.target.value))}
                   placeholder="50"
                   className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
                 />
@@ -113,8 +149,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
                 <Input
                   type="text"
-                  value={formatInputValue(data.internet)}
-                  onChange={(e) => updateData({ internet: parseNumericInput(e.target.value) })}
+                  value={formatInputValue(localData.internet)}
+                  onChange={(e) => updateLocalData('internet', parseNumericInput(e.target.value))}
                   placeholder="80"
                   className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
                 />
@@ -127,8 +163,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
                 <Input
                   type="text"
-                  value={formatInputValue(data.taxLicense)}
-                  onChange={(e) => updateData({ taxLicense: parseNumericInput(e.target.value) })}
+                  value={formatInputValue(localData.taxLicense)}
+                  onChange={(e) => updateLocalData('taxLicense', parseNumericInput(e.target.value))}
                   placeholder="25"
                   className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
                 />
@@ -141,8 +177,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
                 <Input
                   type="text"
-                  value={formatInputValue(data.insurance)}
-                  onChange={(e) => updateData({ insurance: parseNumericInput(e.target.value) })}
+                  value={formatInputValue(localData.insurance)}
+                  onChange={(e) => updateLocalData('insurance', parseNumericInput(e.target.value))}
                   placeholder="75"
                   className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
                 />
@@ -155,8 +191,8 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
                 <Input
                   type="text"
-                  value={formatInputValue(data.software)}
-                  onChange={(e) => updateData({ software: parseNumericInput(e.target.value) })}
+                  value={formatInputValue(localData.software)}
+                  onChange={(e) => updateLocalData('software', parseNumericInput(e.target.value))}
                   placeholder="30"
                   className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
                 />
@@ -169,14 +205,25 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
                 <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
                 <Input
                   type="text"
-                  value={formatInputValue(data.furnitureRental)}
-                  onChange={(e) => updateData({ furnitureRental: parseNumericInput(e.target.value) })}
+                  value={formatInputValue(localData.furnitureRental)}
+                  onChange={(e) => updateLocalData('furnitureRental', parseNumericInput(e.target.value))}
                   placeholder="200"
                   className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
                 />
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Calculate Button */}
+        <div className="flex justify-center">
+          <Button
+            onClick={handleCalculate}
+            className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <Calculator className="h-4 w-4 mr-2" />
+            Calculate Expenses
+          </Button>
         </div>
 
         {/* Total */}
