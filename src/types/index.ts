@@ -15,10 +15,6 @@ export interface CityMarketData {
 }
 
 // Video related types
-export interface VideoHandout {
-  name: string;
-  url: string;
-}
 
 export interface Video {
   _id: string;
@@ -31,7 +27,6 @@ export interface Video {
   featured: boolean;
   isLive: boolean;
   videoUrl: string;
-  handouts: VideoHandout[];
   order: number;
   isActive: boolean;
   createdBy: {
@@ -60,7 +55,6 @@ export interface CreateVideoData {
   tags?: string[];
   featured?: boolean;
   isLive?: boolean;
-  handouts?: VideoHandout[];
 }
 
 export interface UpdateVideoData extends Partial<CreateVideoData> {

@@ -1,25 +1,5 @@
 const mongoose = require('mongoose');
 
-const handoutSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Handout name is required'],
-    trim: true,
-    maxlength: [200, 'Handout name cannot exceed 200 characters']
-  },
-  url: {
-    type: String,
-    required: [true, 'Handout URL is required'],
-    trim: true,
-    validate: {
-      validator: function(v) {
-        return /^https?:\/\/.+/.test(v);
-      },
-      message: 'Handout URL must be a valid HTTP/HTTPS URL'
-    }
-  }
-}, { _id: true });
-
 const videoSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -83,7 +63,6 @@ const videoSchema = new mongoose.Schema({
       message: 'Video URL must be a valid Loom share URL'
     }
   },
-  handouts: [handoutSchema],
   order: {
     type: Number,
     default: 0,

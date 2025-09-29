@@ -230,19 +230,6 @@ const validateVideo = [
     .optional()
     .isInt({ min: 0 })
     .withMessage('Order must be a non-negative integer'),
-  body('handouts')
-    .optional()
-    .isArray()
-    .withMessage('Handouts must be an array'),
-  body('handouts.*.name')
-    .optional()
-    .trim()
-    .isLength({ min: 1, max: 200 })
-    .withMessage('Handout name must be between 1 and 200 characters'),
-  body('handouts.*.url')
-    .optional()
-    .isURL({ protocols: ['http', 'https'] })
-    .withMessage('Handout URL must be a valid URL'),
   handleValidationErrors
 ];
 
@@ -314,19 +301,6 @@ const validateVideoUpdate = [
     .optional()
     .isBoolean()
     .withMessage('isActive must be a boolean value'),
-  body('handouts')
-    .optional()
-    .isArray()
-    .withMessage('Handouts must be an array'),
-  body('handouts.*.name')
-    .optional()
-    .trim()
-    .isLength({ min: 1, max: 200 })
-    .withMessage('Handout name must be between 1 and 200 characters'),
-  body('handouts.*.url')
-    .optional()
-    .isURL({ protocols: ['http', 'https'] })
-    .withMessage('Handout URL must be a valid URL'),
   handleValidationErrors
 ];
 
