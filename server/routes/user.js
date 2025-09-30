@@ -21,4 +21,7 @@ router.put('/change-password', authenticateToken, validatePasswordChange, userCo
 // DELETE /api/user/account - Delete account
 router.delete('/account', authenticateToken, validateAccountDeletion, userController.deleteAccount);
 
+// GET /api/user/member-count - Get total member count (public endpoint)
+router.get('/member-count', userController.getMemberCount);
+
 module.exports = router;

@@ -24,6 +24,7 @@ export const API_CONFIG = {
       UPDATE_PROFILE: '/user/profile',
       CHANGE_PASSWORD: '/user/change-password',
       DELETE_ACCOUNT: '/user/account',
+      MEMBER_COUNT: '/user/member-count',
     },
     HEALTH: '/health',
   },
