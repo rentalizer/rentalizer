@@ -787,11 +787,11 @@ export const VideoLibrary = () => {
 
       {/* Edit Video Dialog */}
       <Dialog open={!!editingVideo} onOpenChange={() => setEditingVideo(null)}>
-        <DialogContent className="max-w-md bg-slate-900 border border-cyan-500/20">
+        <DialogContent className="max-w-md max-h-[90vh] bg-slate-900 border border-cyan-500/20 overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-cyan-300">Edit Video</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 pr-2">
             <div>
               <Label htmlFor="edit-title" className="text-gray-300">Title</Label>
               <Input
