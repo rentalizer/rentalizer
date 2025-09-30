@@ -883,6 +883,16 @@ export const VideoLibrary = () => {
           
           {selectedVideo && (
             <div className="space-y-4 text-gray-300">
+              {/* Description */}
+              {selectedVideo.description && (
+                <div className="bg-slate-800/50 rounded-lg p-4 border border-cyan-500/20">
+                  <h4 className="text-sm font-medium text-cyan-300 mb-2">Description</h4>
+                  <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
+                    {selectedVideo.description}
+                  </p>
+                </div>
+              )}
+              
               <div className="flex items-center gap-4 text-xs text-gray-400">
                 <span>{selectedVideo.views.toLocaleString()} views</span>
               </div>
