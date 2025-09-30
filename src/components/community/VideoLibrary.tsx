@@ -221,6 +221,18 @@ export const VideoLibrary = () => {
   const hasInitiallyLoadedRef = useRef(false);
   const loadVideosRef = useRef<typeof loadVideos>();
 
+  // Helper function to sort videos: featured first, then by order
+  const sortVideosByFeatured = (videos: Video[]) => {
+    return videos.sort((a, b) => {
+      // Featured videos go to top
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+      
+      // If both have same featured status, sort by order
+      return a.order - b.order;
+    });
+  };
+
   // API integration functions
   const loadVideos = useCallback(async (filters?: Partial<VideoFilters>) => {
     if (!isMountedRef.current) return;
@@ -415,7 +427,10 @@ export const VideoLibrary = () => {
 
     try {
       const response = await videoService.createVideo(newVideo);
-      setVideos(prevVideos => [...prevVideos, response.data]);
+      setVideos(prevVideos => {
+        const updatedVideos = [...prevVideos, response.data];
+        return sortVideosByFeatured(updatedVideos);
+      });
     setNewVideo({
       title: '',
       description: '',
@@ -492,11 +507,12 @@ export const VideoLibrary = () => {
 
     try {
       const response = await videoService.updateVideo(editingVideo._id, newVideo);
-      setVideos(prevVideos => 
-        prevVideos.map(video => 
+      setVideos(prevVideos => {
+        const updatedVideos = prevVideos.map(video => 
           video._id === editingVideo._id ? response.data : video
-        )
-      );
+        );
+        return sortVideosByFeatured(updatedVideos);
+      });
     setEditingVideo(null);
     setNewVideo({
       title: '',
@@ -546,11 +562,14 @@ export const VideoLibrary = () => {
   const handleToggleFeatured = async (videoId: string) => {
     try {
       const response = await videoService.toggleFeatured(videoId);
-      setVideos(prevVideos => 
-        prevVideos.map(video => 
+      
+      // Update the video and re-sort the array to prioritize featured videos
+      setVideos(prevVideos => {
+        const updatedVideos = prevVideos.map(video => 
           video._id === videoId ? response.data : video
-        )
-      );
+        );
+        return sortVideosByFeatured(updatedVideos);
+      });
       
       const newStatus = response.data.featured;
     toast({
