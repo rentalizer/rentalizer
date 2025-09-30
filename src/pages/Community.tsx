@@ -134,14 +134,14 @@ const Community = React.memo(() => {
     miscellaneous: 0,
     furnitureRental: 0,
     squareFootage: 0,
-    furnishingsPSF: 8,
+    furnishingsPSF: 0,
   };
   
   const [calculatorData, setCalculatorData] = useState<CalculatorData>(initialData);
   
   // Calculate derived values
   const calculatedFurnishings = Math.round(calculatorData.squareFootage * calculatorData.furnishingsPSF);
-  const cashToLaunch = Math.round(calculatorData.firstMonthRent + calculatorData.securityDeposit + calculatorData.miscellaneous + calculatedFurnishings);
+  const cashToLaunch = Math.round(calculatorData.firstMonthRent + calculatorData.securityDeposit + calculatorData.miscellaneous + calculatedFurnishings + calculatorData.furnitureRental);
   const serviceFeeCalculated = Math.round(calculatorData.rent * 0.029);
   const monthlyExpenses = Math.round(calculatorData.rent + serviceFeeCalculated + calculatorData.maintenance + calculatorData.power + 
                          calculatorData.waterSewer + calculatorData.internet + calculatorData.taxLicense + calculatorData.insurance + 
@@ -154,7 +154,13 @@ const Community = React.memo(() => {
   const cashOnCashReturn = cashToLaunch > 0 ? Math.round((netProfitMonthly * 12 / cashToLaunch) * 100) : 0;
 
   
-  // Note: Service fees are now calculated manually via calculate buttons in each section
+  // Update service fees when rent changes
+  useEffect(() => {
+    setCalculatorData(prev => ({
+      ...prev,
+      serviceFees: Math.round(prev.rent * 0.029)
+    }));
+  }, [calculatorData.rent]);
 
   // Load Calendly script when component mounts
   useEffect(() => {
@@ -170,17 +176,7 @@ const Community = React.memo(() => {
   }, []);
 
   const updateCalculatorData = (updates: Partial<CalculatorData>) => {
-    const roundedUpdates: Record<string, string | number> = {};
-    
-    Object.entries(updates).forEach(([key, value]) => {
-      if (typeof value === 'number') {
-        roundedUpdates[key] = Math.round(value);
-      } else {
-        roundedUpdates[key] = value;
-      }
-    });
-    
-    setCalculatorData(prev => ({ ...prev, ...roundedUpdates }));
+    setCalculatorData(prev => ({ ...prev, ...updates }));
   };
 
   const clearCalculatorData = () => {
@@ -314,7 +310,7 @@ const Community = React.memo(() => {
               </div>
               
               {/* Action buttons */}
-              <div className="flex items-center justify-center gap-4 flex-wrap">
+              <div className="flex items-center justify-center gap-4">
                 <Button
                   variant="outline"
                   onClick={clearCalculatorData}
@@ -333,16 +329,9 @@ const Community = React.memo(() => {
                   Download Data
                 </Button>
               </div>
-              
-              {/* Info message */}
-              <div className="text-center">
-                <p className="text-gray-400 text-sm">
-                  💡 Use the "Calculate" buttons in each section after entering your data for accurate results
-                </p>
-              </div>
 
-              {/* Calculator Sections - Cleaner Grid Layout */}
-              <div className="grid lg:grid-cols-2 xl:grid-cols-4 gap-6 max-w-full">
+              {/* Calculator Sections */}
+              <div className="grid xl:grid-cols-4 lg:grid-cols-2 grid-cols-1 gap-6">
                 <BuildOutSection 
                   data={calculatorData} 
                   updateData={updateCalculatorData} 

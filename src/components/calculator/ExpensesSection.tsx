@@ -1,12 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Receipt, DollarSign, Calculator } from 'lucide-react';
-import { CalculatorData } from '@/pages/Community';
-import { parseNumericInput, formatInputValue } from '@/utils/inputHelpers';
+import { Receipt, DollarSign } from 'lucide-react';
+import { CalculatorData } from '@/pages/Calculator';
 
 interface ExpensesSectionProps {
   data: CalculatorData;
@@ -21,218 +19,210 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
   serviceFeeCalculated,
   monthlyExpenses
 }) => {
-  // Local state for form inputs
-  const [localData, setLocalData] = useState({
-    rent: data.rent,
-    maintenance: data.maintenance,
-    power: data.power,
-    waterSewer: data.waterSewer,
-    internet: data.internet,
-    taxLicense: data.taxLicense,
-    insurance: data.insurance,
-    software: data.software,
-    furnitureRental: data.furnitureRental,
+  // Local state for input values to allow continuous typing
+  const [localValues, setLocalValues] = useState({
+    rent: data.rent?.toString() || '',
+    maintenance: data.maintenance?.toString() || '',
+    power: data.power?.toString() || '',
+    waterSewer: data.waterSewer?.toString() || '',
+    internet: data.internet?.toString() || '',
+    taxLicense: data.taxLicense?.toString() || '',
+    insurance: data.insurance?.toString() || '',
+    software: data.software?.toString() || '',
+    furnitureRental: data.furnitureRental?.toString() || ''
   });
 
-  // Update local state when props change
-  useEffect(() => {
-    setLocalData({
-      rent: data.rent,
-      maintenance: data.maintenance,
-      power: data.power,
-      waterSewer: data.waterSewer,
-      internet: data.internet,
-      taxLicense: data.taxLicense,
-      insurance: data.insurance,
-      software: data.software,
-      furnitureRental: data.furnitureRental,
-    });
-  }, [data]);
-
-  const handleCalculate = () => {
-    updateData(localData);
+  // Helper function to handle input changes
+  const handleInputChange = (field: keyof typeof localValues, value: string) => {
+    setLocalValues(prev => ({ ...prev, [field]: value }));
   };
 
-  const updateLocalData = (field: string, value: number) => {
-    setLocalData(prev => ({ ...prev, [field]: value }));
+  // Helper function to handle input blur (when user finishes typing)
+  const handleInputBlur = (field: keyof typeof localValues) => {
+    const value = localValues[field];
+    if (value === '') {
+      updateData({ [field]: 0 });
+    } else {
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue)) {
+        updateData({ [field]: Math.round(numValue) });
+      }
+    }
   };
   return (
-    <Card className="shadow-lg border-0 bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-md">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center justify-center gap-2 text-white text-xl font-semibold">
-          <Receipt className="h-6 w-6 text-red-400" />
+    <Card className="shadow-lg border-0 bg-white/10 backdrop-blur-md h-full">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center justify-center gap-2 text-white text-lg text-center">
+          <Receipt className="h-5 w-5 text-cyan-400" />
           Monthly Expenses
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Primary Expenses */}
-        <div className="space-y-3">
-          <div>
-            <Label className="text-gray-300 text-sm font-medium mb-2 block">Monthly Rent</Label>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Rent</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
-                type="text"
-                value={formatInputValue(localData.rent)}
-                onChange={(e) => updateLocalData('rent', parseNumericInput(e.target.value))}
-                placeholder="2500"
-                className="pl-9 bg-gray-800/60 border-gray-600/50 text-white h-11 text-base focus:border-red-400/50"
+                type="number"
+                value={localValues.rent}
+                onChange={(e) => handleInputChange('rent', e.target.value)}
+                onBlur={() => handleInputBlur('rent')}
+                onWheel={(e) => e.preventDefault()}
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
               />
             </div>
           </div>
 
-          <div>
-            <Label className="text-gray-300 text-sm font-medium mb-2 block">Service Fees (2.9%)</Label>
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Svc Fees (2.9%)</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
-                type="text"
-                value={serviceFeeCalculated.toString()}
+                type="number"
+                value={serviceFeeCalculated}
                 readOnly
-                className="pl-9 bg-gray-700/50 border-gray-600/50 text-gray-300 h-11 text-base cursor-not-allowed"
+                className="pl-8 bg-gray-700/50 border-gray-600 text-gray-100 h-9 text-sm w-full cursor-not-allowed"
               />
             </div>
-            <p className="text-xs text-gray-400 mt-1">Automatically calculated from rent</p>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Maintenance</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="number"
+                value={localValues.maintenance}
+                onChange={(e) => handleInputChange('maintenance', e.target.value)}
+                onBlur={() => handleInputBlur('maintenance')}
+                onWheel={(e) => e.preventDefault()}
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Power/Electricity</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="number"
+                value={localValues.power}
+                onChange={(e) => handleInputChange('power', e.target.value)}
+                onBlur={() => handleInputBlur('power')}
+                onWheel={(e) => e.preventDefault()}
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Water/Sewer</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="number"
+                value={localValues.waterSewer}
+                onChange={(e) => handleInputChange('waterSewer', e.target.value)}
+                onBlur={() => handleInputBlur('waterSewer')}
+                onWheel={(e) => e.preventDefault()}
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Internet</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="number"
+                value={localValues.internet}
+                onChange={(e) => handleInputChange('internet', e.target.value)}
+                onBlur={() => handleInputBlur('internet')}
+                onWheel={(e) => e.preventDefault()}
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">License</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="number"
+                value={localValues.taxLicense}
+                onChange={(e) => handleInputChange('taxLicense', e.target.value)}
+                onBlur={() => handleInputBlur('taxLicense')}
+                onWheel={(e) => e.preventDefault()}
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Insurance</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="number"
+                value={localValues.insurance}
+                onChange={(e) => handleInputChange('insurance', e.target.value)}
+                onBlur={() => handleInputBlur('insurance')}
+                onWheel={(e) => e.preventDefault()}
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Software</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="number"
+                value={localValues.software}
+                onChange={(e) => handleInputChange('software', e.target.value)}
+                onBlur={() => handleInputBlur('software')}
+                onWheel={(e) => e.preventDefault()}
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-gray-200 text-center block text-sm">Furnishings Rental</Label>
+            <div className="relative">
+              <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="number"
+                value={localValues.furnitureRental}
+                onChange={(e) => handleInputChange('furnitureRental', e.target.value)}
+                onBlur={() => handleInputBlur('furnitureRental')}
+                onWheel={(e) => e.preventDefault()}
+                placeholder=""
+                className="pl-8 bg-gray-800/50 border-gray-600 text-gray-100 h-9 text-sm w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+              />
+            </div>
           </div>
         </div>
 
-        {/* Utilities & Operating Costs */}
-        <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-600/30">
-          <Label className="text-gray-300 text-sm font-medium mb-3 block">Utilities & Operations</Label>
-          
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="text-gray-400 text-xs mb-2 block">Maintenance</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
-                <Input
-                  type="text"
-                  value={formatInputValue(localData.maintenance)}
-                  onChange={(e) => updateLocalData('maintenance', parseNumericInput(e.target.value))}
-                  placeholder="150"
-                  className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-gray-400 text-xs mb-2 block">Electricity</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
-                <Input
-                  type="text"
-                  value={formatInputValue(localData.power)}
-                  onChange={(e) => updateLocalData('power', parseNumericInput(e.target.value))}
-                  placeholder="100"
-                  className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-gray-400 text-xs mb-2 block">Water/Sewer</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
-                <Input
-                  type="text"
-                  value={formatInputValue(localData.waterSewer)}
-                  onChange={(e) => updateLocalData('waterSewer', parseNumericInput(e.target.value))}
-                  placeholder="50"
-                  className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-gray-400 text-xs mb-2 block">Internet</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
-                <Input
-                  type="text"
-                  value={formatInputValue(localData.internet)}
-                  onChange={(e) => updateLocalData('internet', parseNumericInput(e.target.value))}
-                  placeholder="80"
-                  className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-gray-400 text-xs mb-2 block">License</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
-                <Input
-                  type="text"
-                  value={formatInputValue(localData.taxLicense)}
-                  onChange={(e) => updateLocalData('taxLicense', parseNumericInput(e.target.value))}
-                  placeholder="25"
-                  className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-gray-400 text-xs mb-2 block">Insurance</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
-                <Input
-                  type="text"
-                  value={formatInputValue(localData.insurance)}
-                  onChange={(e) => updateLocalData('insurance', parseNumericInput(e.target.value))}
-                  placeholder="75"
-                  className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-gray-400 text-xs mb-2 block">Software</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
-                <Input
-                  type="text"
-                  value={formatInputValue(localData.software)}
-                  onChange={(e) => updateLocalData('software', parseNumericInput(e.target.value))}
-                  placeholder="30"
-                  className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-gray-400 text-xs mb-2 block">Furniture Rental</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-2 top-2.5 h-3 w-3 text-gray-400" />
-                <Input
-                  type="text"
-                  value={formatInputValue(localData.furnitureRental)}
-                  onChange={(e) => updateLocalData('furnitureRental', parseNumericInput(e.target.value))}
-                  placeholder="200"
-                  className="pl-6 bg-gray-800/60 border-gray-600/50 text-white h-9 text-sm"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Calculate Button */}
-        <div className="flex justify-center">
-          <Button
-            onClick={handleCalculate}
-            className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            <Calculator className="h-4 w-4 mr-2" />
-            Calculate Expenses
-          </Button>
-        </div>
-
-        {/* Total */}
-        <div className="bg-gradient-to-r from-red-600/20 to-pink-600/20 rounded-lg p-4 border border-red-500/30">
-          <div className="text-center">
-            <Label className="text-red-300 text-sm font-medium block mb-2">Total Monthly Expenses</Label>
-            <div className="flex items-center justify-center gap-2">
-              <DollarSign className="h-6 w-6 text-red-400" />
-              <span className="text-3xl font-bold text-red-400">
+        <div className="mt-6 p-4 bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-lg border border-purple-500/30">
+          <div className="flex items-center justify-between">
+            <Label className="text-purple-300 font-medium">Total Monthly Expenses</Label>
+            <div className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-purple-400" />
+              <span className="text-2xl font-bold text-purple-400">
                 {Math.round(monthlyExpenses).toLocaleString()}
               </span>
             </div>

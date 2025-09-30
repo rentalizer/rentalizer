@@ -13,6 +13,8 @@ const adminRoutes = require('./routes/admin');
 const discussionRoutes = require('./routes/discussions');
 const commentRoutes = require('./routes/comments');
 const eventRoutes = require('./routes/events');
+const videoRoutes = require('./routes/videos');
+const uploadRoutes = require('./routes/upload');
 
 // Import WebSocket setup
 const { setupWebSocketHandlers } = require('./middleware/websocket');
@@ -37,12 +39,15 @@ app.set('io', io);
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:8080',
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 app.use(morgan('combined'));
+
+// Serve uploaded files statically
+app.use('/uploads', express.static('uploads'));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -51,6 +56,8 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/discussions', discussionRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/events', eventRoutes);
+app.use('/api/videos', videoRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
