@@ -248,11 +248,12 @@ const validateVideoUpdate = [
     .custom((value) => {
       if (!value) return true; // Allow empty values
       
-      // Only allow file paths (uploaded files)
+      // Allow both file paths (uploaded files) and external URLs for updates
       const isFilePath = /^\/uploads\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(value);
+      const isUrl = /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(value);
       
-      if (!isFilePath) {
-        throw new Error('Thumbnail must be an uploaded image file');
+      if (!isFilePath && !isUrl) {
+        throw new Error('Thumbnail must be an uploaded image file or valid image URL');
       }
       
       return true;
