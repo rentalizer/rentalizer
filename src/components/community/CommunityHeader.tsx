@@ -11,6 +11,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { apiService } from '@/services/api';
 import { supabase } from '@/integrations/supabase/client';
 import { useProfile } from '@/hooks/useProfile';
+import axios from 'axios';
+import { API_CONFIG } from '@/config/api';
 
 interface CommunityHeaderProps {
   onPostCreated: () => void;
@@ -254,11 +256,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       // Update photo upload status to uploading with progress
       setPhotoUpload(prev => prev ? { ...prev, uploading: true, uploadProgress: 10, error: undefined } : null);
 
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `community-photos/${fileName}`;
-
-      console.log('Uploading photo to:', filePath);
+      console.log('📤 Uploading photo to Node.js backend...');
       console.log('User ID:', user.id);
       console.log('File size:', file.size);
 
@@ -270,44 +268,47 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
         } : null);
       }, 500);
 
-      // Upload with progress tracking
-      const { data, error } = await supabase.storage
-        .from('community-photos')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('photo', file);
+
+      // Get auth token
+      const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+
+      // Upload to Node.js backend
+      const response = await axios.post(
+        `${API_CONFIG.BASE_URL}/upload/photo`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
 
       clearInterval(progressInterval);
 
-      if (error) {
-        console.error('Photo upload error:', error);
-        setPhotoUpload(prev => prev ? { ...prev, uploading: false, uploadProgress: 0, error: 'Upload failed: ' + error.message } : null);
-        return null;
+      if (response.data.success) {
+        const photoUrl = response.data.data.url;
+        console.log('✅ Photo upload successful:', photoUrl);
+
+        // Update photo upload status to uploaded with URL and full progress
+        setPhotoUpload(prev => prev ? { 
+          ...prev, 
+          uploading: false, 
+          uploaded: true, 
+          url: photoUrl, 
+          uploadProgress: 100,
+          error: undefined
+        } : null);
+
+        return photoUrl;
+      } else {
+        throw new Error(response.data.message || 'Upload failed');
       }
-
-      console.log('Photo upload successful:', data);
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('community-photos')
-        .getPublicUrl(filePath);
-
-      console.log('Photo public URL:', publicUrl);
-
-      // Update photo upload status to uploaded with URL and full progress
-      setPhotoUpload(prev => prev ? { 
-        ...prev, 
-        uploading: false, 
-        uploaded: true, 
-        url: publicUrl, 
-        uploadProgress: 100,
-        error: undefined
-      } : null);
-
-      return publicUrl;
     } catch (error) {
-      console.error('Exception uploading photo:', error);
+      console.error('❌ Exception uploading photo:', error);
       setPhotoUpload(prev => prev ? { 
         ...prev, 
         uploading: false, 
@@ -507,7 +508,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
       // Add photo if uploaded
       if (photoUpload?.uploaded && photoUpload.url) {
-        const photoLink = `📸 [${photoUpload.file.name}](${photoUpload.url})`;
+        // Use proper markdown image syntax: ![alt](url)
+        const photoLink = `![${photoUpload.file.name}](${photoUpload.url})`;
         contentWithMedia = `${contentWithMedia}\n\n${photoLink}`;
       }
       

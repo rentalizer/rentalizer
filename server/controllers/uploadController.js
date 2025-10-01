@@ -72,7 +72,43 @@ const deleteThumbnail = async (req, res) => {
   }
 };
 
+// Upload general photo
+const uploadPhoto = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No image file provided'
+      });
+    }
+
+    // Return the file path relative to the server
+    const filePath = `/uploads/${req.file.filename}`;
+    const fullUrl = `${req.protocol}://${req.get('host')}${filePath}`;
+    
+    res.json({
+      success: true,
+      message: 'Photo uploaded successfully',
+      data: {
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        path: filePath,
+        url: fullUrl,
+        size: req.file.size,
+        mimetype: req.file.mimetype
+      }
+    });
+  } catch (error) {
+    console.error('Error uploading photo:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload photo'
+    });
+  }
+};
+
 module.exports = {
   uploadThumbnail,
+  uploadPhoto,
   deleteThumbnail
 };

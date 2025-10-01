@@ -810,6 +810,53 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     return content.substring(0, maxLength) + '...';
   }, []);
 
+  // Render markdown content with images
+  const renderContent = useCallback((content: string) => {
+    // Convert markdown images ![alt](url) to img tags
+    const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+    const parts: (string | JSX.Element)[] = [];
+    let lastIndex = 0;
+    let match;
+    let key = 0;
+
+    while ((match = imageRegex.exec(content)) !== null) {
+      // Add text before the image
+      if (match.index > lastIndex) {
+        parts.push(content.substring(lastIndex, match.index));
+      }
+
+      // Add the image
+      const alt = match[1];
+      const url = match[2];
+      parts.push(
+        <img
+          key={`img-${key++}`}
+          src={url}
+          alt={alt}
+          className="max-w-full h-auto rounded-lg my-2 border border-slate-600"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            // Show the markdown text as fallback
+            const fallback = document.createElement('div');
+            fallback.className = 'text-gray-400 text-sm italic';
+            fallback.textContent = `📷 Image: ${alt}`;
+            target.parentNode?.insertBefore(fallback, target);
+          }}
+        />
+      );
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (lastIndex < content.length) {
+      parts.push(content.substring(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : content;
+  }, []);
+
   // Handle post creation callback - refresh discussions list
   const handlePostCreated = useCallback(() => {
     console.log('🔄 New post created - refreshing discussions list');
@@ -1037,7 +1084,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                               }`}
                               onClick={() => setExpandedPost(expandedPost === discussion.id ? null : discussion.id)}
                             >
-                              {expandedPost === discussion.id ? discussion.content : getTruncatedContent(discussion.content)}
+                              {expandedPost === discussion.id ? renderContent(discussion.content) : renderContent(getTruncatedContent(discussion.content))}
                               {discussion.content.length > 150 && expandedPost !== discussion.id && (
                                 <span className="text-cyan-400 ml-2 font-medium">Read more</span>
                               )}
