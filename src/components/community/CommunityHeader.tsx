@@ -896,7 +896,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                     accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
                   />
                   
-                  <div className="relative">
+                  {/* <div className="relative">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -911,7 +911,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                         </span>
                       )}
                     </Button>
-                  </div>
+                  </div> */}
                   
                   <input
                     ref={videoInputRef}
