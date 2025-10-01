@@ -17,7 +17,8 @@ const storage = multer.diskStorage({
     // Generate unique filename with timestamp
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const ext = path.extname(file.originalname);
-    cb(null, `thumbnail-${uniqueSuffix}${ext}`);
+    const prefix = file.fieldname === 'thumbnail' ? 'thumbnail' : 'photo';
+    cb(null, `${prefix}-${uniqueSuffix}${ext}`);
   }
 });
 
@@ -43,6 +44,16 @@ const upload = multer({
 // Middleware for single image upload
 const uploadThumbnail = (req, res, next) => {
   upload.single('thumbnail')(req, res, (err) => {
+    if (err) {
+      return next(err);
+    }
+    next();
+  });
+};
+
+// Middleware for general photo upload
+const uploadPhoto = (req, res, next) => {
+  upload.single('photo')(req, res, (err) => {
     if (err) {
       return next(err);
     }
@@ -79,5 +90,6 @@ const handleUploadError = (error, req, res, next) => {
 
 module.exports = {
   uploadThumbnail,
+  uploadPhoto,
   handleUploadError
 };

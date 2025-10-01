@@ -810,6 +810,53 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     return content.substring(0, maxLength) + '...';
   }, []);
 
+  // Render markdown content with images
+  const renderContent = useCallback((content: string) => {
+    // Convert markdown images ![alt](url) to img tags
+    const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+    const parts: (string | JSX.Element)[] = [];
+    let lastIndex = 0;
+    let match;
+    let key = 0;
+
+    while ((match = imageRegex.exec(content)) !== null) {
+      // Add text before the image
+      if (match.index > lastIndex) {
+        parts.push(content.substring(lastIndex, match.index));
+      }
+
+      // Add the image
+      const alt = match[1];
+      const url = match[2];
+      parts.push(
+        <img
+          key={`img-${key++}`}
+          src={url}
+          alt={alt}
+          className="max-w-full h-auto rounded-lg my-2 border border-slate-600"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.style.display = 'none';
+            // Show the markdown text as fallback
+            const fallback = document.createElement('div');
+            fallback.className = 'text-gray-400 text-sm italic';
+            fallback.textContent = `📷 Image: ${alt}`;
+            target.parentNode?.insertBefore(fallback, target);
+          }}
+        />
+      );
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining text
+    if (lastIndex < content.length) {
+      parts.push(content.substring(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : content;
+  }, []);
+
   // Handle post creation callback - refresh discussions list
   const handlePostCreated = useCallback(() => {
     console.log('🔄 New post created - refreshing discussions list');
@@ -1037,7 +1084,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                               }`}
                               onClick={() => setExpandedPost(expandedPost === discussion.id ? null : discussion.id)}
                             >
-                              {expandedPost === discussion.id ? discussion.content : getTruncatedContent(discussion.content)}
+                              {expandedPost === discussion.id ? renderContent(discussion.content) : renderContent(getTruncatedContent(discussion.content))}
                               {discussion.content.length > 150 && expandedPost !== discussion.id && (
                                 <span className="text-cyan-400 ml-2 font-medium">Read more</span>
                               )}
@@ -1137,7 +1184,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
             <NewsFeed isDayMode={isDayMode} />
           </div>
 
-          <Card className="bg-slate-800/50 border-cyan-500/20">
+          {/* <Card className="bg-slate-800/50 border-cyan-500/20">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-yellow-400" />
@@ -1146,7 +1193,6 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="space-y-3">
-                {/* Leaderboard entries */}
                 <div className="flex items-center gap-3 p-2 rounded-lg bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20">
                   <Badge className="bg-yellow-500 text-black font-bold text-xs w-6 h-6 rounded-full flex items-center justify-center p-0">1</Badge>
                   <Avatar className="w-8 h-8">
@@ -1159,7 +1205,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
         </div>
       </div>
