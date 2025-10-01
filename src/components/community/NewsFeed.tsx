@@ -20,11 +20,15 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedArticle, setSelectedArticle] = useState<NewsItem | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
   const { isAdmin } = useAdminRole();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreNews, setHasMoreNews] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const NEWS_PER_PAGE = 3;
 
   // Form state for manual submission
   const [submitForm, setSubmitForm] = useState({
@@ -47,47 +51,41 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
     fetchNewsItems();
   }, []);
 
-  // Auto-scroll effect
-  useEffect(() => {
-    if (newsItems.length > 5) {
-      const interval = setInterval(() => {
-        setCurrentIndex(prev => (prev + 1) % newsItems.length);
-      }, 5000); // Scroll every 5 seconds
-
-      return () => clearInterval(interval);
-    }
-  }, [newsItems.length]);
-
-  // Smooth scroll effect
-  useEffect(() => {
-    if (scrollContainerRef.current && newsItems.length > 0) {
-      const container = scrollContainerRef.current;
-      const itemHeight = 120; // Approximate height of each news item
-      container.scrollTo({
-        top: currentIndex * itemHeight,
-        behavior: 'smooth'
-      });
-    }
-  }, [currentIndex]);
-
-  const fetchNewsItems = async () => {
+  const fetchNewsItems = async (page: number = 1, append: boolean = false) => {
     try {
-      setLoading(true);
-      console.log('🔍 Fetching news items from backend...');
+      if (!append) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+      
+      console.log(`🔍 Fetching news items page ${page} from backend...`);
       
       const response = await newsService.getNews({
-        page: 1,
-        limit: 50,
+        page: page,
+        limit: NEWS_PER_PAGE,
         status: 'published',
         sortBy: 'published_at',
         sortOrder: 'desc'
       });
 
       console.log('📰 News items received:', response);
+      console.log('📄 Pagination:', response.pagination);
 
       if (response.success) {
         console.log(`✅ Successfully fetched ${response.data?.length || 0} news items`);
-        setNewsItems(response.data || []);
+        
+        if (append) {
+          // Append to existing news
+          setNewsItems(prev => [...prev, ...(response.data || [])]);
+        } else {
+          // Replace news (first load or refresh)
+          setNewsItems(response.data || []);
+          setCurrentPage(1);
+        }
+        
+        // Update pagination state
+        setHasMoreNews(response.pagination?.hasNextPage || false);
       } else {
         throw new Error('Failed to fetch news items');
       }
@@ -98,9 +96,21 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
         description: "Failed to load news items. Please try again.",
         variant: "destructive",
       });
-      setNewsItems([]);
+      if (!append) {
+        setNewsItems([]);
+      }
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  // Load more news
+  const loadMoreNews = () => {
+    if (!loadingMore && hasMoreNews) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      fetchNewsItems(nextPage, true);
     }
   };
 
@@ -153,7 +163,9 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
         });
         
         // Refresh to get proper sort order
-        await fetchNewsItems();
+        setCurrentPage(1);
+        setHasMoreNews(true);
+        await fetchNewsItems(1, false);
       }
     } catch (error) {
       console.error('Error toggling pin:', error);
@@ -201,7 +213,9 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
           featured_image_url: ''
         });
         setIsSubmitDialogOpen(false);
-        await fetchNewsItems();
+        setCurrentPage(1);
+        setHasMoreNews(true);
+        await fetchNewsItems(1, false);
       }
     } catch (error) {
       console.error('Error submitting news:', error);
@@ -212,8 +226,6 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
       });
     }
   };
-
-  const visibleNewsItems = newsItems.slice(0, 5);
 
   if (loading) {
     return (
@@ -341,11 +353,8 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
         </div>
       ) : (
         /* News Items */
-        <div 
-          ref={scrollContainerRef}
-          className="space-y-2 max-h-[600px] overflow-y-auto pr-2"
-        >
-          {visibleNewsItems.map((item) => (
+        <div className="space-y-2">
+          {newsItems.map((item) => (
           <Card 
             key={item._id}
             className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-all cursor-pointer"
@@ -432,6 +441,27 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
             </CardContent>
           </Card>
           ))}
+          
+          {/* Show More Button */}
+          {hasMoreNews && (
+            <div className="flex justify-center mt-4">
+              <Button
+                onClick={loadMoreNews}
+                disabled={loadingMore}
+                className="bg-cyan-600 hover:bg-cyan-700 text-white px-6"
+                size="sm"
+              >
+                {loadingMore ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Loading...
+                  </>
+                ) : (
+                  'Show More'
+                )}
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
