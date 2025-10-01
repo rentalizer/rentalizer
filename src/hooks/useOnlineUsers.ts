@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
+import { websocketService } from '@/services/websocketService';
+import { apiService } from '@/services/api';
 
 interface OnlineUser {
   user_id: string;
@@ -10,7 +12,7 @@ interface OnlineUser {
   last_seen: string;
 }
 
-// Mock data for online users
+// Fallback mock data for when WebSocket is not available
 const mockOnlineUsers: OnlineUser[] = [
   {
     user_id: '00000000-0000-0000-0000-000000000001',
@@ -39,6 +41,7 @@ export const useOnlineUsers = () => {
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [onlineCount, setOnlineCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [useWebSocket, setUseWebSocket] = useState(false);
   const { user } = useAuth();
   const { isAdmin } = useAdminRole();
 
@@ -48,29 +51,61 @@ export const useOnlineUsers = () => {
       return;
     }
 
-    // Simulate loading delay
-    const timer = setTimeout(() => {
-      // Add current user to mock data if not already present
-      const currentUserInList = mockOnlineUsers.find(u => u.user_id === user.id);
-      if (!currentUserInList) {
-        const currentUser: OnlineUser = {
-          user_id: user.id,
-          display_name: user.email?.split('@')[0] || 'Anonymous',
-          avatar_url: null,
-          is_admin: isAdmin,
-          last_seen: new Date().toISOString(),
-        };
-        mockOnlineUsers.unshift(currentUser);
-      }
-
-      setOnlineUsers(mockOnlineUsers);
-      setOnlineCount(mockOnlineUsers.length);
+    // Set up WebSocket event listeners (WebSocket connection is managed by AuthContext)
+    const handleOnlineUsersUpdate = (users: OnlineUser[]) => {
+      console.log('📊 Received online users update:', users);
+      setOnlineUsers(users);
       setLoading(false);
-    }, 500);
+      setUseWebSocket(true);
+    };
 
-    // Cleanup
+    const handleOnlineCountUpdate = (count: number) => {
+      console.log('📈 Received online count update:', count);
+      setOnlineCount(count);
+    };
+
+    websocketService.onOnlineUsersUpdate(handleOnlineUsersUpdate);
+    websocketService.onOnlineCountUpdate(handleOnlineCountUpdate);
+
+    // Request initial online users (if WebSocket is connected)
+    const connectionStatus = websocketService.getConnectionStatus();
+    if (connectionStatus.isConnected) {
+      websocketService.requestOnlineUsers();
+    } else {
+      // If WebSocket is not connected, use fallback data
+      console.log('WebSocket not connected, using fallback data');
+      setUseWebSocket(false);
+      
+      const timer = setTimeout(() => {
+        // Add current user to mock data if not already present
+        const currentUserInList = mockOnlineUsers.find(u => u.user_id === user.id);
+        if (!currentUserInList) {
+          const currentUser: OnlineUser = {
+            user_id: user.id,
+            display_name: user.email?.split('@')[0] || 'Anonymous',
+            avatar_url: null,
+            is_admin: isAdmin,
+            last_seen: new Date().toISOString(),
+          };
+          mockOnlineUsers.unshift(currentUser);
+        }
+
+        setOnlineUsers([...mockOnlineUsers]);
+        setOnlineCount(mockOnlineUsers.length);
+        setLoading(false);
+      }, 500);
+
+      return () => {
+        clearTimeout(timer);
+        websocketService.removeOnlineUsersListener(handleOnlineUsersUpdate);
+        websocketService.removeOnlineCountListener(handleOnlineCountUpdate);
+      };
+    }
+
+    // Cleanup function
     return () => {
-      clearTimeout(timer);
+      websocketService.removeOnlineUsersListener(handleOnlineUsersUpdate);
+      websocketService.removeOnlineCountListener(handleOnlineCountUpdate);
     };
   }, [user, isAdmin]);
 
@@ -83,6 +118,7 @@ export const useOnlineUsers = () => {
     onlineCount,
     adminUsers,
     adminNames,
-    loading
+    loading,
+    useWebSocket // Indicates whether we're using real WebSocket data or fallback
   };
 };

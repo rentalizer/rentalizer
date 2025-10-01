@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiService, User } from '@/services/api';
 import { Profile, createProfileFromUser } from '@/utils/authHelpers';
+import { websocketService } from '@/services/websocketService';
 
 interface AuthContextType {
   user: User | null;
@@ -47,6 +48,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setUser(response.user);
             setProfile(createProfileFromUser(response.user));
             console.log('✅ User authenticated from token');
+            
+            // Connect to WebSocket for online presence
+            try {
+              websocketService.connect(token);
+              console.log('🔌 WebSocket connected for authenticated user');
+            } catch (wsError) {
+              console.warn('⚠️ WebSocket connection failed:', wsError);
+            }
           } catch (error) {
             // Token is invalid, remove it
             console.log('❌ Invalid token, removing from storage');
@@ -75,6 +84,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(response.user);
       setProfile(createProfileFromUser(response.user));
       
+      // Connect to WebSocket for online presence
+      try {
+        websocketService.connect(response.token);
+        console.log('🔌 WebSocket connected after sign in');
+      } catch (wsError) {
+        console.warn('⚠️ WebSocket connection failed after sign in:', wsError);
+      }
+      
       console.log('✅ Sign in successful for:', email);
     } catch (error) {
       console.error('❌ Sign in error:', error);
@@ -97,6 +114,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       apiService.setAuthToken(response.token);
       setUser(response.user);
       setProfile(createProfileFromUser(response.user));
+      
+      // Connect to WebSocket for online presence
+      try {
+        websocketService.connect(response.token);
+        console.log('🔌 WebSocket connected after sign up');
+      } catch (wsError) {
+        console.warn('⚠️ WebSocket connection failed after sign up:', wsError);
+      }
       
       console.log('✅ Sign up successful for:', email);
     } catch (error) {
@@ -143,6 +168,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setProfile(null);
       apiService.removeAuthToken();
       
+      // Disconnect WebSocket
+      try {
+        websocketService.disconnect();
+        console.log('🔌 WebSocket disconnected on account deletion');
+      } catch (wsError) {
+        console.warn('⚠️ WebSocket disconnection failed:', wsError);
+      }
+      
       console.log('✅ Account deleted successfully');
     } catch (error) {
       console.error('❌ Account deletion error:', error);
@@ -163,6 +196,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
     setProfile(null);
     apiService.removeAuthToken();
+    
+    // Disconnect WebSocket
+    try {
+      websocketService.disconnect();
+      console.log('🔌 WebSocket disconnected on sign out');
+    } catch (wsError) {
+      console.warn('⚠️ WebSocket disconnection failed:', wsError);
+    }
     
     // Redirect to login page
     window.location.href = '/auth/login';
