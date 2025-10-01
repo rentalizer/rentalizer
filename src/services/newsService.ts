@@ -234,7 +234,7 @@ export const newsService = {
    * Create a new news item (manual submission)
    * Requires authentication
    */
-  async createNews(newsData: {
+  async createNews(newsData: FormData | {
     title: string;
     url: string;
     source?: string;
@@ -245,10 +245,27 @@ export const newsService = {
     published_at?: string;
   }): Promise<SingleNewsResponse> {
     try {
-      const response = await newsAxios.post<SingleNewsResponse>('/', newsData, {
-        headers: getAuthHeaders()
-      });
-      return response.data;
+      const headers = getAuthHeaders();
+      
+      // If FormData, don't set Content-Type (let browser set it with boundary)
+      if (newsData instanceof FormData) {
+        const response = await newsAxios.post<SingleNewsResponse>('/', newsData, {
+          headers: {
+            ...headers,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        return response.data;
+      } else {
+        // Regular JSON data
+        const response = await newsAxios.post<SingleNewsResponse>('/', newsData, {
+          headers: {
+            ...headers,
+            'Content-Type': 'application/json'
+          }
+        });
+        return response.data;
+      }
     } catch (error) {
       return handleError(error);
     }

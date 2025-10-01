@@ -11,6 +11,13 @@ class NewsController {
       const userId = req.user.id;
       const newsData = req.body;
 
+      // If there's an uploaded file, use its URL as featured_image_url
+      if (req.file) {
+        const filePath = `/uploads/${req.file.filename}`;
+        const fullUrl = `${req.protocol}://${req.get('host')}${filePath}`;
+        newsData.featured_image_url = fullUrl;
+      }
+
       const newsItem = await newsService.createNewsItem(newsData, userId);
 
       res.status(201).json({

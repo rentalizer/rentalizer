@@ -3,6 +3,7 @@ const router = express.Router();
 const newsController = require('../controllers/newsController');
 const { authenticateToken } = require('../middleware/auth');
 const { requireAdmin } = require('../middleware/admin');
+const { uploadPhoto, handleUploadError } = require('../middleware/upload');
 const { 
   validateNewsItem, 
   validateNewsItemUpdate, 
@@ -26,7 +27,7 @@ router.get('/:id', validateObjectId, newsController.getNewsItemById);
 router.post('/:id/click', validateObjectId, newsController.incrementClickCount);
 
 // Protected routes (authentication required)
-router.post('/', authenticateToken, validateNewsItem, newsController.createNewsItem);
+router.post('/', authenticateToken, uploadPhoto, handleUploadError, validateNewsItem, newsController.createNewsItem);
 router.put('/:id', authenticateToken, validateObjectId, validateNewsItemUpdate, newsController.updateNewsItem);
 router.delete('/:id', authenticateToken, validateObjectId, newsController.deleteNewsItem);
 

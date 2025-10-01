@@ -40,6 +40,11 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
     featured_image_url: ''
   });
 
+  // Image upload state
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   const availableSources = [
     'AirDNA', 'Skift', 'VRM Intel', 'ShortTermRentalz', 'Rental Scale-Up',
     'Hospitable', 'PriceLabs', 'Guesty', 'Wheelhouse', 'Lodgify', 'Turno',
@@ -112,6 +117,48 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
       setCurrentPage(nextPage);
       fetchNewsItems(nextPage, true);
     }
+  };
+
+  // Handle image file selection
+  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setImageFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Remove selected image
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    setSubmitForm(prev => ({ ...prev, featured_image_url: '' }));
   };
 
   const handleNewsClick = async (newsItem: NewsItem) => {
@@ -188,15 +235,25 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
     }
 
     try {
-      const response = await newsService.createNews({
-        title: submitForm.title,
-        url: submitForm.url,
-        source: submitForm.source,
-        summary: submitForm.summary || undefined,
-        tags: submitForm.tags.length > 0 ? submitForm.tags : undefined,
-        featured_image_url: submitForm.featured_image_url || undefined,
-        published_at: new Date().toISOString(),
-      });
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('title', submitForm.title);
+      formData.append('url', submitForm.url);
+      formData.append('source', submitForm.source);
+      if (submitForm.summary) {
+        formData.append('summary', submitForm.summary);
+      }
+      if (submitForm.tags.length > 0) {
+        formData.append('tags', JSON.stringify(submitForm.tags));
+      }
+      formData.append('published_at', new Date().toISOString());
+      
+      // Add image file if selected
+      if (imageFile) {
+        formData.append('photo', imageFile);
+      }
+
+      const response = await newsService.createNews(formData);
 
       if (response.success) {
         toast({
@@ -204,6 +261,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
           description: "News item submitted successfully!",
         });
 
+        // Reset form
         setSubmitForm({
           title: '',
           url: '',
@@ -212,6 +270,8 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
           tags: [],
           featured_image_url: ''
         });
+        setImageFile(null);
+        setImagePreview(null);
         setIsSubmitDialogOpen(false);
         setCurrentPage(1);
         setHasMoreNews(true);
@@ -310,13 +370,49 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
                 </div>
                 
                 <div>
-                  <label className="text-sm text-gray-300 mb-2 block">Featured Image URL</label>
-                  <Input
-                    value={submitForm.featured_image_url}
-                    onChange={(e) => setSubmitForm(prev => ({ ...prev, featured_image_url: e.target.value }))}
-                    className="bg-slate-700 border-slate-600 text-white"
-                    placeholder="https://..."
-                  />
+                  <label className="text-sm text-gray-300 mb-2 block">Featured Image</label>
+                  
+                  {!imageFile ? (
+                    <div className="border-2 border-dashed border-slate-600 rounded-lg p-4 text-center hover:border-cyan-500/50 transition-colors">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                        id="image-upload"
+                      />
+                      <label
+                        htmlFor="image-upload"
+                        className="cursor-pointer flex flex-col items-center gap-2"
+                      >
+                        <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center">
+                          <Plus className="h-4 w-4 text-gray-400" />
+                        </div>
+                        <span className="text-sm text-gray-400">Click to upload image</span>
+                        <span className="text-xs text-gray-500">PNG, JPG up to 5MB</span>
+                      </label>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <img
+                          src={imagePreview || ''}
+                          alt="Preview"
+                          className="w-full h-32 object-contain rounded-lg bg-slate-700"
+                        />
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="destructive"
+                          onClick={removeImage}
+                          className="absolute top-2 right-2 h-6 w-6 p-0"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      <p className="text-xs text-gray-400">{imageFile.name}</p>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="flex justify-end gap-2">
@@ -497,7 +593,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
                   <img 
                     src={selectedArticle.featured_image_url} 
                     alt={selectedArticle.title}
-                    className="w-full h-48 object-cover rounded-lg"
+                    className="w-full max-h-96 object-contain rounded-lg bg-slate-700"
                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
                 )}
