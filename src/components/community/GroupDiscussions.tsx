@@ -1137,7 +1137,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
             <NewsFeed isDayMode={isDayMode} />
           </div>
 
-          <Card className="bg-slate-800/50 border-cyan-500/20">
+          {/* <Card className="bg-slate-800/50 border-cyan-500/20">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-yellow-400" />
@@ -1146,7 +1146,6 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="space-y-3">
-                {/* Leaderboard entries */}
                 <div className="flex items-center gap-3 p-2 rounded-lg bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20">
                   <Badge className="bg-yellow-500 text-black font-bold text-xs w-6 h-6 rounded-full flex items-center justify-center p-0">1</Badge>
                   <Avatar className="w-8 h-8">
@@ -1159,7 +1158,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
         </div>
       </div>
