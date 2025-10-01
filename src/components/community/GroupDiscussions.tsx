@@ -108,6 +108,12 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const { memberCount, loading: memberCountLoading } = useMemberCount();
   const { onlineCount, adminNames, loading: onlineLoading } = useOnlineUsers();
   const [showMembersList, setShowMembersList] = useState(false);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMorePosts, setHasMorePosts] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const POSTS_PER_PAGE = 7;
 
   // Check if user needs to set up profile
   useEffect(() => {
@@ -314,20 +320,24 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     };
   }, [getInitials, formatTimeAgo]);
 
-  // Fetch discussions from backend API
-  const fetchDiscussions = useCallback(async () => {
-    console.log('🔄 Loading discussions from backend...');
-    setLoading(true);
+  // Fetch discussions from backend API with pagination
+  const fetchDiscussions = useCallback(async (page: number = 1, append: boolean = false) => {
+    console.log(`🔄 Loading discussions page ${page} from backend...`);
+    
+    if (!append) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
     
     try {
       const response = await apiService.getDiscussions({
-        page: 1,
-        limit: 50
-        // Remove server-side sorting since we're doing it locally
+        page: page,
+        limit: POSTS_PER_PAGE
       });
       
       console.log('📥 Discussions loaded:', response.data.length, 'discussions');
-      console.log('📌 Pinned discussions:', response.data.filter(d => d.is_pinned).length);
+      console.log('📄 Pagination:', response.pagination);
       
       // Transform backend data to match frontend expectations
       const transformedDiscussions = response.data.map(discussion => {
@@ -350,14 +360,38 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         return transformed;
       });
       
-      setDiscussionsList(transformedDiscussions);
+      if (append) {
+        // Append to existing discussions
+        setDiscussionsList(prev => [...prev, ...transformedDiscussions]);
+      } else {
+        // Replace discussions (first load or refresh)
+        setDiscussionsList(transformedDiscussions);
+        setCurrentPage(1);
+      }
+      
+      // Update pagination state
+      setHasMorePosts(response.pagination?.hasNextPage || false);
+      
     } catch (error) {
       console.error('❌ Exception loading discussions:', error);
       console.log("Error: Failed to load discussions. Please try again.");
+      if (!append) {
+        setDiscussionsList([]);
+      }
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
-  }, [user]);
+  }, [user, POSTS_PER_PAGE]);
+
+  // Load more discussions
+  const loadMoreDiscussions = useCallback(() => {
+    if (!loadingMore && hasMorePosts) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      fetchDiscussions(nextPage, true);
+    }
+  }, [currentPage, hasMorePosts, loadingMore, fetchDiscussions]);
 
   // Load comments when a discussion is selected
   useEffect(() => {
@@ -860,7 +894,9 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   // Handle post creation callback - refresh discussions list
   const handlePostCreated = useCallback(() => {
     console.log('🔄 New post created - refreshing discussions list');
-    fetchDiscussions();
+    setCurrentPage(1);
+    setHasMorePosts(true);
+    fetchDiscussions(1, false);
   }, [fetchDiscussions]);
 
   // Debug render
@@ -1129,6 +1165,26 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                 </Card>
               );
             })
+            )}
+            
+            {/* Show More Button */}
+            {!loading && hasMorePosts && (
+              <div className="flex justify-center mt-6">
+                <Button
+                  onClick={loadMoreDiscussions}
+                  disabled={loadingMore}
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white px-8"
+                >
+                  {loadingMore ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Loading...
+                    </>
+                  ) : (
+                    `Show More`
+                  )}
+                </Button>
+              </div>
             )}
           </div>
         </div>
