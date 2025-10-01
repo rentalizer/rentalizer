@@ -9,6 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 class RoomManager {
   constructor() {
     this.rooms = new Map(); // discussionId -> Set of socketIds
+    this.onlineUsers = new Map(); // userId -> { socketId, user, lastSeen }
   }
 
   joinRoom(socketId, discussionId) {
@@ -40,6 +41,39 @@ class RoomManager {
         }
       }
     }
+  }
+
+  // Online user management
+  addOnlineUser(socketId, userId, user) {
+    this.onlineUsers.set(userId, {
+      socketId,
+      user,
+      lastSeen: new Date().toISOString()
+    });
+  }
+
+  removeOnlineUser(userId) {
+    this.onlineUsers.delete(userId);
+  }
+
+  getOnlineUsers() {
+    return Array.from(this.onlineUsers.values()).map(onlineUser => ({
+      user_id: onlineUser.user._id.toString(),
+      display_name: onlineUser.user.firstName && onlineUser.user.lastName 
+        ? `${onlineUser.user.firstName} ${onlineUser.user.lastName}`.trim()
+        : (onlineUser.user.email ? onlineUser.user.email.split('@')[0] : 'User'),
+      avatar_url: onlineUser.user.profilePicture,
+      is_admin: onlineUser.user.role === 'admin' || onlineUser.user.role === 'superadmin',
+      last_seen: onlineUser.lastSeen
+    }));
+  }
+
+  getOnlineCount() {
+    return this.onlineUsers.size;
+  }
+
+  isUserOnline(userId) {
+    return this.onlineUsers.has(userId);
   }
 }
 
@@ -297,6 +331,17 @@ const setupWebSocketHandlers = (io) => {
   io.on('connection', (socket) => {
     console.log(`User ${socket.userDisplayName} connected via WebSocket`);
 
+    // Add user to online users
+    roomManager.addOnlineUser(socket.id, socket.userId, socket.user);
+    
+    // Broadcast online users update to all connected clients
+    const onlineUsers = roomManager.getOnlineUsers();
+    const onlineCount = roomManager.getOnlineCount();
+    io.emit('online_users_update', {
+      users: onlineUsers,
+      count: onlineCount
+    });
+
     // Join discussion room
     socket.on('join_discussion', (data) => {
       const { discussionId } = data;
@@ -363,9 +408,46 @@ const setupWebSocketHandlers = (io) => {
       });
     });
 
+    // Online users events
+    socket.on('join_online_users', () => {
+      console.log(`User ${socket.userDisplayName} joined online users`);
+      // Send current online users to this socket
+      const onlineUsers = roomManager.getOnlineUsers();
+      const onlineCount = roomManager.getOnlineCount();
+      socket.emit('online_users_update', {
+        users: onlineUsers,
+        count: onlineCount
+      });
+    });
+
+    socket.on('leave_online_users', () => {
+      console.log(`User ${socket.userDisplayName} left online users`);
+    });
+
+    socket.on('get_online_users', () => {
+      const onlineUsers = roomManager.getOnlineUsers();
+      const onlineCount = roomManager.getOnlineCount();
+      socket.emit('online_users_update', {
+        users: onlineUsers,
+        count: onlineCount
+      });
+    });
+
     // Handle disconnection
     socket.on('disconnect', () => {
       console.log(`User ${socket.userDisplayName} disconnected`);
+      
+      // Remove user from online users
+      roomManager.removeOnlineUser(socket.userId);
+      
+      // Broadcast updated online users to all connected clients
+      const onlineUsers = roomManager.getOnlineUsers();
+      const onlineCount = roomManager.getOnlineCount();
+      io.emit('online_users_update', {
+        users: onlineUsers,
+        count: onlineCount
+      });
+      
       roomManager.removeSocket(socket.id);
     });
 

@@ -166,6 +166,24 @@ class UserController {
       });
     }
   }
+
+  // GET /api/user/member-count
+  async getMemberCount(req, res) {
+    try {
+      const stats = await userService.getUserStats();
+
+      res.json({
+        message: 'Member count retrieved successfully',
+        memberCount: stats.totalUsers
+      });
+
+    } catch (error) {
+      console.error('Member count retrieval error:', error);
+      res.status(500).json({
+        message: 'Internal server error while retrieving member count'
+      });
+    }
+  }
 }
 
 module.exports = new UserController();
