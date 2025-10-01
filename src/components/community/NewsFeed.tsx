@@ -7,31 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Newspaper, ExternalLink, Calendar, Eye, MousePointer, Pin, Plus, X } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { formatDistanceToNow } from 'date-fns';
-
-interface NewsItem {
-  id: string;
-  source: string;
-  title: string;
-  url: string;
-  summary: string | null;
-  content: string | null;
-  published_at: string;
-  created_at: string;
-  updated_at: string;
-  tags: string[];
-  featured_image_url: string | null;
-  is_pinned: boolean;
-  is_featured: boolean;
-  view_count: number;
-  click_count: number;
-  engagement_score: number;
-  admin_submitted: boolean;
-  submitted_by: string | null;
-  status: string;
-}
+import newsService, { NewsItem } from '@/services/newsService';
+import { useToast } from '@/hooks/use-toast';
 
 interface NewsFeedProps {
   isDayMode?: boolean;
@@ -45,6 +24,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
   const { isAdmin } = useAdminRole();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   // Form state for manual submission
   const [submitForm, setSubmitForm] = useState({
@@ -93,27 +73,32 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
   const fetchNewsItems = async () => {
     try {
       setLoading(true);
-      console.log('🔍 Fetching news items...');
+      console.log('🔍 Fetching news items from backend...');
       
-      const { data, error } = await supabase
-        .from('news_items')
-        .select('*')
-        .eq('status', 'published')
-        .order('is_pinned', { ascending: false })
-        .order('published_at', { ascending: false });
+      const response = await newsService.getNews({
+        page: 1,
+        limit: 50,
+        status: 'published',
+        sortBy: 'published_at',
+        sortOrder: 'desc'
+      });
 
-      console.log('📰 News items query result:', { data, error });
+      console.log('📰 News items received:', response);
 
-      if (error) {
-        console.error('❌ Error fetching news items:', error);
-        throw error;
+      if (response.success) {
+        console.log(`✅ Successfully fetched ${response.data?.length || 0} news items`);
+        setNewsItems(response.data || []);
+      } else {
+        throw new Error('Failed to fetch news items');
       }
-
-      console.log(`✅ Successfully fetched ${data?.length || 0} news items`);
-      setNewsItems(data || []);
     } catch (error) {
       console.error('Error fetching news items:', error);
-      console.log("Error: Failed to load news items. Please try again.");
+      toast({
+        title: "Error",
+        description: "Failed to load news items. Please try again.",
+        variant: "destructive",
+      });
+      setNewsItems([]);
     } finally {
       setLoading(false);
     }
@@ -121,16 +106,13 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
 
   const handleNewsClick = async (newsItem: NewsItem) => {
     try {
-      // Increment click count
-      await supabase
-        .from('news_items')
-        .update({ click_count: newsItem.click_count + 1 })
-        .eq('id', newsItem.id);
+      // Track click
+      await newsService.trackClick(newsItem._id);
       
       // Update local state
       setNewsItems(prev => 
         prev.map(item => 
-          item.id === newsItem.id 
+          item._id === newsItem._id 
             ? { ...item, click_count: item.click_count + 1 }
             : item
         )
@@ -153,58 +135,81 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
     if (!isAdmin) return;
 
     try {
-      await supabase
-        .from('news_items')
-        .update({ is_pinned: !newsItem.is_pinned })
-        .eq('id', newsItem.id);
-
-      await fetchNewsItems();
+      const response = await newsService.togglePin(newsItem._id);
       
-      console.log(newsItem.is_pinned ? "Unpinned:" : "Pinned:", `Article ${newsItem.is_pinned ? 'unpinned from' : 'pinned to'} top of feed.`);
+      if (response.success) {
+        // Update local state immediately for better UX
+        setNewsItems(prev =>
+          prev.map(item =>
+            item._id === newsItem._id
+              ? { ...item, is_pinned: !item.is_pinned }
+              : item
+          )
+        );
+        
+        toast({
+          title: newsItem.is_pinned ? "Unpinned" : "Pinned",
+          description: `Article ${newsItem.is_pinned ? 'unpinned from' : 'pinned to'} top of feed.`,
+        });
+        
+        // Refresh to get proper sort order
+        await fetchNewsItems();
+      }
     } catch (error) {
       console.error('Error toggling pin:', error);
-      console.log("Error: Failed to update pin status.");
+      toast({
+        title: "Error",
+        description: "Failed to update pin status.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleSubmitNews = async () => {
     if (!submitForm.title || !submitForm.url || !submitForm.source) {
-      console.log("Error: Title, URL, and source are required.");
+      toast({
+        title: "Error",
+        description: "Title, URL, and source are required.",
+        variant: "destructive",
+      });
       return;
     }
 
     try {
-      const { error } = await supabase
-        .from('news_items')
-        .insert({
-          title: submitForm.title,
-          url: submitForm.url,
-          source: submitForm.source,
-          summary: submitForm.summary || null,
-          tags: submitForm.tags,
-          featured_image_url: submitForm.featured_image_url || null,
-          published_at: new Date().toISOString(),
-          admin_submitted: true,
-          submitted_by: (await supabase.auth.getUser()).data.user?.id
+      const response = await newsService.createNews({
+        title: submitForm.title,
+        url: submitForm.url,
+        source: submitForm.source,
+        summary: submitForm.summary || undefined,
+        tags: submitForm.tags.length > 0 ? submitForm.tags : undefined,
+        featured_image_url: submitForm.featured_image_url || undefined,
+        published_at: new Date().toISOString(),
+      });
+
+      if (response.success) {
+        toast({
+          title: "Success",
+          description: "News item submitted successfully!",
         });
 
-      if (error) throw error;
-
-      console.log("Success: News item submitted successfully!");
-
-      setSubmitForm({
-        title: '',
-        url: '',
-        source: '',
-        summary: '',
-        tags: [],
-        featured_image_url: ''
-      });
-      setIsSubmitDialogOpen(false);
-      await fetchNewsItems();
+        setSubmitForm({
+          title: '',
+          url: '',
+          source: '',
+          summary: '',
+          tags: [],
+          featured_image_url: ''
+        });
+        setIsSubmitDialogOpen(false);
+        await fetchNewsItems();
+      }
     } catch (error) {
       console.error('Error submitting news:', error);
-      console.log("Error: Failed to submit news item.");
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to submit news item.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -220,7 +225,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
+      {/* Header with Add Button - Always visible */}
       <div className="flex items-center justify-between">
         <div className="flex-1 text-center">
           <h3 className="text-lg font-semibold text-cyan-300">Industry News Feed</h3>
@@ -287,16 +292,26 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
                     value={submitForm.summary}
                     onChange={(e) => setSubmitForm(prev => ({ ...prev, summary: e.target.value }))}
                     className="bg-slate-700 border-slate-600 text-white"
-                    placeholder="Brief summary of the article..."
+                    placeholder="Brief summary of the article"
                     rows={3}
                   />
                 </div>
                 
-                <div className="flex gap-3 pt-4">
+                <div>
+                  <label className="text-sm text-gray-300 mb-2 block">Featured Image URL</label>
+                  <Input
+                    value={submitForm.featured_image_url}
+                    onChange={(e) => setSubmitForm(prev => ({ ...prev, featured_image_url: e.target.value }))}
+                    className="bg-slate-700 border-slate-600 text-white"
+                    placeholder="https://..."
+                  />
+                </div>
+                
+                <div className="flex justify-end gap-2">
                   <Button 
-                    variant="ghost" 
+                    variant="outline" 
                     onClick={() => setIsSubmitDialogOpen(false)}
-                    className="text-gray-400 hover:text-white"
+                    className="border-slate-600 text-gray-300"
                   >
                     Cancel
                   </Button>
@@ -304,7 +319,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
                     onClick={handleSubmitNews}
                     className="bg-cyan-600 hover:bg-cyan-700 text-white"
                   >
-                    Submit Article
+                    Submit
                   </Button>
                 </div>
               </div>
@@ -313,188 +328,184 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
         )}
       </div>
 
-      {/* Scrolling News Feed */}
-      <div 
-        ref={scrollContainerRef}
-        className="space-y-3 max-h-[600px] overflow-hidden"
-      >
-        {visibleNewsItems.length === 0 ? (
-          <div className="text-center py-8">
-            <Newspaper className="h-8 w-8 text-gray-500 mx-auto mb-3" />
-            <p className="text-gray-400 text-sm">No news items available</p>
-          </div>
-        ) : (
-          newsItems.map((item, index) => (
-            <Card 
-              key={item.id} 
-              className={`bg-slate-800/50 border-slate-700 hover:border-cyan-500/30 transition-all cursor-pointer ${
-                item.is_pinned ? 'ring-1 ring-cyan-500/20' : ''
-              }`}
-              onClick={() => handleNewsClick(item)}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      {item.is_pinned && (
-                        <Pin className="h-3 w-3 text-cyan-400 flex-shrink-0" />
-                      )}
-                      <Badge 
-                        variant="outline" 
-                        className="border-cyan-500/30 text-cyan-400 text-xs flex-shrink-0"
-                      >
-                        {item.source}
-                      </Badge>
-                      <div className="flex items-center gap-3 text-xs text-gray-500 flex-shrink-0">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {formatDistanceToNow(new Date(item.published_at), { addSuffix: true })}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Eye className="h-3 w-3" />
-                          {item.view_count}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <h4 className={`text-sm font-semibold mb-1 line-clamp-2 transition-colors ${
-                      isDayMode ? 'text-slate-600 hover:text-cyan-700' : 'text-white hover:text-cyan-300'
-                    }`}>
+      {/* Empty State */}
+      {newsItems.length === 0 ? (
+        <div className="text-center py-8">
+          <Newspaper className="h-12 w-12 text-cyan-400 mx-auto mb-4" />
+          <p className="text-gray-400 mb-4">No news items available yet.</p>
+          {isAdmin && (
+            <p className="text-sm text-gray-500">
+              Click the "Add" button above to submit your first article.
+            </p>
+          )}
+        </div>
+      ) : (
+        /* News Items */
+        <div 
+          ref={scrollContainerRef}
+          className="space-y-2 max-h-[600px] overflow-y-auto pr-2"
+        >
+          {visibleNewsItems.map((item) => (
+          <Card 
+            key={item._id}
+            className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-all cursor-pointer"
+            onClick={() => handleNewsClick(item)}
+          >
+            <CardContent className="p-4">
+              <div className="space-y-3">
+                {/* Header with title and pin button */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-2 flex-1 min-w-0">
+                    <Newspaper className="h-5 w-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                    <h4 className="text-white font-semibold text-base truncate leading-snug" title={item.title}>
                       {item.title}
                     </h4>
-                    
-                    {item.summary && (
-                      <p className={`text-xs line-clamp-2 ${
-                        isDayMode ? 'text-slate-500' : 'text-gray-400'
-                      }`}>
-                        {item.summary}
-                      </p>
-                    )}
                   </div>
-                  
-                  {item.featured_image_url && (
-                    <img 
-                      src={item.featured_image_url} 
-                      alt={item.title}
-                      className="w-16 h-12 object-cover rounded flex-shrink-0"
-                    />
+                  {isAdmin && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePinToggle(item);
+                      }}
+                      className={`h-7 w-7 p-0 flex-shrink-0 ${item.is_pinned ? 'text-cyan-400' : 'text-gray-500'}`}
+                    >
+                      <Pin className="h-4 w-4" />
+                    </Button>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
 
-      {/* Article Popup Modal */}
-      {selectedArticle && (
-        <Dialog open={!!selectedArticle} onOpenChange={() => setSelectedArticle(null)}>
-          <DialogContent className="bg-slate-800 border-cyan-500/20 text-white max-w-4xl max-h-[90vh] overflow-y-auto z-50">
-            <DialogHeader className="relative">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedArticle(null)}
-                className="absolute -top-2 -right-2 text-gray-400 hover:text-white"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-              <div className="flex items-center gap-2 mb-3">
-                <Badge 
-                  variant="outline" 
-                  className="border-cyan-500/30 text-cyan-400"
-                >
-                  {selectedArticle.source}
-                </Badge>
-                <div className="flex items-center gap-4 text-sm text-gray-400">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {formatDistanceToNow(new Date(selectedArticle.published_at), { addSuffix: true })}
+                {/* Source and Status badges */}
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs border-cyan-500/30 text-cyan-400 bg-cyan-500/10">
+                    {item.source}
+                  </Badge>
+                  {item.is_pinned && (
+                    <Badge className="text-xs bg-yellow-600/20 text-yellow-400 border-yellow-500/30">
+                      📌 Pinned
+                    </Badge>
+                  )}
+                  {item.is_featured && (
+                    <Badge className="text-xs bg-purple-600/20 text-purple-400 border-purple-500/30">
+                      ⭐ Featured
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Summary */}
+                {item.summary && (
+                  <p className="text-gray-300 text-sm leading-relaxed line-clamp-2">
+                    {item.summary}
+                  </p>
+                )}
+
+                {/* Metadata and stats */}
+                <div className="flex items-center justify-between pt-2 border-t border-slate-700/50">
+                  <div className="flex items-center gap-3 text-xs text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="h-3.5 w-3.5" />
+                      {formatDistanceToNow(new Date(item.published_at), { addSuffix: true })}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Eye className="h-3.5 w-3.5" />
+                      {item.view_count}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <MousePointer className="h-3.5 w-3.5" />
+                      {item.click_count}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Eye className="h-3 w-3" />
-                    {selectedArticle.view_count}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <MousePointer className="h-3 w-3" />
-                    {selectedArticle.click_count}
-                  </div>
+                  
+                  {/* Tags */}
+                  {item.tags && item.tags.length > 0 && (
+                    <div className="flex gap-1 flex-wrap">
+                      {item.tags.slice(0, 2).map((tag, idx) => (
+                        <Badge key={idx} variant="secondary" className="text-xs bg-slate-700/50 text-gray-400 px-2 py-0">
+                          #{tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
-              <DialogTitle className="text-xl font-bold text-white text-left leading-tight">
-                {selectedArticle.title}
-              </DialogTitle>
-            </DialogHeader>
-            
-            <div className="space-y-4">
-              {selectedArticle.featured_image_url && (
-                <img 
-                  src={selectedArticle.featured_image_url} 
-                  alt={selectedArticle.title}
-                  className="w-full h-64 object-cover rounded-lg"
-                />
-              )}
-              
-              {selectedArticle.summary && (
-                <div className="bg-slate-700/30 p-4 rounded-lg border-l-4 border-cyan-500/50">
-                  <p className="text-gray-300 italic">
-                    {selectedArticle.summary}
-                  </p>
+            </CardContent>
+          </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Article Preview Dialog */}
+      <Dialog open={!!selectedArticle} onOpenChange={() => setSelectedArticle(null)}>
+        <DialogContent className="bg-slate-800 border-cyan-500/20 text-white max-w-3xl max-h-[80vh] overflow-y-auto">
+          {selectedArticle && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-cyan-300 text-xl">
+                  {selectedArticle.title}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge variant="outline" className="border-cyan-500/30 text-cyan-400">
+                    {selectedArticle.source}
+                  </Badge>
+                  <span className="text-xs text-gray-400">
+                    {new Date(selectedArticle.published_at).toLocaleDateString()}
+                  </span>
+                  <span className="text-xs text-gray-400 flex items-center gap-1">
+                    <Eye className="h-3 w-3" />
+                    {selectedArticle.view_count} views
+                  </span>
+                  <span className="text-xs text-gray-400 flex items-center gap-1">
+                    <MousePointer className="h-3 w-3" />
+                    {selectedArticle.click_count} clicks
+                  </span>
                 </div>
-              )}
-              
-              {selectedArticle.content ? (
-                <div className="prose prose-invert max-w-none">
-                  <div className="text-gray-300 whitespace-pre-wrap leading-relaxed">
-                    {selectedArticle.content}
+
+                {selectedArticle.featured_image_url && (
+                  <img 
+                    src={selectedArticle.featured_image_url} 
+                    alt={selectedArticle.title}
+                    className="w-full h-48 object-cover rounded-lg"
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                  />
+                )}
+
+                {selectedArticle.summary && (
+                  <div className="bg-slate-700/50 p-4 rounded-lg">
+                    <p className="text-gray-300 text-sm">{selectedArticle.summary}</p>
                   </div>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-400 mb-4">Full article content not available. Read the complete story at the source.</p>
-                </div>
-              )}
-              
-              {selectedArticle.tags && selectedArticle.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-700">
-                  {selectedArticle.tags.map((tag) => (
-                    <Badge 
-                      key={tag} 
-                      variant="secondary" 
-                      className="bg-slate-700 text-gray-300 text-xs"
-                    >
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-              
-              <div className="flex justify-between items-center pt-4 border-t border-slate-700">
-                <Button
-                  variant="outline"
+                )}
+
+                {selectedArticle.content && (
+                  <div className="text-gray-300 text-sm">
+                    <p className="whitespace-pre-wrap">{selectedArticle.content}</p>
+                  </div>
+                )}
+
+                {selectedArticle.tags && selectedArticle.tags.length > 0 && (
+                  <div className="flex gap-2 flex-wrap">
+                    {selectedArticle.tags.map((tag, idx) => (
+                      <Badge key={idx} variant="secondary" className="bg-slate-700 text-gray-300">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                <Button 
                   onClick={() => handleExternalLink(selectedArticle.url)}
-                  className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
+                  className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Read Full Article
                 </Button>
-                
-                {isAdmin && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handlePinToggle(selectedArticle)}
-                    className="text-gray-400 hover:text-cyan-300"
-                  >
-                    <Pin className="h-4 w-4 mr-1" />
-                    {selectedArticle.is_pinned ? 'Unpin' : 'Pin'}
-                  </Button>
-                )}
               </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

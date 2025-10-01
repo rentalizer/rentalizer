@@ -26,6 +26,15 @@ export const API_CONFIG = {
       DELETE_ACCOUNT: '/user/account',
       MEMBER_COUNT: '/user/member-count',
     },
+    NEWS: {
+      BASE: '/news',
+      TRENDING: '/news/trending',
+      FEATURED: '/news/featured',
+      STATS: '/news/stats',
+      SEARCH: '/news/search',
+      SOURCES: '/news/sources',
+      AGGREGATE: '/news/aggregate',
+    },
     HEALTH: '/health',
   },
 };

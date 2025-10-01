@@ -2,13 +2,20 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RefreshCw, Rss, CheckCircle, AlertCircle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAdminRole } from '@/hooks/useAdminRole';
+import { useToast } from '@/hooks/use-toast';
+import newsService from '@/services/newsService';
 
 export const NewsAggregationControls = () => {
   const [isAggregating, setIsAggregating] = useState(false);
   const [lastRun, setLastRun] = useState<string | null>(null);
+  const [lastResult, setLastResult] = useState<{
+    fetched: number;
+    newArticles: number;
+    skipped: number;
+  } | null>(null);
   const { isAdmin } = useAdminRole();
+  const { toast } = useToast();
 
   if (!isAdmin) {
     return null;
@@ -18,31 +25,37 @@ export const NewsAggregationControls = () => {
     setIsAggregating(true);
     
     try {
-      console.log('Triggering news aggregation...');
+      console.log('🔄 Triggering news aggregation from backend...');
       
-      const { data, error } = await supabase.functions.invoke('aggregate-news', {
-        body: { manual_trigger: true }
-      });
+      // Call the backend aggregation endpoint
+      const result = await newsService.aggregateNews();
 
-      if (error) {
-        console.error('Aggregation error:', error);
-        throw error;
-      }
-
-      console.log('Aggregation result:', data);
+      console.log('✅ Aggregation result:', result);
       
       setLastRun(new Date().toLocaleString());
+      setLastResult({
+        fetched: result.totalFetched,
+        newArticles: result.totalNewArticles,
+        skipped: result.totalSkipped,
+      });
       
-      console.log("News Aggregation Complete:", `Successfully processed feeds. ${data?.totalNewArticles || 0} new articles added.`);
+      toast({
+        title: "News Aggregation Complete",
+        description: `Successfully fetched ${result.totalFetched} items. ${result.totalNewArticles} new articles added, ${result.totalSkipped} duplicates skipped.`,
+      });
 
       // Refresh the page to show new articles
       setTimeout(() => {
         window.location.reload();
       }, 2000);
       
-    } catch (error) {
-      console.error('Error triggering aggregation:', error);
-      console.log("Aggregation Failed: Failed to aggregate news feeds. Check console for details.");
+    } catch (error: any) {
+      console.error('❌ Error triggering aggregation:', error);
+      toast({
+        title: "Aggregation Failed",
+        description: error.message || "Failed to aggregate news feeds. Check console for details.",
+        variant: "destructive",
+      });
     } finally {
       setIsAggregating(false);
     }
@@ -64,6 +77,7 @@ export const NewsAggregationControls = () => {
               <li>• AirDNA, Skift, VRM Intel</li>
               <li>• Hospitable, PriceLabs, Guesty</li>
               <li>• BiggerPockets STR content</li>
+              <li>• ShortTermRentalz</li>
             </ul>
           </div>
         </div>
@@ -90,14 +104,33 @@ export const NewsAggregationControls = () => {
           )}
         </div>
 
+        {lastResult && (
+          <div className="bg-slate-700/30 p-3 rounded text-sm">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="text-cyan-400 font-semibold">{lastResult.fetched}</div>
+                <div className="text-xs text-gray-400">Fetched</div>
+              </div>
+              <div>
+                <div className="text-green-400 font-semibold">{lastResult.newArticles}</div>
+                <div className="text-xs text-gray-400">New</div>
+              </div>
+              <div>
+                <div className="text-yellow-400 font-semibold">{lastResult.skipped}</div>
+                <div className="text-xs text-gray-400">Skipped</div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-slate-700/30 p-3 rounded text-sm">
-          <div className="flex items-center gap-2 text-yellow-400 mb-2">
+          <div className="flex items-center gap-2 text-cyan-400 mb-2">
             <AlertCircle className="h-4 w-4" />
-            <span className="font-medium">Automatic Scheduling</span>
+            <span className="font-medium">Backend Integration Active</span>
           </div>
           <p className="text-gray-300 text-xs">
-            To run this automatically every hour, you can set up a cron job in Supabase. 
-            This will keep your news feed updated with the latest industry articles.
+            Connected to Node.js backend with Axios. News is fetched from RSS feeds and stored in MongoDB.
+            This automatically checks for duplicates and updates engagement metrics.
           </p>
         </div>
       </CardContent>
