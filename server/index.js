@@ -15,6 +15,7 @@ const commentRoutes = require('./routes/comments');
 const eventRoutes = require('./routes/events');
 const videoRoutes = require('./routes/videos');
 const uploadRoutes = require('./routes/upload');
+const newsRoutes = require('./routes/news');
 
 // Import WebSocket setup
 const { setupWebSocketHandlers } = require('./middleware/websocket');
@@ -58,6 +59,7 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/videos', videoRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/news', newsRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
