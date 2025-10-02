@@ -181,8 +181,8 @@ directMessageSchema.statics.getUserConversations = function(userId, options = {}
     {
       $match: {
         $or: [
-          { sender_id: mongoose.Types.ObjectId(userId) },
-          { recipient_id: mongoose.Types.ObjectId(userId) }
+          { sender_id: new mongoose.Types.ObjectId(userId) },
+          { recipient_id: new mongoose.Types.ObjectId(userId) }
         ],
         is_deleted: false
       }
@@ -194,7 +194,7 @@ directMessageSchema.statics.getUserConversations = function(userId, options = {}
       $group: {
         _id: {
           $cond: [
-            { $eq: ['$sender_id', mongoose.Types.ObjectId(userId)] },
+            { $eq: ['$sender_id', new mongoose.Types.ObjectId(userId)] },
             '$recipient_id',
             '$sender_id'
           ]
@@ -205,7 +205,7 @@ directMessageSchema.statics.getUserConversations = function(userId, options = {}
             $cond: [
               {
                 $and: [
-                  { $eq: ['$recipient_id', mongoose.Types.ObjectId(userId)] },
+                  { $eq: ['$recipient_id', new mongoose.Types.ObjectId(userId)] },
                   { $eq: ['$read_at', null] }
                 ]
               },

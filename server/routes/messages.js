@@ -154,6 +154,17 @@ router.get(
 );
 
 /**
+ * @route   GET /api/messages/users
+ * @desc    Get all users for admin messaging
+ * @access  Admin only
+ */
+router.get(
+  '/users',
+  requireAdmin,
+  directMessageController.getAllUsers
+);
+
+/**
  * @route   GET /api/messages/admin/first
  * @desc    Get first available admin for support
  * @access  Private

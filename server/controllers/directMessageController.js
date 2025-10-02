@@ -474,6 +474,36 @@ class DirectMessageController {
       });
     }
   }
+
+  /**
+   * Get all users for admin messaging
+   * GET /api/messages/users
+   */
+  async getAllUsers(req, res) {
+    try {
+      const { page = 1, limit = 50, search } = req.query;
+      const currentUserId = req.user.id;
+
+      const result = await messagingService.getAllUsersForMessaging(currentUserId, {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        search
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Users retrieved successfully',
+        data: result.users,
+        pagination: result.pagination
+      });
+    } catch (error) {
+      console.error('Error getting all users:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to retrieve users'
+      });
+    }
+  }
 }
 
 module.exports = new DirectMessageController();

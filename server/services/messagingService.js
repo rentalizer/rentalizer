@@ -503,6 +503,122 @@ class MessagingService {
       throw error;
     }
   }
+
+  /**
+   * Get all users for admin messaging
+   * @param {string} currentUserId - Current admin user ID
+   * @param {Object} options - Query options
+   * @returns {Promise<Object>} Users data with pagination
+   */
+  async getAllUsersForMessaging(currentUserId, options = {}) {
+    try {
+      const {
+        page = 1,
+        limit = 50,
+        search
+      } = options;
+
+      // Build query
+      const query = {
+        _id: { $ne: currentUserId }, // Exclude current user
+        isActive: true
+      };
+
+      // Add search filter if provided
+      if (search) {
+        query.$or = [
+          { firstName: { $regex: search, $options: 'i' } },
+          { lastName: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } }
+        ];
+      }
+
+      // Get users with pagination
+      const skip = (page - 1) * limit;
+      const users = await User.find(query)
+        .select('_id firstName lastName email profilePicture role lastLoginAt isActive')
+        .sort({ firstName: 1, lastName: 1 })
+        .skip(skip)
+        .limit(limit);
+
+      // Get total count
+      const totalCount = await User.countDocuments(query);
+
+      // Get conversation data for each user
+      const usersWithConversationData = await Promise.all(
+        users.map(async (user) => {
+          // Get last message with this user
+          const lastMessage = await DirectMessage.findOne({
+            $or: [
+              { sender_id: currentUserId, recipient_id: user._id },
+              { sender_id: user._id, recipient_id: currentUserId }
+            ],
+            is_deleted: false
+          })
+            .sort({ created_at: -1 })
+            .select('message created_at read_at sender_id');
+
+          // Get unread count
+          const unreadCount = await DirectMessage.countDocuments({
+            sender_id: user._id,
+            recipient_id: currentUserId,
+            read_at: null,
+            is_deleted: false
+          });
+
+          // Determine if user is online (last login within 5 minutes)
+          const isOnline = user.lastLoginAt && 
+            (new Date() - new Date(user.lastLoginAt)) < 5 * 60 * 1000;
+
+          return {
+            _id: user._id,
+            participant_id: user._id,
+            participant: {
+              _id: user._id,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              email: user.email,
+              profilePicture: user.profilePicture,
+              role: user.role,
+              isOnline,
+              lastLoginAt: user.lastLoginAt
+            },
+            last_message: lastMessage ? {
+              _id: lastMessage._id,
+              message: lastMessage.message,
+              created_at: lastMessage.created_at,
+              read_at: lastMessage.read_at,
+              sender_id: lastMessage.sender_id
+            } : null,
+            unread_count: unreadCount,
+            last_activity: lastMessage ? lastMessage.created_at : user.lastLoginAt || user.createdAt,
+            has_conversation: !!lastMessage
+          };
+        })
+      );
+
+      // Sort users: those with conversations first, then by last activity
+      usersWithConversationData.sort((a, b) => {
+        if (a.has_conversation && !b.has_conversation) return -1;
+        if (!a.has_conversation && b.has_conversation) return 1;
+        return new Date(b.last_activity) - new Date(a.last_activity);
+      });
+
+      return {
+        users: usersWithConversationData,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / limit),
+          totalCount,
+          hasNextPage: page < Math.ceil(totalCount / limit),
+          hasPrevPage: page > 1
+        }
+      };
+    } catch (error) {
+      console.error('Error in getAllUsersForMessaging:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new MessagingService();

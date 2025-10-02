@@ -1,13 +1,75 @@
 import { io, Socket } from 'socket.io-client';
-import { apiService } from './api';
-import { useAuth } from '@/contexts/AuthContext';
 
-interface OnlineUser {
+const WS_BASE_URL = import.meta.env.VITE_WS_URL || 'http://localhost:5000';
+
+export interface WebSocketMessage {
+  message: {
+    _id: string;
+    sender_id: string;
+    recipient_id: string;
+    message: string;
+    sender_name: string;
+    message_type: string;
+    support_category: string;
+    priority: string;
+    status: string;
+    read_at: string | null;
+    created_at: string;
+  };
+  sender: {
+    id: string;
+    name: string;
+    avatar?: string;
+    role: string;
+  };
+}
+
+export interface OnlineUser {
   user_id: string;
   display_name: string;
   avatar_url?: string;
   is_admin: boolean;
   last_seen: string;
+}
+
+export interface ConversationStatus {
+  conversationPartnerId: string;
+  unreadCount: number;
+  lastMessage?: {
+    id: string;
+    message: string;
+    sender_id: string;
+    created_at: string;
+    read_at: string | null;
+  };
+}
+
+export interface UserOnlineStatus {
+  userId: string;
+  isOnline: boolean;
+}
+
+export interface MessageStatusUpdate {
+  messageId: string;
+  message: any;
+  updatedBy: string;
+}
+
+export interface MessagesRead {
+  userId: string;
+  conversationPartnerId: string;
+  readCount: number;
+}
+
+export interface MessageDeleted {
+  messageId: string;
+  deletedBy: string;
+}
+
+export interface TypingIndicator {
+  sender_id: string;
+  sender: any;
+  recipient_id: string;
 }
 
 class WebSocketService {
@@ -17,36 +79,44 @@ class WebSocketService {
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000;
 
-  // Event listeners
-  private onlineUsersListeners: ((users: OnlineUser[]) => void)[] = [];
-  private onlineCountListeners: ((count: number) => void)[] = [];
+  /**
+   * Connect to WebSocket server
+   */
+  connect(token?: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const authToken = token || localStorage.getItem('authToken');
+      
+      if (!authToken) {
+        reject(new Error('No authentication token found'));
+        return;
+      }
 
-  connect(token: string) {
-    if (this.socket && this.isConnected) {
-      return;
-    }
-
-    const serverUrl = import.meta.env.VITE_WS_URL || 'http://localhost:5000';
-    
-    this.socket = io(serverUrl, {
-      auth: {
-        token: token
-      },
+      this.socket = io(WS_BASE_URL, {
+        auth: {
+          token: authToken
+        },
       transports: ['websocket', 'polling']
     });
 
     this.socket.on('connect', () => {
-      console.log('✅ WebSocket connected');
+        console.log('Connected to WebSocket server');
       this.isConnected = true;
       this.reconnectAttempts = 0;
       
-      // Join the global online users room immediately
-      this.socket?.emit('join_online_users');
-      console.log('👥 Joined online users room');
+        // Join user room for direct messages
+        this.socket?.emit('join_user_room');
+        
+        resolve();
+      });
+
+      this.socket.on('connect_error', (error) => {
+        console.error('WebSocket connection error:', error);
+        this.isConnected = false;
+        reject(error);
     });
 
     this.socket.on('disconnect', (reason) => {
-      console.log('❌ WebSocket disconnected:', reason);
+        console.log('WebSocket disconnected:', reason);
       this.isConnected = false;
       
       if (reason === 'io server disconnect') {
@@ -55,116 +125,263 @@ class WebSocketService {
       }
     });
 
-    this.socket.on('connect_error', (error) => {
-      console.error('WebSocket connection error:', error);
-      this.handleReconnect();
-    });
-
-    // Listen for online users updates
-    this.socket.on('online_users_update', (data) => {
-      console.log('📊 Online users update:', data);
-      this.onlineUsersListeners.forEach(listener => listener(data.users || []));
-      this.onlineCountListeners.forEach(listener => listener(data.count || 0));
-    });
-
-    // Listen for user joined
-    this.socket.on('user_online', (data) => {
-      console.log('👤 User came online:', data);
-      // Trigger listeners to refresh online users
-      this.requestOnlineUsers();
-    });
-
-    // Listen for user left
-    this.socket.on('user_offline', (data) => {
-      console.log('👋 User went offline:', data);
-      // Trigger listeners to refresh online users
-      this.requestOnlineUsers();
+      this.socket.on('error', (error) => {
+        console.error('WebSocket error:', error);
+      });
     });
   }
 
-  private handleReconnect() {
-    if (this.reconnectAttempts < this.maxReconnectAttempts) {
-      this.reconnectAttempts++;
-      console.log(`🔄 Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
-      
-      setTimeout(() => {
-        if (this.socket) {
-          this.socket.connect();
-        }
-      }, this.reconnectDelay * this.reconnectAttempts);
-    } else {
-      console.error('❌ Max reconnection attempts reached');
-    }
-  }
-
-  disconnect() {
+  /**
+   * Disconnect from WebSocket server
+   */
+  disconnect(): void {
     if (this.socket) {
-      this.socket.emit('leave_online_users');
+      this.socket.emit('leave_user_room');
       this.socket.disconnect();
       this.socket = null;
       this.isConnected = false;
-      console.log('🔌 WebSocket disconnected');
     }
   }
 
-  // Request current online users
-  requestOnlineUsers() {
+  /**
+   * Handle reconnection logic
+   */
+  private handleReconnect(): void {
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++;
+      const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
+      
+      console.log(`Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts})`);
+      
+      setTimeout(() => {
+        this.connect().catch((error) => {
+          console.error('Reconnection failed:', error);
+        });
+      }, delay);
+    } else {
+      console.error('Max reconnection attempts reached');
+    }
+  }
+
+  /**
+   * Send a direct message
+   */
+  sendMessage(data: {
+    recipient_id: string;
+    message: string;
+    message_type?: string;
+    support_category?: string;
+    priority?: string;
+  }): void {
     if (this.socket && this.isConnected) {
-      this.socket.emit('get_online_users');
+      this.socket.emit('new_direct_message', data);
+    } else {
+      console.error('WebSocket not connected');
     }
   }
 
-  // Add event listeners
-  onOnlineUsersUpdate(callback: (users: OnlineUser[]) => void) {
-    this.onlineUsersListeners.push(callback);
+  /**
+   * Start typing indicator
+   */
+  startTyping(recipient_id: string): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('typing_start_dm', { recipient_id });
+    }
   }
 
-  onOnlineCountUpdate(callback: (count: number) => void) {
-    this.onlineCountListeners.push(callback);
+  /**
+   * Stop typing indicator
+   */
+  stopTyping(recipient_id: string): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('typing_stop_dm', { recipient_id });
+    }
+  }
+
+  /**
+   * Mark messages as read
+   */
+  markMessagesAsRead(conversation_partner_id: string): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('mark_messages_read', { conversation_partner_id });
+    }
+  }
+
+  /**
+   * Delete a message
+   */
+  deleteMessage(message_id: string): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('delete_direct_message', { message_id });
+    }
+  }
+
+  /**
+   * Update message status (admin only)
+   */
+  updateMessageStatus(data: {
+    message_id: string;
+    status?: string;
+    priority?: string;
+    support_category?: string;
+  }): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('update_message_status', data);
+    }
+  }
+
+  /**
+   * Get online users
+   */
+  getOnlineUsers(): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('get_online_users_messaging');
+    }
+  }
+
+  /**
+   * Get conversation status
+   */
+  getConversationStatus(conversation_partner_id: string): void {
+    if (this.socket && this.isConnected) {
+      this.socket.emit('get_conversation_status', { conversation_partner_id });
+    }
+  }
+
+  // Event listeners
+  onNewMessage(callback: (data: WebSocketMessage) => void): void {
+    this.socket?.on('new_direct_message', callback);
+  }
+
+  onMessageSent(callback: (data: any) => void): void {
+    this.socket?.on('message_sent', callback);
+  }
+
+  onTypingStart(callback: (data: TypingIndicator) => void): void {
+    this.socket?.on('user_typing_dm', callback);
+  }
+
+  onTypingStop(callback: (data: { sender_id: string; recipient_id: string }) => void): void {
+    this.socket?.on('user_stopped_typing_dm', callback);
+  }
+
+  onMessagesRead(callback: (data: MessagesRead) => void): void {
+    this.socket?.on('messages_read', callback);
+  }
+
+  onMessageDeleted(callback: (data: MessageDeleted) => void): void {
+    this.socket?.on('message_deleted', callback);
+  }
+
+  onMessageStatusUpdated(callback: (data: MessageStatusUpdate) => void): void {
+    this.socket?.on('message_status_updated', callback);
+  }
+
+  onOnlineUsersUpdate(callback: (data: { users: OnlineUser[]; count: number }) => void): void {
+    if (this.socket) {
+      this.socket.on('online_users_for_messaging', callback);
+    } else {
+      console.warn('WebSocket not connected, cannot set up online users listener');
+    }
+  }
+
+  onOnlineCountUpdate(callback: (count: number) => void): void {
+    if (this.socket) {
+      this.socket.on('online_users_for_messaging', (data) => {
+        callback(data.count);
+      });
+    } else {
+      console.warn('WebSocket not connected, cannot set up online count listener');
+    }
+  }
+
+  onConversationStatus(callback: (data: ConversationStatus) => void): void {
+    this.socket?.on('conversation_status', callback);
+  }
+
+  onUserOnlineStatus(callback: (data: UserOnlineStatus) => void): void {
+    this.socket?.on('user_online_status', callback);
+  }
+
+  onError(callback: (error: { message: string }) => void): void {
+    this.socket?.on('error', callback);
   }
 
   // Remove event listeners
-  removeOnlineUsersListener(callback: (users: OnlineUser[]) => void) {
-    this.onlineUsersListeners = this.onlineUsersListeners.filter(listener => listener !== callback);
+  offNewMessage(): void {
+    this.socket?.off('new_direct_message');
   }
 
-  removeOnlineCountListener(callback: (count: number) => void) {
-    this.onlineCountListeners = this.onlineCountListeners.filter(listener => listener !== callback);
+  offMessageSent(): void {
+    this.socket?.off('message_sent');
   }
 
-  // Get connection status
-  getConnectionStatus() {
-    return {
-      isConnected: this.isConnected,
-      socket: this.socket
-    };
+  offTypingStart(): void {
+    this.socket?.off('user_typing_dm');
+  }
+
+  offTypingStop(): void {
+    this.socket?.off('user_stopped_typing_dm');
+  }
+
+  offMessagesRead(): void {
+    this.socket?.off('messages_read');
+  }
+
+  offMessageDeleted(): void {
+    this.socket?.off('message_deleted');
+  }
+
+  offMessageStatusUpdated(): void {
+    this.socket?.off('message_status_updated');
+  }
+
+  offOnlineUsersUpdate(): void {
+    this.socket?.off('online_users_for_messaging');
+  }
+
+  offOnlineCountUpdate(): void {
+    this.socket?.off('online_users_for_messaging');
+  }
+
+  offConversationStatus(): void {
+    this.socket?.off('conversation_status');
+  }
+
+  offUserOnlineStatus(): void {
+    this.socket?.off('user_online_status');
+  }
+
+  offError(): void {
+    this.socket?.off('error');
+  }
+
+  // Additional methods for compatibility
+  getConnectionStatus(): { isConnected: boolean } {
+    return { isConnected: this.isConnected };
+  }
+
+  requestOnlineUsers(): void {
+    this.getOnlineUsers();
+  }
+
+  removeOnlineUsersListener(callback: (users: OnlineUser[]) => void): void {
+    this.socket?.off('online_users_for_messaging', callback);
+  }
+
+  removeOnlineCountListener(callback: (count: number) => void): void {
+    this.socket?.off('online_users_for_messaging', callback);
+  }
+
+  // Getters
+  get connected(): boolean {
+    return this.isConnected;
+  }
+
+  get socketInstance(): Socket | null {
+    return this.socket;
   }
 }
 
-// Create a singleton instance
 export const websocketService = new WebSocketService();
-
-// Hook to use WebSocket service
-export const useWebSocket = () => {
-  const { user } = useAuth();
-
-  const connect = () => {
-    if (user) {
-      const token = apiService.getAuthToken();
-      if (token) {
-        websocketService.connect(token);
-      }
-    }
-  };
-
-  const disconnect = () => {
-    websocketService.disconnect();
-  };
-
-  return {
-    connect,
-    disconnect,
-    websocketService,
-    isConnected: websocketService.getConnectionStatus().isConnected
-  };
-};
+export default websocketService;
