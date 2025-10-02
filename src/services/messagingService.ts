@@ -56,6 +56,9 @@ export interface Message {
   read_at: string | null;
   created_at: string;
   updated_at: string;
+  // Fallback for old field names
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Conversation {
@@ -168,7 +171,7 @@ class MessagingService {
     page = 1, 
     limit = 50, 
     sortBy = 'created_at', 
-    sortOrder = 'desc'
+    sortOrder = 'asc'
   ): Promise<ApiResponse<Message[]>> {
     const response = await messagingAPI.get(`/conversation/${userId}`, {
       params: { page, limit, sortBy, sortOrder }

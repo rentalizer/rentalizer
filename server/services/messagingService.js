@@ -104,6 +104,17 @@ class MessagingService {
         sortOrder
       });
 
+      console.log('📋 Database returned messages in order:', {
+        sortBy,
+        sortOrder,
+        messageCount: messages.length,
+        messageOrder: messages.map(msg => ({
+          id: msg._id,
+          created_at: msg.created_at,
+          message: msg.message.substring(0, 20) + '...'
+        }))
+      });
+
       // Get total count for pagination
       const totalCount = await DirectMessage.countDocuments({
         $or: [
@@ -536,7 +547,7 @@ class MessagingService {
       // Get users with pagination
       const skip = (page - 1) * limit;
       const users = await User.find(query)
-        .select('_id firstName lastName email profilePicture role lastLoginAt isActive')
+        .select('_id firstName lastName email profilePicture role lastLogin isActive')
         .sort({ firstName: 1, lastName: 1 })
         .skip(skip)
         .limit(limit);
@@ -567,8 +578,8 @@ class MessagingService {
           });
 
           // Determine if user is online (last login within 5 minutes)
-          const isOnline = user.lastLoginAt && 
-            (new Date() - new Date(user.lastLoginAt)) < 5 * 60 * 1000;
+          const isOnline = user.lastLogin && 
+            (new Date() - new Date(user.lastLogin)) < 5 * 60 * 1000;
 
           return {
             _id: user._id,
@@ -581,7 +592,7 @@ class MessagingService {
               profilePicture: user.profilePicture,
               role: user.role,
               isOnline,
-              lastLoginAt: user.lastLoginAt
+              lastLoginAt: user.lastLogin
             },
             last_message: lastMessage ? {
               _id: lastMessage._id,
@@ -591,7 +602,7 @@ class MessagingService {
               sender_id: lastMessage.sender_id
             } : null,
             unread_count: unreadCount,
-            last_activity: lastMessage ? lastMessage.created_at : user.lastLoginAt || user.createdAt,
+            last_activity: lastMessage ? lastMessage.created_at : user.lastLogin || user.createdAt,
             has_conversation: !!lastMessage
           };
         })

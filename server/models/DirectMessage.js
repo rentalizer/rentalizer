@@ -81,7 +81,7 @@ const directMessageSchema = new mongoose.Schema({
     default: 'open'
   }
 }, {
-  timestamps: true
+  timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
 
 // Indexes for better query performance
@@ -141,12 +141,12 @@ directMessageSchema.methods.softDelete = function() {
 };
 
 // Static method to get conversation between two users
-directMessageSchema.statics.getConversation = function(userId1, userId2, options = {}) {
+directMessageSchema.statics.getConversation = async function(userId1, userId2, options = {}) {
   const {
     page = 1,
     limit = 50,
     sortBy = 'created_at',
-    sortOrder = 'desc'
+    sortOrder = 'asc'
   } = options;
 
   const query = {
@@ -160,12 +160,28 @@ directMessageSchema.statics.getConversation = function(userId1, userId2, options
   const sort = {};
   sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
-  return this.find(query)
-    .populate('sender_id', 'firstName lastName email profilePicture role')
-    .populate('recipient_id', 'firstName lastName email profilePicture role')
+  console.log('🔍 Database query details:', {
+    sortBy,
+    sortOrder,
+    sortObject: sort,
+    query: query
+  });
+
+  const result = await this.find(query)
     .sort(sort)
     .skip((page - 1) * limit)
     .limit(limit);
+
+  console.log('🔍 Database query result:', {
+    resultCount: result.length,
+    resultOrder: result.map(msg => ({
+      id: msg._id,
+      created_at: msg.created_at,
+      message: msg.message.substring(0, 20) + '...'
+    }))
+  });
+
+  return result;
 };
 
 // Static method to get user's conversations

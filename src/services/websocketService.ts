@@ -235,7 +235,10 @@ class WebSocketService {
    */
   getOnlineUsers(): void {
     if (this.socket && this.isConnected) {
+      console.log('🔍 Requesting online users...');
       this.socket.emit('get_online_users_messaging');
+    } else {
+      console.log('❌ Cannot request online users - WebSocket not connected');
     }
   }
 

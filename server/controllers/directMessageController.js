@@ -77,7 +77,15 @@ class DirectMessageController {
     try {
       const currentUserId = req.user.id;
       const { userId: otherUserId } = req.params;
-      const { page = 1, limit = 50, sortBy = 'created_at', sortOrder = 'desc' } = req.query;
+      const { page = 1, limit = 50, sortBy = 'created_at', sortOrder = 'asc' } = req.query;
+
+      console.log('🎯 Controller received query params:', {
+        page,
+        limit,
+        sortBy,
+        sortOrder,
+        allQueryParams: req.query
+      });
 
       const options = {
         page: parseInt(page),
@@ -85,6 +93,8 @@ class DirectMessageController {
         sortBy,
         sortOrder
       };
+
+      console.log('🎯 Controller passing options to service:', options);
 
       const result = await messagingService.getConversation(currentUserId, otherUserId, options);
 

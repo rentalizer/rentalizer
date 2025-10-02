@@ -21,6 +21,9 @@ export interface Message {
   read_at: string | null;
   created_at: string;
   updated_at: string;
+  // Fallback for old field names
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface MessageThreadProps {
@@ -55,6 +58,25 @@ export default function MessageThread({
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const formatLastMessageTime = (timestamp: string) => {
+    try {
+      if (!timestamp) {
+        console.warn('Empty timestamp provided to formatLastMessageTime');
+        return 'Unknown time';
+      }
+      
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid timestamp provided to formatLastMessageTime:', timestamp);
+        return 'Unknown time';
+      }
+      return formatDistanceToNow(date, { addSuffix: true });
+    } catch (error) {
+      console.warn('Error formatting timestamp:', timestamp, error);
+      return 'Unknown time';
+    }
   };
 
   useEffect(() => {
@@ -135,6 +157,15 @@ export default function MessageThread({
             const isOwn = message.sender_id === currentUserId;
             const isRead = !!message.read_at;
             
+            // Debug logging
+            console.log('Message alignment check:', {
+              messageId: message._id,
+              sender_id: message.sender_id,
+              currentUserId: currentUserId,
+              isOwn: isOwn,
+              message: message.message
+            });
+            
             return (
               <div
                 key={message._id}
@@ -155,7 +186,7 @@ export default function MessageThread({
                   <div className={`flex items-center gap-1 mt-1 text-xs text-slate-400 ${
                     isOwn ? 'flex-row-reverse' : 'flex-row'
                   }`}>
-                    <span>{formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}</span>
+                    <span>{formatLastMessageTime(message.created_at || message.createdAt || '')}</span>
                     
                     {/* Read status for own messages */}
                     {isOwn && (

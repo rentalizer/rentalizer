@@ -10,12 +10,14 @@ interface MembersListProps {
   members: Conversation[];
   selectedMemberId?: string;
   onMemberSelect: (memberId: string) => void;
+  onlineUsers?: Set<string>;
 }
 
 export default function MembersList({
   members,
   selectedMemberId,
-  onMemberSelect
+  onMemberSelect,
+  onlineUsers = new Set()
 }: MembersListProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -44,8 +46,8 @@ export default function MembersList({
     }
     
     // Then sort by online status (online first)
-    const aOnline = (a.participant as any).isOnline;
-    const bOnline = (b.participant as any).isOnline;
+    const aOnline = onlineUsers.has(a.participant_id) || (a.participant as { isOnline?: boolean }).isOnline;
+    const bOnline = onlineUsers.has(b.participant_id) || (b.participant as { isOnline?: boolean }).isOnline;
     if (aOnline !== bOnline) {
       return aOnline ? -1 : 1;
     }
@@ -146,7 +148,7 @@ export default function MembersList({
                         
                         {/* Online status indicator */}
                         <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-slate-800 ${
-                          (member.participant as any).isOnline ? 'bg-green-500' : 'bg-gray-500'
+                          onlineUsers.has(member.participant_id) || (member.participant as { isOnline?: boolean }).isOnline ? 'bg-green-500' : 'bg-gray-500'
                         }`} />
                         
                         {/* Admin badge */}
@@ -232,7 +234,7 @@ export default function MembersList({
           </p>
           {members.length > 0 && (
             <p className="text-slate-500 text-xs mt-1">
-              {members.filter(m => (m.participant as any).isOnline).length} online
+              {members.filter(m => onlineUsers.has(m.participant_id) || (m.participant as { isOnline?: boolean }).isOnline).length} online
             </p>
           )}
         </div>

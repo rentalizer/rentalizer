@@ -345,6 +345,13 @@ const setupWebSocketHandlers = (io) => {
       users: onlineUsers,
       count: onlineCount
     });
+    
+    // Also emit for messaging system
+    console.log(`📊 Broadcasting online users for messaging:`, { users: onlineUsers, count: onlineCount });
+    io.emit('online_users_for_messaging', {
+      users: onlineUsers,
+      count: onlineCount
+    });
 
     // Join discussion room
     socket.on('join_discussion', (data) => {
@@ -448,6 +455,12 @@ const setupWebSocketHandlers = (io) => {
       const onlineUsers = roomManager.getOnlineUsers();
       const onlineCount = roomManager.getOnlineCount();
       io.emit('online_users_update', {
+        users: onlineUsers,
+        count: onlineCount
+      });
+      
+      // Also emit for messaging system
+      io.emit('online_users_for_messaging', {
         users: onlineUsers,
         count: onlineCount
       });

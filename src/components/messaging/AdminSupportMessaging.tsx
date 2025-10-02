@@ -26,6 +26,7 @@ export default function AdminSupportMessaging() {
   const [sendingMessage, setSendingMessage] = useState(false);
   const [wsConnected, setWsConnected] = useState(false);
   const [backendOffline, setBackendOffline] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
 
 
   // Load conversations or all users (for admins)
@@ -74,6 +75,18 @@ export default function AdminSupportMessaging() {
     websocketService.onNewMessage((data) => {
       const newMessage = data.message;
       
+      console.log('📨 Received new message via WebSocket:', {
+        messageId: newMessage._id,
+        sender_id: newMessage.sender_id,
+        sender_idType: typeof newMessage.sender_id,
+        currentUserId: user?.id,
+        currentUserIdType: typeof user?.id,
+        created_at: newMessage.created_at,
+        createdAt: (newMessage as { createdAt?: string }).createdAt,
+        message: newMessage.message,
+        fullMessage: newMessage
+      });
+      
       // Add to messages if it's for current conversation
       setMessages(prev => {
         const exists = prev.some(msg => msg._id === newMessage._id);
@@ -97,6 +110,16 @@ export default function AdminSupportMessaging() {
     // Message sent confirmation
     websocketService.onMessageSent((data) => {
       if (data.message) {
+        console.log('✅ Message sent confirmation via WebSocket:', {
+          messageId: data.message._id,
+          sender_id: data.message.sender_id,
+          sender_idType: typeof data.message.sender_id,
+          currentUserId: user?.id,
+          currentUserIdType: typeof user?.id,
+          created_at: data.message.created_at,
+          message: data.message.message
+        });
+        
         setMessages(prev => {
           const exists = prev.some(msg => msg._id === data.message._id);
           return exists ? prev : [...prev, data.message as Message];
@@ -131,6 +154,27 @@ export default function AdminSupportMessaging() {
       loadConversations();
     });
 
+    // Online users update
+    websocketService.onOnlineUsersUpdate((data) => {
+      console.log('📊 Received online users update:', data);
+      const onlineUserIds = new Set(data.users.map((user: { user_id: string }) => user.user_id));
+      setOnlineUsers(onlineUserIds);
+    });
+
+    // User online status update
+    websocketService.onUserOnlineStatus((data) => {
+      console.log('👤 Received user online status update:', data);
+      setOnlineUsers(prev => {
+        const newSet = new Set(prev);
+        if (data.isOnline) {
+          newSet.add(data.userId);
+        } else {
+          newSet.delete(data.userId);
+        }
+        return newSet;
+      });
+    });
+
     // Error handling
     websocketService.onError((error) => {
       console.error('WebSocket error:', error);
@@ -144,6 +188,9 @@ export default function AdminSupportMessaging() {
         await websocketService.connect();
         setWsConnected(true);
         setupWebSocketListeners();
+        
+        // Request online users for real-time status (both admin and user need this)
+        websocketService.requestOnlineUsers();
       } catch (error) {
         console.error('Failed to connect to WebSocket:', error);
         setWsConnected(false);
@@ -158,7 +205,7 @@ export default function AdminSupportMessaging() {
       websocketService.disconnect();
       setWsConnected(false);
     };
-  }, [user, setupWebSocketListeners]);
+  }, [user, setupWebSocketListeners, isAdmin]);
 
   useEffect(() => {
     if (user) {
@@ -172,6 +219,14 @@ export default function AdminSupportMessaging() {
     try {
       const response = await messagingService.getConversation(memberId);
       if (response.success) {
+        console.log('📨 Frontend received messages from API:', {
+          messageCount: response.data.length,
+          messageOrder: response.data.map(msg => ({
+            id: msg._id,
+            created_at: msg.created_at,
+            message: msg.message.substring(0, 20) + '...'
+          }))
+        });
         setMessages(response.data);
       }
     } catch (error) {
@@ -185,6 +240,22 @@ export default function AdminSupportMessaging() {
     }
   }, [selectedMemberId, user, loadMessages]);
 
+  // Debug logging for user and messages
+  useEffect(() => {
+    if (user && messages.length > 0) {
+      console.log('🔍 Debug - User and Messages:', {
+        userId: user.id,
+        userIdType: typeof user.id,
+        messages: messages.map(msg => ({
+          id: msg._id,
+          sender_id: msg.sender_id,
+          sender_idType: typeof msg.sender_id,
+          message: msg.message
+        }))
+      });
+    }
+  }, [user, messages]);
+
   // For members, find the first admin to chat with
   useEffect(() => {
     if (!user || isAdmin || selectedMemberId) return;
@@ -192,10 +263,14 @@ export default function AdminSupportMessaging() {
     const findAdminAndLoadMessages = async () => {
       try {
         setConnectingToAdmin(true);
+        console.log('🔍 Looking for admin user...');
         const response = await messagingService.getFirstAdmin();
+        console.log('👤 Admin response:', response);
         if (response.success) {
+          console.log('✅ Found admin:', response.data);
           setSelectedMemberId(response.data._id);
         } else {
+          console.log('❌ No admin found');
           toast({
             title: "No Admin Available",
             description: "No admin users are currently available for support.",
@@ -343,7 +418,7 @@ export default function AdminSupportMessaging() {
               "Admin Support"
             }
             recipientAvatar={selectedMember?.participant.profilePicture}
-            isOnline={true}
+            isOnline={selectedMemberId ? onlineUsers.has(selectedMemberId) || (selectedMember?.participant as { isOnline?: boolean })?.isOnline || false : false}
             recipientId={selectedMemberId}
             onMarkAsRead={handleMarkAsRead}
           />
@@ -377,7 +452,7 @@ export default function AdminSupportMessaging() {
               "Unknown User"
             }
             recipientAvatar={selectedMember.participant.profilePicture}
-            isOnline={true}
+            isOnline={onlineUsers.has(selectedMember.participant_id) || (selectedMember.participant as { isOnline?: boolean }).isOnline || false}
             recipientId={selectedMemberId}
             onMarkAsRead={handleMarkAsRead}
           />
@@ -420,6 +495,7 @@ export default function AdminSupportMessaging() {
         members={conversations}
         selectedMemberId={selectedMemberId}
         onMemberSelect={handleMemberSelect}
+        onlineUsers={onlineUsers}
       />
     </div>
   );

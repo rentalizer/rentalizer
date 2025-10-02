@@ -50,9 +50,45 @@ class DirectMessageHandler {
 
       const newMessage = await messagingService.sendMessage(messageData);
 
+      console.log('📤 Sending message via WebSocket:', {
+        messageId: newMessage._id,
+        sender_id: newMessage.sender_id,
+        sender_idType: typeof newMessage.sender_id,
+        sender_idIsObject: typeof newMessage.sender_id === 'object',
+        created_at: newMessage.created_at,
+        updated_at: newMessage.updated_at,
+        createdAt: newMessage.createdAt,
+        updatedAt: newMessage.updatedAt,
+        fullMessage: newMessage.toObject()
+      });
+
+      // Create normalized message object with string IDs (consistent with API)
+      const normalizedMessage = {
+        _id: newMessage._id,
+        sender_id: newMessage.sender_id._id || newMessage.sender_id, // Ensure string ID
+        recipient_id: newMessage.recipient_id._id || newMessage.recipient_id, // Ensure string ID
+        message: newMessage.message,
+        sender_name: newMessage.sender_name,
+        message_type: newMessage.message_type,
+        support_category: newMessage.support_category,
+        priority: newMessage.priority,
+        status: newMessage.status,
+        read_at: newMessage.read_at,
+        created_at: newMessage.created_at,
+        updated_at: newMessage.updated_at
+      };
+
+      console.log('📤 Normalized message for WebSocket:', {
+        messageId: normalizedMessage._id,
+        sender_id: normalizedMessage.sender_id,
+        sender_idType: typeof normalizedMessage.sender_id,
+        recipient_id: normalizedMessage.recipient_id,
+        recipient_idType: typeof normalizedMessage.recipient_id
+      });
+
       // Emit to recipient
       this.io.to(`user_${recipient_id}`).emit('new_direct_message', {
-        message: newMessage,
+        message: normalizedMessage,
         sender: {
           id: sender._id,
           name: senderName,
@@ -64,7 +100,7 @@ class DirectMessageHandler {
       // Emit confirmation to sender
       socket.emit('message_sent', {
         success: true,
-        message: newMessage
+        message: normalizedMessage
       });
 
       // Update online status for both users
@@ -240,6 +276,8 @@ class DirectMessageHandler {
   handleGetOnlineUsers(socket) {
     const onlineUsers = this.roomManager.getOnlineUsers();
     const onlineCount = this.roomManager.getOnlineCount();
+    
+    console.log(`📊 Sending online users to ${socket.userDisplayName}:`, { users: onlineUsers, count: onlineCount });
     
     socket.emit('online_users_for_messaging', {
       users: onlineUsers,
