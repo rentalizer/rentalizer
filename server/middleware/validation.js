@@ -195,8 +195,8 @@ const validateVideo = [
       return true;
     }),
   body('category')
-    .isIn(['Category 1', 'Category 2', 'Category 3'])
-    .withMessage('Category must be one of: Category 1, Category 2, Category 3'),
+    .isIn(['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'])
+    .withMessage('Category must be one of: Business Formation, Market Research, Property Acquisition, Operations'),
   body('videoUrl')
     .isURL({ protocols: ['https'] })
     .withMessage('Video URL must be a valid HTTPS URL')
@@ -260,8 +260,8 @@ const validateVideoUpdate = [
     }),
   body('category')
     .optional()
-    .isIn(['Category 1', 'Category 2', 'Category 3'])
-    .withMessage('Category must be one of: Category 1, Category 2, Category 3'),
+    .isIn(['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'])
+    .withMessage('Category must be one of: Business Formation, Market Research, Property Acquisition, Operations'),
   body('videoUrl')
     .optional()
     .isURL({ protocols: ['https'] })

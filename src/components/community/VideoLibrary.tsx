@@ -198,7 +198,7 @@ export const VideoLibrary = () => {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
-  const [categories, setCategories] = useState<string[]>(['all', 'Category 1', 'Category 2', 'Category 3']);
+  const [categories, setCategories] = useState<string[]>(['all', 'Business Formation', 'Market Research', 'Property Acquisition', 'Operations']);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -211,7 +211,7 @@ export const VideoLibrary = () => {
     title: '',
     description: '',
     thumbnail: '',
-    category: 'Category 1',
+    category: 'Business Formation',
     videoUrl: '',
     tags: [],
     featured: false
@@ -281,14 +281,14 @@ export const VideoLibrary = () => {
       const response = await videoService.getVideoCategories();
       console.log('Categories API response:', response.data);
       // If API returns empty categories, use the default categories
-      const apiCategories = response.data.length > 0 ? response.data : ['Category 1', 'Category 2', 'Category 3'];
+      const apiCategories = response.data.length > 0 ? response.data : ['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'];
       const finalCategories = ['all', ...apiCategories];
       console.log('Final categories:', finalCategories);
       setCategories(finalCategories);
     } catch (error) {
       console.error('Error loading categories:', error);
       // Fallback to default categories if API fails
-      setCategories(['all', 'Category 1', 'Category 2', 'Category 3']);
+      setCategories(['all', 'Business Formation', 'Market Research', 'Property Acquisition', 'Operations']);
     }
   }, []);
 
@@ -334,9 +334,10 @@ export const VideoLibrary = () => {
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      'Category 1': 'bg-blue-500/20 border-blue-500/30 text-blue-300',
-      'Category 2': 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300',
-      'Category 3': 'bg-purple-500/20 border-purple-500/30 text-purple-300'
+      'Business Formation': 'bg-blue-500/20 border-blue-500/30 text-blue-300',
+      'Market Research': 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300',
+      'Property Acquisition': 'bg-purple-500/20 border-purple-500/30 text-purple-300',
+      'Operations': 'bg-green-500/20 border-green-500/30 text-green-300'
     };
     return colors[category as keyof typeof colors] || 'bg-gray-500/20 border-gray-500/30 text-gray-300';
   };
@@ -377,23 +378,54 @@ export const VideoLibrary = () => {
     const { active, over } = event;
 
     if (active.id !== over?.id) {
-      const oldIndex = videos.findIndex((item) => item._id === active.id);
-      const newIndex = videos.findIndex((item) => item._id === over?.id);
+      // Find the active and over videos
+      const activeVideo = videos.find(video => video._id === active.id);
+      const overVideo = videos.find(video => video._id === over?.id);
       
-      const newItems = arrayMove(videos, oldIndex, newIndex);
-      const videoOrders = newItems.map((item, index) => ({
+      if (!activeVideo || !overVideo) return;
+      
+      // Only allow reordering within the same category
+      if (activeVideo.category !== overVideo.category) {
+        toast({
+          title: "Cannot reorder",
+          description: "Videos can only be reordered within the same category.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      // Get videos in the same category
+      const categoryVideos = videos.filter(video => video.category === activeVideo.category);
+      const oldIndex = categoryVideos.findIndex((item) => item._id === active.id);
+      const newIndex = categoryVideos.findIndex((item) => item._id === over?.id);
+      
+      const newCategoryItems = arrayMove(categoryVideos, oldIndex, newIndex);
+      
+      // Update the order for videos in this category
+      const videoOrders = newCategoryItems.map((item, index) => ({
         videoId: item._id,
         order: index + 1
       }));
 
       try {
         await videoService.reorderVideos(videoOrders);
-        setVideos(newItems.map((item, index) => ({ ...item, order: index + 1 })));
+        
+        // Update local state
+        setVideos(prevVideos => {
+          const updatedVideos = [...prevVideos];
+          newCategoryItems.forEach((item, index) => {
+            const videoIndex = updatedVideos.findIndex(v => v._id === item._id);
+            if (videoIndex !== -1) {
+              updatedVideos[videoIndex] = { ...updatedVideos[videoIndex], order: index + 1 };
+            }
+          });
+          return updatedVideos;
+        });
       
-      toast({
-        title: "Video reordered",
-        description: "Video position has been updated successfully.",
-      });
+        toast({
+          title: "Video reordered",
+          description: "Video position has been updated successfully.",
+        });
       } catch (error) {
         console.error('Error reordering videos:', error);
         toast({
@@ -435,7 +467,7 @@ export const VideoLibrary = () => {
       title: '',
       description: '',
       thumbnail: '',
-        category: 'Category 1',
+        category: 'Business Formation',
       videoUrl: '',
       tags: [],
       featured: false
@@ -518,7 +550,7 @@ export const VideoLibrary = () => {
       title: '',
       description: '',
       thumbnail: '',
-        category: 'Category 1',
+        category: 'Business Formation',
       videoUrl: '',
       tags: [],
       featured: false
@@ -613,11 +645,11 @@ export const VideoLibrary = () => {
                 Add Video
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md bg-slate-900 border border-cyan-500/20">
+            <DialogContent className="max-w-md max-h-[90vh] bg-slate-900 border border-cyan-500/20 overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-cyan-300">Add New Video</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4">
+              <div className="space-y-4 pr-2">
                 <div>
                   <Label htmlFor="title" className="text-gray-300">Title</Label>
                   <Input
@@ -701,7 +733,7 @@ export const VideoLibrary = () => {
             className="pl-10 bg-slate-800/50 border-cyan-500/20 text-white placeholder-gray-400"
           />
         </div>
-        <div className="flex gap-2 overflow-x-auto">
+        <div className="flex gap-2 overflow-x-auto pb-2">
           {categories.map(category => (
             <Button
               key={category}
@@ -710,8 +742,8 @@ export const VideoLibrary = () => {
               onClick={() => setSelectedCategory(category)}
               className={
                 selectedCategory === category
-                  ? "bg-cyan-600 hover:bg-cyan-700 whitespace-nowrap"
-                  : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 whitespace-nowrap"
+                  ? "bg-cyan-600 hover:bg-cyan-700 whitespace-nowrap flex-shrink-0"
+                  : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 whitespace-nowrap flex-shrink-0"
               }
             >
               {category === 'all' ? 'All Categories' : category}
@@ -720,7 +752,7 @@ export const VideoLibrary = () => {
         </div>
       </div>
 
-      {/* Videos Grid with Drag and Drop */}
+      {/* Videos organized by category columns */}
       {loading ? (
         <div className="flex justify-center items-center py-12">
           <div className="flex flex-col items-center gap-4">
@@ -730,57 +762,139 @@ export const VideoLibrary = () => {
         </div>
       ) : (
         <>
-      {isAdmin ? (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={videos.map(v => v._id)} strategy={verticalListSortingStrategy}>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {videos.map(video => (
-                <SortableVideoCard
-                      key={video._id}
-                  video={video}
-                  isAdmin={isAdmin}
-                  isAuthenticated={!!user}
-                  onEdit={handleEditVideo}
-                  onDelete={handleDeleteVideo}
-                  onToggleFeatured={handleToggleFeatured}
-                  onClick={handleVideoClick}
-                  getCategoryColor={getCategoryColor}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
-      ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {videos.map(video => (
-            <SortableVideoCard
-                  key={video._id}
-              video={video}
-              isAdmin={false}
-              isAuthenticated={!!user}
-              onEdit={() => {}}
-              onDelete={() => {}}
-              onToggleFeatured={() => {}}
-              onClick={handleVideoClick}
-              getCategoryColor={getCategoryColor}
-            />
-          ))}
-        </div>
-      )}
+          {(() => {
+            // Define the category columns
+            const categoryColumns = ['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'];
+            
+            // Filter videos based on selected category
+            const filteredVideos = selectedCategory === 'all' 
+              ? videos 
+              : videos.filter(video => video.category === selectedCategory);
+            
+            // Group videos by category
+            const videosByCategory = categoryColumns.reduce((acc, category) => {
+              acc[category] = filteredVideos.filter(video => video.category === category);
+              return acc;
+            }, {} as Record<string, Video[]>);
+
+            // If a specific category is selected, show only that column
+            if (selectedCategory !== 'all') {
+              const categoryVideos = videosByCategory[selectedCategory] || [];
+              
+              return (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4 mb-6">
+                    <h3 className="text-xl font-semibold text-cyan-300">{selectedCategory}</h3>
+                    <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
+                      {categoryVideos.length} videos
+                    </Badge>
+                  </div>
+                  
+                  <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                    {isAdmin ? (
+                      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                        <SortableContext items={categoryVideos.map(v => v._id)} strategy={verticalListSortingStrategy}>
+                          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {categoryVideos.map(video => (
+                              <SortableVideoCard
+                                key={video._id}
+                                video={video}
+                                isAdmin={isAdmin}
+                                isAuthenticated={!!user}
+                                onEdit={handleEditVideo}
+                                onDelete={handleDeleteVideo}
+                                onToggleFeatured={handleToggleFeatured}
+                                onClick={handleVideoClick}
+                                getCategoryColor={getCategoryColor}
+                              />
+                            ))}
+                          </div>
+                        </SortableContext>
+                      </DndContext>
+                    ) : (
+                      <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {categoryVideos.map(video => (
+                          <SortableVideoCard
+                            key={video._id}
+                            video={video}
+                            isAdmin={false}
+                            isAuthenticated={!!user}
+                            onEdit={() => {}}
+                            onDelete={() => {}}
+                            onToggleFeatured={() => {}}
+                            onClick={handleVideoClick}
+                            getCategoryColor={getCategoryColor}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            }
+
+            // Show all categories in 4 columns
+            return (
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {categoryColumns.map(category => {
+                    const categoryVideos = videosByCategory[category] || [];
+                    
+                    return (
+                      <div key={category} className="space-y-4">
+                        {/* Category Header */}
+                        <div className="flex items-center gap-2 mb-4">
+                          <h3 className="text-lg font-semibold text-cyan-300">{category}</h3>
+                          <Badge variant="outline" className="border-cyan-500/30 text-cyan-300 text-xs">
+                            {categoryVideos.length}
+                          </Badge>
+                        </div>
+                        
+                        {/* Videos in this category */}
+                        <SortableContext items={categoryVideos.map(v => v._id)} strategy={verticalListSortingStrategy}>
+                          <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                            {categoryVideos.map(video => (
+                              <SortableVideoCard
+                                key={video._id}
+                                video={video}
+                                isAdmin={isAdmin}
+                                isAuthenticated={!!user}
+                                onEdit={handleEditVideo}
+                                onDelete={handleDeleteVideo}
+                                onToggleFeatured={handleToggleFeatured}
+                                onClick={handleVideoClick}
+                                getCategoryColor={getCategoryColor}
+                              />
+                            ))}
+                            
+                            {categoryVideos.length === 0 && (
+                              <div className="text-center py-8 text-gray-400 text-sm">
+                                No videos in this category
+                              </div>
+                            )}
+                          </div>
+                        </SortableContext>
+                      </div>
+                    );
+                  })}
+                </div>
+              </DndContext>
+            );
+          })()}
 
           {videos.length === 0 && !loading && (
-        <Card className="bg-slate-800/50 border-cyan-500/20">
-          <CardContent className="text-center py-12">
+            <Card className="bg-slate-800/50 border-cyan-500/20">
+              <CardContent className="text-center py-12">
                 <VideoIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-300 mb-2">No videos found</h3>
+                <h3 className="text-lg font-medium text-gray-300 mb-2">No videos found</h3>
                 <p className="text-gray-400">
                   {searchTerm || selectedCategory !== 'all' 
                     ? 'Try adjusting your search terms or filters' 
                     : 'No videos have been added yet'
                   }
                 </p>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
           )}
         </>
       )}

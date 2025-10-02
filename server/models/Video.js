@@ -36,8 +36,8 @@ const videoSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Video category is required'],
     enum: {
-      values: ['Category 1', 'Category 2', 'Category 3'],
-      message: 'Category must be one of: Category 1, Category 2, Category 3'
+      values: ['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'],
+      message: 'Category must be one of: Business Formation, Market Research, Property Acquisition, Operations'
     }
   },
   tags: [{
