@@ -270,9 +270,9 @@ const Community = React.memo(() => {
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
             </TabsTrigger>
-            <TabsTrigger value="news" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-              <Newspaper className="h-5 w-5 mr-2" />
-              News
+            <TabsTrigger value="admin-support" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+              <MessageSquare className="h-5 w-5 mr-2" />
+              Admin Support
             </TabsTrigger>
             {/* <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
@@ -531,17 +531,17 @@ const Community = React.memo(() => {
             </div>
           </TabsContent>
 
-          <TabsContent value="news" className="mt-8">
-            <div className="max-w-6xl mx-auto space-y-6">
+          <TabsContent value="admin-support" className="mt-8">
+            <div className="max-w-6xl mx-auto">
               <div className="text-center mb-6">
                 <h2 className="text-3xl font-bold text-cyan-300 mb-2 flex items-center justify-center gap-3">
-                  <Newspaper className="h-8 w-8 text-cyan-400" />
-                  Industry News Feed
+                  <MessageSquare className="h-8 w-8 text-cyan-400" />
+                  Admin Support
                 </h2>
-                <p className="text-gray-400">Curated short-term rental industry news submitted by admins</p>
+                <p className="text-gray-400">Get help from our admin team</p>
               </div>
               
-              <NewsFeed />
+              <AdminSupportMessaging />
             </div>
           </TabsContent>
 
