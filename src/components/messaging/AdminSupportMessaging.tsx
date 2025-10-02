@@ -434,7 +434,7 @@ export default function AdminSupportMessaging() {
   if (!isAdmin) {
     return (
       <div className="h-[600px] max-w-4xl mx-auto">
-        <div className="bg-slate-700/50 border border-border rounded-lg p-6 mb-4">
+        {/* <div className="bg-slate-700/50 border border-border rounded-lg p-6 mb-4">
           <div className="flex items-center gap-3 mb-4">
             <MessageSquare className="h-6 w-6 text-primary" />
             <h2 className="text-xl font-semibold text-white">Contact Admin Support</h2>
@@ -445,7 +445,7 @@ export default function AdminSupportMessaging() {
           <p className="text-slate-300 mb-4">
             Need help? Send a message to our admin team and we'll get back to you as soon as possible.
           </p>
-        </div>
+        </div> */}
 
         {loading ? (
           <div className="bg-slate-800/90 rounded-lg p-8 text-center">

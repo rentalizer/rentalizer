@@ -236,9 +236,9 @@ const Community = React.memo(() => {
           </div>
           
           {/* Admin Chat Button */}
-          <div className="flex items-center justify-center gap-4 mt-4">
+          {/* <div className="flex items-center justify-center gap-4 mt-4">
             <AdminChatButton />
-          </div>
+          </div> */}
         </div>
 
         {/* Admin Quick Links */}

@@ -86,102 +86,71 @@ export default function MessageThread({
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-600 border border-border rounded-lg">
+    <div className="flex flex-col h-full bg-slate-800 border border-slate-700 rounded-lg">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border bg-slate-700/80">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={recipientAvatar} alt={recipientName} />
-              <AvatarFallback className="bg-primary/10 text-primary">
-                {recipientName.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            {isOnline && (
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
-            )}
-          </div>
-          <div>
-            <h3 className="font-semibold text-white">{recipientName}</h3>
-            <p className="text-sm text-slate-300">
-              {isOnline ? 'Online' : 'Offline'}
-            </p>
-          </div>
+      <div className="flex items-center gap-3 p-4 border-b border-slate-700">
+        <div className="relative">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src={recipientAvatar} alt={recipientName} />
+            <AvatarFallback className="bg-cyan-500/20 text-cyan-400">
+              {recipientName.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          {isOnline && (
+            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border border-slate-800 rounded-full" />
+          )}
         </div>
-        <Button variant="ghost" size="sm">
-          <MoreVertical className="h-4 w-4" />
-        </Button>
+        <div>
+          <h3 className="font-medium text-white text-sm">{recipientName}</h3>
+          <p className="text-xs text-slate-400">
+            {isOnline ? 'Online' : 'Offline'}
+          </p>
+        </div>
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4 bg-slate-800/50">
-        <div className="space-y-4">
+      <div className="flex-1 p-4 overflow-y-auto">
+        <div className="space-y-3">
           {messages.map((message) => {
             const isOwn = message.senderId === currentUserId;
             
             return (
               <div
                 key={message.id}
-                className={`flex gap-3 ${isOwn ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
               >
-                {!isOwn && (
-                  <Avatar className="h-8 w-8 flex-shrink-0">
-                    <AvatarImage src={message.senderAvatar} alt={message.senderName} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                      {message.senderName.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-                
-                <div className={`max-w-[70%] ${isOwn ? 'order-last' : ''}`}>
-                  <div
-                    className={`p-3 rounded-lg ${
-                      isOwn
-                        ? 'bg-primary text-primary-foreground ml-auto'
-                        : 'bg-slate-700 text-white border border-slate-600'
-                    }`}
-                  >
-                    {!isOwn && (
-                      <p className="text-xs font-medium mb-1 text-slate-300">
-                        {message.senderName}
-                      </p>
-                    )}
-                    <p className="text-sm leading-relaxed">{message.message}</p>
-                  </div>
-                  <div className={`flex items-center gap-2 mt-1 text-xs text-slate-400 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                    <span>
-                      {formatDistanceToNow(new Date(message.timestamp), { addSuffix: true })}
-                    </span>
-                    {isOwn && (
-                      <Badge variant={message.isRead ? 'default' : 'secondary'} className="text-xs px-1 py-0">
-                        {message.isRead ? 'Read' : 'Sent'}
-                      </Badge>
-                    )}
-                  </div>
+                <div
+                  className={`max-w-[80%] p-3 rounded-lg ${
+                    isOwn
+                      ? 'bg-cyan-600 text-white'
+                      : 'bg-slate-700 text-white'
+                  }`}
+                >
+                  <p className="text-sm">{message.message}</p>
                 </div>
-
-                {isOwn && (
-                  <Avatar className="h-8 w-8 flex-shrink-0">
-                    <AvatarImage src={message.senderAvatar} alt={message.senderName} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                      {message.senderName.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
               </div>
             );
           })}
 
+          {/* Work in Progress Indicator */}
+          {messages.length === 0 && (
+            <div className="flex justify-center items-center h-32">
+              <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 text-center max-w-sm">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                  <span className="text-yellow-400 text-sm font-medium">Work in Progress</span>
+                </div>
+                <p className="text-slate-400 text-xs">
+                  This messaging feature is currently being developed. Stay tuned for updates!
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Typing Indicator */}
           {isTyping && (
-            <div className="flex items-center gap-3">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={recipientAvatar} alt={recipientName} />
-                <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                  {recipientName.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="bg-slate-700 border border-slate-600 p-3 rounded-lg">
+            <div className="flex justify-start">
+              <div className="bg-slate-700 p-3 rounded-lg">
                 <div className="flex space-x-1">
                   <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" />
                   <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
@@ -193,21 +162,19 @@ export default function MessageThread({
           
           <div ref={messagesEndRef} />
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Message Input */}
-      <div className="p-4 border-t border-border bg-slate-700/80">
-        <div className="flex items-end gap-2">
-          <div className="flex-1">
-            <Input
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
-              className="resize-none bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
-              disabled={isUploading}
-            />
-          </div>
+      <div className="p-4 border-t border-slate-700">
+        <div className="flex gap-2">
+          <Input
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Type your message..."
+            className="flex-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+            disabled={isUploading}
+          />
           
           <input
             ref={fileInputRef}
@@ -222,6 +189,7 @@ export default function MessageThread({
             size="sm"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading || !onFileUpload}
+            className="border-slate-600"
           >
             <Paperclip className="h-4 w-4" />
           </Button>
@@ -230,6 +198,7 @@ export default function MessageThread({
             onClick={handleSendMessage}
             disabled={!newMessage.trim() || isUploading}
             size="sm"
+            className="bg-cyan-600 hover:bg-cyan-700"
           >
             <Send className="h-4 w-4" />
           </Button>
