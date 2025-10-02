@@ -15,7 +15,7 @@ import { WelcomeSection } from '@/components/WelcomeSection';
 import { FeaturesGrid } from '@/components/FeaturesGrid';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Calendar } from 'lucide-react';
+import { BarChart3, Calendar, Users, Brain, Calculator, Target } from 'lucide-react';
 
 const Index = () => {
   const { user } = useAuth();
@@ -66,42 +66,120 @@ const Index = () => {
               </p>
             </div>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
-              <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-colors cursor-pointer"
-                    onClick={() => navigate('/community')}>
-                <CardContent className="p-6 text-center">
-                  <div className="text-2xl mb-2">👥</div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Training Hub</h3>
-                  <p className="text-gray-400 text-sm">Live Training, Video & Document Library, Tools, Resources, Community</p>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-colors cursor-pointer"
-                    onClick={() => navigate('/markets')}>
-                <CardContent className="p-6 text-center">
-                  <div className="text-2xl mb-2">📊</div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Market Intelligence</h3>
-                  <p className="text-gray-400 text-sm">The First-Of-Its-Kind AI Tool To Find The Best Rental Arbitrage Markets</p>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-colors cursor-pointer"
-                    onClick={() => navigate('/properties')}>
-                <CardContent className="p-6 text-center">
-                  <div className="text-2xl mb-2">🏢</div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Acquisition Agent</h3>
-                  <p className="text-gray-400 text-sm">Automate Property Outreach, Close Deals, Calculate Profit, Robust CRM</p>
-                </CardContent>
-              </Card>
-              
-              <Card className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-400/40 transition-colors cursor-pointer"
-                    onClick={() => navigate('/pms')}>
-                <CardContent className="p-6 text-center">
-                  <div className="text-2xl mb-2">🫶</div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Property Management</h3>
-                  <p className="text-gray-400 text-sm">Automate Property Management, Operations & Cash Flow</p>
-                </CardContent>
-              </Card>
+            <div className="grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-8 mt-12">
+              {/* Training Hub Card */}
+              <div className="group relative" onClick={() => navigate('/community')}>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
+                  <CardHeader className="text-center pb-4">
+                    <div className="mx-auto mb-4 relative">
+                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center transition-all duration-300">
+                        <Users className="h-10 w-10 text-white" />
+                      </div>
+                      <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    </div>
+                    <div className="text-xl font-bold text-purple-300">
+                      Training Hub
+                    </div>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <div className="text-gray-300 text-sm leading-relaxed">
+                      Live Training, Video & Document Library, Tools, Resources, Community
+                    </div>
+                    <div className="mt-4 flex justify-center">
+                      <div className="flex -space-x-2">
+                        {[...Array(4)].map((_, i) => (
+                          <div key={i} className={`w-6 h-6 bg-gradient-to-br from-purple-400 to-cyan-400 rounded-full border-2 border-slate-800 animate-pulse`} style={{animationDelay: `${i * 150}ms`}}></div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Market Intelligence Card */}
+              <div className="group relative" onClick={() => navigate('/markets')}>
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
+                  <CardHeader className="text-center pb-4">
+                    <div className="mx-auto mb-4 relative">
+                      <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center transition-all duration-300">
+                        <Brain className="h-10 w-10 text-white" />
+                      </div>
+                      <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    </div>
+                    <div className="text-xl font-bold text-cyan-300">
+                      Market Intelligence
+                    </div>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <div className="text-gray-300 text-sm leading-relaxed">
+                      The First-Of-Its-Kind AI Tool To Find The Best Rental Arbitrage Markets
+                    </div>
+                    <div className="mt-4 flex justify-center space-x-2">
+                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-100"></div>
+                      <div className="w-2 h-2 bg-cyan-300 rounded-full animate-bounce delay-200"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Acquisition Agent Card */}
+              <div className="group relative" onClick={() => navigate('/properties')}>
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-purple-500/30 hover:border-purple-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
+                  <CardHeader className="text-center pb-4">
+                    <div className="mx-auto mb-4 relative">
+                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-cyan-500 rounded-2xl flex items-center justify-center transition-all duration-300">
+                        <Calculator className="h-10 w-10 text-white" />
+                      </div>
+                      <div className="absolute -inset-2 bg-gradient-to-br from-purple-500/30 to-cyan-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    </div>
+                    <div className="text-xl font-bold text-purple-300">
+                      Acquisition Agent
+                    </div>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <div className="text-gray-300 text-sm leading-relaxed">
+                      Automate Property Outreach, Close Deals, Calculate Profit, Robust CRM
+                    </div>
+                    <div className="mt-4 flex justify-center space-x-1">
+                      <div className="w-8 h-1 bg-purple-400 rounded animate-pulse"></div>
+                      <div className="w-6 h-1 bg-cyan-400 rounded animate-pulse delay-200"></div>
+                      <div className="w-10 h-1 bg-purple-300 rounded animate-pulse delay-400"></div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Property Management Card */}
+              <div className="group relative" onClick={() => navigate('/pms')}>
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-500 h-full group-hover:scale-105 cursor-pointer">
+                  <CardHeader className="text-center pb-4">
+                    <div className="mx-auto mb-4 relative">
+                      <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-purple-500 rounded-2xl flex items-center justify-center transition-all duration-300">
+                        <Target className="h-10 w-10 text-white" />
+                      </div>
+                      <div className="absolute -inset-2 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-2xl animate-pulse opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    </div>
+                    <div className="text-xl font-bold text-cyan-300">
+                      Property Management
+                    </div>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <div className="text-gray-300 text-sm leading-relaxed">
+                      Automate Property Management, Operations & Cash Flow
+                    </div>
+                    <div className="mt-4 grid grid-cols-3 gap-1">
+                      {[...Array(6)].map((_, i) => (
+                        <div key={i} className={`h-2 bg-cyan-400/50 rounded animate-pulse`} style={{animationDelay: `${i * 100}ms`}}></div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
             
             <div className="mt-12">
