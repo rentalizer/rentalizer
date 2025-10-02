@@ -292,10 +292,14 @@ class CommentHandler {
   }
 }
 
+// Import Direct Message WebSocket handler
+const { setupDirectMessageWebSocket } = require('./directMessageWebSocket');
+
 // Setup WebSocket handlers
 const setupWebSocketHandlers = (io) => {
   const roomManager = new RoomManager();
   const commentHandler = new CommentHandler(io, roomManager);
+  const directMessageHandler = setupDirectMessageWebSocket(io, roomManager);
 
   // Authentication middleware for WebSocket
   io.use(async (socket, next) => {
@@ -457,7 +461,7 @@ const setupWebSocketHandlers = (io) => {
     });
   });
 
-  return { roomManager, commentHandler };
+  return { roomManager, commentHandler, directMessageHandler };
 };
 
 module.exports = { setupWebSocketHandlers, RoomManager, CommentHandler };
