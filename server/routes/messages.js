@@ -3,8 +3,8 @@ const router = express.Router();
 
 // Import controller and middleware
 const directMessageController = require('../controllers/directMessageController');
-const auth = require('../middleware/auth');
-const admin = require('../middleware/admin');
+const { authenticateToken } = require('../middleware/auth');
+const { requireAdmin } = require('../middleware/admin');
 const {
   validateSendMessage,
   validateGetConversation,
@@ -19,7 +19,7 @@ const {
 } = require('../middleware/messageValidation');
 
 // Apply authentication middleware to all routes
-router.use(auth);
+router.use(authenticateToken);
 
 /**
  * @route   POST /api/messages
@@ -149,7 +149,7 @@ router.get(
  */
 router.get(
   '/admins',
-  admin,
+  requireAdmin,
   directMessageController.getAdminUsers
 );
 
@@ -170,7 +170,7 @@ router.get(
  */
 router.put(
   '/:messageId/status',
-  admin,
+  requireAdmin,
   validateUpdateMessageStatus,
   validateMessageOwnership,
   directMessageController.updateMessageStatus
