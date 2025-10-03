@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Users, ArrowLeft, LogIn, User, Lock, UserPlus, Ticket, Upload } from 'lucide-react';
 
 import { Footer } from '@/components/Footer';
+import { TopNavBar } from '@/components/TopNavBar';
 import { supabase } from '@/integrations/supabase/client';
 import Community from './Community';
 
@@ -235,7 +236,9 @@ const CommunityGate = () => {
   if (user || isAdmin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
+        <TopNavBar />
         <Community />
+        <Footer />
       </div>
     );
   }
