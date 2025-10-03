@@ -29,6 +29,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    // Explicitly set the output directory
+    outDir: 'dist',
     // Optimize build output
     rollupOptions: {
       output: {
