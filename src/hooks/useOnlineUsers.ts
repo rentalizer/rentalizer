@@ -52,9 +52,10 @@ export const useOnlineUsers = () => {
     }
 
     // Set up WebSocket event listeners (WebSocket connection is managed by AuthContext)
-    const handleOnlineUsersUpdate = (users: OnlineUser[]) => {
-      console.log('📊 Received online users update:', users);
-      setOnlineUsers(users);
+    const handleOnlineUsersUpdate = (data: { users: OnlineUser[]; count: number }) => {
+      console.log('📊 Received online users update:', data);
+      setOnlineUsers(data.users);
+      setOnlineCount(data.count);
       setLoading(false);
       setUseWebSocket(true);
     };
@@ -97,15 +98,15 @@ export const useOnlineUsers = () => {
 
       return () => {
         clearTimeout(timer);
-        websocketService.removeOnlineUsersListener(handleOnlineUsersUpdate);
-        websocketService.removeOnlineCountListener(handleOnlineCountUpdate);
+        websocketService.offOnlineUsersUpdate();
+        websocketService.offOnlineCountUpdate();
       };
     }
 
     // Cleanup function
     return () => {
-      websocketService.removeOnlineUsersListener(handleOnlineUsersUpdate);
-      websocketService.removeOnlineCountListener(handleOnlineCountUpdate);
+      websocketService.offOnlineUsersUpdate();
+      websocketService.offOnlineCountUpdate();
     };
   }, [user, isAdmin]);
 

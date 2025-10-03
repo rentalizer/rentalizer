@@ -292,10 +292,14 @@ class CommentHandler {
   }
 }
 
+// Import Direct Message WebSocket handler
+const { setupDirectMessageWebSocket } = require('./directMessageWebSocket');
+
 // Setup WebSocket handlers
 const setupWebSocketHandlers = (io) => {
   const roomManager = new RoomManager();
   const commentHandler = new CommentHandler(io, roomManager);
+  const directMessageHandler = setupDirectMessageWebSocket(io, roomManager);
 
   // Authentication middleware for WebSocket
   io.use(async (socket, next) => {
@@ -338,6 +342,13 @@ const setupWebSocketHandlers = (io) => {
     const onlineUsers = roomManager.getOnlineUsers();
     const onlineCount = roomManager.getOnlineCount();
     io.emit('online_users_update', {
+      users: onlineUsers,
+      count: onlineCount
+    });
+    
+    // Also emit for messaging system
+    console.log(`📊 Broadcasting online users for messaging:`, { users: onlineUsers, count: onlineCount });
+    io.emit('online_users_for_messaging', {
       users: onlineUsers,
       count: onlineCount
     });
@@ -448,6 +459,12 @@ const setupWebSocketHandlers = (io) => {
         count: onlineCount
       });
       
+      // Also emit for messaging system
+      io.emit('online_users_for_messaging', {
+        users: onlineUsers,
+        count: onlineCount
+      });
+      
       roomManager.removeSocket(socket.id);
     });
 
@@ -457,7 +474,7 @@ const setupWebSocketHandlers = (io) => {
     });
   });
 
-  return { roomManager, commentHandler };
+  return { roomManager, commentHandler, directMessageHandler };
 };
 
 module.exports = { setupWebSocketHandlers, RoomManager, CommentHandler };

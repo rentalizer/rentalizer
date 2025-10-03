@@ -1,22 +1,29 @@
 import { useState, useEffect, useRef } from 'react';
-import { User, Send, Paperclip, MoreVertical } from 'lucide-react';
+import { User, Send, Paperclip, MoreVertical, Clock, Check, CheckCheck, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { formatDistanceToNow } from 'date-fns';
+import { Message as ApiMessage } from '@/services/messagingService';
 
 export interface Message {
-  id: string;
-  senderId: string;
-  receiverId: string;
+  _id: string;
+  sender_id: string;
+  recipient_id: string;
   message: string;
-  timestamp: string;
-  isRead: boolean;
-  messageType: 'text' | 'file' | 'image';
-  senderName: string;
-  senderAvatar?: string;
+  sender_name: string;
+  message_type: 'text' | 'image' | 'file' | 'system';
+  support_category: 'general' | 'technical' | 'billing' | 'account' | 'other';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  read_at: string | null;
+  created_at: string;
+  updated_at: string;
+  // Fallback for old field names
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface MessageThreadProps {
@@ -28,6 +35,8 @@ interface MessageThreadProps {
   recipientName: string;
   recipientAvatar?: string;
   isOnline: boolean;
+  recipientId?: string;
+  onMarkAsRead?: () => void;
 }
 
 export default function MessageThread({
@@ -38,7 +47,9 @@ export default function MessageThread({
   onFileUpload,
   recipientName,
   recipientAvatar,
-  isOnline
+  isOnline,
+  recipientId,
+  onMarkAsRead
 }: MessageThreadProps) {
   const [newMessage, setNewMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -49,9 +60,40 @@ export default function MessageThread({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const formatLastMessageTime = (timestamp: string) => {
+    try {
+      if (!timestamp) {
+        console.warn('Empty timestamp provided to formatLastMessageTime');
+        return 'Unknown time';
+      }
+      
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid timestamp provided to formatLastMessageTime:', timestamp);
+        return 'Unknown time';
+      }
+      return formatDistanceToNow(date, { addSuffix: true });
+    } catch (error) {
+      console.warn('Error formatting timestamp:', timestamp, error);
+      return 'Unknown time';
+    }
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages, isTyping]);
+
+  // Mark messages as read when component mounts or messages change
+  useEffect(() => {
+    if (messages.length > 0 && onMarkAsRead) {
+      const hasUnreadMessages = messages.some(msg => 
+        msg.recipient_id === currentUserId && !msg.read_at
+      );
+      if (hasUnreadMessages) {
+        onMarkAsRead();
+      }
+    }
+  }, [messages, currentUserId, onMarkAsRead]);
 
   const handleSendMessage = () => {
     const trimmed = newMessage.trim();
@@ -112,36 +154,83 @@ export default function MessageThread({
       <div className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-3">
           {messages.map((message) => {
-            const isOwn = message.senderId === currentUserId;
+            const isOwn = message.sender_id === currentUserId;
+            const isRead = !!message.read_at;
+            
+            // Debug logging
+            console.log('Message alignment check:', {
+              messageId: message._id,
+              sender_id: message.sender_id,
+              currentUserId: currentUserId,
+              isOwn: isOwn,
+              message: message.message
+            });
             
             return (
               <div
-                key={message.id}
+                key={message._id}
                 className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
               >
-                <div
-                  className={`max-w-[80%] p-3 rounded-lg ${
-                    isOwn
-                      ? 'bg-cyan-600 text-white'
-                      : 'bg-slate-700 text-white'
-                  }`}
-                >
-                  <p className="text-sm">{message.message}</p>
+                <div className={`max-w-[80%] ${isOwn ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}>
+                  <div
+                    className={`p-3 rounded-lg ${
+                      isOwn
+                        ? 'bg-cyan-600 text-white'
+                        : 'bg-slate-700 text-white'
+                    }`}
+                  >
+                    <p className="text-sm">{message.message}</p>
+                  </div>
+                  
+                  {/* Message metadata */}
+                  <div className={`flex items-center gap-1 mt-1 text-xs text-slate-400 ${
+                    isOwn ? 'flex-row-reverse' : 'flex-row'
+                  }`}>
+                    <span>{formatLastMessageTime(message.created_at || message.createdAt || '')}</span>
+                    
+                    {/* Read status for own messages */}
+                    {isOwn && (
+                      <div className="flex items-center">
+                        {isRead ? (
+                          <CheckCheck className="h-3 w-3 text-blue-400" />
+                        ) : (
+                          <Check className="h-3 w-3 text-slate-500" />
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Support category badge for admin messages */}
+                    {!isOwn && message.support_category !== 'general' && (
+                      <Badge 
+                        variant="outline" 
+                        className="text-xs px-1 py-0.5 h-4 border-slate-500/30 text-slate-400"
+                      >
+                        {message.support_category}
+                      </Badge>
+                    )}
+                    
+                    {/* Priority indicator */}
+                    {message.priority === 'high' || message.priority === 'urgent' ? (
+                      <div className={`w-2 h-2 rounded-full ${
+                        message.priority === 'urgent' ? 'bg-red-500' : 'bg-orange-500'
+                      }`} />
+                    ) : null}
+                  </div>
                 </div>
               </div>
             );
           })}
 
-          {/* Work in Progress Indicator */}
+          {/* Empty state */}
           {messages.length === 0 && (
             <div className="flex justify-center items-center h-32">
               <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 text-center max-w-sm">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                  <span className="text-yellow-400 text-sm font-medium">Work in Progress</span>
+                  <MessageCircle className="h-5 w-5 text-cyan-400" />
+                  <span className="text-cyan-400 text-sm font-medium">Start a conversation</span>
                 </div>
                 <p className="text-slate-400 text-xs">
-                  This messaging feature is currently being developed. Stay tuned for updates!
+                  Send a message to {recipientName} to start the conversation.
                 </p>
               </div>
             </div>
@@ -184,7 +273,7 @@ export default function MessageThread({
             accept="image/*,.pdf,.doc,.docx,.txt"
           />
           
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={() => fileInputRef.current?.click()}
@@ -192,7 +281,7 @@ export default function MessageThread({
             className="border-slate-600"
           >
             <Paperclip className="h-4 w-4" />
-          </Button>
+          </Button> */}
           
           <Button
             onClick={handleSendMessage}
