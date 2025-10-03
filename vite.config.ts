@@ -72,14 +72,8 @@ export default defineConfig(({ mode }) => ({
     },
     // Increase chunk size warning limit
     chunkSizeWarningLimit: 1000,
-    // Enable minification
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.log in production
-        drop_debugger: true,
-      },
-    },
+    // Enable minification (using esbuild which is faster and included by default)
+    minify: 'esbuild',
   },
   // Optimize dependencies
   optimizeDeps: {
