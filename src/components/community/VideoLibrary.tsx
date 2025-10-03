@@ -31,6 +31,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { videoService } from '@/services/videoService';
 import { Video, CreateVideoData, UpdateVideoData, VideoFilters } from '@/types';
+import { API_CONFIG } from '@/config/api';
 
 interface SortableVideoCardProps {
   video: Video;
@@ -116,7 +117,7 @@ const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, 
             {/* Thumbnail */}
             <div className="aspect-video bg-slate-700 rounded-t-lg relative overflow-hidden">
               <img
-                src={video.thumbnail.startsWith('/uploads/') ? `http://localhost:5000${video.thumbnail}` : video.thumbnail}
+                src={video.thumbnail.startsWith('/uploads/') ? `${API_CONFIG.BASE_URL.replace('/api', '')}${video.thumbnail}` : video.thumbnail}
                 alt={video.title}
                 className={`w-full h-full object-cover transition-all ${!isAuthenticated ? 'filter grayscale opacity-50' : ''}`}
                 onError={(e) => {

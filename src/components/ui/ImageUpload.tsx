@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { videoService } from '@/services/videoService';
+import { API_CONFIG } from '@/config/api';
 
 interface ImageUploadProps {
   value?: string;
@@ -24,7 +25,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(() => {
     if (value) {
-      return value.startsWith('/uploads/') ? `http://localhost:5000${value}` : value;
+      return value.startsWith('/uploads/') ? `${API_CONFIG.BASE_URL.replace('/api', '')}${value}` : value;
     }
     return null;
   });
@@ -37,7 +38,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     if (value) {
       // If it's an uploaded file path, construct the full URL
       if (value.startsWith('/uploads/')) {
-        setPreview(`http://localhost:5000${value}`);
+        setPreview(`${API_CONFIG.BASE_URL.replace('/api', '')}${value}`);
       } else {
         // It's a regular URL
         setPreview(value);
@@ -95,7 +96,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         onChange(filePath);
         
         // Update preview to show the uploaded image
-        const fullImageUrl = `http://localhost:5000${filePath}`;
+        const fullImageUrl = `${API_CONFIG.BASE_URL.replace('/api', '')}${filePath}`;
         setPreview(fullImageUrl);
         
         toast({
