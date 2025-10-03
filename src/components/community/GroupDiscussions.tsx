@@ -401,16 +401,14 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
     const load = async () => {
       try {
-        // Avoid reloading if already loaded in this session
-        if (!loadedDiscussionIds.has(discussionId)) {
-          const res = await apiService.getCommentsForDiscussion(discussionId, { page: 1, limit: 100, sortOrder: 'asc' });
-          console.log('📥 Raw comments from API:', res.data);
-          const list = res.data.map(mapApiCommentToUi);
-          console.log('📥 Mapped comments for discussion', discussionId, ':', list.length, 'comments');
-          console.log('📥 First comment sample:', list[0]);
-          setComments(prev => ({ ...prev, [discussionId]: list }));
-          setLoadedDiscussionIds(prev => new Set(prev).add(discussionId));
-        }
+        // Always reload comments to ensure we have the latest data
+        const res = await apiService.getCommentsForDiscussion(discussionId, { page: 1, limit: 100, sortOrder: 'asc' });
+        console.log('📥 Raw comments from API:', res.data);
+        const list = res.data.map(mapApiCommentToUi);
+        console.log('📥 Mapped comments for discussion', discussionId, ':', list.length, 'comments');
+        console.log('📥 First comment sample:', list[0]);
+        setComments(prev => ({ ...prev, [discussionId]: list }));
+        setLoadedDiscussionIds(prev => new Set(prev).add(discussionId));
       } catch (e) {
         console.error('Failed to load comments', e);
       }
@@ -422,24 +420,38 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     joinDiscussionRoom(discussionId);
     const socket = getSocket();
 
+    // Check socket connection
+    console.log('🔌 Socket connected:', socket.connected);
+    console.log('🔌 Socket ID:', socket.id);
+
     const onNew = (payload: { comment: ApiComment; discussionId: string }) => {
-      if (payload.discussionId !== discussionId) return;
+      console.log('🆕 Received new_comment event:', payload);
+      if (payload.discussionId !== discussionId) {
+        console.log('🆕 Ignoring comment for different discussion:', payload.discussionId, 'vs', discussionId);
+        return;
+      }
       console.log('🆕 New comment from WebSocket:', payload.comment);
       const ui = mapApiCommentToUi(payload.comment);
       console.log('🆕 Mapped comment:', ui);
       let appended = false;
       setComments(prev => {
         const list = prev[discussionId] || [];
-        if (list.some(c => c.id === ui.id)) return prev;
+        if (list.some(c => c.id === ui.id)) {
+          console.log('🆕 Comment already exists, skipping');
+          return prev;
+        }
         appended = true;
+        console.log('🆕 Adding new comment to list');
         return { ...prev, [discussionId]: [...list, ui] };
       });
       if (appended) {
+        console.log('🆕 Updating discussion comment count');
         setDiscussionsList(prev => prev.map(d => d.id === discussionId ? { ...d, comments: d.comments + 1 } : d));
       }
     };
 
     const onUpdated = (payload: { comment: ApiComment; discussionId: string }) => {
+      console.log('✏️ Received comment_updated event:', payload);
       if (payload.discussionId !== discussionId) return;
       const ui = mapApiCommentToUi(payload.comment);
       setComments(prev => ({
@@ -449,6 +461,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     };
 
     const onDeleted = (payload: { commentId: string; discussionId: string }) => {
+      console.log('🗑️ Received comment_deleted event:', payload);
       if (payload.discussionId !== discussionId) return;
       setComments(prev => ({
         ...prev,
@@ -457,17 +470,37 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       setDiscussionsList(prev => prev.map(d => d.id === discussionId ? { ...d, comments: Math.max(0, d.comments - 1) } : d));
     };
 
+    // Add error handler
+    const onError = (error: any) => {
+      console.error('🔌 WebSocket error:', error);
+    };
+
+    // Add connection handler
+    const onConnect = () => {
+      console.log('🔌 WebSocket connected');
+    };
+
+    const onDisconnect = () => {
+      console.log('🔌 WebSocket disconnected');
+    };
+
     socket.on('new_comment', onNew);
     socket.on('comment_updated', onUpdated);
     socket.on('comment_deleted', onDeleted);
+    socket.on('error', onError);
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
 
     return () => {
       socket.off('new_comment', onNew);
       socket.off('comment_updated', onUpdated);
       socket.off('comment_deleted', onDeleted);
+      socket.off('error', onError);
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
       leaveDiscussionRoom(discussionId);
     };
-  }, [selectedDiscussion, mapApiCommentToUi, loadedDiscussionIds]);
+  }, [selectedDiscussion, mapApiCommentToUi]);
 
 
   // Initialize data - fetch when user data is available
@@ -641,13 +674,28 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     const discussionId = selectedDiscussion.id;
     const content = newComment.trim();
     try {
-      await apiService.createComment(discussionId, content);
-      // Do not mutate local comments or counts here; rely on 'new_comment' WS event
+      const response = await apiService.createComment(discussionId, content);
+      console.log('✅ Comment created successfully:', response);
       setNewComment('');
+      
+      // Fallback: If WebSocket doesn't work, manually refresh comments after a short delay
+      setTimeout(async () => {
+        try {
+          const res = await apiService.getCommentsForDiscussion(discussionId, { page: 1, limit: 100, sortOrder: 'asc' });
+          const list = res.data.map(mapApiCommentToUi);
+          setComments(prev => ({ ...prev, [discussionId]: list }));
+          
+          // Update comment count
+          setDiscussionsList(prev => prev.map(d => d.id === discussionId ? { ...d, comments: list.length } : d));
+          console.log('🔄 Fallback: Refreshed comments manually');
+        } catch (e) {
+          console.error('Failed to refresh comments as fallback', e);
+        }
+      }, 1000);
     } catch (e) {
       console.error('Failed to create comment', e);
     }
-  }, [newComment, selectedDiscussion]);
+  }, [newComment, selectedDiscussion, mapApiCommentToUi]);
 
   // Handle comment update
   const handleCommentUpdate = useCallback((commentId: string, content: string) => {

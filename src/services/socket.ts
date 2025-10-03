@@ -15,8 +15,23 @@ export function getSocket(): Socket {
       autoConnect: true,
       withCredentials: true,
       auth: token ? { token } : undefined,
+      timeout: 20000,
+      forceNew: true,
     }
   );
+
+  // Add connection event listeners
+  socket.on('connect', () => {
+    console.log('🔌 WebSocket connected with ID:', socket?.id);
+  });
+
+  socket.on('disconnect', (reason) => {
+    console.log('🔌 WebSocket disconnected:', reason);
+  });
+
+  socket.on('connect_error', (error) => {
+    console.error('🔌 WebSocket connection error:', error);
+  });
 
   return socket;
 }
