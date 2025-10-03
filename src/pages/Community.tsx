@@ -15,6 +15,7 @@ import { ExpensesSection } from '@/components/calculator/ExpensesSection';
 import { NetProfitSection } from '@/components/calculator/NetProfitSection';
 import { exportCalculatorToCSV } from '@/utils/calculatorExport';
 import { useMemberCount } from '@/hooks/useMemberCount';
+import { getTimezoneNotice } from '@/utils/timezone';
 
 import { Footer } from '@/components/Footer';
 import { TopNavBar } from '@/components/TopNavBar';
@@ -227,19 +228,24 @@ const Community = React.memo(() => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
       <div className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">
         {/* Community Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Users className="h-12 w-12 text-cyan-400" />
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight py-2">
-              Training Dashboard
-            </h1>
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Users className="h-12 w-12 text-cyan-400" />
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight py-2">
+                Training Dashboard
+              </h1>
+            </div>
+            
+            {/* Timezone Notice */}
+            <div className="text-xs text-gray-400 mb-2">
+              {getTimezoneNotice()}
+            </div>
+            
+            {/* Admin Chat Button */}
+            {/* <div className="flex items-center justify-center gap-4 mt-4">
+              <AdminChatButton />
+            </div> */}
           </div>
-          
-          {/* Admin Chat Button */}
-          {/* <div className="flex items-center justify-center gap-4 mt-4">
-            <AdminChatButton />
-          </div> */}
-        </div>
 
         {/* Admin Quick Links */}
         {userIsAdmin && (

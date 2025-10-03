@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { formatDistanceToNow } from 'date-fns';
 import { Message as ApiMessage } from '@/services/messagingService';
+import { formatDateWithTimezone } from '@/utils/timezone';
 
 export interface Message {
   _id: string;
@@ -186,7 +187,9 @@ export default function MessageThread({
                   <div className={`flex items-center gap-1 mt-1 text-xs text-slate-400 ${
                     isOwn ? 'flex-row-reverse' : 'flex-row'
                   }`}>
-                    <span>{formatLastMessageTime(message.created_at || message.createdAt || '')}</span>
+                    <span title={formatDateWithTimezone(message.created_at || message.createdAt || '')}>
+                      {formatLastMessageTime(message.created_at || message.createdAt || '')}
+                    </span>
                     
                     {/* Read status for own messages */}
                     {isOwn && (

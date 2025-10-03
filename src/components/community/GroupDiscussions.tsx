@@ -28,6 +28,7 @@ import { CommentsDialog } from '@/components/community/CommentsDialog';
 import { useMemberCount } from '@/hooks/useMemberCount';
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 import { useProfile } from '@/hooks/useProfile';
+import { formatDateWithTimezone, getTimezoneNotice } from '@/utils/timezone';
 
 // Type for user objects that could be populated or just strings
 interface PopulatedUser {
@@ -1040,7 +1041,9 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                               </Badge>
                             )}
                             <span className="text-gray-400">•</span>
-                            <span className="text-gray-400 text-sm">{discussion.timeAgo}</span>
+                            <span className="text-gray-400 text-sm" title={formatDateWithTimezone(discussion.created_at)}>
+                              {discussion.timeAgo}
+                            </span>
                             <span className="text-gray-400">•</span>
                             <span className="text-gray-400 text-sm">{discussion.category}</span>
                             {discussion.isPinned && (
