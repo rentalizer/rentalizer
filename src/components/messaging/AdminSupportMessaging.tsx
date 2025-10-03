@@ -46,9 +46,9 @@ export default function AdminSupportMessaging() {
       if (response.success) {
         setConversations(response.data);
         
-        // Calculate total unread
-        const total = response.data.reduce((sum, conv) => sum + conv.unread_count, 0);
-        setTotalUnread(total);
+        // Calculate total unread - COMMENTED OUT FOR NOW
+        // const total = response.data.reduce((sum, conv) => sum + conv.unread_count, 0);
+        // setTotalUnread(total);
       }
     } catch (error: unknown) {
       console.error('Error loading conversations:', error);
@@ -468,10 +468,11 @@ export default function AdminSupportMessaging() {
                 You can help resolve issues and provide support directly through this interface.
               </p>
               <div className="flex items-center justify-center gap-4 text-sm text-slate-400">
-                <div className="flex items-center gap-2">
+                {/* Unread count - COMMENTED OUT FOR NOW */}
+                {/* <div className="flex items-center gap-2">
                   <Bell className="h-4 w-4" />
                   <span>{totalUnread} unread</span>
-                </div>
+                </div> */}
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
                   <span>{conversations.length} conversations</span>

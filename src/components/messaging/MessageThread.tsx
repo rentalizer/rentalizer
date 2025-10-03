@@ -273,7 +273,7 @@ export default function MessageThread({
             accept="image/*,.pdf,.doc,.docx,.txt"
           />
           
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={() => fileInputRef.current?.click()}
@@ -281,7 +281,7 @@ export default function MessageThread({
             className="border-slate-600"
           >
             <Paperclip className="h-4 w-4" />
-          </Button>
+          </Button> */}
           
           <Button
             onClick={handleSendMessage}
