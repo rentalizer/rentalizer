@@ -1,6 +1,8 @@
 import { io, Socket } from 'socket.io-client';
 
-const WS_BASE_URL = import.meta.env.VITE_WS_URL || 'http://localhost:5000';
+// Use the same base URL as the API, but without the /api suffix
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const WS_BASE_URL = API_BASE_URL.replace('/api', '');
 
 export interface WebSocketMessage {
   message: {
@@ -99,12 +101,17 @@ class WebSocketService {
     });
 
     this.socket.on('connect', () => {
-        console.log('Connected to WebSocket server');
+        console.log('🔌 Connected to WebSocket server with ID:', this.socket?.id);
       this.isConnected = true;
       this.reconnectAttempts = 0;
       
         // Join user room for direct messages
         this.socket?.emit('join_user_room');
+        
+        // Request online users immediately after connection
+        setTimeout(() => {
+          this.getOnlineUsers();
+        }, 100);
         
         resolve();
       });
@@ -360,8 +367,11 @@ class WebSocketService {
   }
 
   // Additional methods for compatibility
-  getConnectionStatus(): { isConnected: boolean } {
-    return { isConnected: this.isConnected };
+  getConnectionStatus(): { isConnected: boolean; socketId?: string } {
+    return { 
+      isConnected: this.isConnected && this.socket?.connected === true,
+      socketId: this.socket?.id 
+    };
   }
 
   requestOnlineUsers(): void {

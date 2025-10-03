@@ -73,34 +73,55 @@ export const useOnlineUsers = () => {
     if (connectionStatus.isConnected) {
       websocketService.requestOnlineUsers();
     } else {
-      // If WebSocket is not connected, use fallback data
-      console.log('WebSocket not connected, using fallback data');
+      // If WebSocket is not connected, try to connect first
+      console.log('WebSocket not connected, attempting to connect...');
       setUseWebSocket(false);
       
-      const timer = setTimeout(() => {
-        // Add current user to mock data if not already present
-        const currentUserInList = mockOnlineUsers.find(u => u.user_id === user.id);
-        if (!currentUserInList) {
-          const currentUser: OnlineUser = {
-            user_id: user.id,
-            display_name: user.email?.split('@')[0] || 'Anonymous',
-            avatar_url: null,
-            is_admin: isAdmin,
-            last_seen: new Date().toISOString(),
+      // Try to connect to WebSocket
+      websocketService.connect().then(() => {
+        console.log('WebSocket connected successfully, requesting online users');
+        websocketService.requestOnlineUsers();
+      }).catch((error) => {
+        console.error('Failed to connect to WebSocket:', error);
+        
+        // Only use fallback data in development or if explicitly needed
+        const isDevelopment = window.location.hostname === 'localhost' || 
+                             window.location.hostname.includes('lovableproject.com');
+        
+        if (isDevelopment) {
+          console.log('Using fallback data for development');
+          const timer = setTimeout(() => {
+            // Add current user to mock data if not already present
+            const currentUserInList = mockOnlineUsers.find(u => u.user_id === user.id);
+            if (!currentUserInList) {
+              const currentUser: OnlineUser = {
+                user_id: user.id,
+                display_name: user.email?.split('@')[0] || 'Anonymous',
+                avatar_url: null,
+                is_admin: isAdmin,
+                last_seen: new Date().toISOString(),
+              };
+              mockOnlineUsers.unshift(currentUser);
+            }
+
+            setOnlineUsers([...mockOnlineUsers]);
+            setOnlineCount(mockOnlineUsers.length);
+            setLoading(false);
+          }, 500);
+
+          return () => {
+            clearTimeout(timer);
+            websocketService.offOnlineUsersUpdate();
+            websocketService.offOnlineCountUpdate();
           };
-          mockOnlineUsers.unshift(currentUser);
+        } else {
+          // In production, show loading state or minimal data
+          console.log('Production environment - not using fallback data');
+          setOnlineUsers([]);
+          setOnlineCount(0);
+          setLoading(false);
         }
-
-        setOnlineUsers([...mockOnlineUsers]);
-        setOnlineCount(mockOnlineUsers.length);
-        setLoading(false);
-      }, 500);
-
-      return () => {
-        clearTimeout(timer);
-        websocketService.offOnlineUsersUpdate();
-        websocketService.offOnlineCountUpdate();
-      };
+      });
     }
 
     // Cleanup function

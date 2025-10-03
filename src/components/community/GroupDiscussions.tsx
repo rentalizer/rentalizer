@@ -106,7 +106,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [userProfiles, setUserProfiles] = useState<{[key: string]: UserProfile}>({});
   const { memberCount, loading: memberCountLoading } = useMemberCount();
-  const { onlineCount, adminNames, loading: onlineLoading } = useOnlineUsers();
+  const { onlineCount, adminNames, loading: onlineLoading, useWebSocket } = useOnlineUsers();
   const [showMembersList, setShowMembersList] = useState(false);
   
   // Pagination state
@@ -1268,17 +1268,22 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                  {isAdmin ? (
                    <div className="flex flex-col">
                      <span className="text-gray-400">Online Now</span>
-                     {adminNames.length > 0 && (
+                     {adminNames.length > 0 && useWebSocket && (
                        <span className="text-xs text-green-300">
                          Admins: {adminNames.join(', ')}
+                       </span>
+                     )}
+                     {!useWebSocket && (
+                       <span className="text-xs text-yellow-400">
+                         Connecting...
                        </span>
                      )}
                    </div>
                  ) : (
                    <span className="text-gray-400">Online Now</span>
                  )}
-                 <Badge className="bg-green-600/20 text-green-300 border-green-500/30">
-                   {onlineLoading ? '...' : onlineCount}
+                 <Badge className={`${useWebSocket ? 'bg-green-600/20 text-green-300 border-green-500/30' : 'bg-yellow-600/20 text-yellow-300 border-yellow-500/30'}`}>
+                   {onlineLoading ? '...' : (useWebSocket ? onlineCount : '?')}
                  </Badge>
                </div>
              </CardContent>
