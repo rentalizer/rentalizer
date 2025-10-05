@@ -97,7 +97,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [pinningPosts, setPinningPosts] = useState<Set<string>>(new Set());
   const [selectedDiscussion, setSelectedDiscussion] = useState<DiscussionType | null>(null);
   const [newComment, setNewComment] = useState('');
-  const [comments, setComments] = useState<{[key: string]: {id: string; author: string; avatar: string; content: string; timeAgo: string;}[]}>({});
+  const [comments, setComments] = useState<{[key: string]: {id: string; author: string; avatar: string; avatarUrl?: string | null; content: string; timeAgo: string;}[]}>({});
   const [loadedDiscussionIds, setLoadedDiscussionIds] = useState<Set<string>>(new Set());
   const [editingPost, setEditingPost] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
@@ -134,8 +134,10 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   }, []);
 
   const getUserAvatar = useCallback(() => {
-    return profile?.avatar_url || null;
-  }, [profile?.avatar_url]);
+    const fromProfile = profile?.avatar_url?.trim() ? profile.avatar_url : null;
+    const fromUser = user?.profilePicture?.trim() ? user.profilePicture : null;
+    return fromProfile || fromUser || null;
+  }, [profile?.avatar_url, user?.profilePicture]);
 
   const getUserName = useCallback(() => {
     const name = profile?.display_name || user?.email?.split('@')[0] || 'Anonymous User';
@@ -306,6 +308,8 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       (userObj.firstName && userObj.lastName ? `${userObj.firstName} ${userObj.lastName}` : '') ||
       userObj.email?.split('@')[0] || 
       'User';
+    // Try various possible avatar fields from backend
+    const possibleAvatarUrl: string | null = (userObj.profilePicture || userObj.avatar_url || null) as (string | null);
     // Normalize id from various possible fields
     const normalizedId = (c as any).id || (c as any)._id || (typeof (c as any)._id === 'object' && (c as any)._id?.toString ? (c as any)._id.toString() : undefined);
     const userId = typeof userObj === 'string' ? userObj : (userObj._id || userObj.id);
@@ -313,6 +317,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       id: normalizedId,
       author: authorName,
       avatar: getInitials(authorName),
+      avatarUrl: possibleAvatarUrl,
       content: c.content,
       timeAgo: formatTimeAgo(c.createdAt),
       userId: userId,

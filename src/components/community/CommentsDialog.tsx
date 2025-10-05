@@ -16,6 +16,7 @@ interface Comment {
   content: string;
   timeAgo: string;
   avatar: string;
+  avatarUrl?: string | null;
   userId?: string;
   isEdited?: boolean;
   editedAt?: string;
@@ -205,9 +206,21 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
         >
           {comments?.map((comment, index) => (
             <div key={comment.id || `${comment.author}-${index}`} className="flex items-start gap-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                {comment.avatar}
-              </div>
+              <Avatar className="h-8 w-8 flex-shrink-0">
+                {comment.avatarUrl ? (
+                  <AvatarImage 
+                    src={comment.avatarUrl} 
+                    alt={comment.author}
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                ) : null}
+                <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold text-sm">
+                  {comment.avatar}
+                </AvatarFallback>
+              </Avatar>
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
@@ -323,12 +336,15 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
                 src={getUserAvatar()!} 
                 alt="Your avatar"
                 className="object-cover w-full h-full"
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
               />
-            ) : (
-              <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold text-sm">
-                {getUserInitials()}
-              </AvatarFallback>
-            )}
+            ) : null}
+            <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold text-sm">
+              {getUserInitials()}
+            </AvatarFallback>
           </Avatar>
           <div className="flex-1 flex gap-2">
             <Textarea
