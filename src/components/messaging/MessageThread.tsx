@@ -133,12 +133,44 @@ export default function MessageThread({
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-slate-700">
         <div className="relative">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={recipientAvatar} alt={recipientName} />
-            <AvatarFallback className="bg-cyan-500/20 text-cyan-400">
-              {recipientName.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          {/* Group Avatar - 3 overlapping avatars like Messenger */}
+          <div className="relative flex items-center">
+            {/* Main recipient avatar (real profile picture) */}
+            <div className="relative z-10">
+              <Avatar className="h-8 w-8 border-2 border-slate-800">
+                <AvatarImage 
+                  src={recipientAvatar} 
+                  alt={recipientName}
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                />
+                <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold text-xs">
+                  {recipientName.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+            
+            {/* Second avatar (placeholder) */}
+            <div className="relative -ml-2 z-20">
+              <Avatar className="h-6 w-6 border-2 border-slate-800">
+                <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-xs">
+                  A
+                </AvatarFallback>
+              </Avatar>
+            </div>
+            
+            {/* Third avatar (placeholder) */}
+            <div className="relative -ml-2 z-30">
+              <Avatar className="h-6 w-6 border-2 border-slate-800">
+                <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-xs">
+                  B
+                </AvatarFallback>
+              </Avatar>
+            </div>
+          </div>
+          
           {isOnline && (
             <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border border-slate-800 rounded-full" />
           )}
