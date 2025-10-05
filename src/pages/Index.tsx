@@ -8,6 +8,7 @@ declare global {
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useProfile } from '@/hooks/useProfile';
 import { useNavigate } from 'react-router-dom';
 import { Footer } from '@/components/Footer';
 import { TopNavBar } from '@/components/TopNavBar';
@@ -19,6 +20,7 @@ import { BarChart3, Calendar, Users, Brain, Calculator, Target } from 'lucide-re
 
 const Index = () => {
   const { user } = useAuth();
+  const { profile, loading: profileLoading } = useProfile();
   const navigate = useNavigate();
 
   // No automatic redirect - let users stay on dashboard if they want
@@ -182,22 +184,24 @@ const Index = () => {
               </div>
             </div>
             
-            <div className="mt-12">
-              <Card className="bg-slate-800/50 border-cyan-500/20">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold text-white mb-4">Complete Your Profile</h3>
-                  <p className="text-gray-400 mb-4">
-                    To get the most out of our community, complete your profile with your name, photo, and bio.
-                  </p>
-                  <Button 
-                    onClick={() => navigate('/profile-setup')}
-                    className="bg-cyan-600 hover:bg-cyan-700 text-white"
-                  >
-                    Complete Profile
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+            {(!profileLoading && (!profile?.bio || !profile?.avatar_url)) && (
+              <div className="mt-12">
+                <Card className="bg-slate-800/50 border-cyan-500/20">
+                  <CardContent className="p-6">
+                    <h3 className="text-lg font-semibold text-white mb-4">Complete Your Profile</h3>
+                    <p className="text-gray-400 mb-4">
+                      To get the most out of our community, complete your profile with your name, photo, and bio.
+                    </p>
+                    <Button 
+                      onClick={() => navigate('/profile-setup')}
+                      className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                    >
+                      Complete Profile
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
         </div>
         <Footer />

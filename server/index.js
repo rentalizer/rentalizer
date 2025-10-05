@@ -28,7 +28,7 @@ const PORT = process.env.PORT || 5000;
 // Initialize Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:8080",
+    origin: process.env.NODE_ENV !== 'production' ? "*" : (process.env.FRONTEND_URL || "http://localhost:8080"),
     methods: ["GET", "POST"],
     credentials: true
   },
@@ -41,6 +41,11 @@ app.set('io', io);
 // Middleware
 const corsOptions = {
   origin: function (origin, callback) {
+    // In development, allow all origins
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
@@ -107,7 +112,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/rentalize
     console.log(`🚀 Server is running on port ${PORT}`);
     console.log(`📡 WebSocket server ready`);
     console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`🔗 CORS enabled for: ${process.env.FRONTEND_URL || 'http://localhost:8080'}`);
+    console.log(`🔗 CORS enabled for: ${process.env.NODE_ENV !== 'production' ? 'ALL ORIGINS (development)' : (process.env.FRONTEND_URL || 'http://localhost:8080')}`);
   });
 })
 .catch((error) => {
