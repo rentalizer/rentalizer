@@ -128,8 +128,8 @@ const transformFrontendToBackend = (frontendEvent: EventFormData): CreateEventRe
 
 export const CommunityCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
-  // Set current month to show events properly - default to September 2025 for testing
-  const [currentMonth, setCurrentMonth] = useState(new Date(2025, 8)); // September 2025
+  // Set current month to show events properly - default to current month
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   
   // Log the initial selected date
   React.useEffect(() => {
@@ -721,8 +721,8 @@ export const CommunityCalendar = () => {
       day: 'numeric' 
     }));
     
-    // Set the form date to the currently selected date or default to September 30, 2025
-    const defaultDate = selectedDate || new Date(2025, 8, 30); // September 30, 2025
+    // Set the form date to the currently selected date or default to today
+    const defaultDate = selectedDate || new Date();
     console.log('📅 Setting form date to:', defaultDate.toLocaleDateString());
     
     setNewEvent(prev => ({
@@ -821,7 +821,7 @@ export const CommunityCalendar = () => {
                           }}
                           initialFocus
                           className="p-3 pointer-events-auto"
-                          defaultMonth={new Date(2025, 8)} // Default to September 2025
+                          defaultMonth={new Date()} // Default to current month
                         />
                       </PopoverContent>
                     </Popover>
