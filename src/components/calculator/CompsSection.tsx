@@ -29,8 +29,8 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
   
   // Local state for input values to allow continuous typing
   const [localValues, setLocalValues] = useState({
-    bedrooms: data.bedrooms?.toString() || '',
-    bathrooms: data.bathrooms?.toString() || ''
+    bedrooms: data.bedrooms && data.bedrooms > 0 ? data.bedrooms.toString() : '',
+    bathrooms: data.bathrooms && data.bathrooms > 0 ? data.bathrooms.toString() : ''
   });
 
   // Helper function to handle input changes
@@ -214,7 +214,7 @@ export const CompsSection: React.FC<CompsSectionProps> = ({
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-blue-400" />
               <span className="text-2xl font-bold text-blue-400">
-                {Math.round(data.averageComparable).toLocaleString()}
+                {data.averageComparable > 0 ? Math.round(data.averageComparable).toLocaleString() : ''}
               </span>
             </div>
           </div>

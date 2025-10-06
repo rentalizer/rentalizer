@@ -21,15 +21,15 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
 }) => {
   // Local state for input values to allow continuous typing
   const [localValues, setLocalValues] = useState({
-    rent: data.rent?.toString() || '',
-    maintenance: data.maintenance?.toString() || '',
-    power: data.power?.toString() || '',
-    waterSewer: data.waterSewer?.toString() || '',
-    internet: data.internet?.toString() || '',
-    taxLicense: data.taxLicense?.toString() || '',
-    insurance: data.insurance?.toString() || '',
-    software: data.software?.toString() || '',
-    furnitureRental: data.furnitureRental?.toString() || ''
+    rent: data.rent && data.rent > 0 ? data.rent.toString() : '',
+    maintenance: data.maintenance && data.maintenance > 0 ? data.maintenance.toString() : '',
+    power: data.power && data.power > 0 ? data.power.toString() : '',
+    waterSewer: data.waterSewer && data.waterSewer > 0 ? data.waterSewer.toString() : '',
+    internet: data.internet && data.internet > 0 ? data.internet.toString() : '',
+    taxLicense: data.taxLicense && data.taxLicense > 0 ? data.taxLicense.toString() : '',
+    insurance: data.insurance && data.insurance > 0 ? data.insurance.toString() : '',
+    software: data.software && data.software > 0 ? data.software.toString() : '',
+    furnitureRental: data.furnitureRental && data.furnitureRental > 0 ? data.furnitureRental.toString() : ''
   });
 
   // Helper function to handle input changes
@@ -81,7 +81,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
               <DollarSign className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
               <Input
                 type="number"
-                value={serviceFeeCalculated}
+                value={serviceFeeCalculated > 0 ? serviceFeeCalculated : ''}
                 readOnly
                 className="pl-8 bg-gray-700/50 border-gray-600 text-gray-100 h-9 text-sm w-full cursor-not-allowed"
               />
@@ -223,7 +223,7 @@ export const ExpensesSection: React.FC<ExpensesSectionProps> = ({
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-purple-400" />
               <span className="text-2xl font-bold text-purple-400">
-                {Math.round(monthlyExpenses).toLocaleString()}
+                {monthlyExpenses > 0 ? Math.round(monthlyExpenses).toLocaleString() : ''}
               </span>
             </div>
           </div>

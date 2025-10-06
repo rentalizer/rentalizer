@@ -19,12 +19,12 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
 }) => {
   // Local state for input values to allow continuous typing
   const [localValues, setLocalValues] = useState({
-    firstMonthRent: data.firstMonthRent?.toString() || '',
-    securityDeposit: data.securityDeposit?.toString() || '',
-    miscellaneous: data.miscellaneous?.toString() || '',
-    squareFootage: data.squareFootage?.toString() || '',
-    furnishingsPSF: data.furnishingsPSF?.toString() || '8',
-    furnitureRental: data.furnitureRental?.toString() || ''
+    firstMonthRent: data.firstMonthRent && data.firstMonthRent > 0 ? data.firstMonthRent.toString() : '',
+    securityDeposit: data.securityDeposit && data.securityDeposit > 0 ? data.securityDeposit.toString() : '',
+    miscellaneous: data.miscellaneous && data.miscellaneous > 0 ? data.miscellaneous.toString() : '',
+    squareFootage: data.squareFootage && data.squareFootage > 0 ? data.squareFootage.toString() : '',
+    furnishingsPSF: data.furnishingsPSF && data.furnishingsPSF > 0 ? data.furnishingsPSF.toString() : '',
+    furnitureRental: data.furnitureRental && data.furnitureRental > 0 ? data.furnitureRental.toString() : ''
   });
 
   const calculatedFurnishings = Math.round(data.squareFootage * (data.furnishingsPSF || 8));
@@ -141,7 +141,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
             <div className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-cyan-400" />
               <span className="text-lg font-bold text-cyan-400">
-                {calculatedFurnishings.toLocaleString()}
+                {calculatedFurnishings > 0 ? calculatedFurnishings.toLocaleString() : ''}
               </span>
             </div>
           </div>
@@ -172,7 +172,7 @@ export const BuildOutSection: React.FC<BuildOutSectionProps> = ({
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-cyan-400" />
               <span className="text-2xl font-bold text-cyan-400">
-                {Math.round(cashToLaunch).toLocaleString()}
+                {cashToLaunch > 0 ? Math.round(cashToLaunch).toLocaleString() : ''}
               </span>
             </div>
           </div>

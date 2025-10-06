@@ -49,7 +49,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-blue-400" />
               <span className="text-2xl font-bold text-blue-400">
-                {Math.round(monthlyRevenue).toLocaleString()}
+                {monthlyRevenue > 0 ? Math.round(monthlyRevenue).toLocaleString() : ''}
               </span>
             </div>
           </div>
@@ -62,7 +62,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-purple-400" />
               <span className={`text-2xl font-bold ${netProfitMonthly >= 0 ? 'text-purple-400' : 'text-red-400'}`}>
-                {netProfitMonthly >= 0 ? '' : '-'}{Math.abs(netProfitMonthly).toLocaleString()}
+                {netProfitMonthly !== 0 ? (netProfitMonthly >= 0 ? '' : '-') + Math.abs(netProfitMonthly).toLocaleString() : ''}
               </span>
             </div>
           </div>
@@ -88,7 +88,7 @@ export const NetProfitSection: React.FC<NetProfitSectionProps> = ({
             <div className="flex items-center gap-2">
               <Percent className="h-5 w-5 text-slate-400" />
               <span className="text-2xl font-bold text-slate-400">
-                {cashOnCashReturn}%
+                {cashOnCashReturn > 0 ? `${cashOnCashReturn}%` : ''}
               </span>
             </div>
           </div>
