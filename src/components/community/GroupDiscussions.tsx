@@ -25,7 +25,6 @@ import { NewsFeed } from '@/components/community/NewsFeed';
 import { MembersList } from '@/components/MembersList';
 import { CommunityHeader } from '@/components/community/CommunityHeader';
 import { CommentsDialog } from '@/components/community/CommentsDialog';
-import { useMemberCount } from '@/hooks/useMemberCount';
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 import { useProfile } from '@/hooks/useProfile';
 import { formatDateWithTimezone, getTimezoneNotice } from '@/utils/timezone';
@@ -106,7 +105,6 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [userProfiles, setUserProfiles] = useState<{[key: string]: UserProfile}>({});
-  const { memberCount, loading: memberCountLoading } = useMemberCount();
   const { onlineCount, adminNames, loading: onlineLoading, useWebSocket } = useOnlineUsers();
   const [showMembersList, setShowMembersList] = useState(false);
   
@@ -1257,21 +1255,23 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
+               {/* Total Members hidden per optimization/customer request
                <div className="flex justify-between items-center">
-                  {isAdmin ? (
-                    <button
-                      onClick={() => setShowMembersList(true)}
-                      className="text-gray-400 hover:text-cyan-300 transition-colors cursor-pointer"
-                    >
-                      Total Members
-                    </button>
-                  ) : (
-                    <span className="text-gray-400">Total Members</span>
-                  )}
-                   <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
-                     {memberCountLoading ? '...' : memberCount}
-                   </Badge>
-                </div>
+                 {isAdmin ? (
+                   <button
+                     onClick={() => setShowMembersList(true)}
+                     className="text-gray-400 hover:text-cyan-300 transition-colors cursor-pointer"
+                   >
+                     Total Members
+                   </button>
+                 ) : (
+                   <span className="text-gray-400">Total Members</span>
+                 )}
+                 <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
+                   {memberCountLoading ? '...' : memberCount}
+                 </Badge>
+               </div>
+               */}
                <div className="flex justify-between items-center">
                  {isAdmin ? (
                    <div className="flex flex-col">
