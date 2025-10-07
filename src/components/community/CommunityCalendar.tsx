@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ImageUpload } from '@/components/ui/ImageUpload';
 import { ChevronLeft, ChevronRight, Plus, Clock, Users, Video, CalendarIcon, Upload } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -74,6 +75,7 @@ interface EventFormData {
   isRecurring: boolean;
   remindMembers: boolean;
   attendees: string;
+  coverImage?: string;
 }
 
 // Helper functions for time conversion
@@ -162,7 +164,8 @@ export const CommunityCalendar = () => {
     event_type: 'workshop' as 'training' | 'webinar' | 'discussion' | 'workshop',
     isRecurring: false,
     remindMembers: false,
-    attendees: 'All members'
+    attendees: 'All members',
+    coverImage: ''
   });
 
   // State for events
@@ -516,7 +519,8 @@ export const CommunityCalendar = () => {
           event_type: 'workshop',
           isRecurring: false,
           remindMembers: false,
-          attendees: 'All members'
+          attendees: 'All members',
+          coverImage: ''
         });
         
         console.log('Event added successfully');
@@ -642,7 +646,8 @@ export const CommunityCalendar = () => {
       event_type: event.type || 'workshop',
       isRecurring: event.isRecurring || false,
       remindMembers: event.remindMembers || false,
-      attendees: String(event.attendees) || 'All members'
+      attendees: String(event.attendees) || 'All members',
+      coverImage: ''
     });
     setIsEditEventOpen(true);
   };
@@ -923,11 +928,11 @@ export const CommunityCalendar = () => {
                 </div>
 
                 {/* Location */}
-                <div className="space-y-4">
-                  <Label className="text-white">
-                    Location <span className="text-red-500">*</span>
-                  </Label>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-white">
+                      Location <span className="text-red-500">*</span>
+                    </Label>
                     <Select value={newEvent.location} onValueChange={(value) => setNewEvent({...newEvent, location: value})}>
                       <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
                         <SelectValue />
@@ -939,24 +944,24 @@ export const CommunityCalendar = () => {
                         <SelectItem value="In Person">📍 In Person</SelectItem>
                       </SelectContent>
                     </Select>
-                    
-                    {newEvent.location === 'Zoom' && (
-                      <div className="space-y-1">
-                        <Label className="text-white">
-                          Zoom Link <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                          placeholder="Meeting ID, room name, or full Zoom URL"
-                          value={newEvent.zoomLink}
-                          onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
-                          className="bg-slate-700 border-gray-600 text-white"
-                        />
-                        <p className="text-xs text-gray-400">
-                          Examples: "123456789", "Room A", or "https://zoom.us/j/123456789"
-                        </p>
-                      </div>
-                    )}
                   </div>
+                  
+                  {newEvent.location === 'Zoom' && (
+                    <div className="space-y-2">
+                      <Label className="text-white">
+                        Zoom Link <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        placeholder="Meeting ID, room name, or full Zoom URL"
+                        value={newEvent.zoomLink}
+                        onChange={(e) => setNewEvent({...newEvent, zoomLink: e.target.value})}
+                        className="bg-slate-700 border-gray-600 text-white"
+                      />
+                      <p className="text-xs text-gray-400">
+                        Examples: "123456789", "Room A", or "https://zoom.us/j/123456789"
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Description */}
@@ -993,12 +998,12 @@ export const CommunityCalendar = () => {
 
                 {/* Upload cover image */}
                 <div className="space-y-2">
-                  <Label className="text-white">Upload cover image</Label>
-                  <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
-                    <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-blue-400 text-sm cursor-pointer hover:underline">Upload cover image</p>
-                    <p className="text-gray-400 text-xs mt-1">1460 x 752 px</p>
-                  </div>
+                  <Label className="text-white">Upload cover image (Optional)</Label>
+                  <ImageUpload
+                    value={newEvent.coverImage}
+                    onChange={(value) => setNewEvent({...newEvent, coverImage: value})}
+                  />
+                  <p className="text-gray-400 text-xs">Recommended size: 1460 x 752 px</p>
                 </div>
 
                 {/* Remind members */}

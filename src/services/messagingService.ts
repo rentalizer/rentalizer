@@ -171,7 +171,7 @@ class MessagingService {
     page = 1, 
     limit = 50, 
     sortBy = 'created_at', 
-    sortOrder = 'asc'
+    sortOrder = 'desc' // Changed to 'desc' to get latest messages first
   ): Promise<ApiResponse<Message[]>> {
     const response = await messagingAPI.get(`/conversation/${userId}`, {
       params: { page, limit, sortBy, sortOrder }

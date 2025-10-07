@@ -40,10 +40,10 @@ export default function MembersList({
 
   // Sort members by unread count, online status, and last message time
   const sortedMembers = filteredMembers.sort((a, b) => {
-    // First sort by unread count (descending) - COMMENTED OUT FOR NOW
-    // if (a.unread_count !== b.unread_count) {
-    //   return b.unread_count - a.unread_count;
-    // }
+    // First sort by unread count (descending)
+    if (a.unread_count !== b.unread_count) {
+      return b.unread_count - a.unread_count;
+    }
     
     // Then sort by online status (online first)
     const aOnline = onlineUsers.has(a.participant_id) || (a.participant as { isOnline?: boolean }).isOnline;
@@ -158,10 +158,10 @@ export default function MembersList({
                           </div>
                         )}
                         
-                        {/* Unread indicator - COMMENTED OUT FOR NOW */}
-                        {/* {hasUnread && (
-                          <div className="absolute -top-1 -left-1 w-3 h-3 bg-red-500 rounded-full border-2 border-slate-800"></div>
-                        )} */}
+                        {/* Unread indicator */}
+                        {hasUnread && (
+                          <div className="absolute -top-1 -left-1 w-3 h-3 bg-red-500 rounded-full border-2 border-slate-800 animate-pulse"></div>
+                        )}
                       </div>
 
                       {/* Content */}
@@ -171,15 +171,15 @@ export default function MembersList({
                             {getDisplayName(member)}
                           </h4>
                           
-                              {/* Unread count - COMMENTED OUT FOR NOW */}
-                              {/* {hasUnread && (
-                                <Badge
-                                  variant="destructive"
-                                  className="text-xs px-2 py-0.5 h-5 min-w-5 flex items-center justify-center"
-                                >
-                                  {member.unread_count > 99 ? '99+' : member.unread_count}
-                                </Badge>
-                              )} */}
+                          {/* Unread count badge */}
+                          {hasUnread && (
+                            <Badge
+                              variant="destructive"
+                              className="text-xs px-2 py-0.5 h-5 min-w-5 flex items-center justify-center animate-pulse"
+                            >
+                              {member.unread_count > 99 ? '99+' : member.unread_count}
+                            </Badge>
+                          )}
                         </div>
 
                         {/* Last message */}
