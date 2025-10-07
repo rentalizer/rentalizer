@@ -506,21 +506,33 @@ export default function AdminSupportMessaging() {
             <p className="text-slate-300">Loading messages...</p>
           </div>
         ) : (
-          <MessageThread
-            messages={messages}
-            currentUserId={user.id}
-            isTyping={isTyping}
-            onSendMessage={handleSendMessage}
-            recipientName={selectedMember?.participant ? 
-              `${selectedMember.participant.firstName} ${selectedMember.participant.lastName}`.trim() || 
-              selectedMember.participant.email.split('@')[0] : 
-              "Admin Support"
-            }
-            recipientAvatar={selectedMember?.participant.profilePicture}
-            isOnline={selectedMemberId ? onlineUsers.has(selectedMemberId) || (selectedMember?.participant as { isOnline?: boolean })?.isOnline || false : false}
-            recipientId={selectedMemberId}
-            onMarkAsRead={handleMarkAsRead}
-          />
+          <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden shadow-lg flex flex-col h-full">
+            {/* Unread Messages Notification Banner for Users */}
+            {totalUnread > 0 && (
+              <div className="bg-red-500/10 border-b border-red-500/20 px-4 py-2 flex items-center justify-center gap-2">
+                <Bell className="h-4 w-4 text-red-400 animate-pulse" />
+                <span className="text-red-400 text-sm font-medium">
+                  You have {totalUnread} unread {totalUnread === 1 ? 'message' : 'messages'} from admin support
+                </span>
+              </div>
+            )}
+            
+            <MessageThread
+              messages={messages}
+              currentUserId={user.id}
+              isTyping={isTyping}
+              onSendMessage={handleSendMessage}
+              recipientName={selectedMember?.participant ? 
+                `${selectedMember.participant.firstName} ${selectedMember.participant.lastName}`.trim() || 
+                selectedMember.participant.email.split('@')[0] : 
+                "Admin Support"
+              }
+              recipientAvatar={selectedMember?.participant.profilePicture}
+              isOnline={selectedMemberId ? onlineUsers.has(selectedMemberId) || (selectedMember?.participant as { isOnline?: boolean })?.isOnline || false : false}
+              recipientId={selectedMemberId}
+              onMarkAsRead={handleMarkAsRead}
+            />
+          </div>
         )}
         
         {/* Connection status indicator */}
@@ -539,6 +551,21 @@ export default function AdminSupportMessaging() {
     <div className="h-[600px] flex bg-slate-800 border border-slate-700 rounded-lg overflow-hidden shadow-lg">
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col bg-slate-800/90">
+        {/* Unread Messages Notification Banner */}
+        {totalUnread > 0 && (
+          <div className="bg-red-500/10 border-b border-red-500/20 px-4 py-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="h-4 w-4 text-red-400 animate-pulse" />
+              <span className="text-red-400 text-sm font-medium">
+                You have {totalUnread} unread {totalUnread === 1 ? 'message' : 'messages'}
+              </span>
+            </div>
+            <div className="text-xs text-red-300">
+              Select a conversation to view
+            </div>
+          </div>
+        )}
+        
         {selectedMember ? (
           <MessageThread
             messages={messages}
