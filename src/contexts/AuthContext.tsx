@@ -134,10 +134,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!user) return { error: new Error('No user logged in') };
     
     try {
-      const response = await apiService.updateProfile({
-        firstName: updates.display_name?.split(' ')[0],
-        lastName: updates.display_name?.split(' ').slice(1).join(' ')
-      });
+      // Build the update payload from Profile updates
+      const updatePayload: {
+        firstName?: string;
+        lastName?: string;
+        bio?: string;
+        profilePicture?: string;
+      } = {};
+
+      // Handle display_name if provided
+      if (updates.display_name) {
+        const nameParts = updates.display_name.split(' ');
+        updatePayload.firstName = nameParts[0];
+        updatePayload.lastName = nameParts.slice(1).join(' ');
+      }
+
+      // Handle bio if provided
+      if (updates.bio !== undefined) {
+        updatePayload.bio = updates.bio || '';
+      }
+
+      // Handle avatar_url if provided
+      if (updates.avatar_url !== undefined) {
+        updatePayload.profilePicture = updates.avatar_url || '';
+      }
+
+      const response = await apiService.updateProfile(updatePayload);
       
       setUser(response.user);
       setProfile(createProfileFromUser(response.user));

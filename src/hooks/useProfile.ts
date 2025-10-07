@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiService } from '@/services/api';
 
@@ -14,74 +14,53 @@ interface Profile {
 }
 
 export const useProfile = () => {
-  const { user } = useAuth();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, isLoading } = useAuth();
+  
+  // Transform user data from AuthContext to Profile interface
+  // No need to fetch - AuthContext already has this data!
+  const profile = useMemo<Profile | null>(() => {
+    if (!user) return null;
+    
+    return {
+      user_id: user.id,
+      display_name: user.firstName && user.lastName 
+        ? `${user.firstName} ${user.lastName}`
+        : user.email?.split('@')[0] || 'User',
+      first_name: user.firstName || null,
+      last_name: user.lastName || null,
+      bio: user.bio || null,
+      avatar_url: user.profilePicture || null,
+      profile_complete: !!(user.firstName && user.lastName)
+    };
+  }, [user]);
 
+  // Only fetch profile when explicitly requested (e.g., after an update)
   const fetchProfile = async () => {
     if (!user) {
-      setProfile(null);
-      setLoading(false);
       return;
     }
 
-    console.log('🔍 Fetching profile for user:', user.id);
+    console.log('🔄 Explicitly fetching profile for user:', user.id);
     
     try {
-      // Fetch real profile data from Node.js backend
       const response = await apiService.getProfile();
-      const backendUser = response.user;
-      
-      // Transform backend user data to Profile interface
-      const profileData: Profile = {
-        user_id: backendUser.id,
-        display_name: backendUser.firstName && backendUser.lastName 
-          ? `${backendUser.firstName} ${backendUser.lastName}`
-          : backendUser.email?.split('@')[0] || 'User',
-        first_name: backendUser.firstName || null,
-        last_name: backendUser.lastName || null,
-        bio: backendUser.bio || null,
-        avatar_url: backendUser.profilePicture || null,
-        profile_complete: !!(backendUser.firstName && backendUser.lastName)
-      };
-      
-      console.log('📊 Profile query result:', { data: profileData, error: null });
-      console.log('✅ Profile loaded successfully:', profileData);
-      console.log('🖼️ Profile picture status:', { 
-        hasProfilePicture: !!profileData.avatar_url, 
-        profilePicture: profileData.avatar_url 
-      });
-      setProfile(profileData);
+      console.log('✅ Profile refreshed:', response.user);
+      // Note: This will update the AuthContext through the updateProfile call
+      return response.user;
     } catch (error) {
       console.error('❌ Error fetching profile:', error);
-      // Fallback to user data from auth context
-      const fallbackProfile: Profile = {
-        user_id: user.id,
-        display_name: user.email?.split('@')[0] || 'User',
-        first_name: user.firstName || null,
-        last_name: user.lastName || null,
-        bio: user.bio || null,
-        avatar_url: user.profilePicture || null,
-        profile_complete: !!(user.firstName && user.lastName)
-      };
-      setProfile(fallbackProfile);
-    } finally {
-      setLoading(false);
+      throw error;
     }
   };
 
   const updateProfile = (newProfile: Profile) => {
     console.log('📝 Updating profile locally:', newProfile);
-    setProfile(newProfile);
+    // This is now just for local state - the actual update should go through AuthContext
   };
-
-  useEffect(() => {
-    fetchProfile();
-  }, [user]);
 
   return {
     profile,
-    loading,
+    loading: isLoading,
     fetchProfile,
     updateProfile
   };

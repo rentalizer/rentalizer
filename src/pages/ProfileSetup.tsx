@@ -28,7 +28,7 @@ const ProfileSetup = () => {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, updateProfile: updateAuthProfile } = useAuth();
   const navigate = useNavigate();
   const [profileComplete, setProfileComplete] = useState(false);
 
@@ -53,34 +53,30 @@ const ProfileSetup = () => {
     try {
       console.log('🔍 Loading profile for user:', user?.id);
       
-      // Load profile from backend API
-      const response = await apiService.getProfile();
-      const profileData = response.user;
+      // Use data from AuthContext - no need to fetch again!
+      if (user) {
+        console.log('📋 Profile data from AuthContext:', user);
 
-      console.log('📋 Profile data from backend:', profileData);
-
-      if (profileData) {
         console.log('📋 Setting form data:', {
-          firstName: profileData.firstName,
-          lastName: profileData.lastName,
-          bio: profileData.bio,
-          profilePicture: profileData.profilePicture ? 'Image loaded' : 'No image'
+          firstName: user.firstName,
+          lastName: user.lastName,
+          bio: user.bio,
+          profilePicture: user.profilePicture ? 'Image loaded' : 'No image'
         });
         
         form.reset({
-          first_name: profileData.firstName || '',
-          last_name: profileData.lastName || '',
-          bio: profileData.bio || '',
+          first_name: user.firstName || '',
+          last_name: user.lastName || '',
+          bio: user.bio || '',
         });
         
         // Set avatar URL if available
-        setAvatarUrl(profileData.profilePicture || '');
-        setProfileComplete(!!(profileData.firstName && profileData.lastName));
-        console.log('✨ Profile state updated from backend');
+        setAvatarUrl(user.profilePicture || '');
+        setProfileComplete(!!(user.firstName && user.lastName));
+        console.log('✨ Profile state loaded from AuthContext');
       }
     } catch (error) {
       console.error('Error loading profile:', error);
-      // If profile doesn't exist, that's okay - user can create one
     } finally {
       setLoading(false);
     }
@@ -151,15 +147,19 @@ const ProfileSetup = () => {
         lastName: data.last_name.trim(),
       });
 
-      // Update profile using backend API
-      const response = await apiService.updateProfile({
-        firstName: data.first_name.trim(),
-        lastName: data.last_name.trim(),
-        bio: data.bio?.trim() || '',
-        profilePicture: avatarUrl || '',
+      // Update profile using AuthContext - this will update both backend and local state
+      // No need to call apiService.updateProfile directly - AuthContext handles it
+      const result = await updateAuthProfile({
+        display_name: `${data.first_name.trim()} ${data.last_name.trim()}`,
+        avatar_url: avatarUrl || null,
+        bio: data.bio?.trim() || null,
       });
 
-      console.log('✅ Profile updated successfully!', response);
+      if (result.error) {
+        throw result.error;
+      }
+
+      console.log('✅ Profile updated successfully!');
       console.log("Success: Your profile has been updated successfully");
 
       navigate('/community');
