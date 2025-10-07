@@ -17,6 +17,7 @@ const videoRoutes = require('./routes/videos');
 const uploadRoutes = require('./routes/upload');
 const newsRoutes = require('./routes/news');
 const messageRoutes = require('./routes/messages');
+const bugReportRoutes = require('./routes/bugReport');
 
 // Import WebSocket setup
 const { setupWebSocketHandlers } = require('./middleware/websocket');
@@ -89,6 +90,7 @@ app.use('/api/videos', videoRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/bug-report', bugReportRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

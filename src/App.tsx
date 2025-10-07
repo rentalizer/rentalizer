@@ -6,6 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SmartRedirect } from "@/components/SmartRedirect";
 import { AuthGuard } from "@/components/AuthGuard";
+import { BugReportWidget } from "@/components/BugReportWidget";
 import React, { lazy, Suspense } from "react";
 
 // Lazy load all page components for better performance with error handling
@@ -102,6 +103,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <AppRoutes />
+          <BugReportWidget />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
