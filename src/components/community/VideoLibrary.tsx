@@ -753,10 +753,7 @@ export const VideoLibrary = () => {
               </div>
             ) : (
               selectedCategory === 'all' 
-                ? `${videos.length > 0 ? Object.keys(videos.reduce((acc, video) => {
-                    acc[video.category] = (acc[video.category] || 0) + 1;
-                    return acc;
-                  }, {} as Record<string, number>)).length : 0} categories`
+                ? '4 categories'
                 : `${videos.filter(v => v.category === selectedCategory).length} videos`
             )}
           </Badge>
@@ -891,10 +888,10 @@ export const VideoLibrary = () => {
       ) : (
         <>
           {(() => {
-            // Define the category columns
+            // Define the category columns - these should ALWAYS show regardless of video count
             const categoryColumns = ['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'];
             
-            // Group videos by category
+            // Group videos by category - initialize all categories with empty arrays
             const videosByCategory = categoryColumns.reduce((acc, category) => {
               acc[category] = videos.filter(video => video.category === category);
               return acc;
