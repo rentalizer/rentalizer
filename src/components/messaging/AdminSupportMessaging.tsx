@@ -46,9 +46,9 @@ export default function AdminSupportMessaging() {
       if (response.success) {
         setConversations(response.data);
         
-        // Calculate total unread - COMMENTED OUT FOR NOW
-        // const total = response.data.reduce((sum, conv) => sum + conv.unread_count, 0);
-        // setTotalUnread(total);
+        // Calculate total unread messages
+        const total = response.data.reduce((sum, conv) => sum + conv.unread_count, 0);
+        setTotalUnread(total);
       }
     } catch (error: unknown) {
       console.error('Error loading conversations:', error);
@@ -103,8 +103,31 @@ export default function AdminSupportMessaging() {
         return prev;
       });
 
-      // Update conversations list
-      loadConversations();
+      // Update conversations list without full reload
+      setConversations(prev => {
+        const senderId = newMessage.sender_id;
+        const recipientId = newMessage.recipient_id;
+        const otherUserId = senderId === user?.id ? recipientId : senderId;
+        
+        return prev.map(conv => {
+          if (conv.participant_id === otherUserId) {
+            return {
+              ...conv,
+              last_message: newMessage,
+              // Only increment unread if we're not currently viewing this conversation
+              unread_count: selectedMemberId === otherUserId ? conv.unread_count : conv.unread_count + 1
+            };
+          }
+          return conv;
+        });
+      });
+      
+      // Recalculate total unread
+      setConversations(prev => {
+        const total = prev.reduce((sum, conv) => sum + conv.unread_count, 0);
+        setTotalUnread(total);
+        return prev;
+      });
     });
 
     // Message sent confirmation
@@ -142,10 +165,28 @@ export default function AdminSupportMessaging() {
 
     // Messages marked as read
     websocketService.onMessagesRead((data) => {
+      console.log('📨 Messages read event received:', data);
+      
+      // Update message read status
       setMessages(prev => prev.map(msg => 
         msg.recipient_id === user?.id ? { ...msg, read_at: new Date().toISOString() } : msg
       ));
-      loadConversations();
+      
+      // Update conversations locally instead of reloading
+      if (data.userId) {
+        setConversations(prev => prev.map(conv => 
+          conv.participant_id === data.userId 
+            ? { ...conv, unread_count: 0 }
+            : conv
+        ));
+        
+        // Recalculate total unread
+        setConversations(prev => {
+          const total = prev.reduce((sum, conv) => sum + conv.unread_count, 0);
+          setTotalUnread(total);
+          return prev;
+        });
+      }
     });
 
     // Message deleted
@@ -213,32 +254,100 @@ export default function AdminSupportMessaging() {
     }
   }, [user, loadConversations]);
 
+  // Mark conversation as read
+  const handleMarkAsRead = useCallback(async () => {
+    if (!selectedMemberId || !user) return;
+
+    try {
+      console.log('✅ Marking messages as read for:', selectedMemberId);
+      
+      // Mark messages as read on backend
+      await messagingService.markConversationAsRead(selectedMemberId);
+      
+      // Update local state immediately (optimistic update)
+      setConversations(prev => {
+        const updated = prev.map(conv => 
+          conv.participant_id === selectedMemberId 
+            ? { ...conv, unread_count: 0 }
+            : conv
+        );
+        
+        // Update total unread count based on the updated conversations
+        const total = updated.reduce((sum, conv) => sum + conv.unread_count, 0);
+        setTotalUnread(total);
+        
+        return updated;
+      });
+      
+      // Broadcast via WebSocket so other clients update
+      // Include the count of messages marked as read
+      const unreadMessagesCount = conversations.find(c => c.participant_id === selectedMemberId)?.unread_count || 0;
+      
+      if (wsConnected) {
+        websocketService.markMessagesAsRead(selectedMemberId, unreadMessagesCount);
+      }
+      
+      console.log('✅ Messages marked as read (local state updated, count:', unreadMessagesCount, ')');
+    } catch (error) {
+      console.error('Error marking messages as read:', error);
+      // On error, refresh from server
+      loadConversations();
+    }
+  }, [selectedMemberId, user, wsConnected, loadConversations]);
 
   // Load messages for selected conversation
   const loadMessages = useCallback(async (memberId: string) => {
     try {
       const response = await messagingService.getConversation(memberId);
       if (response.success) {
+        // Messages come in descending order (newest first) from API
+        // Reverse them to show oldest first (typical chat order)
+        const messagesInChatOrder = [...response.data].reverse();
+        
         console.log('📨 Frontend received messages from API:', {
-          messageCount: response.data.length,
-          messageOrder: response.data.map(msg => ({
+          messageCount: messagesInChatOrder.length,
+          messageOrder: messagesInChatOrder.slice(-5).map(msg => ({
             id: msg._id,
             created_at: msg.created_at,
             message: msg.message.substring(0, 20) + '...'
           }))
         });
-        setMessages(response.data);
+        setMessages(messagesInChatOrder);
       }
     } catch (error) {
       console.error('Error loading messages:', error);
     }
   }, []);
 
+  // Track if user has manually selected a conversation (clicked on it)
+  const [hasUserSelectedConversation, setHasUserSelectedConversation] = useState(false);
+  
+  // Track the last loaded member to prevent duplicate loads
+  const [lastLoadedMemberId, setLastLoadedMemberId] = useState<string | null>(null);
+
   useEffect(() => {
-    if (selectedMemberId && user) {
-      loadMessages(selectedMemberId);
+    // Prevent loading the same conversation multiple times
+    if (!selectedMemberId || !user || lastLoadedMemberId === selectedMemberId) {
+      return;
     }
-  }, [selectedMemberId, user, loadMessages]);
+    
+    console.log('📥 Loading messages for:', selectedMemberId);
+    setLastLoadedMemberId(selectedMemberId);
+    loadMessages(selectedMemberId);
+    
+    if (hasUserSelectedConversation) {
+      // Mark messages as read after a short delay to allow messages to load
+      // This only happens AFTER user clicks on the conversation
+      const markReadTimer = setTimeout(() => {
+        console.log('⏰ Auto-marking messages as read for:', selectedMemberId);
+        handleMarkAsRead();
+      }, 1000); // 1 second delay to ensure user sees the messages
+      
+      return () => {
+        clearTimeout(markReadTimer);
+      };
+    }
+  }, [selectedMemberId, user, hasUserSelectedConversation]);
 
   // Debug logging for user and messages
   useEffect(() => {
@@ -269,6 +378,8 @@ export default function AdminSupportMessaging() {
         if (response.success) {
           console.log('✅ Found admin:', response.data);
           setSelectedMemberId(response.data._id);
+          // Don't auto-mark as read for auto-selected admin
+          setHasUserSelectedConversation(false);
         } else {
           console.log('❌ No admin found');
           toast({
@@ -333,23 +444,11 @@ export default function AdminSupportMessaging() {
     }
   }, [user, selectedMemberId, wsConnected, loadConversations]);
 
-  // Mark conversation as read
-  const handleMarkAsRead = useCallback(async () => {
-    if (!selectedMemberId || !user) return;
-
-    try {
-      await messagingService.markConversationAsRead(selectedMemberId);
-      if (wsConnected) {
-        websocketService.markMessagesAsRead(selectedMemberId);
-      }
-    } catch (error) {
-      console.error('Error marking messages as read:', error);
-    }
-  }, [selectedMemberId, user, wsConnected]);
-
   // Handle member selection
   const handleMemberSelect = useCallback((memberId: string) => {
+    console.log('👆 User clicked on member:', memberId);
     setSelectedMemberId(memberId);
+    setHasUserSelectedConversation(true); // Mark that user actively selected this
   }, []);
 
   const selectedMember = conversations.find(c => c.participant_id === selectedMemberId);
@@ -468,11 +567,13 @@ export default function AdminSupportMessaging() {
                 You can help resolve issues and provide support directly through this interface.
               </p>
               <div className="flex items-center justify-center gap-4 text-sm text-slate-400">
-                {/* Unread count - COMMENTED OUT FOR NOW */}
-                {/* <div className="flex items-center gap-2">
-                  <Bell className="h-4 w-4" />
-                  <span>{totalUnread} unread</span>
-                </div> */}
+                {/* Unread messages count */}
+                {totalUnread > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Bell className="h-4 w-4 text-red-400 animate-pulse" />
+                    <span className="text-red-400 font-semibold">{totalUnread} unread</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
                   <span>{conversations.length} conversations</span>

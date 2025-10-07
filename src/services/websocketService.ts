@@ -208,9 +208,12 @@ class WebSocketService {
   /**
    * Mark messages as read
    */
-  markMessagesAsRead(conversation_partner_id: string): void {
+  markMessagesAsRead(conversation_partner_id: string, count?: number): void {
     if (this.socket && this.isConnected) {
-      this.socket.emit('mark_messages_read', { conversation_partner_id });
+      this.socket.emit('mark_messages_read', { 
+        conversation_partner_id,
+        count: count || 0 
+      });
     }
   }
 
