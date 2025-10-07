@@ -237,9 +237,9 @@ const Community = React.memo(() => {
             </div>
             
             {/* Timezone Notice */}
-            <div className="text-xs text-gray-400 mb-2">
+            {/* <div className="text-xs text-gray-400 mb-2">
               {getTimezoneNotice()}
-            </div>
+            </div> */}
             
             {/* Admin Chat Button */}
             {/* <div className="flex items-center justify-center gap-4 mt-4">

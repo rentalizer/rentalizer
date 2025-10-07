@@ -97,8 +97,8 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
       setEmail('');
       setPassword('');
       
-      // Navigate to community page after successful login
-      navigate('/community');
+      // Navigate to community discussions after successful login
+      navigate('/community#discussions');
       
     } catch (error: any) {
       console.error('❌ Authentication error:', error);
