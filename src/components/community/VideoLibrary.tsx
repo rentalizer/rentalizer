@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Video as VideoIcon, Search, Play, Clock, Eye, Calendar, Star, X, Plus, Edit, Trash2, GripVertical, Lock, Loader2 } from 'lucide-react';
+import { Video as VideoIcon, Search, Play, Clock, Eye, Calendar, Star, X, Plus, Edit, Trash2, GripVertical, Lock, Loader2, ArrowRight, Music, Building2, BarChart3, Home, Settings } from 'lucide-react';
 import { ImageUpload } from '@/components/ui/ImageUpload';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -43,6 +43,120 @@ interface SortableVideoCardProps {
   onClick: (video: Video) => void;
   getCategoryColor: (category: string) => string;
 }
+
+interface CategoryAlbumCardProps {
+  category: string;
+  videoCount: number;
+  videos: Video[];
+  onClick: (category: string) => void;
+  getCategoryColor: (category: string) => string;
+}
+
+const CategoryAlbumCard = ({ category, videoCount, videos, onClick, getCategoryColor }: CategoryAlbumCardProps) => {
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'Business Formation':
+        return <Building2 className="h-6 w-6 text-blue-400" />;
+      case 'Market Research':
+        return <BarChart3 className="h-6 w-6 text-cyan-400" />;
+      case 'Property Acquisition':
+        return <Home className="h-6 w-6 text-purple-400" />;
+      case 'Operations':
+        return <Settings className="h-6 w-6 text-green-400" />;
+      default:
+        return <VideoIcon className="h-6 w-6 text-gray-400" />;
+    }
+  };
+
+  const getCategoryDescription = (category: string) => {
+    switch (category) {
+      case 'Business Formation':
+        return 'Starting your rental business from scratch';
+      case 'Market Research':
+        return 'Analyzing markets and finding opportunities';
+      case 'Property Acquisition':
+        return 'Finding and purchasing rental properties';
+      case 'Operations':
+        return 'Managing and optimizing your properties';
+      default:
+        return 'Training videos and resources';
+    }
+  };
+
+  // Get category-specific placeholder image
+  const getCategoryPlaceholder = (category: string) => {
+    const placeholders = {
+      'Business Formation': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjMWU0MDc3Ii8+CjxyZWN0IHg9IjIwIiB5PSIyMCIgd2lkdGg9IjI4MCIgaGVpZ2h0PSIxNDAiIGZpbGw9IiMzMzY2OTkiLz4KPHRleHQgeD0iMTYwIiB5PSI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzY2YjNmZiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDgiIGZvbnQtd2VpZ2h0PSJib2xkIj7wn5KSPC90ZXh0Pgo8dGV4dCB4PSIxNjAiIHk9IjEyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzY2YjNmZiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiPkJ1c2luZXNzPC90ZXh0Pgo8L3N2Zz4K',
+      'Market Research': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjMDY0ZTc2Ii8+CjxyZWN0IHg9IjIwIiB5PSIyMCIgd2lkdGg9IjI4MCIgaGVpZ2h0PSIxNDAiIGZpbGw9IiMzMzY2NzciLz4KPHRleHQgeD0iMTYwIiB5PSI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE5ZGNmZiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDgiIGZvbnQtd2VpZ2h0PSJib2xkIj7wn5KSPC90ZXh0Pgo8dGV4dCB4PSIxNjAiIHk9IjEyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzE5ZGNmZiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiPk1hcmtldDwvdGV4dD4KPC9zdmc+Cg==',
+      'Property Acquisition': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjN2MwYjE2Ii8+CjxyZWN0IHg9IjIwIiB5PSIyMCIgd2lkdGg9IjI4MCIgaGVpZ2h0PSIxNDAiIGZpbGw9IiM2MzI2MTYiLz4KPHRleHQgeD0iMTYwIiB5PSI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZhNjQzZCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDgiIGZvbnQtd2VpZ2h0PSJib2xkIj7wn5GQPC90ZXh0Pgo8dGV4dCB4PSIxNjAiIHk9IjEyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZhNjQzZCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiPlByb3BlcnR5PC90ZXh0Pgo8L3N2Zz4K',
+      'Operations': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDMyMCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMjAiIGhlaWdodD0iMTgwIiBmaWxsPSIjMTY1MzM3Ii8+CjxyZWN0IHg9IjIwIiB5PSIyMCIgd2lkdGg9IjI4MCIgaGVpZ2h0PSIxNDAiIGZpbGw9IiM0NDU1NTciLz4KPHRleHQgeD0iMTYwIiB5PSI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzEwYjk3OCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDgiIGZvbnQtd2VpZ2h0PSJib2xkIj7wn5GQPC90ZXh0Pgo8dGV4dCB4PSIxNjAiIHk9IjEyMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzEwYjk3OCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTIiPk9wZXJhdGlvbnM8L3RleHQ+Cjwvc3ZnPgo='
+    };
+    return placeholders[category as keyof typeof placeholders] || placeholders['Business Formation'];
+  };
+
+  const albumCover = getCategoryPlaceholder(category);
+
+  return (
+    <Card 
+      className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-all cursor-pointer group hover:scale-105"
+      onClick={() => onClick(category)}
+    >
+      <div className="relative">
+        {/* Album Cover */}
+        <div className="aspect-video bg-slate-700 rounded-t-lg relative overflow-hidden">
+          <img
+            src={albumCover}
+            alt={`${category} album cover`}
+            className="w-full h-full object-cover"
+          />
+          
+          {/* Play button overlay */}
+          <div className="absolute inset-0 bg-black/30 hover:bg-black/20 transition-colors flex items-center justify-center">
+            <div className="bg-white/20 backdrop-blur-sm rounded-full p-4 group-hover:bg-white/30 transition-colors">
+              <Play className="h-8 w-8 text-white" />
+            </div>
+          </div>
+          
+          {/* Video count badge */}
+          <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+            <VideoIcon className="h-3 w-3" />
+            {videoCount}
+          </div>
+        </div>
+      </div>
+
+      <CardContent className="p-4">
+        <div className="space-y-3">
+          {/* Category Icon and Title */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center">
+              {getCategoryIcon(category)}
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-white group-hover:text-cyan-300 transition-colors">
+                {category}
+              </h3>
+              <p className="text-xs text-gray-400 mt-1">
+                {getCategoryDescription(category)}
+              </p>
+            </div>
+          </div>
+
+          {/* Category badge and view button */}
+          <div className="flex items-center justify-between">
+            <Badge className={`${getCategoryColor(category)} text-xs`}>
+              {category}
+            </Badge>
+            <div className="flex items-center gap-1 text-xs text-gray-400 group-hover:text-cyan-300 transition-colors">
+              <span>View All</span>
+              <ArrowRight className="h-3 w-3" />
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, onToggleFeatured, onClick, getCategoryColor }: SortableVideoCardProps) => {
   const {
@@ -222,15 +336,15 @@ export const VideoLibrary = () => {
   const hasInitiallyLoadedRef = useRef(false);
   const loadVideosRef = useRef<typeof loadVideos>();
 
-  // Helper function to sort videos: featured first, then by order
+  // Helper function to sort videos: featured first, then by order (newest first)
   const sortVideosByFeatured = (videos: Video[]) => {
     return videos.sort((a, b) => {
       // Featured videos go to top
       if (a.featured && !b.featured) return -1;
       if (!a.featured && b.featured) return 1;
       
-      // If both have same featured status, sort by order
-      return a.order - b.order;
+      // If both have same featured status, sort by order (newest first - higher order numbers first)
+      return b.order - a.order;
     });
   };
 
@@ -246,7 +360,7 @@ export const VideoLibrary = () => {
         category: filters?.category,
         search: filters?.search,
         sortBy: 'order',
-        sortOrder: 'asc'
+        sortOrder: 'desc'
       };
 
       console.log('Loading videos with filters:', requestFilters);
@@ -343,6 +457,10 @@ export const VideoLibrary = () => {
     return colors[category as keyof typeof colors] || 'bg-gray-500/20 border-gray-500/30 text-gray-300';
   };
 
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(category);
+  };
+
   const handleVideoClick = async (video: Video) => {
     if (!user) {
       toast({
@@ -402,10 +520,10 @@ export const VideoLibrary = () => {
       
       const newCategoryItems = arrayMove(categoryVideos, oldIndex, newIndex);
       
-      // Update the order for videos in this category
+      // Update the order for videos in this category (newest first, so higher numbers first)
       const videoOrders = newCategoryItems.map((item, index) => ({
         videoId: item._id,
-        order: index + 1
+        order: newCategoryItems.length - index
       }));
 
       try {
@@ -417,7 +535,7 @@ export const VideoLibrary = () => {
           newCategoryItems.forEach((item, index) => {
             const videoIndex = updatedVideos.findIndex(v => v._id === item._id);
             if (videoIndex !== -1) {
-              updatedVideos[videoIndex] = { ...updatedVideos[videoIndex], order: index + 1 };
+              updatedVideos[videoIndex] = { ...updatedVideos[videoIndex], order: newCategoryItems.length - index };
             }
           });
           return updatedVideos;
@@ -624,7 +742,9 @@ export const VideoLibrary = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-cyan-300">Training Videos</h2>
+          <h2 className="text-2xl font-bold text-cyan-300">
+            {selectedCategory === 'all' ? 'Training Albums' : 'Training Videos'}
+          </h2>
           <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
             {loading ? (
               <div className="flex items-center gap-2">
@@ -632,7 +752,12 @@ export const VideoLibrary = () => {
                 Loading...
               </div>
             ) : (
-              `${pagination.total} videos`
+              selectedCategory === 'all' 
+                ? `${videos.length > 0 ? Object.keys(videos.reduce((acc, video) => {
+                    acc[video.category] = (acc[video.category] || 0) + 1;
+                    return acc;
+                  }, {} as Record<string, number>)).length : 0} categories`
+                : `${videos.filter(v => v.category === selectedCategory).length} videos`
             )}
           </Badge>
         </div>
@@ -724,34 +849,36 @@ export const VideoLibrary = () => {
       </div>
 
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Search videos..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-slate-800/50 border-cyan-500/20 text-white placeholder-gray-400"
-          />
+      {selectedCategory !== 'all' && (
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search videos in this category..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-slate-800/50 border-cyan-500/20 text-white placeholder-gray-400"
+            />
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {categories.map(category => (
+              <Button
+                key={category}
+                variant={selectedCategory === category ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory(category)}
+                className={
+                  selectedCategory === category
+                    ? "bg-cyan-600 hover:bg-cyan-700 whitespace-nowrap flex-shrink-0"
+                    : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 whitespace-nowrap flex-shrink-0"
+                }
+              >
+                {category === 'all' ? 'All Albums' : category}
+              </Button>
+            ))}
+          </div>
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          {categories.map(category => (
-            <Button
-              key={category}
-              variant={selectedCategory === category ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedCategory(category)}
-              className={
-                selectedCategory === category
-                  ? "bg-cyan-600 hover:bg-cyan-700 whitespace-nowrap flex-shrink-0"
-                  : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 whitespace-nowrap flex-shrink-0"
-              }
-            >
-              {category === 'all' ? 'All Categories' : category}
-            </Button>
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* Videos organized by category columns */}
       {loading ? (
@@ -767,24 +894,28 @@ export const VideoLibrary = () => {
             // Define the category columns
             const categoryColumns = ['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'];
             
-            // Filter videos based on selected category
-            const filteredVideos = selectedCategory === 'all' 
-              ? videos 
-              : videos.filter(video => video.category === selectedCategory);
-            
             // Group videos by category
             const videosByCategory = categoryColumns.reduce((acc, category) => {
-              acc[category] = filteredVideos.filter(video => video.category === category);
+              acc[category] = videos.filter(video => video.category === category);
               return acc;
             }, {} as Record<string, Video[]>);
 
-            // If a specific category is selected, show only that column
+            // If a specific category is selected, show the detailed view
             if (selectedCategory !== 'all') {
               const categoryVideos = videosByCategory[selectedCategory] || [];
               
               return (
                 <div className="space-y-6">
+                  {/* Back button */}
                   <div className="flex items-center gap-4 mb-6">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setSelectedCategory('all')}
+                      className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+                    >
+                      <ArrowRight className="h-4 w-4 mr-2 rotate-180" />
+                      Back to Albums
+                    </Button>
                     <h3 className="text-xl font-semibold text-cyan-300">{selectedCategory}</h3>
                     <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
                       {categoryVideos.length} videos
@@ -792,7 +923,20 @@ export const VideoLibrary = () => {
                   </div>
                   
                   <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                    {isAdmin ? (
+                    {categoryVideos.length === 0 ? (
+                      <Card className="bg-slate-800/50 border-cyan-500/20">
+                        <CardContent className="text-center py-12">
+                          <VideoIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                          <h3 className="text-lg font-medium text-gray-300 mb-2">No videos found</h3>
+                          <p className="text-gray-400">
+                            {searchTerm 
+                              ? 'Try adjusting your search terms or filters' 
+                              : `No videos have been added to ${selectedCategory} yet`
+                            }
+                          </p>
+                        </CardContent>
+                      </Card>
+                    ) : isAdmin ? (
                       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                         <SortableContext items={categoryVideos.map(v => v._id)} strategy={verticalListSortingStrategy}>
                           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -834,69 +978,40 @@ export const VideoLibrary = () => {
               );
             }
 
-            // Show all categories in 4 columns
+            // Show album view (2x2 grid of category cards)
             return (
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {categoryColumns.map(category => {
-                    const categoryVideos = videosByCategory[category] || [];
-                    
-                    return (
-                      <div key={category} className="space-y-4">
-                        {/* Category Header */}
-                        <div className="flex items-center gap-2 mb-4">
-                          <h3 className="text-lg font-semibold text-cyan-300">{category}</h3>
-                          <Badge variant="outline" className="border-cyan-500/30 text-cyan-300 text-xs">
-                            {categoryVideos.length}
-                          </Badge>
-                        </div>
-                        
-                        {/* Videos in this category */}
-                        <SortableContext items={categoryVideos.map(v => v._id)} strategy={verticalListSortingStrategy}>
-                          <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                            {categoryVideos.map(video => (
-                              <SortableVideoCard
-                                key={video._id}
-                                video={video}
-                                isAdmin={isAdmin}
-                                isAuthenticated={!!user}
-                                onEdit={handleEditVideo}
-                                onDelete={handleDeleteVideo}
-                                onToggleFeatured={handleToggleFeatured}
-                                onClick={handleVideoClick}
-                                getCategoryColor={getCategoryColor}
-                              />
-                            ))}
-                            
-                            {categoryVideos.length === 0 && (
-                              <div className="text-center py-8 text-gray-400 text-sm">
-                                No videos in this category
-                              </div>
-                            )}
-                          </div>
-                        </SortableContext>
-                      </div>
-                    );
-                  })}
-                </div>
-              </DndContext>
+              <div className="space-y-6">
+                {videos.length === 0 && !loading ? (
+                  <Card className="bg-slate-800/50 border-cyan-500/20">
+                    <CardContent className="text-center py-12">
+                      <Music className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-gray-300 mb-2">No training albums available</h3>
+                      <p className="text-gray-400">
+                        Training videos will be organized into categories once they are added.
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {categoryColumns.map(category => {
+                      const categoryVideos = videosByCategory[category] || [];
+                      
+                      return (
+                        <CategoryAlbumCard
+                          key={category}
+                          category={category}
+                          videoCount={categoryVideos.length}
+                          videos={categoryVideos}
+                          onClick={handleCategoryClick}
+                          getCategoryColor={getCategoryColor}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             );
           })()}
-
-          {videos.length === 0 && !loading && (
-            <Card className="bg-slate-800/50 border-cyan-500/20">
-              <CardContent className="text-center py-12">
-                <VideoIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-300 mb-2">No videos found</h3>
-                <p className="text-gray-400">
-                  {searchTerm || selectedCategory !== 'all' 
-                    ? 'Try adjusting your search terms or filters' 
-                    : 'No videos have been added yet'
-                  }
-                </p>
-              </CardContent>
-            </Card>
-          )}
         </>
       )}
 

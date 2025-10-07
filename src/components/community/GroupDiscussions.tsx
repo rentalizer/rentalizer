@@ -25,7 +25,6 @@ import { NewsFeed } from '@/components/community/NewsFeed';
 import { MembersList } from '@/components/MembersList';
 import { CommunityHeader } from '@/components/community/CommunityHeader';
 import { CommentsDialog } from '@/components/community/CommentsDialog';
-import { useMemberCount } from '@/hooks/useMemberCount';
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 import { useProfile } from '@/hooks/useProfile';
 import { formatDateWithTimezone, getTimezoneNotice } from '@/utils/timezone';
@@ -97,7 +96,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [pinningPosts, setPinningPosts] = useState<Set<string>>(new Set());
   const [selectedDiscussion, setSelectedDiscussion] = useState<DiscussionType | null>(null);
   const [newComment, setNewComment] = useState('');
-  const [comments, setComments] = useState<{[key: string]: {id: string; author: string; avatar: string; content: string; timeAgo: string;}[]}>({});
+  const [comments, setComments] = useState<{[key: string]: {id: string; author: string; avatar: string; avatarUrl?: string | null; content: string; timeAgo: string;}[]}>({});
   const [loadedDiscussionIds, setLoadedDiscussionIds] = useState<Set<string>>(new Set());
   const [editingPost, setEditingPost] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
@@ -106,9 +105,21 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [userProfiles, setUserProfiles] = useState<{[key: string]: UserProfile}>({});
-  const { memberCount, loading: memberCountLoading } = useMemberCount();
-  const { onlineCount, adminNames, loading: onlineLoading, useWebSocket } = useOnlineUsers();
+  const { onlineUsers, onlineCount, adminNames, loading: onlineLoading, useWebSocket } = useOnlineUsers();
   const [showMembersList, setShowMembersList] = useState(false);
+  const [showOnlineModal, setShowOnlineModal] = useState(false);
+  const [onlineSearch, setOnlineSearch] = useState('');
+  
+  const filteredOnlineUsers = useMemo(() => {
+    const lower = onlineSearch.trim().toLowerCase();
+    const filtered = lower
+      ? onlineUsers.filter(u => (u.display_name || '').toLowerCase().includes(lower))
+      : onlineUsers;
+    return [...filtered].sort((a, b) => {
+      if (a.is_admin !== b.is_admin) return a.is_admin ? -1 : 1;
+      return (a.display_name || '').localeCompare(b.display_name || '');
+    });
+  }, [onlineSearch, onlineUsers]);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -134,8 +145,10 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   }, []);
 
   const getUserAvatar = useCallback(() => {
-    return profile?.avatar_url || null;
-  }, [profile?.avatar_url]);
+    const fromProfile = profile?.avatar_url?.trim() ? profile.avatar_url : null;
+    const fromUser = user?.profilePicture?.trim() ? user.profilePicture : null;
+    return fromProfile || fromUser || null;
+  }, [profile?.avatar_url, user?.profilePicture]);
 
   const getUserName = useCallback(() => {
     const name = profile?.display_name || user?.email?.split('@')[0] || 'Anonymous User';
@@ -306,6 +319,8 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       (userObj.firstName && userObj.lastName ? `${userObj.firstName} ${userObj.lastName}` : '') ||
       userObj.email?.split('@')[0] || 
       'User';
+    // Try various possible avatar fields from backend
+    const possibleAvatarUrl: string | null = (userObj.profilePicture || userObj.avatar_url || null) as (string | null);
     // Normalize id from various possible fields
     const normalizedId = (c as any).id || (c as any)._id || (typeof (c as any)._id === 'object' && (c as any)._id?.toString ? (c as any)._id.toString() : undefined);
     const userId = typeof userObj === 'string' ? userObj : (userObj._id || userObj.id);
@@ -313,6 +328,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       id: normalizedId,
       author: authorName,
       avatar: getInitials(authorName),
+      avatarUrl: possibleAvatarUrl,
       content: c.content,
       timeAgo: formatTimeAgo(c.createdAt),
       userId: userId,
@@ -1252,22 +1268,29 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
+               {/* Total Members hidden per optimization/customer request
                <div className="flex justify-between items-center">
-                  {isAdmin ? (
-                    <button
-                      onClick={() => setShowMembersList(true)}
-                      className="text-gray-400 hover:text-cyan-300 transition-colors cursor-pointer"
-                    >
-                      Total Members
-                    </button>
-                  ) : (
-                    <span className="text-gray-400">Total Members</span>
-                  )}
-                   <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
-                     {memberCountLoading ? '...' : memberCount}
-                   </Badge>
-                </div>
-               <div className="flex justify-between items-center">
+                 {isAdmin ? (
+                   <button
+                     onClick={() => setShowMembersList(true)}
+                     className="text-gray-400 hover:text-cyan-300 transition-colors cursor-pointer"
+                   >
+                     Total Members
+                   </button>
+                 ) : (
+                   <span className="text-gray-400">Total Members</span>
+                 )}
+                 <Badge className="bg-cyan-600/20 text-cyan-300 border-cyan-500/30">
+                   {memberCountLoading ? '...' : memberCount}
+                 </Badge>
+               </div>
+               */}
+               <div
+                 className="flex justify-between items-center cursor-pointer hover:text-cyan-300"
+                 onClick={() => setShowOnlineModal(true)}
+                 role="button"
+                 tabIndex={0}
+               >
                  {isAdmin ? (
                    <div className="flex flex-col">
                      <span className="text-gray-400">Online Now</span>
@@ -1329,6 +1352,50 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           console.log("Message Member: Starting conversation with", memberName);
         }}
       />
+
+      <Dialog open={showOnlineModal} onOpenChange={setShowOnlineModal}>
+        <DialogContent className="bg-slate-900 border-gray-700 max-w-lg w-full">
+          <DialogHeader>
+            <DialogTitle className="text-white">Currently Online</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Input
+              value={onlineSearch}
+              onChange={(e) => setOnlineSearch(e.target.value)}
+              placeholder="Search users..."
+              className="bg-slate-800/80 border-gray-700 text-white placeholder-gray-400"
+            />
+            {/* List online users with admins on top */}
+            <div className="max-h-80 overflow-y-auto divide-y divide-slate-700/60">
+              {filteredOnlineUsers.length === 0 ? (
+                <div className="text-center text-gray-400 py-6">No users online.</div>
+              ) : (
+                filteredOnlineUsers.map(u => (
+                  <div key={u.user_id} className="flex items-center gap-3 p-3">
+                    <Avatar className="w-8 h-8">
+                      {u.avatar_url ? (
+                        <AvatarImage src={u.avatar_url} alt={u.display_name} className="object-cover w-full h-full" />
+                      ) : null}
+                      <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
+                        {(u.display_name || 'U').slice(0,2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-white text-sm truncate">{u.display_name}</span>
+                        {u.is_admin && (
+                          <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-[10px]">Admin</Badge>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-400">Last seen: {new Date(u.last_seen).toLocaleTimeString()}</div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

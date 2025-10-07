@@ -26,9 +26,9 @@ export const SmartRedirect: React.FC<SmartRedirectProps> = ({ children }) => {
     );
   }
 
-  // If user is authenticated, redirect to dashboard
+  // If user is authenticated, redirect to community discussions
   if (user) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/community#discussions" replace />;
   }
 
   // If user is not authenticated, show the children (LandingPage)

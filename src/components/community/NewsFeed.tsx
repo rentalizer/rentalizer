@@ -52,72 +52,72 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
     'BiggerPockets', 'Manual Submission'
   ];
 
-  useEffect(() => {
-    fetchNewsItems();
-  }, []);
+  // useEffect(() => {
+  //   fetchNewsItems();
+  // }, []);
 
-  const fetchNewsItems = async (page: number = 1, append: boolean = false) => {
-    try {
-      if (!append) {
-        setLoading(true);
-      } else {
-        setLoadingMore(true);
-      }
+  // const fetchNewsItems = async (page: number = 1, append: boolean = false) => {
+  //   try {
+  //     if (!append) {
+  //       setLoading(true);
+  //     } else {
+  //       setLoadingMore(true);
+  //     }
       
-      console.log(`🔍 Fetching news items page ${page} from backend...`);
+  //     console.log(`🔍 Fetching news items page ${page} from backend...`);
       
-      const response = await newsService.getNews({
-        page: page,
-        limit: NEWS_PER_PAGE,
-        status: 'published',
-        sortBy: 'published_at',
-        sortOrder: 'desc'
-      });
+  //     const response = await newsService.getNews({
+  //       page: page,
+  //       limit: NEWS_PER_PAGE,
+  //       status: 'published',
+  //       sortBy: 'published_at',
+  //       sortOrder: 'desc'
+  //     });
 
-      console.log('📰 News items received:', response);
-      console.log('📄 Pagination:', response.pagination);
+  //     console.log('📰 News items received:', response);
+  //     console.log('📄 Pagination:', response.pagination);
 
-      if (response.success) {
-        console.log(`✅ Successfully fetched ${response.data?.length || 0} news items`);
+  //     if (response.success) {
+  //       console.log(`✅ Successfully fetched ${response.data?.length || 0} news items`);
         
-        if (append) {
-          // Append to existing news
-          setNewsItems(prev => [...prev, ...(response.data || [])]);
-        } else {
-          // Replace news (first load or refresh)
-          setNewsItems(response.data || []);
-          setCurrentPage(1);
-        }
+  //       if (append) {
+  //         // Append to existing news
+  //         setNewsItems(prev => [...prev, ...(response.data || [])]);
+  //       } else {
+  //         // Replace news (first load or refresh)
+  //         setNewsItems(response.data || []);
+  //         setCurrentPage(1);
+  //       }
         
-        // Update pagination state
-        setHasMoreNews(response.pagination?.hasNextPage || false);
-      } else {
-        throw new Error('Failed to fetch news items');
-      }
-    } catch (error) {
-      console.error('Error fetching news items:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load news items. Please try again.",
-        variant: "destructive",
-      });
-      if (!append) {
-        setNewsItems([]);
-      }
-    } finally {
-      setLoading(false);
-      setLoadingMore(false);
-    }
-  };
+  //       // Update pagination state
+  //       setHasMoreNews(response.pagination?.hasNextPage || false);
+  //     } else {
+  //       throw new Error('Failed to fetch news items');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching news items:', error);
+  //     toast({
+  //       title: "Error",
+  //       description: "Failed to load news items. Please try again.",
+  //       variant: "destructive",
+  //     });
+  //     if (!append) {
+  //       setNewsItems([]);
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //     setLoadingMore(false);
+  //   }
+  // };
 
-  // Load more news
-  const loadMoreNews = () => {
-    if (!loadingMore && hasMoreNews) {
-      const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
-      fetchNewsItems(nextPage, true);
-    }
-  };
+  // // Load more news
+  // const loadMoreNews = () => {
+  //   if (!loadingMore && hasMoreNews) {
+  //     const nextPage = currentPage + 1;
+  //     setCurrentPage(nextPage);
+  //     fetchNewsItems(nextPage, true);
+  //   }
+  // };
 
   // Handle image file selection
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -161,148 +161,150 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
     setSubmitForm(prev => ({ ...prev, featured_image_url: '' }));
   };
 
-  const handleNewsClick = async (newsItem: NewsItem) => {
-    try {
-      // Track click
-      await newsService.trackClick(newsItem._id);
+  // const handleNewsClick = async (newsItem: NewsItem) => {
+  //   try {
+  //     // Track click
+  //     await newsService.trackClick(newsItem._id);
       
-      // Update local state
-      setNewsItems(prev => 
-        prev.map(item => 
-          item._id === newsItem._id 
-            ? { ...item, click_count: item.click_count + 1 }
-            : item
-        )
-      );
+  //     // Update local state
+  //     setNewsItems(prev => 
+  //       prev.map(item => 
+  //         item._id === newsItem._id 
+  //           ? { ...item, click_count: item.click_count + 1 }
+  //           : item
+  //       )
+  //     );
 
-      // Show article in popup
-      setSelectedArticle(newsItem);
-    } catch (error) {
-      console.error('Error tracking click:', error);
-      // Still show the article even if tracking fails
-      setSelectedArticle(newsItem);
-    }
-  };
+  //     // Show article in popup
+  //     setSelectedArticle(newsItem);
+  //   } catch (error) {
+  //     console.error('Error tracking click:', error);
+  //     // Still show the article even if tracking fails
+  //     setSelectedArticle(newsItem);
+  //   }
+  // };
 
   const handleExternalLink = (url: string) => {
     window.open(url, '_blank');
   };
 
-  const handlePinToggle = async (newsItem: NewsItem) => {
-    if (!isAdmin) return;
+  // const handlePinToggle = async (newsItem: NewsItem) => {
+  //   if (!isAdmin) return;
 
-    try {
-      const response = await newsService.togglePin(newsItem._id);
+  //   try {
+  //     const response = await newsService.togglePin(newsItem._id);
       
-      if (response.success) {
-        // Update local state immediately for better UX
-        setNewsItems(prev =>
-          prev.map(item =>
-            item._id === newsItem._id
-              ? { ...item, is_pinned: !item.is_pinned }
-              : item
-          )
-        );
+  //     if (response.success) {
+  //       // Update local state immediately for better UX
+  //       setNewsItems(prev =>
+  //         prev.map(item =>
+  //           item._id === newsItem._id
+  //             ? { ...item, is_pinned: !item.is_pinned }
+  //             : item
+  //         )
+  //       );
         
-        toast({
-          title: newsItem.is_pinned ? "Unpinned" : "Pinned",
-          description: `Article ${newsItem.is_pinned ? 'unpinned from' : 'pinned to'} top of feed.`,
-        });
+  //       toast({
+  //         title: newsItem.is_pinned ? "Unpinned" : "Pinned",
+  //         description: `Article ${newsItem.is_pinned ? 'unpinned from' : 'pinned to'} top of feed.`,
+  //       });
         
-        // Refresh to get proper sort order
-        setCurrentPage(1);
-        setHasMoreNews(true);
-        await fetchNewsItems(1, false);
-      }
-    } catch (error) {
-      console.error('Error toggling pin:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update pin status.",
-        variant: "destructive",
-      });
-    }
-  };
+  //       // Refresh to get proper sort order
+  //       setCurrentPage(1);
+  //       setHasMoreNews(true);
+  //       await fetchNewsItems(1, false);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error toggling pin:', error);
+  //     toast({
+  //       title: "Error",
+  //       description: "Failed to update pin status.",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // };
 
-  const handleSubmitNews = async () => {
-    if (!submitForm.title || !submitForm.url || !submitForm.source) {
-      toast({
-        title: "Error",
-        description: "Title, URL, and source are required.",
-        variant: "destructive",
-      });
-      return;
-    }
+  // const handleSubmitNews = async () => {
+  //   if (!submitForm.title || !submitForm.url || !submitForm.source) {
+  //     toast({
+  //       title: "Error",
+  //       description: "Title, URL, and source are required.",
+  //       variant: "destructive",
+  //     });
+  //     return;
+  //   }
 
-    try {
-      // Create FormData for file upload
-      const formData = new FormData();
-      formData.append('title', submitForm.title);
-      formData.append('url', submitForm.url);
-      formData.append('source', submitForm.source);
-      if (submitForm.summary) {
-        formData.append('summary', submitForm.summary);
-      }
-      if (submitForm.tags.length > 0) {
-        formData.append('tags', JSON.stringify(submitForm.tags));
-      }
-      formData.append('published_at', new Date().toISOString());
+  //   try {
+  //     // Create FormData for file upload
+  //     const formData = new FormData();
+  //     formData.append('title', submitForm.title);
+  //     formData.append('url', submitForm.url);
+  //     formData.append('source', submitForm.source);
+  //     if (submitForm.summary) {
+  //       formData.append('summary', submitForm.summary);
+  //     }
+  //     if (submitForm.tags.length > 0) {
+  //       formData.append('tags', JSON.stringify(submitForm.tags));
+  //     }
+  //     formData.append('published_at', new Date().toISOString());
       
-      // Add image file if selected
-      if (imageFile) {
-        formData.append('photo', imageFile);
-      }
+  //     // Add image file if selected
+  //     if (imageFile) {
+  //       formData.append('photo', imageFile);
+  //     }
 
-      const response = await newsService.createNews(formData);
+  //     const response = await newsService.createNews(formData);
 
-      if (response.success) {
-        toast({
-          title: "Success",
-          description: "News item submitted successfully!",
-        });
+  //     if (response.success) {
+  //       toast({
+  //         title: "Success",
+  //         description: "News item submitted successfully!",
+  //       });
 
-        // Reset form
-        setSubmitForm({
-          title: '',
-          url: '',
-          source: '',
-          summary: '',
-          tags: [],
-          featured_image_url: ''
-        });
-        setImageFile(null);
-        setImagePreview(null);
-        setIsSubmitDialogOpen(false);
-        setCurrentPage(1);
-        setHasMoreNews(true);
-        await fetchNewsItems(1, false);
-      }
-    } catch (error) {
-      console.error('Error submitting news:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to submit news item.",
-        variant: "destructive",
-      });
-    }
-  };
+  //       // Reset form
+  //       setSubmitForm({
+  //         title: '',
+  //         url: '',
+  //         source: '',
+  //         summary: '',
+  //         tags: [],
+  //         featured_image_url: ''
+  //       });
+  //       setImageFile(null);
+  //       setImagePreview(null);
+  //       setIsSubmitDialogOpen(false);
+  //       setCurrentPage(1);
+  //       setHasMoreNews(true);
+  //       await fetchNewsItems(1, false);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error submitting news:', error);
+  //     toast({
+  //       title: "Error",
+  //       description: error instanceof Error ? error.message : "Failed to submit news item.",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <div className="text-cyan-400 text-sm">Loading news...</div>
-      </div>
-    );
-  }
+  // TEMPORARILY COMMENTED OUT FOR COMING SOON - Original loading state preserved below
+  // if (loading) {
+  //   return (
+  //     <div className="flex items-center justify-center py-8">
+  //       <div className="text-cyan-400 text-sm">Loading news...</div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="space-y-4">
-      {/* Header with Add Button - Always visible */}
+      {/* Header - Always visible */}
       <div className="flex items-center justify-between">
         <div className="flex-1 text-center">
           <h3 className="text-lg font-semibold text-cyan-300">Industry News Feed</h3>
         </div>
         
+        {/* TEMPORARILY COMMENTED OUT - Admin Add Button preserved below
         {isAdmin && (
           <Dialog open={isSubmitDialogOpen} onOpenChange={setIsSubmitDialogOpen}>
             <DialogTrigger asChild>
@@ -434,9 +436,26 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
             </DialogContent>
           </Dialog>
         )}
+        */}
       </div>
 
-      {/* Empty State */}
+      {/* COMING SOON STATE - Replaces the news feed temporarily */}
+      <div className="text-center py-12">
+        <Newspaper className="h-16 w-16 text-cyan-400 mx-auto mb-6 opacity-60" />
+        <h4 className="text-xl font-semibold text-cyan-300 mb-3">Coming Soon</h4>
+        <p className="text-gray-400 mb-2">Industry News Feed is under development</p>
+        <p className="text-sm text-gray-500">
+          We're working on bringing you the latest short-term rental industry news and insights.
+        </p>
+        <div className="mt-6 flex justify-center">
+          <Badge variant="outline" className="border-cyan-500/30 text-cyan-400 bg-cyan-500/10">
+            🚧 Under Construction
+          </Badge>
+        </div>
+      </div>
+
+      {/* TEMPORARILY COMMENTED OUT - Original news feed content preserved below
+      {/* Empty State *\/}
       {newsItems.length === 0 ? (
         <div className="text-center py-8">
           <Newspaper className="h-12 w-12 text-cyan-400 mx-auto mb-4" />
@@ -448,7 +467,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
           )}
         </div>
       ) : (
-        /* News Items */
+        /* News Items *\/
         <div className="space-y-2">
           {newsItems.map((item) => (
           <Card 
@@ -458,7 +477,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
           >
             <CardContent className="p-4">
               <div className="space-y-3">
-                {/* Header with title and pin button */}
+                {/* Header with title and pin button *\/}
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-2 flex-1 min-w-0">
                     <Newspaper className="h-5 w-5 text-cyan-400 flex-shrink-0 mt-0.5" />
@@ -481,7 +500,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
                   )}
                 </div>
 
-                {/* Source and Status badges */}
+                {/* Source and Status badges *\/}
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="text-xs border-cyan-500/30 text-cyan-400 bg-cyan-500/10">
                     {item.source}
@@ -498,14 +517,14 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
                   )}
                 </div>
 
-                {/* Summary */}
+                {/* Summary *\/}
                 {item.summary && (
                   <p className="text-gray-300 text-sm leading-relaxed line-clamp-2">
                     {item.summary}
                   </p>
                 )}
 
-                {/* Metadata and stats */}
+                {/* Metadata and stats *\/}
                 <div className="flex items-center justify-between pt-2 border-t border-slate-700/50">
                   <div className="flex items-center gap-3 text-xs text-gray-400">
                     <span className="flex items-center gap-1">
@@ -522,7 +541,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
                     </span>
                   </div>
                   
-                  {/* Tags */}
+                  {/* Tags *\/}
                   {item.tags && item.tags.length > 0 && (
                     <div className="flex gap-1 flex-wrap">
                       {item.tags.slice(0, 2).map((tag, idx) => (
@@ -538,7 +557,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
           </Card>
           ))}
           
-          {/* Show More Button */}
+          {/* Show More Button *\/}
           {hasMoreNews && (
             <div className="flex justify-center mt-4">
               <Button
@@ -561,7 +580,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
         </div>
       )}
 
-      {/* Article Preview Dialog */}
+      {/* Article Preview Dialog *\/}
       <Dialog open={!!selectedArticle} onOpenChange={() => setSelectedArticle(null)}>
         <DialogContent className="bg-slate-800 border-cyan-500/20 text-white max-w-3xl max-h-[80vh] overflow-y-auto">
           {selectedArticle && (
@@ -632,6 +651,7 @@ export const NewsFeed = ({ isDayMode = false }: NewsFeedProps) => {
           )}
         </DialogContent>
       </Dialog>
+      */}
     </div>
   );
 };
