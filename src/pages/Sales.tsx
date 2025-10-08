@@ -68,7 +68,10 @@ export default function Sales() {
                 </div>
                 <span className="text-foreground text-base">Private Community Membership</span>
               </div>
-              <Button className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base font-semibold rounded-md shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all">
+              <Button 
+                onClick={() => window.open('https://arbitrageu.mykajabi.com/offers/UBmPNUaM/checkout', '_blank')}
+                className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base font-semibold rounded-md shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all"
+              >
                 Get Started
               </Button>
             </CardContent>
@@ -144,7 +147,10 @@ export default function Sales() {
               <p className="text-xs text-muted-foreground mt-4 pt-4 border-t border-border italic leading-relaxed">
                 Accelerator Pro is for individuals aiming for turnkey comprehensive personalized guidance from Richie--to achieve their dream outcome.
               </p>
-              <Button className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base font-semibold rounded-md shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all">
+              <Button 
+                onClick={() => window.open('https://arbitrageu.mykajabi.com/offers/G7zcbWt9/checkout', '_blank')}
+                className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base font-semibold rounded-md shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all"
+              >
                 Get Started Pro
               </Button>
             </CardContent>
