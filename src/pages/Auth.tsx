@@ -20,6 +20,7 @@ export const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState('signup');
   
+  
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -65,8 +66,8 @@ export const Auth = () => {
     }
   };
 
-  // Redirect if already authenticated
-  if (user) {
+  // Redirect if already authenticated (but not during loading)
+  if (user && !isLoading) {
     return <Navigate to="/community#discussions" replace />;
   }
 
@@ -113,62 +114,78 @@ export const Auth = () => {
   };
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!loginEmail.trim() || !loginPassword.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Missing Information",
-        description: "Please enter both email and password to sign in.",
-      });
-      return;
-    }
-
-    // Validate email format
-    if (!validateEmailField(loginEmail)) {
-      toast({
-        variant: "destructive",
-        title: "Invalid Email",
-        description: emailError,
-      });
-      return;
-    }
-
-    setLoginLoading(true);
-
     try {
-      await signIn(loginEmail, loginPassword);
-      toast({
-        variant: "success",
-        title: "Welcome Back!",
-        description: "You have been signed in successfully.",
-      });
-    } catch (error) {
-      console.error('Login error:', error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to sign in";
+      e.preventDefault();
+      e.stopPropagation();
       
-      // Handle specific error types
-      let title = "Login Failed";
-      let description = errorMessage;
       
-      if (errorMessage.includes('Invalid credentials') || errorMessage.includes('incorrect')) {
-        title = "Invalid Credentials";
-        description = "The email or password you entered is incorrect. Please try again.";
-      } else if (errorMessage.includes('User not found')) {
-        title = "Account Not Found";
-        description = "No account found with this email address. Please check your email or sign up for a new account.";
-      } else if (errorMessage.includes('network') || errorMessage.includes('connection')) {
-        title = "Connection Error";
-        description = "Unable to connect to the server. Please check your internet connection and try again.";
+      if (!loginEmail.trim() || !loginPassword.trim()) {
+        toast({
+          variant: "destructive",
+          title: "Missing Information",
+          description: "Please enter both email and password to sign in.",
+          duration: 5000,
+        });
+        return;
       }
-      
+
+      // Validate email format
+      if (!validateEmailField(loginEmail)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid Email",
+          description: emailError,
+          duration: 5000,
+        });
+        return;
+      }
+
+      setLoginLoading(true);
+
+      try {
+        await signIn(loginEmail, loginPassword);
+        toast({
+          variant: "success",
+          title: "Welcome Back!",
+          description: "You have been signed in successfully.",
+        });
+      } catch (error) {
+        console.error('Login error:', error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to sign in";
+        
+        // Handle specific error types
+        let title = "Login Failed";
+        let description = errorMessage;
+        
+        if (errorMessage.includes('Invalid credentials') || errorMessage.includes('incorrect')) {
+          title = "Invalid Credentials";
+          description = "The email or password you entered is incorrect. Please try again.";
+        } else if (errorMessage.includes('User not found')) {
+          title = "Account Not Found";
+          description = "No account found with this email address. Please check your email or sign up for a new account.";
+        } else if (errorMessage.includes('network') || errorMessage.includes('connection')) {
+          title = "Connection Error";
+          description = "Unable to connect to the server. Please check your internet connection and try again.";
+        }
+        
+        // Show error toast immediately without delay
+        toast({
+          variant: "destructive",
+          title,
+          description,
+          duration: 5000, // Show error toast for 5 seconds
+        });
+      } finally {
+        setLoginLoading(false);
+      }
+    } catch (error) {
+      console.error('Unexpected error in handleLogin:', error);
       toast({
         variant: "destructive",
-        title,
-        description,
+        title: "Unexpected Error",
+        description: "An unexpected error occurred. Please try again.",
+        duration: 5000,
       });
-    } finally {
-      setLoginLoading(false);
     }
   };
 
@@ -308,6 +325,7 @@ export const Auth = () => {
         variant: "destructive",
         title: "Please Fix the Following Issues",
         description: displayMessage,
+        duration: 5000,
       });
       
       return;
@@ -362,6 +380,7 @@ export const Auth = () => {
         variant: "destructive",
         title,
         description,
+        duration: 5000,
       });
     } finally {
       setSignupLoading(false);
@@ -400,7 +419,7 @@ export const Auth = () => {
             </TabsList>
 
             <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4">
+              <form onSubmit={handleLogin} className="space-y-4" noValidate>
                 <div className="space-y-2">
                   <Label htmlFor="login-email" className="text-gray-300 flex items-center gap-2">
                     <User className="h-4 w-4" />
@@ -465,7 +484,7 @@ export const Auth = () => {
             </TabsContent>
 
             <TabsContent value="signup">
-              <form onSubmit={handleSignup} className="space-y-4">
+              <form onSubmit={handleSignup} className="space-y-4" noValidate>
             {/* Avatar Upload */}
             <div className="flex flex-col items-center space-y-3 pb-2">
               <Avatar className="h-20 w-20">

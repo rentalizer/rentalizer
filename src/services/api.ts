@@ -35,7 +35,12 @@ api.interceptors.response.use(
       // Token expired or invalid
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
-      window.location.href = '/auth/login';
+      
+      // Only redirect if we're not already on an auth page
+      const currentPath = window.location.pathname;
+      if (!currentPath.includes('/auth')) {
+        window.location.href = '/auth/login';
+      }
     }
     return Promise.reject(error);
   }
@@ -89,6 +94,17 @@ export interface ChangePasswordRequest {
 }
 
 // Discussion types
+export interface PopulatedUser {
+  _id: string;
+  id?: string; // Alternative ID field
+  firstName?: string;
+  lastName?: string;
+  email: string;
+  profilePicture?: string;
+  bio?: string;
+  role?: string;
+}
+
 export interface Discussion {
   _id: string;
   title: string;
@@ -96,7 +112,7 @@ export interface Discussion {
   author_name: string;
   author_avatar?: string;
   category: string;
-  user_id: string;
+  user_id: string | PopulatedUser; // Can be either a string ID or a populated user object
   is_pinned: boolean;
   is_admin_post: boolean;
   likes: number;
@@ -116,14 +132,6 @@ export interface Discussion {
   updatedAt: string;
   timeAgo: string;
   isLiked: boolean;
-  user_id: {
-    _id: string;
-    firstName?: string;
-    lastName?: string;
-    email: string;
-    profilePicture?: string;
-    role?: string;
-  };
 }
 
 export interface CreateDiscussionRequest {
@@ -733,13 +741,13 @@ class ApiService {
   }
 
   // Error handling
-  private handleError(error: any): void {
+  private handleError(error: unknown): void {
     if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError;
+      const axiosError = error as AxiosError<{ message?: string }>;
       
       if (axiosError.response) {
         // Server responded with error status
-        const message = (axiosError.response.data as any)?.message || 'Server error occurred';
+        const message = axiosError.response.data?.message || 'Server error occurred';
         throw new Error(message);
       } else if (axiosError.request) {
         // Request was made but no response received
@@ -750,7 +758,8 @@ class ApiService {
       }
     } else {
       // Non-axios error
-      throw new Error(error.message || 'An unexpected error occurred');
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      throw new Error(errorMessage);
     }
   }
 

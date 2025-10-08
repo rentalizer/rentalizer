@@ -19,7 +19,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileSetup } from '@/components/ProfileSetup';
 import { useAdminRole } from '@/hooks/useAdminRole';
-import { apiService, type Discussion, type Comment as ApiComment } from '@/services/api';
+import { apiService, type Discussion, type Comment as ApiComment, type PopulatedUser } from '@/services/api';
 import { getSocket, joinDiscussionRoom, leaveDiscussionRoom } from '@/services/socket';
 import { NewsFeed } from '@/components/community/NewsFeed';
 import { MembersList } from '@/components/MembersList';
@@ -28,18 +28,6 @@ import { CommentsDialog } from '@/components/community/CommentsDialog';
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 import { useProfile } from '@/hooks/useProfile';
 import { formatDateWithTimezone, getTimezoneNotice } from '@/utils/timezone';
-
-// Type for user objects that could be populated or just strings
-interface PopulatedUser {
-  _id?: string;
-  id?: string;
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  profilePicture?: string | null;
-  bio?: string;
-  role?: string;
-}
 
 // Frontend Discussion interface (transformed from backend)
 export interface DiscussionType {
@@ -55,7 +43,7 @@ export interface DiscussionType {
   created_at: string;
   isPinned?: boolean;
   isLiked: boolean;
-  user_id: string;
+  user_id: string | PopulatedUser; // Can be either string ID or populated user object
   isAdmin?: boolean;
   // Backend fields for transformation
   _id: string;
@@ -142,6 +130,13 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       .join('')
       .toUpperCase()
       .slice(0, 2);
+  }, []);
+
+  // Helper to extract user ID from user_id field (can be string or PopulatedUser)
+  const getUserId = useCallback((userId: string | PopulatedUser | undefined): string | undefined => {
+    if (!userId) return undefined;
+    if (typeof userId === 'string') return userId;
+    return userId._id;
   }, []);
 
   const getUserAvatar = useCallback(() => {
@@ -318,7 +313,19 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
   // Map backend comment to UI comment
   const mapApiCommentToUi = useCallback((c: ApiComment) => {
-    const userObj: any = c.user || {};
+    // Type guard for user object
+    interface CommentUser {
+      display_name?: string;
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+      profilePicture?: string;
+      avatar_url?: string;
+      _id?: string;
+      id?: string;
+    }
+    
+    const userObj: CommentUser = (c.user as CommentUser) || {};
     // Handle both old and new user field formats
     const authorName: string = userObj.display_name || 
       (userObj.firstName && userObj.lastName ? `${userObj.firstName} ${userObj.lastName}` : '') ||
@@ -328,8 +335,17 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     const rawAvatar = userObj.profilePicture || userObj.avatar_url;
     // Normalize avatar URL (convert empty strings to null)
     const possibleAvatarUrl: string | null = (rawAvatar && rawAvatar.trim() !== '') ? rawAvatar : null;
+    
     // Normalize id from various possible fields
-    const normalizedId = (c as any).id || (c as any)._id || (typeof (c as any)._id === 'object' && (c as any)._id?.toString ? (c as any)._id.toString() : undefined);
+    interface CommentWithId {
+      id?: string;
+      _id?: string | { toString?: () => string };
+    }
+    const commentWithId = c as unknown as CommentWithId;
+    const normalizedId = commentWithId.id || 
+      (typeof commentWithId._id === 'string' ? commentWithId._id : 
+       (typeof commentWithId._id === 'object' && commentWithId._id?.toString ? commentWithId._id.toString() : undefined));
+    
     const userId = typeof userObj === 'string' ? userObj : (userObj._id || userObj.id);
     return {
       id: normalizedId,
@@ -495,7 +511,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     };
 
     // Add error handler
-    const onError = (error: any) => {
+    const onError = (error: unknown) => {
       console.error('🔌 WebSocket error:', error);
     };
 
@@ -542,7 +558,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   }, [user, discussionsList, fetchUserProfiles]);
 
   // Fixed profile info function - this was the source of the bug
-  const getProfileInfo = useCallback((userId: string | undefined, authorName: string, discussionAvatar?: string) => {
+  const getProfileInfo = useCallback((userId: string | PopulatedUser | undefined, authorName: string, discussionAvatar?: string) => {
     // Helper to normalize avatar URLs (convert empty strings to null)
     const normalizeAvatarUrl = (url: string | null | undefined): string | null => {
       if (!url || url.trim() === '') return null;
@@ -560,9 +576,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
     // For the current user's posts, use their current profile from the auth context and backend
     // Handle both populated user object and string user_id
-    const discussionUserId = userId && typeof userId === 'object' 
-      ? (userId as PopulatedUser)._id || (userId as PopulatedUser).id
-      : userId;
+    const discussionUserId = getUserId(userId);
     
     if (user && user.id === discussionUserId) {
       // Use backend profile data if available, fallback to auth context user data
@@ -616,7 +630,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       display_name: authorName,
       initials: getInitials(authorName)
     };
-  }, [user, profile, supabaseProfile, isAdmin, userProfiles, getInitials]);
+  }, [user, profile, supabaseProfile, isAdmin, userProfiles, getInitials, getUserId]);
 
   // Sort discussions locally: pinned posts first, then by creation date
   const filteredDiscussions = useMemo(() => {
@@ -827,23 +841,23 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     }
   }, [isAdmin, discussionsList, pinningPosts]);
 
-  const canEditOrDelete = useCallback((discussion: Discussion) => {
+  const canEdit = useCallback((discussion: DiscussionType | Discussion) => {
     // Handle both populated user object and string user_id
-    const discussionUserId = discussion.user_id && typeof discussion.user_id === 'object' 
-      ? (discussion.user_id as PopulatedUser)._id || (discussion.user_id as PopulatedUser).id
-      : discussion.user_id;
+    const discussionUserId = getUserId(discussion.user_id);
     
-    
-    // Admins can edit/delete any post
-    if (isAdmin) return true;
-    // Users can only edit/delete their own posts
+    // Only the post author can edit their own post (even admins cannot edit other users' posts)
     if (user && discussionUserId === user.id) return true;
     return false;
-  }, [isAdmin, user]);
+  }, [user, getUserId]);
+
+  const canDelete = useCallback((discussion: DiscussionType | Discussion) => {
+    // Only admins can delete posts
+    return isAdmin;
+  }, [isAdmin]);
 
   const handleStartEdit = useCallback((discussion: DiscussionType) => {
     // Double-check permissions before starting edit
-    if (!canEditOrDelete(discussion)) {
+    if (!canEdit(discussion)) {
       console.log("Access Denied: You can only edit your own posts");
       return;
     }
@@ -851,7 +865,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     setEditingPost(discussion.id);
     setEditTitle(discussion.title);
     setEditContent(discussion.content);
-  }, [canEditOrDelete]);
+  }, [canEdit]);
 
   const handleCancelEdit = useCallback(() => {
     setEditingPost(null);
@@ -1053,7 +1067,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                           </AvatarFallback>
                         </Avatar>
                         {/* Show upload hint for current user's posts without profile picture */}
-                        {user && user.id === discussion.user_id && !profileInfo.avatar_url && (
+                        {user && user.id === getUserId(discussion.user_id) && !profileInfo.avatar_url && (
                           <div className="mt-1">
                             <a 
                               href="/profile-setup" 
@@ -1114,7 +1128,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                             )}
                             
                             {/* Options Menu */}
-                            {canEditOrDelete(discussion) && (
+                            {(canEdit(discussion) || canDelete(discussion)) && (
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-gray-400 hover:text-white">
@@ -1122,23 +1136,27 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="bg-slate-800 border-gray-700">
-                                  <DropdownMenuItem 
-                                    onClick={() => handleStartEdit(discussion)}
-                                    className="text-gray-300 hover:text-white hover:bg-slate-700 cursor-pointer"
-                                  >
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Edit
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem 
-                                    onClick={() => {
-                                      console.log('🗑️ DELETE BUTTON CLICKED for discussion:', discussion.id);
-                                      handleDeleteDiscussion(discussion.id);
-                                    }}
-                                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
-                                  >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    Delete
-                                  </DropdownMenuItem>
+                                  {canEdit(discussion) && (
+                                    <DropdownMenuItem 
+                                      onClick={() => handleStartEdit(discussion)}
+                                      className="text-gray-300 hover:text-white hover:bg-slate-700 cursor-pointer"
+                                    >
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Edit
+                                    </DropdownMenuItem>
+                                  )}
+                                  {canDelete(discussion) && (
+                                    <DropdownMenuItem 
+                                      onClick={() => {
+                                        console.log('🗑️ DELETE BUTTON CLICKED for discussion:', discussion.id);
+                                        handleDeleteDiscussion(discussion.id);
+                                      }}
+                                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Delete
+                                    </DropdownMenuItem>
+                                  )}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             )}
