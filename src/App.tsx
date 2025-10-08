@@ -7,6 +7,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SmartRedirect } from "@/components/SmartRedirect";
 import { AuthGuard } from "@/components/AuthGuard";
 import { BugReportWidget } from "@/components/BugReportWidget";
+import { Toaster } from "@/components/ui/toaster";
 import React, { lazy, Suspense } from "react";
 
 // Lazy load all page components for better performance with error handling
@@ -106,6 +107,7 @@ const App = () => (
         <AuthProvider>
           <AppRoutes />
           <BugReportWidget />
+          <Toaster />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

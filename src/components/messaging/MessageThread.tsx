@@ -133,39 +133,38 @@ export default function MessageThread({
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-slate-700">
         <div className="relative">
-          {/* Group Avatar - 3 overlapping avatars like Messenger */}
+          {/* Group Avatar - 2 overlapping avatars */}
           <div className="relative flex items-center">
-            {/* Main recipient avatar (real profile picture) */}
-            <div className="relative z-10">
+            {/* First avatar */}
+            <div className="relative z-20">
               <Avatar className="h-8 w-8 border-2 border-slate-800">
                 <AvatarImage 
-                  src={recipientAvatar} 
-                  alt={recipientName}
+                  src="/admin/adminRetalizer.jpg" 
+                  alt="Admin 1"
                   onError={(e) => {
                     const target = e.currentTarget as HTMLImageElement;
                     target.style.display = 'none';
                   }}
                 />
                 <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold text-xs">
-                  {recipientName.charAt(0).toUpperCase()}
+                  A1
                 </AvatarFallback>
               </Avatar>
             </div>
-            
-            {/* Second avatar (placeholder) */}
-            <div className="relative -ml-2 z-20">
-              <Avatar className="h-6 w-6 border-2 border-slate-800">
+
+            {/* Second avatar (slightly overlapping) */}
+            <div className="relative -ml-3 z-10">
+              <Avatar className="h-8 w-8 border-2 border-slate-800">
+                <AvatarImage 
+                  src="/admin/adminRentalizer2.jpg" 
+                  alt="Admin 2"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                />
                 <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-xs">
-                  A
-                </AvatarFallback>
-              </Avatar>
-            </div>
-            
-            {/* Third avatar (placeholder) */}
-            <div className="relative -ml-2 z-30">
-              <Avatar className="h-6 w-6 border-2 border-slate-800">
-                <AvatarFallback className="bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold text-xs">
-                  B
+                  A2
                 </AvatarFallback>
               </Avatar>
             </div>

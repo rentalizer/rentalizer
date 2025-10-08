@@ -8,10 +8,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
-import { Eye, EyeOff, Upload, User, Ticket, LogIn, UserPlus } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { validateSignupData, validateEmail, validatePassword, validateName, validateBio, getPasswordStrength } from '@/utils/authValidation';
+import { Eye, EyeOff, Upload, User, Ticket, LogIn, UserPlus, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
 export const Auth = () => {
   const { user, signIn, signUp, isLoading } = useAuth();
+  const { toast } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -31,6 +34,15 @@ export const Auth = () => {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [signupLoading, setSignupLoading] = useState(false);
+  
+  // Validation state
+  const [passwordStrength, setPasswordStrength] = useState<{ strength: 'weak' | 'medium' | 'strong'; message: string } | null>(null);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [firstNameError, setFirstNameError] = useState('');
+  const [lastNameError, setLastNameError] = useState('');
+  const [bioError, setBioError] = useState('');
+  const [avatarError, setAvatarError] = useState('');
 
   // Set active tab based on route
   useEffect(() => {
@@ -58,11 +70,67 @@ export const Auth = () => {
     return <Navigate to="/community#discussions" replace />;
   }
 
+  // Clear validation errors
+  const clearValidationErrors = () => {
+    setEmailError('');
+    setPasswordError('');
+    setFirstNameError('');
+    setLastNameError('');
+    setBioError('');
+    setAvatarError('');
+  };
+
+  // Real-time validation functions
+  const validateEmailField = (email: string) => {
+    const validation = validateEmail(email);
+    setEmailError(validation.isValid ? '' : validation.message);
+    return validation.isValid;
+  };
+
+  const validatePasswordField = (password: string) => {
+    const validation = validatePassword(password);
+    setPasswordError(validation.isValid ? '' : validation.message);
+    
+    // Update password strength
+    if (password.length > 0) {
+      setPasswordStrength(getPasswordStrength(password));
+    } else {
+      setPasswordStrength(null);
+    }
+    
+    return validation.isValid;
+  };
+
+  const validateNameField = (name: string, fieldName: string, setter: (error: string) => void) => {
+    if (!name.trim()) {
+      setter('');
+      return true; // Don't show error for empty field until submit
+    }
+    
+    const validation = validateName(name, fieldName);
+    setter(validation.isValid ? '' : validation.message);
+    return validation.isValid;
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!loginEmail.trim() || !loginPassword.trim()) {
-      console.log("Missing fields: Please enter both email and password");
+      toast({
+        variant: "destructive",
+        title: "Missing Information",
+        description: "Please enter both email and password to sign in.",
+      });
+      return;
+    }
+
+    // Validate email format
+    if (!validateEmailField(loginEmail)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Email",
+        description: emailError,
+      });
       return;
     }
 
@@ -70,10 +138,35 @@ export const Auth = () => {
 
     try {
       await signIn(loginEmail, loginPassword);
-      console.log("Welcome back! You have been signed in successfully");
+      toast({
+        variant: "success",
+        title: "Welcome Back!",
+        description: "You have been signed in successfully.",
+      });
     } catch (error) {
       console.error('Login error:', error);
-      console.log("Login failed:", error instanceof Error ? error.message : "Failed to sign in");
+      const errorMessage = error instanceof Error ? error.message : "Failed to sign in";
+      
+      // Handle specific error types
+      let title = "Login Failed";
+      let description = errorMessage;
+      
+      if (errorMessage.includes('Invalid credentials') || errorMessage.includes('incorrect')) {
+        title = "Invalid Credentials";
+        description = "The email or password you entered is incorrect. Please try again.";
+      } else if (errorMessage.includes('User not found')) {
+        title = "Account Not Found";
+        description = "No account found with this email address. Please check your email or sign up for a new account.";
+      } else if (errorMessage.includes('network') || errorMessage.includes('connection')) {
+        title = "Connection Error";
+        description = "Unable to connect to the server. Please check your internet connection and try again.";
+      }
+      
+      toast({
+        variant: "destructive",
+        title,
+        description,
+      });
     } finally {
       setLoginLoading(false);
     }
@@ -82,9 +175,14 @@ export const Auth = () => {
   const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       setUploading(true);
+      setAvatarError('');
 
       if (!event.target.files || event.target.files.length === 0) {
-        console.log("No file selected: Please select an image to upload");
+        toast({
+          variant: "destructive",
+          title: "No File Selected",
+          description: "Please select an image to upload.",
+        });
         return;
       }
 
@@ -92,13 +190,25 @@ export const Auth = () => {
       
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        console.log("Invalid file type: Please select an image file");
+        const errorMsg = "Invalid file type. Please select an image file (JPEG, PNG, GIF, or WebP).";
+        setAvatarError(errorMsg);
+        toast({
+          variant: "destructive",
+          title: "Invalid File Type",
+          description: errorMsg,
+        });
         return;
       }
 
       // Validate file size (max 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        console.log("File too large: Please select an image smaller than 2MB");
+        const errorMsg = "File is too large. Please select an image smaller than 2MB.";
+        setAvatarError(errorMsg);
+        toast({
+          variant: "destructive",
+          title: "File Too Large",
+          description: errorMsg,
+        });
         return;
       }
 
@@ -109,16 +219,33 @@ export const Auth = () => {
         // Only store if it's a reasonable size (less than 1MB base64)
         if (result.length < 1000000) {
           setAvatarUrl(result);
-          console.log("Success: Profile photo selected");
+          setAvatarError('');
+          toast({
+            variant: "success",
+            title: "Profile Photo Selected",
+            description: "Your profile photo has been successfully selected.",
+          });
         } else {
-          console.log("File too large: Please select a smaller image");
+          const errorMsg = "File is too large. Please select a smaller image.";
+          setAvatarError(errorMsg);
+          toast({
+            variant: "destructive",
+            title: "File Too Large",
+            description: errorMsg,
+          });
         }
       };
       reader.readAsDataURL(file);
       
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      console.log("Error: Failed to upload avatar");
+      const errorMsg = "Failed to upload avatar. Please try again.";
+      setAvatarError(errorMsg);
+      toast({
+        variant: "destructive",
+        title: "Upload Failed",
+        description: errorMsg,
+      });
     } finally {
       setUploading(false);
     }
@@ -127,13 +254,62 @@ export const Auth = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!signupEmail.trim() || !signupPassword.trim() || !firstName.trim() || !lastName.trim()) {
-      console.log("Missing fields: Please fill in first name, last name, email, and password");
-      return;
-    }
-
-    if (signupPassword.length < 6) {
-      console.log("Password too short: Password must be at least 6 characters long");
+    // Clear previous validation errors
+    clearValidationErrors();
+    
+    // Validate all fields
+    const signupData = {
+      email: signupEmail,
+      password: signupPassword,
+      firstName,
+      lastName,
+      bio: bio.trim(),
+      profilePicture: avatarUrl
+    };
+    
+    const validation = validateSignupData(signupData);
+    
+    if (!validation.isValid) {
+      // Parse the validation message to set specific field errors
+      const errorMessage = validation.message;
+      
+      // Set specific field errors based on the validation message
+      if (errorMessage.includes('Email:')) {
+        const emailError = errorMessage.split('Email: ')[1]?.split('\n')[0] || errorMessage;
+        setEmailError(emailError);
+      }
+      if (errorMessage.includes('Password:')) {
+        const passwordError = errorMessage.split('Password: ')[1]?.split('\n')[0] || errorMessage;
+        setPasswordError(passwordError);
+      }
+      if (errorMessage.includes('First Name:')) {
+        const firstNameError = errorMessage.split('First Name: ')[1]?.split('\n')[0] || errorMessage;
+        setFirstNameError(firstNameError);
+      }
+      if (errorMessage.includes('Last Name:')) {
+        const lastNameError = errorMessage.split('Last Name: ')[1]?.split('\n')[0] || errorMessage;
+        setLastNameError(lastNameError);
+      }
+      if (errorMessage.includes('Bio:')) {
+        const bioError = errorMessage.split('Bio: ')[1]?.split('\n')[0] || errorMessage;
+        setBioError(bioError);
+      }
+      if (errorMessage.includes('Profile Picture:')) {
+        const avatarError = errorMessage.split('Profile Picture: ')[1]?.split('\n')[0] || errorMessage;
+        setAvatarError(avatarError);
+      }
+      
+      // Show toast with the full error message
+      const displayMessage = errorMessage.includes('\n• ') 
+        ? errorMessage.replace(/\n• /g, '\n• ')
+        : errorMessage;
+        
+      toast({
+        variant: "destructive",
+        title: "Please Fix the Following Issues",
+        description: displayMessage,
+      });
+      
       return;
     }
 
@@ -148,10 +324,45 @@ export const Auth = () => {
         bio: bio.trim() || undefined,
         profilePicture: avatarUrl || undefined
       });
-      console.log("Welcome! Your account has been created successfully. Please check your email to verify your account.");
+      
+      toast({
+        variant: "success",
+        title: "Account Created Successfully!",
+        description: "Welcome to the community! Your account has been created successfully.",
+      });
     } catch (error) {
       console.error('Signup error:', error);
-      console.log("Signup failed:", error instanceof Error ? error.message : "Failed to create account");
+      const errorMessage = error instanceof Error ? error.message : "Failed to create account";
+      
+      // Handle specific error types
+      let title = "Signup Failed";
+      let description = errorMessage;
+      
+      if (errorMessage.includes('already exists') || errorMessage.includes('duplicate')) {
+        title = "Email Already Exists";
+        description = "An account with this email address already exists. Please try signing in instead.";
+        setEmailError("This email is already registered");
+      } else if (errorMessage.includes('Invalid email')) {
+        title = "Invalid Email";
+        description = "Please enter a valid email address.";
+        setEmailError("Please enter a valid email address");
+      } else if (errorMessage.includes('password') && errorMessage.includes('weak')) {
+        title = "Weak Password";
+        description = "Please choose a stronger password.";
+        setPasswordError("Please choose a stronger password");
+      } else if (errorMessage.includes('network') || errorMessage.includes('connection')) {
+        title = "Connection Error";
+        description = "Unable to connect to the server. Please check your internet connection and try again.";
+      } else if (errorMessage.includes('validation') || errorMessage.includes('required')) {
+        title = "Missing Information";
+        description = "Please fill in all required fields correctly.";
+      }
+      
+      toast({
+        variant: "destructive",
+        title,
+        description,
+      });
     } finally {
       setSignupLoading(false);
     }
@@ -284,6 +495,12 @@ export const Auth = () => {
                   className="hidden"
                 />
               </div>
+              {avatarError && (
+                <div className="flex items-center gap-2 text-red-400 text-sm justify-center">
+                  <XCircle className="h-4 w-4" />
+                  {avatarError}
+                </div>
+              )}
               <p className="text-xs text-gray-400 text-center">
                 Optional: Add a profile picture (max 2MB)
               </p>
@@ -299,11 +516,31 @@ export const Auth = () => {
                   name="first-name"
                   type="text"
                   value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="bg-slate-700/50 border-cyan-500/20 text-white"
+                  onChange={(e) => {
+                    setFirstName(e.target.value);
+                    if (e.target.value.length > 0) {
+                      validateNameField(e.target.value, "First name", setFirstNameError);
+                    } else {
+                      setFirstNameError('');
+                    }
+                  }}
+                  className={`bg-slate-700/50 text-white ${
+                    firstNameError ? 'border-red-500/50 focus:border-red-400' : 'border-cyan-500/20 focus:border-cyan-400'
+                  }`}
                   required
                   disabled={signupLoading}
                 />
+                {firstNameError ? (
+                  <div className="flex items-center gap-2 text-red-400 text-sm">
+                    <XCircle className="h-4 w-4" />
+                    {firstNameError}
+                  </div>
+                ) : firstName && validateName(firstName, "First name").isValid && (
+                  <div className="flex items-center gap-2 text-green-400 text-sm">
+                    <CheckCircle className="h-4 w-4" />
+                    Looks good
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="last-name" className="text-gray-300">
@@ -314,11 +551,31 @@ export const Auth = () => {
                   name="last-name"
                   type="text"
                   value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="bg-slate-700/50 border-cyan-500/20 text-white"
+                  onChange={(e) => {
+                    setLastName(e.target.value);
+                    if (e.target.value.length > 0) {
+                      validateNameField(e.target.value, "Last name", setLastNameError);
+                    } else {
+                      setLastNameError('');
+                    }
+                  }}
+                  className={`bg-slate-700/50 text-white ${
+                    lastNameError ? 'border-red-500/50 focus:border-red-400' : 'border-cyan-500/20 focus:border-cyan-400'
+                  }`}
                   required
                   disabled={signupLoading}
                 />
+                {lastNameError ? (
+                  <div className="flex items-center gap-2 text-red-400 text-sm">
+                    <XCircle className="h-4 w-4" />
+                    {lastNameError}
+                  </div>
+                ) : lastName && validateName(lastName, "Last name").isValid && (
+                  <div className="flex items-center gap-2 text-green-400 text-sm">
+                    <CheckCircle className="h-4 w-4" />
+                    Looks good
+                  </div>
+                )}
               </div>
             </div>
             
@@ -329,11 +586,31 @@ export const Auth = () => {
                 name="signup-email"
                 type="email"
                 value={signupEmail}
-                onChange={(e) => setSignupEmail(e.target.value)}
-                className="bg-slate-700/50 border-cyan-500/20 text-white"
+                onChange={(e) => {
+                  setSignupEmail(e.target.value);
+                  if (e.target.value.length > 0) {
+                    validateEmailField(e.target.value);
+                  } else {
+                    setEmailError('');
+                  }
+                }}
+                className={`bg-slate-700/50 text-white ${
+                  emailError ? 'border-red-500/50 focus:border-red-400' : 'border-cyan-500/20 focus:border-cyan-400'
+                }`}
                 required
                 disabled={signupLoading}
               />
+              {emailError ? (
+                <div className="flex items-center gap-2 text-red-400 text-sm">
+                  <XCircle className="h-4 w-4" />
+                  {emailError}
+                </div>
+              ) : signupEmail && validateEmail(signupEmail).isValid && (
+                <div className="flex items-center gap-2 text-green-400 text-sm">
+                  <CheckCircle className="h-4 w-4" />
+                  Email looks good
+                </div>
+              )}
             </div>
             
             <div className="space-y-2">
@@ -344,8 +621,18 @@ export const Auth = () => {
                   name="signup-password"
                   type={showPassword ? "text" : "password"}
                   value={signupPassword}
-                  onChange={(e) => setSignupPassword(e.target.value)}
-                  className="bg-slate-700/50 border-cyan-500/20 text-white pr-10"
+                  onChange={(e) => {
+                    setSignupPassword(e.target.value);
+                    if (e.target.value.length > 0) {
+                      validatePasswordField(e.target.value);
+                    } else {
+                      setPasswordError('');
+                      setPasswordStrength(null);
+                    }
+                  }}
+                  className={`bg-slate-700/50 text-white pr-10 ${
+                    passwordError ? 'border-red-500/50 focus:border-red-400' : 'border-cyan-500/20 focus:border-cyan-400'
+                  }`}
                   required
                   minLength={6}
                   disabled={signupLoading}
@@ -360,7 +647,33 @@ export const Auth = () => {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
-              <p className="text-xs text-gray-400">Password must be at least 6 characters long</p>
+              
+              {/* Password strength indicator */}
+              {passwordStrength && (
+                <div className="flex items-center gap-2 text-sm">
+                  <div className={`flex items-center gap-1 ${
+                    passwordStrength.strength === 'weak' ? 'text-red-400' :
+                    passwordStrength.strength === 'medium' ? 'text-yellow-400' :
+                    'text-green-400'
+                  }`}>
+                    {passwordStrength.strength === 'weak' ? <XCircle className="h-4 w-4" /> :
+                     passwordStrength.strength === 'medium' ? <AlertCircle className="h-4 w-4" /> :
+                     <CheckCircle className="h-4 w-4" />}
+                    {passwordStrength.message}
+                  </div>
+                </div>
+              )}
+              
+              {passwordError && (
+                <div className="flex items-center gap-2 text-red-400 text-sm">
+                  <XCircle className="h-4 w-4" />
+                  {passwordError}
+                </div>
+              )}
+              
+              <p className="text-xs text-gray-400">
+                Password must be at least 6 characters long and contain at least one uppercase letter, one lowercase letter, and one number
+              </p>
             </div>
 
             {/* Bio field */}
@@ -370,14 +683,33 @@ export const Auth = () => {
                 id="bio"
                 name="bio"
                 value={bio}
-                onChange={(e) => setBio(e.target.value)}
+                onChange={(e) => {
+                  setBio(e.target.value);
+                  if (e.target.value.length > 0) {
+                    const validation = validateBio(e.target.value);
+                    setBioError(validation.isValid ? '' : validation.message);
+                  } else {
+                    setBioError('');
+                  }
+                }}
                 placeholder="Tell the community about yourself, your real estate experience, goals, etc."
                 rows={3}
-                className="bg-slate-700/50 border-cyan-500/20 text-white resize-none"
+                className={`bg-slate-700/50 text-white resize-none ${
+                  bioError ? 'border-red-500/50 focus:border-red-400' : 'border-cyan-500/20 focus:border-cyan-400'
+                }`}
                 disabled={signupLoading}
                 maxLength={500}
               />
-              <p className="text-xs text-gray-400">This will be visible to other community members</p>
+              {bioError && (
+                <div className="flex items-center gap-2 text-red-400 text-sm">
+                  <XCircle className="h-4 w-4" />
+                  {bioError}
+                </div>
+              )}
+              <div className="flex justify-between items-center">
+                <p className="text-xs text-gray-400">This will be visible to other community members</p>
+                <p className="text-xs text-gray-500">{bio.length}/500</p>
+              </div>
             </div>
             
             <Button
