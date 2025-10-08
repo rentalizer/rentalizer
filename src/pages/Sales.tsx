@@ -26,49 +26,49 @@ export default function Sales() {
       </section>
 
       {/* Pricing Cards Section */}
-      <section className="py-16 px-4">
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
+      <section className="py-12 px-4">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6">
           {/* Accelerator Card */}
           <Card className="bg-slate-900/80 backdrop-blur-md border-2 border-primary/40 hover:border-primary/60 transition-all shadow-2xl shadow-primary/10 hover:shadow-primary/20">
-            <CardHeader className="text-center pb-8 pt-8">
-              <CardTitle className="text-3xl font-bold text-foreground mb-6">Accelerator</CardTitle>
-              <div className="space-y-2">
-                <div className="text-6xl font-bold text-primary">$7,000</div>
-                <p className="text-muted-foreground text-lg">12-Months</p>
+            <CardHeader className="text-center pb-4 pt-6">
+              <CardTitle className="text-2xl font-bold text-foreground mb-3">Accelerator</CardTitle>
+              <div className="space-y-1">
+                <div className="text-5xl font-bold text-primary">$7,000</div>
+                <p className="text-muted-foreground text-sm">12-Months</p>
               </div>
             </CardHeader>
-            <CardContent className="px-8 pb-8 space-y-5">
-              <div className="flex items-start gap-4">
+            <CardContent className="px-6 pb-6 space-y-3">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">Weekly Live Training</span>
+                <span className="text-foreground text-base">Weekly Live Training</span>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">Rentalizer™ Student Portal & Tools</span>
+                <span className="text-foreground text-base">Rentalizer™ Student Portal & Tools</span>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">Video & Documents Library</span>
+                <span className="text-foreground text-base">Video & Documents Library</span>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">AirDNA Market Research Software</span>
+                <span className="text-foreground text-base">AirDNA Market Research Software</span>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">Private Community Membership</span>
+                <span className="text-foreground text-base">Private Community Membership</span>
               </div>
-              <Button className="w-full mt-8 bg-primary hover:bg-primary/90 text-primary-foreground h-12 text-lg font-semibold rounded-md shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all">
+              <Button className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base font-semibold rounded-md shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all">
                 Get Started
               </Button>
             </CardContent>
@@ -79,72 +79,72 @@ export default function Sales() {
             <div className="absolute top-0 right-0 bg-primary/20 text-primary text-xs font-bold px-3 py-1 rounded-bl-lg">
               POPULAR
             </div>
-            <CardHeader className="text-center pb-8 pt-8">
-              <CardTitle className="text-3xl font-bold text-foreground mb-6">Accelerator Pro</CardTitle>
-              <div className="space-y-2">
-                <div className="text-6xl font-bold text-primary">$10,000</div>
-                <p className="text-muted-foreground text-lg">12-Months</p>
+            <CardHeader className="text-center pb-4 pt-6">
+              <CardTitle className="text-2xl font-bold text-foreground mb-3">Accelerator Pro</CardTitle>
+              <div className="space-y-1">
+                <div className="text-5xl font-bold text-primary">$10,000</div>
+                <p className="text-muted-foreground text-sm">12-Months</p>
               </div>
             </CardHeader>
-            <CardContent className="px-8 pb-8 space-y-5">
-              <div className="flex items-start gap-4">
+            <CardContent className="px-6 pb-6 space-y-3">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">Weekly Live Training</span>
+                <span className="text-foreground text-base">Weekly Live Training</span>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">Invited Expert Panelists</span>
+                <span className="text-foreground text-base">Invited Expert Panelists</span>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">Video & Documents Library</span>
+                <span className="text-foreground text-base">Video & Documents Library</span>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">Rentalizer.ai™ Student Portal</span>
+                <span className="text-foreground text-base">Rentalizer.ai™ Student Portal</span>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">Private Community Membership</span>
+                <span className="text-foreground text-base">Private Community Membership</span>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">Personalized Roadmap</span>
+                <span className="text-foreground text-base">Personalized Roadmap</span>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">Done For You Market Research</span>
+                <span className="text-foreground text-base">Done For You Market Research</span>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">Close Your 1st 6 Properties</span>
+                <span className="text-foreground text-base">Close Your 1st 6 Properties</span>
               </div>
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-foreground text-lg">Train Your Virtual Assistant</span>
+                <span className="text-foreground text-base">Train Your Virtual Assistant</span>
               </div>
-              <p className="text-sm text-muted-foreground mt-6 pt-6 border-t border-border italic leading-relaxed">
+              <p className="text-xs text-muted-foreground mt-4 pt-4 border-t border-border italic leading-relaxed">
                 Accelerator Pro is for individuals aiming for turnkey comprehensive personalized guidance from Richie--to achieve their dream outcome.
               </p>
-              <Button className="w-full mt-8 bg-primary hover:bg-primary/90 text-primary-foreground h-12 text-lg font-semibold rounded-md shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all">
+              <Button className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base font-semibold rounded-md shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all">
                 Get Started Pro
               </Button>
             </CardContent>
