@@ -162,19 +162,19 @@ export default function Sales() {
             Here's what your success story might look like in &lt;2 months:
           </h3>
           <div className="grid md:grid-cols-2 gap-6 text-left max-w-3xl mx-auto mt-8">
-            <div className="flex items-start gap-3 bg-slate-900/40 p-4 rounded-lg border border-slate-700 hover:border-slate-600 transition-colors">
+            <div className="flex items-start gap-3 bg-slate-900/60 p-5 rounded-lg border-2 border-slate-600/80 hover:border-slate-500 transition-all shadow-lg">
               <Check className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
               <span className="text-lg text-foreground">1-4 Cash Flowing Properties</span>
             </div>
-            <div className="flex items-start gap-3 bg-slate-900/40 p-4 rounded-lg border border-slate-700 hover:border-slate-600 transition-colors">
+            <div className="flex items-start gap-3 bg-slate-900/60 p-5 rounded-lg border-2 border-slate-600/80 hover:border-slate-500 transition-all shadow-lg">
               <Check className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
               <span className="text-lg text-foreground">$10K–$25K/Month Automated Income</span>
             </div>
-            <div className="flex items-start gap-3 bg-slate-900/40 p-4 rounded-lg border border-slate-700 hover:border-slate-600 transition-colors">
+            <div className="flex items-start gap-3 bg-slate-900/60 p-5 rounded-lg border-2 border-slate-600/80 hover:border-slate-500 transition-all shadow-lg">
               <Check className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
               <span className="text-lg text-foreground">Hands-Off Operations System Managing Guests, Cleanings, Bookings</span>
             </div>
-            <div className="flex items-start gap-3 bg-slate-900/40 p-4 rounded-lg border border-slate-700 hover:border-slate-600 transition-colors">
+            <div className="flex items-start gap-3 bg-slate-900/60 p-5 rounded-lg border-2 border-slate-600/80 hover:border-slate-500 transition-all shadow-lg">
               <Check className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
               <span className="text-lg text-foreground">True Income Freedom — A Strategy That Doesn't Require Property Ownership</span>
             </div>
