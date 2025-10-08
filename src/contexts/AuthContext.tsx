@@ -9,7 +9,7 @@ interface AuthContextType {
   profile: Profile | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, profileData?: { displayName?: string; firstName?: string; lastName?: string; bio?: string; avatarFile?: File }) => Promise<void>;
+  signUp: (email: string, password: string, profileData?: { displayName?: string; firstName?: string; lastName?: string; bio?: string; profilePicture?: string }) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: Error | null }>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
@@ -99,7 +99,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const signUp = async (email: string, password: string, profileData?: { displayName?: string; firstName?: string; lastName?: string; bio?: string; avatarFile?: File }) => {
+  const signUp = async (email: string, password: string, profileData?: { displayName?: string; firstName?: string; lastName?: string; bio?: string; profilePicture?: string }) => {
     console.log('📝 Starting sign up for:', email);
     
     try {
@@ -107,7 +107,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         email,
         password,
         firstName: profileData?.firstName,
-        lastName: profileData?.lastName
+        lastName: profileData?.lastName,
+        bio: profileData?.bio,
+        profilePicture: profileData?.profilePicture
       });
       
       // Store token and user data

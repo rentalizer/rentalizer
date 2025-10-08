@@ -191,12 +191,17 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           const userObj = discussion.user_id as PopulatedUser;
           const userId = userObj._id || userObj.id;
           if (userId && !profilesMap[userId]) {
+            // Normalize profilePicture (convert empty strings to null)
+            const normalizedProfilePicture = userObj.profilePicture && userObj.profilePicture.trim() !== '' 
+              ? userObj.profilePicture 
+              : null;
+            
             profilesMap[userId] = {
               id: userId,
               email: userObj.email || '',
               firstName: userObj.firstName || '',
               lastName: userObj.lastName || '',
-              profilePicture: userObj.profilePicture || null,
+              profilePicture: normalizedProfilePicture,
               bio: userObj.bio || '',
               role: userObj.role || 'user'
             };
@@ -320,7 +325,9 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       userObj.email?.split('@')[0] || 
       'User';
     // Try various possible avatar fields from backend
-    const possibleAvatarUrl: string | null = (userObj.profilePicture || userObj.avatar_url || null) as (string | null);
+    const rawAvatar = userObj.profilePicture || userObj.avatar_url;
+    // Normalize avatar URL (convert empty strings to null)
+    const possibleAvatarUrl: string | null = (rawAvatar && rawAvatar.trim() !== '') ? rawAvatar : null;
     // Normalize id from various possible fields
     const normalizedId = (c as any).id || (c as any)._id || (typeof (c as any)._id === 'object' && (c as any)._id?.toString ? (c as any)._id.toString() : undefined);
     const userId = typeof userObj === 'string' ? userObj : (userObj._id || userObj.id);
@@ -535,12 +542,17 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   }, [user, discussionsList, fetchUserProfiles]);
 
   // Fixed profile info function - this was the source of the bug
-  const getProfileInfo = useCallback((userId: string | undefined, authorName: string) => {
+  const getProfileInfo = useCallback((userId: string | undefined, authorName: string, discussionAvatar?: string) => {
+    // Helper to normalize avatar URLs (convert empty strings to null)
+    const normalizeAvatarUrl = (url: string | null | undefined): string | null => {
+      if (!url || url.trim() === '') return null;
+      return url;
+    };
     
     // For posts without a user_id, use the author name and generate initials
     if (!userId) {
       return {
-        avatar_url: null,
+        avatar_url: normalizeAvatarUrl(discussionAvatar),
         display_name: authorName,
         initials: getInitials(authorName)
       };
@@ -554,13 +566,18 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     
     if (user && user.id === discussionUserId) {
       // Use backend profile data if available, fallback to auth context user data
-      const profilePicture = supabaseProfile?.avatar_url || user.profilePicture;
+      // Prioritize discussionAvatar if available and not empty
+      const normalizedDiscussionAvatar = normalizeAvatarUrl(discussionAvatar);
+      const normalizedSupabaseAvatar = normalizeAvatarUrl(supabaseProfile?.avatar_url);
+      const normalizedUserPicture = normalizeAvatarUrl(user.profilePicture);
+      
+      const profilePicture = normalizedDiscussionAvatar || normalizedSupabaseAvatar || normalizedUserPicture;
       const currentDisplayName = supabaseProfile?.display_name || profile?.display_name || user.email?.split('@')[0] || authorName;
       const finalDisplayName = isAdmin ? `${currentDisplayName} (Admin)` : currentDisplayName;
       
       
       return {
-        avatar_url: profilePicture || null,
+        avatar_url: profilePicture,
         display_name: finalDisplayName,
         initials: getInitials(currentDisplayName)
       };
@@ -572,17 +589,22 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       discussionUserId,
       userProfile,
       userProfilesKeys: Object.keys(userProfiles),
-      hasProfilePicture: userProfile?.profilePicture
+      hasProfilePicture: userProfile?.profilePicture,
+      discussionAvatar: discussionAvatar ? 'present' : 'missing'
     });
     
-    if (userProfile) {
-      const displayName = userProfile.firstName && userProfile.lastName 
+    if (userProfile || discussionAvatar) {
+      const displayName = userProfile?.firstName && userProfile?.lastName 
         ? `${userProfile.firstName} ${userProfile.lastName}`
-        : userProfile.email?.split('@')[0] || authorName;
+        : userProfile?.email?.split('@')[0] || authorName;
       
+      // Prioritize discussionAvatar (author_avatar from backend) over userProfile.profilePicture
+      const normalizedDiscussionAvatar = normalizeAvatarUrl(discussionAvatar);
+      const normalizedUserProfilePicture = normalizeAvatarUrl(userProfile?.profilePicture);
+      const avatar = normalizedDiscussionAvatar || normalizedUserProfilePicture;
       
       return {
-        avatar_url: userProfile.profilePicture || null,
+        avatar_url: avatar,
         display_name: displayName,
         initials: getInitials(displayName)
       };
@@ -590,7 +612,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     
     // Fallback to author name and initials
     return {
-      avatar_url: null,
+      avatar_url: normalizeAvatarUrl(discussionAvatar),
       display_name: authorName,
       initials: getInitials(authorName)
     };
@@ -1010,7 +1032,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
               </div>
             ) : (
               filteredDiscussions.map((discussion) => {
-              const profileInfo = getProfileInfo(discussion.user_id, discussion.author);
+              const profileInfo = getProfileInfo(discussion.user_id, discussion.author, discussion.avatar);
               
               return (
                 <Card key={discussion.id} className="bg-slate-800/50 border-gray-700/50 hover:bg-slate-800/70 transition-all duration-300 ease-in-out">

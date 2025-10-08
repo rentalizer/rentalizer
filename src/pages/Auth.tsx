@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { Eye, EyeOff, Upload, User, Ticket, LogIn, UserPlus } from 'lucide-react';
 
@@ -27,8 +28,8 @@ export const Auth = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [bio, setBio] = useState('');
-  const [promoCode, setPromoCode] = useState('');
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [signupLoading, setSignupLoading] = useState(false);
 
   // Set active tab based on route
@@ -78,6 +79,51 @@ export const Auth = () => {
     }
   };
 
+  const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      setUploading(true);
+
+      if (!event.target.files || event.target.files.length === 0) {
+        console.log("No file selected: Please select an image to upload");
+        return;
+      }
+
+      const file = event.target.files[0];
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        console.log("Invalid file type: Please select an image file");
+        return;
+      }
+
+      // Validate file size (max 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        console.log("File too large: Please select an image smaller than 2MB");
+        return;
+      }
+
+      // Convert to base64 for storage
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        // Only store if it's a reasonable size (less than 1MB base64)
+        if (result.length < 1000000) {
+          setAvatarUrl(result);
+          console.log("Success: Profile photo selected");
+        } else {
+          console.log("File too large: Please select a smaller image");
+        }
+      };
+      reader.readAsDataURL(file);
+      
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      console.log("Error: Failed to upload avatar");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -85,8 +131,6 @@ export const Auth = () => {
       console.log("Missing fields: Please fill in first name, last name, email, and password");
       return;
     }
-
-    // Promo code validation removed for backend integration
 
     if (signupPassword.length < 6) {
       console.log("Password too short: Password must be at least 6 characters long");
@@ -100,7 +144,9 @@ export const Auth = () => {
       await signUp(signupEmail, signupPassword, {
         displayName,
         firstName,
-        lastName
+        lastName,
+        bio: bio.trim() || undefined,
+        profilePicture: avatarUrl || undefined
       });
       console.log("Welcome! Your account has been created successfully. Please check your email to verify your account.");
     } catch (error) {
@@ -209,6 +255,40 @@ export const Auth = () => {
 
             <TabsContent value="signup">
               <form onSubmit={handleSignup} className="space-y-4">
+            {/* Avatar Upload */}
+            <div className="flex flex-col items-center space-y-3 pb-2">
+              <Avatar className="h-20 w-20">
+                <AvatarImage src={avatarUrl} className="object-cover" />
+                <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-blue-500 text-white text-lg">
+                  {firstName.charAt(0)}{lastName.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+              
+              <div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+                  disabled={uploading || signupLoading}
+                  onClick={() => document.getElementById('avatar-upload')?.click()}
+                >
+                  <Upload className="h-3 w-3 mr-2" />
+                  {uploading ? 'Uploading...' : 'Upload Photo'}
+                </Button>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={uploadAvatar}
+                  className="hidden"
+                />
+              </div>
+              <p className="text-xs text-gray-400 text-center">
+                Optional: Add a profile picture (max 2MB)
+              </p>
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="first-name" className="text-gray-300">
@@ -222,6 +302,7 @@ export const Auth = () => {
                   onChange={(e) => setFirstName(e.target.value)}
                   className="bg-slate-700/50 border-cyan-500/20 text-white"
                   required
+                  disabled={signupLoading}
                 />
               </div>
               <div className="space-y-2">
@@ -236,6 +317,7 @@ export const Auth = () => {
                   onChange={(e) => setLastName(e.target.value)}
                   className="bg-slate-700/50 border-cyan-500/20 text-white"
                   required
+                  disabled={signupLoading}
                 />
               </div>
             </div>
@@ -250,6 +332,7 @@ export const Auth = () => {
                 onChange={(e) => setSignupEmail(e.target.value)}
                 className="bg-slate-700/50 border-cyan-500/20 text-white"
                 required
+                disabled={signupLoading}
               />
             </div>
             
@@ -265,6 +348,7 @@ export const Auth = () => {
                   className="bg-slate-700/50 border-cyan-500/20 text-white pr-10"
                   required
                   minLength={6}
+                  disabled={signupLoading}
                 />
                 <Button
                   type="button"
@@ -279,18 +363,39 @@ export const Auth = () => {
               <p className="text-xs text-gray-400">Password must be at least 6 characters long</p>
             </div>
 
-            {/* Profile picture upload removed - users can add it later in ProfileSetup */}
-
-            {/* Bio field removed - users can add it later in ProfileSetup */}
-
-            {/* Promo code field removed for backend integration */}
+            {/* Bio field */}
+            <div className="space-y-2">
+              <Label htmlFor="bio" className="text-gray-300">About Yourself (Optional)</Label>
+              <Textarea
+                id="bio"
+                name="bio"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Tell the community about yourself, your real estate experience, goals, etc."
+                rows={3}
+                className="bg-slate-700/50 border-cyan-500/20 text-white resize-none"
+                disabled={signupLoading}
+                maxLength={500}
+              />
+              <p className="text-xs text-gray-400">This will be visible to other community members</p>
+            </div>
             
             <Button
               type="submit"
-              disabled={signupLoading}
+              disabled={signupLoading || uploading}
               className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
             >
-              {signupLoading ? 'Creating account...' : 'Create Account'}
+              {signupLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Creating account...
+                </>
+              ) : (
+                <>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Create Account
+                </>
+              )}
             </Button>
               </form>
             </TabsContent>

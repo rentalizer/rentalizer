@@ -36,6 +36,24 @@ class CommentService {
       .limit(limit)
       .lean();
 
+    // Update user profile pictures to use current data
+    comments.forEach(comment => {
+      if (comment.user && comment.user.profilePicture) {
+        comment.user.avatar_url = comment.user.profilePicture;
+        comment.user.display_name = `${comment.user.firstName} ${comment.user.lastName}`;
+      }
+      
+      // Update reaction user profile pictures
+      if (comment.reactions) {
+        comment.reactions.forEach(reaction => {
+          if (reaction.user && reaction.user.profilePicture) {
+            reaction.user.avatar_url = reaction.user.profilePicture;
+            reaction.user.display_name = `${reaction.user.firstName} ${reaction.user.lastName}`;
+          }
+        });
+      }
+    });
+
     const totalComments = await Comment.countDocuments(query);
 
     return {
@@ -71,14 +89,20 @@ class CommentService {
     });
 
     await comment.save();
-    await comment.populate('user', 'display_name email avatar_url role');
+    await comment.populate('user', 'firstName lastName email profilePicture role');
+
+    // Add display_name and avatar_url for compatibility
+    if (comment.user) {
+      comment.user.display_name = `${comment.user.firstName} ${comment.user.lastName}`;
+      comment.user.avatar_url = comment.user.profilePicture;
+    }
 
     return comment;
   }
 
   // Update a comment
   static async updateComment(commentId, userId, content, userRole = 'user') {
-    const comment = await Comment.findById(commentId).populate('user', 'display_name email avatar_url role');
+    const comment = await Comment.findById(commentId).populate('user', 'firstName lastName email profilePicture role');
     
     if (!comment) {
       throw new Error('Comment not found');

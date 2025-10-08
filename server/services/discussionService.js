@@ -87,12 +87,18 @@ class DiscussionService {
         .skip((page - 1) * limit)
         .limit(limit);
 
-      // Add like status for requesting user
-      if (requestingUserId) {
-        discussions.forEach(discussion => {
+      // Update author_avatar with current user profile picture and add like status
+      discussions.forEach(discussion => {
+        // Use current user's profile picture instead of stored author_avatar
+        if (discussion.user_id && discussion.user_id.profilePicture) {
+          discussion.author_avatar = discussion.user_id.profilePicture;
+        }
+        
+        // Add like status for requesting user
+        if (requestingUserId) {
           discussion._isLiked = discussion.liked_by.includes(requestingUserId);
-        });
-      }
+        }
+      });
 
       const total = await Discussion.countDocuments(query);
       const totalPages = Math.ceil(total / limit);
@@ -128,6 +134,11 @@ class DiscussionService {
 
       if (!discussion) {
         throw new Error('Discussion not found');
+      }
+
+      // Use current user's profile picture instead of stored author_avatar
+      if (discussion.user_id && discussion.user_id.profilePicture) {
+        discussion.author_avatar = discussion.user_id.profilePicture;
       }
 
       // Increment view count

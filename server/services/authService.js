@@ -4,7 +4,7 @@ const { generateToken } = require('../middleware/auth');
 class AuthService {
   // Register a new user
   async registerUser(userData) {
-    const { email, password, firstName, lastName } = userData;
+    const { email, password, firstName, lastName, bio, profilePicture } = userData;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -19,7 +19,9 @@ class AuthService {
       email,
       password,
       firstName,
-      lastName
+      lastName,
+      bio: bio || null,
+      profilePicture: profilePicture || null
     });
 
     await user.save();
@@ -33,6 +35,8 @@ class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        bio: user.bio,
+        profilePicture: user.profilePicture,
         role: user.role,
         createdAt: user.createdAt
       },
@@ -78,6 +82,8 @@ class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        bio: user.bio,
+        profilePicture: user.profilePicture,
         role: user.role,
         lastLogin: user.lastLogin
       },

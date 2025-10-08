@@ -19,8 +19,14 @@ class UserService {
     const updateFields = {};
     if (firstName !== undefined) updateFields.firstName = firstName;
     if (lastName !== undefined) updateFields.lastName = lastName;
-    if (bio !== undefined) updateFields.bio = bio;
-    if (profilePicture !== undefined) updateFields.profilePicture = profilePicture;
+    if (bio !== undefined) updateFields.bio = bio || null; // Convert empty string to null
+    // Only update profilePicture if it's not empty string
+    if (profilePicture !== undefined && profilePicture !== '') {
+      updateFields.profilePicture = profilePicture;
+    } else if (profilePicture === '') {
+      // If explicitly set to empty string, set to null
+      updateFields.profilePicture = null;
+    }
 
     const user = await User.findByIdAndUpdate(
       userId,
