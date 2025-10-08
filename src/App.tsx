@@ -35,6 +35,7 @@ const GuideBook = lazy(() => import("./pages/GuideBook").catch(() => ({ default:
 const GuideBook2 = lazy(() => import("./pages/GuideBook2").catch(() => ({ default: () => <div>Error loading page</div> })));
 const GuestGuide = lazy(() => import("./pages/GuestGuide").catch(() => ({ default: () => <div>Error loading page</div> })));
 const Auth = lazy(() => import("./pages/Auth").then(module => ({ default: module.Auth })).catch(() => ({ default: () => <div>Error loading page</div> })));
+const Sales = lazy(() => import("./pages/Sales").catch(() => ({ default: () => <div>Error loading page</div> })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,6 +72,7 @@ const AppRoutes = () => (
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/guide/:slug" element={<GuestGuide />} />
+        <Route path="/sales" element={<Sales />} />
         
         {/* Protected routes - require authentication */}
         <Route path="/dashboard" element={<AuthGuard><Index /></AuthGuard>} />
