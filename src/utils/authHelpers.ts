@@ -5,6 +5,7 @@ export interface Profile {
   user_id: string;
   display_name: string | null;
   avatar_url: string | null;
+  bio?: string | null;
 }
 
 // Helper function to create profile from user data

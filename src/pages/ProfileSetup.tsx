@@ -31,6 +31,9 @@ const ProfileSetup = () => {
   const { user, updateProfile: updateAuthProfile } = useAuth();
   const navigate = useNavigate();
   const [profileComplete, setProfileComplete] = useState(false);
+  
+  // Check if user is admin
+  const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -47,6 +50,7 @@ const ProfileSetup = () => {
     } else {
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadProfile = async () => {
@@ -152,7 +156,8 @@ const ProfileSetup = () => {
       const result = await updateAuthProfile({
         display_name: `${data.first_name.trim()} ${data.last_name.trim()}`,
         avatar_url: avatarUrl || null,
-        bio: data.bio?.trim() || null,
+        // Only include bio for non-admin users
+        bio: isAdmin ? null : (data.bio?.trim() || null),
       });
 
       if (result.error) {
@@ -163,14 +168,16 @@ const ProfileSetup = () => {
       console.log("Success: Your profile has been updated successfully");
 
       navigate('/community');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('💥 Exception:', error);
       
       let errorMessage = 'Failed to update profile';
-      if (error.message.includes('request entity too large')) {
-        errorMessage = 'Profile picture is too large. Please select a smaller image.';
-      } else if (error.message) {
-        errorMessage = error.message;
+      if (error instanceof Error) {
+        if (error.message.includes('request entity too large')) {
+          errorMessage = 'Profile picture is too large. Please select a smaller image.';
+        } else {
+          errorMessage = error.message;
+        }
       }
       
       console.log("Error:", errorMessage);
@@ -320,26 +327,29 @@ const ProfileSetup = () => {
                     />
                   </div>
 
-                  <FormField
-                    control={form.control}
-                    name="bio"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-300">About Yourself</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            {...field}
-                            className="bg-slate-700 border-slate-600 text-white"
-                            placeholder="Tell the community about yourself, your real estate experience, goals, etc."
-                            rows={4}
-                          />
-                        </FormControl>
-                        <p className="text-sm text-gray-400 mt-1">
-                          This will be visible to other community members
-                        </p>
-                      </FormItem>
-                    )}
-                  />
+                  {/* Only show bio field for non-admin users */}
+                  {!isAdmin && (
+                    <FormField
+                      control={form.control}
+                      name="bio"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-300">About Yourself</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              className="bg-slate-700 border-slate-600 text-white"
+                              placeholder="Tell the community about yourself, your real estate experience, goals, etc."
+                              rows={4}
+                            />
+                          </FormControl>
+                          <p className="text-sm text-gray-400 mt-1">
+                            This will be visible to other community members
+                          </p>
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   <Button
                     type="submit"
