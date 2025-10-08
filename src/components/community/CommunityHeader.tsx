@@ -63,7 +63,11 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
   const [photoUpload, setPhotoUpload] = useState<PhotoUpload | null>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
-  const getUserAvatar = () => supabaseProfile?.avatar_url || user?.profilePicture || null;
+  const getUserAvatar = () => {
+    const avatar = supabaseProfile?.avatar_url || user?.profilePicture;
+    // Normalize avatar (convert empty strings to null)
+    return (avatar && avatar.trim() !== '') ? avatar : null;
+  };
   const getUserName = () => {
     if (user?.firstName && user?.lastName) {
       return `${user.firstName} ${user.lastName}`;
