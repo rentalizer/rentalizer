@@ -8,7 +8,7 @@ export default function Sales() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800">
       {/* Hero Section */}
-      <section className="relative py-20 px-4 text-center">
+      <section className="relative py-10 px-4 text-center">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="flex items-center justify-center gap-3 mb-6">
             <BarChart3 className="h-12 w-12 text-primary neon-text" />
@@ -26,7 +26,7 @@ export default function Sales() {
       </section>
 
       {/* Pricing Cards Section */}
-      <section className="py-12 px-4">
+      <section className="py-6 px-4">
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6">
           {/* Accelerator Card */}
           <Card className="bg-slate-900/80 backdrop-blur-md border-2 border-primary/40 hover:border-primary/60 transition-all shadow-2xl shadow-primary/10 hover:shadow-primary/20">
@@ -153,7 +153,7 @@ export default function Sales() {
       </section>
 
       {/* Success Story Section */}
-      <section className="py-16 px-4 bg-secondary/30">
+      <section className="py-8 px-4 bg-secondary/30">
         <div className="max-w-4xl mx-auto text-center space-y-8">
           <p className="text-xl md:text-2xl text-foreground leading-relaxed">
             Our live training program has been proven and replicated by hundreds of our students — without much capital, or a real estate license.
@@ -183,7 +183,7 @@ export default function Sales() {
       </section>
 
       {/* Video Testimonials Section */}
-      <section className="py-16 px-4">
+      <section className="py-8 px-4">
         <div className="max-w-7xl mx-auto">
           <h3 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
             Just Listen To What Our Students Say
