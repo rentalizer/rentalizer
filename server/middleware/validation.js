@@ -330,6 +330,55 @@ const validateBulkUpdate = [
   handleValidationErrors
 ];
 
+// Document validation rules
+const validateDocument = [
+  body('filename')
+    .trim()
+    .isLength({ min: 1, max: 255 })
+    .withMessage('Filename must be between 1 and 255 characters'),
+  body('url')
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage('Document URL is required'),
+  body('type')
+    .isIn(['pdf', 'excel'])
+    .withMessage('Document type must be either pdf or excel'),
+  body('size')
+    .isInt({ min: 0, max: 3 * 1024 * 1024 })
+    .withMessage('File size must be between 0 and 3MB'),
+  body('category')
+    .isIn(['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'])
+    .withMessage('Invalid category'),
+  handleValidationErrors
+];
+
+// Document update validation rules (more lenient)
+const validateDocumentUpdate = [
+  body('filename')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 255 })
+    .withMessage('Filename must be between 1 and 255 characters'),
+  body('url')
+    .optional()
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage('Document URL is required'),
+  body('type')
+    .optional()
+    .isIn(['pdf', 'excel'])
+    .withMessage('Document type must be either pdf or excel'),
+  body('size')
+    .optional()
+    .isInt({ min: 0, max: 3 * 1024 * 1024 })
+    .withMessage('File size must be between 0 and 3MB'),
+  body('category')
+    .optional()
+    .isIn(['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'])
+    .withMessage('Invalid category'),
+  handleValidationErrors
+];
+
 module.exports = {
   validateRegistration,
   validateLogin,
@@ -342,5 +391,7 @@ module.exports = {
   validateVideoUpdate,
   validateVideoReorder,
   validateBulkUpdate,
+  validateDocument,
+  validateDocumentUpdate,
   handleValidationErrors
 };

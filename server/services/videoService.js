@@ -1,4 +1,5 @@
 const Video = require('../models/Video');
+const documentService = require('./documentService');
 
 class VideoService {
   // Create a new video
@@ -11,6 +12,22 @@ class VideoService {
       });
 
       await video.save();
+      
+      // Auto-sync: If video has attachment, create document in library
+      if (videoData.attachment && videoData.attachment.filename && videoData.attachment.url) {
+        try {
+          await documentService.createDocumentFromVideoAttachment(
+            video._id,
+            videoData.attachment,
+            videoData.category, // Pass the video's category
+            createdBy
+          );
+        } catch (docError) {
+          console.error('Error creating document from video attachment:', docError);
+          // Don't fail the video creation if document creation fails
+        }
+      }
+      
       return await this.getVideoById(video._id);
     } catch (error) {
       if (error.name === 'ValidationError') {

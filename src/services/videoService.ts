@@ -186,19 +186,95 @@ class VideoService {
 
   // Admin operations
   // Create new video
-  async createVideo(videoData: CreateVideoData): Promise<ApiResponse<Video>> {
+  async createVideo(videoData: CreateVideoData, attachmentFile?: File): Promise<ApiResponse<Video>> {
+    const formData = new FormData();
+    
+    // Add video data fields
+    formData.append('title', videoData.title);
+    formData.append('description', videoData.description);
+    formData.append('thumbnail', videoData.thumbnail);
+    formData.append('category', videoData.category);
+    formData.append('videoUrl', videoData.videoUrl);
+    
+    if (videoData.tags && videoData.tags.length > 0) {
+      formData.append('tags', JSON.stringify(videoData.tags));
+    }
+    
+    if (videoData.featured !== undefined) {
+      formData.append('featured', videoData.featured.toString());
+    }
+    
+    if (videoData.isLive !== undefined) {
+      formData.append('isLive', videoData.isLive.toString());
+    }
+    
+    // Add attachment if provided
+    if (attachmentFile) {
+      formData.append('document', attachmentFile);
+    }
+    
+    // If attachment data is already provided (without file), include it
+    if (videoData.attachment && !attachmentFile) {
+      formData.append('attachment', JSON.stringify(videoData.attachment));
+    }
+
     const response: AxiosResponse<ApiResponse<Video>> = await videoApi.post(
       VIDEO_ENDPOINTS.VIDEOS,
-      videoData
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
     );
     return response.data;
   }
 
   // Update video
-  async updateVideo(id: string, updateData: UpdateVideoData): Promise<ApiResponse<Video>> {
+  async updateVideo(id: string, updateData: UpdateVideoData, attachmentFile?: File): Promise<ApiResponse<Video>> {
+    const formData = new FormData();
+    
+    // Add update data fields
+    if (updateData.title) formData.append('title', updateData.title);
+    if (updateData.description) formData.append('description', updateData.description);
+    if (updateData.thumbnail) formData.append('thumbnail', updateData.thumbnail);
+    if (updateData.category) formData.append('category', updateData.category);
+    if (updateData.videoUrl) formData.append('videoUrl', updateData.videoUrl);
+    
+    if (updateData.tags && updateData.tags.length > 0) {
+      formData.append('tags', JSON.stringify(updateData.tags));
+    }
+    
+    if (updateData.featured !== undefined) {
+      formData.append('featured', updateData.featured.toString());
+    }
+    
+    if (updateData.isLive !== undefined) {
+      formData.append('isLive', updateData.isLive.toString());
+    }
+    
+    if (updateData.isActive !== undefined) {
+      formData.append('isActive', updateData.isActive.toString());
+    }
+    
+    // Add attachment if provided
+    if (attachmentFile) {
+      formData.append('document', attachmentFile);
+    }
+    
+    // If attachment data is already provided (without file), include it
+    if (updateData.attachment && !attachmentFile) {
+      formData.append('attachment', JSON.stringify(updateData.attachment));
+    }
+
     const response: AxiosResponse<ApiResponse<Video>> = await videoApi.put(
       VIDEO_ENDPOINTS.VIDEO_BY_ID(id),
-      updateData
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
     );
     return response.data;
   }

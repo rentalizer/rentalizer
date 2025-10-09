@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Video as VideoIcon, Search, Play, Clock, Eye, Calendar, Star, X, Plus, Edit, Trash2, GripVertical, Lock, Loader2, ArrowRight, Music, Building2, BarChart3, Home, Settings } from 'lucide-react';
+import { Video as VideoIcon, Search, Play, Clock, Eye, Calendar, Star, X, Plus, Edit, Trash2, GripVertical, Lock, Loader2, ArrowRight, Music, Building2, BarChart3, Home, Settings, FileText } from 'lucide-react';
 import { ImageUpload } from '@/components/ui/ImageUpload';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -31,6 +31,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { videoService } from '@/services/videoService';
 import { Video, CreateVideoData, UpdateVideoData, VideoFilters } from '@/types';
+import { DocumentsLibrary } from './DocumentsLibrary';
 import { API_CONFIG } from '@/config/api';
 
 interface SortableVideoCardProps {
@@ -290,6 +291,28 @@ const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, 
                   {video.views.toLocaleString()}
                 </div>
               </div>
+              
+              {/* Attachment and Views */}
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1 text-gray-400">
+                  {video.attachment ? (
+                    <div className="flex items-center gap-1 text-cyan-300">
+                      {video.attachment.type === 'pdf' ? (
+                        <span className="text-red-400">📄</span>
+                      ) : (
+                        <span className="text-green-400">📊</span>
+                      )}
+                      <span className="truncate max-w-20">{video.attachment.filename}</span>
+                    </div>
+                  ) : (
+                    <span className="text-gray-500">No attachment</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-1 text-gray-400">
+                  <Eye className="h-3 w-3" />
+                  {video.views.toLocaleString()} views
+                </div>
+              </div>
 
             </div>
           </CardContent>
@@ -313,6 +336,7 @@ export const VideoLibrary = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
   const [categories, setCategories] = useState<string[]>(['all', 'Business Formation', 'Market Research', 'Property Acquisition', 'Operations', 'Documents Library']);
+  const [documentCount, setDocumentCount] = useState(0);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -330,6 +354,9 @@ export const VideoLibrary = () => {
     tags: [],
     featured: false
   });
+  
+  // Track attachment file separately
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
 
   const isMountedRef = useRef(true);
   const hasInitiallyLoadedRef = useRef(false);
@@ -577,7 +604,7 @@ export const VideoLibrary = () => {
     }
 
     try {
-      const response = await videoService.createVideo(newVideo);
+      const response = await videoService.createVideo(newVideo, attachmentFile || undefined);
       setVideos(prevVideos => {
         const updatedVideos = [...prevVideos, response.data];
         return sortVideosByFeatured(updatedVideos);
@@ -591,6 +618,7 @@ export const VideoLibrary = () => {
       tags: [],
       featured: false
     });
+    setAttachmentFile(null);
     setIsAddDialogOpen(false);
     
     toast({
@@ -635,6 +663,7 @@ export const VideoLibrary = () => {
 
   const handleEditVideo = (video: Video) => {
     setEditingVideo(video);
+    setAttachmentFile(null); // Reset attachment file when editing
     setNewVideo({
       title: video.title,
       description: video.description,
@@ -642,7 +671,8 @@ export const VideoLibrary = () => {
       category: video.category,
       videoUrl: video.videoUrl,
       tags: video.tags,
-      featured: video.featured
+      featured: video.featured,
+      attachment: video.attachment // Include existing attachment
     });
   };
 
@@ -657,7 +687,7 @@ export const VideoLibrary = () => {
     }
 
     try {
-      const response = await videoService.updateVideo(editingVideo._id, newVideo);
+      const response = await videoService.updateVideo(editingVideo._id, newVideo, attachmentFile || undefined);
       setVideos(prevVideos => {
         const updatedVideos = prevVideos.map(video => 
           video._id === editingVideo._id ? response.data : video
@@ -674,6 +704,7 @@ export const VideoLibrary = () => {
       tags: [],
       featured: false
     });
+    setAttachmentFile(null);
     
     toast({
       title: "Video updated",
@@ -749,6 +780,11 @@ export const VideoLibrary = () => {
                 <VideoIcon className="h-10 w-10 text-cyan-300" />
                 Training Replays & Documents
               </>
+            ) : selectedCategory === 'Documents Library' ? (
+              <>
+                <FileText className="h-10 w-10 text-cyan-300" />
+                Training Documents
+              </>
             ) : (
               <>
                 <VideoIcon className="h-10 w-10 text-cyan-300" />
@@ -765,6 +801,8 @@ export const VideoLibrary = () => {
             ) : (
               selectedCategory === 'all' 
                 ? '5 categories'
+                : selectedCategory === 'Documents Library'
+                ? `${documentCount} documents`
                 : `${videos.filter(v => v.category === selectedCategory).length} videos`
             )}
           </Badge>
@@ -817,6 +855,53 @@ export const VideoLibrary = () => {
                     value={newVideo.thumbnail}
                   onChange={(value) => setNewVideo({...newVideo, thumbnail: value})}
                 />
+                
+                {/* File Attachment Field */}
+                <div>
+                  <Label htmlFor="attachment" className="text-gray-300">Support Document (Optional)</Label>
+                  <div className="mt-2">
+                    <input
+                      type="file"
+                      id="attachment"
+                      accept=".pdf,.xlsx,.xls"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          // Check file size (3MB max)
+                          if (file.size > 3 * 1024 * 1024) {
+                            toast({
+                              title: "File too large",
+                              description: "File must be 3MB or smaller.",
+                              variant: "destructive"
+                            });
+                            e.target.value = ''; // Reset file input
+                            return;
+                          }
+                          
+                          // Check file type
+                          const fileType = file.name.endsWith('.pdf') ? 'pdf' : 'excel';
+                          
+                          // Store the file separately for upload
+                          setAttachmentFile(file);
+                          
+                          // Store metadata in video data
+                          setNewVideo({
+                            ...newVideo,
+                            attachment: {
+                              filename: file.name,
+                              url: '', // Will be set after upload
+                              type: fileType as 'pdf' | 'excel',
+                              size: file.size
+                            }
+                          });
+                        }
+                      }}
+                      className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">PDF or Excel files only, max 3MB</p>
+                  </div>
+                </div>
+                
                 <div>
                   <Label htmlFor="category" className="text-gray-300">Category</Label>
                   <Select value={newVideo.category} onValueChange={(value) => setNewVideo({...newVideo, category: value})}>
@@ -858,10 +943,10 @@ export const VideoLibrary = () => {
         </div>
       </div>
 
-      {/* Search and Filters */}
-      {selectedCategory !== 'all' && (
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
+      {/* Search - Only show when in a specific category */}
+      {selectedCategory !== 'all' && selectedCategory !== 'Documents Library' && (
+        <div className="flex justify-center">
+          <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
               placeholder="Search videos in this category..."
@@ -869,23 +954,6 @@ export const VideoLibrary = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 bg-slate-800/50 border-cyan-500/20 text-white placeholder-gray-400"
             />
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {categories.map(category => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory(category)}
-                className={
-                  selectedCategory === category
-                    ? "bg-cyan-600 hover:bg-cyan-700 whitespace-nowrap flex-shrink-0"
-                    : "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 whitespace-nowrap flex-shrink-0"
-                }
-              >
-                {category === 'all' ? 'All Albums' : category}
-              </Button>
-            ))}
           </div>
         </div>
       )}
@@ -912,6 +980,14 @@ export const VideoLibrary = () => {
 
             // If a specific category is selected, show the detailed view
             if (selectedCategory !== 'all') {
+              // Show Documents Library for Documents Library category
+              if (selectedCategory === 'Documents Library') {
+                return <DocumentsLibrary 
+                  onBack={() => setSelectedCategory('all')} 
+                  onDocumentCountChange={setDocumentCount}
+                />;
+              }
+              
               const categoryVideos = videosByCategory[selectedCategory] || [];
               
               return (
@@ -1063,6 +1139,73 @@ export const VideoLibrary = () => {
               value={newVideo.thumbnail}
               onChange={(value) => setNewVideo({...newVideo, thumbnail: value})}
             />
+            
+            {/* File Attachment Field */}
+            <div>
+              <Label htmlFor="edit-attachment" className="text-gray-300">Support Document (Optional)</Label>
+              <div className="mt-2">
+                {newVideo.attachment && (
+                  <div className="mb-2 p-2 bg-slate-800/50 rounded border border-cyan-500/20 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {newVideo.attachment.type === 'pdf' ? (
+                        <span className="text-red-400">📄</span>
+                      ) : (
+                        <span className="text-green-400">📊</span>
+                      )}
+                      <span className="text-sm text-gray-300">{newVideo.attachment.filename}</span>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setNewVideo({...newVideo, attachment: undefined})}
+                      className="h-6 w-6 p-0"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  id="edit-attachment"
+                  accept=".pdf,.xlsx,.xls"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      // Check file size (3MB max)
+                      if (file.size > 3 * 1024 * 1024) {
+                        toast({
+                          title: "File too large",
+                          description: "File must be 3MB or smaller.",
+                          variant: "destructive"
+                        });
+                        e.target.value = ''; // Reset file input
+                        return;
+                      }
+                      
+                      // Check file type
+                      const fileType = file.name.endsWith('.pdf') ? 'pdf' : 'excel';
+                      
+                      // Store the file separately for upload
+                      setAttachmentFile(file);
+                      
+                      // Store metadata in video data
+                      setNewVideo({
+                        ...newVideo,
+                        attachment: {
+                          filename: file.name,
+                          url: '', // Will be set after upload
+                          type: fileType as 'pdf' | 'excel',
+                          size: file.size
+                        }
+                      });
+                    }
+                  }}
+                  className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700"
+                />
+                <p className="text-xs text-gray-400 mt-1">PDF or Excel files only, max 3MB</p>
+              </div>
+            </div>
+            
             <div>
               <Label htmlFor="edit-category" className="text-gray-300">Category</Label>
               <Select value={newVideo.category} onValueChange={(value) => setNewVideo({...newVideo, category: value})}>

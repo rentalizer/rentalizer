@@ -29,6 +29,12 @@ export interface Video {
   videoUrl: string;
   order: number;
   isActive: boolean;
+  attachment?: {
+    filename: string;
+    url: string;
+    type: 'pdf' | 'excel';
+    size: number;
+  };
   createdBy: {
     _id: string;
     firstName: string;
@@ -55,6 +61,12 @@ export interface CreateVideoData {
   tags?: string[];
   featured?: boolean;
   isLive?: boolean;
+  attachment?: {
+    filename: string;
+    url: string;
+    type: 'pdf' | 'excel';
+    size: number;
+  };
 }
 
 export interface UpdateVideoData extends Partial<CreateVideoData> {
@@ -69,4 +81,22 @@ export interface VideoFilters {
   featured?: boolean;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+}
+
+export interface Document {
+  _id: string;
+  filename: string;
+  url: string;
+  type: 'pdf' | 'excel';
+  size: number;
+  category: string;
+  videoId?: string; // Optional reference to the video it came from
+  createdBy: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  createdAt: string;
+  updatedAt: string;
 }

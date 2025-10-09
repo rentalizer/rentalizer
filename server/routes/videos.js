@@ -2,6 +2,7 @@ const express = require('express');
 const videoController = require('../controllers/videoController');
 const { authenticateToken } = require('../middleware/auth');
 const { requireAdmin } = require('../middleware/admin');
+const { uploadDocument } = require('../middleware/upload');
 const { 
   validateVideo, 
   validateVideoUpdate, 
@@ -39,7 +40,7 @@ router.use(authenticateToken);
 
 // Admin-only routes
 // POST /api/videos - Create new video (Admin only)
-router.post('/', requireAdmin, validateVideo, videoController.createVideo);
+router.post('/', requireAdmin, uploadDocument, validateVideo, videoController.createVideo);
 
 // PUT /api/videos/:id - Update video (Admin only)
 router.put('/:id', requireAdmin, validateVideoUpdate, videoController.updateVideo);

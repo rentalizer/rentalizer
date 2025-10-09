@@ -77,6 +77,16 @@ class VideoController {
       const createdBy = req.user._id;
       const videoData = req.body;
 
+      // Handle file upload for attachment if present
+      if (req.file) {
+        videoData.attachment = {
+          filename: req.file.originalname,
+          url: `/uploads/${req.file.filename}`,
+          type: req.file.mimetype.includes('pdf') ? 'pdf' : 'excel',
+          size: req.file.size
+        };
+      }
+
       const video = await videoService.createVideo(videoData, createdBy);
 
       res.status(201).json({

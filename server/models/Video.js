@@ -65,6 +65,29 @@ const videoSchema = new mongoose.Schema({
       message: 'Video URL must be a valid Loom share URL'
     }
   },
+  attachment: {
+    filename: {
+      type: String,
+      trim: true,
+      maxlength: [255, 'Filename cannot exceed 255 characters']
+    },
+    url: {
+      type: String,
+      trim: true
+    },
+    type: {
+      type: String,
+      enum: {
+        values: ['pdf', 'excel'],
+        message: 'Attachment type must be either pdf or excel'
+      }
+    },
+    size: {
+      type: Number,
+      min: [0, 'File size cannot be negative'],
+      max: [3 * 1024 * 1024, 'File size cannot exceed 3MB']
+    }
+  },
   order: {
     type: Number,
     default: 0,
