@@ -53,18 +53,21 @@ interface CategoryAlbumCardProps {
 }
 
 const CategoryAlbumCard = ({ category, videoCount, videos, onClick, getCategoryColor }: CategoryAlbumCardProps) => {
-  const getCategoryIcon = (category: string) => {
+  const getCategoryIcon = (category: string, size: 'small' | 'large' = 'small') => {
+    const sizeClass = size === 'large' ? 'h-24 w-24' : 'h-4 w-4';
     switch (category) {
       case 'Business Formation':
-        return <Building2 className="h-6 w-6 text-blue-400" />;
+        return <Building2 className={`${sizeClass} text-blue-300`} />;
       case 'Market Research':
-        return <BarChart3 className="h-6 w-6 text-cyan-400" />;
+        return <BarChart3 className={`${sizeClass} text-cyan-300`} />;
       case 'Property Acquisition':
-        return <Home className="h-6 w-6 text-purple-400" />;
+        return <Home className={`${sizeClass} text-purple-300`} />;
       case 'Operations':
-        return <Settings className="h-6 w-6 text-green-400" />;
+        return <Settings className={`${sizeClass} text-green-300`} />;
+      case 'Documents Library':
+        return <VideoIcon className={`${sizeClass} text-orange-300`} />;
       default:
-        return <VideoIcon className="h-6 w-6 text-gray-400" />;
+        return <VideoIcon className={`${sizeClass} text-gray-300`} />;
     }
   };
 
@@ -78,6 +81,8 @@ const CategoryAlbumCard = ({ category, videoCount, videos, onClick, getCategoryC
         return 'Finding and purchasing rental properties';
       case 'Operations':
         return 'Managing and optimizing your properties';
+      case 'Documents Library':
+        return 'Templates, guides, and reference materials';
       default:
         return 'Training videos and resources';
     }
@@ -98,22 +103,16 @@ const CategoryAlbumCard = ({ category, videoCount, videos, onClick, getCategoryC
 
   return (
     <Card 
-      className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-all cursor-pointer group hover:scale-105"
+      className="bg-slate-700/80 border-cyan-500/40 hover:border-cyan-500/60 transition-all cursor-pointer group hover:scale-105 shadow-lg hover:shadow-xl"
       onClick={() => onClick(category)}
     >
       <div className="relative">
-        {/* Album Cover */}
-        <div className="aspect-video bg-slate-700 rounded-t-lg relative overflow-hidden">
-          <img
-            src={albumCover}
-            alt={`${category} album cover`}
-            className="w-full h-full object-cover"
-          />
-          
-          {/* Play button overlay */}
-          <div className="absolute inset-0 bg-black/30 hover:bg-black/20 transition-colors flex items-center justify-center">
-            <div className="bg-white/20 backdrop-blur-sm rounded-full p-4 group-hover:bg-white/30 transition-colors">
-              <Play className="h-8 w-8 text-white" />
+        {/* Album Cover with Icon */}
+        <div className="aspect-video bg-slate-800/60 rounded-t-lg relative overflow-hidden flex items-center justify-center border border-slate-500/30">
+          {/* Category Icon as Background */}
+          <div className="flex items-center justify-center w-full h-full">
+            <div className="opacity-100">
+              {getCategoryIcon(category, 'large')}
             </div>
           </div>
           
@@ -125,18 +124,18 @@ const CategoryAlbumCard = ({ category, videoCount, videos, onClick, getCategoryC
         </div>
       </div>
 
-      <CardContent className="p-4">
-        <div className="space-y-3">
+      <CardContent className="p-3 bg-slate-800/60">
+        <div className="space-y-2">
           {/* Category Icon and Title */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <div className="flex items-center justify-center">
-              {getCategoryIcon(category)}
+              {getCategoryIcon(category, 'small')}
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-white group-hover:text-cyan-300 transition-colors">
+              <h3 className="font-semibold text-white group-hover:text-cyan-300 transition-colors text-sm">
                 {category}
               </h3>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-gray-400">
                 {getCategoryDescription(category)}
               </p>
             </div>
@@ -313,7 +312,7 @@ export const VideoLibrary = () => {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
-  const [categories, setCategories] = useState<string[]>(['all', 'Business Formation', 'Market Research', 'Property Acquisition', 'Operations']);
+  const [categories, setCategories] = useState<string[]>(['all', 'Business Formation', 'Market Research', 'Property Acquisition', 'Operations', 'Documents Library']);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -452,7 +451,8 @@ export const VideoLibrary = () => {
       'Business Formation': 'bg-blue-500/20 border-blue-500/30 text-blue-300',
       'Market Research': 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300',
       'Property Acquisition': 'bg-purple-500/20 border-purple-500/30 text-purple-300',
-      'Operations': 'bg-green-500/20 border-green-500/30 text-green-300'
+      'Operations': 'bg-green-500/20 border-green-500/30 text-green-300',
+      'Documents Library': 'bg-orange-500/20 border-orange-500/30 text-orange-300'
     };
     return colors[category as keyof typeof colors] || 'bg-gray-500/20 border-gray-500/30 text-gray-300';
   };
@@ -741,9 +741,20 @@ export const VideoLibrary = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h2 className="text-2xl font-bold text-cyan-300">
-            {selectedCategory === 'all' ? 'Training Albums' : 'Training Videos'}
+        <div className="flex-1"></div>
+        <div className="flex flex-col items-center gap-2">
+          <h2 className="text-3xl font-bold text-cyan-300 flex items-center gap-3">
+            {selectedCategory === 'all' ? (
+              <>
+                <VideoIcon className="h-10 w-10 text-cyan-300" />
+                Training Replays & Documents
+              </>
+            ) : (
+              <>
+                <VideoIcon className="h-10 w-10 text-cyan-300" />
+                Training Videos
+              </>
+            )}
           </h2>
           <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
             {loading ? (
@@ -753,13 +764,14 @@ export const VideoLibrary = () => {
               </div>
             ) : (
               selectedCategory === 'all' 
-                ? '4 categories'
+                ? '5 categories'
                 : `${videos.filter(v => v.category === selectedCategory).length} videos`
             )}
           </Badge>
         </div>
         
         {/* Admin Add Button */}
+        <div className="flex-1 flex justify-end">
         {isAdmin && user && (
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
@@ -843,6 +855,7 @@ export const VideoLibrary = () => {
             </DialogContent>
           </Dialog>
         )}
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -889,7 +902,7 @@ export const VideoLibrary = () => {
         <>
           {(() => {
             // Define the category columns - these should ALWAYS show regardless of video count
-            const categoryColumns = ['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'];
+            const categoryColumns = ['Business Formation', 'Market Research', 'Property Acquisition', 'Operations', 'Documents Library'];
             
             // Group videos by category - initialize all categories with empty arrays
             const videosByCategory = categoryColumns.reduce((acc, category) => {
@@ -989,7 +1002,7 @@ export const VideoLibrary = () => {
                     </CardContent>
                   </Card>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                     {categoryColumns.map(category => {
                       const categoryVideos = videosByCategory[category] || [];
                       
