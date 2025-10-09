@@ -38,6 +38,7 @@ interface MessageThreadProps {
   isOnline: boolean;
   recipientId?: string;
   onMarkAsRead?: () => void;
+  isAdmin?: boolean;
 }
 
 export default function MessageThread({
@@ -50,7 +51,8 @@ export default function MessageThread({
   recipientAvatar,
   isOnline,
   recipientId,
-  onMarkAsRead
+  onMarkAsRead,
+  isAdmin
 }: MessageThreadProps) {
   const [newMessage, setNewMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -136,43 +138,58 @@ export default function MessageThread({
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-slate-700">
         <div className="relative">
-          {/* Group Avatar - 2 overlapping avatars */}
-          <div className="relative flex items-center">
-            {/* First avatar */}
-            <div className="relative z-20">
-              <Avatar className="h-8 w-8 border-2 border-slate-800">
+          {!isAdmin ? (
+            // Show group avatars for admins
+            <div className="relative flex items-center">
+              <div className="relative z-20">
+                <Avatar className="h-8 w-8 border-2 border-slate-800">
+                  <AvatarImage 
+                    src="/admin/adminRetalizer.jpg" 
+                    alt="Admin 1"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                  <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold text-xs">
+                    A1
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+              <div className="relative -ml-3 z-10">
+                <Avatar className="h-8 w-8 border-2 border-slate-800">
+                  <AvatarImage 
+                    src="/admin/adminRentalizer2.jpg" 
+                    alt="Admin 2"
+                    onError={(e) => {
+                      const target = e.currentTarget as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                  <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-xs">
+                    A2
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+            </div>
+          ) : (
+            // Show recipient avatar for non-admins; never show the logged-in user's own profile picture here
+            <Avatar className="h-8 w-8 border-2 border-slate-800">
+              {recipientAvatar ? (
                 <AvatarImage 
-                  src="/admin/adminRetalizer.jpg" 
-                  alt="Admin 1"
+                  src={recipientAvatar}
+                  alt={recipientName}
                   onError={(e) => {
                     const target = e.currentTarget as HTMLImageElement;
                     target.style.display = 'none';
                   }}
                 />
-                <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold text-xs">
-                  A1
-                </AvatarFallback>
-              </Avatar>
-            </div>
-
-            {/* Second avatar (slightly overlapping) */}
-            <div className="relative -ml-3 z-10">
-              <Avatar className="h-8 w-8 border-2 border-slate-800">
-                <AvatarImage 
-                  src="/admin/adminRentalizer2.jpg" 
-                  alt="Admin 2"
-                  onError={(e) => {
-                    const target = e.currentTarget as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
-                />
-                <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-xs">
-                  A2
-                </AvatarFallback>
-              </Avatar>
-            </div>
-          </div>
-          
+              ) : null}
+              <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold text-xs">
+                {recipientName?.[0]?.toUpperCase() || 'U'}
+              </AvatarFallback>
+            </Avatar>
+          )}
           {isOnline && (
             <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border border-slate-800 rounded-full" />
           )}

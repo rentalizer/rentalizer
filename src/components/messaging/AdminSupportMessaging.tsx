@@ -531,6 +531,7 @@ export default function AdminSupportMessaging() {
               isOnline={selectedMemberId ? onlineUsers.has(selectedMemberId) || (selectedMember?.participant as { isOnline?: boolean })?.isOnline || false : false}
               recipientId={selectedMemberId}
               onMarkAsRead={handleMarkAsRead}
+            isAdmin={false}
             />
           </div>
         )}
@@ -581,6 +582,7 @@ export default function AdminSupportMessaging() {
             isOnline={onlineUsers.has(selectedMember.participant_id) || (selectedMember.participant as { isOnline?: boolean }).isOnline || false}
             recipientId={selectedMemberId}
             onMarkAsRead={handleMarkAsRead}
+            isAdmin={true}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center bg-slate-800/90">

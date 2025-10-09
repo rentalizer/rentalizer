@@ -24,9 +24,9 @@ export const TopNavBar = () => {
     }
   };
 
-  const navigationItems: any[] = [
-    { name: 'Programs', path: '/sales' }
-  ];
+  // const navigationItems: any[] = [
+  //   { name: 'Programs', path: '/sales' }
+  // ];
 
   const isActiveTab = (path: string) => {
     return location.pathname === path;
@@ -46,7 +46,7 @@ export const TopNavBar = () => {
           </div>
 
           {/* Center - Navigation (only show for logged-in users) */}
-          {user && (
+          {/* {user && (
             <div className="hidden md:flex items-center space-x-8">
               {navigationItems.map((item) => {
                 const isActive = isActiveTab(item.path);
@@ -71,7 +71,7 @@ export const TopNavBar = () => {
                 );
               })}
             </div>
-          )}
+          )} */}
 
           {/* Right side - Menu and User */}
           <div className="flex items-center space-x-4">
