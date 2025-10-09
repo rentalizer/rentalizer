@@ -55,10 +55,13 @@ export default function MessageThread({
   const [newMessage, setNewMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
   };
 
   const formatLastMessageTime = (timestamp: string) => {
@@ -183,7 +186,7 @@ export default function MessageThread({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 p-4 overflow-y-auto">
+      <div ref={messagesContainerRef} className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-3">
           {messages.map((message) => {
             const isOwn = message.sender_id === currentUserId;

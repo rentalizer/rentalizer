@@ -34,6 +34,7 @@ import { ProfileEditor } from '@/components/ProfileEditor';
 
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { useAdminSupportNotifications } from '@/hooks/useAdminSupportNotifications';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -86,6 +87,7 @@ const Community = React.memo(() => {
   const [showPricingOverlay, setShowPricingOverlay] = useState(false);
   const { isAdmin } = useAdminRole();
   const { unreadCount } = useUnreadMessages();
+  const { adminSupportUnreadCount, hasNotification, clearNotification } = useAdminSupportNotifications();
   const { user } = useAuth();
   const navigate = useNavigate();
   
@@ -258,7 +260,13 @@ const Community = React.memo(() => {
         )}
 
         {/* Navigation Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={(value) => {
+          setActiveTab(value);
+          // Clear notification when user switches to Admin Support tab
+          if (value === 'admin-support' && hasNotification) {
+            clearNotification();
+          }
+        }} className="w-full">
           <TabsList className="flex w-full bg-slate-800/50 border border-cyan-500/20 justify-evenly h-14 p-2">
             <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Users className="h-5 w-5 mr-2" />
@@ -276,9 +284,18 @@ const Community = React.memo(() => {
               <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
               Calculator
             </TabsTrigger>
-            <TabsTrigger value="admin-support" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+            <TabsTrigger 
+              value="admin-support" 
+              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 relative"
+            >
               <MessageSquare className="h-5 w-5 mr-2" />
               Admin Support
+              {/* Notification bubble */}
+              {hasNotification && (
+                <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold animate-pulse">
+                  {adminSupportUnreadCount > 9 ? '9+' : adminSupportUnreadCount}
+                </div>
+              )}
             </TabsTrigger>
             {/* <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
