@@ -39,6 +39,8 @@ interface MessageThreadProps {
   recipientId?: string;
   onMarkAsRead?: () => void;
   isAdmin?: boolean;
+  adminUserId?: string;
+  memberAvatarUrl?: string;
 }
 
 export default function MessageThread({
@@ -52,7 +54,9 @@ export default function MessageThread({
   isOnline,
   recipientId,
   onMarkAsRead,
-  isAdmin
+  isAdmin,
+  adminUserId,
+  memberAvatarUrl
 }: MessageThreadProps) {
   const [newMessage, setNewMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -221,28 +225,85 @@ export default function MessageThread({
             return (
               <div
                 key={message._id}
-                className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                className={`flex justify-start`}
               >
-                <div className={`max-w-[80%] ${isOwn ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}>
-                  <div
-                    className={`p-3 rounded-lg ${
-                      isOwn
-                        ? 'bg-cyan-600 text-white'
-                        : 'bg-slate-700 text-white'
-                    }`}
-                  >
-                    <p className="text-sm">{message.message}</p>
+                <div className="flex items-start gap-2 max-w-[85%]">
+                  {/* Per-message avatar on the left */}
+                  <div className="flex-shrink-0 mt-0.5">
+                    {adminUserId && message.sender_id === adminUserId ? (
+                      <div className="relative flex items-center">
+                        <div className="relative z-20">
+                          <Avatar className="h-7 w-7 border-2 border-slate-800">
+                            <AvatarImage 
+                              src="/admin/adminRetalizer.jpg"
+                              alt="Admin 1"
+                              onError={(e) => {
+                                const target = e.currentTarget as HTMLImageElement;
+                                target.style.display = 'none';
+                              }}
+                            />
+                            <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-[10px] font-bold">
+                              A1
+                            </AvatarFallback>
+                          </Avatar>
+                        </div>
+                        <div className="relative -ml-3 z-10">
+                          <Avatar className="h-7 w-7 border-2 border-slate-800">
+                            <AvatarImage 
+                              src="/admin/adminRentalizer2.jpg"
+                              alt="Admin 2"
+                              onError={(e) => {
+                                const target = e.currentTarget as HTMLImageElement;
+                                target.style.display = 'none';
+                              }}
+                            />
+                            <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold">
+                              A2
+                            </AvatarFallback>
+                          </Avatar>
+                        </div>
+                      </div>
+                    ) : (
+                      <Avatar className="h-7 w-7 border-2 border-slate-800">
+                        {memberAvatarUrl ? (
+                          <AvatarImage 
+                            src={memberAvatarUrl}
+                            alt="User"
+                            onError={(e) => {
+                              const target = e.currentTarget as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                        ) : null}
+                        <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-[10px] font-bold">
+                          {message.sender_name?.[0]?.toUpperCase() || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
                   </div>
+
+                  <div className={`flex-1 max-w-full flex flex-col items-start`}>
+                    <div
+                      className={`p-3 rounded-lg bg-slate-700 text-white ${
+                        adminUserId && message.sender_id === adminUserId 
+                          ? '' 
+                          : 'ml-3'
+                      }`}
+                    >
+                      <p className="text-sm">{message.message}</p>
+                    </div>
                   
                   {/* Message metadata */}
-                  <div className={`flex items-center gap-1 mt-1 text-xs text-slate-400 ${
-                    isOwn ? 'flex-row-reverse' : 'flex-row'
+                  <div className={`flex items-center gap-1 mt-1 text-xs text-slate-400 flex-row ${
+                    adminUserId && message.sender_id === adminUserId 
+                      ? '' 
+                      : 'ml-3'
                   }`}>
                     <span title={formatDateWithTimezone(message.created_at || message.createdAt || '')}>
                       {formatLastMessageTime(message.created_at || message.createdAt || '')}
                     </span>
                     
-                    {/* Read status for own messages */}
+                    {/* Read status for own messages (kept but alignment unified) */}
                     {isOwn && (
                       <div className="flex items-center">
                         {isRead ? (
@@ -269,6 +330,7 @@ export default function MessageThread({
                         message.priority === 'urgent' ? 'bg-red-500' : 'bg-orange-500'
                       }`} />
                     ) : null}
+                  </div>
                   </div>
                 </div>
               </div>

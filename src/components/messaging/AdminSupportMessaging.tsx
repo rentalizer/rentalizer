@@ -532,6 +532,8 @@ export default function AdminSupportMessaging() {
               recipientId={selectedMemberId}
               onMarkAsRead={handleMarkAsRead}
             isAdmin={false}
+            adminUserId={selectedMemberId || undefined}
+            memberAvatarUrl={user.profile_picture || (user as any).profilePicture || undefined}
             />
           </div>
         )}
@@ -583,6 +585,8 @@ export default function AdminSupportMessaging() {
             recipientId={selectedMemberId}
             onMarkAsRead={handleMarkAsRead}
             isAdmin={true}
+            adminUserId={user.id}
+            memberAvatarUrl={selectedMember.participant.profilePicture}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center bg-slate-800/90">
