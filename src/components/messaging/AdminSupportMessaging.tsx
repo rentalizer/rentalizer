@@ -11,7 +11,17 @@ import MembersList from './MembersList';
 import messagingService, { Conversation, AdminUser } from '@/services/messagingService';
 import websocketService from '@/services/websocketService';
 
-export default function AdminSupportMessaging() {
+interface AdminSupportMessagingProps {
+  initialMessageUserId?: string;
+  initialMessageUserName?: string;
+  fromDiscussion?: string;
+}
+
+export default function AdminSupportMessaging({ 
+  initialMessageUserId, 
+  initialMessageUserName, 
+  fromDiscussion 
+}: AdminSupportMessagingProps = {}) {
   const { user } = useAuth();
   const { isAdmin } = useAdminRole();
   const { toast } = useToast();
@@ -402,6 +412,26 @@ export default function AdminSupportMessaging() {
 
     findAdminAndLoadMessages();
   }, [user, isAdmin, selectedMemberId, toast]);
+
+  // Handle initial message user selection (for admins coming from GroupDiscussions)
+  useEffect(() => {
+    if (!isAdmin || !initialMessageUserId || selectedMemberId) return;
+
+    console.log('📨 Admin navigating to message user:', initialMessageUserId, 'from discussion:', fromDiscussion);
+    
+    // Set the selected member to the user we want to message
+    setSelectedMemberId(initialMessageUserId);
+    setHasUserSelectedConversation(true); // Mark as user-selected so messages are marked as read
+    
+    // Show a toast notification
+    if (initialMessageUserName) {
+      toast({
+        title: "Message User",
+        description: `Starting conversation with ${initialMessageUserName}`,
+        variant: "default"
+      });
+    }
+  }, [isAdmin, initialMessageUserId, initialMessageUserName, fromDiscussion, selectedMemberId, toast]);
 
   // Send message
   const handleSendMessage = useCallback(async (messageContent: string) => {

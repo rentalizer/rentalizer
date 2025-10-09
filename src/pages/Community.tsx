@@ -35,7 +35,7 @@ import { ProfileEditor } from '@/components/ProfileEditor';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { useAdminSupportNotifications } from '@/hooks/useAdminSupportNotifications';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 export interface CalculatorData {
@@ -76,8 +76,21 @@ const Community = React.memo(() => {
     const hash = window.location.hash.substring(1);
     return hash || 'discussions';
   };
+
+  const location = useLocation();
   
-  const [activeTab, setActiveTab] = useState(getInitialTab());
+  const [activeTab, setActiveTab] = useState(() => {
+    // Check for URL parameters from GroupDiscussions (both search and hash)
+    const urlParams = new URLSearchParams(location.search);
+    const hashParams = new URLSearchParams(location.hash.split('?')[1] || '');
+    const messageUserId = urlParams.get('messageUserId') || hashParams.get('messageUserId');
+    
+    // If navigating from GroupDiscussions to message a user, start on admin-support tab
+    if (messageUserId) {
+      return 'admin-support';
+    }
+    return getInitialTab();
+  });
   const [isChatOpen, setChatOpen] = useState(false);
   const [membersDialogOpen, setMembersDialogOpen] = useState(false);
   const [calculatorOpen, setCalculatorOpen] = useState(false);
@@ -91,11 +104,20 @@ const Community = React.memo(() => {
   const { user } = useAuth();
   const navigate = useNavigate();
   
+  // Check for URL parameters from GroupDiscussions (both search and hash)
+  const urlParams = new URLSearchParams(location.search);
+  const hashParams = new URLSearchParams(location.hash.split('?')[1] || '');
+  const navigationState = {
+    messageUserId: urlParams.get('messageUserId') || hashParams.get('messageUserId'),
+    messageUserName: urlParams.get('messageUserName') || hashParams.get('messageUserName'),
+    fromDiscussion: urlParams.get('fromDiscussion') || hashParams.get('fromDiscussion')
+  };
+  
   // Check if we're in Lovable environment
   const isLovableEnv = window.location.hostname.includes('lovableproject.com') || 
                        window.location.search.includes('__lovable_token') ||
                        window.location.hostname === 'localhost';
-  
+
   // Check admin status based on user role - optimized to run only once
   const userIsAdmin = useMemo(() => {
     if (!user) return false;
@@ -115,6 +137,19 @@ const Community = React.memo(() => {
 
     return () => clearTimeout(timeoutId);
   }, [activeTab]);
+
+  // Clear URL parameters after initial navigation to prevent re-redirects
+  useEffect(() => {
+    if (navigationState.messageUserId) {
+      // Clear the URL parameters after a short delay to allow the component to initialize
+      const timeoutId = setTimeout(() => {
+        const cleanUrl = window.location.pathname + window.location.hash;
+        window.history.replaceState({}, '', cleanUrl);
+      }, 1000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [navigationState.messageUserId]);
   
   // Calculator state
   const initialData: CalculatorData = {
@@ -564,7 +599,11 @@ const Community = React.memo(() => {
                 <p className="text-gray-400">Get help from our admin team</p>
               </div>
               
-              <AdminSupportMessaging />
+              <AdminSupportMessaging 
+                initialMessageUserId={navigationState?.messageUserId}
+                initialMessageUserName={navigationState?.messageUserName}
+                fromDiscussion={navigationState?.fromDiscussion}
+              />
             </div>
           </TabsContent>
 

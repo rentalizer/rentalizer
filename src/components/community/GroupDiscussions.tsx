@@ -28,6 +28,7 @@ import { CommentsDialog } from '@/components/community/CommentsDialog';
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 import { useProfile } from '@/hooks/useProfile';
 import { formatDateWithTimezone, getTimezoneNotice } from '@/utils/timezone';
+import { useNavigate } from 'react-router-dom';
 
 // Frontend Discussion interface (transformed from backend)
 export interface DiscussionType {
@@ -77,6 +78,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const { user, profile } = useAuth();
   const { profile: supabaseProfile } = useProfile();
   const { isAdmin } = useAdminRole();
+  const navigate = useNavigate();
   
   const [discussionsList, setDiscussionsList] = useState<DiscussionType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1000,6 +1002,35 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     fetchDiscussions(1, false);
   }, [fetchDiscussions]);
 
+  // Handle admin clicking on user name to message them
+  const handleMessageUser = useCallback((discussion: DiscussionType) => {
+    if (!isAdmin) return;
+    
+    const discussionUserId = getUserId(discussion.user_id);
+    if (!discussionUserId) {
+      console.log("Error: Cannot message user - user ID not found");
+      return;
+    }
+    
+    // Don't allow messaging yourself
+    if (user && discussionUserId === user.id) {
+      console.log("Info: Cannot message yourself");
+      return;
+    }
+    
+    console.log('📨 Admin messaging user:', discussionUserId, 'from discussion:', discussion.id);
+    
+    // Use URL parameters and reload the page to ensure state is preserved
+    const params = new URLSearchParams({
+      messageUserId: discussionUserId,
+      messageUserName: discussion.author,
+      fromDiscussion: discussion.id
+    });
+    
+    // Navigate with URL parameters and reload (parameters before hash)
+    window.location.href = `/community?${params.toString()}#admin-support`;
+  }, [isAdmin, getUserId, user]);
+
   // Debug render
   console.log('🎨 RENDERING GroupDiscussions with', filteredDiscussions.length, 'discussions');
 
@@ -1086,7 +1117,17 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             {discussion.isPinned && <Pin className="h-4 w-4 text-yellow-400" />}
-                            <span className="text-cyan-300 font-medium">{profileInfo.display_name}</span>
+                            {isAdmin && getUserId(discussion.user_id) !== user?.id ? (
+                              <button
+                                onClick={() => handleMessageUser(discussion)}
+                                className="text-cyan-300 font-medium hover:text-cyan-200 hover:underline transition-colors cursor-pointer"
+                                title={`Message ${profileInfo.display_name}`}
+                              >
+                                {profileInfo.display_name}
+                              </button>
+                            ) : (
+                              <span className="text-cyan-300 font-medium">{profileInfo.display_name}</span>
+                            )}
                             {discussion.isAdmin && (
                               <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
                                 Admin
