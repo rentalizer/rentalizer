@@ -1,9 +1,4 @@
-// Extend Window interface for Calendly
-declare global {
-  interface Window {
-    Calendly: any;
-  }
-}
+// Calendly widget is loaded via external script; we access it dynamically at runtime
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -97,10 +92,10 @@ const LandingPage = () => {
 
   const handleBookDemo = () => {
     console.log('Book Demo button clicked - opening Calendly popup');
-    // @ts-ignore
-    if (window.Calendly) {
-      // @ts-ignore
-      window.Calendly.initPopupWidget({
+    type CalendlyApi = { initPopupWidget?: (options: { url: string }) => void } | undefined;
+    const calendly = (window as unknown as { Calendly?: CalendlyApi }).Calendly;
+    if (calendly?.initPopupWidget) {
+      calendly.initPopupWidget({
         url: 'https://calendly.com/richies-schedule/scale'
       });
     }
@@ -145,6 +140,14 @@ const LandingPage = () => {
             <nav className="flex items-center gap-4">
               {user ? (
                 <div className="flex items-center gap-3">
+                  <Button
+                    onClick={() => navigate('/sales')}
+                    variant="outline"
+                    size="sm"
+                    className="border-cyan-400/60 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 bg-slate-800/40 animate-pulse shadow-[0_0_16px_rgba(34,211,238,0.35)]"
+                  >
+                    Programs
+                  </Button>
                   <span className="text-cyan-300 text-sm">
                     {user.email}
                   </span>
@@ -160,6 +163,14 @@ const LandingPage = () => {
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
+                  <Button
+                    onClick={() => navigate('/sales')}
+                    variant="outline"
+                    size="lg"
+                    className="border-cyan-400/60 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 px-5 bg-slate-800/40 animate-pulse shadow-[0_0_18px_rgba(34,211,238,0.35)]"
+                  >
+                    Programs
+                  </Button>
                   <Button
                     onClick={() => navigate('/auth/signup')}
                     variant="default"
@@ -191,9 +202,9 @@ const LandingPage = () => {
       </div>
 
       <div className="relative z-10">
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto px-4 py-12">
           {/* Main Content */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-4 mb-6">
               <BarChart3 className="h-16 w-16 text-cyan-400 neon-text" />
               <div className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -212,13 +223,40 @@ const LandingPage = () => {
             </div>
 
             {/* New Description */}
-            <div className="mb-12 px-4">
+            {/* <div className="mb-12 px-4">
               <div className="text-lg text-gray-300 max-w-4xl mx-auto leading-relaxed">
                 Rentalizer is an AI-powered training platform built to help you launch and grow your rental arbitrage business.
               </div>
+            </div> */}
+
+            {/* Programs Callout Card */}
+            <div className="max-w-xl mx-auto px-4 mb-8">
+              <div
+                onClick={() => navigate('/sales')}
+                className="group relative cursor-pointer"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/40 hover:border-cyan-400/70 transition-all duration-500 group-hover:scale-[1.005]">
+                  <CardContent className="p-4 sm:p-5 flex items-center justify-between gap-3">
+                    <div className="flex-1 text-left">
+                      <div className="text-base sm:text-lg font-bold text-cyan-300 mb-0.5">Programs</div>
+                      <p className="text-gray-300 text-xs sm:text-sm">
+                        Explore Accelerator and Accelerator Pro to fast-track your rental income journey.
+                      </p>
+                    </div>
+                    <div className="hidden sm:flex items-center">
+                      <Button
+                        onClick={(e) => { e.stopPropagation(); navigate('/sales'); }}
+                        size="sm"
+                        className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white shadow-[0_0_12px_rgba(34,211,238,0.3)]"
+                      >
+                        View Programs
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-
-
           </div>
 
           {/* Animated Features Section */}

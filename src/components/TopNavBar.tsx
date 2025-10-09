@@ -24,7 +24,9 @@ export const TopNavBar = () => {
     }
   };
 
-  const navigationItems: any[] = [];
+  const navigationItems: any[] = [
+    { name: 'Programs', path: '/sales' }
+  ];
 
   const isActiveTab = (path: string) => {
     return location.pathname === path;
@@ -102,14 +104,24 @@ export const TopNavBar = () => {
             )}
             
             {!user && (
-              <Button
-                onClick={() => navigate('/auth')}
-                variant="outline"
-                size="sm"
-                className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium"
-              >
-                Login
-              </Button>
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={() => navigate('/sales')}
+                  variant="ghost"
+                  size="sm"
+                  className="text-cyan-300 hover:text-cyan-200"
+                >
+                  Programs
+                </Button>
+                <Button
+                  onClick={() => navigate('/auth')}
+                  variant="outline"
+                  size="sm"
+                  className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 font-medium"
+                >
+                  Login
+                </Button>
+              </div>
             )}
           </div>
         </div>
