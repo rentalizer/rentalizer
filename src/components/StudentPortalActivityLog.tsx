@@ -443,6 +443,7 @@ export const StudentPortalActivityLog = () => {
   const [isActivityDialogOpen, setIsActivityDialogOpen] = useState(false);
   const [studentSubmitting, setStudentSubmitting] = useState(false);
   const [activitySubmitting, setActivitySubmitting] = useState(false);
+  const [activityStudentId, setActivityStudentId] = useState<string>('');
   const [studentForm, setStudentForm] = useState({
     name: '',
     email: '',
@@ -530,6 +531,11 @@ export const StudentPortalActivityLog = () => {
   }, []);
 
   const filterTabs = ['All Activity', 'Module', 'Assignment', 'Quiz', 'Achievement', 'Video', 'Document'];
+
+  const backendStudents = useMemo(
+    () => students.filter((student) => student.source === 'backend'),
+    [students]
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -643,6 +649,19 @@ export const StudentPortalActivityLog = () => {
     fetchActivitiesForStudent(student);
   }, [selectedStudentId, students, fetchActivitiesForStudent]);
 
+  useEffect(() => {
+    if (!backendStudents.length) {
+      if (activityStudentId) {
+        setActivityStudentId('');
+      }
+      return;
+    }
+
+    if (!activityStudentId || !backendStudents.some((student) => student.id === activityStudentId)) {
+      setActivityStudentId(backendStudents[0].id);
+    }
+  }, [backendStudents, activityStudentId]);
+
   const handleOpenStudentDialog = () => {
     const today = new Date().toISOString().split('T')[0];
     resetStudentForm();
@@ -666,8 +685,20 @@ export const StudentPortalActivityLog = () => {
   };
 
   const handleOpenActivityDialog = () => {
+    if (!backendStudents.length) {
+      toast({
+        variant: 'destructive',
+        title: 'No synced students available',
+        description: 'Create or sync a student profile before logging activity.'
+      });
+      return;
+    }
     const today = new Date().toISOString().split('T')[0];
     resetActivityForm();
+    const defaultStudentId = selectedStudent?.source === 'backend'
+      ? selectedStudent.id
+      : backendStudents[0]?.id ?? '';
+    setActivityStudentId(defaultStudentId);
     setActivityForm((prev) => ({
       ...prev,
       date: today
@@ -679,6 +710,7 @@ export const StudentPortalActivityLog = () => {
     setIsActivityDialogOpen(open);
     if (!open) {
       resetActivityForm();
+      setActivityStudentId('');
     }
   };
 
@@ -726,6 +758,7 @@ export const StudentPortalActivityLog = () => {
       setStudents((prev) => sortStudents([...prev.filter((s) => s.id !== mapped.id), mapped]));
       setActivitiesByStudent((prev) => ({ ...prev, [mapped.id]: [] }));
       setSelectedStudentId(mapped.id);
+      setActivityStudentId(mapped.id);
       setDataSourceMessage('Live student log synced from the server.');
       toast({ title: 'Student added', description: `${mapped.name} is now in the student log.` });
       setIsStudentDialogOpen(false);
@@ -741,13 +774,14 @@ export const StudentPortalActivityLog = () => {
 
   const handleSubmitActivity: React.FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
-    const current = students.find((s) => s.id === selectedStudentId);
 
-    if (!current || current.source !== 'backend') {
+    const linkedStudent = backendStudents.find((student) => student.id === activityStudentId);
+
+    if (!linkedStudent) {
       toast({
         variant: 'destructive',
         title: 'Select a synced student first',
-        description: 'Create or select a student that exists on the server before adding activity.'
+        description: 'Choose a student that exists on the server before adding activity.'
       });
       return;
     }
@@ -782,7 +816,7 @@ export const StudentPortalActivityLog = () => {
         metadata: activityForm.metadataNotes.trim() ? { notes: activityForm.metadataNotes.trim() } : undefined
       };
 
-      const response = await apiService.createStudentLogActivity(current.id, payload);
+      const response = await apiService.createStudentLogActivity(linkedStudent.id, payload);
 
       if (!response.success) {
         throw new Error(response.message || 'Failed to create activity');
@@ -790,12 +824,16 @@ export const StudentPortalActivityLog = () => {
 
       const created = mapActivityToEntry(response.data);
       setActivitiesByStudent((prev) => {
-        const existing = prev[current.id] || [];
+        const existing = prev[linkedStudent.id] || [];
         const updated = [created, ...existing].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        return { ...prev, [current.id]: updated };
+        return { ...prev, [linkedStudent.id]: updated };
       });
 
-      toast({ title: 'Activity added', description: `${created.title} was added to ${current.name}.` });
+      if (linkedStudent.id !== selectedStudentId) {
+        setSelectedStudentId(linkedStudent.id);
+      }
+
+      toast({ title: 'Activity added', description: `${created.title} was added to ${linkedStudent.name}.` });
       setIsActivityDialogOpen(false);
       resetActivityForm();
     } catch (error) {
@@ -836,10 +874,10 @@ export const StudentPortalActivityLog = () => {
     : getMockStartDate(currentLegacyId);
 
   const courseProgress = selectedStudent?.progress ?? 0;
-  const canAddActivity = !!selectedStudent && selectedStudent.source === 'backend';
+  const canAddActivity = backendStudents.length > 0;
   const activityButtonTitle = canAddActivity
-    ? 'Add a new learning log entry for this student'
-    : 'Create or select a synced student before adding activity logs.';
+    ? 'Add a new learning log entry for a synced student'
+    : 'Create or sync a student in the list before adding activity logs.';
 
   return (
     <>
@@ -1215,10 +1253,34 @@ export const StudentPortalActivityLog = () => {
           <form onSubmit={handleSubmitActivity} className="space-y-3 px-6 pb-6">
           <div className="grid max-h-[60vh] gap-3 overflow-y-auto pr-2 sm:grid-cols-2">
             <div className="sm:col-span-2 space-y-2">
-              <Label className="text-gray-200">Student</Label>
-              <div className="rounded-md border border-gray-700 bg-slate-800 px-3 py-2 text-sm text-gray-200">
-                {selectedStudent?.name || 'No student selected'}
-              </div>
+              <Label htmlFor="activity-student" className="text-gray-200">Student</Label>
+              <Select
+                value={activityStudentId}
+                onValueChange={setActivityStudentId}
+                disabled={!backendStudents.length}
+              >
+                <SelectTrigger
+                  id="activity-student"
+                  className="h-9 bg-slate-800 border-gray-700 text-white"
+                >
+                  <SelectValue placeholder="Select a synced student" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-gray-700 text-white">
+                  {backendStudents.map((student) => (
+                    <SelectItem key={student.id} value={student.id}>
+                      <div className="flex flex-col">
+                        <span>{student.name}</span>
+                        <span className="text-xs text-gray-400">{student.email}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {!backendStudents.length && (
+                <p className="text-xs text-amber-300">
+                  Create a synced student profile before logging activity.
+                </p>
+              )}
             </div>
             <div>
               <Label htmlFor="activity-type" className="text-gray-200">Type</Label>
