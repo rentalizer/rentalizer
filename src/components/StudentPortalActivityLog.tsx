@@ -145,6 +145,48 @@ const mockActivityData: ActivityEntry[] = [
     serverID: 'srv-us-east-1-prod-802'
   },
 
+  // Student Learning Activities - Santosh Roka
+  {
+    id: 'sr1',
+    type: 'achievement',
+    title: 'Welcome to Rentalizer Academy',
+    description: 'Successfully enrolled in Accelerator Pro Program',
+    date: '2025-01-15',
+    material: 'Welcome Package.pdf',
+    materialType: 'pdf',
+    completed: true,
+    duration: '15 min',
+    serverID: 'srv-us-west-1-prod-810'
+  },
+  {
+    id: 'sr2',
+    type: 'video',
+    title: 'Foundation Business Formation',
+    description: 'Watched complete business setup training',
+    date: '2025-01-16',
+    material: 'Business Formation Basics',
+    materialType: 'video',
+    completed: true,
+    duration: '45:30',
+    serverID: 'srv-content-delivery-005',
+    category: 'Business Formation',
+    views: 1
+  },
+  {
+    id: 'sr3',
+    type: 'video',
+    title: 'Market Research Fundamentals',
+    description: 'Completed market research methodology training',
+    date: '2025-01-18',
+    material: 'Market Research Fundamentals',
+    materialType: 'video',
+    completed: true,
+    duration: '33:18',
+    serverID: 'srv-content-delivery-006',
+    category: 'Market Research',
+    views: 2
+  },
+
   // Student Learning Activities - Vinod Kumar
   {
     id: 'vk1',
@@ -325,6 +367,7 @@ const mockStudents = [
   { id: '8', name: 'Sanyo Mathew', email: 'sanyo.6677@gmail.com', progress: 100 },
   { id: '9', name: 'Vinod Kumar', email: 'vinodkhatri@hotmail.com', progress: 100 },
   { id: '10', name: 'Mary Fofanah', email: 'maryfofanah18@gmail.com', progress: 100 },
+  { id: '11', name: 'Santosh Roka', email: 'santosh.roka@email.com', progress: 100 },
 ];
 
 export const StudentPortalActivityLog = () => {
@@ -340,7 +383,8 @@ export const StudentPortalActivityLog = () => {
     // Filter by student - show specific activities for each student
     if (selectedStudent === '2' && !activity.id.startsWith('tm')) return false; // Takeisha Moore - Accelerator
     if (selectedStudent === '9' && !activity.id.startsWith('vk')) return false; // Vinod Kumar
-    if (!['2', '9'].includes(selectedStudent) && (activity.id.startsWith('tm') || activity.id.startsWith('vk'))) return false;
+    if (selectedStudent === '11' && !activity.id.startsWith('sr')) return false; // Santosh Roka
+    if (!['2', '9', '11'].includes(selectedStudent) && (activity.id.startsWith('tm') || activity.id.startsWith('vk') || activity.id.startsWith('sr'))) return false;
     
     // Filter by activity type
     if (activeFilter === 'All Activity') return true;
@@ -423,7 +467,7 @@ export const StudentPortalActivityLog = () => {
               </div>
               
               <div className="text-right text-sm">
-                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '2' ? '2025-06-18' : selectedStudent === '9' ? '2025-06-19' : '2024-08-01'}</span></div>
+                <div className="text-gray-400">Started: <span className="text-white">{selectedStudent === '2' ? '2025-06-18' : selectedStudent === '9' ? '2025-06-19' : selectedStudent === '11' ? '2025-01-15' : '2024-08-01'}</span></div>
                 <div className="text-gray-400">Progress: <span className="text-white">{currentStudent.progress}%</span></div>
               </div>
             </div>
