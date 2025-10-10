@@ -1120,7 +1120,7 @@ export const CommunityCalendar = () => {
         </Card>
 
         {/* Event Type Legend */}
-        <Card className="bg-gradient-to-r from-slate-800/60 to-slate-700/60 border-cyan-500/20">
+        {/* <Card className="bg-gradient-to-r from-slate-800/60 to-slate-700/60 border-cyan-500/20">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
@@ -1162,7 +1162,7 @@ export const CommunityCalendar = () => {
               </p>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
         
         {/* Event Details Popup */}
         <Dialog open={isEventDetailsOpen} onOpenChange={setIsEventDetailsOpen}>
