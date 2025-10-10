@@ -57,10 +57,18 @@ async function runPromoCodeFlow() {
     }, authHeaders);
     const promoCode = promoCodeResponse.data.promoCode.code;
     console.log(`✅ Promo code created: ${promoCode}`);
+    if (promoCodeResponse.data.promoCode.singleUse || promoCodeResponse.data.promoCode.maxUsage) {
+      console.log('   Type:', promoCodeResponse.data.promoCode.singleUse ? 'Single-use' : `Limited (${promoCodeResponse.data.promoCode.maxUsage} uses)`);
+    } else {
+      console.log('   Type: Reusable');
+    }
 
     console.log('\n4. Verifying promo code availability...');
     const verifyResponse = await axios.post(`${BASE_URL}/promo-codes/verify`, { code: promoCode });
-    console.log(`✅ Promo code valid. Usage count: ${verifyResponse.data.promoCode.usageCount}`);
+    const remainingUses = verifyResponse.data.promoCode.maxUsage
+      ? verifyResponse.data.promoCode.maxUsage - verifyResponse.data.promoCode.usageCount
+      : 'unlimited';
+    console.log(`✅ Promo code valid. Usage count: ${verifyResponse.data.promoCode.usageCount}. Remaining: ${remainingUses}`);
 
     const userWithoutCode = buildTestUser('missing');
     console.log('\n5. Attempting registration without promo code (should fail)...');

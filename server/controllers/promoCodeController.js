@@ -3,12 +3,14 @@ const promoCodeService = require('../services/promoCodeService');
 class PromoCodeController {
   async create(req, res) {
     try {
-      const { prefix, length, description } = req.body;
+      const { prefix, length, description, maxUsage, singleUse } = req.body;
       const promoCode = await promoCodeService.createPromoCode({
         createdBy: req.user._id,
         prefix,
         length,
-        description
+        description,
+        maxUsage,
+        singleUse
       });
 
       res.status(201).json({
@@ -17,6 +19,11 @@ class PromoCodeController {
       });
     } catch (error) {
       console.error('Create promo code error:', error);
+      if (error.name === 'ValidationError') {
+        return res.status(400).json({
+          message: error.message || 'Invalid promo code data'
+        });
+      }
       res.status(500).json({
         message: error.message || 'Failed to create promo code'
       });
@@ -75,7 +82,7 @@ class PromoCodeController {
       const promoCode = await promoCodeService.setPromoCodeStatus(code, isActive);
 
       res.json({
-        message: `Promo code ${isActive ? 'activated' : 'deactivated'} successfully`,
+        message: `Promo code ${promoCode.isActive ? 'activated' : 'deactivated'} successfully`,
         promoCode
       });
     } catch (error) {
@@ -102,6 +109,8 @@ class PromoCodeController {
           code: promoCode.code,
           isActive: promoCode.isActive,
           usageCount: promoCode.usageCount,
+          maxUsage: promoCode.maxUsage,
+          singleUse: promoCode.singleUse,
           lastUsedAt: promoCode.lastUsedAt
         }
       });

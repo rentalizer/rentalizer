@@ -15,12 +15,29 @@ class PromoCodeService {
     return combined.toUpperCase();
   }
 
-  async createPromoCode({ createdBy, prefix, length = 12, description } = {}) {
+  async createPromoCode({ createdBy, prefix, length = 12, description, maxUsage, singleUse } = {}) {
     if (!createdBy) {
       throw new Error('createdBy is required to create a promo code');
     }
 
-    const codeLength = Math.max(6, Math.min(length, 24));
+    const parsedLength = parseInt(length, 10);
+    const codeLength = Math.max(6, Math.min(Number.isNaN(parsedLength) ? 12 : parsedLength, 24));
+
+    const singleUseFlag = singleUse === true || singleUse === 'true';
+
+    let resolvedMaxUsage = null;
+    if (singleUseFlag) {
+      resolvedMaxUsage = 1;
+    } else if (typeof maxUsage !== 'undefined' && maxUsage !== null && maxUsage !== '') {
+      const parsedMaxUsage = parseInt(maxUsage, 10);
+      if (Number.isNaN(parsedMaxUsage) || parsedMaxUsage < 1) {
+        const error = new Error('maxUsage must be a positive integer when provided');
+        error.name = 'ValidationError';
+        throw error;
+      }
+      resolvedMaxUsage = parsedMaxUsage;
+    }
+    const finalSingleUse = singleUseFlag || resolvedMaxUsage === 1;
 
     let code;
     let attempts = 0;
@@ -43,7 +60,9 @@ class PromoCodeService {
     const promoCode = new PromoCode({
       code,
       description: description || null,
-      createdBy
+      createdBy,
+      maxUsage: resolvedMaxUsage,
+      singleUse: finalSingleUse
     });
 
     await promoCode.save();
@@ -123,6 +142,16 @@ class PromoCodeService {
       throw error;
     }
 
+    if (promoCode.maxUsage && promoCode.usageCount >= promoCode.maxUsage) {
+      if (promoCode.isActive) {
+        promoCode.isActive = false;
+        await promoCode.save();
+      }
+      const error = new Error('Promo code has already been used');
+      error.name = 'AuthError';
+      throw error;
+    }
+
     if (!promoCode.isActive) {
       const error = new Error('Promo code is no longer active');
       error.name = 'AuthError';
@@ -161,11 +190,26 @@ class PromoCodeService {
       };
     }
 
-    return PromoCode.findByIdAndUpdate(
+    let updatedPromo = await PromoCode.findByIdAndUpdate(
       promo._id,
       update,
       { new: true }
     );
+
+    if (
+      updatedPromo &&
+      updatedPromo.maxUsage &&
+      updatedPromo.usageCount >= updatedPromo.maxUsage &&
+      updatedPromo.isActive
+    ) {
+      updatedPromo = await PromoCode.findByIdAndUpdate(
+        promo._id,
+        { $set: { isActive: false } },
+        { new: true }
+      );
+    }
+
+    return updatedPromo;
   }
 
   async setPromoCodeStatus(code, isActive) {
@@ -178,7 +222,8 @@ class PromoCodeService {
       throw error;
     }
 
-    promoCode.isActive = Boolean(isActive);
+    const desiredStatus = isActive === true || isActive === 'true';
+    promoCode.isActive = desiredStatus;
     await promoCode.save();
 
     return promoCode;

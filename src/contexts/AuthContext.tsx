@@ -9,11 +9,26 @@ interface AuthContextType {
   profile: Profile | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, profileData?: { displayName?: string; firstName?: string; lastName?: string; bio?: string; profilePicture?: string }) => Promise<void>;
+  signUp: (params: SignUpParams) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: Error | null }>;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   deleteAccount: (password: string) => Promise<void>;
+}
+
+interface SignUpProfileData {
+  displayName?: string;
+  firstName?: string;
+  lastName?: string;
+  bio?: string;
+  profilePicture?: string;
+}
+
+interface SignUpParams {
+  email: string;
+  password: string;
+  promoCode: string;
+  profileData?: SignUpProfileData;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -99,13 +114,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const signUp = async (email: string, password: string, profileData?: { displayName?: string; firstName?: string; lastName?: string; bio?: string; profilePicture?: string }) => {
+  const signUp = async ({ email, password, promoCode, profileData }: SignUpParams) => {
     console.log('📝 Starting sign up for:', email);
     
     try {
       const response = await apiService.register({
         email,
         password,
+        promoCode,
         firstName: profileData?.firstName,
         lastName: profileData?.lastName,
         bio: profileData?.bio,

@@ -25,6 +25,7 @@ export interface SignupValidationData {
   password: string;
   firstName: string;
   lastName: string;
+  promoCode: string;
   bio?: string;
   profilePicture?: string;
 }
@@ -154,6 +155,25 @@ export const validateProfilePicture = (profilePicture: string): ValidationResult
   return { isValid: true, message: "" };
 };
 
+export const validatePromoCode = (promoCode: string): ValidationResult => {
+  if (!promoCode || !promoCode.trim()) {
+    return { isValid: false, message: "Promo code is required" };
+  }
+
+  const normalized = promoCode.trim().toUpperCase();
+
+  if (normalized.length < 6 || normalized.length > 24) {
+    return { isValid: false, message: "Promo code must be between 6 and 24 characters" };
+  }
+
+  const promoRegex = /^[A-Z0-9\-]+$/;
+  if (!promoRegex.test(normalized)) {
+    return { isValid: false, message: "Promo code can only contain letters, numbers, and hyphens" };
+  }
+
+  return { isValid: true, message: "" };
+};
+
 export const validateSignupData = (data: SignupValidationData): ValidationResult => {
   const errors: string[] = [];
   
@@ -169,6 +189,9 @@ export const validateSignupData = (data: SignupValidationData): ValidationResult
   }
   if (!data.lastName || !data.lastName.trim()) {
     errors.push(`Last Name: Last name is required`);
+  }
+  if (!data.promoCode || !data.promoCode.trim()) {
+    errors.push(`Promo Code: Promo code is required`);
   }
   
   // If required fields are missing, return early
@@ -201,6 +224,12 @@ export const validateSignupData = (data: SignupValidationData): ValidationResult
   const lastNameValidation = validateName(data.lastName, "Last name");
   if (!lastNameValidation.isValid) {
     errors.push(`Last Name: ${lastNameValidation.message}`);
+  }
+
+  // Validate promo code
+  const promoCodeValidation = validatePromoCode(data.promoCode);
+  if (!promoCodeValidation.isValid) {
+    errors.push(`Promo Code: ${promoCodeValidation.message}`);
   }
   
   // Validate bio (optional)

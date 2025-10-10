@@ -26,6 +26,15 @@ const promoCodeSchema = new mongoose.Schema({
     trim: true,
     maxlength: 200
   },
+  singleUse: {
+    type: Boolean,
+    default: false
+  },
+  maxUsage: {
+    type: Number,
+    min: [1, 'Usage limit must be at least 1'],
+    default: null
+  },
   isActive: {
     type: Boolean,
     default: true
