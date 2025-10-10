@@ -94,6 +94,16 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
     loadDocuments();
   }, [loadDocuments]);
 
+  // Also reload when component becomes visible (when user navigates to Documents Library)
+  useEffect(() => {
+    // Small delay to ensure the component is fully mounted
+    const timer = setTimeout(() => {
+      loadDocuments();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []); // Run once when component mounts
+
   const handleAddDocument = async () => {
     if (!newDocument.file) {
       toast({
@@ -273,14 +283,6 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
                       
                       {isAdmin && (
                         <>
-                          <Button
-                            size="sm"
-                    variant="outline" 
-                            onClick={() => setEditingDocument(document)}
-                            className="border-gray-500/30 text-gray-300 hover:bg-gray-500/10"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
                           <Button
                             size="sm"
                             variant="destructive"

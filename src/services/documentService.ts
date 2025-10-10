@@ -4,6 +4,41 @@ import { Document } from '@/types';
 
 const API_URL = `${API_CONFIG.BASE_URL}/documents`;
 
+// Create axios instance for document API
+const documentApi = axios.create({
+  baseURL: API_CONFIG.BASE_URL,
+  timeout: API_CONFIG.TIMEOUT,
+  headers: API_CONFIG.DEFAULT_HEADERS,
+});
+
+// Request interceptor to add auth token
+documentApi.interceptors.request.use(
+  (config) => {
+    // Check for both 'token' and 'authToken' keys
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor for error handling
+documentApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid - don't redirect automatically
+      // Let the component handle the error gracefully
+      console.warn('Authentication failed - token may be expired or invalid');
+    }
+    return Promise.reject(error);
+  }
+);
+
 interface DocumentFilters {
   page?: number;
   limit?: number;
@@ -39,19 +74,6 @@ interface CreateDocumentData {
 }
 
 class DocumentService {
-  // Get auth token from localStorage
-  private getAuthToken(): string | null {
-    return localStorage.getItem('token');
-  }
-
-  // Get auth headers
-  private getAuthHeaders() {
-    const token = this.getAuthToken();
-    return {
-      'Authorization': token ? `Bearer ${token}` : '',
-      'Content-Type': 'application/json'
-    };
-  }
 
   // Get all documents with filtering
   async getDocuments(filters: DocumentFilters = {}): Promise<DocumentResponse> {
@@ -65,7 +87,7 @@ class DocumentService {
       if (filters.sortBy) params.append('sortBy', filters.sortBy);
       if (filters.sortOrder) params.append('sortOrder', filters.sortOrder);
 
-      const response = await axios.get(`${API_URL}?${params.toString()}`);
+      const response = await documentApi.get(`/documents?${params.toString()}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching documents:', error);
@@ -76,7 +98,7 @@ class DocumentService {
   // Get document by ID
   async getDocumentById(documentId: string): Promise<SingleDocumentResponse> {
     try {
-      const response = await axios.get(`${API_URL}/${documentId}`);
+      const response = await documentApi.get(`/documents/${documentId}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching document:', error);
@@ -91,9 +113,8 @@ class DocumentService {
       formData.append('document', file);
       formData.append('category', documentData.category);
 
-      const response = await axios.post(API_URL, formData, {
+      const response = await documentApi.post('/documents', formData, {
         headers: {
-          'Authorization': `Bearer ${this.getAuthToken()}`,
           'Content-Type': 'multipart/form-data'
         }
       });
@@ -118,9 +139,8 @@ class DocumentService {
         formData.append('category', documentData.category);
       }
 
-      const response = await axios.put(`${API_URL}/${documentId}`, formData, {
+      const response = await documentApi.put(`/documents/${documentId}`, formData, {
         headers: {
-          'Authorization': `Bearer ${this.getAuthToken()}`,
           'Content-Type': 'multipart/form-data'
         }
       });
@@ -135,9 +155,7 @@ class DocumentService {
   // Delete document (Admin only)
   async deleteDocument(documentId: string): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await axios.delete(`${API_URL}/${documentId}`, {
-        headers: this.getAuthHeaders()
-      });
+      const response = await documentApi.delete(`/documents/${documentId}`);
 
       return response.data;
     } catch (error) {
@@ -149,7 +167,7 @@ class DocumentService {
   // Get document categories
   async getDocumentCategories(): Promise<{ success: boolean; data: string[] }> {
     try {
-      const response = await axios.get(`${API_URL}/categories`);
+      const response = await documentApi.get('/documents/categories');
       return response.data;
     } catch (error) {
       console.error('Error fetching document categories:', error);
@@ -160,7 +178,7 @@ class DocumentService {
   // Get documents by category
   async getDocumentsByCategory(category: string): Promise<DocumentResponse> {
     try {
-      const response = await axios.get(`${API_URL}/category/${category}`);
+      const response = await documentApi.get(`/documents/category/${category}`);
       return response.data;
     } catch (error) {
       console.error('Error fetching documents by category:', error);

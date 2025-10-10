@@ -30,6 +30,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { videoService } from '@/services/videoService';
+import { documentService } from '@/services/documentService';
 import { Video, CreateVideoData, UpdateVideoData, VideoFilters } from '@/types';
 import { DocumentsLibrary } from './DocumentsLibrary';
 import { API_CONFIG } from '@/config/api';
@@ -51,9 +52,10 @@ interface CategoryAlbumCardProps {
   videos: Video[];
   onClick: (category: string) => void;
   getCategoryColor: (category: string) => string;
+  documentCount: number;
 }
 
-const CategoryAlbumCard = ({ category, videoCount, videos, onClick, getCategoryColor }: CategoryAlbumCardProps) => {
+const CategoryAlbumCard = ({ category, videoCount, videos, onClick, getCategoryColor, documentCount }: CategoryAlbumCardProps) => {
   const getCategoryIcon = (category: string, size: 'small' | 'large' = 'small') => {
     const sizeClass = size === 'large' ? 'h-24 w-24' : 'h-4 w-4';
     switch (category) {
@@ -119,8 +121,17 @@ const CategoryAlbumCard = ({ category, videoCount, videos, onClick, getCategoryC
           
           {/* Video count badge */}
           <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-            <VideoIcon className="h-3 w-3" />
-            {videoCount}
+            {category === 'Documents Library' ? (
+              <>
+                <FileText className="h-3 w-3" />
+                {documentCount}
+              </>
+            ) : (
+              <>
+                <VideoIcon className="h-3 w-3" />
+                {videoCount}
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -433,10 +444,23 @@ export const VideoLibrary = () => {
     }
   }, []);
 
-  // Load categories once on mount (categories are static)
+  // Load document count on mount
+  const loadDocumentCount = useCallback(async () => {
+    try {
+      const response = await documentService.getDocuments({});
+      setDocumentCount(response.data.length);
+    } catch (error) {
+      console.error('Error loading document count:', error);
+      // Set to 0 if error
+      setDocumentCount(0);
+    }
+  }, []);
+
+  // Load categories and document count once on mount
   useEffect(() => {
     loadCategories();
-  }, [loadCategories]); // loadCategories is stable (useCallback with empty deps)
+    loadDocumentCount();
+  }, [loadCategories, loadDocumentCount]); // Both functions are stable (useCallback with empty deps)
 
   // Load videos on mount
   useEffect(() => {
@@ -609,6 +633,13 @@ export const VideoLibrary = () => {
         const updatedVideos = [...prevVideos, response.data];
         return sortVideosByFeatured(updatedVideos);
       });
+      
+      // If video has attachment, refresh document count
+      if (newVideo.attachment) {
+        // Update document count immediately for better UX
+        setDocumentCount(prev => prev + 1);
+      }
+      
     setNewVideo({
       title: '',
       description: '',
@@ -694,6 +725,13 @@ export const VideoLibrary = () => {
         );
         return sortVideosByFeatured(updatedVideos);
       });
+      
+      // If video has attachment, refresh document count
+      if (newVideo.attachment) {
+        // Update document count immediately for better UX
+        setDocumentCount(prev => prev + 1);
+      }
+      
     setEditingVideo(null);
     setNewVideo({
       title: '',
@@ -983,6 +1021,7 @@ export const VideoLibrary = () => {
               // Show Documents Library for Documents Library category
               if (selectedCategory === 'Documents Library') {
                 return <DocumentsLibrary 
+                  key="documents-library" // Force remount to refresh data
                   onBack={() => setSelectedCategory('all')} 
                   onDocumentCountChange={setDocumentCount}
                 />;
@@ -1090,6 +1129,7 @@ export const VideoLibrary = () => {
                           videos={categoryVideos}
                           onClick={handleCategoryClick}
                           getCategoryColor={getCategoryColor}
+                          documentCount={documentCount}
                         />
                       );
                     })}
@@ -1246,7 +1286,7 @@ export const VideoLibrary = () => {
 
       {/* Video Player Dialog */}
       <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
-        <DialogContent className="max-w-4xl bg-slate-900 border border-cyan-500/20">
+        <DialogContent className="max-w-4xl max-h-[90vh] bg-slate-900 border border-cyan-500/20 overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-cyan-300">
               {selectedVideo?.title}
@@ -1273,6 +1313,41 @@ export const VideoLibrary = () => {
                   <p className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
                     {selectedVideo.description}
                   </p>
+                </div>
+              )}
+              
+              {/* Attachment */}
+              {selectedVideo.attachment && (
+                <div className="bg-slate-800/50 rounded-lg p-3 border border-cyan-500/20">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {selectedVideo.attachment.type === 'pdf' ? (
+                        <span className="text-red-400 text-lg">📄</span>
+                      ) : (
+                        <span className="text-green-400 text-lg">📊</span>
+                      )}
+                      <div>
+                        <p className="text-xs text-white font-medium">{selectedVideo.attachment.filename}</p>
+                        <p className="text-xs text-gray-400">
+                          {(selectedVideo.attachment.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        // Open attachment in new tab
+                        const fullUrl = selectedVideo.attachment.url.startsWith('/uploads/') 
+                          ? `${API_CONFIG.BASE_URL.replace('/api', '')}${selectedVideo.attachment.url}`
+                          : selectedVideo.attachment.url;
+                        window.open(fullUrl, '_blank');
+                      }}
+                      className="h-7 px-3 text-xs border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+                    >
+                      Open
+                    </Button>
+                  </div>
                 </div>
               )}
               
