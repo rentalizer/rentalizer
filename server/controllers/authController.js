@@ -4,7 +4,7 @@ class AuthController {
   // POST /api/auth/register
   async register(req, res) {
     try {
-      const { email, password, firstName, lastName, bio, profilePicture } = req.body;
+      const { email, password, firstName, lastName, bio, profilePicture, promoCode } = req.body;
 
       const result = await authService.registerUser({
         email,
@@ -12,7 +12,8 @@ class AuthController {
         firstName,
         lastName,
         bio,
-        profilePicture
+        profilePicture,
+        promoCode
       });
 
       res.status(201).json({

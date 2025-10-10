@@ -85,6 +85,13 @@ const validateRegistration = [
     .trim()
     .isLength({ min: 1, max: 50 })
     .withMessage('Last name must be between 1 and 50 characters'),
+  body('promoCode')
+    .notEmpty()
+    .withMessage('Promo code is required')
+    .isLength({ min: 6, max: 24 })
+    .withMessage('Promo code must be between 6 and 24 characters')
+    .trim()
+    .toUpperCase(),
   handleValidationErrors
 ];
 
