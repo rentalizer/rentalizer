@@ -288,8 +288,8 @@ const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, 
           <CardContent className="p-4">
             <div className="space-y-3">
               {/* Title */}
-              <h3 className="font-semibold text-white line-clamp-2 hover:text-cyan-300 transition-colors">
-                {video.title}
+              <h3 className="font-semibold text-white hover:text-cyan-300 transition-colors">
+                {video.title.length > 25 ? video.title.slice(0, 30) + "..." : video.title}
               </h3>
 
               {/* Meta info */}
@@ -319,10 +319,10 @@ const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, 
                     <span className="text-gray-500">No attachment</span>
                   )}
                 </div>
-                <div className="flex items-center gap-1 text-gray-400">
+                {/* <div className="flex items-center gap-1 text-gray-400">
                   <Eye className="h-3 w-3" />
                   {video.views.toLocaleString()} views
-                </div>
+                </div> */}
               </div>
 
             </div>
