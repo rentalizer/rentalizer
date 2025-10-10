@@ -21,6 +21,7 @@ const newsRoutes = require('./routes/news');
 const messageRoutes = require('./routes/messages');
 const bugReportRoutes = require('./routes/bugReport');
 const promoCodeRoutes = require('./routes/promoCodes');
+const studentLogRoutes = require('./routes/studentLog');
 
 // Import WebSocket setup
 const { setupWebSocketHandlers } = require('./middleware/websocket');
@@ -96,6 +97,7 @@ app.use('/api/news', newsRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/bug-report', bugReportRoutes);
 app.use('/api/promo-codes', promoCodeRoutes);
+app.use('/api/student-log', studentLogRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

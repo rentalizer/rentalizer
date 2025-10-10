@@ -334,6 +334,80 @@ export interface Event {
   updatedAt: string;
 }
 
+export interface StudentLogStudent {
+  _id: string;
+  legacyId?: string;
+  name: string;
+  email: string;
+  status: 'active' | 'inactive' | 'paused' | 'completed';
+  progress?: number;
+  startDate?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StudentLogActivity {
+  _id: string;
+  legacyId?: string;
+  student: string;
+  type: 'module' | 'assignment' | 'quiz' | 'achievement' | 'video' | 'document';
+  title: string;
+  description?: string;
+  date: string;
+  material?: string;
+  materialType: 'pdf' | 'video' | 'document' | 'link';
+  materialUrl?: string | null;
+  completed: boolean;
+  score?: string | null;
+  duration?: string | null;
+  serverId?: string | null;
+  category?: string | null;
+  views?: number;
+  metadata?: Record<string, string>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface StudentLogStudentsResponse {
+  success: boolean;
+  message: string;
+  data: StudentLogStudent[];
+}
+
+export interface StudentLogActivitiesResponse {
+  success: boolean;
+  message: string;
+  data: StudentLogActivity[];
+}
+
+export interface CreateStudentLogStudentRequest {
+  name: string;
+  email: string;
+  progress?: number;
+  status?: 'active' | 'inactive' | 'paused' | 'completed';
+  startDate?: string;
+  notes?: string;
+  legacyId?: string;
+}
+
+export interface CreateStudentLogActivityRequest {
+  type: StudentLogActivity['type'];
+  title: string;
+  description?: string;
+  date: string;
+  material?: string;
+  materialType?: StudentLogActivity['materialType'];
+  materialUrl?: string;
+  completed?: boolean;
+  score?: string;
+  duration?: string;
+  serverId?: string;
+  category?: string;
+  views?: number;
+  metadata?: Record<string, string>;
+}
+
 export interface CreateEventRequest {
   title: string;
   description?: string;
@@ -1088,6 +1162,60 @@ class ApiService {
   async getCalendarIntegrationStatus(): Promise<{ success: boolean; message: string; data: { google: { connected: boolean; lastSync: string | null }; outlook: { connected: boolean; lastSync: string | null }; apple: { connected: boolean; lastSync: string | null } } }> {
     try {
       const response = await api.get<{ success: boolean; message: string; data: { google: { connected: boolean; lastSync: string | null }; outlook: { connected: boolean; lastSync: string | null }; apple: { connected: boolean; lastSync: string | null } } }>('/events/integration/status');
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // ===== Student Log endpoints =====
+  async getStudentLogStudents(params?: {
+    status?: 'active' | 'inactive' | 'paused' | 'completed';
+    search?: string;
+    sort?: string;
+    order?: 'asc' | 'desc';
+  }): Promise<StudentLogStudentsResponse> {
+    try {
+      const response = await api.get<StudentLogStudentsResponse>('/student-log/students', {
+        params
+      });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async getStudentLogActivities(studentId: string, params?: {
+    type?: StudentLogActivity['type'];
+    limit?: number;
+    skip?: number;
+  }): Promise<StudentLogActivitiesResponse> {
+    try {
+      const response = await api.get<StudentLogActivitiesResponse>(`/student-log/students/${studentId}/activities`, {
+        params
+      });
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async createStudentLogStudent(data: CreateStudentLogStudentRequest): Promise<{ success: boolean; message: string; data: StudentLogStudent }> {
+    try {
+      const response = await api.post<{ success: boolean; message: string; data: StudentLogStudent }>('/student-log/students', data);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async createStudentLogActivity(studentId: string, data: CreateStudentLogActivityRequest): Promise<{ success: boolean; message: string; data: StudentLogActivity }> {
+    try {
+      const response = await api.post<{ success: boolean; message: string; data: StudentLogActivity }>(`/student-log/students/${studentId}/activities`, data);
       return response.data;
     } catch (error) {
       this.handleError(error);

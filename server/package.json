@@ -11,7 +11,8 @@
     "test:auth": "node test-auth.js",
     "test:promo": "node test-promo-codes.js",
     "health-check": "node scripts/health-check.js",
-    "verify-deployment": "node scripts/verify-deployment.js"
+    "verify-deployment": "node scripts/verify-deployment.js",
+    "seed:student-log": "node scripts/seedStudentLog.js"
   },
   "keywords": ["rental", "management", "api", "nodejs", "express", "mongodb"],
   "author": "Rentalizer Team",

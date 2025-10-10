@@ -6,6 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SmartRedirect } from "@/components/SmartRedirect";
 import { AuthGuard } from "@/components/AuthGuard";
+import { AdminGuard } from "@/components/AdminGuard";
 import { BugReportWidget } from "@/components/BugReportWidget";
 import { Toaster } from "@/components/ui/toaster";
 import React, { lazy, Suspense } from "react";
@@ -74,7 +75,6 @@ const AppRoutes = () => (
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/guide/:slug" element={<GuestGuide />} />
         <Route path="/sales" element={<Sales />} />
-        <Route path="/student_log" element={<StudentLog />} />
         
         {/* Protected routes - require authentication */}
         <Route path="/dashboard" element={<AuthGuard><Index /></AuthGuard>} />
@@ -90,6 +90,7 @@ const AppRoutes = () => (
         <Route path="/pms" element={<AuthGuard><PMS /></AuthGuard>} />
         <Route path="/admin/members" element={<AuthGuard><AdminMembers /></AuthGuard>} />
         <Route path="/admin/richie" element={<AuthGuard><RichieAdmin /></AuthGuard>} />
+        <Route path="/student_log" element={<AuthGuard><AdminGuard><StudentLog /></AdminGuard></AuthGuard>} />
         <Route path="/members" element={<AuthGuard><Members /></AuthGuard>} />
         <Route path="/profile-setup" element={<AuthGuard><ProfileSetup /></AuthGuard>} />
         <Route path="/reset-password" element={<AuthGuard><ResetPassword /></AuthGuard>} />
