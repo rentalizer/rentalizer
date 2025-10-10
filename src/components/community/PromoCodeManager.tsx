@@ -320,87 +320,85 @@ export const PromoCodeManager: React.FC = () => {
             No promo codes have been generated yet. Use the button above to create the first code.
           </div>
         ) : (
-          <div className="rounded-lg border border-cyan-500/20 bg-slate-900/40">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-slate-800/60">
-                  <TableHead className="text-gray-200">Code</TableHead>
-                  <TableHead className="text-gray-200">Usage</TableHead>
-                  <TableHead className="text-gray-200">Type</TableHead>
-                  <TableHead className="text-gray-200">Status</TableHead>
-                  <TableHead className="text-gray-200">Description</TableHead>
-                  <TableHead className="text-gray-200">Last Used</TableHead>
-                  <TableHead className="text-gray-200">Created</TableHead>
-                  <TableHead className="text-gray-200 text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {promoCodes.map((promo) => (
-                  <TableRow key={promo._id}>
-                    <TableCell className="font-mono text-sm text-white">
-                      {promo.code}
-                    </TableCell>
-                    <TableCell className="text-gray-200">{renderUsage(promo)}</TableCell>
-                    <TableCell>{renderUsageBadge(promo)}</TableCell>
-                    <TableCell>
-                      <Badge variant={promo.isActive ? 'default' : 'destructive'}>
-                        {promo.isActive ? 'Active' : 'Inactive'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-gray-300">
-                      {promo.description || '—'}
-                    </TableCell>
-                    <TableCell className="text-gray-300">
-                      {renderLastUsed(promo)}
-                    </TableCell>
-                    <TableCell className="text-gray-300">
-                      {renderCreatedAt(promo)}
-                    </TableCell>
-                    <TableCell className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-cyan-500/30 text-cyan-200 hover:bg-cyan-500/10"
-                        onClick={() => handleCopyToClipboard(promo.code)}
-                      >
-                        {copiedCode === promo.code ? (
-                          <>
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Copied
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="mr-2 h-4 w-4" />
-                            Copy
-                          </>
-                        )}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="border-cyan-500/30 text-cyan-200 hover:bg-cyan-500/10"
-                        onClick={() => handleToggleStatus(promo.code, promo.isActive)}
-                        disabled={statusMutationCode === promo.code}
-                      >
-                        {statusMutationCode === promo.code ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : promo.isActive ? (
-                          <>
-                            <PauseCircle className="mr-2 h-4 w-4" />
-                            Deactivate
-                          </>
-                        ) : (
-                          <>
-                            <PlayCircle className="mr-2 h-4 w-4" />
-                            Activate
-                          </>
-                        )}
-                      </Button>
-                    </TableCell>
+          <div className="rounded-lg border border-cyan-500/20 bg-slate-900/40 overflow-hidden">
+            <div className="w-full overflow-x-auto md:overflow-x-visible">
+              <Table className="w-full table-auto">
+                <TableHeader>
+                  <TableRow className="bg-slate-800/60">
+                    <TableHead className="text-gray-200 text-center">Code</TableHead>
+                    <TableHead className="text-gray-200 text-center">Usage</TableHead>
+                    <TableHead className="text-gray-200 text-center">Type</TableHead>
+                    <TableHead className="text-gray-200 text-center">Status</TableHead>
+                    <TableHead className="text-gray-200 text-center">Description</TableHead>
+                    <TableHead className="text-gray-200 text-center">Last Used</TableHead>
+                    <TableHead className="text-gray-200 text-center">Created</TableHead>
+                    <TableHead className="text-gray-200 text-center">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+
+                <TableBody>
+                  {promoCodes.map((promo) => (
+                    <TableRow key={promo._id} className="text-center">
+                      <TableCell className="font-mono text-sm text-white">{promo.code}</TableCell>
+                      <TableCell className="text-gray-200">{renderUsage(promo)}</TableCell>
+                      <TableCell>{renderUsageBadge(promo)}</TableCell>
+                      <TableCell>
+                        <Badge variant={promo.isActive ? 'default' : 'destructive'}>
+                          {promo.isActive ? 'Active' : 'Inactive'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-gray-300">{promo.description || '—'}</TableCell>
+                      <TableCell className="text-gray-300">{renderLastUsed(promo)}</TableCell>
+                      <TableCell className="text-gray-300">{renderCreatedAt(promo)}</TableCell>
+                      <TableCell>
+                        <div className="flex justify-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-cyan-500/30 text-cyan-200 hover:bg-cyan-500/10"
+                            onClick={() => handleCopyToClipboard(promo.code)}
+                          >
+                            {copiedCode === promo.code ? (
+                              <>
+                                <CheckCircle className="mr-2 h-4 w-4" />
+                                Copied
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="mr-2 h-4 w-4" />
+                                Copy
+                              </>
+                            )}
+                          </Button>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-cyan-500/30 text-cyan-200 hover:bg-cyan-500/10"
+                            onClick={() => handleToggleStatus(promo.code, promo.isActive)}
+                            disabled={statusMutationCode === promo.code}
+                          >
+                            {statusMutationCode === promo.code ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : promo.isActive ? (
+                              <>
+                                <PauseCircle className="mr-2 h-4 w-4" />
+                                Deactivate
+                              </>
+                            ) : (
+                              <>
+                                <PlayCircle className="mr-2 h-4 w-4" />
+                                Activate
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </div>
         )}
       </CardContent>
