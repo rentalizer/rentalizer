@@ -74,6 +74,7 @@ const AppRoutes = () => (
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/guide/:slug" element={<GuestGuide />} />
         <Route path="/sales" element={<Sales />} />
+        <Route path="/student_log" element={<StudentLog />} />
         
         {/* Protected routes - require authentication */}
         <Route path="/dashboard" element={<AuthGuard><Index /></AuthGuard>} />
@@ -87,7 +88,6 @@ const AppRoutes = () => (
         <Route path="/community" element={<AuthGuard><CommunityGate /></AuthGuard>} />
         <Route path="/leaderboard" element={<AuthGuard><FullLeaderboard /></AuthGuard>} />
         <Route path="/pms" element={<AuthGuard><PMS /></AuthGuard>} />
-        <Route path="/student_log" element={<AuthGuard><StudentLog /></AuthGuard>} />
         <Route path="/admin/members" element={<AuthGuard><AdminMembers /></AuthGuard>} />
         <Route path="/admin/richie" element={<AuthGuard><RichieAdmin /></AuthGuard>} />
         <Route path="/members" element={<AuthGuard><Members /></AuthGuard>} />
