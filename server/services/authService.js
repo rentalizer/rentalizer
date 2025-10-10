@@ -1,10 +1,11 @@
 const User = require('../models/User');
 const { generateToken } = require('../middleware/auth');
+const promoCodeService = require('./promoCodeService');
 
 class AuthService {
   // Register a new user
   async registerUser(userData) {
-    const { email, password, firstName, lastName, bio, profilePicture } = userData;
+    const { email, password, firstName, lastName, bio, profilePicture, promoCode } = userData;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -13,6 +14,8 @@ class AuthService {
       error.name = 'AuthError';
       throw error;
     }
+
+    const promoCodeDocument = await promoCodeService.assertPromoCodeIsValid(promoCode);
 
     // Create new user
     const user = new User({
@@ -25,6 +28,7 @@ class AuthService {
     });
 
     await user.save();
+    await promoCodeService.recordUsage({ promoCode: promoCodeDocument, userId: user._id });
 
     // Generate JWT token
     const token = generateToken(user._id);

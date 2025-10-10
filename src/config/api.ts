@@ -19,6 +19,10 @@ export const API_CONFIG = {
       LOGOUT: '/auth/logout',
       REFRESH: '/auth/refresh',
     },
+    PROMO_CODES: {
+      VERIFY: '/promo-codes/verify',
+      BASE: '/promo-codes'
+    },
     USER: {
       PROFILE: '/user/profile',
       UPDATE_PROFILE: '/user/profile',

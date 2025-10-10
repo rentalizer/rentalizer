@@ -75,10 +75,62 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string;
   password: string;
+  promoCode: string;
   firstName?: string;
   lastName?: string;
   bio?: string;
   profilePicture?: string;
+}
+
+export interface PromoCodeVerificationResponse {
+  message: string;
+  promoCode: {
+    code: string;
+    isActive: boolean;
+    usageCount: number;
+    maxUsage?: number | null;
+    singleUse?: boolean;
+    lastUsedAt?: string;
+  };
+}
+
+export interface PromoCodeEntry {
+  _id: string;
+  code: string;
+  description?: string | null;
+  singleUse: boolean;
+  maxUsage?: number | null;
+  usageCount: number;
+  isActive: boolean;
+  lastUsedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: {
+    _id: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    role?: string;
+  };
+}
+
+export interface PromoCodeListResponse {
+  message: string;
+  promoCodes: PromoCodeEntry[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface CreatePromoCodeRequest {
+  description?: string;
+  prefix?: string;
+  length?: number;
+  singleUse?: boolean;
+  maxUsage?: number;
 }
 
 export interface UpdateProfileRequest {
@@ -405,6 +457,58 @@ class ApiService {
   async register(data: RegisterRequest): Promise<AuthResponse> {
     try {
       const response = await api.post<AuthResponse>('/auth/register', data);
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async createPromoCode(data: CreatePromoCodeRequest = {}): Promise<{ message: string; promoCode: PromoCodeEntry }> {
+    try {
+      const response = await api.post<{ message: string; promoCode: PromoCodeEntry }>(
+        API_CONFIG.ENDPOINTS.PROMO_CODES.BASE,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async verifyPromoCode(code: string): Promise<PromoCodeVerificationResponse> {
+    try {
+      const response = await api.post<PromoCodeVerificationResponse>(
+        API_CONFIG.ENDPOINTS.PROMO_CODES.VERIFY,
+        { code }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async getPromoCodes(params?: { page?: number; limit?: number; search?: string; isActive?: boolean }): Promise<PromoCodeListResponse> {
+    try {
+      const response = await api.get<PromoCodeListResponse>(
+        API_CONFIG.ENDPOINTS.PROMO_CODES.BASE,
+        { params }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async updatePromoCodeStatus(code: string, isActive: boolean): Promise<{ message: string; promoCode: PromoCodeEntry }> {
+    try {
+      const response = await api.patch<{ message: string; promoCode: PromoCodeEntry }>(
+        `${API_CONFIG.ENDPOINTS.PROMO_CODES.BASE}/${encodeURIComponent(code)}/status`,
+        { isActive }
+      );
       return response.data;
     } catch (error) {
       this.handleError(error);

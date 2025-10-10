@@ -9,7 +9,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Upload, User, Ticket, Lock } from 'lucide-react';
+import { apiService } from '@/services/api';
+import { validatePromoCode } from '@/utils/authValidation';
+import { Eye, EyeOff, User, Ticket, Lock } from 'lucide-react';
 
 import { Footer } from '@/components/Footer';
 
@@ -40,7 +42,6 @@ export const AccessGate: React.FC<AccessGateProps> = ({
   const [lastName, setLastName] = useState('');
   const [bio, setBio] = useState('');
   const [promoCode, setPromoCode] = useState('');
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [signupLoading, setSignupLoading] = useState(false);
 
   // If user is authenticated, show the protected content without TopNavBar
@@ -108,15 +109,6 @@ export const AccessGate: React.FC<AccessGateProps> = ({
       return;
     }
 
-    if (promoCode.toUpperCase() !== 'T6MEM') {
-      toast({
-        title: "Invalid promo code",
-        description: "Please enter a valid promo code to sign up",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (signupPassword.length < 6) {
       toast({
         title: "Password too short",
@@ -126,16 +118,47 @@ export const AccessGate: React.FC<AccessGateProps> = ({
       return;
     }
 
+    const normalizedPromoCode = promoCode.trim().toUpperCase();
+
+    if (promoCode !== normalizedPromoCode) {
+      setPromoCode(normalizedPromoCode);
+    }
+    const promoValidation = validatePromoCode(normalizedPromoCode);
+
+    if (!promoValidation.isValid) {
+      toast({
+        title: "Invalid promo code",
+        description: promoValidation.message,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await apiService.verifyPromoCode(normalizedPromoCode);
+    } catch (error) {
+      toast({
+        title: "Promo code error",
+        description: error instanceof Error ? error.message : 'Unable to verify promo code',
+        variant: "destructive"
+      });
+      return;
+    }
+
     setSignupLoading(true);
 
     try {
       const displayName = `${firstName} ${lastName}`;
-      await signUp(signupEmail, signupPassword, {
-        displayName,
-        firstName,
-        lastName,
-        bio,
-        avatarFile
+      await signUp({
+        email: signupEmail,
+        password: signupPassword,
+        promoCode: normalizedPromoCode,
+        profileData: {
+          displayName,
+          firstName,
+          lastName,
+          bio: bio || undefined,
+        }
       });
       toast({
         title: "Welcome!",

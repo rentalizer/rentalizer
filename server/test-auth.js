@@ -3,11 +3,23 @@ const axios = require('axios');
 const BASE_URL = 'http://localhost:5000/api';
 
 // Test data
-const testUser = {
-  email: 'test@example.com',
-  password: 'SecurePass123',
-  firstName: 'Test',
-  lastName: 'User'
+const PROMO_CODE = process.env.TEST_PROMO_CODE || process.env.PROMO_CODE || '9VRFMP3969JQ';
+
+if (!PROMO_CODE) {
+  console.error('❌ TEST_PROMO_CODE (or PROMO_CODE) environment variable is required to register users.');
+  console.error('   Provide a valid promo code or run test-promo-codes.js to generate one automatically.');
+  process.exit(1);
+}
+
+const buildTestUser = () => {
+  const uniqueSuffix = Math.random().toString(36).substring(2, 8);
+  return {
+    email: `auth-test-${uniqueSuffix}@example.com`,
+    password: 'SecurePass123',
+    firstName: 'Test',
+    lastName: 'User',
+    promoCode: PROMO_CODE
+  };
 };
 
 async function testAuthentication() {
@@ -22,6 +34,7 @@ async function testAuthentication() {
 
     // Test 2: Register user
     console.log('2. Testing user registration...');
+    const testUser = buildTestUser();
     const registerResponse = await axios.post(`${BASE_URL}/auth/register`, testUser);
     console.log('✅ Registration successful');
     console.log('User ID:', registerResponse.data.user.id);

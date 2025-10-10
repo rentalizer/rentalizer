@@ -9,8 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { validateSignupData, validateEmail, validatePassword, validateName, validateBio, getPasswordStrength } from '@/utils/authValidation';
-import { Eye, EyeOff, Upload, User, Ticket, LogIn, UserPlus, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { validateSignupData, validateEmail, validatePassword, validateName, validateBio, validatePromoCode, getPasswordStrength } from '@/utils/authValidation';
+import { apiService } from '@/services/api';
+import { Eye, EyeOff, Upload, User, Ticket, LogIn, UserPlus, CheckCircle, XCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 export const Auth = () => {
   const { user, signIn, signUp, isLoading } = useAuth();
@@ -35,6 +36,18 @@ export const Auth = () => {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [signupLoading, setSignupLoading] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [promoCodeError, setPromoCodeError] = useState('');
+  const [promoCodeStatus, setPromoCodeStatus] = useState<'idle' | 'valid' | 'invalid'>('idle');
+  const [promoCodeChecking, setPromoCodeChecking] = useState(false);
+  const [lastValidatedPromoCode, setLastValidatedPromoCode] = useState<string | null>(null);
+  const [promoCodeDetails, setPromoCodeDetails] = useState<{
+    code?: string;
+    usageCount: number;
+    maxUsage?: number | null;
+    singleUse?: boolean;
+    lastUsedAt?: string | null;
+  } | null>(null);
   
   // Validation state
   const [passwordStrength, setPasswordStrength] = useState<{ strength: 'weak' | 'medium' | 'strong'; message: string } | null>(null);
@@ -79,6 +92,10 @@ export const Auth = () => {
     setLastNameError('');
     setBioError('');
     setAvatarError('');
+    setPromoCodeError('');
+    setPromoCodeStatus('idle');
+    setLastValidatedPromoCode(null);
+    setPromoCodeDetails(null);
   };
 
   // Real-time validation functions
@@ -111,6 +128,77 @@ export const Auth = () => {
     const validation = validateName(name, fieldName);
     setter(validation.isValid ? '' : validation.message);
     return validation.isValid;
+  };
+
+  const handlePromoCodeChange = (value: string) => {
+    const formatted = value.toUpperCase();
+    setPromoCode(formatted);
+    setPromoCodeError('');
+    setPromoCodeStatus('idle');
+    setPromoCodeDetails(null);
+    if (lastValidatedPromoCode && formatted !== lastValidatedPromoCode) {
+      setLastValidatedPromoCode(null);
+    }
+  };
+
+  const performPromoCodeVerification = async (showToast = true) => {
+    setPromoCodeDetails(null);
+    const validation = validatePromoCode(promoCode);
+    if (!validation.isValid) {
+      setPromoCodeError(validation.message);
+      setPromoCodeStatus('invalid');
+      if (showToast) {
+        toast({
+          variant: "destructive",
+          title: "Invalid Promo Code",
+          description: validation.message,
+          duration: 5000,
+        });
+      }
+      throw new Error(validation.message);
+    }
+
+    setPromoCodeChecking(true);
+    try {
+      const response = await apiService.verifyPromoCode(promoCode.trim().toUpperCase());
+      setPromoCodeStatus('valid');
+      setPromoCodeError('');
+      setLastValidatedPromoCode(promoCode.trim().toUpperCase());
+      setPromoCodeDetails(response.promoCode);
+
+      if (showToast) {
+        const remainingUses = typeof response.promoCode.maxUsage === 'number'
+          ? Math.max(response.promoCode.maxUsage - response.promoCode.usageCount, 0)
+          : null;
+        toast({
+          variant: "success",
+          title: "Promo Code Verified",
+          description: remainingUses !== null
+            ? `Promo code ${response.promoCode.code} is valid. Uses remaining: ${remainingUses}.`
+            : `Promo code ${response.promoCode.code} is valid and active.`,
+        });
+      }
+
+      return response;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to verify promo code';
+      setPromoCodeStatus('invalid');
+      setPromoCodeError(message);
+      setPromoCodeDetails(null);
+
+      if (showToast) {
+        toast({
+          variant: "destructive",
+          title: "Promo Code Error",
+          description: message,
+          duration: 5000,
+        });
+      }
+
+      throw error;
+    } finally {
+      setPromoCodeChecking(false);
+    }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -275,13 +363,16 @@ export const Auth = () => {
     clearValidationErrors();
     
     // Validate all fields
+    const normalizedPromoCode = promoCode.trim().toUpperCase();
+
     const signupData = {
       email: signupEmail,
       password: signupPassword,
       firstName,
       lastName,
       bio: bio.trim(),
-      profilePicture: avatarUrl
+      profilePicture: avatarUrl,
+      promoCode: normalizedPromoCode
     };
     
     const validation = validateSignupData(signupData);
@@ -315,6 +406,10 @@ export const Auth = () => {
         const avatarError = errorMessage.split('Profile Picture: ')[1]?.split('\n')[0] || errorMessage;
         setAvatarError(avatarError);
       }
+      if (errorMessage.includes('Promo Code:')) {
+        const promoError = errorMessage.split('Promo Code: ')[1]?.split('\n')[0] || errorMessage;
+        setPromoCodeError(promoError);
+      }
       
       // Show toast with the full error message
       const displayMessage = errorMessage.includes('\n• ') 
@@ -331,16 +426,34 @@ export const Auth = () => {
       return;
     }
 
+    if (promoCode !== normalizedPromoCode) {
+      setPromoCode(normalizedPromoCode);
+    }
+
     setSignupLoading(true);
 
     try {
+      const shouldVerifyPromo = !(
+        promoCodeStatus === 'valid' &&
+        lastValidatedPromoCode === normalizedPromoCode
+      );
+
+      if (shouldVerifyPromo) {
+        await performPromoCodeVerification(false);
+      }
+
       const displayName = `${firstName} ${lastName}`;
-      await signUp(signupEmail, signupPassword, {
-        displayName,
-        firstName,
-        lastName,
-        bio: bio.trim() || undefined,
-        profilePicture: avatarUrl || undefined
+      await signUp({
+        email: signupEmail,
+        password: signupPassword,
+        promoCode: normalizedPromoCode,
+        profileData: {
+          displayName,
+          firstName,
+          lastName,
+          bio: bio.trim() || undefined,
+          profilePicture: avatarUrl || undefined
+        }
       });
       
       toast({
@@ -348,6 +461,9 @@ export const Auth = () => {
         title: "Account Created Successfully!",
         description: "Welcome to the community! Your account has been created successfully.",
       });
+      setPromoCodeDetails(null);
+      setPromoCodeStatus('idle');
+      setLastValidatedPromoCode(null);
     } catch (error) {
       console.error('Signup error:', error);
       const errorMessage = error instanceof Error ? error.message : "Failed to create account";
@@ -371,6 +487,12 @@ export const Auth = () => {
       } else if (errorMessage.includes('network') || errorMessage.includes('connection')) {
         title = "Connection Error";
         description = "Unable to connect to the server. Please check your internet connection and try again.";
+      } else if (errorMessage.toLowerCase().includes('promo')) {
+        title = "Promo Code Required";
+        description = errorMessage;
+        setPromoCodeError(errorMessage);
+        setPromoCodeStatus('invalid');
+        setPromoCodeDetails(null);
       } else if (errorMessage.includes('validation') || errorMessage.includes('required')) {
         title = "Missing Information";
         description = "Please fill in all required fields correctly.";
@@ -628,6 +750,89 @@ export const Auth = () => {
                 <div className="flex items-center gap-2 text-green-400 text-sm">
                   <CheckCircle className="h-4 w-4" />
                   Email looks good
+                </div>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="promo-code" className="text-gray-300 flex items-center gap-2">
+                <Ticket className="h-4 w-4" />
+                Promo Code
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="promo-code"
+                  name="promo-code"
+                  type="text"
+                  value={promoCode}
+                  onChange={(e) => handlePromoCodeChange(e.target.value)}
+                  placeholder="Enter your invite code"
+                  className={`bg-slate-700/50 text-white uppercase tracking-wide ${
+                    promoCodeError
+                      ? 'border-red-500/50 focus:border-red-400'
+                      : promoCodeStatus === 'valid'
+                        ? 'border-green-500/50 focus:border-green-400'
+                        : 'border-cyan-500/20 focus:border-cyan-400'
+                  }`}
+                  required
+                  disabled={signupLoading}
+                  maxLength={24}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={`whitespace-nowrap ${
+                    promoCodeStatus === 'valid'
+                      ? 'border-green-500/60 bg-green-500/90 text-white hover:bg-green-600'
+                      : 'border-cyan-500/40 text-cyan-200 hover:bg-cyan-500/10'
+                  }`}
+                  onClick={() => performPromoCodeVerification(true)}
+                  disabled={promoCodeChecking || signupLoading || !promoCode.trim()}
+                >
+                  {promoCodeChecking ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Checking...
+                    </>
+                  ) : promoCodeStatus === 'valid' ? (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Verified
+                    </>
+                  ) : (
+                    <>
+                      <Ticket className="h-4 w-4 mr-2" />
+                      Verify
+                    </>
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-gray-400">
+                A valid promo code is required to join the community.
+              </p>
+              {promoCodeStatus === 'valid' && !promoCodeError && (
+                <div className="flex flex-col gap-1 text-green-400 text-sm">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4" />
+                    Promo code verified
+                  </div>
+                  {promoCodeDetails && (
+                    <div className="text-xs text-gray-300">
+                      {promoCodeDetails.singleUse || promoCodeDetails.maxUsage === 1
+                        ? promoCodeDetails.usageCount > 0
+                          ? 'Single-use code has already been applied.'
+                          : 'Single-use code available for one registration.'
+                        : typeof promoCodeDetails.maxUsage === 'number'
+                          ? `Uses remaining: ${Math.max((promoCodeDetails.maxUsage ?? 0) - promoCodeDetails.usageCount, 0)}`
+                          : 'This code can be reused without limits.'}
+                    </div>
+                  )}
+                </div>
+              )}
+              {promoCodeError && (
+                <div className="flex items-center gap-2 text-red-400 text-sm">
+                  <XCircle className="h-4 w-4" />
+                  {promoCodeError}
                 </div>
               )}
             </div>
