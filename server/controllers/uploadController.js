@@ -108,26 +108,50 @@ const uploadPhoto = async (req, res) => {
   }
 };
 
-module.exports = {
-  uploadThumbnail,
-  uploadPhoto,
-  deleteThumbnail,
-  uploadAvatar: async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({
-          success: false,
-          message: 'No avatar file provided'
-        });
+const uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No avatar file provided'
+      });
+    }
+
+    const userId = req.user?._id?.toString();
+    const { key, url } = await r2StorageService.uploadAvatar(req.file, userId);
+
+    res.json({
+      success: true,
+      message: 'Avatar uploaded successfully',
+      data: {
+        key,
+        url
       }
+    });
+  } catch (error) {
+    console.error('Error uploading avatar:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload avatar'
+    });
+  }
+};
 
-      const userId = req.user?._id?.toString();
-      const { key, url } = await r2StorageService.uploadAvatar(req.file, userId);
+const uploadPublicAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No avatar file provided'
+      });
+    }
 
-      res.json({
-        success: true,
-        message: 'Avatar uploaded successfully',
-        data: {
+    const { key, url } = await r2StorageService.uploadAvatar(req.file, 'public');
+
+    res.json({
+      success: true,
+      message: 'Avatar uploaded successfully',
+      data: {
           key,
           url
         }
@@ -137,7 +161,14 @@ module.exports = {
       res.status(500).json({
         success: false,
         message: 'Failed to upload avatar'
-      });
-    }
+    });
   }
+};
+
+module.exports = {
+  uploadThumbnail,
+  uploadPhoto,
+  deleteThumbnail,
+  uploadAvatar,
+  uploadPublicAvatar
 };

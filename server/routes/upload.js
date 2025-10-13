@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { uploadThumbnail, uploadPhoto, deleteThumbnail, uploadAvatar } = require('../controllers/uploadController');
+const { uploadThumbnail, uploadPhoto, deleteThumbnail, uploadAvatar, uploadPublicAvatar } = require('../controllers/uploadController');
 const { uploadThumbnail: uploadMiddleware, uploadPhoto: uploadPhotoMiddleware, uploadAvatar: uploadAvatarMiddleware, handleUploadError } = require('../middleware/upload');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 
@@ -28,6 +28,14 @@ router.post(
   uploadAvatarMiddleware,
   handleUploadError,
   uploadAvatar
+);
+
+// Upload avatar without authentication (used during signup)
+router.post(
+  '/avatar/public',
+  uploadAvatarMiddleware,
+  handleUploadError,
+  uploadPublicAvatar
 );
 
 // Delete thumbnail image (Admin only)

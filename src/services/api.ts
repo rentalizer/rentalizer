@@ -636,16 +636,22 @@ class ApiService {
     }
   }
 
-  async uploadAvatar(file: File): Promise<UploadAvatarResponseData> {
+  async uploadAvatar(
+    file: File,
+    options: { publicUpload?: boolean } = {}
+  ): Promise<UploadAvatarResponseData> {
     try {
+      const { publicUpload = false } = options;
       const formData = new FormData();
       formData.append('avatar', file);
+
+      const endpoint = publicUpload ? '/upload/avatar/public' : '/upload/avatar';
 
       const response = await api.post<{
         success: boolean;
         message: string;
         data: UploadAvatarResponseData;
-      }>('/upload/avatar', formData, {
+      }>(endpoint, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

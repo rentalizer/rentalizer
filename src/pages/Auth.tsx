@@ -319,7 +319,7 @@ export const Auth = () => {
         return;
       }
 
-      const { url } = await apiService.uploadAvatar(file);
+      const { url } = await apiService.uploadAvatar(file, { publicUpload: true });
 
       setAvatarUrl(url);
       setAvatarError('');

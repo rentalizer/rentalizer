@@ -130,29 +130,32 @@ export const validateProfilePicture = (profilePicture: string): ValidationResult
   if (!profilePicture) {
     return { isValid: true, message: "" }; // Profile picture is optional
   }
-  
-  // Check if it's a valid base64 data URL
-  if (!profilePicture.startsWith('data:image/')) {
-    return { isValid: false, message: "Invalid image format" };
+
+  if (profilePicture.startsWith('http://') || profilePicture.startsWith('https://')) {
+    return { isValid: true, message: "" };
   }
-  
-  // Check file size (base64 is about 33% larger than binary)
-  const sizeInBytes = (profilePicture.length * 3) / 4;
-  const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
-  
-  if (sizeInBytes > maxSizeInBytes) {
-    return { isValid: false, message: "Image is too large (maximum 2MB)" };
+
+  if (profilePicture.startsWith('data:image/')) {
+    // Check file size (base64 is about 33% larger than binary)
+    const sizeInBytes = (profilePicture.length * 3) / 4;
+    const maxSizeInBytes = 2 * 1024 * 1024; // 2MB
+    
+    if (sizeInBytes > maxSizeInBytes) {
+      return { isValid: false, message: "Image is too large (maximum 2MB)" };
+    }
+    
+    // Check for valid image types
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    const imageType = profilePicture.split(';')[0].split(':')[1];
+    
+    if (!validTypes.includes(imageType)) {
+      return { isValid: false, message: "Unsupported image format. Please use JPEG, PNG, GIF, or WebP" };
+    }
+    
+    return { isValid: true, message: "" };
   }
-  
-  // Check for valid image types
-  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-  const imageType = profilePicture.split(';')[0].split(':')[1];
-  
-  if (!validTypes.includes(imageType)) {
-    return { isValid: false, message: "Unsupported image format. Please use JPEG, PNG, GIF, or WebP" };
-  }
-  
-  return { isValid: true, message: "" };
+
+  return { isValid: false, message: "Invalid image format" };
 };
 
 export const validatePromoCode = (promoCode: string): ValidationResult => {
