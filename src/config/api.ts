@@ -4,7 +4,7 @@ export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   
   // Timeout for requests (in milliseconds)
-  TIMEOUT: 10000,
+  TIMEOUT: 25000,
   
   // Default headers
   DEFAULT_HEADERS: {

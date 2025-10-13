@@ -170,7 +170,8 @@ export interface Discussion {
   likes: number;
   comments_count: number;
   views_count: number;
-  liked_by: string[];
+  liked_by?: string[];
+  likedByCount?: number;
   tags: string[];
   attachments: Array<{
     type: 'image' | 'video' | 'document';

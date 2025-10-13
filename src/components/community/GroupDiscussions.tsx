@@ -55,7 +55,8 @@ export interface DiscussionType {
   is_admin_post: boolean;
   // Additional backend fields
   views_count: number;
-  liked_by: string[];
+  liked_by?: string[];
+  likedByCount?: number;
   tags: string[];
   attachments: { type: "video" | "image" | "document"; url: string; filename: string; size: number; }[];
   is_active: boolean;
@@ -383,7 +384,15 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       
       // Transform backend data to match frontend expectations
       const transformedDiscussions = response.data.map(discussion => {
-        const isLiked = user ? discussion.liked_by.includes(user.id) : false;
+        const backendIsLiked = typeof discussion.isLiked === 'boolean' ? discussion.isLiked : undefined;
+        const fallbackIsLiked = user
+          ? (discussion.liked_by || []).some(id => {
+              if (!id) return false;
+              const candidate = typeof id === 'string' ? id : id.toString?.();
+              return candidate === user.id;
+            })
+          : false;
+        const isLiked = backendIsLiked !== undefined ? backendIsLiked : fallbackIsLiked;
         
         const transformed = {
           ...discussion,
@@ -393,7 +402,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           comments: discussion.comments_count,
           timeAgo: discussion.timeAgo,
           isPinned: discussion.is_pinned,
-          isLiked: isLiked,
+          isLiked,
           isAdmin: discussion.is_admin_post,
           created_at: discussion.createdAt
         };

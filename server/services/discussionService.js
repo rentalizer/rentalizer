@@ -1,6 +1,63 @@
 const Discussion = require('../models/Discussion');
 const User = require('../models/User');
 
+const MAX_PAGE_SIZE = 50;
+
+const parsePositiveInt = (value, fallback) => {
+  const parsed = parseInt(value, 10);
+  if (Number.isNaN(parsed) || parsed <= 0) {
+    return fallback;
+  }
+  return parsed;
+};
+
+const buildAuthorName = (discussionAuthorName, userDoc) => {
+  if (discussionAuthorName) return discussionAuthorName;
+
+  if (userDoc) {
+    const hasNames = userDoc.firstName && userDoc.lastName;
+    if (hasNames) {
+      return `${userDoc.firstName} ${userDoc.lastName}`;
+    }
+    if (userDoc.email) {
+      return userDoc.email.split('@')[0];
+    }
+  }
+
+  return 'Community Member';
+};
+
+const buildAuthorAvatar = (discussionAvatar, userDoc) => {
+  if (userDoc?.profilePicture && userDoc.profilePicture.trim() !== '') {
+    return userDoc.profilePicture;
+  }
+  if (discussionAvatar && discussionAvatar.trim() !== '') {
+    return discussionAvatar;
+  }
+  return null;
+};
+
+const mapDiscussionForList = (discussion, requestingUserId) => {
+  const userDoc = typeof discussion.user_id === 'object' ? discussion.user_id : null;
+  const likedByArray = Array.isArray(discussion.liked_by) ? discussion.liked_by : [];
+  const requesterId = requestingUserId ? requestingUserId.toString() : null;
+  const isLiked = requesterId
+    ? likedByArray.some(id => id.toString() === requesterId)
+    : false;
+
+  const sanitizedDiscussion = {
+    ...discussion,
+    author_name: buildAuthorName(discussion.author_name, userDoc),
+    author_avatar: buildAuthorAvatar(discussion.author_avatar, userDoc),
+    likedByCount: likedByArray.length,
+    isLiked
+  };
+
+  delete sanitizedDiscussion.liked_by; // Drop potentially large arrays for faster responses
+
+  return sanitizedDiscussion;
+};
+
 class DiscussionService {
   /**
    * Create a new discussion post
@@ -59,6 +116,9 @@ class DiscussionService {
         userId = null
       } = options;
 
+      const parsedPage = parsePositiveInt(page, 1);
+      const parsedLimit = Math.min(MAX_PAGE_SIZE, parsePositiveInt(limit, 10));
+
       const query = { is_active: true };
       
       if (category && category !== 'All') {
@@ -80,38 +140,31 @@ class DiscussionService {
       if (sortBy === 'createdAt') {
         sortOptions.is_pinned = -1;
       }
-
+      
       const discussions = await Discussion.find(query)
+        .select('title content author_name author_avatar category user_id is_pinned is_admin_post likes comments_count views_count liked_by tags attachments createdAt updatedAt last_activity is_active')
         .populate('user_id', 'firstName lastName email profilePicture role')
         .sort(sortOptions)
-        .skip((page - 1) * limit)
-        .limit(limit);
+        .skip((parsedPage - 1) * parsedLimit)
+        .limit(parsedLimit)
+        .lean({ virtuals: true });
 
-      // Update author_avatar with current user profile picture and add like status
-      discussions.forEach(discussion => {
-        // Use current user's profile picture instead of stored author_avatar
-        if (discussion.user_id && discussion.user_id.profilePicture) {
-          discussion.author_avatar = discussion.user_id.profilePicture;
-        }
-        
-        // Add like status for requesting user
-        if (requestingUserId) {
-          discussion._isLiked = discussion.liked_by.includes(requestingUserId);
-        }
-      });
+      const formattedDiscussions = discussions.map(discussion =>
+        mapDiscussionForList(discussion, requestingUserId)
+      );
 
       const total = await Discussion.countDocuments(query);
-      const totalPages = Math.ceil(total / limit);
+      const totalPages = Math.ceil(total / parsedLimit);
 
       return {
-        discussions,
+        discussions: formattedDiscussions,
         pagination: {
-          currentPage: page,
+          currentPage: parsedPage,
           totalPages,
           totalItems: total,
-          itemsPerPage: limit,
-          hasNextPage: page < totalPages,
-          hasPrevPage: page > 1
+          itemsPerPage: parsedLimit,
+          hasNextPage: parsedPage < totalPages,
+          hasPrevPage: parsedPage > 1
         }
       };
     } catch (error) {
