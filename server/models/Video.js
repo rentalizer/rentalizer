@@ -36,8 +36,8 @@ const videoSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Video category is required'],
     enum: {
-      values: ['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'],
-      message: 'Category must be one of: Business Formation, Market Research, Property Acquisition, Operations'
+      values: ['Business Formation', 'Market Research', 'Property Acquisition', 'Operations', 'Training Replays', 'Documents Library'],
+      message: 'Category must be one of: Business Formation, Market Research, Property Acquisition, Operations, Training Replays, Documents Library'
     }
   },
   tags: [{
@@ -71,6 +71,11 @@ const videoSchema = new mongoose.Schema({
       trim: true,
       maxlength: [255, 'Filename cannot exceed 255 characters']
     },
+    storageKey: {
+      type: String,
+      trim: true,
+      default: null
+    },
     url: {
       type: String,
       trim: true
@@ -78,14 +83,18 @@ const videoSchema = new mongoose.Schema({
     type: {
       type: String,
       enum: {
-        values: ['pdf', 'excel'],
-        message: 'Attachment type must be either pdf or excel'
+        values: ['pdf', 'excel', 'spreadsheet', 'document', 'presentation', 'text'],
+        message: 'Attachment type must be one of: pdf, excel, spreadsheet, document, presentation, text'
       }
+    },
+    contentType: {
+      type: String,
+      trim: true
     },
     size: {
       type: Number,
       min: [0, 'File size cannot be negative'],
-      max: [3 * 1024 * 1024, 'File size cannot exceed 3MB']
+      max: [20 * 1024 * 1024, 'File size cannot exceed 20MB']
     }
   },
   order: {

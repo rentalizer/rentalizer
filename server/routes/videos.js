@@ -43,7 +43,7 @@ router.use(authenticateToken);
 router.post('/', requireAdmin, uploadDocument, validateVideo, videoController.createVideo);
 
 // PUT /api/videos/:id - Update video (Admin only)
-router.put('/:id', requireAdmin, validateVideoUpdate, videoController.updateVideo);
+router.put('/:id', requireAdmin, uploadDocument, validateVideoUpdate, videoController.updateVideo);
 
 // DELETE /api/videos/:id - Delete video (Admin only)
 router.delete('/:id', requireAdmin, videoController.deleteVideo);

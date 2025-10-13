@@ -30,11 +30,10 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState<Document | null>(null);
-  const [categories] = useState<string[]>(['all', 'Business Formation', 'Market Research', 'Property Acquisition', 'Operations']);
+  const [categories] = useState<string[]>(['all', 'Business Formation', 'Market Research', 'Property Acquisition', 'Operations', 'Documents Library', 'Training Replays']);
 
   // Form state for new document
   const [newDocument, setNewDocument] = useState({
-    filename: '',
     category: 'Business Formation',
     file: null as File | null
   });
@@ -44,16 +43,26 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
       'Business Formation': 'bg-blue-500/20 border-blue-500/30 text-blue-300',
       'Market Research': 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300',
       'Property Acquisition': 'bg-purple-500/20 border-purple-500/30 text-purple-300',
-      'Operations': 'bg-green-500/20 border-green-500/30 text-green-300'
+      'Operations': 'bg-green-500/20 border-green-500/30 text-green-300',
+      'Documents Library': 'bg-indigo-500/20 border-indigo-500/30 text-indigo-300',
+      'Training Replays': 'bg-amber-500/20 border-amber-500/30 text-amber-300'
     };
     return colors[category as keyof typeof colors] || 'bg-gray-500/20 border-gray-500/30 text-gray-300';
   };
 
-  const getFileIcon = (type: 'pdf' | 'excel') => {
-    if (type === 'pdf') {
-      return <span className="text-red-400 text-lg">📄</span>;
-    } else {
-      return <span className="text-green-400 text-lg">📊</span>;
+  const getFileIcon = (type: Document['type']) => {
+    switch (type) {
+      case 'pdf':
+        return <span className="text-red-400 text-lg">📄</span>;
+      case 'spreadsheet':
+      case 'excel':
+        return <span className="text-green-400 text-lg">📊</span>;
+      case 'presentation':
+        return <span className="text-orange-400 text-lg">📽️</span>;
+      case 'text':
+        return <span className="text-blue-300 text-lg">📝</span>;
+      default:
+        return <span className="text-purple-300 text-lg">📁</span>;
     }
   };
 
@@ -114,31 +123,25 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
       return;
     }
 
-    // Check file size (3MB max)
-    if (newDocument.file.size > 3 * 1024 * 1024) {
+    // Check file size (20MB max)
+    if (newDocument.file.size > 20 * 1024 * 1024) {
       toast({
         title: "File too large",
-        description: "File must be 3MB or smaller.",
+        description: "File must be 20MB or smaller.",
         variant: "destructive"
       });
       return;
     }
 
     try {
-      const documentData = {
-        filename: newDocument.file.name,
-        url: '', // Will be set by backend
-        type: newDocument.file.name.endsWith('.pdf') ? 'pdf' as const : 'excel' as const,
-        size: newDocument.file.size,
+      await documentService.createDocument({
         category: newDocument.category
-      };
-
-      await documentService.createDocument(documentData, newDocument.file);
+      }, newDocument.file);
       
       // Reload documents to get the updated list
       await loadDocuments();
       
-      setNewDocument({ filename: '', category: 'Business Formation', file: null });
+      setNewDocument({ category: 'Business Formation', file: null });
       setIsAddDialogOpen(false);
       
       toast({

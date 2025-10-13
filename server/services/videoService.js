@@ -1,5 +1,6 @@
 const Video = require('../models/Video');
 const documentService = require('./documentService');
+const r2StorageService = require('./r2StorageService');
 
 class VideoService {
   // Create a new video
@@ -130,16 +131,7 @@ class VideoService {
   // Update video
   async updateVideo(videoId, updateData, modifiedBy) {
     try {
-      const video = await Video.findByIdAndUpdate(
-        videoId,
-        {
-          ...updateData,
-          lastModifiedBy: modifiedBy
-        },
-        { new: true, runValidators: true }
-      )
-        .populate('createdBy', 'firstName lastName email')
-        .populate('lastModifiedBy', 'firstName lastName email');
+      const video = await Video.findById(videoId);
 
       if (!video) {
         const error = new Error('Video not found');
@@ -147,7 +139,70 @@ class VideoService {
         throw error;
       }
 
-      return video;
+      const previousAttachmentKey = video.attachment?.storageKey;
+
+      if (updateData.title !== undefined) video.title = updateData.title;
+      if (updateData.description !== undefined) video.description = updateData.description;
+      if (updateData.thumbnail !== undefined) video.thumbnail = updateData.thumbnail;
+      if (updateData.category !== undefined) video.category = updateData.category;
+      if (updateData.videoUrl !== undefined) video.videoUrl = updateData.videoUrl;
+      if (updateData.tags !== undefined) video.tags = updateData.tags;
+      if (updateData.featured !== undefined) video.featured = updateData.featured;
+      if (updateData.isLive !== undefined) video.isLive = updateData.isLive;
+      if (updateData.isActive !== undefined) video.isActive = updateData.isActive;
+      if (updateData.order !== undefined) video.order = updateData.order;
+
+      if (updateData.attachment !== undefined) {
+        if (updateData.attachment === null) {
+          video.attachment = undefined;
+        } else {
+          video.attachment = updateData.attachment;
+        }
+      }
+
+      video.lastModifiedBy = modifiedBy;
+      await video.save();
+
+      if (
+        updateData.attachment &&
+        updateData.attachment.storageKey &&
+        previousAttachmentKey &&
+        previousAttachmentKey !== updateData.attachment.storageKey
+      ) {
+        r2StorageService.deleteObject(previousAttachmentKey).catch((err) => {
+          console.warn('⚠️  Failed to delete previous video attachment from R2:', err.message);
+        });
+      }
+
+      if (updateData.attachment === null) {
+        try {
+          const documents = await documentService.getDocumentsByVideoId(videoId);
+          await Promise.all(documents.map((doc) => documentService.deleteDocument(doc._id)));
+        } catch (docError) {
+          console.warn('⚠️  Failed to remove linked documents for video:', docError.message);
+        }
+      } else if (
+        updateData.attachment &&
+        updateData.attachment.filename &&
+        updateData.attachment.url &&
+        (!previousAttachmentKey || previousAttachmentKey !== updateData.attachment.storageKey)
+      ) {
+        try {
+          const documents = await documentService.getDocumentsByVideoId(videoId);
+          await Promise.all(documents.map((doc) => documentService.deleteDocument(doc._id)));
+
+          await documentService.createDocumentFromVideoAttachment(
+            videoId,
+            updateData.attachment,
+            video.category,
+            modifiedBy
+          );
+        } catch (docError) {
+          console.warn('⚠️  Failed to sync attachment with document library:', docError.message);
+        }
+      }
+
+      return await this.getVideoById(videoId);
     } catch (error) {
       if (error.name === 'ValidationError') {
         const errors = Object.values(error.errors).map(err => err.message);
@@ -168,6 +223,19 @@ class VideoService {
       const error = new Error('Video not found');
       error.name = 'NotFoundError';
       throw error;
+    }
+
+    if (video.attachment && video.attachment.storageKey) {
+      r2StorageService.deleteObject(video.attachment.storageKey).catch((err) => {
+        console.warn('⚠️  Failed to delete video attachment from R2:', err.message);
+      });
+    }
+
+    try {
+      const documents = await documentService.getDocumentsByVideoId(videoId);
+      await Promise.all(documents.map((doc) => documentService.deleteDocument(doc._id)));
+    } catch (docError) {
+      console.warn('⚠️  Failed to remove linked documents for video:', docError.message);
     }
 
     return video;

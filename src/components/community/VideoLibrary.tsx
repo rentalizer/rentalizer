@@ -35,6 +35,35 @@ import { Video, CreateVideoData, UpdateVideoData, VideoFilters } from '@/types';
 import { DocumentsLibrary } from './DocumentsLibrary';
 import { API_CONFIG } from '@/config/api';
 
+const MAX_DOCUMENT_SIZE = 20 * 1024 * 1024;
+const ALLOWED_DOCUMENT_EXTENSIONS = ['pdf', 'xls', 'xlsx', 'xlsm', 'doc', 'docx', 'ppt', 'pptx', 'ppsx', 'txt', 'md', 'csv', 'ods', 'odp', 'odt'];
+
+const determineDocumentType = (fileName: string): 'pdf' | 'spreadsheet' | 'document' | 'presentation' | 'text' => {
+  const ext = fileName.split('.').pop()?.toLowerCase() || '';
+
+  if (ext === 'pdf') return 'pdf';
+  if (['xls', 'xlsx', 'xlsm', 'csv', 'ods'].includes(ext)) return 'spreadsheet';
+  if (['ppt', 'pptx', 'ppsx', 'odp'].includes(ext)) return 'presentation';
+  if (['txt', 'md'].includes(ext)) return 'text';
+  return 'document';
+};
+
+const getAttachmentIcon = (type: 'pdf' | 'spreadsheet' | 'document' | 'presentation' | 'text') => {
+  switch (type) {
+    case 'pdf':
+      return <span className="text-red-400 text-lg">📄</span>;
+    case 'spreadsheet':
+    case 'excel':
+      return <span className="text-green-400 text-lg">📊</span>;
+    case 'presentation':
+      return <span className="text-orange-400 text-lg">📽️</span>;
+    case 'text':
+      return <span className="text-blue-300 text-lg">📝</span>;
+    default:
+      return <span className="text-purple-300 text-lg">📁</span>;
+  }
+};
+
 interface SortableVideoCardProps {
   video: Video;
   isAdmin: boolean;
@@ -69,6 +98,8 @@ const CategoryAlbumCard = ({ category, videoCount, videos, onClick, getCategoryC
         return <Settings className={`${sizeClass} text-green-300`} />;
       case 'Documents Library':
         return <VideoIcon className={`${sizeClass} text-orange-300`} />;
+      case 'Training Replays':
+        return <FileText className={`${sizeClass} text-amber-300`} />;
       default:
         return <VideoIcon className={`${sizeClass} text-gray-300`} />;
     }
@@ -86,6 +117,8 @@ const CategoryAlbumCard = ({ category, videoCount, videos, onClick, getCategoryC
         return 'Managing and optimizing your properties';
       case 'Documents Library':
         return 'Templates, guides, and reference materials';
+      case 'Training Replays':
+        return 'On-demand access to our live training sessions';
       default:
         return 'Training videos and resources';
     }
@@ -308,11 +341,7 @@ const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, 
                 <div className="flex items-center gap-1 text-gray-400">
                   {video.attachment ? (
                     <div className="flex items-center gap-1 text-cyan-300">
-                      {video.attachment.type === 'pdf' ? (
-                        <span className="text-red-400">📄</span>
-                      ) : (
-                        <span className="text-green-400">📊</span>
-                      )}
+                      {getAttachmentIcon(video.attachment.type)}
                       <span className="truncate max-w-20">{video.attachment.filename}</span>
                     </div>
                   ) : (
@@ -346,7 +375,7 @@ export const VideoLibrary = () => {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
-  const [categories, setCategories] = useState<string[]>(['all', 'Business Formation', 'Market Research', 'Property Acquisition', 'Operations', 'Documents Library']);
+  const [categories, setCategories] = useState<string[]>(['all', 'Business Formation', 'Market Research', 'Property Acquisition', 'Operations', 'Documents Library', 'Training Replays']);
   const [documentCount, setDocumentCount] = useState(0);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -363,7 +392,8 @@ export const VideoLibrary = () => {
     category: 'Business Formation',
     videoUrl: '',
     tags: [],
-    featured: false
+    featured: false,
+    attachment: null
   });
   
   // Track attachment file separately
@@ -635,11 +665,10 @@ export const VideoLibrary = () => {
       });
       
       // If video has attachment, refresh document count
-      if (newVideo.attachment) {
-        // Update document count immediately for better UX
+      if (response.data.attachment) {
         setDocumentCount(prev => prev + 1);
       }
-      
+
     setNewVideo({
       title: '',
       description: '',
@@ -647,7 +676,8 @@ export const VideoLibrary = () => {
         category: 'Business Formation',
       videoUrl: '',
       tags: [],
-      featured: false
+      featured: false,
+      attachment: null
     });
     setAttachmentFile(null);
     setIsAddDialogOpen(false);
@@ -727,11 +757,15 @@ export const VideoLibrary = () => {
       });
       
       // If video has attachment, refresh document count
-      if (newVideo.attachment) {
-        // Update document count immediately for better UX
+      const hadAttachment = !!editingVideo.attachment;
+      const hasAttachmentNow = !!response.data.attachment;
+
+      if (hasAttachmentNow && !hadAttachment) {
         setDocumentCount(prev => prev + 1);
+      } else if (!hasAttachmentNow && hadAttachment) {
+        setDocumentCount(prev => Math.max(prev - 1, 0));
       }
-      
+
     setEditingVideo(null);
     setNewVideo({
       title: '',
@@ -740,7 +774,8 @@ export const VideoLibrary = () => {
         category: 'Business Formation',
       videoUrl: '',
       tags: [],
-      featured: false
+      featured: false,
+      attachment: null
     });
     setAttachmentFile(null);
     
@@ -762,8 +797,12 @@ export const VideoLibrary = () => {
   const handleDeleteVideo = async (videoId: string) => {
     if (confirm('Are you sure you want to delete this video?')) {
       try {
+        const videoToDelete = videos.find(video => video._id === videoId);
         await videoService.deleteVideo(videoId);
         setVideos(prevVideos => prevVideos.filter(video => video._id !== videoId));
+      if (videoToDelete?.attachment) {
+        setDocumentCount(prev => Math.max(prev - 1, 0));
+      }
       toast({
         title: "Video deleted",
         description: "Video has been deleted successfully.",
@@ -901,34 +940,41 @@ export const VideoLibrary = () => {
                     <input
                       type="file"
                       id="attachment"
-                      accept=".pdf,.xlsx,.xls"
+                      accept=".pdf,.xls,.xlsx,.xlsm,.doc,.docx,.ppt,.pptx,.ppsx,.txt,.md,.csv,.ods,.odp,.odt"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
-                          // Check file size (3MB max)
-                          if (file.size > 3 * 1024 * 1024) {
+                          if (file.size > MAX_DOCUMENT_SIZE) {
                             toast({
                               title: "File too large",
-                              description: "File must be 3MB or smaller.",
+                              description: "File must be 20MB or smaller.",
                               variant: "destructive"
                             });
-                            e.target.value = ''; // Reset file input
+                            e.target.value = '';
                             return;
                           }
-                          
-                          // Check file type
-                          const fileType = file.name.endsWith('.pdf') ? 'pdf' : 'excel';
-                          
-                          // Store the file separately for upload
+
+                          const extension = file.name.split('.').pop()?.toLowerCase() || '';
+                          if (!ALLOWED_DOCUMENT_EXTENSIONS.includes(extension)) {
+                            toast({
+                              title: "Unsupported file type",
+                              description: "Please upload PDF, Office, text, or CSV documents.",
+                              variant: "destructive"
+                            });
+                            e.target.value = '';
+                            return;
+                          }
+
+                          const fileType = determineDocumentType(file.name);
+
                           setAttachmentFile(file);
-                          
-                          // Store metadata in video data
+
                           setNewVideo({
                             ...newVideo,
                             attachment: {
                               filename: file.name,
-                              url: '', // Will be set after upload
-                              type: fileType as 'pdf' | 'excel',
+                              url: '',
+                              type: fileType,
                               size: file.size
                             }
                           });
@@ -936,7 +982,7 @@ export const VideoLibrary = () => {
                       }}
                       className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700"
                     />
-                    <p className="text-xs text-gray-400 mt-1">PDF or Excel files only, max 3MB</p>
+                    <p className="text-xs text-gray-400 mt-1">Upload PDF, Office, text, or CSV files up to 20MB</p>
                   </div>
                 </div>
                 
@@ -1187,17 +1233,13 @@ export const VideoLibrary = () => {
                 {newVideo.attachment && (
                   <div className="mb-2 p-2 bg-slate-800/50 rounded border border-cyan-500/20 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      {newVideo.attachment.type === 'pdf' ? (
-                        <span className="text-red-400">📄</span>
-                      ) : (
-                        <span className="text-green-400">📊</span>
-                      )}
+                      {getAttachmentIcon(newVideo.attachment.type)}
                       <span className="text-sm text-gray-300">{newVideo.attachment.filename}</span>
                     </div>
                     <Button
                       size="sm"
                       variant="destructive"
-                      onClick={() => setNewVideo({...newVideo, attachment: undefined})}
+                      onClick={() => setNewVideo({...newVideo, attachment: null})}
                       className="h-6 w-6 p-0"
                     >
                       <X className="h-3 w-3" />
@@ -1207,34 +1249,41 @@ export const VideoLibrary = () => {
                 <input
                   type="file"
                   id="edit-attachment"
-                  accept=".pdf,.xlsx,.xls"
+                  accept=".pdf,.xls,.xlsx,.xlsm,.doc,.docx,.ppt,.pptx,.ppsx,.txt,.md,.csv,.ods,.odp,.odt"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      // Check file size (3MB max)
-                      if (file.size > 3 * 1024 * 1024) {
+                      if (file.size > MAX_DOCUMENT_SIZE) {
                         toast({
                           title: "File too large",
-                          description: "File must be 3MB or smaller.",
+                          description: "File must be 20MB or smaller.",
                           variant: "destructive"
                         });
-                        e.target.value = ''; // Reset file input
+                        e.target.value = '';
                         return;
                       }
-                      
-                      // Check file type
-                      const fileType = file.name.endsWith('.pdf') ? 'pdf' : 'excel';
-                      
-                      // Store the file separately for upload
+
+                      const extension = file.name.split('.').pop()?.toLowerCase() || '';
+                      if (!ALLOWED_DOCUMENT_EXTENSIONS.includes(extension)) {
+                        toast({
+                          title: "Unsupported file type",
+                          description: "Please upload PDF, Office, text, or CSV documents.",
+                          variant: "destructive"
+                        });
+                        e.target.value = '';
+                        return;
+                      }
+
+                      const fileType = determineDocumentType(file.name);
+
                       setAttachmentFile(file);
-                      
-                      // Store metadata in video data
+
                       setNewVideo({
                         ...newVideo,
                         attachment: {
                           filename: file.name,
-                          url: '', // Will be set after upload
-                          type: fileType as 'pdf' | 'excel',
+                          url: '',
+                          type: fileType,
                           size: file.size
                         }
                       });
@@ -1242,7 +1291,7 @@ export const VideoLibrary = () => {
                   }}
                   className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700"
                 />
-                <p className="text-xs text-gray-400 mt-1">PDF or Excel files only, max 3MB</p>
+                <p className="text-xs text-gray-400 mt-1">Upload PDF, Office, text, or CSV files up to 20MB</p>
               </div>
             </div>
             
@@ -1321,11 +1370,7 @@ export const VideoLibrary = () => {
                 <div className="bg-slate-800/50 rounded-lg p-3 border border-cyan-500/20">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      {selectedVideo.attachment.type === 'pdf' ? (
-                        <span className="text-red-400 text-lg">📄</span>
-                      ) : (
-                        <span className="text-green-400 text-lg">📊</span>
-                      )}
+                      {getAttachmentIcon(selectedVideo.attachment.type)}
                       <div>
                         <p className="text-xs text-white font-medium">{selectedVideo.attachment.filename}</p>
                         <p className="text-xs text-gray-400">
@@ -1338,9 +1383,9 @@ export const VideoLibrary = () => {
                       variant="outline"
                       onClick={() => {
                         // Open attachment in new tab
-                        const fullUrl = selectedVideo.attachment.url.startsWith('/uploads/') 
-                          ? `${API_CONFIG.BASE_URL.replace('/api', '')}${selectedVideo.attachment.url}`
-                          : selectedVideo.attachment.url;
+                        const fullUrl = selectedVideo.attachment.url.startsWith('http')
+                          ? selectedVideo.attachment.url
+                          : `${API_CONFIG.BASE_URL.replace('/api', '')}${selectedVideo.attachment.url}`;
                         window.open(fullUrl, '_blank');
                       }}
                       className="h-7 px-3 text-xs border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"

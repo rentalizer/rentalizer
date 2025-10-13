@@ -1,4 +1,40 @@
+const path = require('path');
 const documentService = require('../services/documentService');
+const r2StorageService = require('../services/r2StorageService');
+
+const determineDocumentType = (mimetype = '', filename = '') => {
+  const ext = path.extname(filename).toLowerCase();
+  const normalizedMime = mimetype.toLowerCase();
+
+  if (normalizedMime.includes('pdf') || ext === '.pdf') {
+    return 'pdf';
+  }
+
+  if (
+    normalizedMime.includes('spreadsheet') ||
+    normalizedMime.includes('excel') ||
+    ['.xls', '.xlsx', '.xlsm', '.csv', '.ods'].includes(ext)
+  ) {
+    return 'spreadsheet';
+  }
+
+  if (
+    normalizedMime.includes('presentation') ||
+    normalizedMime.includes('powerpoint') ||
+    ['.ppt', '.pptx', '.ppsx', '.pptm', '.odp'].includes(ext)
+  ) {
+    return 'presentation';
+  }
+
+  if (
+    normalizedMime.startsWith('text/') ||
+    ['.txt', '.md'].includes(ext)
+  ) {
+    return 'text';
+  }
+
+  return 'document';
+};
 
 class DocumentController {
   // GET /api/documents - Get all documents with filtering and pagination
@@ -64,13 +100,31 @@ class DocumentController {
       const createdBy = req.user._id;
       const documentData = req.body;
 
-      // Handle file upload if present
-      if (req.file) {
-        documentData.url = `/uploads/${req.file.filename}`;
-        documentData.filename = req.file.originalname;
-        documentData.size = req.file.size;
-        documentData.type = req.file.mimetype.includes('pdf') ? 'pdf' : 'excel';
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: 'Document file is required'
+        });
       }
+
+      if (!documentData.category) {
+        return res.status(400).json({
+          success: false,
+          message: 'Document category is required'
+        });
+      }
+
+      const uploadResult = await r2StorageService.uploadDocument(
+        req.file,
+        documentData.category
+      );
+
+      documentData.url = uploadResult.url;
+      documentData.storageKey = uploadResult.key;
+      documentData.filename = req.file.originalname;
+      documentData.size = req.file.size;
+      documentData.type = determineDocumentType(req.file.mimetype, req.file.originalname);
+      documentData.contentType = req.file.mimetype;
 
       const document = await documentService.createDocument(documentData, createdBy);
 
@@ -105,12 +159,15 @@ class DocumentController {
       const modifiedBy = req.user._id;
       const updateData = req.body;
 
-      // Handle file upload if present
       if (req.file) {
-        updateData.url = `/uploads/${req.file.filename}`;
+        const categoryForStorage = updateData.category || 'Documents Library';
+        const uploadResult = await r2StorageService.uploadDocument(req.file, categoryForStorage);
+        updateData.url = uploadResult.url;
+        updateData.storageKey = uploadResult.key;
         updateData.filename = req.file.originalname;
         updateData.size = req.file.size;
-        updateData.type = req.file.mimetype.includes('pdf') ? 'pdf' : 'excel';
+        updateData.type = determineDocumentType(req.file.mimetype, req.file.originalname);
+        updateData.contentType = req.file.mimetype;
       }
 
       const document = await documentService.updateDocument(id, updateData, modifiedBy);

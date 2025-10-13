@@ -65,12 +65,7 @@ interface SingleDocumentResponse {
 }
 
 interface CreateDocumentData {
-  filename: string;
-  url: string;
-  type: 'pdf' | 'excel';
-  size: number;
   category: string;
-  file?: File;
 }
 
 class DocumentService {
@@ -189,7 +184,7 @@ class DocumentService {
   // Download document
   downloadDocument(document: Document) {
     const link = window.document.createElement('a');
-    link.href = `${API_CONFIG.BASE_URL.replace('/api', '')}${document.url}`;
+    link.href = document.url.startsWith('http') ? document.url : `${API_CONFIG.BASE_URL.replace('/api', '')}${document.url}`;
     link.download = document.filename;
     window.document.body.appendChild(link);
     link.click();

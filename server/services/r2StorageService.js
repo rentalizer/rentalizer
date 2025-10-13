@@ -26,12 +26,40 @@ const s3Client = new S3Client({
   } : undefined
 });
 
+const sanitizeSegment = (segment) => {
+  if (!segment) return 'general';
+  return segment
+    .toString()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'general';
+};
+
 const buildAvatarKey = (userId, originalName = '') => {
   const extension = path.extname(originalName) || '.png';
   const safeExtension = extension.split('?')[0] || '.png';
   return [
     'avatars',
     userId || 'anonymous',
+    `${Date.now()}-${crypto.randomUUID()}${safeExtension}`
+  ].join('/');
+};
+
+const buildDocumentKey = (category, originalName = '') => {
+  const extension = path.extname(originalName) || '.bin';
+  const safeExtension = extension.split('?')[0] || '.bin';
+  return [
+    'documents',
+    sanitizeSegment(category),
+    `${Date.now()}-${crypto.randomUUID()}${safeExtension}`
+  ].join('/');
+};
+
+const buildThumbnailKey = (originalName = '') => {
+  const extension = path.extname(originalName) || '.png';
+  const safeExtension = extension.split('?')[0] || '.png';
+  return [
+    'thumbnails',
     `${Date.now()}-${crypto.randomUUID()}${safeExtension}`
   ].join('/');
 };
@@ -93,6 +121,56 @@ const uploadAvatar = async ({ buffer, mimetype, originalname }, userId) => {
   };
 };
 
+const uploadDocument = async ({ buffer, mimetype, originalname }, category) => {
+  if (!buffer) {
+    throw new Error('Document file buffer is required');
+  }
+
+  if (!bucketName) {
+    throw new Error('R2 bucket name is not configured');
+  }
+
+  const key = buildDocumentKey(category, originalname);
+
+  await s3Client.send(new PutObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+    Body: buffer,
+    ContentType: mimetype || 'application/octet-stream',
+    CacheControl: 'public, max-age=86400'
+  }));
+
+  return {
+    key,
+    url: buildPublicUrl(key)
+  };
+};
+
+const uploadThumbnailImage = async ({ buffer, mimetype, originalname }) => {
+  if (!buffer) {
+    throw new Error('Thumbnail file buffer is required');
+  }
+
+  if (!bucketName) {
+    throw new Error('R2 bucket name is not configured');
+  }
+
+  const key = buildThumbnailKey(originalname);
+
+  await s3Client.send(new PutObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+    Body: buffer,
+    ContentType: mimetype || 'image/png',
+    CacheControl: 'public, max-age=31536000, immutable'
+  }));
+
+  return {
+    key,
+    url: buildPublicUrl(key)
+  };
+};
+
 const deleteObject = async (key) => {
   if (!key || !bucketName) {
     return false;
@@ -112,6 +190,8 @@ const deleteObject = async (key) => {
 
 module.exports = {
   uploadAvatar,
+  uploadDocument,
+  uploadThumbnailImage,
   deleteObject,
   extractKeyFromUrl,
   buildPublicUrl

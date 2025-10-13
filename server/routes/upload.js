@@ -39,7 +39,7 @@ router.post(
 );
 
 // Delete thumbnail image (Admin only)
-router.delete('/thumbnail/:filename', 
+router.delete('/thumbnail', 
   authenticateToken, 
   requireAdmin, 
   deleteThumbnail

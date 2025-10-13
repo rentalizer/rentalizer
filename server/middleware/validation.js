@@ -192,18 +192,18 @@ const validateVideo = [
         throw new Error('Thumbnail is required');
       }
       
-      // Only allow file paths (uploaded files)
       const isFilePath = /^\/uploads\/.+\.(jpg|jpeg|png|gif|webp)$/i.test(value);
-      
-      if (!isFilePath) {
-        throw new Error('Thumbnail must be an uploaded image file');
+      const isR2Url = /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i.test(value);
+
+      if (!isFilePath && !isR2Url) {
+        throw new Error('Thumbnail must be a valid image URL');
       }
       
       return true;
     }),
   body('category')
-    .isIn(['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'])
-    .withMessage('Category must be one of: Business Formation, Market Research, Property Acquisition, Operations'),
+    .isIn(['Business Formation', 'Market Research', 'Property Acquisition', 'Operations', 'Training Replays', 'Documents Library'])
+    .withMessage('Category must be one of: Business Formation, Market Research, Property Acquisition, Operations, Training Replays, Documents Library'),
   body('videoUrl')
     .isURL({ protocols: ['https'] })
     .withMessage('Video URL must be a valid HTTPS URL')
@@ -267,8 +267,8 @@ const validateVideoUpdate = [
     }),
   body('category')
     .optional()
-    .isIn(['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'])
-    .withMessage('Category must be one of: Business Formation, Market Research, Property Acquisition, Operations'),
+    .isIn(['Business Formation', 'Market Research', 'Property Acquisition', 'Operations', 'Training Replays', 'Documents Library'])
+    .withMessage('Category must be one of: Business Formation, Market Research, Property Acquisition, Operations, Training Replays, Documents Library'),
   body('videoUrl')
     .optional()
     .isURL({ protocols: ['https'] })
@@ -338,51 +338,23 @@ const validateBulkUpdate = [
 ];
 
 // Document validation rules
+const validDocumentCategories = ['Business Formation', 'Market Research', 'Property Acquisition', 'Operations', 'Documents Library', 'Training Replays'];
+
 const validateDocument = [
-  body('filename')
-    .trim()
-    .isLength({ min: 1, max: 255 })
-    .withMessage('Filename must be between 1 and 255 characters'),
-  body('url')
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage('Document URL is required'),
-  body('type')
-    .isIn(['pdf', 'excel'])
-    .withMessage('Document type must be either pdf or excel'),
-  body('size')
-    .isInt({ min: 0, max: 3 * 1024 * 1024 })
-    .withMessage('File size must be between 0 and 3MB'),
   body('category')
-    .isIn(['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'])
-    .withMessage('Invalid category'),
+    .notEmpty()
+    .withMessage('Document category is required')
+    .isIn(validDocumentCategories)
+    .withMessage('Invalid document category'),
   handleValidationErrors
 ];
 
 // Document update validation rules (more lenient)
 const validateDocumentUpdate = [
-  body('filename')
-    .optional()
-    .trim()
-    .isLength({ min: 1, max: 255 })
-    .withMessage('Filename must be between 1 and 255 characters'),
-  body('url')
-    .optional()
-    .trim()
-    .isLength({ min: 1 })
-    .withMessage('Document URL is required'),
-  body('type')
-    .optional()
-    .isIn(['pdf', 'excel'])
-    .withMessage('Document type must be either pdf or excel'),
-  body('size')
-    .optional()
-    .isInt({ min: 0, max: 3 * 1024 * 1024 })
-    .withMessage('File size must be between 0 and 3MB'),
   body('category')
     .optional()
-    .isIn(['Business Formation', 'Market Research', 'Property Acquisition', 'Operations'])
-    .withMessage('Invalid category'),
+    .isIn(validDocumentCategories)
+    .withMessage('Invalid document category'),
   handleValidationErrors
 ];
 

@@ -1,9 +1,37 @@
 const Document = require('../models/Document');
+const r2StorageService = require('./r2StorageService');
+
+const normalizeAttachmentType = (type = '') => {
+  switch (type) {
+    case 'pdf':
+      return 'pdf';
+    case 'excel':
+    case 'spreadsheet':
+      return 'spreadsheet';
+    case 'presentation':
+    case 'powerpoint':
+      return 'presentation';
+    case 'text':
+      return 'text';
+    default:
+      return 'document';
+  }
+};
 
 class DocumentService {
   // Create a new document
   async createDocument(documentData, createdBy) {
     try {
+      if (documentData.size !== undefined) {
+        documentData.size = Number(documentData.size);
+      }
+      if (documentData.storageKey === undefined) {
+        documentData.storageKey = null;
+      }
+      if (documentData.contentType === undefined && documentData.type) {
+        documentData.contentType = null;
+      }
+
       const document = new Document({
         ...documentData,
         createdBy,
@@ -96,23 +124,37 @@ class DocumentService {
   // Update document
   async updateDocument(documentId, updateData, modifiedBy) {
     try {
-      const document = await Document.findByIdAndUpdate(
-        documentId,
-        {
-          ...updateData,
-          lastModifiedBy: modifiedBy
-        },
-        { new: true, runValidators: true }
-      )
-        .populate('createdBy', 'firstName lastName email')
-        .populate('lastModifiedBy', 'firstName lastName email')
-        .populate('videoId', 'title videoUrl');
+      const document = await Document.findById(documentId);
 
       if (!document) {
         throw new Error('Document not found');
       }
 
-      return document;
+      const previousStorageKey = document.storageKey;
+
+      if (updateData.filename !== undefined) document.filename = updateData.filename;
+      if (updateData.url !== undefined) document.url = updateData.url;
+      if (updateData.type !== undefined) document.type = updateData.type;
+      if (updateData.size !== undefined) document.size = Number(updateData.size);
+      if (updateData.category !== undefined) document.category = updateData.category;
+      if (updateData.storageKey !== undefined) document.storageKey = updateData.storageKey;
+      if (updateData.contentType !== undefined) document.contentType = updateData.contentType;
+      if (updateData.videoId !== undefined) document.videoId = updateData.videoId;
+
+      document.lastModifiedBy = modifiedBy;
+      await document.save();
+
+      if (
+        updateData.storageKey &&
+        previousStorageKey &&
+        previousStorageKey !== updateData.storageKey
+      ) {
+        r2StorageService.deleteObject(previousStorageKey).catch((err) => {
+          console.warn('⚠️  Failed to delete previous document from R2:', err.message);
+        });
+      }
+
+      return this.getDocumentById(document._id);
     } catch (error) {
       if (error.name === 'ValidationError') {
         const errors = Object.values(error.errors).map(err => err.message);
@@ -132,6 +174,14 @@ class DocumentService {
       
       if (!document) {
         throw new Error('Document not found');
+      }
+
+      if (document.storageKey) {
+        try {
+          await r2StorageService.deleteObject(document.storageKey);
+        } catch (err) {
+          console.warn('⚠️  Failed to delete document from R2:', err.message);
+        }
       }
 
       return document;
@@ -173,8 +223,10 @@ class DocumentService {
       const documentData = {
         filename: attachmentData.filename,
         url: attachmentData.url,
-        type: attachmentData.type,
+        type: normalizeAttachmentType(attachmentData.type),
         size: attachmentData.size,
+        storageKey: attachmentData.storageKey || null,
+        contentType: attachmentData.contentType || null,
         category: videoCategory || 'Documents Library', // Use video's category or default
         videoId: videoId
       };

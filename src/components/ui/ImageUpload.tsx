@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Upload, X, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { videoService } from '@/services/videoService';
 import { API_CONFIG } from '@/config/api';
@@ -22,30 +22,24 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   className = '',
   disabled = false
 }) => {
-  const [isUploading, setIsUploading] = useState(false);
-  const [preview, setPreview] = useState<string | null>(() => {
-    if (value) {
-      return value.startsWith('/uploads/') ? `${API_CONFIG.BASE_URL.replace('/api', '')}${value}` : value;
+  const resolvePreview = (input?: string) => {
+    if (!input) return null;
+    if (input.startsWith('http')) return input;
+    if (input.startsWith('/uploads/')) {
+      return `${API_CONFIG.BASE_URL.replace('/api', '')}${input}`;
     }
-    return null;
-  });
+    return input;
+  };
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(() => resolvePreview(value));
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   // Update preview when value changes (for edit mode)
   useEffect(() => {
-    if (value) {
-      // If it's an uploaded file path, construct the full URL
-      if (value.startsWith('/uploads/')) {
-        setPreview(`${API_CONFIG.BASE_URL.replace('/api', '')}${value}`);
-      } else {
-        // It's a regular URL
-        setPreview(value);
-      }
-    } else {
-      setPreview(null);
-    }
+    setPreview(resolvePreview(value));
   }, [value]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,12 +86,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       const response = await videoService.uploadThumbnail(fileToUpload);
       
       if (response.data.success) {
-        const filePath = response.data.data.path;
-        onChange(filePath);
-        
-        // Update preview to show the uploaded image
-        const fullImageUrl = `${API_CONFIG.BASE_URL.replace('/api', '')}${filePath}`;
-        setPreview(fullImageUrl);
+        const { url } = response.data.data;
+        onChange(url);
+        setPreview(url);
         
         toast({
           title: "Image uploaded",
@@ -118,14 +109,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
   const handleRemove = async () => {
     // If there's an uploaded file, try to delete it from server
-    if (value && value.startsWith('/uploads/')) {
-      const filename = value.split('/').pop();
-      if (filename) {
-        try {
-          await videoService.deleteThumbnail(filename);
-        } catch (error) {
-          console.error('Error deleting uploaded image:', error);
-        }
+    if (value) {
+      try {
+        await videoService.deleteThumbnail({ url: value });
+      } catch (error) {
+        console.error('Error deleting uploaded image:', error);
       }
     }
     
@@ -206,7 +194,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             )}
           </div>
           <p className="text-xs text-gray-400 mt-1">
-            {selectedFile ? `Selected: ${selectedFile.name}` : (value?.startsWith('/uploads/') ? `Uploaded: ${value.split('/').pop()}` : 'Image')}
+            {selectedFile ? `Selected: ${selectedFile.name}` : (value ? `Uploaded: ${value.split('/').pop()}` : 'Image')}
           </p>
         </div>
       )}

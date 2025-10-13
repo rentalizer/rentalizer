@@ -32,19 +32,31 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// File filter for documents (PDF and Excel)
+// File filter for documents (PDF, Office, Text)
 const documentFileFilter = (req, file, cb) => {
-  // Check if file is PDF or Excel
   const allowedMimes = [
     'application/pdf',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-    'application/vnd.ms-excel' // .xls
+    'application/vnd.ms-excel', // .xls
+    'application/msword', // .doc
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+    'application/vnd.ms-powerpoint', // .ppt
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
+    'application/vnd.openxmlformats-officedocument.presentationml.slideshow', // .ppsx
+    'application/vnd.ms-powerpoint.presentation.macroenabled.12', // .pptm
+    'application/vnd.ms-excel.sheet.macroenabled.12', // .xlsm
+    'text/plain', // .txt
+    'text/markdown', // .md
+    'text/csv',
+    'application/vnd.oasis.opendocument.text', // .odt
+    'application/vnd.oasis.opendocument.spreadsheet', // .ods
+    'application/vnd.oasis.opendocument.presentation' // .odp
   ];
   
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Only PDF and Excel files are allowed!'), false);
+    cb(new Error('Unsupported document file type'), false);
   }
 };
 
@@ -67,18 +79,26 @@ const avatarUpload = multer({
   }
 });
 
+const thumbnailUpload = multer({
+  storage: memoryStorage,
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit for thumbnails
+  }
+});
+
 // Configure multer for documents
 const documentUpload = multer({
-  storage: storage,
+  storage: memoryStorage,
   fileFilter: documentFileFilter,
   limits: {
-    fileSize: 3 * 1024 * 1024, // 3MB limit for documents
+    fileSize: 20 * 1024 * 1024, // 20MB limit for documents
   }
 });
 
 // Middleware for single image upload
 const uploadThumbnail = (req, res, next) => {
-  upload.single('thumbnail')(req, res, (err) => {
+  thumbnailUpload.single('thumbnail')(req, res, (err) => {
     if (err) {
       return next(err);
     }
@@ -122,7 +142,7 @@ const handleUploadError = (error, req, res, next) => {
     if (error.code === 'LIMIT_FILE_SIZE') {
       return res.status(400).json({
         success: false,
-        message: 'File too large. Maximum size is 5MB.'
+        message: 'File too large. Maximum size is 5MB for images, 2MB for avatars, and 20MB for documents.'
       });
     }
     if (error.code === 'LIMIT_UNEXPECTED_FILE') {
@@ -140,10 +160,10 @@ const handleUploadError = (error, req, res, next) => {
     });
   }
   
-  if (error.message === 'Only PDF and Excel files are allowed!') {
+  if (error.message === 'Unsupported document file type') {
     return res.status(400).json({
       success: false,
-      message: 'Only PDF and Excel files are allowed!'
+      message: 'Unsupported document file type. Please upload PDF, Office, text, or CSV files.'
     });
   }
   

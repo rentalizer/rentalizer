@@ -265,6 +265,8 @@ class VideoService {
     // If attachment data is already provided (without file), include it
     if (updateData.attachment && !attachmentFile) {
       formData.append('attachment', JSON.stringify(updateData.attachment));
+    } else if (updateData.attachment === null && !attachmentFile) {
+      formData.append('attachment', 'null');
     }
 
     const response: AxiosResponse<ApiResponse<Video>> = await videoApi.put(
@@ -322,7 +324,7 @@ class VideoService {
   }
 
   // Upload thumbnail image
-  async uploadThumbnail(file: File): Promise<AxiosResponse<{ success: boolean; data: { filename: string; path: string; size: number; mimetype: string } }>> {
+  async uploadThumbnail(file: File): Promise<AxiosResponse<{ success: boolean; data: { key: string; url: string; size: number; mimetype: string } }>> {
     const formData = new FormData();
     formData.append('thumbnail', file);
 
@@ -334,8 +336,12 @@ class VideoService {
   }
 
   // Delete thumbnail image
-  async deleteThumbnail(filename: string): Promise<AxiosResponse<{ success: boolean; message: string }>> {
-    return videoApi.delete(`/upload/thumbnail/${filename}`);
+  async deleteThumbnail(payload: { key?: string; url?: string } | string): Promise<AxiosResponse<{ success: boolean; message: string }>> {
+    const data = typeof payload === 'string' ? { key: payload } : payload;
+
+    return videoApi.delete('/upload/thumbnail', {
+      data,
+    });
   }
 }
 

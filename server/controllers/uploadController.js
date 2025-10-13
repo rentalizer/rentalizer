@@ -1,5 +1,3 @@
-const path = require('path');
-const fs = require('fs');
 const r2StorageService = require('../services/r2StorageService');
 
 // Upload thumbnail image
@@ -12,16 +10,14 @@ const uploadThumbnail = async (req, res) => {
       });
     }
 
-    // Return the file path relative to the server
-    const filePath = `/uploads/${req.file.filename}`;
-    
+    const { key, url } = await r2StorageService.uploadThumbnailImage(req.file);
+
     res.json({
       success: true,
       message: 'Image uploaded successfully',
       data: {
-        filename: req.file.filename,
-        originalName: req.file.originalname,
-        path: filePath,
+        key,
+        url,
         size: req.file.size,
         mimetype: req.file.mimetype
       }
@@ -38,28 +34,25 @@ const uploadThumbnail = async (req, res) => {
 // Delete uploaded image
 const deleteThumbnail = async (req, res) => {
   try {
-    const { filename } = req.params;
-    
-    if (!filename) {
+    const { filename } = req.params || {};
+    const { key: bodyKey, url: bodyUrl } = req.body || {};
+    const keyFromQuery = req.query.key || bodyKey;
+    const urlFromQuery = req.query.url || bodyUrl;
+
+    const objectKey =
+      keyFromQuery ||
+      r2StorageService.extractKeyFromUrl(urlFromQuery) ||
+      null;
+
+    if (!objectKey) {
       return res.status(400).json({
         success: false,
-        message: 'Filename is required'
+        message: 'No thumbnail identifier provided'
       });
     }
 
-    const filePath = path.join(__dirname, '../uploads', filename);
-    
-    // Check if file exists
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({
-        success: false,
-        message: 'File not found'
-      });
-    }
+    const deleted = await r2StorageService.deleteObject(objectKey);
 
-    // Delete the file
-    fs.unlinkSync(filePath);
-    
     res.json({
       success: true,
       message: 'Image deleted successfully'
@@ -152,15 +145,15 @@ const uploadPublicAvatar = async (req, res) => {
       success: true,
       message: 'Avatar uploaded successfully',
       data: {
-          key,
-          url
-        }
-      });
-    } catch (error) {
-      console.error('Error uploading avatar:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to upload avatar'
+        key,
+        url
+      }
+    });
+  } catch (error) {
+    console.error('Error uploading avatar:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload avatar'
     });
   }
 };

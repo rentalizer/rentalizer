@@ -1,4 +1,46 @@
+const path = require('path');
 const videoService = require('../services/videoService');
+const r2StorageService = require('../services/r2StorageService');
+
+const parseJsonField = (value) => {
+  if (typeof value !== 'string') return value;
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    return value;
+  }
+};
+
+const determineAttachmentType = (mimetype = '', filename = '') => {
+  const ext = path.extname(filename).toLowerCase();
+  const normalizedMime = mimetype.toLowerCase();
+
+  if (normalizedMime.includes('pdf') || ext === '.pdf') {
+    return 'pdf';
+  }
+
+  if (
+    normalizedMime.includes('spreadsheet') ||
+    normalizedMime.includes('excel') ||
+    ['.xls', '.xlsx', '.xlsm', '.csv', '.ods'].includes(ext)
+  ) {
+    return 'spreadsheet';
+  }
+
+  if (
+    normalizedMime.includes('presentation') ||
+    normalizedMime.includes('powerpoint') ||
+    ['.ppt', '.pptx', '.ppsx', '.odp'].includes(ext)
+  ) {
+    return 'presentation';
+  }
+
+  if (normalizedMime.startsWith('text/') || ['.txt', '.md'].includes(ext)) {
+    return 'text';
+  }
+
+  return 'document';
+};
 
 class VideoController {
   // GET /api/videos - Get all videos with filtering and pagination
@@ -77,13 +119,37 @@ class VideoController {
       const createdBy = req.user._id;
       const videoData = req.body;
 
+      if (videoData.tags) {
+        const parsedTags = parseJsonField(videoData.tags);
+        if (Array.isArray(parsedTags)) {
+          videoData.tags = parsedTags;
+        }
+      }
+
+      if (videoData.featured !== undefined) {
+        videoData.featured = videoData.featured === 'true' || videoData.featured === true;
+      }
+
+      if (videoData.isLive !== undefined) {
+        videoData.isLive = videoData.isLive === 'true' || videoData.isLive === true;
+      }
+
+      if (videoData.attachment) {
+        videoData.attachment = parseJsonField(videoData.attachment);
+      }
+
       // Handle file upload for attachment if present
       if (req.file) {
+        const categoryForStorage = videoData.category || 'Training Replays';
+        const uploadResult = await r2StorageService.uploadDocument(req.file, categoryForStorage);
+
         videoData.attachment = {
           filename: req.file.originalname,
-          url: `/uploads/${req.file.filename}`,
-          type: req.file.mimetype.includes('pdf') ? 'pdf' : 'excel',
-          size: req.file.size
+          storageKey: uploadResult.key,
+          url: uploadResult.url,
+          type: determineAttachmentType(req.file.mimetype, req.file.originalname),
+          size: req.file.size,
+          contentType: req.file.mimetype
         };
       }
 
@@ -119,6 +185,46 @@ class VideoController {
       const { id } = req.params;
       const modifiedBy = req.user._id;
       const updateData = req.body;
+
+      if (updateData.tags) {
+        const parsedTags = parseJsonField(updateData.tags);
+        if (Array.isArray(parsedTags)) {
+          updateData.tags = parsedTags;
+        }
+      }
+
+      if (updateData.featured !== undefined) {
+        updateData.featured = updateData.featured === 'true' || updateData.featured === true;
+      }
+
+      if (updateData.isLive !== undefined) {
+        updateData.isLive = updateData.isLive === 'true' || updateData.isLive === true;
+      }
+
+      if (updateData.isActive !== undefined) {
+        updateData.isActive = updateData.isActive === 'true' || updateData.isActive === true;
+      }
+
+      if (updateData.attachment) {
+        updateData.attachment = parseJsonField(updateData.attachment);
+      }
+
+      if (updateData.attachment === 'null') {
+        updateData.attachment = null;
+      }
+
+      if (req.file) {
+        const categoryForStorage = updateData.category || 'Training Replays';
+        const uploadResult = await r2StorageService.uploadDocument(req.file, categoryForStorage);
+        updateData.attachment = {
+          filename: req.file.originalname,
+          storageKey: uploadResult.key,
+          url: uploadResult.url,
+          type: determineAttachmentType(req.file.mimetype, req.file.originalname),
+          size: req.file.size,
+          contentType: req.file.mimetype
+        };
+      }
 
       const video = await videoService.updateVideo(id, updateData, modifiedBy);
 

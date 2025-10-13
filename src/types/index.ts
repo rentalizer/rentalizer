@@ -32,9 +32,11 @@ export interface Video {
   attachment?: {
     filename: string;
     url: string;
-    type: 'pdf' | 'excel';
+    type: 'pdf' | 'excel' | 'spreadsheet' | 'document' | 'presentation' | 'text';
     size: number;
-  };
+    storageKey?: string | null;
+    contentType?: string | null;
+  } | null;
   createdBy: {
     _id: string;
     firstName: string;
@@ -64,8 +66,10 @@ export interface CreateVideoData {
   attachment?: {
     filename: string;
     url: string;
-    type: 'pdf' | 'excel';
+    type: 'pdf' | 'excel' | 'spreadsheet' | 'document' | 'presentation' | 'text';
     size: number;
+    storageKey?: string | null;
+    contentType?: string | null;
   };
 }
 
@@ -87,7 +91,8 @@ export interface Document {
   _id: string;
   filename: string;
   url: string;
-  type: 'pdf' | 'excel';
+  storageKey?: string | null;
+  type: 'pdf' | 'excel' | 'spreadsheet' | 'document' | 'presentation' | 'text';
   size: number;
   category: string;
   videoId?: string; // Optional reference to the video it came from

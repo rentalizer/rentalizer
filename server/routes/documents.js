@@ -18,7 +18,7 @@ router.get('/', documentController.getAllDocuments);
 router.get('/categories', documentController.getDocumentCategories);
 
 // GET /api/documents/category/:category - Get documents by category
-router.get('/category/:category', documentController.getDocumentCategories);
+router.get('/category/:category', documentController.getDocumentsByCategory);
 
 // GET /api/documents/:id - Get document by ID
 router.get('/:id', documentController.getDocumentById);
