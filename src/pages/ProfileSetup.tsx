@@ -90,42 +90,37 @@ const ProfileSetup = () => {
     try {
       setUploading(true);
 
-      if (!event.target.files || event.target.files.length === 0) {
-        console.log("No file selected: Please select an image to upload");
+      const file = event.target.files?.[0];
+      // Reset input so users can re-upload the same file if needed
+      event.target.value = '';
+
+      if (!file) {
+        console.log('No file selected: Please choose an image to upload');
         return;
       }
 
-      const file = event.target.files[0];
-      
-      // Validate file type
       if (!file.type.startsWith('image/')) {
-        console.log("Invalid file type: Please select an image file");
+        console.log('Invalid file type: Please select an image file');
         return;
       }
 
-      // Validate file size (max 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        console.log("File too large: Please select an image smaller than 2MB");
+        console.log('File too large: Please select an image smaller than 2MB');
         return;
       }
 
-      // Convert to base64 for storage (you might want to implement proper file upload later)
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        // Only store if it's a reasonable size (less than 1MB base64)
-        if (result.length < 1000000) {
-          setAvatarUrl(result);
-          console.log("Success: Profile photo selected");
-        } else {
-          console.log("File too large: Please select a smaller image");
-        }
-      };
-      reader.readAsDataURL(file);
-      
+      const { url } = await apiService.uploadAvatar(file);
+
+      if (!url) {
+        console.log('Upload failed: No URL returned');
+        return;
+      }
+
+      setAvatarUrl(url);
+      console.log('Success: Profile photo uploaded');
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      console.log("Error: Failed to upload avatar");
+      console.log('Error: Failed to upload avatar');
     } finally {
       setUploading(false);
     }
@@ -214,6 +209,8 @@ const ProfileSetup = () => {
 
   const watchedFirstName = form.watch('first_name');
   const watchedLastName = form.watch('last_name');
+  const firstInitial = (watchedFirstName || '').charAt(0).toUpperCase();
+  const lastInitial = (watchedLastName || '').charAt(0).toUpperCase();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -257,7 +254,7 @@ const ProfileSetup = () => {
                     <Avatar className="h-32 w-32">
                       <AvatarImage src={avatarUrl} className="object-cover" />
                       <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-blue-500 text-white text-2xl">
-                        {watchedFirstName.charAt(0)}{watchedLastName.charAt(0)}
+                        {`${firstInitial}${lastInitial}`.trim() || 'U'}
                       </AvatarFallback>
                     </Avatar>
                     

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { uploadThumbnail, uploadPhoto, deleteThumbnail } = require('../controllers/uploadController');
-const { uploadThumbnail: uploadMiddleware, uploadPhoto: uploadPhotoMiddleware, handleUploadError } = require('../middleware/upload');
+const { uploadThumbnail, uploadPhoto, deleteThumbnail, uploadAvatar } = require('../controllers/uploadController');
+const { uploadThumbnail: uploadMiddleware, uploadPhoto: uploadPhotoMiddleware, uploadAvatar: uploadAvatarMiddleware, handleUploadError } = require('../middleware/upload');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 
 // Upload thumbnail image (Admin only)
@@ -19,6 +19,15 @@ router.post('/photo',
   uploadPhotoMiddleware, 
   handleUploadError, 
   uploadPhoto
+);
+
+// Upload avatar (Authenticated users)
+router.post(
+  '/avatar',
+  authenticateToken,
+  uploadAvatarMiddleware,
+  handleUploadError,
+  uploadAvatar
 );
 
 // Delete thumbnail image (Admin only)

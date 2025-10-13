@@ -79,6 +79,9 @@ export const Auth = () => {
     }
   };
 
+  const firstInitial = (firstName || '').charAt(0).toUpperCase();
+  const lastInitial = (lastName || '').charAt(0).toUpperCase();
+
   // Redirect if already authenticated (but not during loading)
   if (user && !isLoading) {
     return <Navigate to="/community#discussions" replace />;
@@ -282,73 +285,56 @@ export const Auth = () => {
       setUploading(true);
       setAvatarError('');
 
-      if (!event.target.files || event.target.files.length === 0) {
+      const file = event.target.files?.[0];
+      event.target.value = '';
+
+      if (!file) {
         toast({
-          variant: "destructive",
-          title: "No File Selected",
-          description: "Please select an image to upload.",
+          variant: 'destructive',
+          title: 'No File Selected',
+          description: 'Please select an image to upload.',
         });
         return;
       }
 
-      const file = event.target.files[0];
-      
-      // Validate file type
       if (!file.type.startsWith('image/')) {
-        const errorMsg = "Invalid file type. Please select an image file (JPEG, PNG, GIF, or WebP).";
+        const errorMsg = 'Invalid file type. Please select an image file (JPEG, PNG, GIF, or WebP).';
         setAvatarError(errorMsg);
         toast({
-          variant: "destructive",
-          title: "Invalid File Type",
+          variant: 'destructive',
+          title: 'Invalid File Type',
           description: errorMsg,
         });
         return;
       }
 
-      // Validate file size (max 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        const errorMsg = "File is too large. Please select an image smaller than 2MB.";
+        const errorMsg = 'File is too large. Please select an image smaller than 2MB.';
         setAvatarError(errorMsg);
         toast({
-          variant: "destructive",
-          title: "File Too Large",
+          variant: 'destructive',
+          title: 'File Too Large',
           description: errorMsg,
         });
         return;
       }
 
-      // Convert to base64 for storage
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        // Only store if it's a reasonable size (less than 1MB base64)
-        if (result.length < 1000000) {
-          setAvatarUrl(result);
-          setAvatarError('');
-          toast({
-            variant: "success",
-            title: "Profile Photo Selected",
-            description: "Your profile photo has been successfully selected.",
-          });
-        } else {
-          const errorMsg = "File is too large. Please select a smaller image.";
-          setAvatarError(errorMsg);
-          toast({
-            variant: "destructive",
-            title: "File Too Large",
-            description: errorMsg,
-          });
-        }
-      };
-      reader.readAsDataURL(file);
-      
+      const { url } = await apiService.uploadAvatar(file);
+
+      setAvatarUrl(url);
+      setAvatarError('');
+      toast({
+        variant: 'success',
+        title: 'Profile Photo Uploaded',
+        description: 'Your profile photo has been uploaded successfully.',
+      });
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      const errorMsg = "Failed to upload avatar. Please try again.";
+      const errorMsg = 'Failed to upload avatar. Please try again.';
       setAvatarError(errorMsg);
       toast({
-        variant: "destructive",
-        title: "Upload Failed",
+        variant: 'destructive',
+        title: 'Upload Failed',
         description: errorMsg,
       });
     } finally {
@@ -612,7 +598,7 @@ export const Auth = () => {
               <Avatar className="h-20 w-20">
                 <AvatarImage src={avatarUrl} className="object-cover" />
                 <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-blue-500 text-white text-lg">
-                  {firstName.charAt(0)}{lastName.charAt(0)}
+                  {`${firstInitial}${lastInitial}`.trim() || 'U'}
                 </AvatarFallback>
               </Avatar>
               

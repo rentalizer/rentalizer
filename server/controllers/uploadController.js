@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const r2StorageService = require('../services/r2StorageService');
 
 // Upload thumbnail image
 const uploadThumbnail = async (req, res) => {
@@ -110,5 +111,33 @@ const uploadPhoto = async (req, res) => {
 module.exports = {
   uploadThumbnail,
   uploadPhoto,
-  deleteThumbnail
+  deleteThumbnail,
+  uploadAvatar: async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: 'No avatar file provided'
+        });
+      }
+
+      const userId = req.user?._id?.toString();
+      const { key, url } = await r2StorageService.uploadAvatar(req.file, userId);
+
+      res.json({
+        success: true,
+        message: 'Avatar uploaded successfully',
+        data: {
+          key,
+          url
+        }
+      });
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to upload avatar'
+      });
+    }
+  }
 };

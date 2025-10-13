@@ -48,12 +48,22 @@ const documentFileFilter = (req, file, cb) => {
   }
 };
 
+const memoryStorage = multer.memoryStorage();
+
 // Configure multer for images
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit
+  }
+});
+
+const avatarUpload = multer({
+  storage: memoryStorage,
+  fileFilter,
+  limits: {
+    fileSize: 2 * 1024 * 1024 // 2MB limit for avatars
   }
 });
 
@@ -79,6 +89,16 @@ const uploadThumbnail = (req, res, next) => {
 // Middleware for general photo upload
 const uploadPhoto = (req, res, next) => {
   upload.single('photo')(req, res, (err) => {
+    if (err) {
+      return next(err);
+    }
+    next();
+  });
+};
+
+// Middleware for avatar upload (in-memory)
+const uploadAvatar = (req, res, next) => {
+  avatarUpload.single('avatar')(req, res, (err) => {
     if (err) {
       return next(err);
     }
@@ -133,6 +153,7 @@ const handleUploadError = (error, req, res, next) => {
 module.exports = {
   uploadThumbnail,
   uploadPhoto,
+  uploadAvatar,
   uploadDocument,
   handleUploadError
 };

@@ -23,6 +23,8 @@ const bugReportRoutes = require('./routes/bugReport');
 const promoCodeRoutes = require('./routes/promoCodes');
 const studentLogRoutes = require('./routes/studentLog');
 
+const { ensureSuperAdminUser } = require('./services/adminProvisionService');
+
 // Import WebSocket setup
 const { setupWebSocketHandlers } = require('./middleware/websocket');
 
@@ -115,8 +117,9 @@ const mongoOptions = {
 };
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/rentalizer', mongoOptions)
-.then(() => {
+.then(async () => {
   console.log('✅ Connected to MongoDB');
+  await ensureSuperAdminUser();
   server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server is running on port ${PORT}`);
     console.log(`📡 WebSocket server ready`);

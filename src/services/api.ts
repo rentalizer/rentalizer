@@ -145,6 +145,11 @@ export interface ChangePasswordRequest {
   newPassword: string;
 }
 
+export interface UploadAvatarResponseData {
+  key: string;
+  url: string;
+}
+
 // Discussion types
 export interface PopulatedUser {
   _id: string;
@@ -625,6 +630,32 @@ class ApiService {
     try {
       const response = await api.put<{ message: string; user: User }>('/user/profile', data);
       return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async uploadAvatar(file: File): Promise<UploadAvatarResponseData> {
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+
+      const response = await api.post<{
+        success: boolean;
+        message: string;
+        data: UploadAvatarResponseData;
+      }>('/upload/avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (!response.data.success) {
+        throw new Error(response.data.message || 'Failed to upload avatar');
+      }
+
+      return response.data.data;
     } catch (error) {
       this.handleError(error);
       throw error;

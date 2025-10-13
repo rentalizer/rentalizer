@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const r2StorageService = require('./r2StorageService');
 
 class UserService {
   // Get user by ID
@@ -16,28 +17,40 @@ class UserService {
   async updateUser(userId, updateData) {
     const { firstName, lastName, bio, profilePicture } = updateData;
 
-    const updateFields = {};
-    if (firstName !== undefined) updateFields.firstName = firstName;
-    if (lastName !== undefined) updateFields.lastName = lastName;
-    if (bio !== undefined) updateFields.bio = bio || null; // Convert empty string to null
-    // Only update profilePicture if it's not empty string
-    if (profilePicture !== undefined && profilePicture !== '') {
-      updateFields.profilePicture = profilePicture;
-    } else if (profilePicture === '') {
-      // If explicitly set to empty string, set to null
-      updateFields.profilePicture = null;
-    }
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      updateFields,
-      { new: true, runValidators: true }
-    ).select('-password');
+    const user = await User.findById(userId).select('-password');
 
     if (!user) {
       const error = new Error('User not found');
       error.name = 'NotFoundError';
       throw error;
+    }
+
+    const previousProfilePicture = user.profilePicture;
+
+    if (firstName !== undefined) user.firstName = firstName;
+    if (lastName !== undefined) user.lastName = lastName;
+    if (bio !== undefined) user.bio = bio || null; // Convert empty string to null
+
+    if (profilePicture !== undefined) {
+      if (profilePicture === '') {
+        user.profilePicture = null;
+      } else {
+        user.profilePicture = profilePicture;
+      }
+    }
+
+    await user.save();
+
+    if (
+      previousProfilePicture &&
+      previousProfilePicture !== user.profilePicture
+    ) {
+      const key = r2StorageService.extractKeyFromUrl(previousProfilePicture);
+      if (key) {
+        r2StorageService.deleteObject(key).catch((err) => {
+          console.warn('⚠️  Failed to remove previous avatar from R2:', err.message);
+        });
+      }
     }
 
     return user;
