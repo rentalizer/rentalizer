@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Video as VideoIcon, Search, Play, Clock, Eye, Calendar, Star, X, Plus, Edit, Trash2, GripVertical, Lock, Loader2, ArrowRight, Music, Building2, BarChart3, Home, Settings, FileText } from 'lucide-react';
+import { Video as VideoIcon, Search, Play, Clock, Eye, Calendar, Star, X, Plus, Edit, Trash2, GripVertical, Lock, Loader2, ArrowRight, Music, Building2, BarChart3, Home, Settings, FileText, NotebookPen } from 'lucide-react';
 import { ImageUpload } from '@/components/ui/ImageUpload';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -97,7 +97,7 @@ const CategoryAlbumCard = ({ category, videoCount, videos, onClick, getCategoryC
       case 'Operations':
         return <Settings className={`${sizeClass} text-green-300`} />;
       case 'Documents Library':
-        return <VideoIcon className={`${sizeClass} text-orange-300`} />;
+        return <NotebookPen className={`${sizeClass} text-orange-300`} />;
       case 'Training Replays':
         return <FileText className={`${sizeClass} text-amber-300`} />;
       default:
