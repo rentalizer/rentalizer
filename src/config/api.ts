@@ -23,6 +23,7 @@ export const API_CONFIG = {
       VERIFY: '/promo-codes/verify',
       BASE: '/promo-codes'
     },
+    PROMO_CODE_REQUEST: '/promo-code-requests',
     USER: {
       PROFILE: '/user/profile',
       UPDATE_PROFILE: '/user/profile',

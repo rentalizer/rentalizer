@@ -94,6 +94,11 @@ export interface PromoCodeVerificationResponse {
   };
 }
 
+export interface PromoCodeRequestResponse {
+  success: boolean;
+  message: string;
+}
+
 export interface PromoCodeEntry {
   _id: string;
   code: string;
@@ -562,6 +567,19 @@ class ApiService {
       const response = await api.post<PromoCodeVerificationResponse>(
         API_CONFIG.ENDPOINTS.PROMO_CODES.VERIFY,
         { code }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async requestPromoCode(email: string): Promise<PromoCodeRequestResponse> {
+    try {
+      const response = await api.post<PromoCodeRequestResponse>(
+        API_CONFIG.ENDPOINTS.PROMO_CODE_REQUEST,
+        { email }
       );
       return response.data;
     } catch (error) {

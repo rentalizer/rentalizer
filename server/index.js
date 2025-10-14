@@ -21,6 +21,7 @@ const newsRoutes = require('./routes/news');
 const messageRoutes = require('./routes/messages');
 const bugReportRoutes = require('./routes/bugReport');
 const promoCodeRoutes = require('./routes/promoCodes');
+const promoCodeRequestRoutes = require('./routes/promoCodeRequest');
 const studentLogRoutes = require('./routes/studentLog');
 
 const { ensureSuperAdminUser } = require('./services/adminProvisionService');
@@ -99,6 +100,7 @@ app.use('/api/news', newsRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/bug-report', bugReportRoutes);
 app.use('/api/promo-codes', promoCodeRoutes);
+app.use('/api/promo-code-requests', promoCodeRequestRoutes);
 app.use('/api/student-log', studentLogRoutes);
 
 // Health check endpoint

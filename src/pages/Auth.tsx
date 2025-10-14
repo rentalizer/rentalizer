@@ -7,11 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { validateSignupData, validateEmail, validatePassword, validateName, validateBio, validatePromoCode, getPasswordStrength } from '@/utils/authValidation';
 import { apiService } from '@/services/api';
-import { Eye, EyeOff, Upload, User, Ticket, LogIn, UserPlus, CheckCircle, XCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Upload, User, Ticket, LogIn, UserPlus, CheckCircle, XCircle, AlertCircle, Loader2, Mail } from 'lucide-react';
 
 export const Auth = () => {
   const { user, signIn, signUp, isLoading } = useAuth();
@@ -48,6 +49,10 @@ export const Auth = () => {
     singleUse?: boolean;
     lastUsedAt?: string | null;
   } | null>(null);
+  const [isPromoRequestOpen, setIsPromoRequestOpen] = useState(false);
+  const [promoRequestEmail, setPromoRequestEmail] = useState('');
+  const [promoRequestError, setPromoRequestError] = useState('');
+  const [promoRequestLoading, setPromoRequestLoading] = useState(false);
   
   // Validation state
   const [passwordStrength, setPasswordStrength] = useState<{ strength: 'weak' | 'medium' | 'strong'; message: string } | null>(null);
@@ -201,6 +206,58 @@ export const Auth = () => {
       throw error;
     } finally {
       setPromoCodeChecking(false);
+    }
+  };
+
+  const openPromoRequestDialog = () => {
+    setPromoRequestError('');
+    setPromoRequestEmail(signupEmail.trim());
+    setIsPromoRequestOpen(true);
+  };
+
+  const handlePromoRequestOpenChange = (open: boolean) => {
+    setIsPromoRequestOpen(open);
+    if (!open) {
+      setPromoRequestLoading(false);
+      setPromoRequestError('');
+      setPromoRequestEmail('');
+    } else if (!promoRequestEmail.trim() && signupEmail.trim()) {
+      setPromoRequestEmail(signupEmail.trim());
+    }
+  };
+
+  const handlePromoRequestSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const trimmedEmail = promoRequestEmail.trim();
+    const validation = validateEmail(trimmedEmail);
+
+    if (!validation.isValid) {
+      setPromoRequestError(validation.message);
+      return;
+    }
+
+    setPromoRequestError('');
+    setPromoRequestLoading(true);
+
+    try {
+      await apiService.requestPromoCode(trimmedEmail);
+      toast({
+        variant: 'success',
+        title: 'Request received!',
+        description: "Thanks for reaching out. We'll send you a promo code within 24 hours.",
+      });
+      setPromoRequestEmail('');
+      setIsPromoRequestOpen(false);
+    } catch (error) {
+      console.error('Promo code request error:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Unable to submit request',
+        description: 'Please try again later or email gelodevelops@gmail.com directly.',
+      });
+    } finally {
+      setPromoRequestLoading(false);
     }
   };
 
@@ -507,14 +564,15 @@ export const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-slate-800/50 border-cyan-500/20">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl text-white">Community Access</CardTitle>
-          <p className="text-gray-400">Join our vibrant community of rental entrepreneurs</p>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+    <>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center justify-center p-4">
+        <Card className="w-full max-w-md max-h-[90vh] bg-slate-800/50 border-cyan-500/20 flex flex-col">
+          <CardHeader className="text-center shrink-0">
+            <CardTitle className="text-2xl text-white">Community Access</CardTitle>
+            <p className="text-gray-400">Join our vibrant community of rental entrepreneurs</p>
+          </CardHeader>
+          <CardContent className="flex-1 overflow-y-auto">
+            <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
             <TabsList className="grid w-full grid-cols-2 bg-slate-700/50">
               <TabsTrigger value="login" className="text-gray-300 data-[state=active]:bg-cyan-600 data-[state=active]:text-white">
                 <LogIn className="h-4 w-4 mr-2" />
@@ -796,6 +854,16 @@ export const Auth = () => {
               <p className="text-xs text-gray-400">
                 A valid promo code is required to join the community.
               </p>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={openPromoRequestDialog}
+                className="w-full border border-dashed border-cyan-500/30 text-cyan-200 hover:text-white hover:bg-cyan-500/10"
+                disabled={signupLoading}
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Request a promo code
+              </Button>
               {promoCodeStatus === 'valid' && !promoCodeError && (
                 <div className="flex flex-col gap-1 text-green-400 text-sm">
                   <div className="flex items-center gap-2">
@@ -946,5 +1014,77 @@ export const Auth = () => {
         </CardContent>
       </Card>
     </div>
+
+      <Dialog open={isPromoRequestOpen} onOpenChange={handlePromoRequestOpenChange}>
+        <DialogContent className="bg-slate-900 border-cyan-500/30 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white">Request a Promo Code</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Share your email and we&apos;ll send over an invite code within 24 hours.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handlePromoRequestSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="promo-request-email" className="text-gray-300">
+                Email Address
+              </Label>
+              <Input
+                id="promo-request-email"
+                type="email"
+                autoComplete="email"
+                value={promoRequestEmail}
+                onChange={(e) => {
+                  setPromoRequestEmail(e.target.value);
+                  if (promoRequestError) {
+                    setPromoRequestError('');
+                  }
+                }}
+                placeholder="you@example.com"
+                className="bg-slate-800 border-cyan-500/40 text-white placeholder:text-gray-500"
+                disabled={promoRequestLoading}
+                required
+              />
+              {promoRequestError && (
+                <div className="flex items-center gap-2 text-red-400 text-sm">
+                  <XCircle className="h-4 w-4" />
+                  {promoRequestError}
+                </div>
+              )}
+              <p className="text-xs text-gray-500">
+                We&apos;ll use this address only to send your invite code.
+              </p>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => handlePromoRequestOpenChange(false)}
+                disabled={promoRequestLoading}
+                className="text-gray-400 hover:text-white"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={promoRequestLoading}
+                className="bg-cyan-600 hover:bg-cyan-700 text-white"
+              >
+                {promoRequestLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Mail className="h-4 w-4 mr-2" />
+                    Send request
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
