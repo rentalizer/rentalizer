@@ -101,7 +101,7 @@ class PromoCodeController {
   async verify(req, res) {
     try {
       const { code } = req.body;
-      const promoCode = await promoCodeService.assertPromoCodeIsValid(code);
+      const { promoCode, isStatic } = await promoCodeService.assertPromoCodeIsValid(code);
 
       res.json({
         message: 'Promo code is valid',
@@ -111,7 +111,8 @@ class PromoCodeController {
           usageCount: promoCode.usageCount,
           maxUsage: promoCode.maxUsage,
           singleUse: promoCode.singleUse,
-          lastUsedAt: promoCode.lastUsedAt
+          lastUsedAt: promoCode.lastUsedAt,
+          isReusable: isStatic
         }
       });
     } catch (error) {

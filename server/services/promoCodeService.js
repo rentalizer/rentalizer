@@ -1,6 +1,14 @@
 const crypto = require('crypto');
 const PromoCode = require('../models/PromoCode');
 
+// Reusable promo code for testing/onboarding; override via environment variables if needed.
+const DEFAULT_STATIC_PROMO_CODE = 'TESTACCESS';
+const STATIC_PROMO_CODE = (
+  process.env.STATIC_PROMO_CODE ||
+  process.env.MULTI_USE_PROMO_CODE ||
+  DEFAULT_STATIC_PROMO_CODE
+).trim().toUpperCase();
+
 class PromoCodeService {
   async generateRandomCode(length = 12, prefix = '') {
     const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -134,6 +142,20 @@ class PromoCodeService {
       throw error;
     }
 
+    if (STATIC_PROMO_CODE && normalizedCode === STATIC_PROMO_CODE) {
+      return {
+        promoCode: {
+          code: STATIC_PROMO_CODE,
+          isActive: true,
+          usageCount: 0,
+          maxUsage: null,
+          singleUse: false,
+          lastUsedAt: null
+        },
+        isStatic: true
+      };
+    }
+
     const promoCode = await PromoCode.findOne({ code: normalizedCode });
 
     if (!promoCode) {
@@ -158,7 +180,7 @@ class PromoCodeService {
       throw error;
     }
 
-    return promoCode;
+    return { promoCode, isStatic: false };
   }
 
   async recordUsage({ promoCode, userId }) {

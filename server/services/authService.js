@@ -15,7 +15,7 @@ class AuthService {
       throw error;
     }
 
-    const promoCodeDocument = await promoCodeService.assertPromoCodeIsValid(promoCode);
+    const { promoCode: promoCodeDocument, isStatic } = await promoCodeService.assertPromoCodeIsValid(promoCode);
 
     // Create new user
     const user = new User({
@@ -28,7 +28,9 @@ class AuthService {
     });
 
     await user.save();
-    await promoCodeService.recordUsage({ promoCode: promoCodeDocument, userId: user._id });
+    if (!isStatic) {
+      await promoCodeService.recordUsage({ promoCode: promoCodeDocument, userId: user._id });
+    }
 
     // Generate JWT token
     const token = generateToken(user._id);
