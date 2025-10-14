@@ -37,6 +37,12 @@ import { API_CONFIG } from '@/config/api';
 
 const MAX_DOCUMENT_SIZE = 20 * 1024 * 1024;
 const ALLOWED_DOCUMENT_EXTENSIONS = ['pdf', 'xls', 'xlsx', 'xlsm', 'doc', 'docx', 'ppt', 'pptx', 'ppsx', 'txt', 'md', 'csv', 'ods', 'odp', 'odt'];
+const CHRONOLOGICAL_CATEGORIES = new Set([
+  'Business Formation',
+  'Market Research',
+  'Property Acquisition',
+  'Operations'
+]);
 
 const determineDocumentType = (fileName: string): 'pdf' | 'spreadsheet' | 'document' | 'presentation' | 'text' => {
   const ext = fileName.split('.').pop()?.toLowerCase() || '';
@@ -62,6 +68,25 @@ const getAttachmentIcon = (type: 'pdf' | 'spreadsheet' | 'document' | 'presentat
     default:
       return <span className="text-purple-300 text-lg">📁</span>;
   }
+};
+
+const orderVideosForDisplay = (category: string, items: Video[]) => {
+  if (!CHRONOLOGICAL_CATEGORIES.has(category)) {
+    return items;
+  }
+
+  return [...items].sort((a, b) => {
+    const orderA = typeof a.order === 'number' ? a.order : 0;
+    const orderB = typeof b.order === 'number' ? b.order : 0;
+
+    if (orderA === orderB) {
+      const createdAtA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const createdAtB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return createdAtA - createdAtB;
+    }
+
+    return orderA - orderB;
+  });
 };
 
 interface SortableVideoCardProps {
@@ -595,16 +620,20 @@ export const VideoLibrary = () => {
       }
       
       // Get videos in the same category
-      const categoryVideos = videos.filter(video => video.category === activeVideo.category);
+      let categoryVideos = videos.filter(video => video.category === activeVideo.category);
+      categoryVideos = orderVideosForDisplay(activeVideo.category, categoryVideos);
       const oldIndex = categoryVideos.findIndex((item) => item._id === active.id);
       const newIndex = categoryVideos.findIndex((item) => item._id === over?.id);
       
       const newCategoryItems = arrayMove(categoryVideos, oldIndex, newIndex);
-      
-      // Update the order for videos in this category (newest first, so higher numbers first)
+      const useChronologicalOrdering = CHRONOLOGICAL_CATEGORIES.has(activeVideo.category);
+      const getOrderValue = (index: number, length: number) =>
+        useChronologicalOrdering ? index + 1 : length - index;
+
+      // Update the order for videos in this category
       const videoOrders = newCategoryItems.map((item, index) => ({
         videoId: item._id,
-        order: newCategoryItems.length - index
+        order: getOrderValue(index, newCategoryItems.length)
       }));
 
       try {
@@ -616,7 +645,10 @@ export const VideoLibrary = () => {
           newCategoryItems.forEach((item, index) => {
             const videoIndex = updatedVideos.findIndex(v => v._id === item._id);
             if (videoIndex !== -1) {
-              updatedVideos[videoIndex] = { ...updatedVideos[videoIndex], order: newCategoryItems.length - index };
+              updatedVideos[videoIndex] = { 
+                ...updatedVideos[videoIndex], 
+                order: getOrderValue(index, newCategoryItems.length) 
+              };
             }
           });
           return updatedVideos;
@@ -1058,7 +1090,8 @@ export const VideoLibrary = () => {
             
             // Group videos by category - initialize all categories with empty arrays
             const videosByCategory = categoryColumns.reduce((acc, category) => {
-              acc[category] = videos.filter(video => video.category === category);
+              const filteredVideos = videos.filter(video => video.category === category);
+              acc[category] = orderVideosForDisplay(category, filteredVideos);
               return acc;
             }, {} as Record<string, Video[]>);
 
