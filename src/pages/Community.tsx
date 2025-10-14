@@ -292,14 +292,14 @@ const Community = React.memo(() => {
           </div>
 
         {/* Admin Quick Links */}
-        {userIsAdmin && (
+        {/* {userIsAdmin && (
           <div className="mb-6 flex justify-center">
             <Link to="/admin/richie" className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center gap-2">
               <Bot className="h-4 w-4" />
               Manage Richie's Knowledge Base
             </Link>
           </div>
-        )}
+        )} */}
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={(value) => {
