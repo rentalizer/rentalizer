@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useProfile } from '@/hooks/useProfile';
 import axios from 'axios';
 import { API_CONFIG } from '@/config/api';
+import { AdminGroupAvatar } from '@/components/community/AdminGroupAvatar';
 
 interface CommunityHeaderProps {
   onPostCreated: () => void;
@@ -62,6 +63,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
   const [videoUpload, setVideoUpload] = useState<VideoUpload | null>(null);
   const [photoUpload, setPhotoUpload] = useState<PhotoUpload | null>(null);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+
+  const isAdminUser = user?.role === 'admin' || user?.role === 'superadmin';
 
   const getUserAvatar = () => {
     const avatar = supabaseProfile?.avatar_url || user?.profilePicture;
@@ -568,24 +571,28 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       <CardContent className="p-6">
         <div className="space-y-4">
           <div className="flex items-start gap-4">
-            <Avatar className="w-12 h-12 flex-shrink-0">
-              {getUserAvatar() ? (
-                <AvatarImage 
-                  src={getUserAvatar()!} 
-                  alt="Your avatar" 
-                  className="object-cover w-full h-full"
-                />
-              ) : (
-                <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
-                  {getUserInitials()}
-                </AvatarFallback>
-              )}
-            </Avatar>
+            {isAdminUser ? (
+              <AdminGroupAvatar size="xl" className="shrink-0" />
+            ) : (
+              <Avatar className="w-12 h-12 flex-shrink-0">
+                {getUserAvatar() ? (
+                  <AvatarImage 
+                    src={getUserAvatar()!} 
+                    alt="Your avatar" 
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
+                    {getUserInitials()}
+                  </AvatarFallback>
+                )}
+              </Avatar>
+            )}
             <div className="flex-1 space-y-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-cyan-300 font-medium">{getUserName()}</span>
-                  {user?.role === 'admin' || user?.role === 'superadmin' ? (
+                  {isAdminUser ? (
                     <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
                       Admin
                     </Badge>
