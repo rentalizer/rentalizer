@@ -65,8 +65,8 @@ const getAttachmentIcon = (type: 'pdf' | 'spreadsheet' | 'document' | 'presentat
       return <span className="text-orange-400 text-lg">📽️</span>;
     case 'text':
       return <span className="text-blue-300 text-lg">📝</span>;
-    default:
-      return <span className="text-purple-300 text-lg">📁</span>;
+    // default:
+    //   return <span className="text-purple-300 text-lg">📁</span>;
   }
 };
 
@@ -877,6 +877,27 @@ export const VideoLibrary = () => {
     }
   };
 
+  const selectedAttachment = selectedVideo?.attachment ?? null;
+  const hasSelectedAttachment =
+    !!(
+      selectedAttachment &&
+      selectedAttachment.url &&
+      selectedAttachment.url.trim() !== '' &&
+      selectedAttachment.filename &&
+      selectedAttachment.filename.trim() !== ''
+    );
+  const selectedAttachmentSizeLabel = (() => {
+    if (
+      !hasSelectedAttachment ||
+      !selectedAttachment ||
+      typeof selectedAttachment.size !== 'number' ||
+      !Number.isFinite(selectedAttachment.size)
+    ) {
+      return null;
+    }
+    return `${(selectedAttachment.size / 1024).toFixed(1)} KB`;
+  })();
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -1399,16 +1420,18 @@ export const VideoLibrary = () => {
               )}
               
               {/* Attachment */}
-              {selectedVideo.attachment && (
+              {hasSelectedAttachment && selectedAttachment && (
                 <div className="bg-slate-800/50 rounded-lg p-3 border border-cyan-500/20">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      {getAttachmentIcon(selectedVideo.attachment.type)}
+                      {getAttachmentIcon(selectedAttachment.type)}
                       <div>
-                        <p className="text-xs text-white font-medium">{selectedVideo.attachment.filename}</p>
-                        <p className="text-xs text-gray-400">
-                          {(selectedVideo.attachment.size / 1024).toFixed(1)} KB
-                        </p>
+                        <p className="text-xs text-white font-medium">{selectedAttachment.filename}</p>
+                        {selectedAttachmentSizeLabel && (
+                          <p className="text-xs text-gray-400">
+                            {selectedAttachmentSizeLabel}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <Button
@@ -1416,9 +1439,9 @@ export const VideoLibrary = () => {
                       variant="outline"
                       onClick={() => {
                         // Open attachment in new tab
-                        const fullUrl = selectedVideo.attachment.url.startsWith('http')
-                          ? selectedVideo.attachment.url
-                          : `${API_CONFIG.BASE_URL.replace('/api', '')}${selectedVideo.attachment.url}`;
+                        const fullUrl = selectedAttachment.url.startsWith('http')
+                          ? selectedAttachment.url
+                          : `${API_CONFIG.BASE_URL.replace('/api', '')}${selectedAttachment.url}`;
                         window.open(fullUrl, '_blank');
                       }}
                       className="h-7 px-3 text-xs border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"

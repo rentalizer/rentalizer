@@ -30,7 +30,7 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState<Document | null>(null);
-  const [categories] = useState<string[]>(['all', 'Business Formation', 'Market Research', 'Property Acquisition', 'Operations', 'Documents Library', 'Training Replays']);
+  const [categories] = useState<string[]>(['all', 'Business Formation', 'Market Research', 'Property Acquisition', 'Operations']);
 
   // Form state for new document
   const [newDocument, setNewDocument] = useState({
