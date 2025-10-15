@@ -25,6 +25,7 @@ import { NewsFeed } from '@/components/community/NewsFeed';
 import { MembersList } from '@/components/MembersList';
 import { CommunityHeader } from '@/components/community/CommunityHeader';
 import { CommentsDialog } from '@/components/community/CommentsDialog';
+import { AdminGroupAvatar } from '@/components/community/AdminGroupAvatar';
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 import { useProfile } from '@/hooks/useProfile';
 import { formatDateWithTimezone, getTimezoneNotice } from '@/utils/timezone';
@@ -1094,20 +1095,24 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                     <div className="flex items-start gap-4">
                       {/* User Avatar */}
                       <div className="flex flex-col items-center">
-                        <Avatar className="w-12 h-12 flex-shrink-0">
-                          {profileInfo.avatar_url ? (
-                            <AvatarImage 
-                              src={profileInfo.avatar_url} 
-                              alt={`${discussion.author}'s avatar`}
-                              className="object-cover w-full h-full"
-                            />
-                          ) : null}
-                          <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
-                            {profileInfo.initials}
-                          </AvatarFallback>
-                        </Avatar>
+                        {discussion.isAdmin ? (
+                          <AdminGroupAvatar size="lg" className="shrink-0" />
+                        ) : (
+                          <Avatar className="w-12 h-12 flex-shrink-0">
+                            {profileInfo.avatar_url ? (
+                              <AvatarImage 
+                                src={profileInfo.avatar_url} 
+                                alt={`${discussion.author}'s avatar`}
+                                className="object-cover w-full h-full"
+                              />
+                            ) : null}
+                            <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
+                              {profileInfo.initials}
+                            </AvatarFallback>
+                          </Avatar>
+                        )}
                         {/* Show upload hint for current user's posts without profile picture */}
-                        {user && user.id === getUserId(discussion.user_id) && !profileInfo.avatar_url && (
+                        {user && user.id === getUserId(discussion.user_id) && !profileInfo.avatar_url && !discussion.isAdmin && (
                           <div className="mt-1">
                             <a 
                               href="/profile-setup" 
