@@ -572,7 +572,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
         <div className="space-y-4">
           <div className="flex items-start gap-4">
             {isAdminUser ? (
-              <AdminGroupAvatar size="lg" className="shrink-0" />
+              <AdminGroupAvatar size="xl" className="shrink-0" />
             ) : (
               <Avatar className="w-12 h-12 flex-shrink-0">
                 {getUserAvatar() ? (

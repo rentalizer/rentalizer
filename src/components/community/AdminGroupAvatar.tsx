@@ -3,7 +3,7 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 
-type AdminGroupAvatarSize = 'sm' | 'md' | 'lg';
+type AdminGroupAvatarSize = 'sm' | 'md' | 'lg' | 'xl';
 
 interface AdminGroupAvatarProps {
   size?: AdminGroupAvatarSize;
@@ -16,12 +16,14 @@ const containerSizeMap: Record<AdminGroupAvatarSize, string> = {
   sm: 'h-6 w-6',
   md: 'h-10 w-10',
   lg: 'h-12 w-12',
+  xl: 'h-14 w-16',
 };
 
 const avatarSizeMap: Record<AdminGroupAvatarSize, string> = {
   sm: 'h-4 w-4',
   md: 'h-7 w-7',
   lg: 'h-9 w-9',
+  xl: 'h-10 w-10',
 };
 
 export const AdminGroupAvatar: React.FC<AdminGroupAvatarProps> = ({
@@ -63,7 +65,8 @@ export const AdminGroupAvatar: React.FC<AdminGroupAvatarProps> = ({
       <Avatar
         className={cn(
           sharedAvatarClasses,
-          'absolute right-0 top-1/2 -translate-y-1/2 z-10',
+          'absolute top-1/2 -translate-y-1/2 z-10',
+          size === 'xl' ? '-right-0' : 'right-0',
         )}
       >
         <AvatarImage

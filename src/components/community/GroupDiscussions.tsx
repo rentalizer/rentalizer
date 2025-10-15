@@ -1096,7 +1096,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                       {/* User Avatar */}
                       <div className="flex flex-col items-center">
                         {discussion.isAdmin ? (
-                          <AdminGroupAvatar size="lg" className="shrink-0" />
+                          <AdminGroupAvatar size="xl" className="shrink-0" />
                         ) : (
                           <Avatar className="w-12 h-12 flex-shrink-0">
                             {profileInfo.avatar_url ? (
