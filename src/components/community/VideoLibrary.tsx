@@ -65,8 +65,8 @@ const getAttachmentIcon = (type: 'pdf' | 'spreadsheet' | 'document' | 'presentat
       return <span className="text-orange-400 text-lg">📽️</span>;
     case 'text':
       return <span className="text-blue-300 text-lg">📝</span>;
-    // default:
-    //   return <span className="text-purple-300 text-lg">📁</span>;
+    default:
+      return <span className="text-purple-300 text-lg">📁</span>;
   }
 };
 
@@ -245,7 +245,7 @@ const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, 
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card className={`bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors cursor-pointer ${video.featured ? 'ring-1 ring-cyan-400/30' : ''} relative group`}>
+      <Card className={`bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors cursor-pointer ${video.featured ? 'ring-1 ring-cyan-400/30' : ''} relative group flex h-full flex-col`}>
         {/* Admin Controls */}
         {isAdmin && (
           <div className="absolute top-2 left-2 z-10 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -295,7 +295,7 @@ const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, 
           </div>
         )}
 
-        <div onClick={() => onClick(video)}>
+        <div onClick={() => onClick(video)} className="flex flex-1 flex-col">
           <div className="relative">
             {/* Thumbnail */}
             <div className="aspect-video bg-slate-700 rounded-t-lg relative overflow-hidden">
@@ -343,8 +343,8 @@ const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, 
             </div>
           </div>
 
-          <CardContent className="p-4">
-            <div className="space-y-3">
+          <CardContent className="flex flex-1 flex-col p-4">
+            <div className="flex h-full flex-col gap-3">
               {/* Title */}
               <h3 className="font-semibold text-white hover:text-cyan-300 transition-colors">
                 {video.title.length > 25 ? video.title.slice(0, 30) + "..." : video.title}
@@ -361,22 +361,21 @@ const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, 
                 </div>
               </div>
               
-              {/* Attachment and Views */}
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1 text-gray-400">
+              {/* Attachment info */}
+              <div className="mt-auto">
+                <div className="flex min-h-[2.5rem] items-center gap-2 rounded-md border border-slate-600/60 bg-slate-700/40 px-3 py-2 text-xs">
                   {video.attachment ? (
-                    <div className="flex items-center gap-1 text-cyan-300">
+                    <>
                       {getAttachmentIcon(video.attachment.type)}
-                      <span className="truncate max-w-20">{video.attachment.filename}</span>
-                    </div>
+                      <span className="block max-w-[10rem] truncate text-cyan-300">{video.attachment.filename}</span>
+                    </>
                   ) : (
-                    <span className="text-gray-500">No attachment</span>
+                    <>
+                      <FileText className="h-3 w-3 text-gray-500" />
+                      <span className="text-gray-500">No supporting document</span>
+                    </>
                   )}
                 </div>
-                {/* <div className="flex items-center gap-1 text-gray-400">
-                  <Eye className="h-3 w-3" />
-                  {video.views.toLocaleString()} views
-                </div> */}
               </div>
 
             </div>
