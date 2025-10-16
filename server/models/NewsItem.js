@@ -10,7 +10,7 @@ const newsItemSchema = new mongoose.Schema({
         'AirDNA', 'Skift', 'VRM Intel', 'ShortTermRentalz', 'Rental Scale-Up',
         'Hospitable', 'PriceLabs', 'Guesty', 'Wheelhouse', 'Lodgify', 'Turno',
         'Hostaway', 'Beyond', 'Boostly', 'Get Paid For Your Pad', 'Robuilt',
-        'BiggerPockets', 'Manual Submission'
+        'BiggerPockets', 'Attom Transportation Noise', 'Manual Submission'
       ],
       message: 'Invalid news source'
     }

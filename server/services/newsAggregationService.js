@@ -3,6 +3,13 @@ const NewsService = require('./newsService');
 
 class NewsAggregationService {
   constructor() {
+    const attomAddressesEnv = process.env.ATTOM_TRANSPORTATION_NOISE_ADDRESSES;
+    const attomAddresses = attomAddressesEnv
+      ? attomAddressesEnv.split('|').map(address => address.trim()).filter(Boolean)
+      : [
+          '4301 MURRAY ST, FLUSHING, NY 11355'
+        ];
+
     // Configure RSS/API feed sources for each platform
     this.feedSources = {
       'AirDNA': {
@@ -44,6 +51,12 @@ class NewsAggregationService {
         type: 'rss',
         url: 'https://www.biggerpockets.com/blog/category/rental-properties/feed/',
         enabled: true
+      },
+      'Attom Transportation Noise': {
+        type: 'attom_transportation_noise',
+        url: 'https://api.gateway.attomdata.com/transportationnoise',
+        enabled: true,
+        addresses: attomAddresses
       }
     };
 
@@ -191,21 +204,239 @@ class NewsAggregationService {
   async fetchFromSource(sourceName, sourceConfig) {
     try {
       console.log(`📰 Fetching news from ${sourceName}...`);
-      
-      const response = await axios.get(sourceConfig.url, this.axiosConfig);
-      
-      if (response.status === 200) {
-        const items = this.parseRSSFeed(response.data, sourceName);
-        console.log(`✅ Fetched ${items.length} items from ${sourceName}`);
-        return items;
-      } else {
-        console.warn(`⚠️ Unexpected status ${response.status} from ${sourceName}`);
-        return [];
+
+      switch (sourceConfig.type) {
+        case 'rss':
+          return await this.fetchRSSFeedSource(sourceName, sourceConfig);
+        case 'attom_transportation_noise':
+          return await this.fetchAttomTransportationNoise(sourceName, sourceConfig);
+        default:
+          console.warn(`⚠️ Unsupported source type "${sourceConfig.type}" for ${sourceName}`);
+          return [];
       }
     } catch (error) {
       console.error(`❌ Error fetching from ${sourceName}:`, error.message);
       return [];
     }
+  }
+
+  async fetchRSSFeedSource(sourceName, sourceConfig) {
+    try {
+      if (!sourceConfig.url) {
+        console.warn(`⚠️ No URL configured for ${sourceName}`);
+        return [];
+      }
+
+      const response = await axios.get(sourceConfig.url, this.axiosConfig);
+
+      if (response.status === 200) {
+        const items = this.parseRSSFeed(response.data, sourceName);
+        console.log(`✅ Fetched ${items.length} items from ${sourceName}`);
+        return items;
+      }
+
+      console.warn(`⚠️ Unexpected status ${response.status} from ${sourceName}`);
+      return [];
+    } catch (error) {
+      console.error(`❌ Error fetching RSS feed from ${sourceName}:`, error.message);
+      return [];
+    }
+  }
+
+  async fetchAttomTransportationNoise(sourceName, sourceConfig) {
+    const apiKey = process.env.ATTOM_API_KEY;
+
+    if (!apiKey) {
+      console.warn('⚠️ ATTOM_API_KEY is not set. Skipping Attom transportation noise aggregation.');
+      return [];
+    }
+
+    if (!sourceConfig.url) {
+      console.warn(`⚠️ No URL configured for ${sourceName}`);
+      return [];
+    }
+
+    const addresses = Array.isArray(sourceConfig.addresses) ? sourceConfig.addresses.filter(Boolean) : [];
+
+    if (!addresses.length) {
+      console.warn(`⚠️ No addresses configured for ${sourceName}. Set ATTOM_TRANSPORTATION_NOISE_ADDRESSES to a | separated list of addresses.`);
+      return [];
+    }
+
+    const results = await Promise.all(
+      addresses.map(async (address) => {
+        try {
+          const response = await axios.get(sourceConfig.url, {
+            headers: {
+              Accept: 'application/json',
+              apikey: apiKey
+            },
+            params: { address },
+            timeout: sourceConfig.timeout || 15000
+          });
+
+          if (response.status !== 200) {
+            console.warn(`⚠️ Attom API returned status ${response.status} for ${address}`);
+            return null;
+          }
+
+          const payload = response.data || {};
+
+          if (payload.status?.code !== 0) {
+            console.warn(`⚠️ Attom API returned status code ${payload.status?.code} for ${address}: ${payload.status?.msg}`);
+            return null;
+          }
+
+          if (!payload.transportationNoise) {
+            console.warn(`⚠️ No transportationNoise data returned for ${address}`);
+            return null;
+          }
+
+          return this.formatAttomTransportationNoise(payload.transportationNoise, address, sourceName, sourceConfig);
+        } catch (error) {
+          console.error(`❌ Error fetching Attom transportation noise for ${address}:`, error.message);
+          return null;
+        }
+      })
+    );
+
+    const items = results.filter(Boolean);
+    console.log(`✅ Fetched ${items.length} transportation noise insights from ${sourceName}`);
+    return items;
+  }
+
+  formatAttomTransportationNoise(noiseData, address, sourceName, sourceConfig) {
+    const normalizedAddress = address.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const title = `Transportation noise outlook for ${address}`.substring(0, 300);
+
+    const overallSummary = noiseData.overall_summary ? noiseData.overall_summary.trim() : null;
+
+    const roadNoise = noiseData.road_noise || {};
+    const aviationNoise = noiseData.aviation_noise || {};
+    const emergencyNoise = noiseData.emg_vehicle_noise || {};
+    const railWhistleNoise = noiseData.rail_whistle_noise || {};
+    const railNoise = noiseData.rail_noise || {};
+
+    const summarySegments = [
+      `Attom Data transportation noise snapshot for ${address}.`,
+      overallSummary
+    ].filter(Boolean);
+
+    const summary = summarySegments.join(' ').substring(0, 1000);
+
+    const contentSections = [
+      `Noise environment insights for ${address}.`,
+      '',
+      overallSummary ? `Overall summary: ${overallSummary}` : null,
+      '',
+      roadNoise.level !== undefined
+        ? `Road noise level ${roadNoise.level} – ${roadNoise.level_description || 'no description provided'}.`
+        : 'Road noise data not available.',
+      roadNoise.noise_sources && roadNoise.noise_sources.length
+        ? `Road noise sources:\n${this.formatAttomNoiseSources(roadNoise.noise_sources, true)}`
+        : null,
+      '',
+      aviationNoise.level !== undefined
+        ? `Aviation noise level ${aviationNoise.level} – ${aviationNoise.level_description || 'no description provided'}.`
+        : 'Aviation noise data not available.',
+      '',
+      emergencyNoise.level !== undefined
+        ? `Emergency vehicle noise level ${emergencyNoise.level} – ${emergencyNoise.level_description || 'no description provided'}.`
+        : 'Emergency vehicle noise data not available.',
+      emergencyNoise.noise_sources && emergencyNoise.noise_sources.length
+        ? `Emergency noise sources:\n${this.formatAttomNoiseSources(emergencyNoise.noise_sources, true)}`
+        : null,
+      '',
+      railNoise.level !== undefined
+        ? `Rail noise level ${railNoise.level} – ${railNoise.level_description || 'no description provided'}.`
+        : 'Rail noise data not available.',
+      railNoise.noise_sources && railNoise.noise_sources.length
+        ? `Rail noise sources:\n${this.formatAttomNoiseSources(railNoise.noise_sources, true)}`
+        : null,
+      '',
+      railWhistleNoise.level !== undefined
+        ? `Rail crossing whistle impact level ${railWhistleNoise.level} – ${railWhistleNoise.level_description || 'no description provided'}.`
+        : 'Rail crossing whistle data not available.'
+    ].filter(Boolean);
+
+    const content = contentSections.join('\n').substring(0, 10000);
+
+    const metadata = {};
+
+    metadata.address = address;
+
+    if (noiseData.attomId !== undefined) {
+      metadata.attomId = String(noiseData.attomId);
+    }
+
+    if (noiseData.lat !== undefined) {
+      metadata.latitude = String(noiseData.lat);
+    }
+
+    if (noiseData.lon !== undefined) {
+      metadata.longitude = String(noiseData.lon);
+    }
+
+    if (roadNoise.level !== undefined) {
+      metadata.roadNoiseLevel = String(roadNoise.level);
+    }
+
+    if (aviationNoise.level !== undefined) {
+      metadata.aviationNoiseLevel = String(aviationNoise.level);
+    }
+
+    if (emergencyNoise.level !== undefined) {
+      metadata.emergencyNoiseLevel = String(emergencyNoise.level);
+    }
+
+    if (railNoise.level !== undefined) {
+      metadata.railNoiseLevel = String(railNoise.level);
+    }
+
+    if (railWhistleNoise.level !== undefined) {
+      metadata.railWhistleNoiseLevel = String(railWhistleNoise.level);
+    }
+
+    if (overallSummary) {
+      metadata.overallSummary = overallSummary;
+    }
+
+    const tags = [
+      'attom data',
+      'noise analysis',
+      'neighborhood insights',
+      'due diligence',
+      'transportation'
+    ];
+
+    const articleUrl = `${sourceConfig.url}?address=${encodeURIComponent(address)}`;
+
+    return {
+      source: sourceName,
+      title,
+      url: articleUrl,
+      summary,
+      content,
+      published_at: new Date(),
+      tags,
+      external_id: `attom-transportation-noise-${noiseData.attomId || normalizedAddress}`,
+      metadata
+    };
+  }
+
+  formatAttomNoiseSources(sources = [], multiline = false) {
+    return sources
+      .filter(source => source && (source.source_description || source.source_type))
+      .map(source => {
+        const description = source.source_description || source.source_type || 'Unknown source';
+        const type = source.source_sub_type || source.source_type || '';
+        const distance = source.source_dist_km !== undefined ? `${source.source_dist_km} km` : '';
+        const suffixParts = [type, distance].filter(Boolean).join(' · ');
+        const suffix = suffixParts ? ` (${suffixParts})` : '';
+        const line = `${description}${suffix}`;
+        return multiline ? `- ${line}` : line;
+      })
+      .join(multiline ? '\n' : ', ');
   }
 
   /**
