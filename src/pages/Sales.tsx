@@ -4,6 +4,83 @@ import { Button } from '@/components/ui/button';
 import { Check, BarChart3 } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 
+const getMimeType = (filename: string) => {
+  const extension = filename.split('.').pop()?.toLowerCase();
+
+  switch (extension) {
+    case 'mov':
+      return undefined;
+    case 'webm':
+      return 'video/webm';
+    case 'mp4':
+    default:
+      return 'video/mp4';
+  }
+};
+
+const testimonialVideos = [
+  {
+    title: 'Bobby Han',
+    src: 'https://pub-187e14117d624770a9f8a5b04835d33c.r2.dev/testimonials/Bobby%20Han.MOV',
+    type: getMimeType('Bobby Han.MOV')
+  },
+  {
+    title: 'Brandon',
+    src: 'https://pub-187e14117d624770a9f8a5b04835d33c.r2.dev/testimonials/Brandon%20-%20(1).mp4',
+    type: getMimeType('Brandon - (1).mp4')
+  },
+  {
+    title: 'Colten',
+    src: 'https://pub-187e14117d624770a9f8a5b04835d33c.r2.dev/testimonials/Colten%20(1).mov',
+    type: getMimeType('Colten (1).mov')
+  },
+  {
+    title: 'Drew',
+    src: 'https://pub-187e14117d624770a9f8a5b04835d33c.r2.dev/testimonials/Drew%20(1).mp4',
+    type: getMimeType('Drew (1).mp4')
+  },
+  {
+    title: 'Elena',
+    src: 'https://pub-187e14117d624770a9f8a5b04835d33c.r2.dev/testimonials/Elena%20(1).mp4',
+    type: getMimeType('Elena (1).mp4')
+  },
+  {
+    title: 'Emmanuel',
+    src: 'https://pub-187e14117d624770a9f8a5b04835d33c.r2.dev/testimonials/Emmanuel%201.mp4',
+    type: getMimeType('Emmanuel 1.mp4')
+  },
+  {
+    title: 'Liz Garcia',
+    src: 'https://pub-187e14117d624770a9f8a5b04835d33c.r2.dev/testimonials/Liz%20Garcia.mp4',
+    type: getMimeType('Liz Garcia.mp4')
+  },
+  {
+    title: 'Mahmoud',
+    src: 'https://pub-187e14117d624770a9f8a5b04835d33c.r2.dev/testimonials/Mahmoud%20(1).mp4',
+    type: getMimeType('Mahmoud (1).mp4')
+  },
+  {
+    title: 'Maria Allie Forte-Charette',
+    src: 'https://pub-187e14117d624770a9f8a5b04835d33c.r2.dev/testimonials/Maria%20allie%20Forte-Charette%20(1).mp4',
+    type: getMimeType('Maria allie Forte-Charette (1).mp4')
+  },
+  {
+    title: 'Ryan',
+    src: 'https://pub-187e14117d624770a9f8a5b04835d33c.r2.dev/testimonials/Ryan.MOV',
+    type: getMimeType('Ryan.MOV')
+  },
+  {
+    title: 'Bishoi',
+    src: 'https://pub-187e14117d624770a9f8a5b04835d33c.r2.dev/testimonials/bISHOI%20(1)%20(1).mp4',
+    type: getMimeType('bISHOI (1) (1).mp4')
+  },
+  {
+    title: 'Shante',
+    src: 'https://pub-187e14117d624770a9f8a5b04835d33c.r2.dev/testimonials/shante%20(1).mp4',
+    type: getMimeType('shante (1).mp4')
+  }
+];
+
 export default function Sales() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800">
@@ -194,17 +271,23 @@ export default function Sales() {
           <h3 className="text-3xl md:text-4xl font-bold text-center text-foreground mb-12">
             Just Listen To What Our Students Say
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {Array.from({ length: 15 }).map((_, index) => (
-              <div key={index} className="aspect-video bg-secondary/50 rounded-lg border border-border flex items-center justify-center hover:border-primary/50 transition-all">
-                <div className="text-center">
-                  <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-primary/20 flex items-center justify-center">
-                    <svg className="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Video {index + 1}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {testimonialVideos.map((video) => (
+              <div
+                key={video.filename}
+                className="space-y-3 bg-slate-900/60 p-4 rounded-lg border border-slate-700 hover:border-primary/50 transition-all shadow-lg"
+              >
+                <div className="relative aspect-video overflow-hidden rounded-md bg-black">
+                  <video
+                    className="h-full w-full object-cover"
+                    controls
+                    preload="metadata"
+                  >
+                    <source src={video.src} type={video.type} />
+                    Your browser does not support the video tag.
+                  </video>
                 </div>
+                <p className="text-sm text-center text-foreground font-medium">{video.title}</p>
               </div>
             ))}
           </div>
