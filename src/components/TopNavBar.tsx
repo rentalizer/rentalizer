@@ -106,7 +106,7 @@ export const TopNavBar = () => {
             {!user && (
               <div className="flex items-center gap-3">
                 <Button
-                  onClick={() => navigate('/sales')}
+                  onClick={() => navigate('/offers')}
                   variant="ghost"
                   size="sm"
                   className="text-cyan-300 hover:text-cyan-200"

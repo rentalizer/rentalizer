@@ -141,7 +141,7 @@ const LandingPage = () => {
               {user ? (
                 <div className="flex items-center gap-3">
                   <Button
-                    onClick={() => navigate('/sales')}
+                    onClick={() => navigate('/offers')}
                     variant="outline"
                     size="sm"
                     className="border-cyan-400/60 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 bg-slate-800/40 animate-pulse shadow-[0_0_16px_rgba(34,211,238,0.35)]"
@@ -164,7 +164,7 @@ const LandingPage = () => {
               ) : (
                 <div className="flex items-center gap-3">
                   <Button
-                    onClick={() => navigate('/sales')}
+                    onClick={() => navigate('/offers')}
                     variant="outline"
                     size="lg"
                     className="border-cyan-400/60 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 px-5 bg-slate-800/40 animate-pulse shadow-[0_0_18px_rgba(34,211,238,0.35)]"
@@ -232,7 +232,7 @@ const LandingPage = () => {
             {/* Programs Callout Card */}
             <div className="max-w-xl mx-auto px-4 mb-8">
               <div
-                onClick={() => navigate('/sales')}
+                onClick={() => navigate('/offers')}
                 className="group relative cursor-pointer"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
@@ -246,7 +246,7 @@ const LandingPage = () => {
                     </div>
                     <div className="hidden sm:flex items-center">
                       <Button
-                        onClick={(e) => { e.stopPropagation(); navigate('/sales'); }}
+                        onClick={(e) => { e.stopPropagation(); navigate('/offers'); }}
                         size="sm"
                         className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white shadow-[0_0_12px_rgba(34,211,238,0.3)]"
                       >
