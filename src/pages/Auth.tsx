@@ -567,7 +567,18 @@ export const Auth = () => {
     <>
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center justify-center p-4">
         <Card className="w-full max-w-md max-h-[90vh] bg-slate-800/50 border-cyan-500/20 flex flex-col">
-          <CardHeader className="text-center shrink-0">
+          <CardHeader className="text-center shrink-0 space-y-4">
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/')}
+                className="text-gray-300 hover:text-white hover:bg-cyan-500/10"
+              >
+                Go Home
+              </Button>
+            </div>
             <CardTitle className="text-2xl text-white">Community Access</CardTitle>
             <p className="text-gray-400">Join our vibrant community of rental entrepreneurs</p>
           </CardHeader>

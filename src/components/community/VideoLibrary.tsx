@@ -594,8 +594,17 @@ export const VideoLibrary = () => {
   };
 
   const getEmbedUrl = (loomUrl: string) => {
-    const videoId = loomUrl.split('/share/')[1]?.split('?')[0];
-    return `https://www.loom.com/embed/${videoId}`;
+    try {
+      const url = new URL(loomUrl);
+      const videoId = url.pathname.split('/share/')[1]?.split('/')[0];
+      const params = new URLSearchParams(url.search);
+      params.set('autoplay', '1');
+      const query = params.toString();
+      return videoId ? `https://www.loom.com/embed/${videoId}${query ? `?${query}` : ''}` : loomUrl;
+    } catch (error) {
+      console.error('Invalid Loom URL provided:', loomUrl, error);
+      return loomUrl;
+    }
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -1398,8 +1407,10 @@ export const VideoLibrary = () => {
           {selectedVideo?.videoUrl && (
             <div className="aspect-video w-full">
               <iframe
+                key={selectedVideo._id}
                 src={getEmbedUrl(selectedVideo.videoUrl)}
                 frameBorder="0"
+                allow="autoplay; fullscreen"
                 allowFullScreen
                 className="w-full h-full rounded-lg"
               />
