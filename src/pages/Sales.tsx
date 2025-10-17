@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check, BarChart3 } from 'lucide-react';
+import { Check, BarChart3, Sparkles } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 
 const getMimeType = (filename: string) => {
@@ -81,6 +81,16 @@ const testimonialVideos = [
   }
 ];
 
+const proFeatures = [
+  'Weekly Live Training & Invited Experts',
+  'Rentalizer.ai™ Student Portal & Deal Analyzer',
+  'Done-For-You Market Research',
+  'Personalized Roadmap & Accountability',
+  'Train & Deploy Your Virtual Assistant',
+  'Close Your First Six Cash-Flowing Properties'
+];
+
+
 export default function Sales() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800">
@@ -102,139 +112,56 @@ export default function Sales() {
         </div>
       </section>
 
-      {/* Pricing Cards Section */}
-      <section className="py-6 px-4">
-        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6">
-          {/* Accelerator Card */}
-          <Card className="bg-slate-900/80 backdrop-blur-md border-2 border-primary/40 hover:border-primary/60 transition-all shadow-2xl shadow-primary/10 hover:shadow-primary/20">
-            <CardHeader className="text-center pb-4 pt-6">
-              <CardTitle className="text-2xl font-bold text-foreground mb-3">Accelerator</CardTitle>
-              <div className="space-y-1">
-                <div className="text-5xl font-bold text-primary">$7,000</div>
-                <p className="text-muted-foreground text-sm">12-Months</p>
+      {/* Pricing Highlight */}
+      <section className="py-10 px-4">
+        <div className="max-w-4xl mx-auto">
+          <Card className="relative overflow-hidden border-2 border-primary/70 bg-gradient-to-r from-slate-950 via-slate-900 to-primary/10 shadow-[0_35px_70px_-30px_rgba(56,189,248,0.8)]">
+            <div className="absolute -top-24 -right-16 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
+            <div className="absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-blue-500/20 blur-3xl" />
+            <CardHeader className="pb-0">
+              <div className="flex items-center gap-2 text-primary font-semibold uppercase tracking-wide text-sm">
+                <Sparkles className="h-4 w-4" />
+                Concierge Launch Experience
               </div>
             </CardHeader>
-            <CardContent className="px-6 pb-6 space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
+            <CardContent className="md:flex md:items-center md:justify-between gap-10 px-8 pb-10 pt-6">
+              <div className="md:w-7/12 space-y-6">
+                <div>
+                  <CardTitle className="text-4xl font-bold text-foreground">Accelerator Pro</CardTitle>
+                  <p className="mt-3 text-lg text-muted-foreground leading-relaxed">
+                    Partner directly with Richie and the Rentalizer team for a turnkey launch. We co-build your systems,
+                    line up winning properties, and hand you a business engineered to cash flow from day one.
+                  </p>
                 </div>
-                <span className="text-foreground text-base">Weekly Live Training</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {proFeatures.map((feature) => (
+                    <div key={feature} className="flex items-start gap-2 rounded-lg bg-slate-900/70 px-4 py-3 border border-slate-800/80">
+                      <Check className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                      <span className="text-sm text-foreground">{feature}</span>
+                    </div>
+                  ))}
                 </div>
-                <span className="text-foreground text-base">Rentalizer™ Student Portal & Tools</span>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
+              <div className="md:w-5/12 mt-8 md:mt-0 flex flex-col items-center md:items-end text-center md:text-right space-y-5">
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold uppercase tracking-[0.3em] text-primary/80">All-In Investment</span>
+                  <div className="text-5xl font-extrabold text-primary drop-shadow-lg">$10,000</div>
+                  <p className="text-muted-foreground text-sm">12 months of private support • Limited Cohort</p>
                 </div>
-                <span className="text-foreground text-base">Video & Documents Library</span>
+                <Button
+                  onClick={() => window.open('https://arbitrageu.mykajabi.com/offers/G7zcbWt9/checkout', '_blank')}
+                  className="w-full md:w-auto px-10 h-12 bg-primary hover:bg-primary/90 text-primary-foreground text-base font-semibold rounded-full shadow-lg shadow-primary/40 hover:shadow-primary/60 transition-all"
+                >
+                  Join Accelerator Pro
+                </Button>
+                <p className="text-xs text-muted-foreground max-w-xs leading-relaxed">
+                  Ideal for operators ready to launch or scale fast without guessing. We bring the deals, the playbook, and the accountability.
+                </p>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-foreground text-base">AirDNA Market Research Software</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-foreground text-base">Private Community Membership</span>
-              </div>
-              <Button 
-                onClick={() => window.open('https://arbitrageu.mykajabi.com/offers/UBmPNUaM/checkout', '_blank')}
-                className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base font-semibold rounded-md shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all"
-              >
-                Get Started
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Accelerator Pro Card */}
-          <Card className="bg-slate-900/80 backdrop-blur-md border-2 border-primary/60 hover:border-primary/80 transition-all shadow-2xl shadow-primary/20 hover:shadow-primary/30 relative overflow-hidden">
-            <div className="absolute top-0 right-0 bg-primary/20 text-primary text-xs font-bold px-3 py-1 rounded-bl-lg">
-              POPULAR
-            </div>
-            <CardHeader className="text-center pb-4 pt-6">
-              <CardTitle className="text-2xl font-bold text-foreground mb-3">Accelerator Pro</CardTitle>
-              <div className="space-y-1">
-                <div className="text-5xl font-bold text-primary">$10,000</div>
-                <p className="text-muted-foreground text-sm">12-Months</p>
-              </div>
-            </CardHeader>
-            <CardContent className="px-6 pb-6 space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-foreground text-base">Weekly Live Training</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-foreground text-base">Invited Expert Panelists</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-foreground text-base">Video & Documents Library</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-foreground text-base">Rentalizer.ai™ Student Portal</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-foreground text-base">Private Community Membership</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-foreground text-base">Personalized Roadmap</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-foreground text-base">Done For You Market Research</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-foreground text-base">Close Your 1st 6 Properties</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex-shrink-0">
-                  <Check className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-foreground text-base">Train Your Virtual Assistant</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-4 pt-4 border-t border-border italic leading-relaxed">
-                Accelerator Pro is for individuals aiming for turnkey comprehensive personalized guidance from Richie--to achieve their dream outcome.
-              </p>
-              <Button 
-                onClick={() => window.open('https://arbitrageu.mykajabi.com/offers/G7zcbWt9/checkout', '_blank')}
-                className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground h-11 text-base font-semibold rounded-md shadow-lg shadow-primary/30 hover:shadow-primary/50 transition-all"
-              >
-                Get Started Pro
-              </Button>
             </CardContent>
           </Card>
         </div>
       </section>
-
       {/* Success Story Section */}
       <section className="py-8 px-4 bg-secondary/30">
         <div className="max-w-4xl mx-auto text-center space-y-8">
@@ -274,7 +201,7 @@ export default function Sales() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {testimonialVideos.map((video) => (
               <div
-                key={video.filename}
+                key={video.title}
                 className="space-y-3 bg-slate-900/60 p-4 rounded-lg border border-slate-700 hover:border-primary/50 transition-all shadow-lg"
               >
                 <div className="relative aspect-video overflow-hidden rounded-md bg-black">
