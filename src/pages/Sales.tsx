@@ -1,8 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check, BarChart3, Sparkles } from 'lucide-react';
+import { Check, BarChart3, Sparkles, Home } from 'lucide-react';
 import { Footer } from '@/components/Footer';
+
+type StripeBuyButtonProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+  'buy-button-id': string;
+  'publishable-key': string;
+  className?: string;
+};
+
+const StripeBuyButton: React.FC<StripeBuyButtonProps> = (props) =>
+  React.createElement('stripe-buy-button', props as any);
 
 const getMimeType = (filename: string) => {
   const extension = filename.split('.').pop()?.toLowerCase();
@@ -92,10 +102,102 @@ const proFeatures = [
 
 
 export default function Sales() {
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const scriptId = 'stripe-buy-button-script';
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement('script');
+      script.id = scriptId;
+      script.async = true;
+      script.src = 'https://js.stripe.com/v3/buy-button.js';
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const brandButton = () => {
+      const elements = Array.from(document.querySelectorAll('stripe-buy-button')) as Array<
+        (HTMLElement & { shadowRoot?: ShadowRoot }) | null
+      >;
+
+      elements.forEach((element) => {
+        if (!element?.shadowRoot) return;
+        const button = element.shadowRoot.querySelector('button') as (HTMLButtonElement & {
+          dataset: DOMStringMap;
+        }) | null;
+        if (!button || button.dataset.rentalizerStyled) return;
+
+        button.dataset.rentalizerStyled = 'true';
+        button.style.background = 'linear-gradient(130deg, rgba(56,189,248,1) 0%, rgba(99,102,241,1) 100%)';
+        button.style.color = '#0b1120';
+        button.style.borderRadius = '9999px';
+        button.style.border = '1px solid rgba(56,189,248,0.65)';
+        button.style.padding = '0.9rem 2.8rem';
+        button.style.fontSize = '1.0625rem';
+        button.style.fontWeight = '700';
+        button.style.letterSpacing = '0.02em';
+        button.style.width = '100%';
+        button.style.boxShadow = '0 32px 60px -28px rgba(56,189,248,0.75)';
+        button.style.transition = 'transform 150ms ease, box-shadow 150ms ease';
+
+        const handleEnter = () => {
+          button.style.transform = 'translateY(-1px) scale(1.01)';
+          button.style.boxShadow = '0 38px 70px -30px rgba(99,102,241,0.65)';
+        };
+
+        const handleLeave = () => {
+          button.style.transform = 'none';
+          button.style.boxShadow = '0 32px 60px -28px rgba(56,189,248,0.75)';
+        };
+
+        button.addEventListener('mouseenter', handleEnter);
+        button.addEventListener('mouseleave', handleLeave);
+      });
+    };
+
+    let mutationObservers: MutationObserver[] = [];
+
+    customElements.whenDefined('stripe-buy-button').then(() => {
+      brandButton();
+
+      const elements = Array.from(document.querySelectorAll('stripe-buy-button')) as Array<
+        HTMLElement & { shadowRoot?: ShadowRoot }
+      >;
+
+      mutationObservers = elements
+        .filter((element) => element.shadowRoot)
+        .map((element) => {
+          const observer = new MutationObserver(brandButton);
+          observer.observe(element.shadowRoot as ShadowRoot, { childList: true, subtree: true });
+          return observer;
+        });
+    });
+
+    return () => {
+      mutationObservers.forEach((observer) => observer.disconnect());
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800">
       {/* Hero Section */}
       <section className="relative py-10 px-4 text-center">
+        <div className="absolute top-4 left-4">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="bg-slate-900/60 text-primary hover:text-primary-foreground hover:bg-primary/80"
+          >
+            <Link to="/" className="inline-flex items-center gap-2">
+              <Home className="h-4 w-4" />
+              Home
+            </Link>
+          </Button>
+        </div>
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="flex items-center justify-center gap-3 mb-6">
             <BarChart3 className="h-12 w-12 text-primary neon-text" />
@@ -148,12 +250,25 @@ export default function Sales() {
                   <div className="text-5xl font-extrabold text-primary drop-shadow-lg">$10,000</div>
                   <p className="text-muted-foreground text-sm">12 months of private support • Limited Cohort</p>
                 </div>
-                <Button
-                  onClick={() => window.open('https://arbitrageu.mykajabi.com/offers/G7zcbWt9/checkout', '_blank')}
-                  className="w-full md:w-auto px-10 h-12 bg-primary hover:bg-primary/90 text-primary-foreground text-base font-semibold rounded-full shadow-lg shadow-primary/40 hover:shadow-primary/60 transition-all"
-                >
-                  Join Accelerator Pro
-                </Button>
+                <div className="w-full md:w-auto flex flex-col items-center md:items-end gap-4">
+                  <div className="relative w-full md:w-auto max-w-sm">
+                    <div className="absolute inset-0 -z-10 rounded-full bg-primary/30 blur-xl opacity-70" />
+                    <div className="relative w-full rounded-full border border-primary/40 bg-slate-950/80 px-4 py-4 shadow-lg shadow-primary/30 backdrop-blur">
+                      <StripeBuyButton
+                        className="block w-full"
+                        buy-button-id="buy_btn_1S1qNLGiyV9r2LUGhCoFgbzZ"
+                        publishable-key="pk_live_51Mj9IfGiyV9r2LUGCgvUVh7w4ZBxXTco98HDuHi8n0EITVkk1imtOy4THIaglnSbNRpCWuS5wELXvKOtFXZND18r00TJXjfXuK"
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    onClick={() => window.open('https://buy.stripe.com/8x200jgCd0QG7JW6Ep3AY05', '_blank')}
+                    className="w-full md:w-auto max-w-sm rounded-full border border-primary/40 bg-slate-950/80 px-6 py-3 text-sm font-semibold text-primary shadow-lg shadow-primary/40 hover:bg-primary hover:text-primary-foreground transition-all"
+                  >
+                    Prefer direct link? Open secure checkout
+                  </Button>
+                </div>
                 <p className="text-xs text-muted-foreground max-w-xs leading-relaxed">
                   Ideal for operators ready to launch or scale fast without guessing. We bring the deals, the playbook, and the accountability.
                 </p>
