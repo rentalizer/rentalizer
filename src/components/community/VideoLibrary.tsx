@@ -1051,7 +1051,7 @@ export const VideoLibrary = () => {
         <div className="hidden sm:block sm:flex-1 sm:order-1" />
 
         <div className="order-1 flex flex-col items-center gap-2 sm:order-2">
-          <div className="flex items-center gap-3 text-cyan-300">
+          <div className="flex flex-col items-center gap-2 text-cyan-300 sm:flex-row sm:items-center sm:gap-3">
             {selectedCategory === 'all' ? (
               <VideoIcon className="h-8 w-8 sm:h-10 sm:w-10" />
             ) : selectedCategory === 'Documents Library' ? (
