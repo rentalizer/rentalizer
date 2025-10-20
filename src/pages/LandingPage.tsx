@@ -17,7 +17,6 @@ import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { CommunityCalendar } from '@/components/community/CommunityCalendar';
 import { MessageThreads } from '@/components/community/MessageThreads';
 import { DocumentsLibrary } from '@/components/community/DocumentsLibrary';
-import { AskRichieChat } from '@/components/AskRichieChat';
 import { TrainingHubDemo } from '@/components/TrainingHubDemo';
 
 const LandingPage = () => {
@@ -129,45 +128,45 @@ const LandingPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
       {/* Header */}
       <header className="relative z-20 w-full border-b border-gray-500/50 bg-slate-700/90 backdrop-blur-lg">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+        <div className="container mx-auto px-4 py-3 sm:px-6 sm:py-4">
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
             {/* Logo */}
-            <div className="flex items-center gap-3">
-              <BarChart3 className="h-8 w-8 text-cyan-400 neon-text" />
+            <div className="flex items-center gap-2 sm:gap-3">
+              <BarChart3 className="h-6 w-6 text-cyan-400 neon-text sm:h-8 sm:w-8" />
             </div>
 
             {/* Navigation */}
-            <nav className="flex items-center gap-4">
+            <nav className="flex items-center gap-2 sm:gap-4">
               {user ? (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <Button
                     onClick={() => navigate('/offers')}
                     variant="outline"
                     size="sm"
-                    className="border-cyan-400/60 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 bg-slate-800/40 animate-pulse shadow-[0_0_16px_rgba(34,211,238,0.35)]"
+                    className="h-8 px-3 text-xs border-cyan-400/60 bg-slate-800/40 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 shadow-[0_0_16px_rgba(34,211,238,0.35)] animate-pulse sm:h-9 sm:px-4 sm:text-sm md:h-10 md:px-5 md:text-base"
                   >
                     Programs
                   </Button>
-                  <span className="text-cyan-300 text-sm">
+                  <span className="text-xs text-cyan-300 sm:text-sm md:text-base">
                     {user.email}
                   </span>
                   <Button
                     onClick={signOut}
                     variant="outline"
                     size="sm"
-                    className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200"
+                    className="h-8 px-3 text-xs border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 sm:h-9 sm:px-4 sm:text-sm md:h-10 md:px-5 md:text-base"
                   >
-                    <LogOut className="h-4 w-4 mr-2" />
+                    <LogOut className="mr-1 h-3.5 w-3.5 sm:mr-1.5 sm:h-4 sm:w-4 md:mr-2" />
                     Sign Out
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <Button
                     onClick={() => navigate('/offers')}
                     variant="outline"
                     size="lg"
-                    className="border-cyan-400/60 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 px-5 bg-slate-800/40 animate-pulse shadow-[0_0_18px_rgba(34,211,238,0.35)]"
+                    className="h-9 px-3 text-xs border-cyan-400/60 bg-slate-800/40 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 shadow-[0_0_18px_rgba(34,211,238,0.35)] animate-pulse sm:h-10 sm:px-4 sm:text-sm md:h-11 md:px-6 md:text-base"
                   >
                     Programs
                   </Button>
@@ -175,7 +174,7 @@ const LandingPage = () => {
                     onClick={() => navigate('/auth/signup')}
                     variant="default"
                     size="lg"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3"
+                    className="h-9 px-3 text-xs bg-primary text-primary-foreground hover:bg-primary/90 sm:h-10 sm:px-4 sm:text-sm md:h-11 md:px-6 md:text-base"
                   >
                     Sign Up
                   </Button>
@@ -183,9 +182,9 @@ const LandingPage = () => {
                     onClick={() => navigate('/auth/login')}
                     variant="outline"
                     size="lg"
-                    className="border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-300 hover:text-cyan-200 px-6 py-3"
+                    className="h-9 px-3 text-xs border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 sm:h-10 sm:px-4 sm:text-sm md:h-11 md:px-6 md:text-base"
                   >
-                    <LogIn className="h-4 w-4 mr-2" />
+                    <LogIn className="mr-1 h-3.5 w-3.5 sm:mr-1.5 sm:h-4 sm:w-4 md:mr-2" />
                     Login
                   </Button>
                 </div>
@@ -489,7 +488,7 @@ const LandingPage = () => {
       </Dialog>
 
       {/* Ask Richie Chat */}
-      <AskRichieChat />
+      {/* <AskRichieChat /> */}
 
       {/* Footer */}
       <Footer showLinks={false} />
