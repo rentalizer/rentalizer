@@ -1055,7 +1055,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   }
 
   return (
-    <div className="flex gap-6">
+    <div className="flex flex-col gap-6 lg:flex-row">
       {/* Main Content */}
       <div className="flex-1">
         <div className="max-w-4xl space-y-6">
@@ -1091,8 +1091,8 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
               
               return (
                 <Card key={discussion.id} className="bg-slate-800/50 border-gray-700/50 hover:bg-slate-800/70 transition-all duration-300 ease-in-out">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex items-start gap-3 sm:gap-4">
                       {/* User Avatar */}
                       <div className="flex flex-col items-center">
                         {discussion.isAdmin ? (
@@ -1128,40 +1128,42 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                       {/* Post Content */}
                       <div className="flex-1 min-w-0">
                         {/* Header */}
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            {discussion.isPinned && <Pin className="h-4 w-4 text-yellow-400" />}
-                            {isAdmin && getUserId(discussion.user_id) !== user?.id ? (
-                              <button
-                                onClick={() => handleMessageUser(discussion)}
-                                className="text-cyan-300 font-medium hover:text-cyan-200 hover:underline transition-colors cursor-pointer"
-                                title={`Message ${profileInfo.display_name}`}
-                              >
-                                {profileInfo.display_name}
-                              </button>
-                            ) : (
-                              <span className="text-cyan-300 font-medium">{profileInfo.display_name}</span>
-                            )}
-                            {discussion.isAdmin && (
-                              <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
-                                Admin
-                              </Badge>
-                            )}
-                            <span className="text-gray-400">•</span>
-                            <span className="text-gray-400 text-sm" title={formatDateWithTimezone(discussion.created_at)}>
-                              {discussion.timeAgo}
-                            </span>
-                            <span className="text-gray-400">•</span>
-                            <span className="text-gray-400 text-sm">{discussion.category}</span>
-                            {discussion.isPinned && (
-                              <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs ml-2">
-                                Pinned
-                              </Badge>
-                            )}
+                        <div className="mb-3 flex flex-col gap-3 sm:mb-2 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
+                              {discussion.isPinned && <Pin className="h-4 w-4 text-yellow-400" />}
+                              {isAdmin && getUserId(discussion.user_id) !== user?.id ? (
+                                <button
+                                  onClick={() => handleMessageUser(discussion)}
+                                  className="text-cyan-300 font-medium hover:text-cyan-200 hover:underline transition-colors cursor-pointer"
+                                  title={`Message ${profileInfo.display_name}`}
+                                >
+                                  {profileInfo.display_name}
+                                </button>
+                              ) : (
+                                <span className="text-cyan-300 font-medium">{profileInfo.display_name}</span>
+                              )}
+                              {discussion.isAdmin && (
+                                <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
+                                  Admin
+                                </Badge>
+                              )}
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400 sm:text-sm">
+                              <span title={formatDateWithTimezone(discussion.created_at)}>{discussion.timeAgo}</span>
+                              <span className="hidden sm:inline">•</span>
+                              <span>{discussion.category}</span>
+                              {discussion.isPinned && (
+                                <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-[10px] sm:text-xs">
+                                  Pinned
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                          
+
                           {/* Pin Icon and Options Menu */}
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 sm:gap-2">
                             {/* Pin Icon for Admin Posts Only */}
                             {canPin(discussion) && (
                               <Button
@@ -1295,7 +1297,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
                         {/* Action Buttons - Only show when not editing */}
                         {editingPost !== discussion.id && (
-                        <div className="flex items-center gap-6">
+                        <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                           <Button 
                             variant="ghost" 
                             size="sm" 

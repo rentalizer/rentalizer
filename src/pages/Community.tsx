@@ -272,10 +272,10 @@ const Community = React.memo(() => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col">
       <div className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">
         {/* Community Header */}
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Users className="h-12 w-12 text-cyan-400" />
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight py-2">
+          <div className="mb-8 text-center">
+            <div className="flex flex-col items-center justify-center gap-3 mb-4 sm:flex-row sm:gap-4">
+              <Users className="h-10 w-10 text-cyan-400 sm:h-12 sm:w-12" />
+              <h1 className="text-3xl font-bold leading-tight bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent sm:text-5xl sm:py-2">
                 Training Dashboard
               </h1>
             </div>
@@ -309,28 +309,28 @@ const Community = React.memo(() => {
             clearNotification();
           }
         }} className="w-full">
-          <TabsList className="flex w-full bg-slate-800/50 border border-cyan-500/20 justify-evenly h-14 p-2 overflow-x-auto">
-            <TabsTrigger value="discussions" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-              <Users className="h-5 w-5 mr-2" />
+          <TabsList className="flex h-auto w-full flex-wrap items-stretch justify-between gap-2 rounded-xl border border-cyan-500/20 bg-slate-800/50 p-2 sm:h-14 sm:flex-nowrap sm:items-center sm:justify-evenly sm:gap-0">
+            <TabsTrigger value="discussions" className="flex-1 min-w-[7.5rem] rounded-lg px-3 py-2 text-xs sm:min-w-0 sm:rounded-md sm:px-4 sm:text-sm data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+              <Users className="mr-1.5 h-4 w-4 sm:mr-2 sm:h-5 sm:w-5" />
               Discussions
             </TabsTrigger>
-            <TabsTrigger value="calendar" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-              <Calendar className="h-5 w-5 mr-2" />
+            <TabsTrigger value="calendar" className="flex-1 min-w-[7.5rem] rounded-lg px-3 py-2 text-xs sm:min-w-0 sm:rounded-md sm:px-4 sm:text-sm data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+              <Calendar className="mr-1.5 h-4 w-4 sm:mr-2 sm:h-5 sm:w-5" />
               Calendar
             </TabsTrigger>
-            <TabsTrigger value="videos" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-              <Video className="h-5 w-5 mr-2" />
+            <TabsTrigger value="videos" className="flex-1 min-w-[7.5rem] rounded-lg px-3 py-2 text-xs sm:min-w-0 sm:rounded-md sm:px-4 sm:text-sm data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+              <Video className="mr-1.5 h-4 w-4 sm:mr-2 sm:h-5 sm:w-5" />
               Training
             </TabsTrigger>
-            <TabsTrigger value="calculator" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
-              <Calculator size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
+            <TabsTrigger value="calculator" className="flex-1 min-w-[7.5rem] rounded-lg px-3 py-2 text-xs sm:min-w-0 sm:rounded-md sm:px-4 sm:text-sm data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
+              <Calculator size={20} className="mr-1.5 h-4 w-4 sm:mr-2 sm:h-5 sm:w-5" />
               Calculator
             </TabsTrigger>
             <TabsTrigger 
               value="admin-support" 
-              className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 relative"
+              className="relative flex-1 min-w-[7.5rem] rounded-lg px-3 py-2 text-xs sm:min-w-0 sm:rounded-md sm:px-4 sm:text-sm data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300"
             >
-              <MessageSquare className="h-5 w-5 mr-2" />
+              <MessageSquare className="mr-1.5 h-4 w-4 sm:mr-2 sm:h-5 sm:w-5" />
               Admin Support
               {/* Notification bubble */}
               {hasNotification && (
@@ -342,9 +342,9 @@ const Community = React.memo(() => {
             {userIsAdmin && (
               <TabsTrigger
                 value="promo-codes"
-                className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300"
+                className="flex-1 min-w-[7.5rem] rounded-lg px-3 py-2 text-xs sm:min-w-0 sm:rounded-md sm:px-4 sm:text-sm data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300"
               >
-                <Ticket className="h-5 w-5 mr-2" />
+                <Ticket className="mr-1.5 h-4 w-4 sm:mr-2 sm:h-5 sm:w-5" />
                 Promo Codes
               </TabsTrigger>
             )}
