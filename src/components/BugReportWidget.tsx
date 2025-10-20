@@ -83,7 +83,7 @@ export const BugReportWidget = () => {
 
       {/* Bug Report Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="bg-slate-900 border-red-500/30 max-w-md">
+        <DialogContent className="bg-slate-900 border-red-500/30 w-full max-w-[calc(100vw-1.5rem)] sm:max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
               <Bug className="h-5 w-5 text-red-400" />
