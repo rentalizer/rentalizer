@@ -1129,7 +1129,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                       <div className="flex-1 min-w-0">
                         {/* Header */}
                         <div className="mb-3 flex flex-col gap-3 sm:mb-2 sm:flex-row sm:items-center sm:justify-between">
-                          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+                          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
                             <div className="flex flex-wrap items-center gap-2">
                               {discussion.isPinned && <Pin className="h-4 w-4 text-yellow-400" />}
                               {isAdmin && getUserId(discussion.user_id) !== user?.id ? (
@@ -1144,26 +1144,95 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                                 <span className="text-cyan-300 font-medium">{profileInfo.display_name}</span>
                               )}
                               {discussion.isAdmin && (
-                                <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
+                                <Badge className="hidden sm:inline-flex bg-red-500/20 text-red-300 border-red-500/30 text-xs">
                                   Admin
+                                </Badge>
+                              )}
+                              {discussion.isPinned && (
+                                <Badge className="hidden sm:inline-flex bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
+                                  Pinned
                                 </Badge>
                               )}
                             </div>
 
+                            {(discussion.isAdmin || discussion.isPinned || canPin(discussion) || canEdit(discussion) || canDelete(discussion)) && (
+                              <div className="flex flex-wrap items-center gap-2 sm:hidden">
+                                {discussion.isAdmin && (
+                                  <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
+                                    Admin
+                                  </Badge>
+                                )}
+                                {discussion.isPinned && (
+                                  <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-xs">
+                                    Pinned
+                                  </Badge>
+                                )}
+                                <div className="flex items-center gap-1">
+                                  {canPin(discussion) && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handlePinToggle(discussion.id)}
+                                      disabled={pinningPosts.has(discussion.id)}
+                                      className={`h-7 w-7 p-0 text-gray-400 transition-all duration-200 ${
+                                        discussion.isPinned 
+                                          ? 'text-yellow-400 hover:text-yellow-300' 
+                                          : 'hover:text-yellow-400'
+                                      } ${pinningPosts.has(discussion.id) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                      title={discussion.isPinned ? 'Unpin post' : 'Pin post'}
+                                    >
+                                      <Pin className={`h-3.5 w-3.5`} />
+                                    </Button>
+                                  )}
+                                  {(canEdit(discussion) || canDelete(discussion)) && (
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-gray-400 hover:text-white">
+                                          <MoreHorizontal className="h-3.5 w-3.5" />
+                                        </Button>
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent align="start" sideOffset={4} className="bg-slate-800 border-gray-700">
+                                        {canEdit(discussion) && (
+                                          <DropdownMenuItem 
+                                            onClick={() => handleStartEdit(discussion)}
+                                            className="text-gray-300 hover:text-white hover:bg-slate-700 cursor-pointer"
+                                          >
+                                            <Edit className="h-4 w-4 mr-2" />
+                                            Edit
+                                          </DropdownMenuItem>
+                                        )}
+                                        {canDelete(discussion) && (
+                                          <DropdownMenuItem 
+                                            onClick={() => {
+                                              console.log('🗑️ DELETE BUTTON CLICKED for discussion:', discussion.id);
+                                              handleDeleteDiscussion(discussion.id);
+                                            }}
+                                            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
+                                          >
+                                            <Trash2 className="h-4 w-4 mr-2" />
+                                            Delete
+                                          </DropdownMenuItem>
+                                        )}
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+
                             <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400 sm:text-sm">
                               <span title={formatDateWithTimezone(discussion.created_at)}>{discussion.timeAgo}</span>
-                              <span className="hidden sm:inline">•</span>
-                              <span>{discussion.category}</span>
-                              {discussion.isPinned && (
-                                <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30 text-[10px] sm:text-xs">
-                                  Pinned
-                                </Badge>
+                              {discussion.category && (
+                                <>
+                                  <span className="hidden sm:inline">•</span>
+                                  <span className="hidden sm:inline">{discussion.category}</span>
+                                </>
                               )}
                             </div>
                           </div>
 
                           {/* Pin Icon and Options Menu */}
-                          <div className="flex items-center gap-1 sm:gap-2">
+                          <div className="hidden items-center gap-1 sm:flex sm:gap-2">
                             {/* Pin Icon for Admin Posts Only */}
                             {canPin(discussion) && (
                               <Button

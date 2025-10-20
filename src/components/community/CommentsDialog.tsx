@@ -194,7 +194,7 @@ export const CommentsDialog: React.FC<CommentsDialogProps> = ({
           {discussion.comments}
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+      <DialogContent className="bg-slate-800 border-gray-700 w-full max-w-[calc(100vw-1.5rem)] max-h-[85vh] overflow-hidden flex flex-col p-4 sm:max-w-2xl sm:max-h-[80vh] sm:p-6">
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-white">Comments - {discussion.title}</DialogTitle>
         </DialogHeader>
