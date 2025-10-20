@@ -765,7 +765,7 @@ export const CommunityCalendar = () => {
                 <Plus className="h-4 w-4 mr-2" />
                 Add Event
               </Button>
-            <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="add-event-description">
+            <DialogContent className="bg-slate-800 border-gray-700 w-full max-w-[calc(100vw-1.5rem)] max-h-[85vh] overflow-y-auto p-4 sm:max-w-2xl sm:max-h-[90vh] sm:p-6" aria-describedby="add-event-description">
               <DialogHeader>
                 <DialogTitle className="text-white text-xl">Add event</DialogTitle>
                 <p id="add-event-description" className="text-gray-400 text-sm">
@@ -1166,7 +1166,7 @@ export const CommunityCalendar = () => {
         
         {/* Event Details Popup */}
         <Dialog open={isEventDetailsOpen} onOpenChange={setIsEventDetailsOpen}>
-          <DialogContent className="bg-slate-800 border-gray-700 max-w-md" aria-describedby="event-details-description">
+          <DialogContent className="bg-slate-800 border-gray-700 w-full max-w-[calc(100vw-1.5rem)] max-h-[85vh] overflow-y-auto p-4 sm:max-w-md sm:max-h-[90vh] sm:p-6" aria-describedby="event-details-description">
             <DialogHeader>
               <DialogTitle className="text-white text-xl">
                 {selectedEvent?.title}
@@ -1268,7 +1268,7 @@ export const CommunityCalendar = () => {
          {/* Edit Event Dialog - Only visible to admins */}
          {isAdmin && (
            <Dialog open={isEditEventOpen} onOpenChange={setIsEditEventOpen}>
-             <DialogContent className="bg-slate-800 border-gray-700 max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="edit-event-description">
+             <DialogContent className="bg-slate-800 border-gray-700 w-full max-w-[calc(100vw-1.5rem)] max-h-[85vh] overflow-y-auto p-4 sm:max-w-2xl sm:max-h-[90vh] sm:p-6" aria-describedby="edit-event-description">
                <DialogHeader>
                  <DialogTitle className="text-white text-xl">Edit Event</DialogTitle>
                  <p id="edit-event-description" className="text-gray-400 text-sm">
