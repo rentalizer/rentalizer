@@ -100,7 +100,7 @@ export default function Offers() {
     <div className="min-h-screen bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800">
       {/* Hero Section */}
       <section className="relative py-10 px-4 text-center">
-        <div className="absolute top-4 left-4">
+        <div className="absolute top-4 left-4 hidden md:block">
           <Button
             asChild
             variant="ghost"
@@ -115,10 +115,15 @@ export default function Offers() {
         </div>
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="flex items-center justify-center gap-3 mb-6">
-            <BarChart3 className="h-12 w-12 text-primary neon-text" />
-            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Rentalizer
-            </h1>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-3 rounded-md px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+            >
+              <BarChart3 className="h-12 w-12 text-primary neon-text" />
+              <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Rentalizer
+              </h1>
+            </Link>
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">
             The #1 Training Program To Build Rental Income Fast
