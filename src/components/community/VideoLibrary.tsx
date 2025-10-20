@@ -906,30 +906,167 @@ export const VideoLibrary = () => {
     return `${(selectedAttachment.size / 1024).toFixed(1)} KB`;
   })();
 
+  const addVideoButton = isAdmin && user ? (
+    <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+      <DialogTrigger asChild>
+        <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 w-full justify-center sm:w-auto">
+          <Plus className="h-4 w-4 mr-2" />
+          Add Video
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="w-full max-w-[calc(100vw-1.5rem)] max-h-[85vh] bg-slate-900 border border-cyan-500/20 overflow-y-auto p-4 sm:max-w-md sm:max-h-[90vh] sm:p-6">
+        <DialogHeader>
+          <DialogTitle className="text-cyan-300">Add New Video</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 pr-2">
+          <div>
+            <Label htmlFor="title" className="text-gray-300">Title</Label>
+            <Input
+              id="title"
+              value={newVideo.title}
+              onChange={(e) => setNewVideo({...newVideo, title: e.target.value})}
+              className="bg-slate-800/50 border-cyan-500/20 text-white"
+            />
+          </div>
+          <div>
+            <Label htmlFor="description" className="text-gray-300">Description</Label>
+            <Textarea
+              id="description"
+              value={newVideo.description}
+              onChange={(e) => setNewVideo({...newVideo, description: e.target.value})}
+              className="bg-slate-800/50 border-cyan-500/20 text-white"
+            />
+          </div>
+          <div>
+            <Label htmlFor="videoUrl" className="text-gray-300">Video URL</Label>
+            <Input
+              id="videoUrl"
+              value={newVideo.videoUrl}
+              onChange={(e) => setNewVideo({...newVideo, videoUrl: e.target.value})}
+              placeholder="https://www.loom.com/share/..."
+              className="bg-slate-800/50 border-cyan-500/20 text-white"
+            />
+          </div>
+          <ImageUpload
+              value={newVideo.thumbnail}
+            onChange={(value) => setNewVideo({...newVideo, thumbnail: value})}
+          />
+          
+          {/* File Attachment Field */}
+          <div>
+            <Label htmlFor="attachment" className="text-gray-300">Support Document (Optional)</Label>
+            <div className="mt-2">
+              <input
+                type="file"
+                id="attachment"
+                accept=".pdf,.xls,.xlsx,.xlsm,.doc,.docx,.ppt,.pptx,.ppsx,.txt,.md,.csv,.ods,.odp,.odt"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (file.size > MAX_DOCUMENT_SIZE) {
+                      toast({
+                        title: "File too large",
+                        description: "File must be 20MB or smaller.",
+                        variant: "destructive"
+                      });
+                      e.target.value = '';
+                      return;
+                    }
+
+                    const extension = file.name.split('.').pop()?.toLowerCase() || '';
+                    if (!ALLOWED_DOCUMENT_EXTENSIONS.includes(extension)) {
+                      toast({
+                        title: "Unsupported file type",
+                        description: "Please upload PDF, Office, text, or CSV documents.",
+                        variant: "destructive"
+                      });
+                      e.target.value = '';
+                      return;
+                    }
+
+                    const fileType = determineDocumentType(file.name);
+
+                    setAttachmentFile(file);
+
+                    setNewVideo({
+                      ...newVideo,
+                      attachment: {
+                        filename: file.name,
+                        url: '',
+                        type: fileType,
+                        size: file.size
+                      }
+                    });
+                  }
+                }}
+                className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700"
+              />
+              <p className="text-xs text-gray-400 mt-1">Upload PDF, Office, text, or CSV files up to 20MB</p>
+            </div>
+          </div>
+          
+          <div>
+            <Label htmlFor="category" className="text-gray-300">Category</Label>
+            <Select value={newVideo.category} onValueChange={(value) => setNewVideo({...newVideo, category: value})}>
+              <SelectTrigger className="bg-slate-800/50 border-cyan-500/20 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-slate-800 border-cyan-500/20">
+                {categories.filter(cat => cat !== 'all').map(category => (
+                  <SelectItem key={category} value={category} className="text-white hover:bg-slate-700">
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="featured"
+              checked={newVideo.featured}
+              onChange={(e) => setNewVideo({...newVideo, featured: e.target.checked})}
+              className="rounded"
+            />
+            <Label htmlFor="featured" className="text-gray-300">Featured</Label>
+          </div>
+
+          <div className="flex gap-2">
+            <Button onClick={handleAddVideo} className="flex-1 bg-cyan-600 hover:bg-cyan-700">
+              Add Video
+            </Button>
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="border-gray-600 text-gray-300">
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  ) : null;
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex-1"></div>
-        <div className="flex flex-col items-center gap-2">
-          <h2 className="text-3xl font-bold text-cyan-300 flex items-center gap-3">
+      <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:justify-between">
+        <div className="hidden sm:block sm:flex-1 sm:order-1" />
+
+        <div className="order-1 flex flex-col items-center gap-2 sm:order-2">
+          <div className="flex items-center gap-3 text-cyan-300">
             {selectedCategory === 'all' ? (
-              <>
-                <VideoIcon className="h-10 w-10 text-cyan-300" />
-                Training Replays & Documents
-              </>
+              <VideoIcon className="h-8 w-8 sm:h-10 sm:w-10" />
             ) : selectedCategory === 'Documents Library' ? (
-              <>
-                <FileText className="h-10 w-10 text-cyan-300" />
-                Training Documents
-              </>
+              <FileText className="h-8 w-8 sm:h-10 sm:w-10" />
             ) : (
-              <>
-                <VideoIcon className="h-10 w-10 text-cyan-300" />
-                Training Videos
-              </>
+              <VideoIcon className="h-8 w-8 sm:h-10 sm:w-10" />
             )}
-          </h2>
+            <h2 className="text-2xl font-bold text-cyan-300 sm:text-3xl">
+              {selectedCategory === 'all'
+                ? 'Training Replays & Documents'
+                : selectedCategory === 'Documents Library'
+                ? 'Training Documents'
+                : 'Training Videos'}
+            </h2>
+          </div>
           <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
             {loading ? (
               <div className="flex items-center gap-2">
@@ -945,147 +1082,14 @@ export const VideoLibrary = () => {
             )}
           </Badge>
         </div>
-        
-        {/* Admin Add Button */}
-        <div className="flex-1 flex justify-end">
-        {isAdmin && user && (
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Video
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md max-h-[90vh] bg-slate-900 border border-cyan-500/20 overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-cyan-300">Add New Video</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 pr-2">
-                <div>
-                  <Label htmlFor="title" className="text-gray-300">Title</Label>
-                  <Input
-                    id="title"
-                    value={newVideo.title}
-                    onChange={(e) => setNewVideo({...newVideo, title: e.target.value})}
-                    className="bg-slate-800/50 border-cyan-500/20 text-white"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="description" className="text-gray-300">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={newVideo.description}
-                    onChange={(e) => setNewVideo({...newVideo, description: e.target.value})}
-                    className="bg-slate-800/50 border-cyan-500/20 text-white"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="videoUrl" className="text-gray-300">Video URL</Label>
-                  <Input
-                    id="videoUrl"
-                    value={newVideo.videoUrl}
-                    onChange={(e) => setNewVideo({...newVideo, videoUrl: e.target.value})}
-                    placeholder="https://www.loom.com/share/..."
-                    className="bg-slate-800/50 border-cyan-500/20 text-white"
-                  />
-                </div>
-                <ImageUpload
-                    value={newVideo.thumbnail}
-                  onChange={(value) => setNewVideo({...newVideo, thumbnail: value})}
-                />
-                
-                {/* File Attachment Field */}
-                <div>
-                  <Label htmlFor="attachment" className="text-gray-300">Support Document (Optional)</Label>
-                  <div className="mt-2">
-                    <input
-                      type="file"
-                      id="attachment"
-                      accept=".pdf,.xls,.xlsx,.xlsm,.doc,.docx,.ppt,.pptx,.ppsx,.txt,.md,.csv,.ods,.odp,.odt"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          if (file.size > MAX_DOCUMENT_SIZE) {
-                            toast({
-                              title: "File too large",
-                              description: "File must be 20MB or smaller.",
-                              variant: "destructive"
-                            });
-                            e.target.value = '';
-                            return;
-                          }
 
-                          const extension = file.name.split('.').pop()?.toLowerCase() || '';
-                          if (!ALLOWED_DOCUMENT_EXTENSIONS.includes(extension)) {
-                            toast({
-                              title: "Unsupported file type",
-                              description: "Please upload PDF, Office, text, or CSV documents.",
-                              variant: "destructive"
-                            });
-                            e.target.value = '';
-                            return;
-                          }
-
-                          const fileType = determineDocumentType(file.name);
-
-                          setAttachmentFile(file);
-
-                          setNewVideo({
-                            ...newVideo,
-                            attachment: {
-                              filename: file.name,
-                              url: '',
-                              type: fileType,
-                              size: file.size
-                            }
-                          });
-                        }
-                      }}
-                      className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700"
-                    />
-                    <p className="text-xs text-gray-400 mt-1">Upload PDF, Office, text, or CSV files up to 20MB</p>
-                  </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="category" className="text-gray-300">Category</Label>
-                  <Select value={newVideo.category} onValueChange={(value) => setNewVideo({...newVideo, category: value})}>
-                    <SelectTrigger className="bg-slate-800/50 border-cyan-500/20 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-cyan-500/20">
-                      {categories.filter(cat => cat !== 'all').map(category => (
-                        <SelectItem key={category} value={category} className="text-white hover:bg-slate-700">
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="featured"
-                    checked={newVideo.featured}
-                    onChange={(e) => setNewVideo({...newVideo, featured: e.target.checked})}
-                    className="rounded"
-                  />
-                  <Label htmlFor="featured" className="text-gray-300">Featured</Label>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button onClick={handleAddVideo} className="flex-1 bg-cyan-600 hover:bg-cyan-700">
-                    Add Video
-                  </Button>
-                  <Button variant="outline" onClick={() => setIsAddDialogOpen(false)} className="border-gray-600 text-gray-300">
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+        {addVideoButton ? (
+          <div className="order-2 flex w-full justify-center sm:order-3 sm:flex-1 sm:justify-end">
+            <div className="w-full sm:w-auto">{addVideoButton}</div>
+          </div>
+        ) : (
+          <div className="hidden sm:block sm:flex-1 sm:order-3" />
         )}
-        </div>
       </div>
 
       {/* Search - Only show when in a specific category */}
@@ -1144,10 +1148,10 @@ export const VideoLibrary = () => {
                     <Button 
                       variant="outline" 
                       onClick={() => setSelectedCategory('all')}
-                      className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+                      className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2"
                     >
-                      <ArrowRight className="h-4 w-4 mr-2 rotate-180" />
-                      Back to Albums
+                      <ArrowRight className="h-5 w-5 rotate-180" />
+                      <span className="hidden sm:inline">Back to Albums</span>
                     </Button>
                     <h3 className="text-xl font-semibold text-cyan-300">{selectedCategory}</h3>
                     <Badge variant="outline" className="border-cyan-500/30 text-cyan-300">
@@ -1225,7 +1229,7 @@ export const VideoLibrary = () => {
                     </CardContent>
                   </Card>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                     {categoryColumns.map(category => {
                       const categoryVideos = videosByCategory[category] || [];
                       
