@@ -95,7 +95,6 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [editTitle, setEditTitle] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
-  const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [userProfiles, setUserProfiles] = useState<{[key: string]: UserProfile}>({});
   const { onlineUsers, onlineCount, adminNames, loading: onlineLoading, useWebSocket } = useOnlineUsers();
   const [showMembersList, setShowMembersList] = useState(false);
@@ -952,56 +951,65 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     return isAdmin;
   }, [isAdmin]);
 
-  const getTruncatedContent = useCallback((content: string, maxLength: number = 150) => {
-    if (content.length <= maxLength) return content;
-    return content.substring(0, maxLength) + '...';
-  }, []);
-
   // Render markdown content with images
   const renderContent = useCallback((content: string) => {
-    // Convert markdown images ![alt](url) to img tags
-    const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
-    const parts: (string | JSX.Element)[] = [];
-    let lastIndex = 0;
-    let match;
-    let key = 0;
+    const imagePattern = /!\[([^\]]*)\]\(([^)]+)\)/g;
+    const matches = Array.from(content.matchAll(imagePattern));
 
-    while ((match = imageRegex.exec(content)) !== null) {
-      // Add text before the image
-      if (match.index > lastIndex) {
-        parts.push(content.substring(lastIndex, match.index));
-      }
-
-      // Add the image
-      const alt = match[1];
-      const url = match[2];
-      parts.push(
-        <img
-          key={`img-${key++}`}
-          src={url}
-          alt={alt}
-          className="max-w-full h-auto rounded-lg my-2 border border-slate-600"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-            // Show the markdown text as fallback
-            const fallback = document.createElement('div');
-            fallback.className = 'text-gray-400 text-sm italic';
-            fallback.textContent = `📷 Image: ${alt}`;
-            target.parentNode?.insertBefore(fallback, target);
-          }}
-        />
-      );
-
-      lastIndex = match.index + match[0].length;
+    if (matches.length === 0) {
+      return content;
     }
 
-    // Add remaining text
+    const parts: (string | JSX.Element)[] = [];
+    let lastIndex = 0;
+
+    matches.forEach((match) => {
+      const index = match.index ?? 0;
+      if (index > lastIndex) {
+        parts.push(content.substring(lastIndex, index));
+      }
+      lastIndex = index + match[0].length;
+    });
+
     if (lastIndex < content.length) {
       parts.push(content.substring(lastIndex));
     }
 
-    return parts.length > 0 ? parts : content;
+    let gridClasses = 'mt-2 grid gap-2';
+    if (matches.length === 1) {
+      gridClasses += ' grid-cols-1 max-w-md mx-auto';
+    } else if (matches.length === 2) {
+      gridClasses += ' grid-cols-2 max-w-3xl mx-auto';
+    } else {
+      gridClasses += ' grid-cols-2 md:grid-cols-3 max-w-4xl mx-auto';
+    }
+
+    const imageElements = matches.map((match, idx) => {
+      const alt = match[1];
+      const url = match[2];
+
+      return (
+        <div key={`img-${idx}`} className="w-full">
+          <img
+            src={url}
+            alt={alt}
+            className="w-full h-auto rounded-lg border border-slate-600 object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+            }}
+          />
+        </div>
+      );
+    });
+
+    parts.push(
+      <div key="image-grid" className={gridClasses}>
+        {imageElements}
+      </div>
+    );
+
+    return parts;
   }, []);
 
   // Handle post creation callback - refresh discussions list
@@ -1348,18 +1356,11 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                             </h3>
 
                             <div 
-                              className={`mb-4 leading-relaxed whitespace-pre-wrap cursor-pointer transition-colors ${
+                              className={`mb-4 leading-relaxed whitespace-pre-wrap transition-colors ${
                                 isDayMode ? 'text-slate-600 hover:text-slate-700' : 'text-gray-300 hover:text-gray-200'
                               }`}
-                              onClick={() => setExpandedPost(expandedPost === discussion.id ? null : discussion.id)}
                             >
-                              {expandedPost === discussion.id ? renderContent(discussion.content) : renderContent(getTruncatedContent(discussion.content))}
-                              {discussion.content.length > 150 && expandedPost !== discussion.id && (
-                                <span className="text-cyan-400 ml-2 font-medium">Read more</span>
-                              )}
-                              {expandedPost === discussion.id && discussion.content.length > 150 && (
-                                <span className="text-cyan-400 ml-2 font-medium">Show less</span>
-                              )}
+                              {renderContent(discussion.content)}
                             </div>
                           </>
                         )}

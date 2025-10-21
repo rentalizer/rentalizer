@@ -38,6 +38,7 @@ interface VideoUpload {
 }
 
 interface PhotoUpload {
+  id: string;
   file: File;
   url?: string;
   uploaded: boolean;
@@ -61,7 +62,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
   const [videoUpload, setVideoUpload] = useState<VideoUpload | null>(null);
-  const [photoUpload, setPhotoUpload] = useState<PhotoUpload | null>(null);
+  const [photoUploads, setPhotoUploads] = useState<PhotoUpload[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
   const isAdminUser = user?.role === 'admin' || user?.role === 'superadmin';
@@ -95,6 +96,14 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
     return file.type.startsWith('video/');
   };
 
+  const createUploadId = () => {
+    const globalCrypto = typeof globalThis !== 'undefined' ? (globalThis as any).crypto : undefined;
+    if (globalCrypto && typeof globalCrypto.randomUUID === 'function') {
+      return globalCrypto.randomUUID();
+    }
+    return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  };
+
   const handleFileAttach = () => {
     fileInputRef.current?.click();
   };
@@ -104,6 +113,10 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
   };
 
   const handlePhotoUpload = () => {
+    if (photoUploads.length >= 3) {
+      console.log('Photo limit reached: Maximum of 3 photos per post.');
+      return;
+    }
     photoInputRef.current?.click();
   };
 
@@ -251,28 +264,35 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
     }
   };
 
-  const uploadPhotoFile = async (file: File): Promise<string | null> => {
+  const uploadPhotoFile = async (file: File, uploadId: string): Promise<string | null> => {
+    const updatePhotoUpload = (updater: (item: PhotoUpload) => PhotoUpload) => {
+      setPhotoUploads(prev => prev.map(item => item.id === uploadId ? updater(item) : item));
+    };
+
+    let progressInterval: ReturnType<typeof setInterval> | undefined;
+
     try {
       // Check if user is authenticated
       if (!user) {
         console.error('User not authenticated');
-        setPhotoUpload(prev => prev ? { ...prev, uploading: false, error: 'User not authenticated' } : null);
+        updatePhotoUpload(item => ({ ...item, uploading: false, error: 'User not authenticated' }));
         return null;
       }
 
       // Update photo upload status to uploading with progress
-      setPhotoUpload(prev => prev ? { ...prev, uploading: true, uploadProgress: 10, error: undefined } : null);
+      updatePhotoUpload(item => ({ ...item, uploading: true, uploadProgress: 10, error: undefined }));
 
       console.log('📤 Uploading photo to Node.js backend...');
       console.log('User ID:', user.id);
       console.log('File size:', file.size);
 
       // Simulate progress updates
-      const progressInterval = setInterval(() => {
-        setPhotoUpload(prev => prev ? { 
-          ...prev, 
-          uploadProgress: Math.min(prev.uploadProgress + 20, 90) 
-        } : null);
+      progressInterval = setInterval(() => {
+        setPhotoUploads(prev => prev.map(item => 
+          item.id === uploadId 
+            ? { ...item, uploadProgress: Math.min(item.uploadProgress + 20, 90) } 
+            : item
+        ));
       }, 500);
 
       // Create FormData for file upload
@@ -294,21 +314,23 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
         }
       );
 
-      clearInterval(progressInterval);
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
 
       if (response.data.success) {
         const photoUrl = response.data.data.url;
         console.log('✅ Photo upload successful:', photoUrl);
 
         // Update photo upload status to uploaded with URL and full progress
-        setPhotoUpload(prev => prev ? { 
-          ...prev, 
-          uploading: false, 
-          uploaded: true, 
-          url: photoUrl, 
+        updatePhotoUpload(item => ({
+          ...item,
+          uploading: false,
+          uploaded: true,
+          url: photoUrl,
           uploadProgress: 100,
           error: undefined
-        } : null);
+        }));
 
         return photoUrl;
       } else {
@@ -316,12 +338,15 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       }
     } catch (error) {
       console.error('❌ Exception uploading photo:', error);
-      setPhotoUpload(prev => prev ? { 
-        ...prev, 
-        uploading: false, 
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
+      updatePhotoUpload(item => ({
+        ...item,
+        uploading: false,
         uploadProgress: 0,
-        error: 'Upload failed: ' + (error as Error).message 
-      } : null);
+        error: 'Upload failed: ' + (error as Error).message
+      }));
       return null;
     }
   };
@@ -413,44 +438,69 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
   const handlePhotoSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    const photoFile = files[0];
+    if (files.length === 0) return;
 
-    if (!photoFile) return;
+    const remainingSlots = 3 - photoUploads.length;
+    if (remainingSlots <= 0) {
+      console.log('Photo limit reached: Maximum of 3 photos per post.');
+      if (event.target) {
+        event.target.value = '';
+      }
+      return;
+    }
 
-    // Check file type
     const validImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    if (!validImageTypes.includes(photoFile.type)) {
-      console.log("Invalid file type: Please select a valid image file (.jpg, .jpeg, .png, .gif, .webp)");
-      return;
-    }
-
-    // Check file size (5MB limit)
     const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-    if (photoFile.size > maxSize) {
-      console.log("File too large: Photo file must be smaller than 5MB");
+
+    const validPhotos: File[] = [];
+    files.forEach(file => {
+      if (!validImageTypes.includes(file.type)) {
+        console.log(`Invalid file type: ${file.name} is not a supported image format (.jpg, .jpeg, .png, .gif, .webp)`);
+        return;
+      }
+      if (file.size > maxSize) {
+        console.log(`File too large: ${file.name} is larger than 5MB`);
+        return;
+      }
+      validPhotos.push(file);
+    });
+
+    if (validPhotos.length === 0) {
+      if (event.target) {
+        event.target.value = '';
+      }
       return;
     }
 
-    // Check if user is authenticated
+    const photosToProcess = validPhotos.slice(0, remainingSlots);
+    if (validPhotos.length > remainingSlots) {
+      console.log(`Photo limit reached: Only the first ${remainingSlots} photo(s) were added (maximum 3 photos per post).`);
+    }
+
     if (!user) {
       console.log("Authentication required: Please sign in to upload photos");
+      if (event.target) {
+        event.target.value = '';
+      }
       return;
     }
 
-    // Initialize photo upload state immediately
-    setPhotoUpload({
-      file: photoFile,
+    const uploadsToAdd = photosToProcess.map(file => ({
+      id: createUploadId(),
+      file,
       uploaded: false,
       uploading: false,
       uploadProgress: 0,
       url: undefined,
       error: undefined
-    });
+    }));
 
-    // Start upload process
-    await uploadPhotoFile(photoFile);
+    setPhotoUploads(prev => [...prev, ...uploadsToAdd]);
 
-    // Reset the input
+    for (const upload of uploadsToAdd) {
+      await uploadPhotoFile(upload.file, upload.id);
+    }
+
     if (event.target) {
       event.target.value = '';
     }
@@ -465,8 +515,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
     setIsVideoPlaying(false);
   };
 
-  const removePhotoUpload = () => {
-    setPhotoUpload(null);
+  const removePhotoUpload = (uploadId: string) => {
+    setPhotoUploads(prev => prev.filter(item => item.id !== uploadId));
   };
 
   const toggleVideoPlayback = () => {
@@ -513,11 +563,11 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
         contentWithMedia = `${contentWithMedia}\n\n${videoLink}`;
       }
 
-      // Add photo if uploaded
-      if (photoUpload?.uploaded && photoUpload.url) {
-        // Use proper markdown image syntax: ![alt](url)
-        const photoLink = `![${photoUpload.file.name}](${photoUpload.url})`;
-        contentWithMedia = `${contentWithMedia}\n\n${photoLink}`;
+      // Add photos if uploaded
+      const uploadedPhotos = photoUploads.filter(photo => photo.uploaded && photo.url);
+      if (uploadedPhotos.length > 0) {
+        const photoLinks = uploadedPhotos.map(photo => `![${photo.file.name}](${photo.url})`).join('\n\n');
+        contentWithMedia = `${contentWithMedia}\n\n${photoLinks}`;
       }
       
       console.log('Creating discussion with data:', {
@@ -538,7 +588,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       
       console.log('Discussion created successfully:', response.data);
 
-      const attachmentCount = uploadedFiles.length + (videoUpload?.uploaded ? 1 : 0) + (photoUpload?.uploaded ? 1 : 0);
+      const attachmentCount = uploadedFiles.length + (videoUpload?.uploaded ? 1 : 0) + uploadedPhotos.length;
       console.log("Post created:", attachmentCount > 0 
         ? `Your post has been shared with ${attachmentCount} attachment(s)`
         : "Your post has been shared with the community");
@@ -547,7 +597,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       setPostTitle('');
       setAttachedFiles([]);
       setVideoUpload(null);
-      setPhotoUpload(null);
+      setPhotoUploads([]);
       setUploadSuccess(null);
       setIsVideoPlaying(false);
       onPostCreated();
@@ -796,85 +846,82 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                 )}
 
                 {/* Photo upload display - This stays visible after upload */}
-                {photoUpload && (
-                  <div className="bg-slate-700/30 border border-cyan-500/20 rounded-lg p-3 space-y-3">
+                {photoUploads.length > 0 && (
+                  <div className="bg-slate-700/30 border border-cyan-500/20 rounded-lg p-3 space-y-4">
                     <div className="flex items-center gap-2">
                       <Image className="h-4 w-4 text-cyan-400" />
                       <span className="text-sm font-medium text-cyan-300">
-                        Photo Upload
+                        Photo Uploads
                       </span>
-                      {photoUpload.uploaded && (
-                        <span className="text-xs text-green-400">✓ uploaded</span>
-                      )}
-                      {photoUpload.uploading && (
-                        <span className="text-xs text-yellow-400">uploading...</span>
-                      )}
-                      {photoUpload.error && (
-                        <span className="text-xs text-red-400">failed</span>
-                      )}
+                      <span className="text-xs text-gray-400">
+                        ({photoUploads.length}/3)
+                      </span>
                     </div>
 
                     <div className="space-y-3">
-                      {/* File info section */}
-                      <div className="flex items-center justify-between bg-slate-600/50 rounded-lg px-3 py-2 border border-slate-500/30">
-                        <div className="flex items-center gap-2 min-w-0 flex-1">
-                          {photoUpload.uploading ? (
-                            <div className="h-4 w-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin flex-shrink-0" />
-                          ) : photoUpload.uploaded ? (
-                            <Check className="h-4 w-4 text-green-400 flex-shrink-0" />
-                          ) : photoUpload.error ? (
-                            <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0" />
-                          ) : (
-                            <Image className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                          )}
-                          <div className="min-w-0 flex-1">
-                            <div className="text-sm text-gray-200 truncate" title={photoUpload.file.name}>
-                              {photoUpload.file.name}
-                            </div>
-                            <div className="text-xs text-gray-400">
-                              {(photoUpload.file.size / 1024 / 1024).toFixed(2)} MB
-                              {photoUpload.error && (
-                                <span className="text-red-400 ml-2">• {photoUpload.error}</span>
+                      {photoUploads.map((upload) => (
+                        <div key={upload.id} className="space-y-3 rounded-lg border border-slate-500/30 bg-slate-600/20 p-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              {upload.uploading ? (
+                                <div className="h-4 w-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                              ) : upload.uploaded ? (
+                                <Check className="h-4 w-4 text-green-400 flex-shrink-0" />
+                              ) : upload.error ? (
+                                <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0" />
+                              ) : (
+                                <Image className="h-4 w-4 text-gray-400 flex-shrink-0" />
                               )}
+                              <div className="min-w-0 flex-1">
+                                <div className="text-sm text-gray-200 truncate" title={upload.file.name}>
+                                  {upload.file.name}
+                                </div>
+                                <div className="text-xs text-gray-400">
+                                  {(upload.file.size / 1024 / 1024).toFixed(2)} MB
+                                  {upload.uploaded && <span className="text-green-400 ml-2">• ready</span>}
+                                  {upload.uploading && <span className="text-yellow-400 ml-2">• uploading</span>}
+                                  {upload.error && <span className="text-red-400 ml-2">• {upload.error}</span>}
+                                </div>
+                              </div>
                             </div>
+                            <button
+                              onClick={() => removePhotoUpload(upload.id)}
+                              className="text-red-400 hover:text-red-300 ml-2 flex-shrink-0 p-1 hover:bg-red-500/10 rounded transition-colors"
+                              title="Remove photo"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
                           </div>
-                        </div>
-                        <button
-                          onClick={removePhotoUpload}
-                          className="text-red-400 hover:text-red-300 ml-2 flex-shrink-0 p-1 hover:bg-red-500/10 rounded transition-colors"
-                          title="Remove photo"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
 
-                      {/* Upload progress bar - only shown during upload */}
-                      {photoUpload.uploading && (
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-xs text-gray-400">
-                            <span>Uploading photo...</span>
-                            <span>{Math.round(photoUpload.uploadProgress)}%</span>
-                          </div>
-                          <Progress value={photoUpload.uploadProgress} className="h-2" />
-                        </div>
-                      )}
+                          {/* Upload progress bar - only shown during upload */}
+                          {upload.uploading && (
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-xs text-gray-400">
+                                <span>Uploading photo...</span>
+                                <span>{Math.round(upload.uploadProgress)}%</span>
+                              </div>
+                              <Progress value={upload.uploadProgress} className="h-2" />
+                            </div>
+                          )}
 
-                      {/* Photo preview - shown after successful upload */}
-                      {photoUpload.uploaded && photoUpload.url && (
-                        <div className="relative">
-                          <img
-                            src={photoUpload.url}
-                            alt={`Preview of ${photoUpload.file.name}`}
-                            className="w-full h-48 object-cover rounded-lg border border-slate-500/30"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
-                          <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                            Photo Ready
-                          </div>
+                          {/* Photo preview - shown after successful upload */}
+                          {upload.uploaded && upload.url && (
+                            <div className="relative">
+                              <img
+                                src={upload.url}
+                                alt={`Preview of ${upload.file.name}`}
+                                className="w-full h-48 object-cover rounded-lg border border-slate-500/30"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                              <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                                Photo Ready
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
+                      ))}
                     </div>
                   </div>
                 )}
@@ -886,14 +933,15 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                     <Button
                       variant="ghost"
                       size="sm"
-                      className={`${photoUpload ? 'text-cyan-400 bg-cyan-500/10' : 'text-gray-400'} hover:text-cyan-300 relative`}
+                      disabled={photoUploads.length >= 3}
+                      className={`${photoUploads.length > 0 ? 'text-cyan-400 bg-cyan-500/10' : 'text-gray-400'} hover:text-cyan-300 relative disabled:opacity-60 disabled:cursor-not-allowed`}
                       onClick={handlePhotoUpload}
-                      title={photoUpload ? 'Photo attached' : 'Upload photo'}
+                      title={photoUploads.length >= 3 ? 'Maximum of 3 photos attached' : photoUploads.length > 0 ? `${photoUploads.length} photo(s) attached` : 'Upload photos'}
                     >
                       <Image className="h-4 w-4" />
-                      {photoUpload && (
-                        <span className="ml-1 text-xs bg-cyan-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
-                          1
+                      {photoUploads.length > 0 && (
+                        <span className="ml-1 text-xs bg-cyan-500 text-white rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center">
+                          {photoUploads.length}
                         </span>
                       )}
                     </Button>
@@ -905,6 +953,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                     className="hidden"
                     onChange={handlePhotoSelect}
                     accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                    multiple
                   />
                   
                   {/* <div className="relative">
