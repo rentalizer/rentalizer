@@ -89,7 +89,7 @@ export default function MembersList({
   };
 
   return (
-    <div className="w-80 bg-slate-800/90 border-l border-slate-700 flex flex-col">
+    <div className="w-full sm:w-80 bg-slate-800/90 border-t border-slate-700 sm:border-t-0 sm:border-l flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-slate-700">
         <h3 className="text-lg font-semibold text-white mb-3">Members</h3>

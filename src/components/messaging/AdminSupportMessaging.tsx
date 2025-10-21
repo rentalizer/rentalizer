@@ -37,6 +37,13 @@ export default function AdminSupportMessaging({
   const [wsConnected, setWsConnected] = useState(false);
   const [backendOffline, setBackendOffline] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
+  const [showMembersPanel, setShowMembersPanel] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 640) {
+      setShowMembersPanel(true);
+    }
+  }, []);
 
 
   // Load conversations or all users (for admins)
@@ -479,6 +486,9 @@ export default function AdminSupportMessaging({
     console.log('👆 User clicked on member:', memberId);
     setSelectedMemberId(memberId);
     setHasUserSelectedConversation(true); // Mark that user actively selected this
+    if (typeof window !== 'undefined' && window.innerWidth < 640) {
+      setShowMembersPanel(false);
+    }
   }, []);
 
   const selectedMember = conversations.find(c => c.participant_id === selectedMemberId);
@@ -581,9 +591,29 @@ export default function AdminSupportMessaging({
 
   // Admin view - full messaging interface
   return (
-    <div className="h-[600px] flex bg-slate-800 border border-slate-700 rounded-lg overflow-hidden shadow-lg">
+    <div className="flex h-[600px] flex-col overflow-hidden rounded-lg border border-slate-700 bg-slate-800 shadow-lg sm:h-[600px] sm:flex-row">
+      {/* Mobile Toggle */}
+      <div className="flex items-center justify-between border-b border-slate-700 bg-slate-900/80 px-4 py-2 sm:hidden">
+        <div className="flex items-center gap-2 text-sm text-slate-200">
+          {showMembersPanel ? (
+            <Users className="h-4 w-4 text-cyan-300" />
+          ) : (
+            <MessageSquare className="h-4 w-4 text-cyan-300" />
+          )}
+          <span>{showMembersPanel ? 'Members' : 'Support Chat'}</span>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-cyan-500/30 text-cyan-200 hover:bg-cyan-500/10"
+          onClick={() => setShowMembersPanel((prev) => !prev)}
+        >
+          {showMembersPanel ? 'View Chat' : 'View Members'}
+        </Button>
+      </div>
+
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-slate-800/90">
+      <div className={`${showMembersPanel ? 'hidden' : 'flex'} flex-1 flex-col bg-slate-800/90 sm:flex`}>
         {/* Unread Messages Notification Banner */}
         {totalUnread > 0 && (
           <div className="bg-red-500/10 border-b border-red-500/20 px-4 py-2 flex items-center justify-between">
@@ -656,12 +686,14 @@ export default function AdminSupportMessaging({
       </div>
 
       {/* Members List */}
-      <MembersList
-        members={conversations}
-        selectedMemberId={selectedMemberId}
-        onMemberSelect={handleMemberSelect}
-        onlineUsers={onlineUsers}
-      />
+      <div className={`${showMembersPanel ? 'flex' : 'hidden'} h-full w-full sm:flex sm:w-80 sm:min-w-[18rem] border-t border-slate-700 bg-slate-900/60 sm:border-t-0 sm:border-l`}>
+        <MembersList
+          members={conversations}
+          selectedMemberId={selectedMemberId}
+          onMemberSelect={handleMemberSelect}
+          onlineUsers={onlineUsers}
+        />
+      </div>
     </div>
   );
 }

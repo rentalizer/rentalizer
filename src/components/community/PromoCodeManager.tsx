@@ -321,9 +321,9 @@ export const PromoCodeManager: React.FC = () => {
           </div>
         ) : (
           <>
-          <div className="hidden sm:block rounded-lg border border-cyan-500/20 bg-slate-900/40 overflow-hidden">
-            <div className="w-full overflow-x-auto md:overflow-x-visible">
-              <Table className="w-full table-auto">
+            <div className="hidden sm:block rounded-lg border border-cyan-500/20 bg-slate-900/40 overflow-hidden">
+              <div className="w-full overflow-x-auto md:overflow-x-visible">
+                <Table className="w-full table-auto">
                 <TableHeader>
                   <TableRow className="bg-slate-800/60">
                     <TableHead className="text-gray-200 text-center text-xs sm:text-sm">Code</TableHead>
@@ -398,9 +398,9 @@ export const PromoCodeManager: React.FC = () => {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+                </Table>
+              </div>
             </div>
-          </div>
             <div className="space-y-4 sm:hidden">
               {promoCodes.map((promo) => (
                 <div key={promo._id} className="rounded-lg border border-cyan-500/20 bg-slate-900/40 p-4 space-y-3">
