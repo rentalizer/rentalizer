@@ -187,28 +187,27 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
   return (
     <div className="space-y-6">
       {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-                  {/* Back button */}
-                  <div className="flex items-center gap-4 mb-6">
-                    <Button 
-                      variant="outline" 
-                      onClick={onBack}
-                      className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
-                    >
-                      <ArrowRight className="h-4 w-4 mr-2 rotate-180" />
-                      Back to Albums
-                    </Button>
-                  </div>
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/3 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Search documents..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-slate-800/50 border-cyan-500/20 text-white placeholder-gray-400"
-          />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+        <div className="flex w-full items-center gap-2 sm:w-auto sm:items-center">
+          <Button
+            variant="outline"
+            onClick={onBack}
+            className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 flex items-center justify-center gap-2 p-2 sm:px-4 sm:py-2"
+          >
+            <ArrowRight className="h-5 w-5 rotate-180" />
+            <span className="hidden sm:inline">Back to Albums</span>
+          </Button>
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search documents..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 bg-slate-800/50 border-cyan-500/20 text-white placeholder-gray-400"
+            />
+          </div>
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="flex w-full gap-2 overflow-x-auto pb-2 sm:w-auto sm:ml-4">
           {categories.map(category => (
             <Button
               key={category}
@@ -247,59 +246,49 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
                 </p>
               </CardContent>
             </Card>
-          ) : (
+        ) : (
             documents.map(document => (
               <Card key={document._id} className="bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 flex-1">
-                      {/* File Icon */}
-                      <div className="flex-shrink-0">
-                        {getFileIcon(document.type)}
+                <CardContent className="space-y-4 p-4">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0">
+                      {getFileIcon(document.type)}
+                    </div>
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <h3 className="font-semibold text-white break-words">
+                        {document.filename}
+                      </h3>
+                      <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-400">
+                        <Badge className={`${getCategoryColor(document.category)} text-xs sm:text-sm`}>
+                          {document.category}
+                        </Badge>
+                        <span>{formatFileSize(document.size)}</span>
+                        <span>{new Date(document.createdAt).toLocaleDateString()}</span>
                       </div>
-                      
-                      {/* Document Info */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-white truncate">
-                          {document.filename}
-                        </h3>
-                        <div className="flex items-center gap-4 mt-1 text-sm text-gray-400">
-                          <Badge className={getCategoryColor(document.category)}>
-                            {document.category}
-                  </Badge>
-                          <span>{formatFileSize(document.size)}</span>
-                          <span>{new Date(document.createdAt).toLocaleDateString()}</span>
-                </div>
-              </div>
-              </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-2">
+                    </div>
+                  </div>
+                  <div className="flex w-full flex-col gap-2 sm:flex-row sm:w-auto sm:justify-end">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDownload(document)}
+                      className="w-full border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 sm:w-auto"
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                    {isAdmin && (
                       <Button
                         size="sm"
-                        variant="outline"
-                        onClick={() => handleDownload(document)}
-                        className="border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10"
+                        variant="destructive"
+                        onClick={() => handleDeleteDocument(document._id)}
+                        className="w-full bg-red-900/80 hover:bg-red-800 sm:w-auto"
                       >
-                        <Download className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
-                      
-                      {isAdmin && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleDeleteDocument(document._id)}
-                            className="bg-red-900/80 hover:bg-red-800"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </>
-                      )}
-              </div>
-              </div>
-            </CardContent>
-          </Card>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             ))
           )}
       </div>
