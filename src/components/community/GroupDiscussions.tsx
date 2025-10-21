@@ -95,6 +95,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [editTitle, setEditTitle] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
+  const [expandedPost, setExpandedPost] = useState<string | null>(null);
   const [userProfiles, setUserProfiles] = useState<{[key: string]: UserProfile}>({});
   const { onlineUsers, onlineCount, adminNames, loading: onlineLoading, useWebSocket } = useOnlineUsers();
   const [showMembersList, setShowMembersList] = useState(false);
@@ -951,6 +952,16 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     return isAdmin;
   }, [isAdmin]);
 
+  const getTruncatedContent = useCallback((content: string, maxLength: number = 150) => {
+    if (content.length <= maxLength) return content;
+    return content.substring(0, maxLength) + '...';
+  }, []);
+
+  const hasImagesInContent = useCallback((content: string) => {
+    const imagePattern = /!\[[^\]]*\]\([^\)]+\)/;
+    return imagePattern.test(content);
+  }, []);
+
   // Render markdown content with images
   const renderContent = useCallback((content: string) => {
     const imagePattern = /!\[([^\]]*)\]\(([^)]+)\)/g;
@@ -1355,13 +1366,32 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                               {discussion.title}
                             </h3>
 
-                            <div 
-                              className={`mb-4 leading-relaxed whitespace-pre-wrap transition-colors ${
-                                isDayMode ? 'text-slate-600 hover:text-slate-700' : 'text-gray-300 hover:text-gray-200'
-                              }`}
-                            >
-                              {renderContent(discussion.content)}
-                            </div>
+                            {(() => {
+                              const contentHasImages = hasImagesInContent(discussion.content);
+                              const isExpanded = expandedPost === discussion.id;
+                              const shouldTruncate = !contentHasImages && discussion.content.length > 150;
+                              const displayContent = shouldTruncate && !isExpanded
+                                ? getTruncatedContent(discussion.content)
+                                : discussion.content;
+
+                              return (
+                                <div 
+                                  className={`mb-4 leading-relaxed whitespace-pre-wrap transition-colors ${
+                                    isDayMode ? 'text-slate-600 hover:text-slate-700' : 'text-gray-300 hover:text-gray-200'
+                                  }`}
+                                >
+                                  {renderContent(displayContent)}
+                                  {shouldTruncate && (
+                                    <button
+                                      onClick={() => setExpandedPost(isExpanded ? null : discussion.id)}
+                                      className="text-cyan-400 ml-2 font-medium hover:text-cyan-300"
+                                    >
+                                      {isExpanded ? 'Show less' : 'Show more'}
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            })()}
                           </>
                         )}
 
