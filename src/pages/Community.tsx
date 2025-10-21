@@ -331,7 +331,7 @@ const Community = React.memo(() => {
               className="relative flex-1 min-w-[7.5rem] rounded-lg px-3 py-2 text-xs sm:min-w-0 sm:rounded-md sm:px-4 sm:text-sm data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300"
             >
               <MessageSquare className="mr-1.5 h-4 w-4 sm:mr-2 sm:h-5 sm:w-5" />
-              Admin Support
+              Support
               {/* Notification bubble */}
               {hasNotification && (
                 <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold animate-pulse">
@@ -610,7 +610,7 @@ const Community = React.memo(() => {
               <div className="text-center mb-6">
                 <h2 className="text-3xl font-bold text-cyan-300 mb-2 flex items-center justify-center gap-3">
                   <MessageSquare className="h-8 w-8 text-cyan-400" />
-                  Admin Support
+                  Support
                 </h2>
                 <p className="text-gray-400">Get help from our admin team</p>
               </div>

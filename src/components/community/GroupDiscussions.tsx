@@ -995,6 +995,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       gridClasses += ' grid-cols-2 md:grid-cols-3 max-w-4xl mx-auto';
     }
 
+    const isMultiImage = matches.length > 1;
     const imageElements = matches.map((match, idx) => {
       const alt = match[1];
       const url = match[2];
@@ -1004,7 +1005,9 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           <img
             src={url}
             alt={alt}
-            className="w-full h-auto rounded-lg border border-slate-600 object-cover"
+            className={isMultiImage
+              ? 'w-full h-48 sm:h-56 md:h-60 rounded-lg border border-slate-600 object-cover'
+              : 'w-full h-auto rounded-lg border border-slate-600 object-cover'}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
