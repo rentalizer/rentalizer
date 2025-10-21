@@ -320,9 +320,10 @@ export const PromoCodeManager: React.FC = () => {
             No promo codes have been generated yet. Use the button above to create the first code.
           </div>
         ) : (
-          <div className="rounded-lg border border-cyan-500/20 bg-slate-900/40 overflow-hidden">
+          <>
+          <div className="hidden sm:block rounded-lg border border-cyan-500/20 bg-slate-900/40 overflow-hidden">
             <div className="w-full overflow-x-auto md:overflow-x-visible">
-              <Table className="min-w-[720px] md:min-w-full table-auto">
+              <Table className="w-full table-auto">
                 <TableHeader>
                   <TableRow className="bg-slate-800/60">
                     <TableHead className="text-gray-200 text-center text-xs sm:text-sm">Code</TableHead>
@@ -400,6 +401,83 @@ export const PromoCodeManager: React.FC = () => {
               </Table>
             </div>
           </div>
+            <div className="space-y-4 sm:hidden">
+              {promoCodes.map((promo) => (
+                <div key={promo._id} className="rounded-lg border border-cyan-500/20 bg-slate-900/40 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-white text-sm">{promo.code}</span>
+                    <Badge variant={promo.isActive ? 'default' : 'destructive'}>
+                      {promo.isActive ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-xs text-gray-300">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wide text-gray-400">Usage</p>
+                      <p>{renderUsage(promo)}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wide text-gray-400">Type</p>
+                      <p>{promo.isSingleUse ? 'Single Use' : 'Multi Use'}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wide text-gray-400">Last Used</p>
+                      <p>{renderLastUsed(promo)}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wide text-gray-400">Created</p>
+                      <p>{renderCreatedAt(promo)}</p>
+                    </div>
+                  </div>
+                  {promo.description ? (
+                    <div className="rounded-md bg-slate-800/60 p-2 text-xs text-gray-200">
+                      {promo.description}
+                    </div>
+                  ) : null}
+                  <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-cyan-500/30 text-cyan-200 hover:bg-cyan-500/10"
+                      onClick={() => handleCopyToClipboard(promo.code)}
+                    >
+                      {copiedCode === promo.code ? (
+                        <>
+                          <CheckCircle className="mr-2 h-4 w-4" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="mr-2 h-4 w-4" />
+                          Copy
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-cyan-500/30 text-cyan-200 hover:bg-cyan-500/10"
+                      onClick={() => handleToggleStatus(promo.code, promo.isActive)}
+                      disabled={statusMutationCode === promo.code}
+                    >
+                      {statusMutationCode === promo.code ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : promo.isActive ? (
+                        <>
+                          <PauseCircle className="mr-2 h-4 w-4" />
+                          Deactivate
+                        </>
+                      ) : (
+                        <>
+                          <PlayCircle className="mr-2 h-4 w-4" />
+                          Activate
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </CardContent>
     </Card>
