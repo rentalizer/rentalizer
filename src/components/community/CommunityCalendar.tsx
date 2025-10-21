@@ -35,6 +35,40 @@ interface FrontendEvent {
 }
 
 // Helper functions to transform between backend and frontend formats
+const formatEventTimeDisplay = (timeStr: string) => {
+  if (!timeStr) return '';
+  let clean = timeStr.trim();
+  clean = clean.replace(/\s*EST$/i, '').trim(); // remove existing timezone tag if any
+
+  const ampmMatch = clean.match(/(\d{1,2}):(\d{2})\s*([AP]M)?/i);
+  if (!ampmMatch) {
+    return `${clean} EST`;
+  }
+
+  let [, hourStr, minuteStr, period] = ampmMatch;
+  let hourNum = parseInt(hourStr, 10);
+  minuteStr = minuteStr.padStart(2, '0');
+
+  if (period) {
+    period = period.toUpperCase();
+    if (hourNum === 0) hourNum = 12;
+    else if (hourNum > 12) hourNum = hourNum % 12;
+    return `${hourNum}:${minuteStr}${period} EST`;
+  }
+
+  if (Number.isNaN(hourNum)) {
+    return `${clean} EST`;
+  }
+
+  const derivedPeriod = hourNum >= 12 ? 'PM' : 'AM';
+  let displayHour = hourNum % 12;
+  if (displayHour === 0) {
+    displayHour = 12;
+  }
+
+  return `${displayHour}:${minuteStr}${derivedPeriod} EST`;
+};
+
 const transformBackendToFrontend = (backendEvent: Event): FrontendEvent => {
   // Extract just the date part from the ISO string to avoid timezone issues
   const dateStr = backendEvent.event_date.split('T')[0]; // Get "2025-09-30" from "2025-09-30T00:00:00.000Z"
@@ -47,7 +81,7 @@ const transformBackendToFrontend = (backendEvent: Event): FrontendEvent => {
     id: backendEvent._id,
     title: backendEvent.title,
     date: localDate,
-    time: backendEvent.event_time,
+    time: formatEventTimeDisplay(backendEvent.event_time),
     attendees: backendEvent.attendees,
     isRecurring: backendEvent.is_recurring,
     description: backendEvent.description,
@@ -78,22 +112,42 @@ interface EventFormData {
 // Helper functions for time conversion
 const timeToHourMinutePeriod = (timeStr: string) => {
   if (!timeStr) return { hour: '12', minute: '00', period: 'AM' };
-  
-  const [time, period] = timeStr.split(' ');
-  const [hour, minute] = time.split(':');
-  
-  // Convert 24-hour to 12-hour format
-  let hourNum = parseInt(hour);
-  const newPeriod = hourNum >= 12 ? 'PM' : 'AM';
-  
-  if (hourNum === 0) hourNum = 12;
-  else if (hourNum > 12) hourNum = hourNum - 12;
-  
-  return {
-    hour: hourNum.toString(),
-    minute: minute || '00',
-    period: newPeriod
-  };
+
+  const clean = timeStr.trim().replace(/\s*EST$/i, '').trim();
+  const match = clean.match(/(\d{1,2}):(\d{2})\s*([AP]M)?/i);
+
+  if (match) {
+    let [, hourPart, minutePart, periodPart] = match;
+    let hourNum = parseInt(hourPart, 10);
+    const minute = minutePart.padStart(2, '0');
+
+    if (periodPart) {
+      periodPart = periodPart.toUpperCase();
+      if (hourNum === 0) hourNum = 12;
+      else if (hourNum > 12) hourNum = hourNum % 12;
+      return {
+        hour: hourNum.toString(),
+        minute,
+        period: periodPart as 'AM' | 'PM'
+      };
+    }
+
+    const derivedPeriod = hourNum >= 12 ? 'PM' : 'AM';
+    if (hourNum === 0) {
+      hourNum = 12;
+    } else if (hourNum > 12) {
+      hourNum -= 12;
+    }
+
+    return {
+      hour: hourNum.toString(),
+      minute,
+      period: derivedPeriod as 'AM' | 'PM'
+    };
+  }
+
+  // Fallback: default to noon
+  return { hour: '12', minute: '00', period: 'PM' };
 };
 
 const hourMinutePeriodToTime = (hour: string, minute: string, period: string) => {
