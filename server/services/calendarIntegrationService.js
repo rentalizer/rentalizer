@@ -127,10 +127,6 @@ class CalendarIntegrationService {
       details.push(`Duration: ${event.duration}`);
     }
     
-    if (event.event_type) {
-      details.push(`Type: ${event.event_type.charAt(0).toUpperCase() + event.event_type.slice(1)}`);
-    }
-    
     if (event.attendees) {
       details.push(`Attendees: ${event.attendees}`);
     }

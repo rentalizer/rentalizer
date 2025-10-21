@@ -325,7 +325,6 @@ export interface Event {
   duration: string;
   location: string;
   zoom_link?: string;
-  event_type: 'training' | 'webinar' | 'discussion' | 'workshop';
   attendees: string;
   is_recurring: boolean;
   remind_members: boolean;
@@ -427,7 +426,6 @@ export interface CreateEventRequest {
   duration?: string;
   location?: string;
   zoom_link?: string;
-  event_type?: 'training' | 'webinar' | 'discussion' | 'workshop';
   attendees?: string;
   is_recurring?: boolean;
   remind_members?: boolean;
@@ -444,7 +442,6 @@ export interface UpdateEventRequest {
   duration?: string;
   location?: string;
   zoom_link?: string;
-  event_type?: 'training' | 'webinar' | 'discussion' | 'workshop';
   attendees?: string;
   is_recurring?: boolean;
   remind_members?: boolean;
@@ -528,11 +525,7 @@ export interface EventStatsResponse {
     totalEvents: number;
     upcomingEvents: number;
     totalPastEvents: number;
-    byType: Array<{
-      _id: string;
-      count: number;
-      totalAttendees: number;
-    }>;
+    totalCapacity: number;
   };
 }
 
@@ -1022,7 +1015,6 @@ class ApiService {
   async getEvents(params?: {
     page?: number;
     limit?: number;
-    type?: 'training' | 'webinar' | 'discussion' | 'workshop';
     date_from?: string;
     date_to?: string;
     year?: number;
@@ -1063,7 +1055,6 @@ class ApiService {
 
   // Search events
   async searchEvents(query: string, filters?: {
-    type?: 'training' | 'webinar' | 'discussion' | 'workshop';
     date_from?: string;
     date_to?: string;
   }): Promise<EventsResponse> {

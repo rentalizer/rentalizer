@@ -300,7 +300,6 @@ export type Database = {
           duration: string | null
           event_date: string
           event_time: string
-          event_type: string | null
           id: string
           is_recurring: boolean | null
           location: string | null
@@ -317,7 +316,6 @@ export type Database = {
           duration?: string | null
           event_date: string
           event_time: string
-          event_type?: string | null
           id?: string
           is_recurring?: boolean | null
           location?: string | null
@@ -334,7 +332,6 @@ export type Database = {
           duration?: string | null
           event_date?: string
           event_time?: string
-          event_type?: string | null
           id?: string
           is_recurring?: boolean | null
           location?: string | null

@@ -48,15 +48,6 @@ const eventSchema = new mongoose.Schema({
     // Removed URL validation for development flexibility
     // Users can enter meeting IDs, room names, or full URLs
   },
-  event_type: {
-    type: String,
-    required: [true, 'Event type is required'],
-    enum: {
-      values: ['training', 'webinar', 'discussion', 'workshop'],
-      message: 'Event type must be one of: training, webinar, discussion, workshop'
-    },
-    default: 'workshop'
-  },
   attendees: {
     type: String,
     required: [true, 'Attendees setting is required'],
@@ -117,7 +108,6 @@ const eventSchema = new mongoose.Schema({
 // Indexes for better performance
 eventSchema.index({ event_date: 1, event_time: 1 });
 eventSchema.index({ created_by: 1, createdAt: -1 });
-eventSchema.index({ event_type: 1, event_date: 1 });
 eventSchema.index({ series_id: 1 });
 eventSchema.index({ is_active: 1, event_date: 1 });
 

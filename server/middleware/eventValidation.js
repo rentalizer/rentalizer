@@ -74,12 +74,6 @@ const validateCreateEvent = [
     .isLength({ max: 500 })
     .withMessage('Zoom link cannot exceed 500 characters'),
     
-  body('event_type')
-    .notEmpty()
-    .withMessage('Event type is required')
-    .isIn(['training', 'webinar', 'discussion', 'workshop'])
-    .withMessage('Event type must be one of: training, webinar, discussion, workshop'),
-    
   body('attendees')
     .optional()
     .isIn(['All members', 'Premium members only', 'Invited members only'])
@@ -192,11 +186,6 @@ const validateUpdateEvent = [
     .isLength({ max: 500 })
     .withMessage('Zoom link cannot exceed 500 characters'),
     
-  body('event_type')
-    .optional()
-    .isIn(['training', 'webinar', 'discussion', 'workshop'])
-    .withMessage('Event type must be one of: training, webinar, discussion, workshop'),
-    
   body('attendees')
     .optional()
     .isIn(['All members', 'Premium members only', 'Invited members only'])
@@ -262,11 +251,6 @@ const validateEventQuery = [
     .optional()
     .isInt({ min: 1, max: 100 })
     .withMessage('Limit must be between 1 and 100'),
-    
-  query('type')
-    .optional()
-    .isIn(['training', 'webinar', 'discussion', 'workshop'])
-    .withMessage('Type must be one of: training, webinar, discussion, workshop'),
     
   query('date_from')
     .optional()

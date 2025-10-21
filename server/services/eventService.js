@@ -30,7 +30,6 @@ class EventService {
   static async getEvents(filters = {}, pagination = {}) {
     try {
       const {
-        type,
         date_from,
         date_to,
         year,
@@ -40,11 +39,6 @@ class EventService {
       } = filters;
 
       const query = { is_active: true };
-
-      // Add filters
-      if (type) {
-        query.event_type = type;
-      }
 
       // Date range filter
       if (date_from || date_to) {
@@ -197,7 +191,6 @@ class EventService {
           duration: parentEvent.duration,
           location: parentEvent.location,
           zoom_link: parentEvent.zoom_link,
-          event_type: parentEvent.event_type,
           attendees: parentEvent.attendees,
           is_recurring: true,
           remind_members: parentEvent.remind_members,
@@ -246,10 +239,6 @@ class EventService {
         is_active: true
       };
 
-      if (filters.type) {
-        query.event_type = filters.type;
-      }
-
       const events = await Event.find(query)
         .populate('created_by', 'firstName lastName email profilePicture')
         .sort({ createdAt: -1 });
@@ -271,10 +260,6 @@ class EventService {
           { tags: { $in: [new RegExp(searchTerm, 'i')] } }
         ]
       };
-
-      if (filters.type) {
-        query.event_type = filters.type;
-      }
 
       if (filters.date_from || filters.date_to) {
         query.event_date = {};
@@ -299,28 +284,26 @@ class EventService {
   // Get event statistics
   static async getEventStats() {
     try {
-      const stats = await Event.aggregate([
-        { $match: { is_active: true } },
-        {
-          $group: {
-            _id: '$event_type',
-            count: { $sum: 1 },
-            totalAttendees: { $sum: '$max_attendees' }
-          }
-        }
-      ]);
-
       const totalEvents = await Event.countDocuments({ is_active: true });
       const upcomingEvents = await Event.countDocuments({
         is_active: true,
         event_date: { $gte: new Date() }
       });
+      const [{ totalCapacity = 0 } = {}] = await Event.aggregate([
+        { $match: { is_active: true } },
+        {
+          $group: {
+            _id: null,
+            totalCapacity: { $sum: '$max_attendees' }
+          }
+        }
+      ]);
 
       return {
         totalEvents,
         upcomingEvents,
-        byType: stats,
-        totalPastEvents: totalEvents - upcomingEvents
+        totalPastEvents: totalEvents - upcomingEvents,
+        totalCapacity
       };
     } catch (error) {
       throw new Error(`Failed to fetch event statistics: ${error.message}`);

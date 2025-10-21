@@ -25,7 +25,6 @@ interface FrontendEvent {
   title: string;
   date: Date;
   time: string;
-  type: 'training' | 'webinar' | 'discussion' | 'workshop';
   attendees?: number | string;
   isRecurring?: boolean;
   description?: string;
@@ -49,7 +48,6 @@ const transformBackendToFrontend = (backendEvent: Event): FrontendEvent => {
     title: backendEvent.title,
     date: localDate,
     time: backendEvent.event_time,
-    type: backendEvent.event_type,
     attendees: backendEvent.attendees,
     isRecurring: backendEvent.is_recurring,
     description: backendEvent.description,
@@ -71,7 +69,6 @@ interface EventFormData {
   location: string;
   zoomLink: string;
   description: string;
-  event_type: 'training' | 'webinar' | 'discussion' | 'workshop';
   isRecurring: boolean;
   remindMembers: boolean;
   attendees: string;
@@ -122,7 +119,6 @@ const transformFrontendToBackend = (frontendEvent: EventFormData): CreateEventRe
   duration: frontendEvent.duration,
   location: frontendEvent.location,
   zoom_link: frontendEvent.zoomLink,
-  event_type: frontendEvent.event_type || 'workshop', // Use actual event type or default
   attendees: String(frontendEvent.attendees),
   is_recurring: frontendEvent.isRecurring,
   remind_members: frontendEvent.remindMembers,
@@ -150,7 +146,7 @@ export const CommunityCalendar = () => {
   const { user } = useAuth();
   
   // Form state for adding new events
-  const [newEvent, setNewEvent] = useState({
+  const [newEvent, setNewEvent] = useState<EventFormData>({
     title: '',
     date: new Date(),
     time: '',
@@ -161,7 +157,6 @@ export const CommunityCalendar = () => {
     location: 'Zoom',
     zoomLink: '',
     description: '',
-    event_type: 'workshop' as 'training' | 'webinar' | 'discussion' | 'workshop',
     isRecurring: false,
     remindMembers: false,
     attendees: 'All members',
@@ -180,7 +175,6 @@ export const CommunityCalendar = () => {
       title: 'September Market Outlook',
       date: new Date(2025, 8, 3), // September 3, 2025
       time: '2:00 PM',
-      type: 'webinar' as const,
       description: 'Join us for a comprehensive look at the September real estate market trends and investment opportunities.',
       location: 'Zoom Meeting',
       duration: '1.5 hours',
@@ -194,7 +188,6 @@ export const CommunityCalendar = () => {
       title: 'Property Analysis Masterclass',
       date: new Date(2025, 8, 7), // September 7, 2025
       time: '10:00 AM',
-      type: 'workshop' as const,
       description: 'Advanced property analysis techniques including cash flow modeling, ROI calculations, and market comparison methods.',
       location: 'Zoom Meeting',
       duration: '3 hours',
@@ -208,7 +201,6 @@ export const CommunityCalendar = () => {
       title: 'Weekly Community Check-in',
       date: new Date(2025, 8, 9), // September 9, 2025
       time: '6:00 PM',
-      type: 'discussion' as const,
       description: 'Weekly community check-in where members share updates, ask questions, and support each other.',
       location: 'Zoom Meeting',
       duration: '1 hour',
@@ -222,7 +214,6 @@ export const CommunityCalendar = () => {
       title: 'New Member Orientation',
       date: new Date(2025, 8, 12), // September 12, 2025
       time: '3:00 PM',
-      type: 'training' as const,
       description: 'Welcome session for new members. Learn about community resources and get started on your rental investment journey.',
       location: 'Zoom Meeting',
       duration: '1 hour',
@@ -236,7 +227,6 @@ export const CommunityCalendar = () => {
       title: 'Tax Planning for Q4',
       date: new Date(2025, 8, 14), // September 14, 2025
       time: '1:00 PM',
-      type: 'webinar' as const,
       description: 'Strategic tax planning session for the fourth quarter. Learn how to optimize your rental property tax strategy.',
       location: 'Zoom Meeting',
       duration: '1.5 hours',
@@ -250,7 +240,6 @@ export const CommunityCalendar = () => {
       title: 'Property Management Excellence',
       date: new Date(2025, 8, 17), // September 17, 2025
       time: '2:00 PM',
-      type: 'training' as const,
       description: 'Advanced property management strategies including tenant retention, maintenance optimization, and cost control.',
       location: 'Zoom Meeting',
       duration: '2 hours',
@@ -264,7 +253,6 @@ export const CommunityCalendar = () => {
       title: 'Market Analysis Deep Dive',
       date: new Date(2025, 8, 19), // September 19, 2025
       time: '7:30 PM',
-      type: 'webinar' as const,
       description: 'Advanced market analysis techniques and tools for identifying the best investment opportunities in today\'s market.',
       location: 'Zoom Meeting',
       duration: '1.5 hours',
@@ -278,7 +266,6 @@ export const CommunityCalendar = () => {
       title: 'Weekly Community Check-in',
       date: new Date(2025, 8, 23), // September 23, 2025
       time: '6:00 PM',
-      type: 'discussion' as const,
       description: 'Weekly community check-in where members share updates, ask questions, and support each other.',
       location: 'Zoom Meeting',
       duration: '1 hour',
@@ -292,7 +279,6 @@ export const CommunityCalendar = () => {
       title: 'Creative Financing Strategies',
       date: new Date(2025, 8, 25), // September 25, 2025
       time: '1:00 PM',
-      type: 'workshop' as const,
       description: 'Explore creative financing options including seller financing, partnerships, and alternative lending solutions.',
       location: 'Zoom Meeting',
       duration: '2.5 hours',
@@ -306,7 +292,6 @@ export const CommunityCalendar = () => {
       title: 'Legal Updates & Compliance',
       date: new Date(2025, 8, 28), // September 28, 2025
       time: '3:00 PM',
-      type: 'webinar' as const,
       description: 'Stay updated on the latest legal changes affecting rental property investors and landlord-tenant laws.',
       location: 'Zoom Meeting',
       duration: '1 hour',
@@ -320,7 +305,6 @@ export const CommunityCalendar = () => {
       title: 'Portfolio Optimization Workshop',
       date: new Date(2025, 8, 30), // September 30, 2025
       time: '2:00 PM',
-      type: 'workshop' as const,
       description: 'Learn how to optimize your rental portfolio for maximum returns and risk management.',
       location: 'Zoom Meeting',
       duration: '2 hours',
@@ -375,26 +359,6 @@ export const CommunityCalendar = () => {
     console.log('📅 Calendar month changed to:', currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }));
     fetchEvents();
   }, [currentMonth, fetchEvents]);
-
-  const getEventTypeColor = (type: string) => {
-    switch (type) {
-      case 'training': return 'bg-green-500/20 border-green-500/30 text-green-300';
-      case 'webinar': return 'bg-blue-500/20 border-blue-500/30 text-blue-300';
-      case 'workshop': return 'bg-purple-500/20 border-purple-500/30 text-purple-300';
-      case 'discussion': return 'bg-orange-500/20 border-orange-500/30 text-orange-300';
-      default: return 'bg-gray-500/20 border-gray-500/30 text-gray-300';
-    }
-  };
-
-  const getEventIcon = (type: string) => {
-    switch (type) {
-      case 'training': return <Video className="h-4 w-4" />;
-      case 'webinar': return <Video className="h-4 w-4" />;
-      case 'workshop': return <Users className="h-4 w-4" />;
-      case 'discussion': return <Users className="h-4 w-4" />;
-      default: return <Clock className="h-4 w-4" />;
-    }
-  };
 
   // Memoized events lookup for better performance
   const eventsByDate = useMemo(() => {
@@ -467,11 +431,6 @@ export const CommunityCalendar = () => {
       return;
     }
     
-    if (!newEvent.event_type) {
-      console.error('Event type is required');
-      return;
-    }
-    
     if (!newEvent.location) {
       console.error('Location is required');
       return;
@@ -516,7 +475,6 @@ export const CommunityCalendar = () => {
           location: 'Zoom',
           zoomLink: '',
           description: '',
-          event_type: 'workshop',
           isRecurring: false,
           remindMembers: false,
           attendees: 'All members',
@@ -550,11 +508,6 @@ export const CommunityCalendar = () => {
     
     if (!newEvent.duration) {
       console.error('Duration is required');
-      return;
-    }
-    
-    if (!newEvent.event_type) {
-      console.error('Event type is required');
       return;
     }
     
@@ -643,7 +596,6 @@ export const CommunityCalendar = () => {
       location: event.location || 'Zoom',
       zoomLink: event.zoomLink || '',
       description: event.description || '',
-      event_type: event.type || 'workshop',
       isRecurring: event.isRecurring || false,
       remindMembers: event.remindMembers || false,
       attendees: String(event.attendees) || 'All members',
@@ -768,13 +720,6 @@ export const CommunityCalendar = () => {
             <DialogContent className="bg-slate-800 border-gray-700 w-full max-w-[calc(100vw-1.5rem)] max-h-[85vh] overflow-y-auto p-4 sm:max-w-2xl sm:max-h-[90vh] sm:p-6" aria-describedby="add-event-description">
               <DialogHeader>
                 <DialogTitle className="text-white text-xl">Add event</DialogTitle>
-                <p id="add-event-description" className="text-gray-400 text-sm">
-                  Need ideas? Try one of these fun formats: 
-                  <span className="text-blue-400 hover:underline cursor-pointer"> coffee hour</span>,
-                  <span className="text-blue-400 hover:underline cursor-pointer"> Q&A</span>,
-                  <span className="text-blue-400 hover:underline cursor-pointer"> co-working session</span>, or
-                  <span className="text-blue-400 hover:underline cursor-pointer"> happy hour</span>
-                </p>
               </DialogHeader>
               
               <div className="space-y-6 mt-6">
@@ -899,24 +844,6 @@ export const CommunityCalendar = () => {
                   </div>
                 </div>
 
-                {/* Event Type */}
-                <div className="space-y-2">
-                  <Label className="text-white">
-                    Event Type <span className="text-red-500">*</span>
-                  </Label>
-                  <Select value={newEvent.event_type} onValueChange={(value) => setNewEvent({...newEvent, event_type: value as 'training' | 'webinar' | 'discussion' | 'workshop'})}>
-                    <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-gray-700">
-                      <SelectItem value="training">🟢 Training</SelectItem>
-                      <SelectItem value="webinar">🔵 Webinar</SelectItem>
-                      <SelectItem value="discussion">🟡 Discussion</SelectItem>
-                      <SelectItem value="workshop">🟣 Workshop</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
                 {/* Recurring Event */}
                 <div className="flex items-center space-x-2">
                   <Checkbox 
@@ -1027,7 +954,7 @@ export const CommunityCalendar = () => {
                   </Button>
                   <Button 
                     onClick={handleAddEvent}
-                    disabled={!newEvent.title.trim() || !newEvent.hour || !newEvent.minute || !newEvent.period || !newEvent.duration || !newEvent.event_type || !newEvent.location || !newEvent.description.trim() || (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim())}
+                    disabled={!newEvent.title.trim() || !newEvent.hour || !newEvent.minute || !newEvent.period || !newEvent.duration || !newEvent.location || !newEvent.description.trim() || (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim())}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     ADD
@@ -1100,13 +1027,7 @@ export const CommunityCalendar = () => {
                         {getEventsForDate(date).map((event, eventIndex) => (
                           <div 
                             key={eventIndex}
-                            className={`w-2 h-2 rounded-full animate-pulse ${
-                              event.type === 'training' ? 'bg-green-400' :
-                              event.type === 'webinar' ? 'bg-blue-400' :
-                              event.type === 'workshop' ? 'bg-purple-400' :
-                              event.type === 'discussion' ? 'bg-orange-400' :
-                              'bg-cyan-400'
-                            }`}
+                            className="w-2 h-2 rounded-full animate-pulse bg-cyan-400"
                             title={event.title}
                           ></div>
                         ))}
@@ -1118,52 +1039,6 @@ export const CommunityCalendar = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Event Type Legend */}
-        {/* <Card className="bg-gradient-to-r from-slate-800/60 to-slate-700/60 border-cyan-500/20">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-              <h3 className="text-cyan-300 font-semibold text-lg">Event Type Legend</h3>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg border border-green-500/20">
-                <div className="w-4 h-4 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/30"></div>
-                <div>
-                  <span className="text-green-300 font-medium">Training</span>
-                  <p className="text-green-400/70 text-xs">Skill Development</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg border border-blue-500/20">
-                <div className="w-4 h-4 bg-blue-400 rounded-full animate-pulse shadow-lg shadow-blue-400/30"></div>
-                <div>
-                  <span className="text-blue-300 font-medium">Webinar</span>
-                  <p className="text-blue-400/70 text-xs">Expert Presentation</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg border border-purple-500/20">
-                <div className="w-4 h-4 bg-purple-400 rounded-full animate-pulse shadow-lg shadow-purple-400/30"></div>
-                <div>
-                  <span className="text-purple-300 font-medium">Workshop</span>
-                  <p className="text-purple-400/70 text-xs">Hands-on Learning</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-slate-700/30 rounded-lg border border-orange-500/20">
-                <div className="w-4 h-4 bg-orange-400 rounded-full animate-pulse shadow-lg shadow-orange-400/30"></div>
-                <div>
-                  <span className="text-orange-300 font-medium">Discussion</span>
-                  <p className="text-orange-400/70 text-xs">Community Chat</p>
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 p-3 bg-slate-600/20 rounded-lg border border-gray-600/30">
-              <p className="text-gray-400 text-sm">
-                <span className="text-cyan-300">💡 Tip:</span> Click on any date with colored dots to view event details!
-              </p>
-            </div>
-          </CardContent>
-        </Card> */}
-        
         {/* Event Details Popup */}
         <Dialog open={isEventDetailsOpen} onOpenChange={setIsEventDetailsOpen}>
           <DialogContent className="bg-slate-800 border-gray-700 w-full max-w-[calc(100vw-1.5rem)] max-h-[85vh] overflow-y-auto p-4 sm:max-w-md sm:max-h-[90vh] sm:p-6" aria-describedby="event-details-description">
@@ -1429,24 +1304,6 @@ export const CommunityCalendar = () => {
                    </div>
                  </div>
 
-                 {/* Event Type */}
-                 <div className="space-y-2">
-                   <Label className="text-white">
-                     Event Type <span className="text-red-500">*</span>
-                   </Label>
-                   <Select value={newEvent.event_type} onValueChange={(value) => setNewEvent({...newEvent, event_type: value as 'training' | 'webinar' | 'discussion' | 'workshop'})}>
-                     <SelectTrigger className="bg-slate-700 border-gray-600 text-white">
-                       <SelectValue />
-                     </SelectTrigger>
-                     <SelectContent className="bg-slate-800 border-gray-700">
-                       <SelectItem value="training">🟢 Training</SelectItem>
-                       <SelectItem value="webinar">🔵 Webinar</SelectItem>
-                       <SelectItem value="discussion">🟡 Discussion</SelectItem>
-                       <SelectItem value="workshop">🟣 Workshop</SelectItem>
-                     </SelectContent>
-                   </Select>
-                 </div>
-
                  {/* Description */}
                  <div className="space-y-2">
                    <Label htmlFor="edit-description" className="text-white">
@@ -1492,7 +1349,7 @@ export const CommunityCalendar = () => {
                    </Button>
                    <Button 
                      onClick={handleEditEvent}
-                     disabled={!newEvent.title.trim() || !newEvent.hour || !newEvent.minute || !newEvent.period || !newEvent.duration || !newEvent.event_type || !newEvent.location || !newEvent.description.trim() || (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim())}
+                     disabled={!newEvent.title.trim() || !newEvent.hour || !newEvent.minute || !newEvent.period || !newEvent.duration || !newEvent.location || !newEvent.description.trim() || (newEvent.location === 'Zoom' && !newEvent.zoomLink.trim())}
                      className="bg-purple-600 hover:bg-purple-700 text-white"
                    >
                      UPDATE
