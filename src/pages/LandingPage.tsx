@@ -205,8 +205,8 @@ const LandingPage = () => {
           {/* Main Content */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-4 mb-6">
-              <BarChart3 className="h-16 w-16 text-cyan-400 neon-text" />
-              <div className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <BarChart3 className="hidden h-16 w-16 text-cyan-400 neon-text sm:block" />
+              <div className="text-6xl sm:text-7xl md:text-8xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 {texts.mainTitle}
               </div>
             </div>
@@ -235,25 +235,6 @@ const LandingPage = () => {
                 className="group relative cursor-pointer"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                <Card className="relative bg-slate-800/80 backdrop-blur-lg border border-cyan-500/40 hover:border-cyan-400/70 transition-all duration-500 group-hover:scale-[1.005]">
-                  <CardContent className="p-4 sm:p-5 flex items-center justify-between gap-3">
-                    <div className="flex-1 text-left">
-                      <div className="text-base sm:text-lg font-bold text-cyan-300 mb-0.5">Programs</div>
-                      <p className="text-gray-300 text-xs sm:text-sm">
-                        Explore Accelerator and Accelerator Pro to fast-track your rental income journey.
-                      </p>
-                    </div>
-                    <div className="hidden sm:flex items-center">
-                      <Button
-                        onClick={(e) => { e.stopPropagation(); navigate('/offers'); }}
-                        size="sm"
-                        className="bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white shadow-[0_0_12px_rgba(34,211,238,0.3)]"
-                      >
-                        View Programs
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
             </div>
           </div>
