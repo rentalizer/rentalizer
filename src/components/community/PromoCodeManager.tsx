@@ -224,7 +224,7 @@ export const PromoCodeManager: React.FC = () => {
           automatically deactivate after their first successful registration.
         </p>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 px-3 sm:px-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-lg border border-cyan-500/20 bg-slate-900/50 p-4">
             <p className="text-xs uppercase tracking-wide text-gray-400">Total Codes</p>
@@ -263,11 +263,11 @@ export const PromoCodeManager: React.FC = () => {
             </div>
 
             {/* Right: buttons (row 1) */}
-            <div className="flex gap-2 self-end md:place-self-end">
+            <div className="flex w-full flex-col gap-2 self-end sm:flex-row sm:justify-end md:place-self-end">
               <Button
                 onClick={handleGenerateCode}
                 disabled={isGenerating}
-                className="bg-cyan-600 hover:bg-cyan-500 text-white whitespace-nowrap"
+                className="bg-cyan-600 hover:bg-cyan-500 text-white whitespace-nowrap w-full sm:w-auto"
               >
                 {isGenerating ? (
                   <>
@@ -283,7 +283,7 @@ export const PromoCodeManager: React.FC = () => {
                 variant="outline"
                 onClick={handleRefresh}
                 disabled={isRefreshing || isLoading}
-                className="whitespace-nowrap border-cyan-500/30 text-cyan-200 hover:bg-cyan-500/10"
+                className="whitespace-nowrap border-cyan-500/30 text-cyan-200 hover:bg-cyan-500/10 w-full sm:w-auto"
               >
                 {isRefreshing ? (
                   <>
@@ -322,36 +322,36 @@ export const PromoCodeManager: React.FC = () => {
         ) : (
           <div className="rounded-lg border border-cyan-500/20 bg-slate-900/40 overflow-hidden">
             <div className="w-full overflow-x-auto md:overflow-x-visible">
-              <Table className="w-full table-auto">
+              <Table className="min-w-[720px] md:min-w-full table-auto">
                 <TableHeader>
                   <TableRow className="bg-slate-800/60">
-                    <TableHead className="text-gray-200 text-center">Code</TableHead>
-                    <TableHead className="text-gray-200 text-center">Usage</TableHead>
-                    <TableHead className="text-gray-200 text-center">Type</TableHead>
-                    <TableHead className="text-gray-200 text-center">Status</TableHead>
-                    <TableHead className="text-gray-200 text-center">Description</TableHead>
-                    <TableHead className="text-gray-200 text-center">Last Used</TableHead>
-                    <TableHead className="text-gray-200 text-center">Created</TableHead>
-                    <TableHead className="text-gray-200 text-center">Actions</TableHead>
+                    <TableHead className="text-gray-200 text-center text-xs sm:text-sm">Code</TableHead>
+                    <TableHead className="text-gray-200 text-center text-xs sm:text-sm">Usage</TableHead>
+                    <TableHead className="text-gray-200 text-center text-xs sm:text-sm">Type</TableHead>
+                    <TableHead className="text-gray-200 text-center text-xs sm:text-sm">Status</TableHead>
+                    <TableHead className="text-gray-200 text-center text-xs sm:text-sm">Description</TableHead>
+                    <TableHead className="text-gray-200 text-center text-xs sm:text-sm">Last Used</TableHead>
+                    <TableHead className="text-gray-200 text-center text-xs sm:text-sm">Created</TableHead>
+                    <TableHead className="text-gray-200 text-center text-xs sm:text-sm">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
 
                 <TableBody>
                   {promoCodes.map((promo) => (
                     <TableRow key={promo._id} className="text-center">
-                      <TableCell className="font-mono text-sm text-white">{promo.code}</TableCell>
-                      <TableCell className="text-gray-200">{renderUsage(promo)}</TableCell>
+                      <TableCell className="font-mono text-xs text-white sm:text-sm">{promo.code}</TableCell>
+                      <TableCell className="text-gray-200 text-xs sm:text-sm">{renderUsage(promo)}</TableCell>
                       <TableCell>{renderUsageBadge(promo)}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-xs sm:text-sm">
                         <Badge variant={promo.isActive ? 'default' : 'destructive'}>
                           {promo.isActive ? 'Active' : 'Inactive'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-gray-300">{promo.description || '—'}</TableCell>
-                      <TableCell className="text-gray-300">{renderLastUsed(promo)}</TableCell>
-                      <TableCell className="text-gray-300">{renderCreatedAt(promo)}</TableCell>
+                      <TableCell className="text-gray-300 text-xs sm:text-sm max-w-[160px] break-words">{promo.description || '—'}</TableCell>
+                      <TableCell className="text-gray-300 text-xs sm:text-sm">{renderLastUsed(promo)}</TableCell>
+                      <TableCell className="text-gray-300 text-xs sm:text-sm">{renderCreatedAt(promo)}</TableCell>
                       <TableCell>
-                        <div className="flex justify-center gap-2">
+                        <div className="flex flex-wrap justify-center gap-2">
                           <Button
                             variant="outline"
                             size="sm"
