@@ -96,6 +96,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [savingEdit, setSavingEdit] = useState(false);
   const [showProfileSetup, setShowProfileSetup] = useState(false);
   const [expandedPost, setExpandedPost] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<{ url: string; alt: string } | null>(null);
   const [userProfiles, setUserProfiles] = useState<{[key: string]: UserProfile}>({});
   const { onlineUsers, onlineCount, adminNames, loading: onlineLoading, useWebSocket } = useOnlineUsers();
   const [showMembersList, setShowMembersList] = useState(false);
@@ -1001,19 +1002,24 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       const url = match[2];
 
       return (
-        <div key={`img-${idx}`} className="w-full">
+        <button
+          key={`img-${idx}`}
+          type="button"
+          className="w-full focus:outline-none"
+          onClick={() => setImagePreview({ url, alt })}
+        >
           <img
             src={url}
             alt={alt}
             className={isMultiImage
-              ? 'w-full h-48 sm:h-56 md:h-60 rounded-lg border border-slate-600 object-cover'
-              : 'w-full h-auto rounded-lg border border-slate-600 object-cover'}
+              ? 'w-full h-48 sm:h-56 md:h-60 rounded-lg border border-slate-600 object-cover transition-transform duration-200 hover:scale-[1.02]'
+              : 'w-full h-64 sm:h-72 md:h-80 rounded-lg border border-slate-600 object-cover transition-transform duration-200 hover:scale-[1.02]'}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
             }}
           />
-        </div>
+        </button>
       );
     });
 
@@ -1544,6 +1550,32 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
         </div>
       </div>
+
+      <Dialog
+        open={!!imagePreview}
+        onOpenChange={(open) => {
+          if (!open) {
+            setImagePreview(null);
+          }
+        }}
+      >
+        <DialogContent className="bg-slate-900/80 backdrop-blur-md border border-slate-700 max-w-4xl w-full p-4">
+          <DialogHeader>
+            <DialogTitle className="text-white text-base">
+              {imagePreview?.alt || 'Image preview'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[80vh] overflow-auto flex justify-center">
+            {imagePreview && (
+              <img
+                src={imagePreview.url}
+                alt={imagePreview.alt || 'Full size image'}
+                className="max-w-full h-auto rounded-lg"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <MembersList
         open={showMembersList}
