@@ -14,7 +14,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Users, MessageCircle, Heart, Pin, TrendingUp, Calendar, Edit, Trash2, Send, MoreHorizontal, BarChart3, Check, X } from 'lucide-react';
+import { Users, MessageCircle, Heart, Pin, TrendingUp, Calendar, Edit, Trash2, Send, MoreHorizontal, BarChart3, Check, X, Paperclip, Download } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileSetup } from '@/components/ProfileSetup';
@@ -965,72 +965,118 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
 
   // Render markdown content with images
   const renderContent = useCallback((content: string) => {
+    const attachmentPattern = /📎 \[([^\]]+)\]\(([^)]+)\)/g;
+    const attachmentMatches = Array.from(content.matchAll(attachmentPattern));
+
+    const contentWithoutAttachments = content
+      .replace(/📎 \[[^\]]+\]\([^)]+\)\s*/g, '')
+      .trim();
+
     const imagePattern = /!\[([^\]]*)\]\(([^)]+)\)/g;
-    const matches = Array.from(content.matchAll(imagePattern));
+    const imageMatches = Array.from(contentWithoutAttachments.matchAll(imagePattern));
 
-    if (matches.length === 0) {
-      return content;
-    }
+    const output: React.ReactNode[] = [];
 
-    const parts: (string | JSX.Element)[] = [];
-    let lastIndex = 0;
-
-    matches.forEach((match) => {
-      const index = match.index ?? 0;
-      if (index > lastIndex) {
-        parts.push(content.substring(lastIndex, index));
-      }
-      lastIndex = index + match[0].length;
-    });
-
-    if (lastIndex < content.length) {
-      parts.push(content.substring(lastIndex));
-    }
-
-    let gridClasses = 'mt-3 grid gap-2';
-    if (matches.length === 1) {
-      gridClasses += ' grid-cols-1 max-w-md mx-auto';
-    } else if (matches.length === 2) {
-      gridClasses += ' grid-cols-2 max-w-full sm:max-w-3xl sm:mx-auto';
-    } else {
-      gridClasses += ' grid-cols-2 sm:grid-cols-3 max-w-full sm:max-w-4xl sm:mx-auto';
-    }
-
-    const isMultiImage = matches.length > 1;
-    const imageElements = matches.map((match, idx) => {
-      const alt = match[1];
-      const url = match[2];
-
-      return (
-        <button
-          key={`img-${idx}`}
-          type="button"
-          className="w-full focus:outline-none overflow-hidden rounded-lg border border-slate-600"
-          onClick={() => setImagePreview({ url, alt })}
-        >
-          <img
-            src={url}
-            alt={alt}
-            className={isMultiImage
-              ? 'w-full h-48 sm:h-56 md:h-60 rounded-lg object-cover transition-transform duration-200 hover:scale-[1.02]'
-              : 'w-full h-64 sm:h-72 md:h-80 rounded-lg object-cover transition-transform duration-200 hover:scale-[1.02]'}
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
-          />
-        </button>
+    const textWithoutImages = contentWithoutAttachments.replace(imagePattern, '').trim();
+    if (textWithoutImages) {
+      output.push(
+        <div key="text" className="whitespace-pre-wrap">
+          {textWithoutImages}
+        </div>
       );
-    });
+    }
 
-    parts.push(
-      <div key="image-grid" className={gridClasses}>
-        {imageElements}
-      </div>
-    );
+    if (imageMatches.length > 0) {
+      let gridClasses = 'mt-3 grid gap-2';
+      if (imageMatches.length === 1) {
+        gridClasses += ' grid-cols-1 max-w-md mx-auto';
+      } else if (imageMatches.length === 2) {
+        gridClasses += ' grid-cols-2 max-w-full sm:max-w-3xl sm:mx-auto';
+      } else {
+        gridClasses += ' grid-cols-2 sm:grid-cols-3 max-w-full sm:max-w-4xl sm:mx-auto';
+      }
 
-    return parts;
-  }, []);
+      const isMultiImage = imageMatches.length > 1;
+      const imageElements = imageMatches.map((match, idx) => {
+        const alt = match[1];
+        const url = match[2];
+
+        return (
+          <button
+            key={`img-${idx}`}
+            type="button"
+            className="w-full focus:outline-none overflow-hidden rounded-lg border border-slate-600"
+            onClick={() => setImagePreview({ url, alt })}
+          >
+            <img
+              src={url}
+              alt={alt}
+              className={isMultiImage
+                ? 'w-full h-48 sm:h-56 md:h-60 rounded-lg object-cover transition-transform duration-200 hover:scale-[1.02]'
+                : 'w-full h-64 sm:h-72 md:h-80 rounded-lg object-cover transition-transform duration-200 hover:scale-[1.02]'}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+              }}
+            />
+          </button>
+        );
+      });
+
+      output.push(
+        <div key="image-grid" className={gridClasses}>
+          {imageElements}
+        </div>
+      );
+    }
+
+    if (attachmentMatches.length > 0) {
+      output.push(
+        <div key="attachments" className="mt-4 space-y-2">
+          <span className={`text-sm font-medium ${isDayMode ? 'text-cyan-600' : 'text-cyan-300'}`}>
+            Attachments
+          </span>
+          <div className="space-y-2">
+            {attachmentMatches.map((match, idx) => {
+              const fileName = match[1];
+              const fileUrl = match[2];
+
+              return (
+                <div
+                  key={`attachment-${idx}`}
+                  className={`flex flex-wrap items-center gap-3 rounded-lg border p-3 ${isDayMode ? 'border-slate-300 bg-white/70' : 'border-slate-600 bg-slate-700/40'}`}
+                >
+                  <div className="flex flex-1 min-w-0 items-center gap-3">
+                    <span className={`flex h-10 w-10 items-center justify-center rounded-md ${isDayMode ? 'bg-cyan-500/10 text-cyan-600' : 'bg-cyan-500/10 text-cyan-300'}`}>
+                      <Paperclip className="h-5 w-5" />
+                    </span>
+                    <span
+                      className={`block truncate text-sm font-medium ${isDayMode ? 'text-slate-700' : 'text-white'}`}
+                      title={fileName}
+                    >
+                      {fileName}
+                    </span>
+                  </div>
+                  <a
+                    href={fileUrl}
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${isDayMode ? 'border-cyan-500/40 text-cyan-600 hover:bg-cyan-500/10' : 'border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10'}`}
+                  >
+                    <Download className="h-4 w-4" />
+                    Download
+                  </a>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    return output.length > 0 ? output : content;
+  }, [setImagePreview, isDayMode]);
 
   // Handle post creation callback - refresh discussions list
   const handlePostCreated = useCallback(() => {

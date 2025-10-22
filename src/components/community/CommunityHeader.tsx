@@ -994,7 +994,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                     accept="video/mp4,video/mov,video/avi,video/webm,video/quicktime"
                   />
                   
-                  <div className="relative">
+                  {/* <div className="relative">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -1010,23 +1010,22 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                       )}
                     </Button>
                     
-                    {/* Success message */}
                     {uploadSuccess && (
                       <div className="absolute bottom-full left-0 mb-2 bg-green-600 text-white text-xs px-3 py-2 rounded-lg shadow-lg whitespace-nowrap z-10">
                         <Check className="h-3 w-3 inline mr-1" />
                         {uploadSuccess}
                       </div>
                     )}
-                  </div>
+                  </div> */}
                   
-                  <input
+                  {/* <input
                     ref={fileInputRef}
                     type="file"
                     multiple
                     className="hidden"
                     onChange={handleFileSelect}
                     accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.gif,.mp4,.mp3,.zip,.rar"
-                  />
+                  /> */}
 
                   <div className="relative">
                     <Button
