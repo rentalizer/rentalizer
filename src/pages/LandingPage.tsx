@@ -139,14 +139,14 @@ const LandingPage = () => {
             <nav className="flex items-center gap-2 sm:gap-4">
               {user ? (
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <Button
+                  {/* <Button
                     onClick={() => navigate('/offers')}
                     variant="outline"
                     size="sm"
                     className="h-8 px-3 text-xs border-cyan-400/60 bg-slate-800/40 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 shadow-[0_0_16px_rgba(34,211,238,0.35)] animate-pulse sm:h-9 sm:px-4 sm:text-sm md:h-10 md:px-5 md:text-base"
                   >
                     Programs
-                  </Button>
+                  </Button> */}
                   <span className="text-xs text-cyan-300 sm:text-sm md:text-base">
                     {user.email}
                   </span>

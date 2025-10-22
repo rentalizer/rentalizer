@@ -123,6 +123,7 @@ const videoSchema = new mongoose.Schema({
 videoSchema.index({ category: 1, isActive: 1 });
 videoSchema.index({ featured: 1, isActive: 1 });
 videoSchema.index({ order: 1 });
+videoSchema.index({ category: 1, order: 1 });
 videoSchema.index({ createdAt: -1 });
 videoSchema.index({ title: 'text', description: 'text', tags: 'text' });
 
@@ -143,10 +144,11 @@ videoSchema.methods.incrementViews = function() {
 
 // Method to reorder videos
 videoSchema.statics.reorderVideos = async function(videoOrders) {
+  const timestamp = new Date();
   const bulkOps = videoOrders.map(({ videoId, order }) => ({
     updateOne: {
       filter: { _id: videoId },
-      update: { order }
+      update: { order, updatedAt: timestamp }
     }
   }));
   
@@ -156,7 +158,9 @@ videoSchema.statics.reorderVideos = async function(videoOrders) {
 // Pre-save middleware to set order if not provided
 videoSchema.pre('save', async function(next) {
   if (this.isNew && this.order === 0) {
-    const maxOrder = await this.constructor.findOne({}, { order: 1 }).sort({ order: -1 });
+    const maxOrder = await this.constructor
+      .findOne({ category: this.category }, { order: 1 })
+      .sort({ order: -1 });
     this.order = maxOrder ? maxOrder.order + 1 : 1;
   }
   next();

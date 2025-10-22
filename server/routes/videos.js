@@ -42,6 +42,12 @@ router.use(authenticateToken);
 // POST /api/videos - Create new video (Admin only)
 router.post('/', requireAdmin, uploadDocument, validateVideo, videoController.createVideo);
 
+// PUT /api/videos/reorder - Reorder videos (Admin only)
+router.put('/reorder', requireAdmin, validateVideoReorder, videoController.reorderVideos);
+
+// PUT /api/videos/bulk - Bulk update videos (Admin only)
+router.put('/bulk', requireAdmin, validateBulkUpdate, videoController.bulkUpdateVideos);
+
 // PUT /api/videos/:id - Update video (Admin only)
 router.put('/:id', requireAdmin, uploadDocument, validateVideoUpdate, videoController.updateVideo);
 
@@ -51,13 +57,7 @@ router.delete('/:id', requireAdmin, videoController.deleteVideo);
 // PATCH /api/videos/:id/featured - Toggle featured status (Admin only)
 router.patch('/:id/featured', requireAdmin, videoController.toggleFeatured);
 
-// PUT /api/videos/reorder - Reorder videos (Admin only)
-router.put('/reorder', requireAdmin, validateVideoReorder, videoController.reorderVideos);
-
 // GET /api/videos/stats - Get video statistics (Admin only)
 router.get('/admin/stats', requireAdmin, videoController.getVideoStats);
-
-// PUT /api/videos/bulk - Bulk update videos (Admin only)
-router.put('/bulk', requireAdmin, validateBulkUpdate, videoController.bulkUpdateVideos);
 
 module.exports = router;

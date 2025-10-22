@@ -37,7 +37,7 @@ import { API_CONFIG } from '@/config/api';
 
 const MAX_DOCUMENT_SIZE = 20 * 1024 * 1024;
 const ALLOWED_DOCUMENT_EXTENSIONS = ['pdf', 'xls', 'xlsx', 'xlsm', 'doc', 'docx', 'ppt', 'pptx', 'ppsx', 'txt', 'md', 'csv', 'ods', 'odp', 'odt'];
-const CHRONOLOGICAL_CATEGORIES = new Set([
+const MANUAL_ORDER_CATEGORIES = new Set([
   'Business Formation',
   'Market Research',
   'Property Acquisition',
@@ -71,21 +71,25 @@ const getAttachmentIcon = (type: 'pdf' | 'spreadsheet' | 'document' | 'presentat
 };
 
 const orderVideosForDisplay = (category: string, items: Video[]) => {
-  if (!CHRONOLOGICAL_CATEGORIES.has(category)) {
-    return items;
+  if (MANUAL_ORDER_CATEGORIES.has(category)) {
+    return [...items].sort((a, b) => {
+      const orderA = typeof a.order === 'number' ? a.order : Number.MAX_SAFE_INTEGER;
+      const orderB = typeof b.order === 'number' ? b.order : Number.MAX_SAFE_INTEGER;
+
+      if (orderA === orderB) {
+        const createdAtA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const createdAtB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return createdAtA - createdAtB;
+      }
+
+      return orderA - orderB;
+    });
   }
 
   return [...items].sort((a, b) => {
-    const orderA = typeof a.order === 'number' ? a.order : 0;
-    const orderB = typeof b.order === 'number' ? b.order : 0;
-
-    if (orderA === orderB) {
-      const createdAtA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const createdAtB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return createdAtA - createdAtB;
-    }
-
-    return orderA - orderB;
+    const createdAtA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const createdAtB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return createdAtB - createdAtA;
   });
 };
 
@@ -447,11 +451,11 @@ export const VideoLibrary = () => {
       setLoading(true);
       const requestFilters: VideoFilters = {
         page: filters?.page || 1,
-        limit: filters?.limit || 20,
+        limit: filters?.limit || 200,
         category: filters?.category,
         search: filters?.search,
         sortBy: 'order',
-        sortOrder: 'desc'
+        sortOrder: 'asc'
       };
 
       console.log('Loading videos with filters:', requestFilters);
@@ -626,6 +630,15 @@ export const VideoLibrary = () => {
         });
         return;
       }
+
+      if (!MANUAL_ORDER_CATEGORIES.has(activeVideo.category)) {
+        toast({
+          title: "Reordering unavailable",
+          description: "Manual ordering is only available for Training Replay albums.",
+          variant: "destructive"
+        });
+        return;
+      }
       
       // Get videos in the same category
       let categoryVideos = videos.filter(video => video.category === activeVideo.category);
@@ -634,14 +647,12 @@ export const VideoLibrary = () => {
       const newIndex = categoryVideos.findIndex((item) => item._id === over?.id);
       
       const newCategoryItems = arrayMove(categoryVideos, oldIndex, newIndex);
-      const useChronologicalOrdering = CHRONOLOGICAL_CATEGORIES.has(activeVideo.category);
-      const getOrderValue = (index: number, length: number) =>
-        useChronologicalOrdering ? index + 1 : length - index;
+      const getOrderValue = (index: number) => index + 1;
 
       // Update the order for videos in this category
       const videoOrders = newCategoryItems.map((item, index) => ({
         videoId: item._id,
-        order: getOrderValue(index, newCategoryItems.length)
+        order: getOrderValue(index)
       }));
 
       try {
@@ -655,7 +666,7 @@ export const VideoLibrary = () => {
             if (videoIndex !== -1) {
               updatedVideos[videoIndex] = { 
                 ...updatedVideos[videoIndex], 
-                order: getOrderValue(index, newCategoryItems.length) 
+                order: getOrderValue(index) 
               };
             }
           });

@@ -276,7 +276,7 @@ class VideoService {
     try {
       // Validate that all video IDs exist
       const videoIds = videoOrders.map(item => item.videoId);
-      const existingVideos = await Video.find({ _id: { $in: videoIds } });
+      const existingVideos = await Video.find({ _id: { $in: videoIds } }).select('category');
       
       if (existingVideos.length !== videoIds.length) {
         const error = new Error('One or more videos not found');
@@ -284,16 +284,31 @@ class VideoService {
         throw error;
       }
 
+      const uniqueCategories = new Set(existingVideos.map(video => video.category));
+
+      if (uniqueCategories.size > 1) {
+        const error = new Error('Videos must belong to the same category to reorder');
+        error.name = 'ValidationError';
+        throw error;
+      }
+
+      const category = existingVideos[0]?.category;
+
       // Update lastModifiedBy for all videos
       await Video.updateMany(
         { _id: { $in: videoIds } },
-        { lastModifiedBy: modifiedBy }
+        { lastModifiedBy: modifiedBy, updatedAt: new Date() }
       );
 
       // Reorder videos
       await Video.reorderVideos(videoOrders);
-      
-      return await this.getAllVideos({ sortBy: 'order', sortOrder: 'asc' });
+
+      const videos = await Video.find({ category })
+        .populate('createdBy', 'firstName lastName email')
+        .populate('lastModifiedBy', 'firstName lastName email')
+        .sort({ featured: -1, order: 1, createdAt: 1 });
+
+      return { videos };
     } catch (error) {
       throw error;
     }
