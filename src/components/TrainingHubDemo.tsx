@@ -189,27 +189,27 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
   }, [currentStep, isRunning, demoStep]);
 
   return (
-    <Card className="w-full max-w-7xl mx-auto bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-cyan-500/20 shadow-2xl">
+    <Card className="w-full max-w-7xl mx-auto overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-cyan-500/20 shadow-2xl">
       {/* Hero Section */}
       <CardHeader 
-        className={`text-center py-12 border-b border-cyan-500/20 transition-all duration-500 ${
+        className={`text-center px-4 py-8 border-b border-cyan-500/20 transition-all duration-500 sm:py-12 ${
           stepHighlights[demoStep] === 'hero-section' ? 'ring-2 ring-cyan-400 bg-cyan-500/5' : ''
         }`}
       >
         <div className="flex items-center justify-center gap-3 mb-4">
           <Users className="h-12 w-12 text-cyan-400" />
-          <CardTitle className="text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+          <CardTitle className="text-3xl font-bold sm:text-5xl bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
             Training Dashboard
           </CardTitle>
         </div>
-        <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-base text-gray-300 sm:text-xl max-w-3xl mx-auto leading-relaxed">
           Your complete rental arbitrage education hub with live training, community discussions, 
           AI mentorship, and powerful tools to accelerate your success.
         </p>
         
-        <div className="flex justify-center gap-8 mt-8">
+        <div className="mt-8 grid grid-cols-2 gap-4 sm:flex sm:justify-center sm:gap-8">
           {stats.map((stat, index) => (
-            <div key={index} className="text-center">
+            <div key={index} className="text-left text-gray-300 sm:min-w-0 sm:text-center">
               <div className="text-2xl font-bold text-white">{stat.value}</div>
               <div className="text-sm text-gray-400">{stat.label}</div>
               <div className="text-xs text-green-400">{stat.change}</div>
@@ -225,22 +225,22 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
         }`}
       >
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="flex w-full bg-slate-800/50 border-b border-cyan-500/20 justify-evenly h-16 p-2 rounded-none">
+          <TabsList className="!flex !h-auto w-full flex-wrap justify-center gap-2 bg-slate-800/50 border-b border-cyan-500/20 rounded-none px-2 py-3 max-[360px]:flex-col sm:flex-nowrap sm:justify-evenly sm:gap-0 sm:px-2 sm:py-2 sm:h-16">
             {tabs.map((tab) => (
               <TabsTrigger 
                 key={tab.id}
                 value={tab.id} 
-                className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex-1 h-12 text-base"
+                className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300 flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm sm:w-auto sm:flex-1 sm:rounded-none sm:px-2 sm:py-0 sm:h-12 sm:text-base"
               >
-                <tab.icon className="h-5 w-5 mr-2" />
+                <tab.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                 {tab.label}
               </TabsTrigger>
             ))}
           </TabsList>
 
-          <div className="flex">
+          <div className="flex flex-col lg:flex-row">
             {/* Main Content Area */}
-            <div className="flex-1 p-6">
+            <div className="flex-1 p-4 sm:p-6">
               {/* Discussions Tab */}
               <TabsContent value="discussions" className="mt-0">
                 <div 
@@ -248,14 +248,14 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
                     stepHighlights[demoStep] === 'discussions-feed' ? 'ring-2 ring-cyan-400 bg-cyan-500/5 p-4 rounded-lg' : ''
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-6">
+                  <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <h3 className="text-2xl font-bold text-white">Community Discussions</h3>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="border-cyan-500/30 text-cyan-400">
+                    <div className="flex w-full gap-2 sm:w-auto sm:justify-end">
+                      <Button variant="outline" size="sm" className="h-10 flex-1 border-cyan-500/30 text-cyan-400 sm:h-auto sm:flex-none">
                         <Filter className="h-4 w-4 mr-2" />
                         Filter
                       </Button>
-                      <Button size="sm" className="bg-cyan-600 hover:bg-cyan-500">
+                      <Button size="sm" className="h-10 flex-1 bg-cyan-600 hover:bg-cyan-500 sm:h-auto sm:flex-none">
                         <Plus className="h-4 w-4 mr-2" />
                         New Discussion
                       </Button>
@@ -329,10 +329,10 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
                     stepHighlights[demoStep] === 'video-library' ? 'ring-2 ring-cyan-400 bg-cyan-500/5 p-4 rounded-lg' : ''
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-6">
+                  <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <h3 className="text-2xl font-bold text-white">Training Library</h3>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="border-cyan-500/30 text-cyan-400">
+                    <div className="flex w-full gap-2 sm:w-auto sm:justify-end">
+                      <Button variant="outline" size="sm" className="h-10 flex-1 border-cyan-500/30 text-cyan-400 sm:h-auto sm:flex-none">
                         <Search className="h-4 w-4 mr-2" />
                         Search
                       </Button>
@@ -424,8 +424,8 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
 
             {/* Sidebar */}
             <div 
-              className={`w-80 border-l border-slate-700 p-6 space-y-6 transition-all duration-500 ${
-                stepHighlights[demoStep] === 'community-sidebar' ? 'ring-2 ring-cyan-400 bg-cyan-500/5' : ''
+              className={`hidden transition-all duration-500 lg:flex lg:w-80 lg:flex-col lg:border-l lg:border-slate-700 lg:p-6 lg:space-y-6 ${
+                stepHighlights[demoStep] === 'community-sidebar' ? 'lg:ring-2 lg:ring-cyan-400 lg:bg-cyan-500/5' : ''
               }`}
             >
               {/* Community Stats */}

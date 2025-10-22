@@ -77,11 +77,12 @@ export const PMSDemo = ({ currentStep, isRunning }: PMSDemoProps) => {
     return titles[currentStep] || "Property Management System";
   };
 
-  const getTabColor = (tab) => {
-    if (tab === activeTab) {
-      return "data-[state=active]:bg-cyan-600 bg-cyan-600 text-white";
-    }
-    return "data-[state=active]:bg-cyan-600";
+  const getTabClasses = (tab: string) => {
+    const baseClasses = "flex w-full basis-[48%] items-center justify-center gap-2 rounded-md px-3 py-2 text-sm text-gray-200 transition-colors max-[360px]:basis-full sm:w-auto sm:flex-1 sm:rounded-none sm:px-4 sm:py-0 sm:h-12 sm:text-base";
+    const activeClasses = tab === activeTab
+      ? "bg-cyan-600 text-white shadow-sm"
+      : "bg-transparent text-gray-300 hover:bg-cyan-500/20 hover:text-cyan-200";
+    return `${baseClasses} ${activeClasses}`;
   };
 
   return (
@@ -94,25 +95,25 @@ export const PMSDemo = ({ currentStep, isRunning }: PMSDemoProps) => {
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-gray-700/50">
-            <TabsTrigger value="dashboard" className={getTabColor('dashboard')}>
-              <Home className="h-4 w-4 mr-2" />
+          <TabsList className="!flex !h-auto w-full flex-wrap gap-2 bg-gray-700/50 p-2 sm:flex-nowrap sm:gap-0 sm:p-0">
+            <TabsTrigger value="dashboard" className={getTabClasses('dashboard')}>
+              <Home className="h-4 w-4 sm:mr-2" />
               Dashboard
             </TabsTrigger>
-            <TabsTrigger value="calendar" className={getTabColor('calendar')}>
-              <Calendar className="h-4 w-4 mr-2" />
+            <TabsTrigger value="calendar" className={getTabClasses('calendar')}>
+              <Calendar className="h-4 w-4 sm:mr-2" />
               Calendar
             </TabsTrigger>
-            <TabsTrigger value="messages" className={getTabColor('messages')}>
-              <MessageCircle className="h-4 w-4 mr-2" />
+            <TabsTrigger value="messages" className={getTabClasses('messages')}>
+              <MessageCircle className="h-4 w-4 sm:mr-2" />
               Messages
             </TabsTrigger>
-            <TabsTrigger value="automation" className={getTabColor('automation')}>
-              <Settings className="h-4 w-4 mr-2" />
+            <TabsTrigger value="automation" className={getTabClasses('automation')}>
+              <Settings className="h-4 w-4 sm:mr-2" />
               Automation
             </TabsTrigger>
-            <TabsTrigger value="platforms" className={getTabColor('platforms')}>
-              <BarChart3 className="h-4 w-4 mr-2" />
+            <TabsTrigger value="platforms" className={getTabClasses('platforms')}>
+              <BarChart3 className="h-4 w-4 sm:mr-2" />
               Analytics
             </TabsTrigger>
           </TabsList>

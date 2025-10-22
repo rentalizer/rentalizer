@@ -416,7 +416,7 @@ const LandingPage = () => {
 
       {/* Demo Modal */}
       <Dialog open={!!activeDemo} onOpenChange={() => handleCloseDemo()}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-slate-900 border-slate-700">
+        <DialogContent className="w-full max-w-[95vw] sm:max-w-6xl max-h-[90vh] overflow-y-auto overflow-x-hidden bg-slate-900 border-slate-700">
           <DialogHeader>
             <DialogTitle className="text-white text-xl">
               {activeDemo === 'market' && 'Market Intelligence Demo'}
