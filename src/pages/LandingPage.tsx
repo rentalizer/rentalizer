@@ -163,14 +163,6 @@ const LandingPage = () => {
               ) : (
                 <div className="flex items-center gap-2 sm:gap-3">
                   <Button
-                    onClick={() => navigate('/offers')}
-                    variant="outline"
-                    size="lg"
-                    className="h-9 px-3 text-xs border-cyan-400/60 bg-slate-800/40 text-cyan-300 hover:bg-cyan-500/10 hover:text-cyan-200 shadow-[0_0_18px_rgba(34,211,238,0.35)] animate-pulse sm:h-10 sm:px-4 sm:text-sm md:h-11 md:px-6 md:text-base"
-                  >
-                    Programs
-                  </Button>
-                  <Button
                     onClick={() => navigate('/auth/signup')}
                     variant="default"
                     size="lg"
