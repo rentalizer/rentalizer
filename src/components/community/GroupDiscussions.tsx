@@ -1559,18 +1559,18 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           }
         }}
       >
-        <DialogContent className="bg-slate-900/80 backdrop-blur-md border border-slate-700 max-w-4xl w-full p-4">
+        <DialogContent className="bg-slate-900/80 backdrop-blur-md border border-slate-700 w-full max-w-[90vw] p-4 sm:max-w-4xl sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-white text-base">
               {imagePreview?.alt || 'Image preview'}
             </DialogTitle>
           </DialogHeader>
-          <div className="max-h-[80vh] overflow-auto flex justify-center">
+          <div className="flex justify-center overflow-auto max-h-[70vh] sm:max-h-[80vh]">
             {imagePreview && (
               <img
                 src={imagePreview.url}
                 alt={imagePreview.alt || 'Full size image'}
-                className="max-w-full h-auto rounded-lg"
+                className="h-auto max-h-[65vh] w-auto max-w-full rounded-lg sm:max-h-[75vh]"
               />
             )}
           </div>
