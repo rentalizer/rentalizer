@@ -620,27 +620,37 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
     <Card className="bg-slate-800/50 border-cyan-500/20">
       <CardContent className="p-6">
         <div className="space-y-4">
-          <div className="flex items-start gap-4">
-            {isAdminUser ? (
-              <AdminGroupAvatar size="xl" className="shrink-0" />
-            ) : (
-              <Avatar className="w-12 h-12 flex-shrink-0">
-                {getUserAvatar() ? (
-                  <AvatarImage 
-                    src={getUserAvatar()!} 
-                    alt="Your avatar" 
-                    className="object-cover w-full h-full"
-                  />
-                ) : (
-                  <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
-                    {getUserInitials()}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-            )}
+          <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-start">
+            <div className="flex items-center gap-3 sm:flex-col sm:items-start sm:gap-0">
+              {isAdminUser ? (
+                <AdminGroupAvatar size="xl" className="shrink-0" />
+              ) : (
+                <Avatar className="w-12 h-12 flex-shrink-0">
+                  {getUserAvatar() ? (
+                    <AvatarImage 
+                      src={getUserAvatar()!} 
+                      alt="Your avatar" 
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
+                      {getUserInitials()}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+              )}
+              <div className="flex flex-1 min-w-0 flex-wrap items-center gap-2 sm:hidden">
+                <span className="text-cyan-300 font-medium">{getUserName()}</span>
+                {isAdminUser ? (
+                  <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
+                    Admin
+                  </Badge>
+                ) : null}
+              </div>
+            </div>
             <div className="flex-1 space-y-4">
               <div>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="hidden sm:flex items-center gap-2 mb-2">
                   <span className="text-cyan-300 font-medium">{getUserName()}</span>
                   {isAdminUser ? (
                     <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-xs">
@@ -666,7 +676,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                 
                 {/* File attachments display */}
                 {attachedFiles.length > 0 && (
-                  <div className="bg-slate-700/30 border border-cyan-500/20 rounded-lg p-3 space-y-3">
+                  <div className="w-full rounded-lg border border-cyan-500/20 bg-slate-700/30 p-3 space-y-3">
                     <div className="flex items-center gap-2">
                       <Paperclip className="h-4 w-4 text-cyan-400" />
                       <span className="text-sm font-medium text-cyan-300">
@@ -748,7 +758,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
                 {/* Video upload display - This stays visible after upload */}
                 {videoUpload && (
-                  <div className="bg-slate-700/30 border border-cyan-500/20 rounded-lg p-3 space-y-3">
+                  <div className="w-full rounded-lg border border-cyan-500/20 bg-slate-700/30 p-3 space-y-3">
                     <div className="flex items-center gap-2">
                       <Video className="h-4 w-4 text-cyan-400" />
                       <span className="text-sm font-medium text-cyan-300">
@@ -847,8 +857,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
                 {/* Photo upload display - This stays visible after upload */}
                 {photoUploads.length > 0 && (
-                  <div className="bg-slate-700/30 border border-cyan-500/20 rounded-lg p-3 space-y-4">
-                    <div className="flex items-center gap-2">
+                  <div className="w-full rounded-lg border border-cyan-500/20 bg-slate-700/30 p-3 space-y-4">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Image className="h-4 w-4 text-cyan-400" />
                       <span className="text-sm font-medium text-cyan-300">
                         Photo Uploads
@@ -860,9 +870,12 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
                     <div className="space-y-3">
                       {photoUploads.map((upload) => (
-                        <div key={upload.id} className="space-y-3 rounded-lg border border-slate-500/30 bg-slate-600/20 p-3">
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <div
+                          key={upload.id}
+                          className="space-y-3 rounded-lg border border-slate-500/30 bg-slate-600/20 p-3"
+                        >
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex min-w-0 flex-1 items-start gap-2">
                               {upload.uploading ? (
                                 <div className="h-4 w-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin flex-shrink-0" />
                               ) : upload.uploaded ? (
@@ -873,20 +886,20 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                                 <Image className="h-4 w-4 text-gray-400 flex-shrink-0" />
                               )}
                               <div className="min-w-0 flex-1">
-                                <div className="text-sm text-gray-200 truncate" title={upload.file.name}>
+                                <div className="text-sm text-gray-200 break-words" title={upload.file.name}>
                                   {upload.file.name}
                                 </div>
-                                <div className="text-xs text-gray-400">
-                                  {(upload.file.size / 1024 / 1024).toFixed(2)} MB
-                                  {upload.uploaded && <span className="text-green-400 ml-2">• ready</span>}
-                                  {upload.uploading && <span className="text-yellow-400 ml-2">• uploading</span>}
-                                  {upload.error && <span className="text-red-400 ml-2">• {upload.error}</span>}
+                                <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400">
+                                  <span>{(upload.file.size / 1024 / 1024).toFixed(2)} MB</span>
+                                  {upload.uploaded && <span className="text-green-400">• ready</span>}
+                                  {upload.uploading && <span className="text-yellow-400">• uploading</span>}
+                                  {upload.error && <span className="text-red-400 break-words">• {upload.error}</span>}
                                 </div>
                               </div>
                             </div>
                             <button
                               onClick={() => removePhotoUpload(upload.id)}
-                              className="text-red-400 hover:text-red-300 ml-2 flex-shrink-0 p-1 hover:bg-red-500/10 rounded transition-colors"
+                              className="self-center rounded p-1 text-red-400 transition-colors hover:bg-red-500/10 hover:text-red-300 sm:self-auto"
                               title="Remove photo"
                             >
                               <X className="h-4 w-4" />

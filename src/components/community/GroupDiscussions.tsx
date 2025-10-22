@@ -987,13 +987,13 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       parts.push(content.substring(lastIndex));
     }
 
-    let gridClasses = 'mt-2 grid gap-2';
+    let gridClasses = 'mt-3 grid gap-2';
     if (matches.length === 1) {
       gridClasses += ' grid-cols-1 max-w-md mx-auto';
     } else if (matches.length === 2) {
-      gridClasses += ' grid-cols-2 max-w-3xl mx-auto';
+      gridClasses += ' grid-cols-2 max-w-full sm:max-w-3xl sm:mx-auto';
     } else {
-      gridClasses += ' grid-cols-2 md:grid-cols-3 max-w-4xl mx-auto';
+      gridClasses += ' grid-cols-2 sm:grid-cols-3 max-w-full sm:max-w-4xl sm:mx-auto';
     }
 
     const isMultiImage = matches.length > 1;
@@ -1005,15 +1005,15 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         <button
           key={`img-${idx}`}
           type="button"
-          className="w-full focus:outline-none"
+          className="w-full focus:outline-none overflow-hidden rounded-lg border border-slate-600"
           onClick={() => setImagePreview({ url, alt })}
         >
           <img
             src={url}
             alt={alt}
             className={isMultiImage
-              ? 'w-full h-48 sm:h-56 md:h-60 rounded-lg border border-slate-600 object-cover transition-transform duration-200 hover:scale-[1.02]'
-              : 'w-full h-64 sm:h-72 md:h-80 rounded-lg border border-slate-600 object-cover transition-transform duration-200 hover:scale-[1.02]'}
+              ? 'w-full h-48 sm:h-56 md:h-60 rounded-lg object-cover transition-transform duration-200 hover:scale-[1.02]'
+              : 'w-full h-64 sm:h-72 md:h-80 rounded-lg object-cover transition-transform duration-200 hover:scale-[1.02]'}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
