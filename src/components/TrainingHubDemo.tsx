@@ -207,9 +207,9 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
           AI mentorship, and powerful tools to accelerate your success.
         </p>
         
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:flex sm:justify-center sm:gap-8">
+        <div className="mt-8 grid grid-cols-2 gap-4 justify-items-center sm:flex sm:justify-center sm:gap-8">
           {stats.map((stat, index) => (
-            <div key={index} className="text-left text-gray-300 sm:min-w-0 sm:text-center">
+            <div key={index} className="text-center text-gray-300 sm:min-w-0">
               <div className="text-2xl font-bold text-white">{stat.value}</div>
               <div className="text-sm text-gray-400">{stat.label}</div>
               <div className="text-xs text-green-400">{stat.change}</div>
@@ -294,12 +294,12 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
                               <h4 className="font-semibold text-white mb-2 hover:text-cyan-300 cursor-pointer">
                                 {discussion.title}
                               </h4>
-                              <div className="flex items-center justify-between text-sm text-gray-400">
-                                <div className="flex items-center gap-4">
+                              <div className="flex flex-col gap-3 text-sm text-gray-400 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex flex-col items-center gap-1 text-center sm:flex-row sm:items-center sm:gap-4 sm:text-left">
                                   <span>by {discussion.author}</span>
                                   <span>{discussion.time}</span>
                                 </div>
-                                <div className="flex items-center gap-4">
+                                <div className="flex flex-wrap items-center justify-center gap-4 sm:flex-nowrap sm:justify-end">
                                   <div className="flex items-center gap-1">
                                     <MessageCircle className="h-4 w-4" />
                                     <span>{discussion.replies}</span>
@@ -308,7 +308,7 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
                                     <Heart className="h-4 w-4" />
                                     <span>{discussion.likes}</span>
                                   </div>
-                                  <Button variant="ghost" size="sm">
+                                  <Button variant="ghost" size="sm" className="w-full justify-center sm:w-auto">
                                     <MoreHorizontal className="h-4 w-4" />
                                   </Button>
                                 </div>
