@@ -317,9 +317,6 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
                                     <Heart className="h-4 w-4" />
                                     <span>{discussion.likes}</span>
                                   </div>
-                                  <Button variant="ghost" size="sm" className="w-full justify-center sm:w-auto">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
                                 </div>
                               </div>
                             </div>
