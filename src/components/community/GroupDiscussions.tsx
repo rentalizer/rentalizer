@@ -1538,7 +1538,18 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
         <div className="sticky top-6 space-y-6">
           <Card className="bg-slate-800/50 border-cyan-500/20">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
+              <CardTitle
+                className="text-lg font-semibold text-white flex items-center gap-2 cursor-pointer hover:text-cyan-300 focus-within:text-cyan-300"
+                role="button"
+                tabIndex={0}
+                onClick={() => setShowOnlineModal(true)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    setShowOnlineModal(true);
+                  }
+                }}
+              >
                 <Users className="h-5 w-5 text-cyan-400" />
                 Members
               </CardTitle>
