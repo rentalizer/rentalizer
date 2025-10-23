@@ -328,6 +328,20 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
                 </div>
               </TabsContent>
 
+              {/* Calendar Tab */}
+              <TabsContent value="calendar" className="mt-0">
+                <div className="text-center py-12">
+                  <Calendar className="h-16 w-16 text-cyan-400 mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold text-white mb-4">Events Calendar</h3>
+                  <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
+                    Discover upcoming workshops, live coaching, and community meetups designed to keep your rental arbitrage momentum going.
+                  </p>
+                  <Button size="lg" className="bg-cyan-600 hover:bg-cyan-500">
+                    Explore Events
+                  </Button>
+                </div>
+              </TabsContent>
+
               {/* Videos Tab */}
               <TabsContent value="videos" className="mt-0">
                 <div 
