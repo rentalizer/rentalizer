@@ -1751,7 +1751,6 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                             <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-[10px]">Admin</Badge>
                           )}
                         </div>
-                        <div className="text-xs text-gray-400">Last seen: {new Date(u.last_seen).toLocaleTimeString()}</div>
                       </div>
                     </div>
                   );
