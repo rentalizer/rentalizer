@@ -197,7 +197,7 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
         }`}
       >
         <div className="flex items-center justify-center gap-3 mb-4">
-          <Users className="h-12 w-12 text-cyan-400" />
+          <Users className="hidden h-12 w-12 text-cyan-400 sm:block" />
           <CardTitle className="text-3xl font-bold sm:text-5xl bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
             Training Dashboard
           </CardTitle>
