@@ -308,12 +308,40 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   // Time ago helper must be defined before being referenced
   const formatTimeAgo = useCallback((dateString: string) => {
     const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) {
+      return 'Unknown time';
+    }
+
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-    return `${Math.floor(diffInMinutes / 1440)}d ago`;
+    const diffMs = Math.max(0, now.getTime() - date.getTime());
+    const diffInMinutes = Math.floor(diffMs / (1000 * 60));
+
+    if (diffInMinutes < 1) {
+      return 'Just now';
+    }
+
+    if (diffInMinutes < 60) {
+      const minutes = diffInMinutes;
+      return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+    }
+
+    if (diffInMinutes < 1440) {
+      const hours = Math.floor(diffInMinutes / 60);
+      return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+    }
+
+    const days = Math.floor(diffInMinutes / 1440);
+    if (diffInMinutes <= 10080) {
+      return `${days} day${days === 1 ? '' : 's'} ago`;
+    }
+
+    const formatter = new Intl.DateTimeFormat(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+
+    return formatter.format(date);
   }, []);
 
   // Map backend comment to UI comment
@@ -396,17 +424,20 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
           : false;
         const isLiked = backendIsLiked !== undefined ? backendIsLiked : fallbackIsLiked;
         
+        const createdAt = discussion.createdAt || discussion.created_at;
+        const derivedTimeAgo = createdAt ? formatTimeAgo(createdAt) : formatTimeAgo(new Date().toISOString());
+
         const transformed = {
           ...discussion,
           id: discussion._id,
           author: discussion.author_name,
           avatar: discussion.author_avatar || '',
           comments: discussion.comments_count,
-          timeAgo: discussion.timeAgo,
+          timeAgo: discussion.timeAgo || derivedTimeAgo,
           isPinned: discussion.is_pinned,
           isLiked,
           isAdmin: discussion.is_admin_post,
-          created_at: discussion.createdAt
+          created_at: createdAt || discussion.created_at || discussion.createdAt
         };
         
         console.log('📊 Discussion', discussion._id, 'comment count from backend:', discussion.comments_count);
@@ -435,7 +466,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [user, POSTS_PER_PAGE]);
+  }, [user, POSTS_PER_PAGE, formatTimeAgo]);
 
   // Load more discussions
   const loadMoreDiscussions = useCallback(() => {

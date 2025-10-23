@@ -116,7 +116,7 @@ export const validateName = (name: string, fieldName: string): ValidationResult 
 
 export const validateBio = (bio: string): ValidationResult => {
   if (!bio || !bio.trim()) {
-    return { isValid: true, message: "" }; // Bio is optional
+    return { isValid: false, message: "Bio is required" };
   }
   
   if (bio.trim().length > 500) {
@@ -127,8 +127,8 @@ export const validateBio = (bio: string): ValidationResult => {
 };
 
 export const validateProfilePicture = (profilePicture: string): ValidationResult => {
-  if (!profilePicture) {
-    return { isValid: true, message: "" }; // Profile picture is optional
+  if (!profilePicture || !profilePicture.trim()) {
+    return { isValid: false, message: "Profile picture is required" };
   }
 
   if (profilePicture.startsWith('http://') || profilePicture.startsWith('https://')) {
@@ -193,6 +193,9 @@ export const validateSignupData = (data: SignupValidationData): ValidationResult
   if (!data.lastName || !data.lastName.trim()) {
     errors.push(`Last Name: Last name is required`);
   }
+  if (!data.profilePicture || !data.profilePicture.trim()) {
+    errors.push(`Profile Picture: Profile picture is required`);
+  }
   if (!data.promoCode || !data.promoCode.trim()) {
     errors.push(`Promo Code: Promo code is required`);
   }
@@ -242,9 +245,11 @@ export const validateSignupData = (data: SignupValidationData): ValidationResult
   }
   
   // Validate profile picture (optional)
-  const profilePictureValidation = validateProfilePicture(data.profilePicture || '');
-  if (!profilePictureValidation.isValid) {
-    errors.push(`Profile Picture: ${profilePictureValidation.message}`);
+  if (data.profilePicture && data.profilePicture.trim()) {
+    const profilePictureValidation = validateProfilePicture(data.profilePicture);
+    if (!profilePictureValidation.isValid) {
+      errors.push(`Profile Picture: ${profilePictureValidation.message}`);
+    }
   }
   
   if (errors.length > 0) {

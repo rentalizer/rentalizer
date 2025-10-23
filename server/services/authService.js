@@ -6,26 +6,77 @@ const messagingService = require('./messagingService');
 class AuthService {
   // Register a new user
   async registerUser(userData) {
-    const { email, password, firstName, lastName, bio, profilePicture, promoCode } = userData;
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      bio,
+      profilePicture,
+      promoCode
+    } = userData;
+
+    const normalizedEmail = email?.toLowerCase().trim();
+    const trimmedFirstName = firstName?.trim();
+    const trimmedLastName = lastName?.trim();
+    const trimmedProfilePicture = profilePicture?.trim();
+    const trimmedBio = bio?.trim();
+    const normalizedPromoCode = promoCode?.trim().toUpperCase();
+    const validationErrors = {};
+
+    if (!normalizedEmail) {
+      validationErrors.email = { message: 'Email: Email is required' };
+    }
+
+    if (!password || !password.trim()) {
+      validationErrors.password = { message: 'Password: Password is required' };
+    }
+
+    if (!trimmedFirstName) {
+      validationErrors.firstName = { message: 'First Name: First name is required' };
+    }
+
+    if (!trimmedLastName) {
+      validationErrors.lastName = { message: 'Last Name: Last name is required' };
+    }
+
+    if (!trimmedProfilePicture) {
+      validationErrors.profilePicture = { message: 'Profile Picture: Profile picture is required' };
+    }
+
+    if (!trimmedBio) {
+      validationErrors.bio = { message: 'Bio: Bio is required' };
+    }
+
+    if (!normalizedPromoCode) {
+      validationErrors.promoCode = { message: 'Promo Code: Promo code is required' };
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      const validationError = new Error('Validation failed');
+      validationError.name = 'ValidationError';
+      validationError.errors = validationErrors;
+      throw validationError;
+    }
 
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       const error = new Error('User with this email already exists');
       error.name = 'AuthError';
       throw error;
     }
 
-    const { promoCode: promoCodeDocument, isStatic } = await promoCodeService.assertPromoCodeIsValid(promoCode);
+    const { promoCode: promoCodeDocument, isStatic } = await promoCodeService.assertPromoCodeIsValid(normalizedPromoCode);
 
     // Create new user
     const user = new User({
-      email,
+      email: normalizedEmail,
       password,
-      firstName,
-      lastName,
-      bio: bio || null,
-      profilePicture: profilePicture || null
+      firstName: trimmedFirstName,
+      lastName: trimmedLastName,
+      bio: trimmedBio,
+      profilePicture: trimmedProfilePicture
     });
 
     await user.save();

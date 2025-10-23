@@ -970,12 +970,36 @@ class ApiService {
   // Error handling
   private handleError(error: unknown): void {
     if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError<{ message?: string }>;
+      const axiosError = error as AxiosError<{ message?: string; errors?: unknown }>;
       
       if (axiosError.response) {
         // Server responded with error status
-        const message = axiosError.response.data?.message || 'Server error occurred';
-        throw new Error(message);
+        const responseData = axiosError.response.data as { message?: string; errors?: unknown } | undefined;
+        const baseMessage = responseData?.message || 'Server error occurred';
+        const errors = responseData?.errors;
+
+        let detailedMessage = baseMessage;
+
+        if (Array.isArray(errors) && errors.length > 0) {
+          detailedMessage = `${baseMessage}\n${errors.join('\n')}`;
+        } else if (errors && typeof errors === 'object') {
+          const extractedErrors = Object.values(errors as Record<string, unknown>)
+            .map((err) => {
+              if (!err) return null;
+              if (typeof err === 'string') return err;
+              if (typeof err === 'object' && 'message' in err && typeof (err as { message?: string }).message === 'string') {
+                return (err as { message?: string }).message;
+              }
+              return null;
+            })
+            .filter((value): value is string => Boolean(value));
+
+          if (extractedErrors.length > 0) {
+            detailedMessage = `${baseMessage}\n${extractedErrors.join('\n')}`;
+          }
+        }
+
+        throw new Error(detailedMessage);
       } else if (axiosError.request) {
         // Request was made but no response received
         throw new Error('Network error - please check your connection');

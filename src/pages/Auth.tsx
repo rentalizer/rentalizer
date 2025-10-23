@@ -14,6 +14,13 @@ import { validateSignupData, validateEmail, validatePassword, validateName, vali
 import { apiService } from '@/services/api';
 import { Eye, EyeOff, Upload, User, Ticket, LogIn, UserPlus, CheckCircle, XCircle, AlertCircle, Loader2, Mail } from 'lucide-react';
 
+const RequiredAsterisk = () => (
+  <>
+    <span aria-hidden="true" className="ml-1 text-red-400">*</span>
+    <span className="sr-only">required</span>
+  </>
+);
+
 export const Auth = () => {
   const { user, signIn, signUp, isLoading } = useAuth();
   const { toast } = useToast();
@@ -406,14 +413,18 @@ export const Auth = () => {
     clearValidationErrors();
     
     // Validate all fields
+    const trimmedEmail = signupEmail.trim();
+    const trimmedFirstName = firstName.trim();
+    const trimmedLastName = lastName.trim();
     const normalizedPromoCode = promoCode.trim().toUpperCase();
+    const trimmedBio = bio.trim();
 
     const signupData = {
-      email: signupEmail,
+      email: trimmedEmail,
       password: signupPassword,
-      firstName,
-      lastName,
-      bio: bio.trim(),
+      firstName: trimmedFirstName,
+      lastName: trimmedLastName,
+      bio: trimmedBio,
       profilePicture: avatarUrl,
       promoCode: normalizedPromoCode
     };
@@ -473,6 +484,22 @@ export const Auth = () => {
       setPromoCode(normalizedPromoCode);
     }
 
+    if (signupEmail !== trimmedEmail) {
+      setSignupEmail(trimmedEmail);
+    }
+
+    if (firstName !== trimmedFirstName) {
+      setFirstName(trimmedFirstName);
+    }
+
+    if (lastName !== trimmedLastName) {
+      setLastName(trimmedLastName);
+    }
+
+    if (bio !== trimmedBio) {
+      setBio(trimmedBio);
+    }
+
     setSignupLoading(true);
 
     try {
@@ -485,16 +512,16 @@ export const Auth = () => {
         await performPromoCodeVerification(false);
       }
 
-      const displayName = `${firstName} ${lastName}`;
+      const displayName = `${trimmedFirstName} ${trimmedLastName}`.trim();
       await signUp({
-        email: signupEmail,
+        email: trimmedEmail,
         password: signupPassword,
         promoCode: normalizedPromoCode,
         profileData: {
           displayName,
-          firstName,
-          lastName,
-          bio: bio.trim() || undefined,
+          firstName: trimmedFirstName,
+          lastName: trimmedLastName,
+          bio: trimmedBio || undefined,
           profilePicture: avatarUrl || undefined
         }
       });
@@ -664,6 +691,10 @@ export const Auth = () => {
               <form onSubmit={handleSignup} className="space-y-4" noValidate>
             {/* Avatar Upload */}
             <div className="flex flex-col items-center space-y-3 pb-2">
+              <div className="text-sm text-gray-300 flex items-center gap-1">
+                <span>Profile Photo</span>
+                <RequiredAsterisk />
+              </div>
               <Avatar className="h-20 w-20">
                 <AvatarImage src={avatarUrl} className="object-cover" />
                 <AvatarFallback className="bg-gradient-to-br from-cyan-400 to-blue-500 text-white text-lg">
@@ -698,14 +729,15 @@ export const Auth = () => {
                 </div>
               )}
               <p className="text-xs text-gray-400 text-center">
-                Optional: Add a profile picture (max 2MB)
+                Profile photo is required. Upload a clear image (max 2MB, JPEG/PNG/GIF/WebP).
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label htmlFor="first-name" className="text-gray-300">
-                  First Name
+                <Label htmlFor="first-name" className="text-gray-300 flex items-center gap-1">
+                  <span>First Name</span>
+                  <RequiredAsterisk />
                 </Label>
                 <Input
                   id="first-name"
@@ -724,6 +756,8 @@ export const Auth = () => {
                     firstNameError ? 'border-red-500/50 focus:border-red-400' : 'border-cyan-500/20 focus:border-cyan-400'
                   }`}
                   required
+                  aria-required="true"
+                  aria-invalid={!!firstNameError}
                   disabled={signupLoading}
                 />
                 {firstNameError ? (
@@ -739,8 +773,9 @@ export const Auth = () => {
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="last-name" className="text-gray-300">
-                  Last Name
+                <Label htmlFor="last-name" className="text-gray-300 flex items-center gap-1">
+                  <span>Last Name</span>
+                  <RequiredAsterisk />
                 </Label>
                 <Input
                   id="last-name"
@@ -759,6 +794,8 @@ export const Auth = () => {
                     lastNameError ? 'border-red-500/50 focus:border-red-400' : 'border-cyan-500/20 focus:border-cyan-400'
                   }`}
                   required
+                  aria-required="true"
+                  aria-invalid={!!lastNameError}
                   disabled={signupLoading}
                 />
                 {lastNameError ? (
@@ -776,7 +813,10 @@ export const Auth = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="signup-email" className="text-gray-300">Email</Label>
+              <Label htmlFor="signup-email" className="text-gray-300 flex items-center gap-1">
+                <span>Email</span>
+                <RequiredAsterisk />
+              </Label>
               <Input
                 id="signup-email"
                 name="signup-email"
@@ -790,12 +830,14 @@ export const Auth = () => {
                     setEmailError('');
                   }
                 }}
-                className={`bg-slate-700/50 text-white ${
-                  emailError ? 'border-red-500/50 focus:border-red-400' : 'border-cyan-500/20 focus:border-cyan-400'
-                }`}
-                required
-                disabled={signupLoading}
-              />
+                  className={`bg-slate-700/50 text-white ${
+                    emailError ? 'border-red-500/50 focus:border-red-400' : 'border-cyan-500/20 focus:border-cyan-400'
+                  }`}
+                  required
+                  aria-required="true"
+                  aria-invalid={!!emailError}
+                  disabled={signupLoading}
+                />
               {emailError ? (
                 <div className="flex items-center gap-2 text-red-400 text-sm">
                   <XCircle className="h-4 w-4" />
@@ -812,7 +854,10 @@ export const Auth = () => {
             <div className="space-y-2">
               <Label htmlFor="promo-code" className="text-gray-300 flex items-center gap-2">
                 <Ticket className="h-4 w-4" />
-                Promo Code
+                <span className="flex items-center gap-1">
+                  Promo Code
+                  <RequiredAsterisk />
+                </span>
               </Label>
               <div className="flex gap-2">
                 <Input
@@ -830,6 +875,8 @@ export const Auth = () => {
                         : 'border-cyan-500/20 focus:border-cyan-400'
                   }`}
                   required
+                  aria-required="true"
+                  aria-invalid={!!promoCodeError}
                   disabled={signupLoading}
                   maxLength={24}
                 />
@@ -903,7 +950,10 @@ export const Auth = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="signup-password" className="text-gray-300">Password</Label>
+              <Label htmlFor="signup-password" className="text-gray-300 flex items-center gap-1">
+                <span>Password</span>
+                <RequiredAsterisk />
+              </Label>
               <div className="relative">
                 <Input
                   id="signup-password"
@@ -923,6 +973,8 @@ export const Auth = () => {
                     passwordError ? 'border-red-500/50 focus:border-red-400' : 'border-cyan-500/20 focus:border-cyan-400'
                   }`}
                   required
+                  aria-required="true"
+                  aria-invalid={!!passwordError}
                   minLength={6}
                   disabled={signupLoading}
                 />
@@ -967,19 +1019,18 @@ export const Auth = () => {
 
             {/* Bio field */}
             <div className="space-y-2">
-              <Label htmlFor="bio" className="text-gray-300">About Yourself (Optional)</Label>
+              <Label htmlFor="bio" className="text-gray-300 flex items-center gap-1">
+                <span>About Yourself</span>
+                <RequiredAsterisk />
+              </Label>
               <Textarea
                 id="bio"
                 name="bio"
                 value={bio}
                 onChange={(e) => {
                   setBio(e.target.value);
-                  if (e.target.value.length > 0) {
-                    const validation = validateBio(e.target.value);
-                    setBioError(validation.isValid ? '' : validation.message);
-                  } else {
-                    setBioError('');
-                  }
+                  const validation = validateBio(e.target.value);
+                  setBioError(validation.isValid ? '' : validation.message);
                 }}
                 placeholder="Tell the community about yourself, your real estate experience, goals, etc."
                 rows={3}
@@ -987,6 +1038,9 @@ export const Auth = () => {
                   bioError ? 'border-red-500/50 focus:border-red-400' : 'border-cyan-500/20 focus:border-cyan-400'
                 }`}
                 disabled={signupLoading}
+                required
+                aria-required="true"
+                aria-invalid={!!bioError}
                 maxLength={500}
               />
               {bioError && (
