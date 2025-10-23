@@ -88,6 +88,12 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
     }
   ];
 
+  const discussionCategoryStyles: Record<string, string> = {
+    Negotiations: "border-orange-500/40 bg-orange-500/10 text-orange-300",
+    "Market Research": "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
+    Legal: "border-sky-500/40 bg-sky-500/10 text-sky-300"
+  };
+
   const videos = [
     {
       id: 1,
@@ -287,7 +293,10 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
                                     Official
                                   </Badge>
                                 )}
-                                <Badge variant="outline" className="text-xs">
+                                <Badge
+                                  variant="outline"
+                                  className={`text-xs ${discussionCategoryStyles[discussion.category] ?? "border-cyan-500/40 bg-cyan-500/10 text-cyan-300"}`}
+                                >
                                   {discussion.category}
                                 </Badge>
                               </div>
@@ -295,11 +304,11 @@ export const TrainingHubDemo = ({ currentStep, isRunning }: TrainingHubDemoProps
                                 {discussion.title}
                               </h4>
                               <div className="flex flex-col gap-3 text-sm text-gray-400 sm:flex-row sm:items-center sm:justify-between">
-                                <div className="flex flex-col items-center gap-1 text-center sm:flex-row sm:items-center sm:gap-4 sm:text-left">
+                                <div className="flex flex-col items-start gap-1 text-left sm:flex-row sm:items-center sm:gap-4">
                                   <span>by {discussion.author}</span>
                                   <span>{discussion.time}</span>
                                 </div>
-                                <div className="flex flex-wrap items-center justify-center gap-4 sm:flex-nowrap sm:justify-end">
+                                <div className="flex flex-wrap items-center justify-start gap-4 sm:flex-nowrap sm:justify-end">
                                   <div className="flex items-center gap-1">
                                     <MessageCircle className="h-4 w-4" />
                                     <span>{discussion.replies}</span>
