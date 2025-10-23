@@ -1086,34 +1086,58 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
     fetchDiscussions(1, false);
   }, [fetchDiscussions]);
 
+  const navigateToSupportChat = useCallback(
+    (targetUserId?: string, targetUserName?: string, extraParams: Record<string, string> = {}) => {
+      if (!isAdmin) return false;
+
+      if (!targetUserId) {
+        console.warn('Support navigation skipped: target user ID missing.');
+        return false;
+      }
+
+      if (user && targetUserId === user.id) {
+        console.log('Info: Cannot message yourself');
+        return false;
+      }
+
+      const params = new URLSearchParams({
+        messageUserId: targetUserId,
+        messageUserName: targetUserName?.trim() || 'Community Member',
+        ...extraParams
+      });
+
+      console.log('📨 Admin navigating to support chat with user:', targetUserId, {
+        targetUserName,
+        extraParams
+      });
+
+      window.location.href = `/community?${params.toString()}#admin-support`;
+      return true;
+    },
+    [isAdmin, user]
+  );
+
   // Handle admin clicking on user name to message them
-  const handleMessageUser = useCallback((discussion: DiscussionType) => {
-    if (!isAdmin) return;
-    
-    const discussionUserId = getUserId(discussion.user_id);
-    if (!discussionUserId) {
-      console.log("Error: Cannot message user - user ID not found");
-      return;
-    }
-    
-    // Don't allow messaging yourself
-    if (user && discussionUserId === user.id) {
-      console.log("Info: Cannot message yourself");
-      return;
-    }
-    
-    console.log('📨 Admin messaging user:', discussionUserId, 'from discussion:', discussion.id);
-    
-    // Use URL parameters and reload the page to ensure state is preserved
-    const params = new URLSearchParams({
-      messageUserId: discussionUserId,
-      messageUserName: discussion.author,
-      fromDiscussion: discussion.id
-    });
-    
-    // Navigate with URL parameters and reload (parameters before hash)
-    window.location.href = `/community?${params.toString()}#admin-support`;
-  }, [isAdmin, getUserId, user]);
+  const handleMessageUser = useCallback(
+    (discussion: DiscussionType) => {
+      const discussionUserId = getUserId(discussion.user_id);
+      navigateToSupportChat(discussionUserId, discussion.author, { fromDiscussion: discussion.id });
+    },
+    [getUserId, navigateToSupportChat]
+  );
+
+  const handleOnlineMemberClick = useCallback(
+    (onlineUser: { user_id: string; display_name: string }) => {
+      const navigated = navigateToSupportChat(onlineUser.user_id, onlineUser.display_name, {
+        fromOnlineList: 'true'
+      });
+
+      if (navigated) {
+        setShowOnlineModal(false);
+      }
+    },
+    [navigateToSupportChat, setShowOnlineModal]
+  );
 
   // Debug render
   console.log('🎨 RENDERING GroupDiscussions with', filteredDiscussions.length, 'discussions');
@@ -1648,27 +1672,48 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
               {filteredOnlineUsers.length === 0 ? (
                 <div className="text-center text-gray-400 py-6">No users online.</div>
               ) : (
-                filteredOnlineUsers.map(u => (
-                  <div key={u.user_id} className="flex items-center gap-3 p-3">
-                    <Avatar className="w-8 h-8">
-                      {u.avatar_url ? (
-                        <AvatarImage src={u.avatar_url} alt={u.display_name} className="object-cover w-full h-full" />
-                      ) : null}
-                      <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
-                        {(u.display_name || 'U').slice(0,2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-white text-sm truncate">{u.display_name}</span>
-                        {u.is_admin && (
-                          <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-[10px]">Admin</Badge>
-                        )}
+                filteredOnlineUsers.map(u => {
+                  const canMessage = !!(isAdmin && user && u.user_id !== user.id);
+
+                  return (
+                    <div
+                      key={u.user_id}
+                      onClick={() => canMessage && handleOnlineMemberClick(u)}
+                      onKeyDown={(event) => {
+                        if (!canMessage) return;
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          handleOnlineMemberClick(u);
+                        }
+                      }}
+                      role={canMessage ? 'button' : undefined}
+                      tabIndex={canMessage ? 0 : -1}
+                      className={`flex items-center gap-3 p-3 rounded-md transition-colors ${
+                        canMessage
+                          ? 'cursor-pointer hover:bg-slate-800/80 focus:outline-none focus:ring-2 focus:ring-cyan-500/50'
+                          : 'cursor-default'
+                      }`}
+                    >
+                      <Avatar className="w-8 h-8">
+                        {u.avatar_url ? (
+                          <AvatarImage src={u.avatar_url} alt={u.display_name} className="object-cover w-full h-full" />
+                        ) : null}
+                        <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold">
+                          {(u.display_name || 'U').slice(0,2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-white text-sm truncate">{u.display_name}</span>
+                          {u.is_admin && (
+                            <Badge className="bg-red-500/20 text-red-300 border-red-500/30 text-[10px]">Admin</Badge>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-400">Last seen: {new Date(u.last_seen).toLocaleTimeString()}</div>
                       </div>
-                      <div className="text-xs text-gray-400">Last seen: {new Date(u.last_seen).toLocaleTimeString()}</div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
