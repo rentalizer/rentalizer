@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const { generateToken } = require('../middleware/auth');
 const promoCodeService = require('./promoCodeService');
+const messagingService = require('./messagingService');
 
 class AuthService {
   // Register a new user
@@ -31,6 +32,10 @@ class AuthService {
     if (!isStatic) {
       await promoCodeService.recordUsage({ promoCode: promoCodeDocument, userId: user._id });
     }
+
+    await this.sendWelcomeMessage(user).catch(error => {
+      console.error('Welcome message dispatch failed:', error);
+    });
 
     // Generate JWT token
     const token = generateToken(user._id);
@@ -162,6 +167,36 @@ class AuthService {
       throw error;
     }
     return user;
+  }
+
+  async sendWelcomeMessage(user) {
+    const adminEmail = process.env.ADMIN_SUPPORT_EMAIL || 'team@rentalizer.ai';
+
+    const adminUser = await User.findOne({ email: adminEmail });
+    if (!adminUser) {
+      console.warn(`Welcome message skipped: admin user with email ${adminEmail} not found.`);
+      return;
+    }
+
+    const senderName = [adminUser.firstName, adminUser.lastName]
+      .filter(Boolean)
+      .join(' ')
+      .trim() || 'Kristina';
+
+    const recipientName = user.firstName?.trim() || user.lastName?.trim()
+      ? [user.firstName, user.lastName].filter(Boolean).join(' ').trim()
+      : user.email;
+
+    const message = `Welcome to Rentalizer, ${recipientName}!\n\nMessage us here if you need help with anything.\n\nKristina\nClient Success`;
+
+    await messagingService.sendMessage({
+      sender_id: adminUser._id.toString(),
+      recipient_id: user._id.toString(),
+      message,
+      sender_name: senderName,
+      support_category: 'general',
+      priority: 'medium'
+    });
   }
 }
 
