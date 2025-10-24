@@ -138,6 +138,34 @@ export interface CreatePromoCodeRequest {
   maxUsage?: number;
 }
 
+export interface AdminMemberSummary {
+  totalUsers: number;
+  activeUsers: number;
+  inactiveUsers: number;
+  adminUsers: number;
+  newUsersToday: number;
+}
+
+export interface AdminMembersResponse {
+  message: string;
+  members: User[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    pages: number;
+  };
+  summary: AdminMemberSummary;
+}
+
+export interface AdminMembersParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: 'active' | 'inactive' | 'all';
+  role?: 'user' | 'admin' | 'superadmin' | 'all';
+}
+
 export interface UpdateProfileRequest {
   firstName?: string;
   lastName?: string;
@@ -599,6 +627,20 @@ class ApiService {
       const response = await api.patch<{ message: string; promoCode: PromoCodeEntry }>(
         `${API_CONFIG.ENDPOINTS.PROMO_CODES.BASE}/${encodeURIComponent(code)}/status`,
         { isActive }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  // Admin endpoints
+  async getAdminMembers(params?: AdminMembersParams): Promise<AdminMembersResponse> {
+    try {
+      const response = await api.get<AdminMembersResponse>(
+        API_CONFIG.ENDPOINTS.ADMIN.MEMBERS,
+        { params }
       );
       return response.data;
     } catch (error) {

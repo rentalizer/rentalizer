@@ -27,6 +27,7 @@ import { VideoLibrary } from '@/components/community/VideoLibrary';
 import { CommunityLeaderboard } from '@/components/community/CommunityLeaderboard';
 import { NewsFeed } from '@/components/community/NewsFeed';
 import { PromoCodeManager } from '@/components/community/PromoCodeManager';
+import { AdminMembersPanel } from '@/components/community/AdminMembersPanel';
 import { MemberAskRichie } from '@/components/MemberAskRichie';
 import { ContactChat } from '@/components/ContactChat';
 import { AccessGate } from '@/components/AccessGate';
@@ -130,7 +131,7 @@ const Community = React.memo(() => {
   }, [user]);
 
   useEffect(() => {
-    if (!userIsAdmin && activeTab === 'promo-codes') {
+    if (!userIsAdmin && (activeTab === 'promo-codes' || activeTab === 'members')) {
       setActiveTab('discussions');
     }
   }, [userIsAdmin, activeTab]);
@@ -340,13 +341,22 @@ const Community = React.memo(() => {
               )}
             </TabsTrigger>
             {userIsAdmin && (
-              <TabsTrigger
-                value="promo-codes"
-                className="flex-1 min-w-[7.5rem] rounded-lg px-3 py-2 text-xs sm:min-w-0 sm:rounded-md sm:px-4 sm:text-sm data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300"
-              >
-                <Ticket className="mr-1.5 h-4 w-4 sm:mr-2 sm:h-5 sm:w-5" />
-                Promo Codes
-              </TabsTrigger>
+              <>
+                <TabsTrigger
+                  value="members"
+                  className="flex-1 min-w-[7.5rem] rounded-lg px-3 py-2 text-xs sm:min-w-0 sm:rounded-md sm:px-4 sm:text-sm data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300"
+                >
+                  <User className="mr-1.5 h-4 w-4 sm:mr-2 sm:h-5 sm:w-5" />
+                  Members
+                </TabsTrigger>
+                <TabsTrigger
+                  value="promo-codes"
+                  className="flex-1 min-w-[7.5rem] rounded-lg px-3 py-2 text-xs sm:min-w-0 sm:rounded-md sm:px-4 sm:text-sm data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300"
+                >
+                  <Ticket className="mr-1.5 h-4 w-4 sm:mr-2 sm:h-5 sm:w-5" />
+                  Promo Codes
+                </TabsTrigger>
+              </>
             )}
             {/* <TabsTrigger value="askrichie" className="data-[state=active]:bg-cyan-600/20 data-[state=active]:text-cyan-300">
               <Bot size={24} style={{width: '24px', height: '24px', minWidth: '24px', minHeight: '24px'}} className="mr-2 flex-shrink-0" />
@@ -624,9 +634,14 @@ const Community = React.memo(() => {
           </TabsContent>
 
           {userIsAdmin && (
-            <TabsContent value="promo-codes" className="mt-8">
-              <PromoCodeManager />
-            </TabsContent>
+            <>
+              <TabsContent value="members" className="mt-8">
+                <AdminMembersPanel />
+              </TabsContent>
+              <TabsContent value="promo-codes" className="mt-8">
+                <PromoCodeManager />
+              </TabsContent>
+            </>
           )}
 
           <TabsContent value="askrichie" className="mt-8">

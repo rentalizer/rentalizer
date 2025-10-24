@@ -24,6 +24,11 @@ export const API_CONFIG = {
       BASE: '/promo-codes'
     },
     PROMO_CODE_REQUEST: '/promo-code-requests',
+    ADMIN: {
+      MEMBERS: '/admin/members',
+      USERS: '/admin/users',
+      STATS: '/admin/stats',
+    },
     USER: {
       PROFILE: '/user/profile',
       UPDATE_PROFILE: '/user/profile',
