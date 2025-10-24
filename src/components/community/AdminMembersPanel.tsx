@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import { apiService, AdminMemberSummary, User } from '@/services/api';
 import { CalendarClock, Loader2, RefreshCw, Search, ShieldAlert, ShieldCheck, Users } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const MEMBERS_PER_PAGE = 25;
 
@@ -112,6 +113,7 @@ interface PaginationState {
 export const AdminMembersPanel: React.FC = () => {
   const { toast } = useToast();
   const isMountedRef = useRef(true);
+  const { user } = useAuth();
 
   const [members, setMembers] = useState<User[]>([]);
   const [summary, setSummary] = useState<AdminMemberSummary | null>(null);
@@ -275,6 +277,48 @@ export const AdminMembersPanel: React.FC = () => {
     setPage((prev) => Math.min(prev + 1, pagination.pages || prev + 1));
   };
 
+  const handleMemberClick = useCallback(
+    (member: User) => {
+      const targetUserId = resolveMemberId(member);
+      const currentUserId = user?.id || (user as typeof user & { _id?: string })?._id;
+      const isAdminUser = user?.role === 'admin' || user?.role === 'superadmin';
+
+      if (!isAdminUser) {
+        toast({
+          title: 'Admin access required',
+          description: 'Only admins can start support messages.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (!targetUserId) {
+        console.warn('Cannot open support chat: target member missing identifier.');
+        return;
+      }
+
+      if (currentUserId && targetUserId.toString() === currentUserId.toString()) {
+        toast({
+          title: 'Heads up',
+          description: 'You cannot message yourself.',
+        });
+        return;
+      }
+
+      const targetName = getDisplayName(member);
+      const params = new URLSearchParams({
+        messageUserId: targetUserId.toString(),
+        messageUserName: targetName,
+        fromMembers: 'directory',
+      });
+
+      if (typeof window !== 'undefined') {
+        window.location.href = `/community?${params.toString()}#admin-support`;
+      }
+    },
+    [toast, user]
+  );
+
   const showPagination = pageStats.totalPages > 1;
 
   return (
@@ -413,29 +457,35 @@ export const AdminMembersPanel: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {members.map((member) => (
-                    <TableRow key={resolveMemberId(member)} className="border-slate-800">
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10 ring-2 ring-cyan-500/20">
-                            {member.profilePicture ? (
-                              <AvatarImage src={member.profilePicture} alt={getDisplayName(member)} />
-                            ) : (
-                              <AvatarFallback className="bg-cyan-500/20 text-cyan-200">
-                                {getInitials(member)}
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
-                          <div>
-                            <p className="font-medium text-white">{getDisplayName(member)}</p>
-                            <p className="text-sm text-gray-400">{member.email}</p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{renderRoleBadge(member.role)}</TableCell>
-                      <TableCell>{renderStatusBadge(Boolean(member.isActive))}</TableCell>
-                      <TableCell className="max-w-xs text-sm text-gray-300">
-                        {member.bio ? member.bio : <span className="text-gray-500">No bio provided</span>}
+              {members.map((member) => (
+                <TableRow key={resolveMemberId(member)} className="border-slate-800">
+                  <TableCell>
+                    <button
+                      type="button"
+                      onClick={() => handleMemberClick(member)}
+                      className="group flex w-full items-center gap-3 rounded-lg border border-transparent bg-transparent p-0 text-left transition-colors hover:border-cyan-500/20 focus:outline-none focus-visible:border-cyan-500/40 focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+                    >
+                      <Avatar className="h-10 w-10 ring-2 ring-cyan-500/20 transition-transform group-hover:scale-105">
+                        {member.profilePicture ? (
+                          <AvatarImage src={member.profilePicture} alt={getDisplayName(member)} />
+                        ) : (
+                          <AvatarFallback className="bg-cyan-500/20 text-cyan-200">
+                            {getInitials(member)}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div>
+                        <p className="font-medium text-white group-hover:text-cyan-200">
+                          {getDisplayName(member)}
+                        </p>
+                        <p className="text-sm text-gray-400">{member.email}</p>
+                      </div>
+                    </button>
+                  </TableCell>
+                  <TableCell>{renderRoleBadge(member.role)}</TableCell>
+                  <TableCell>{renderStatusBadge(Boolean(member.isActive))}</TableCell>
+                  <TableCell className="max-w-xs text-sm text-gray-300">
+                    {member.bio ? member.bio : <span className="text-gray-500">No bio provided</span>}
                       </TableCell>
                       <TableCell className="text-sm text-gray-300">
                         {formatDate(member.createdAt)}
@@ -454,6 +504,15 @@ export const AdminMembersPanel: React.FC = () => {
                 <div
                   key={resolveMemberId(member)}
                   className="rounded-lg border border-cyan-500/20 bg-slate-900/40 p-4 space-y-4"
+                  onClick={() => handleMemberClick(member)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      handleMemberClick(member);
+                    }
+                  }}
                 >
                   <div className="flex items-center gap-3">
                     <Avatar className="h-12 w-12 ring-2 ring-cyan-500/20">

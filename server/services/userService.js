@@ -144,6 +144,9 @@ class UserService {
     if (filters.isActive !== undefined) {
       query.isActive = filters.isActive;
     }
+    if (filters.role) {
+      query.role = filters.role;
+    }
     if (filters.search) {
       query.$or = [
         { email: { $regex: filters.search, $options: 'i' } },
@@ -176,6 +179,7 @@ class UserService {
     const totalUsers = await User.countDocuments();
     const activeUsers = await User.countDocuments({ isActive: true });
     const inactiveUsers = await User.countDocuments({ isActive: false });
+    const adminUsers = await User.countDocuments({ role: { $in: ['admin', 'superadmin'] } });
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -187,6 +191,7 @@ class UserService {
       totalUsers,
       activeUsers,
       inactiveUsers,
+      adminUsers,
       newUsersToday
     };
   }
