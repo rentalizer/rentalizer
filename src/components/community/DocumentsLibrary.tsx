@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { FileText, Download, Plus, Search, Eye, Trash2, Edit, Loader2, ArrowRight } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { FileText, Download, Search, Trash2, Edit, Loader2, ArrowRight, Upload } from 'lucide-react';
 import { useAdminRole } from '@/hooks/useAdminRole';
-import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Document } from '@/types';
 import { documentService } from '@/services/documentService';
@@ -20,7 +19,6 @@ interface DocumentsLibraryProps {
 
 export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLibraryProps) => {
   const { isAdmin } = useAdminRole();
-  const { user } = useAuth();
   const { toast } = useToast();
   
   // State management
@@ -30,11 +28,20 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState<Document | null>(null);
-  const [categories] = useState<string[]>(['all', 'Business Formation', 'Market Research', 'Property Acquisition', 'Operations']);
+  const [categories] = useState<string[]>(['all', 'Documents Library', 'Business Formation', 'Market Research', 'Property Acquisition', 'Operations']);
 
   // Form state for new document
   const [newDocument, setNewDocument] = useState({
-    category: 'Business Formation',
+    category: 'Documents Library',
+    file: null as File | null
+  });
+  const uploadInputRef = useRef<HTMLInputElement | null>(null);
+  const editFileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isSavingNewDocument, setIsSavingNewDocument] = useState(false);
+  const [isUpdatingDocument, setIsUpdatingDocument] = useState(false);
+  const [editForm, setEditForm] = useState({
+    filename: '',
+    category: 'Documents Library',
     file: null as File | null
   });
 
@@ -113,6 +120,8 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
     return () => clearTimeout(timer);
   }, []); // Run once when component mounts
 
+  const categoryOptions = categories.filter(category => category !== 'all');
+
   const handleAddDocument = async () => {
     if (!newDocument.file) {
       toast({
@@ -134,6 +143,7 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
     }
 
     try {
+      setIsSavingNewDocument(true);
       await documentService.createDocument({
         category: newDocument.category
       }, newDocument.file);
@@ -141,7 +151,10 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
       // Reload documents to get the updated list
       await loadDocuments();
       
-      setNewDocument({ category: 'Business Formation', file: null });
+      setNewDocument({ category: 'Documents Library', file: null });
+      if (uploadInputRef.current) {
+        uploadInputRef.current.value = '';
+      }
       setIsAddDialogOpen(false);
       
       toast({
@@ -155,6 +168,8 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
         description: "Failed to add document. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsSavingNewDocument(false);
     }
   };
 
@@ -180,6 +195,116 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
 
   const handleDownload = (document: Document) => {
     documentService.downloadDocument(document);
+  };
+
+  const handleEditOpen = (document: Document) => {
+    setEditingDocument(document);
+    setEditForm({
+      filename: document.filename,
+      category: document.category || 'Documents Library',
+      file: null
+    });
+    if (editFileInputRef.current) {
+      editFileInputRef.current.value = '';
+    }
+  };
+
+  const handleUpdateDocument = async () => {
+    if (!editingDocument) return;
+
+    const trimmedFilename = editForm.filename.trim();
+    if (!trimmedFilename) {
+      toast({
+        title: "File name required",
+        description: "Please enter a name for the document.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const payload: { category?: string; filename?: string } = {};
+    if (trimmedFilename !== editingDocument.filename) {
+      payload.filename = trimmedFilename;
+    }
+    if (editForm.category && editForm.category !== editingDocument.category) {
+      payload.category = editForm.category;
+    }
+
+    const replacementFile = editForm.file ?? undefined;
+
+    if (!payload.filename && !payload.category && !replacementFile) {
+      toast({
+        title: "No changes detected",
+        description: "Update the name, category, or upload a new file before saving.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (replacementFile && replacementFile.size > 20 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Replacement file must be 20MB or smaller.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsUpdatingDocument(true);
+      await documentService.updateDocument(
+        editingDocument._id,
+        payload,
+        replacementFile
+      );
+      await loadDocuments();
+      toast({
+        title: "Document updated",
+        description: "Document changes saved successfully."
+      });
+      setEditingDocument(null);
+      setEditForm({
+        filename: '',
+        category: 'Documents Library',
+        file: null
+      });
+      if (editFileInputRef.current) {
+        editFileInputRef.current.value = '';
+      }
+    } catch (error) {
+      console.error('Error updating document:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update the document. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUpdatingDocument(false);
+    }
+  };
+
+  const handleUploadDialogChange = (open: boolean) => {
+    setIsAddDialogOpen(open);
+    if (!open) {
+      setNewDocument({ category: 'Documents Library', file: null });
+      if (uploadInputRef.current) {
+        uploadInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleEditDialogChange = (open: boolean) => {
+    if (!open) {
+      setEditingDocument(null);
+      setEditForm({
+        filename: '',
+        category: 'Documents Library',
+        file: null
+      });
+      if (editFileInputRef.current) {
+        editFileInputRef.current.value = '';
+      }
+    }
   };
 
   // Documents are already filtered by backend, no need for client-side filtering
@@ -225,6 +350,96 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
           ))}
         </div>
       </div>
+
+      {isAdmin && (
+        <div className="flex justify-end">
+          <Dialog open={isAddDialogOpen} onOpenChange={handleUploadDialogChange}>
+            <DialogTrigger asChild>
+              <Button className="bg-cyan-600 hover:bg-cyan-700 text-white flex items-center gap-2">
+                <Upload className="h-4 w-4" />
+                Upload Document
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-slate-900 border-cyan-500/30">
+              <DialogHeader>
+                <DialogTitle className="text-white">Upload Training Document</DialogTitle>
+                <DialogDescription className="text-gray-400">
+                  Select a file and choose a category to make it available in the library.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-gray-300">Category</Label>
+                  <Select
+                    value={newDocument.category}
+                    onValueChange={(value) => setNewDocument(prev => ({ ...prev, category: value }))}
+                  >
+                    <SelectTrigger className="bg-slate-800/80 border-cyan-500/20 text-white">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-900 border-cyan-500/20 text-white">
+                      {categoryOptions.map(category => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-300">Document</Label>
+                  <Input
+                    ref={uploadInputRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.txt,.md"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0] ?? null;
+                      setNewDocument(prev => ({ ...prev, file }));
+                    }}
+                    className="bg-slate-800/80 border-cyan-500/20 text-white"
+                  />
+                  {newDocument.file && (
+                    <p className="text-xs text-gray-400">
+                      Selected: {newDocument.file.name} ({formatFileSize(newDocument.file.size)})
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-500">
+                    Maximum file size: 20MB. Supported formats: PDF, Word, Excel, PowerPoint, Text.
+                  </p>
+                </div>
+              </div>
+              <DialogFooter className="gap-2 sm:gap-0">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleUploadDialogChange(false)}
+                  className="border-gray-600 text-gray-300 hover:bg-slate-800/80"
+                  disabled={isSavingNewDocument}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleAddDocument}
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                  disabled={isSavingNewDocument}
+                >
+                  {isSavingNewDocument ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload
+                    </>
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      )}
 
       {/* Documents List */}
       {loading ? (
@@ -277,14 +492,24 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
                       <Download className="h-4 w-4" />
                     </Button>
                     {isAdmin && (
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleDeleteDocument(document._id)}
-                        className="w-full bg-red-900/80 hover:bg-red-800 sm:w-auto"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="flex w-full flex-col gap-2 sm:flex-row sm:w-auto">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEditOpen(document)}
+                          className="w-full border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10 sm:w-auto"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDeleteDocument(document._id)}
+                          className="w-full bg-red-900/80 hover:bg-red-800 sm:w-auto"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </CardContent>
@@ -293,6 +518,93 @@ export const DocumentsLibrary = ({ onBack, onDocumentCountChange }: DocumentsLib
           )}
       </div>
       )}
+
+      <Dialog open={!!editingDocument} onOpenChange={handleEditDialogChange}>
+        <DialogContent className="bg-slate-900 border-cyan-500/30">
+          <DialogHeader>
+            <DialogTitle className="text-white">Edit Document</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Update the file name, category, or replace the uploaded file.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-gray-300" htmlFor="edit-filename">File Name</Label>
+              <Input
+                id="edit-filename"
+                value={editForm.filename}
+                onChange={(event) => setEditForm(prev => ({ ...prev, filename: event.target.value }))}
+                className="bg-slate-800/80 border-cyan-500/20 text-white"
+                placeholder="Enter file name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-gray-300">Category</Label>
+              <Select
+                value={editForm.category}
+                onValueChange={(value) => setEditForm(prev => ({ ...prev, category: value }))}
+              >
+                <SelectTrigger className="bg-slate-800/80 border-cyan-500/20 text-white">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-900 border-cyan-500/20 text-white">
+                  {categoryOptions.map(category => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-gray-300">Replace File (optional)</Label>
+              <Input
+                ref={editFileInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.txt,.md"
+                onChange={(event) => {
+                  const file = event.target.files?.[0] ?? null;
+                  setEditForm(prev => ({ ...prev, file }));
+                }}
+                className="bg-slate-800/80 border-cyan-500/20 text-white"
+              />
+              {editForm.file && (
+                <p className="text-xs text-gray-400">
+                  Selected: {editForm.file.name} ({formatFileSize(editForm.file.size)})
+                </p>
+              )}
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleEditDialogChange(false)}
+              className="border-gray-600 text-gray-300 hover:bg-slate-800/80"
+              disabled={isUpdatingDocument}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleUpdateDocument}
+              className="bg-cyan-600 hover:bg-cyan-700 text-white"
+              disabled={isUpdatingDocument}
+            >
+              {isUpdatingDocument ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

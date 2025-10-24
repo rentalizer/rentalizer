@@ -66,6 +66,7 @@ interface SingleDocumentResponse {
 
 interface CreateDocumentData {
   category: string;
+  filename?: string;
 }
 
 class DocumentService {
@@ -107,6 +108,9 @@ class DocumentService {
       const formData = new FormData();
       formData.append('document', file);
       formData.append('category', documentData.category);
+      if (documentData.filename) {
+        formData.append('filename', documentData.filename);
+      }
 
       const response = await documentApi.post('/documents', formData, {
         headers: {
@@ -132,6 +136,10 @@ class DocumentService {
       
       if (documentData.category) {
         formData.append('category', documentData.category);
+      }
+
+      if (documentData.filename) {
+        formData.append('filename', documentData.filename);
       }
 
       const response = await documentApi.put(`/documents/${documentId}`, formData, {
