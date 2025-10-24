@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { ACCOUNT_INACTIVE_MESSAGE } = require('../constants/messages');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -28,8 +29,8 @@ const authenticateToken = async (req, res, next) => {
     }
 
     if (!user.isActive) {
-      return res.status(401).json({ 
-        message: 'Account is deactivated.' 
+      return res.status(401).json({
+        message: ACCOUNT_INACTIVE_MESSAGE,
       });
     }
 

@@ -28,6 +28,7 @@ export const API_CONFIG = {
       MEMBERS: '/admin/members',
       USERS: '/admin/users',
       STATS: '/admin/stats',
+      USER_STATUS: (userId: string) => `/admin/users/${userId}/status`,
     },
     USER: {
       PROFILE: '/user/profile',

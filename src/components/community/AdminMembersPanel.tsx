@@ -8,8 +8,28 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { apiService, AdminMemberSummary, User } from '@/services/api';
-import { CalendarClock, Loader2, RefreshCw, Search, ShieldAlert, ShieldCheck, Users } from 'lucide-react';
+import {
+  CalendarClock,
+  Loader2,
+  RefreshCw,
+  Search,
+  ShieldAlert,
+  ShieldCheck,
+  UserCheck,
+  UserX,
+  Users,
+} from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const MEMBERS_PER_PAGE = 25;
 
@@ -130,6 +150,11 @@ export const AdminMembersPanel: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('all');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
+  const [pendingStatusToggle, setPendingStatusToggle] = useState<{
+    member: User;
+    nextStatus: boolean;
+  } | null>(null);
 
   useEffect(() => {
     return () => {
@@ -319,6 +344,66 @@ export const AdminMembersPanel: React.FC = () => {
     [toast, user]
   );
 
+  const handleStatusToggle = useCallback(
+    async (member: User, nextStatus: boolean) => {
+      const memberId = resolveMemberId(member);
+      if (!memberId) {
+        toast({
+          title: 'Unable to update status',
+          description: 'Missing member identifier.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const memberIdString = memberId.toString();
+      setStatusUpdatingId(memberIdString);
+
+      try {
+        await apiService.updateAdminMemberStatus(memberIdString, nextStatus);
+
+        toast({
+          title: `Member ${nextStatus ? 'activated' : 'deactivated'}`,
+          description: `${getDisplayName(member)} is now ${nextStatus ? 'active' : 'inactive'}.`,
+        });
+
+        await fetchMembers();
+      } catch (err) {
+        console.error('Failed to update member status', err);
+        toast({
+          title: 'Status update failed',
+          description:
+            err instanceof Error ? err.message : 'Unable to update the member status right now.',
+          variant: 'destructive',
+        });
+      } finally {
+        setStatusUpdatingId(null);
+      }
+    },
+    [fetchMembers, toast]
+  );
+
+  const requestStatusToggle = useCallback(
+    (member: User, nextStatus: boolean) => {
+      if (nextStatus) {
+        handleStatusToggle(member, nextStatus);
+      } else {
+        setPendingStatusToggle({ member, nextStatus });
+      }
+    },
+    [handleStatusToggle]
+  );
+
+  const confirmStatusToggle = useCallback(() => {
+    if (!pendingStatusToggle) return;
+    handleStatusToggle(pendingStatusToggle.member, pendingStatusToggle.nextStatus);
+    setPendingStatusToggle(null);
+  }, [handleStatusToggle, pendingStatusToggle]);
+
+  const cancelStatusToggle = useCallback(() => {
+    setPendingStatusToggle(null);
+  }, []);
+
   const showPagination = pageStats.totalPages > 1;
 
   return (
@@ -448,77 +533,127 @@ export const AdminMembersPanel: React.FC = () => {
               <Table className="min-w-full">
                 <TableHeader>
                   <TableRow className="bg-slate-800/60">
-                    <TableHead className="text-gray-300">Member</TableHead>
-                    <TableHead className="text-gray-300">Role</TableHead>
-                    <TableHead className="text-gray-300">Status</TableHead>
-                    <TableHead className="text-gray-300">Bio</TableHead>
-                    <TableHead className="text-gray-300">Joined</TableHead>
-                    <TableHead className="text-gray-300">Last Active</TableHead>
+                    <TableHead className="text-center text-gray-300">Member</TableHead>
+                    <TableHead className="text-center text-gray-300">Role</TableHead>
+                    <TableHead className="text-center text-gray-300">Status</TableHead>
+                    <TableHead className="text-center text-gray-300">Bio</TableHead>
+                    <TableHead className="text-center text-gray-300">Joined</TableHead>
+                    <TableHead className="text-center text-gray-300">Last Active</TableHead>
+                    <TableHead className="text-center text-gray-300">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-              {members.map((member) => (
-                <TableRow key={resolveMemberId(member)} className="border-slate-800">
-                  <TableCell>
-                    <button
-                      type="button"
-                      onClick={() => handleMemberClick(member)}
-                      className="group flex w-full items-center gap-3 rounded-lg border border-transparent bg-transparent p-0 text-left transition-colors hover:border-cyan-500/20 focus:outline-none focus-visible:border-cyan-500/40 focus-visible:ring-2 focus-visible:ring-cyan-400/40"
-                    >
-                      <Avatar className="h-10 w-10 ring-2 ring-cyan-500/20 transition-transform group-hover:scale-105">
-                        {member.profilePicture ? (
-                          <AvatarImage src={member.profilePicture} alt={getDisplayName(member)} />
-                        ) : (
-                          <AvatarFallback className="bg-cyan-500/20 text-cyan-200">
-                            {getInitials(member)}
-                          </AvatarFallback>
-                        )}
-                      </Avatar>
-                      <div>
-                        <p className="font-medium text-white group-hover:text-cyan-200">
-                          {getDisplayName(member)}
-                        </p>
-                        <p className="text-sm text-gray-400">{member.email}</p>
-                      </div>
-                    </button>
-                  </TableCell>
-                  <TableCell>{renderRoleBadge(member.role)}</TableCell>
-                  <TableCell>{renderStatusBadge(Boolean(member.isActive))}</TableCell>
-                  <TableCell className="max-w-xs text-sm text-gray-300">
-                    {member.bio ? member.bio : <span className="text-gray-500">No bio provided</span>}
-                      </TableCell>
-                      <TableCell className="text-sm text-gray-300">
-                        {formatDate(member.createdAt)}
-                      </TableCell>
-                      <TableCell className="text-sm text-gray-300">
-                        {formatRelative(member.lastLogin)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {members.map((member) => {
+                    const memberId = resolveMemberId(member);
+                    const memberIdString = memberId?.toString() ?? '';
+                    const isUpdating = statusUpdatingId === memberIdString;
+                    const nextStatus = !Boolean(member.isActive);
+
+                    return (
+                      <TableRow key={memberIdString || member.email} className="border-slate-800">
+                        <TableCell className="text-left">
+                          <button
+                            type="button"
+                            onClick={() => handleMemberClick(member)}
+                            className="group flex w-full items-center gap-3 rounded-lg border border-transparent bg-transparent p-0 text-left transition-colors hover:border-cyan-500/20 focus:outline-none focus-visible:border-cyan-500/40 focus-visible:ring-2 focus-visible:ring-cyan-400/40"
+                          >
+                            <Avatar className="h-10 w-10 ring-2 ring-cyan-500/20 transition-transform group-hover:scale-105">
+                              {member.profilePicture ? (
+                                <AvatarImage
+                                  src={member.profilePicture}
+                                  alt={getDisplayName(member)}
+                                />
+                              ) : (
+                                <AvatarFallback className="bg-cyan-500/20 text-cyan-200">
+                                  {getInitials(member)}
+                                </AvatarFallback>
+                              )}
+                            </Avatar>
+                            <div>
+                              <p className="font-medium text-white group-hover:text-cyan-200">
+                                {getDisplayName(member)}
+                              </p>
+                              <p className="text-sm text-gray-400">{member.email}</p>
+                            </div>
+                          </button>
+                        </TableCell>
+                        <TableCell className="text-center">{renderRoleBadge(member.role)}</TableCell>
+                        <TableCell className="text-center">{renderStatusBadge(Boolean(member.isActive))}</TableCell>
+                        <TableCell className="max-w-xs text-center text-sm text-gray-300">
+                          {member.bio ? (
+                            member.bio
+                          ) : (
+                            <span className="text-gray-500">No bio provided</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center text-sm text-gray-300">
+                          {formatDate(member.createdAt)}
+                        </TableCell>
+                        <TableCell className="text-center text-sm text-gray-300">
+                          {formatRelative(member.lastLogin)}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <div className="flex justify-center">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant={member.isActive ? 'destructive' : 'outline'}
+                              className={
+                                member.isActive
+                                  ? 'bg-red-500/20 text-red-200 hover:bg-red-500/30 hover:text-red-100'
+                                  : 'border-green-500/40 text-green-200 hover:bg-green-500/10'
+                              }
+                              onClick={() => requestStatusToggle(member, nextStatus)}
+                              disabled={isUpdating}
+                            >
+                              {isUpdating ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              ) : member.isActive ? (
+                                <UserX className="mr-2 h-4 w-4" />
+                              ) : (
+                                <UserCheck className="mr-2 h-4 w-4" />
+                              )}
+                              {isUpdating
+                                ? 'Updating...'
+                                : member.isActive
+                                ? 'Deactivate'
+                                : 'Activate'}
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
 
             <div className="grid gap-3 md:hidden">
-              {members.map((member) => (
-                <div
-                  key={resolveMemberId(member)}
-                  className="rounded-lg border border-cyan-500/20 bg-slate-900/40 p-4 space-y-4"
-                  onClick={() => handleMemberClick(member)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-                      handleMemberClick(member);
-                    }
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12 ring-2 ring-cyan-500/20">
-                      {member.profilePicture ? (
-                        <AvatarImage src={member.profilePicture} alt={getDisplayName(member)} />
-                      ) : (
+              {members.map((member) => {
+                const memberId = resolveMemberId(member);
+                const memberIdString = memberId?.toString() ?? '';
+                const isUpdating = statusUpdatingId === memberIdString;
+                const nextStatus = !Boolean(member.isActive);
+
+                return (
+                  <div
+                    key={memberIdString || member.email}
+                    className="rounded-lg border border-cyan-500/20 bg-slate-900/40 p-4 space-y-4"
+                    onClick={() => handleMemberClick(member)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        handleMemberClick(member);
+                      }
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12 ring-2 ring-cyan-500/20">
+                        {member.profilePicture ? (
+                          <AvatarImage src={member.profilePicture} alt={getDisplayName(member)} />
+                        ) : (
                         <AvatarFallback className="bg-cyan-500/20 text-cyan-100">
                           {getInitials(member)}
                         </AvatarFallback>
@@ -549,8 +684,53 @@ export const AdminMembersPanel: React.FC = () => {
                       <p className="mt-1 text-white/90">{formatRelative(member.lastLogin)}</p>
                     </div>
                   </div>
-                </div>
-              ))}
+                    <div className="flex flex-wrap items-center gap-2 pt-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant={member.isActive ? 'destructive' : 'outline'}
+                        className={
+                          member.isActive
+                            ? 'bg-red-500/20 text-red-200 hover:bg-red-500/30 hover:text-red-100'
+                            : 'border-green-500/40 text-green-200 hover:bg-green-500/10'
+                        }
+                        disabled={isUpdating}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          requestStatusToggle(member, nextStatus);
+                        }}
+                      >
+                        {isUpdating ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : member.isActive ? (
+                          <UserX className="mr-2 h-4 w-4" />
+                        ) : (
+                          <UserCheck className="mr-2 h-4 w-4" />
+                        )}
+                        {isUpdating
+                          ? 'Updating...'
+                          : member.isActive
+                          ? 'Deactivate'
+                          : 'Activate'}
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="border-cyan-500/30 text-cyan-200 hover:bg-cyan-500/10"
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          handleMemberClick(member);
+                        }}
+                      >
+                        Message
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </>
         )}
@@ -583,6 +763,37 @@ export const AdminMembersPanel: React.FC = () => {
           </div>
         )}
       </CardContent>
+
+      <AlertDialog
+        open={pendingStatusToggle !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            cancelStatusToggle();
+          }
+        }}
+      >
+        <AlertDialogContent className="bg-slate-900 border border-red-500/30 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-300">Deactivate member?</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-300">
+              {pendingStatusToggle
+                ? `This will prevent ${getDisplayName(pendingStatusToggle.member)} from logging in. They will see an inactive account notice and must contact the admin via the bug report modal.`
+                : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-slate-600 text-gray-200 hover:bg-slate-700" onClick={cancelStatusToggle}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={confirmStatusToggle}
+            >
+              Deactivate Member
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };

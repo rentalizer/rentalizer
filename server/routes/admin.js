@@ -81,6 +81,53 @@ router.get('/members', async (req, res) => {
   }
 });
 
+// PATCH /api/admin/users/:userId/status - Update user active status (admin only)
+router.patch('/users/:userId/status', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { isActive } = req.body;
+
+    if (typeof isActive !== 'boolean') {
+      return res.status(400).json({
+        message: 'isActive must be provided as a boolean value',
+      });
+    }
+
+    if (!userId) {
+      return res.status(400).json({
+        message: 'User ID is required',
+      });
+    }
+
+    if (req.user && req.user._id && req.user._id.toString() === userId && isActive === false) {
+      return res.status(400).json({
+        message: 'You cannot deactivate your own account.',
+      });
+    }
+
+    const updatedUser = isActive
+      ? await userService.activateUser(userId)
+      : await userService.deactivateUser(userId);
+
+    res.json({
+      message: `User ${isActive ? 'activated' : 'deactivated'} successfully`,
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error('Update user status error:', error);
+
+    if (error.name === 'NotFoundError') {
+      return res.status(404).json({
+        message: 'User not found',
+      });
+    }
+
+    res.status(500).json({
+      message: 'Internal server error while updating user status',
+    });
+  }
+});
+
 // GET /api/admin/stats - Get admin dashboard stats
 router.get('/stats', async (req, res) => {
   try {

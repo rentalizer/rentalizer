@@ -2,6 +2,7 @@ const User = require('../models/User');
 const { generateToken } = require('../middleware/auth');
 const promoCodeService = require('./promoCodeService');
 const messagingService = require('./messagingService');
+const { ACCOUNT_INACTIVE_MESSAGE } = require('../constants/messages');
 
 class AuthService {
   // Register a new user
@@ -118,7 +119,7 @@ class AuthService {
 
     // Check if user is active
     if (!user.isActive) {
-      const error = new Error('Account is deactivated');
+      const error = new Error(ACCOUNT_INACTIVE_MESSAGE);
       error.name = 'AuthError';
       throw error;
     }
@@ -180,7 +181,7 @@ class AuthService {
       }
 
       if (!user.isActive) {
-        const error = new Error('Account is deactivated.');
+        const error = new Error(ACCOUNT_INACTIVE_MESSAGE);
         error.name = 'AuthError';
         throw error;
       }

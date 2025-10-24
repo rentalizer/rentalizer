@@ -113,8 +113,10 @@ export const LoginDialog = ({ trigger }: LoginDialogProps) => {
         errorMessage = error.message;
       }
       
+      const isInactiveAccount = errorMessage.toLowerCase().includes('account inactive');
+
       toast({
-        title: "❌ Authentication Failed",
+        title: isInactiveAccount ? "🚫 Account Inactive" : "❌ Authentication Failed",
         description: errorMessage,
         variant: "destructive",
       });

@@ -166,6 +166,11 @@ export interface AdminMembersParams {
   role?: 'user' | 'admin' | 'superadmin' | 'all';
 }
 
+export interface AdminUpdateMemberStatusResponse {
+  message: string;
+  user: User;
+}
+
 export interface UpdateProfileRequest {
   firstName?: string;
   lastName?: string;
@@ -641,6 +646,22 @@ class ApiService {
       const response = await api.get<AdminMembersResponse>(
         API_CONFIG.ENDPOINTS.ADMIN.MEMBERS,
         { params }
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
+  async updateAdminMemberStatus(
+    userId: string,
+    isActive: boolean
+  ): Promise<AdminUpdateMemberStatusResponse> {
+    try {
+      const response = await api.patch<AdminUpdateMemberStatusResponse>(
+        API_CONFIG.ENDPOINTS.ADMIN.USER_STATUS(userId),
+        { isActive }
       );
       return response.data;
     } catch (error) {

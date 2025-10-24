@@ -87,9 +87,11 @@ export const AccessGate: React.FC<AccessGateProps> = ({
       });
     } catch (error) {
       console.error('Login error:', error);
+      const description = error instanceof Error ? error.message : "Failed to sign in";
+      const isInactive = description.toLowerCase().includes('account inactive');
       toast({
-        title: "Login failed",
-        description: error instanceof Error ? error.message : "Failed to sign in",
+        title: isInactive ? "Account inactive" : "Login failed",
+        description,
         variant: "destructive"
       });
     } finally {
