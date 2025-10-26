@@ -1,7 +1,11 @@
 const Discussion = require('../models/Discussion');
 const User = require('../models/User');
+const r2StorageService = require('./r2StorageService');
 
 const MAX_PAGE_SIZE = 50;
+const MAX_ATTACHMENTS = 3;
+const MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024;
+const VALID_ATTACHMENT_TYPES = new Set(['image', 'video', 'document']);
 
 const parsePositiveInt = (value, fallback) => {
   const parsed = parseInt(value, 10);
@@ -58,6 +62,54 @@ const mapDiscussionForList = (discussion, requestingUserId) => {
   return sanitizedDiscussion;
 };
 
+const determineAttachmentType = (mimetype = '') => {
+  if (typeof mimetype !== 'string') {
+    return 'document';
+  }
+
+  if (mimetype.startsWith('image/')) {
+    return 'image';
+  }
+
+  if (mimetype.startsWith('video/')) {
+    return 'video';
+  }
+
+  return 'document';
+};
+
+const normalizeAttachments = (attachments = []) => {
+  if (!Array.isArray(attachments) || attachments.length === 0) {
+    return [];
+  }
+
+  return attachments
+    .filter(att => att && typeof att === 'object')
+    .slice(0, MAX_ATTACHMENTS)
+    .map(att => {
+      const sanitizedType = VALID_ATTACHMENT_TYPES.has(att.type)
+        ? att.type
+        : 'document';
+
+      const size = Number(att.size) || 0;
+      if (size > MAX_ATTACHMENT_SIZE) {
+        throw new Error('Attachment exceeds the maximum allowed size of 5MB');
+      }
+
+      if (!att.url || !att.filename) {
+        throw new Error('Attachment must include url and filename');
+      }
+
+      return {
+        type: sanitizedType,
+        url: att.url,
+        filename: att.filename,
+        size,
+        storageKey: att.storageKey || null
+      };
+    });
+};
+
 class DiscussionService {
   /**
    * Create a new discussion post
@@ -74,17 +126,21 @@ class DiscussionService {
       }
 
       // Set author information from user data
+      const { attachments: rawAttachments, ...restDiscussion } = discussionData || {};
       const authorName = user.firstName && user.lastName 
         ? `${user.firstName} ${user.lastName}` 
         : user.email.split('@')[0];
 
+      const attachments = normalizeAttachments(rawAttachments);
+
       const discussion = new Discussion({
-        ...discussionData,
+        ...restDiscussion,
         user_id: userId,
         author_name: discussionData.author_name || authorName,
         author_avatar: discussionData.author_avatar || user.profilePicture,
         is_admin_post: user.role === 'admin' || user.role === 'superadmin',
-        category: discussionData.category || 'General'
+        category: discussionData.category || 'General',
+        attachments
       });
 
       const savedDiscussion = await discussion.save();
@@ -240,23 +296,40 @@ class DiscussionService {
         throw new Error('Unauthorized: You can only update your own discussions');
       }
 
+      const { attachments: rawAttachments, ...restUpdates } = updateData || {};
+
       // Update allowed fields
       const allowedUpdates = ['title', 'content', 'category', 'tags'];
-      const updates = {};
-      
       allowedUpdates.forEach(field => {
-        if (updateData[field] !== undefined) {
-          updates[field] = updateData[field];
+        if (restUpdates[field] !== undefined) {
+          discussion[field] = restUpdates[field];
         }
       });
 
-      const updatedDiscussion = await Discussion.findByIdAndUpdate(
-        discussionId,
-        updates,
-        { new: true, runValidators: true }
-      ).populate('user_id', 'firstName lastName email profilePicture role');
+      if (rawAttachments !== undefined) {
+        const normalizedAttachments = normalizeAttachments(rawAttachments);
+        const previousKeys = (discussion.attachments || []).map(att => att.storageKey).filter(Boolean);
+        const nextKeySet = new Set(
+          normalizedAttachments
+            .map(att => att.storageKey)
+            .filter(Boolean)
+        );
 
-      return updatedDiscussion;
+        discussion.attachments = normalizedAttachments;
+
+        previousKeys
+          .filter(key => key && !nextKeySet.has(key))
+          .forEach(key => {
+            r2StorageService.deleteObject(key).catch(err => {
+              console.warn('⚠️  Failed to delete previous attachment from R2:', err.message);
+            });
+          });
+      }
+
+      await discussion.save();
+      await discussion.populate('user_id', 'firstName lastName email profilePicture role');
+
+      return discussion;
     } catch (error) {
       throw new Error(`Failed to update discussion: ${error.message}`);
     }
@@ -380,6 +453,29 @@ class DiscussionService {
       };
     } catch (error) {
       throw new Error(`Failed to toggle pin: ${error.message}`);
+    }
+  }
+
+  async uploadAttachment(file, userId) {
+    try {
+      if (!file) {
+        throw new Error('No attachment file provided');
+      }
+
+      const ownerId = userId || 'anonymous';
+      const { key, url } = await r2StorageService.uploadDiscussionAttachment(file, ownerId);
+
+      return {
+        key,
+        url,
+        filename: file.originalname,
+        size: file.size,
+        mimetype: file.mimetype,
+        type: determineAttachmentType(file.mimetype),
+        storageKey: key
+      };
+    } catch (error) {
+      throw new Error(`Failed to upload attachment: ${error.message}`);
     }
   }
 

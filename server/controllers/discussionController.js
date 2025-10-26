@@ -27,6 +27,36 @@ class DiscussionController {
   }
 
   /**
+   * Upload an attachment for discussions
+   * POST /api/discussions/attachments
+   */
+  async uploadAttachment(req, res) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: 'No attachment file provided'
+        });
+      }
+
+      const userId = req.user?.id;
+      const attachment = await discussionService.uploadAttachment(req.file, userId);
+
+      res.status(200).json({
+        success: true,
+        message: 'Attachment uploaded successfully',
+        data: attachment
+      });
+    } catch (error) {
+      console.error('Error uploading discussion attachment:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to upload attachment'
+      });
+    }
+  }
+
+  /**
    * Get all discussions with pagination and filtering
    * GET /api/discussions
    */

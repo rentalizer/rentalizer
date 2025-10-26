@@ -25,6 +25,11 @@ interface AttachedFile {
   url?: string;
   uploaded: boolean;
   uploading: boolean;
+  storageKey?: string | null;
+  type?: 'image' | 'video' | 'document';
+  size?: number;
+  mimetype?: string;
+  serverFilename?: string;
   error?: string;
 }
 
@@ -66,6 +71,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
 
   const isAdminUser = user?.role === 'admin' || user?.role === 'superadmin';
+  const MAX_ATTACHMENTS = 3;
+  const MAX_ATTACHMENT_SIZE_BYTES = 5 * 1024 * 1024;
 
   const getUserAvatar = () => {
     const avatar = supabaseProfile?.avatar_url || user?.profilePicture;
@@ -122,66 +129,48 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
   const uploadSingleFile = async (file: File, index: number): Promise<string | null> => {
     try {
-      // Update file status to uploading
-      setAttachedFiles(prev => prev.map((item, i) => 
+      setAttachedFiles(prev => prev.map((item, i) =>
         i === index ? { ...item, uploading: true, error: undefined } : item
       ));
 
-      // Check if user is authenticated
       if (!user) {
         console.error('User not authenticated');
-        setAttachedFiles(prev => prev.map((item, i) => 
+        setAttachedFiles(prev => prev.map((item, i) =>
           i === index ? { ...item, uploading: false, error: 'User not authenticated' } : item
         ));
         return null;
       }
 
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `community-attachments/${fileName}`;
+      console.log('Uploading attachment to R2 storage:', {
+        filename: file.name,
+        size: file.size
+      });
 
-      console.log('Uploading file to:', filePath);
-      console.log('User ID:', user.id);
-      console.log('File size:', file.size);
+      const data = await apiService.uploadDiscussionAttachment(file);
 
-      // Upload with explicit options
-      const { data, error } = await supabase.storage
-        .from('course-materials')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (error) {
-        console.error('Storage upload error:', error);
-        setAttachedFiles(prev => prev.map((item, i) => 
-          i === index ? { ...item, uploading: false, error: 'Upload failed: ' + error.message } : item
-        ));
-        return null;
-      }
-
-      console.log('Upload successful:', data);
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('course-materials')
-        .getPublicUrl(filePath);
-
-      console.log('Public URL:', publicUrl);
-
-      // Update file status to uploaded with URL
-      setAttachedFiles(prev => prev.map((item, i) => 
-        i === index ? { ...item, uploading: false, uploaded: true, url: publicUrl } : item
+      setAttachedFiles(prev => prev.map((item, i) =>
+        i === index
+          ? {
+              ...item,
+              uploading: false,
+              uploaded: true,
+              url: data.url,
+              storageKey: data.storageKey ?? data.key,
+              size: data.size,
+              mimetype: data.mimetype,
+              type: data.type,
+              serverFilename: data.filename
+            }
+          : item
       ));
 
-      // Show success message
-      setUploadSuccess(`${file.name} uploaded successfully!`);
+      setUploadSuccess(`${data.filename} uploaded successfully!`);
       setTimeout(() => setUploadSuccess(null), 3000);
 
-      return publicUrl;
+      return data.url;
     } catch (error) {
       console.error('Exception uploading file:', error);
-      setAttachedFiles(prev => prev.map((item, i) => 
+      setAttachedFiles(prev => prev.map((item, i) =>
         i === index ? { ...item, uploading: false, error: 'Upload failed: ' + (error as Error).message } : item
       ));
       return null;
@@ -353,20 +342,42 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    const validFiles = files.filter(file => {
-      // Limit file size to 10MB
-      if (file.size > 10 * 1024 * 1024) {
-        console.log("File too large:", `${file.name} is larger than 10MB`);
+    const remainingSlots = Math.max(0, MAX_ATTACHMENTS - attachedFiles.length);
+
+    if (remainingSlots <= 0) {
+      console.log('Attachment limit reached: Maximum of 3 attachments per post.');
+      if (event.target) {
+        event.target.value = '';
+      }
+      return;
+    }
+
+    if (files.length > remainingSlots) {
+      console.log(`Attachment limit: Only ${remainingSlots} more attachment${remainingSlots === 1 ? '' : 's'} can be added.`);
+    }
+
+    const limitedFiles = files.slice(0, remainingSlots);
+    const validFiles = limitedFiles.filter(file => {
+      if (file.size > MAX_ATTACHMENT_SIZE_BYTES) {
+        console.log("File too large:", `${file.name} exceeds the 5MB limit.`);
         return false;
       }
       return true;
     });
 
-    if (validFiles.length === 0) return;
+    if (validFiles.length === 0) {
+      if (event.target) {
+        event.target.value = '';
+      }
+      return;
+    }
 
     // Check if user is authenticated before proceeding
     if (!user) {
       console.log("Authentication required: Please sign in to upload files");
+      if (event.target) {
+        event.target.value = '';
+      }
       return;
     }
 
@@ -545,17 +556,17 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
       const postTitleToUse = postTitle.trim() || 
         (newPost.length > 50 ? newPost.substring(0, 50) + '...' : newPost);
       
-      // Add file attachments, video, and photo to post content if any were uploaded
+      // Add media references to content if video or photos are included
       let contentWithMedia = newPost;
       const uploadedFiles = attachedFiles.filter(item => item.uploaded && item.url);
-      
-      if (uploadedFiles.length > 0) {
-        const fileLinks = uploadedFiles.map(item => {
-          const fileName = item.file.name;
-          return `📎 [${fileName}](${item.url})`;
-        }).join('\n');
-        contentWithMedia = `${newPost}\n\n${fileLinks}`;
-      }
+
+      const attachmentsPayload = uploadedFiles.map(item => ({
+        type: item.type || (isImageFile(item.file) ? 'image' : 'document'),
+        url: item.url!,
+        filename: item.serverFilename || item.file.name,
+        size: item.size ?? item.file.size,
+        storageKey: item.storageKey ?? null
+      }));
       
       // Add video if uploaded
       if (videoUpload?.uploaded && videoUpload.url) {
@@ -575,7 +586,8 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
         content: contentWithMedia,
         author_name: getUserName(),
         category: 'General',
-        author_avatar: user?.profilePicture
+        author_avatar: user?.profilePicture,
+        attachments: attachmentsPayload
       });
       
       const response = await apiService.createDiscussion({
@@ -583,12 +595,13 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
         content: contentWithMedia,
         author_name: getUserName(),
         category: 'General',
-        author_avatar: user?.profilePicture
+        author_avatar: user?.profilePicture,
+        attachments: attachmentsPayload
       });
       
       console.log('Discussion created successfully:', response.data);
 
-      const attachmentCount = uploadedFiles.length + (videoUpload?.uploaded ? 1 : 0) + uploadedPhotos.length;
+      const attachmentCount = attachmentsPayload.length + (videoUpload?.uploaded ? 1 : 0) + uploadedPhotos.length;
       console.log("Post created:", attachmentCount > 0 
         ? `Your post has been shared with ${attachmentCount} attachment(s)`
         : "Your post has been shared with the community");
@@ -698,6 +711,9 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                         </span>
                       )}
                     </div>
+                    <p className={`text-xs ${isDayMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                      Up to 3 files, 5MB each.
+                    </p>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {attachedFiles.map((item, index) => (
@@ -718,7 +734,7 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                                   {item.file.name}
                                 </div>
                                 <div className="text-xs text-gray-400">
-                                  {(item.file.size / 1024 / 1024).toFixed(2)} MB
+                                  {(((item.size ?? item.file.size) / (1024 * 1024))).toFixed(2)} MB
                                   {item.error && (
                                     <span className="text-red-400 ml-2">• {item.error}</span>
                                   )}
@@ -994,17 +1010,24 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                     accept="video/mp4,video/mov,video/avi,video/webm,video/quicktime"
                   />
                   
-                  {/* <div className="relative">
+                  <div className="relative">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className={`${attachedFiles.length > 0 ? 'text-cyan-400 bg-cyan-500/10' : 'text-gray-400'} hover:text-cyan-300 relative`}
+                      disabled={attachedFiles.length >= MAX_ATTACHMENTS}
+                      className={`${attachedFiles.length > 0 ? 'text-cyan-400 bg-cyan-500/10' : 'text-gray-400'} hover:text-cyan-300 relative disabled:opacity-60 disabled:cursor-not-allowed`}
                       onClick={handleFileAttach}
-                      title={attachedFiles.length > 0 ? `${attachedFiles.length} file(s) attached` : 'Attach files'}
+                      title={
+                        attachedFiles.length >= MAX_ATTACHMENTS
+                          ? 'Maximum of 3 attachments reached'
+                          : attachedFiles.length > 0
+                            ? `${attachedFiles.length} attachment${attachedFiles.length === 1 ? '' : 's'} added`
+                            : 'Attach files'
+                      }
                     >
                       <Paperclip className="h-4 w-4" />
                       {attachedFiles.length > 0 && (
-                        <span className="ml-1 text-xs bg-cyan-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                        <span className="ml-1 text-xs bg-cyan-500 text-white rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center">
                           {attachedFiles.length}
                         </span>
                       )}
@@ -1016,16 +1039,16 @@ export const CommunityHeader: React.FC<CommunityHeaderProps> = ({ onPostCreated,
                         {uploadSuccess}
                       </div>
                     )}
-                  </div> */}
+                  </div>
                   
-                  {/* <input
+                  <input
                     ref={fileInputRef}
                     type="file"
                     multiple
                     className="hidden"
                     onChange={handleFileSelect}
-                    accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.gif,.mp4,.mp3,.zip,.rar"
-                  /> */}
+                    accept=".pdf,.doc,.docx,.txt,.md,.csv,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.gif,.webp,.zip"
+                  />
 
                   <div className="relative">
                     <Button

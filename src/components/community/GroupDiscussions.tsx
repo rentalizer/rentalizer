@@ -995,9 +995,40 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   }, []);
 
   // Render markdown content with images
-  const renderContent = useCallback((content: string) => {
+  const renderContent = useCallback((discussion: DiscussionType, content: string) => {
     const attachmentPattern = /📎 \[([^\]]+)\]\(([^)]+)\)/g;
-    const attachmentMatches = Array.from(content.matchAll(attachmentPattern));
+    const legacyAttachmentMatches = Array.from(content.matchAll(attachmentPattern)).map(match => ({
+      filename: match[1],
+      url: match[2]
+    }));
+
+    const structuredAttachments = Array.isArray(discussion.attachments)
+      ? discussion.attachments
+      : [];
+
+    const attachmentMap = new Map<string, { filename: string; url: string; size?: number; type?: string }>();
+
+    structuredAttachments.forEach(att => {
+      if (att && att.url) {
+        attachmentMap.set(att.url, {
+          filename: att.filename || 'Attachment',
+          url: att.url,
+          size: att.size,
+          type: att.type
+        });
+      }
+    });
+
+    legacyAttachmentMatches.forEach(att => {
+      if (att.url && !attachmentMap.has(att.url)) {
+        attachmentMap.set(att.url, {
+          filename: att.filename,
+          url: att.url
+        });
+      }
+    });
+
+    const attachmentsToRender = Array.from(attachmentMap.values());
 
     const contentWithoutAttachments = content
       .replace(/📎 \[[^\]]+\]\([^)]+\)\s*/g, '')
@@ -1061,39 +1092,47 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
       );
     }
 
-    if (attachmentMatches.length > 0) {
+    if (attachmentsToRender.length > 0) {
       output.push(
         <div key="attachments" className="mt-4 space-y-2">
           <span className={`text-sm font-medium ${isDayMode ? 'text-cyan-600' : 'text-cyan-300'}`}>
             Attachments
           </span>
           <div className="space-y-2">
-            {attachmentMatches.map((match, idx) => {
-              const fileName = match[1];
-              const fileUrl = match[2];
+            {attachmentsToRender.map((attachment, idx) => {
+              const sizeInMb = attachment.size
+                ? (attachment.size / (1024 * 1024)).toFixed(2)
+                : null;
 
               return (
                 <div
                   key={`attachment-${idx}`}
-                  className={`flex flex-wrap items-center gap-3 rounded-lg border p-3 ${isDayMode ? 'border-slate-300 bg-white/70' : 'border-slate-600 bg-slate-700/40'}`}
+                  className={`flex flex-col sm:flex-row sm:items-center gap-3 rounded-lg border p-3 ${isDayMode ? 'border-slate-300 bg-white/70' : 'border-slate-600 bg-slate-700/40'}`}
                 >
-                  <div className="flex flex-1 min-w-0 items-center gap-3">
-                    <span className={`flex h-10 w-10 items-center justify-center rounded-md ${isDayMode ? 'bg-cyan-500/10 text-cyan-600' : 'bg-cyan-500/10 text-cyan-300'}`}>
+                  <div className="flex flex-1 w-full items-start gap-3">
+                    <span className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md ${isDayMode ? 'bg-cyan-500/10 text-cyan-600' : 'bg-cyan-500/10 text-cyan-300'}`}>
                       <Paperclip className="h-5 w-5" />
                     </span>
-                    <span
-                      className={`block truncate text-sm font-medium ${isDayMode ? 'text-slate-700' : 'text-white'}`}
-                      title={fileName}
-                    >
-                      {fileName}
-                    </span>
+                    <div className="min-w-0 space-y-1">
+                      <span
+                        className={`block truncate text-sm font-medium ${isDayMode ? 'text-slate-700' : 'text-white'}`}
+                        title={attachment.filename}
+                      >
+                        {attachment.filename}
+                      </span>
+                      {sizeInMb && (
+                        <span className="text-xs text-slate-400">
+                          {sizeInMb} MB
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <a
-                    href={fileUrl}
+                    href={attachment.url}
                     download
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${isDayMode ? 'border-cyan-500/40 text-cyan-600 hover:bg-cyan-500/10' : 'border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10'}`}
+                    className={`inline-flex items-center gap-2 self-start rounded-md border px-3 py-1.5 text-sm font-medium transition-colors ${isDayMode ? 'border-cyan-500/40 text-cyan-600 hover:bg-cyan-500/10' : 'border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/10'}`}
                   >
                     <Download className="h-4 w-4" />
                     Download
@@ -1490,7 +1529,7 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
                                     isDayMode ? 'text-slate-600 hover:text-slate-700' : 'text-gray-300 hover:text-gray-200'
                                   }`}
                                 >
-                                  {renderContent(displayContent)}
+                                  {renderContent(discussion, displayContent)}
                                   {shouldTruncate && (
                                     <button
                                       onClick={() => setExpandedPost(isExpanded ? null : discussion.id)}

@@ -60,6 +60,39 @@ const documentFileFilter = (req, file, cb) => {
   }
 };
 
+const attachmentFileFilter = (req, file, cb) => {
+  const allowedMimes = new Set([
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-excel',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+    'application/vnd.ms-powerpoint.presentation.macroenabled.12',
+    'application/vnd.ms-excel.sheet.macroenabled.12',
+    'text/plain',
+    'text/markdown',
+    'text/csv',
+    'application/vnd.oasis.opendocument.text',
+    'application/vnd.oasis.opendocument.spreadsheet',
+    'application/vnd.oasis.opendocument.presentation',
+    'application/zip',
+    'application/x-zip-compressed'
+  ]);
+
+  if (file.mimetype.startsWith('image/')) {
+    return cb(null, true);
+  }
+
+  if (allowedMimes.has(file.mimetype)) {
+    return cb(null, true);
+  }
+
+  cb(new Error('Unsupported attachment file type'), false);
+};
+
 const memoryStorage = multer.memoryStorage();
 
 // Configure multer for images
@@ -93,6 +126,14 @@ const documentUpload = multer({
   fileFilter: documentFileFilter,
   limits: {
     fileSize: 20 * 1024 * 1024, // 20MB limit for documents
+  }
+});
+
+const discussionAttachmentUpload = multer({
+  storage: memoryStorage,
+  fileFilter: attachmentFileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit for attachments
   }
 });
 
@@ -136,6 +177,15 @@ const uploadDocument = (req, res, next) => {
   });
 };
 
+const uploadDiscussionAttachment = (req, res, next) => {
+  discussionAttachmentUpload.single('attachment')(req, res, (err) => {
+    if (err) {
+      return next(err);
+    }
+    next();
+  });
+};
+
 // Error handling middleware
 const handleUploadError = (error, req, res, next) => {
   if (error instanceof multer.MulterError) {
@@ -166,6 +216,13 @@ const handleUploadError = (error, req, res, next) => {
       message: 'Unsupported document file type. Please upload PDF, Office, text, or CSV files.'
     });
   }
+
+  if (error.message === 'Unsupported attachment file type') {
+    return res.status(400).json({
+      success: false,
+      message: 'Unsupported attachment file type. Please upload images, PDF, Office, text, CSV, or ZIP files.'
+    });
+  }
   
   next(error);
 };
@@ -175,5 +232,6 @@ module.exports = {
   uploadPhoto,
   uploadAvatar,
   uploadDocument,
+  uploadDiscussionAttachment,
   handleUploadError
 };

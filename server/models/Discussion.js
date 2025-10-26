@@ -95,6 +95,10 @@ const discussionSchema = new mongoose.Schema({
     size: {
       type: Number,
       required: true
+    },
+    storageKey: {
+      type: String,
+      default: null
     }
   }],
   is_active: {

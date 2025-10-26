@@ -221,6 +221,7 @@ export interface Discussion {
     url: string;
     filename: string;
     size: number;
+    storageKey?: string | null;
   }>;
   is_active: boolean;
   last_activity: string;
@@ -237,6 +238,13 @@ export interface CreateDiscussionRequest {
   author_avatar?: string;
   category?: string;
   tags?: string[];
+  attachments?: Array<{
+    type: 'image' | 'video' | 'document';
+    url: string;
+    filename: string;
+    size: number;
+    storageKey?: string | null;
+  }>;
 }
 
 export interface UpdateDiscussionRequest {
@@ -244,6 +252,13 @@ export interface UpdateDiscussionRequest {
   content?: string;
   category?: string;
   tags?: string[];
+  attachments?: Array<{
+    type: 'image' | 'video' | 'document';
+    url: string;
+    filename: string;
+    size: number;
+    storageKey?: string | null;
+  }>;
 }
 
 export interface DiscussionResponse {
@@ -292,6 +307,16 @@ export interface PinResponse {
     discussion: Discussion;
     isPinned: boolean;
   };
+}
+
+export interface DiscussionAttachmentUploadData {
+  key: string;
+  url: string;
+  filename: string;
+  size: number;
+  mimetype: string;
+  type: 'image' | 'video' | 'document';
+  storageKey?: string | null;
 }
 
 // Comment types
@@ -776,6 +801,32 @@ class ApiService {
   }
 
   // Discussion endpoints
+  async uploadDiscussionAttachment(file: File): Promise<DiscussionAttachmentUploadData> {
+    try {
+      const formData = new FormData();
+      formData.append('attachment', file);
+
+      const response = await api.post<{
+        success: boolean;
+        message: string;
+        data: DiscussionAttachmentUploadData;
+      }>('/discussions/attachments', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      if (!response.data.success) {
+        throw new Error(response.data.message || 'Failed to upload attachment');
+      }
+
+      return response.data.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
   async createDiscussion(data: CreateDiscussionRequest): Promise<DiscussionResponse> {
     try {
       const response = await api.post<DiscussionResponse>('/discussions', data);

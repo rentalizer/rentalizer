@@ -145,6 +145,35 @@ const validateDiscussion = [
     .trim()
     .isLength({ min: 1, max: 50 })
     .withMessage('Each tag must be between 1 and 50 characters'),
+  body('attachments')
+    .optional()
+    .isArray()
+    .withMessage('Attachments must be an array')
+    .custom((attachments) => !attachments || attachments.length <= 3)
+    .withMessage('You can add up to 3 attachments'),
+  body('attachments.*.type')
+    .optional()
+    .isIn(['image', 'video', 'document'])
+    .withMessage('Attachment type must be image, video, or document'),
+  body('attachments.*.url')
+    .optional()
+    .trim()
+    .isURL()
+    .withMessage('Attachment URL must be a valid URL'),
+  body('attachments.*.filename')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 255 })
+    .withMessage('Attachment filename must be between 1 and 255 characters'),
+  body('attachments.*.size')
+    .optional()
+    .isInt({ min: 0, max: 5 * 1024 * 1024 })
+    .withMessage('Attachment size must be 5MB or smaller'),
+  body('attachments.*.storageKey')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 512 })
+    .withMessage('Attachment storage key must be between 1 and 512 characters'),
   handleValidationErrors
 ];
 
@@ -173,6 +202,35 @@ const validateDiscussionUpdate = [
     .trim()
     .isLength({ min: 1, max: 50 })
     .withMessage('Each tag must be between 1 and 50 characters'),
+  body('attachments')
+    .optional()
+    .isArray()
+    .withMessage('Attachments must be an array')
+    .custom((attachments) => !attachments || attachments.length <= 3)
+    .withMessage('You can add up to 3 attachments'),
+  body('attachments.*.type')
+    .optional()
+    .isIn(['image', 'video', 'document'])
+    .withMessage('Attachment type must be image, video, or document'),
+  body('attachments.*.url')
+    .optional()
+    .trim()
+    .isURL()
+    .withMessage('Attachment URL must be a valid URL'),
+  body('attachments.*.filename')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 255 })
+    .withMessage('Attachment filename must be between 1 and 255 characters'),
+  body('attachments.*.size')
+    .optional()
+    .isInt({ min: 0, max: 5 * 1024 * 1024 })
+    .withMessage('Attachment size must be 5MB or smaller'),
+  body('attachments.*.storageKey')
+    .optional()
+    .trim()
+    .isLength({ min: 1, max: 512 })
+    .withMessage('Attachment storage key must be between 1 and 512 characters'),
   handleValidationErrors
 ];
 

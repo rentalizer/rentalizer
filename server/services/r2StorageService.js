@@ -55,6 +55,18 @@ const buildDocumentKey = (category, originalName = '') => {
   ].join('/');
 };
 
+const buildDiscussionAttachmentKey = (userId, originalName = '') => {
+  const extension = path.extname(originalName) || '.bin';
+  const safeExtension = extension.split('?')[0] || '.bin';
+  const ownerSegment = sanitizeSegment(userId);
+  return [
+    'attachments',
+    'discussions',
+    ownerSegment,
+    `${Date.now()}-${crypto.randomUUID()}${safeExtension}`
+  ].join('/');
+};
+
 const buildThumbnailKey = (originalName = '') => {
   const extension = path.extname(originalName) || '.png';
   const safeExtension = extension.split('?')[0] || '.png';
@@ -171,6 +183,31 @@ const uploadThumbnailImage = async ({ buffer, mimetype, originalname }) => {
   };
 };
 
+const uploadDiscussionAttachment = async ({ buffer, mimetype, originalname }, userId) => {
+  if (!buffer) {
+    throw new Error('Attachment file buffer is required');
+  }
+
+  if (!bucketName) {
+    throw new Error('R2 bucket name is not configured');
+  }
+
+  const key = buildDiscussionAttachmentKey(userId, originalname);
+
+  await s3Client.send(new PutObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+    Body: buffer,
+    ContentType: mimetype || 'application/octet-stream',
+    CacheControl: 'public, max-age=86400'
+  }));
+
+  return {
+    key,
+    url: buildPublicUrl(key)
+  };
+};
+
 const deleteObject = async (key) => {
   if (!key || !bucketName) {
     return false;
@@ -191,6 +228,7 @@ const deleteObject = async (key) => {
 module.exports = {
   uploadAvatar,
   uploadDocument,
+  uploadDiscussionAttachment,
   uploadThumbnailImage,
   deleteObject,
   extractKeyFromUrl,
