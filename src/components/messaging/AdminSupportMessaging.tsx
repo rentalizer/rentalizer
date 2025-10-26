@@ -546,7 +546,7 @@ export default function AdminSupportMessaging({
             <p className="text-slate-300">Loading messages...</p>
           </div>
         ) : (
-          <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden shadow-lg flex flex-col h-full">
+          <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden shadow-lg flex flex-col h-full min-h-0">
             {/* Unread Messages Notification Banner for Users */}
             {totalUnread > 0 && (
               <div className="bg-red-500/10 border-b border-red-500/20 px-4 py-2 flex items-center justify-center gap-2">
@@ -591,7 +591,7 @@ export default function AdminSupportMessaging({
 
   // Admin view - full messaging interface
   return (
-    <div className="flex h-[600px] flex-col overflow-hidden rounded-lg border border-slate-700 bg-slate-800 shadow-lg sm:h-[600px] sm:flex-row">
+    <div className="flex h-[600px] min-h-0 flex-col overflow-hidden rounded-lg border border-slate-700 bg-slate-800 shadow-lg sm:h-[600px] sm:flex-row">
       {/* Mobile Toggle */}
       <div className="flex items-center justify-between border-b border-slate-700 bg-slate-900/80 px-4 py-2 sm:hidden">
         <div className="flex items-center gap-2 text-sm text-slate-200">
@@ -613,7 +613,7 @@ export default function AdminSupportMessaging({
       </div>
 
       {/* Main Chat Area */}
-      <div className={`${showMembersPanel ? 'hidden' : 'flex'} flex-1 flex-col bg-slate-800/90 sm:flex`}>
+      <div className={`${showMembersPanel ? 'hidden' : 'flex'} flex-1 flex-col bg-slate-800/90 sm:flex min-h-0`}>
         {/* Unread Messages Notification Banner */}
         {totalUnread > 0 && (
           <div className="bg-red-500/10 border-b border-red-500/20 px-4 py-2 flex items-center justify-between">
@@ -686,7 +686,7 @@ export default function AdminSupportMessaging({
       </div>
 
       {/* Members List */}
-      <div className={`${showMembersPanel ? 'flex' : 'hidden'} h-full w-full sm:flex sm:w-80 sm:min-w-[18rem] border-t border-slate-700 bg-slate-900/60 sm:border-t-0 sm:border-l`}>
+      <div className={`${showMembersPanel ? 'flex' : 'hidden'} h-full min-h-0 w-full sm:flex sm:w-80 sm:min-w-[18rem] border-t border-slate-700 bg-slate-900/60 sm:border-t-0 sm:border-l`}>
         <MembersList
           members={conversations}
           selectedMemberId={selectedMemberId}

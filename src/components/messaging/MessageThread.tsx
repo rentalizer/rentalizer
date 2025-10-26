@@ -138,7 +138,7 @@ export default function MessageThread({
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-800 border border-slate-700 rounded-lg">
+    <div className="flex flex-col h-full min-h-0 bg-slate-800 border border-slate-700 rounded-lg">
       {/* Header */}
       <div className="flex items-center gap-3 p-4 border-b border-slate-700">
         <div className="relative">
@@ -207,7 +207,7 @@ export default function MessageThread({
       </div>
 
       {/* Messages */}
-      <div ref={messagesContainerRef} className="flex-1 p-4 overflow-y-auto">
+      <div ref={messagesContainerRef} className="flex-1 min-h-0 p-4 overflow-y-auto">
         <div className="space-y-3">
           {messages.map((message) => {
             const isOwn = message.sender_id === currentUserId;

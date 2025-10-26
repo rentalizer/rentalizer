@@ -89,7 +89,7 @@ export default function MembersList({
   };
 
   return (
-    <div className="w-full sm:w-80 bg-slate-800/90 border-t border-slate-700 sm:border-t-0 sm:border-l flex flex-col">
+    <div className="w-full sm:w-80 bg-slate-800/90 border-t border-slate-700 sm:border-t-0 sm:border-l flex flex-col min-h-0">
       {/* Header */}
       <div className="p-4 border-b border-slate-700">
         <h3 className="text-lg font-semibold text-white mb-3">Members</h3>
@@ -107,7 +107,7 @@ export default function MembersList({
       </div>
 
       {/* Members List */}
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 min-h-0">
         <div className="p-2">
           {sortedMembers.length === 0 ? (
             <div className="text-center py-8">
