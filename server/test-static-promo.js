@@ -2,7 +2,7 @@ const axios = require('axios');
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:5000/api';
 const STATIC_PROMO_CODE =
-  (process.env.STATIC_PROMO_CODE || process.env.MULTI_USE_PROMO_CODE || 'TESTACCESS').trim().toUpperCase();
+  (process.env.STATIC_PROMO_CODE || process.env.MULTI_USE_PROMO_CODE || 'RENTALIZER281').trim().toUpperCase();
 
 if (!STATIC_PROMO_CODE) {
   console.error('❌ STATIC_PROMO_CODE (or MULTI_USE_PROMO_CODE) environment variable must be set.');

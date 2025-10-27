@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const PromoCode = require('../models/PromoCode');
 
 // Reusable promo code for testing/onboarding; override via environment variables if needed.
-const DEFAULT_STATIC_PROMO_CODE = 'TESTACCESS';
+const DEFAULT_STATIC_PROMO_CODE = 'RENTALIZER281';
 const STATIC_PROMO_CODE = (
   process.env.STATIC_PROMO_CODE ||
   process.env.MULTI_USE_PROMO_CODE ||
