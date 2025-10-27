@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 // Extend Window interface for Calendly
 declare global {
@@ -76,7 +76,15 @@ interface UserProfile {
   role?: string;
 }
 
-export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean }) => {
+export const GroupDiscussions = ({
+  isDayMode = false,
+  highlightDiscussionId,
+  highlightToken,
+}: {
+  isDayMode?: boolean;
+  highlightDiscussionId?: string;
+  highlightToken?: number;
+}) => {
   const { user, profile } = useAuth();
   const { profile: supabaseProfile } = useProfile();
   const { isAdmin } = useAdminRole();
@@ -119,6 +127,58 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
   const [hasMorePosts, setHasMorePosts] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const POSTS_PER_PAGE = 7;
+  const highlightAppliedRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!highlightDiscussionId) {
+      highlightAppliedRef.current = null;
+      return;
+    }
+
+    const highlightSignature = `${highlightDiscussionId}:${highlightToken ?? '0'}`;
+
+    if (highlightAppliedRef.current === highlightSignature) {
+      return;
+    }
+
+    if (discussionsList.length === 0) {
+      return;
+    }
+
+    const targetDiscussion = discussionsList.find(
+      (discussion) =>
+        discussion.id === highlightDiscussionId || discussion._id === highlightDiscussionId
+    );
+
+    if (!targetDiscussion) {
+      return;
+    }
+
+    highlightAppliedRef.current = highlightSignature;
+    setExpandedPost(targetDiscussion.id);
+    setSelectedDiscussion(targetDiscussion);
+
+    requestAnimationFrame(() => {
+      const element = document.getElementById(`discussion-${targetDiscussion.id}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        element.classList.add(
+          'ring-2',
+          'ring-cyan-400',
+          'ring-offset-2',
+          'ring-offset-slate-900'
+        );
+        setTimeout(() => {
+          element.classList.remove(
+            'ring-2',
+            'ring-cyan-400',
+            'ring-offset-2',
+            'ring-offset-slate-900'
+          );
+        }, 2500);
+      }
+    });
+  }, [highlightDiscussionId, highlightToken, discussionsList]);
 
   // Check if user needs to set up profile
   useEffect(() => {
@@ -1258,7 +1318,11 @@ export const GroupDiscussions = ({ isDayMode = false }: { isDayMode?: boolean })
               const profileInfo = getProfileInfo(discussion.user_id, discussion.author, discussion.avatar);
               
               return (
-                <Card key={discussion.id} className="bg-slate-800/50 border-gray-700/50 hover:bg-slate-800/70 transition-all duration-300 ease-in-out">
+                <Card
+                  key={discussion.id}
+                  id={`discussion-${discussion.id}`}
+                  className="bg-slate-800/50 border-gray-700/50 hover:bg-slate-800/70 transition-all duration-300 ease-in-out scroll-mt-28"
+                >
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex items-start gap-3 sm:gap-4">
                       {/* User Avatar */}

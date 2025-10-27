@@ -1,5 +1,5 @@
 // Community Component - Fixed TopNavBar issue
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -86,10 +86,14 @@ const Community = React.memo(() => {
     const urlParams = new URLSearchParams(location.search);
     const hashParams = new URLSearchParams(location.hash.split('?')[1] || '');
     const messageUserId = urlParams.get('messageUserId') || hashParams.get('messageUserId');
+    const highlightDiscussionId = urlParams.get('highlightDiscussion') || hashParams.get('highlightDiscussion');
     
     // If navigating from GroupDiscussions to message a user, start on admin-support tab
     if (messageUserId) {
       return 'admin-support';
+    }
+    if (highlightDiscussionId) {
+      return 'discussions';
     }
     return getInitialTab();
   });
@@ -109,10 +113,18 @@ const Community = React.memo(() => {
   // Check for URL parameters from GroupDiscussions (both search and hash)
   const urlParams = new URLSearchParams(location.search);
   const hashParams = new URLSearchParams(location.hash.split('?')[1] || '');
+  const locationState =
+    (location.state as { highlightDiscussionId?: string; highlightToken?: number } | null) || null;
   const navigationState = {
     messageUserId: urlParams.get('messageUserId') || hashParams.get('messageUserId'),
     messageUserName: urlParams.get('messageUserName') || hashParams.get('messageUserName'),
-    fromDiscussion: urlParams.get('fromDiscussion') || hashParams.get('fromDiscussion')
+    fromDiscussion: urlParams.get('fromDiscussion') || hashParams.get('fromDiscussion'),
+    highlightDiscussionId:
+      urlParams.get('highlightDiscussion') ||
+      hashParams.get('highlightDiscussion') ||
+      locationState?.highlightDiscussionId ||
+      null,
+    highlightToken: locationState?.highlightToken ?? null,
   };
   
   // Check if we're in Lovable environment
@@ -130,11 +142,50 @@ const Community = React.memo(() => {
     return !user; // Only loading if user is not loaded yet
   }, [user]);
 
+  const [highlightIntent, setHighlightIntent] = useState<{ id: string; token: number } | null>(null);
+
   useEffect(() => {
     if (!userIsAdmin && (activeTab === 'promo-codes' || activeTab === 'members')) {
       setActiveTab('discussions');
     }
   }, [userIsAdmin, activeTab]);
+
+  useEffect(() => {
+    if (navigationState.highlightDiscussionId) {
+      setHighlightIntent({
+        id: navigationState.highlightDiscussionId,
+        token: navigationState.highlightToken ?? Date.now(),
+      });
+    }
+  }, [navigationState.highlightDiscussionId, navigationState.highlightToken]);
+
+  const handleHighlightEvent = useCallback(
+    (event: Event) => {
+      const customEvent = event as CustomEvent<{ highlightDiscussionId?: string; highlightToken?: number }>;
+      const detail = customEvent.detail;
+      if (!detail || !detail.highlightDiscussionId) {
+        return;
+      }
+      setHighlightIntent({
+        id: detail.highlightDiscussionId,
+        token: detail.highlightToken ?? Date.now(),
+      });
+    },
+    []
+  );
+
+  useEffect(() => {
+    window.addEventListener('rentalizer-highlight-discussion', handleHighlightEvent);
+    return () => {
+      window.removeEventListener('rentalizer-highlight-discussion', handleHighlightEvent);
+    };
+  }, [handleHighlightEvent]);
+
+  useEffect(() => {
+    if (highlightIntent?.id && activeTab !== 'discussions') {
+      setActiveTab('discussions');
+    }
+  }, [highlightIntent?.id, activeTab]);
   
   
   // Update URL hash when tab changes - debounced to prevent excessive updates
@@ -148,16 +199,24 @@ const Community = React.memo(() => {
 
   // Clear URL parameters after initial navigation to prevent re-redirects
   useEffect(() => {
-    if (navigationState.messageUserId) {
-      // Clear the URL parameters after a short delay to allow the component to initialize
+    if (navigationState.messageUserId || navigationState.highlightDiscussionId) {
       const timeoutId = setTimeout(() => {
-        const cleanUrl = window.location.pathname + window.location.hash;
-        window.history.replaceState({}, '', cleanUrl);
+        if (location.state) {
+          window.history.replaceState({}, '', `${location.pathname}${location.search}${location.hash}`);
+        }
       }, 1000);
 
       return () => clearTimeout(timeoutId);
     }
-  }, [navigationState.messageUserId]);
+  }, [
+    navigationState.messageUserId,
+    navigationState.highlightDiscussionId,
+    navigationState.highlightToken,
+    location.pathname,
+    location.search,
+    location.hash,
+    location.state,
+  ]);
   
   // Calculator state
   const initialData: CalculatorData = {
@@ -378,7 +437,10 @@ const Community = React.memo(() => {
 
           {/* Other Tabs */}
           <TabsContent value="discussions" className="mt-8">
-            <GroupDiscussions />
+            <GroupDiscussions
+              highlightDiscussionId={highlightIntent?.id}
+              highlightToken={highlightIntent?.token}
+            />
           </TabsContent>
           <TabsContent value="calendar" className="mt-8">
             <CommunityCalendar />

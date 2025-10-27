@@ -1,18 +1,37 @@
 
 import React from 'react';
-import { BarChart3, User, LogOut, Calendar, MessageSquare, Menu, Bell } from 'lucide-react';
+import { BarChart3, User, LogOut, Bell, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import AdminSupportButton from '@/components/AdminSupportButton';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useQuery } from '@tanstack/react-query';
+import apiService from '@/services/api';
+import { formatDistanceToNow } from 'date-fns';
 
 export const TopNavBar = () => {
   const { user, signOut, isLoading } = useAuth();
   const { isAdmin } = useAdminRole();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { data: recentPostsData, isLoading: notificationsLoading, isError: notificationsError } = useQuery({
+    queryKey: ['admin-recent-discussions'],
+    queryFn: () => apiService.getDiscussions({
+      page: 1,
+      limit: 5,
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
+    }),
+    enabled: Boolean(user && isAdmin),
+    staleTime: 60 * 1000,
+    refetchInterval: 60 * 1000,
+  });
+
+  const recentPosts = recentPostsData?.data?.slice(0, 5) ?? [];
+  const notificationsCount = recentPosts.length;
 
   const handleSignOut = async () => {
     try {
@@ -77,6 +96,94 @@ export const TopNavBar = () => {
           <div className="flex items-center space-x-4">
             {user && (
               <div className="flex items-center gap-4">
+                {isAdmin && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="relative h-10 w-10 shrink-0 rounded-full border border-cyan-500/30 bg-slate-800/60 text-cyan-300 hover:bg-slate-700/70 hover:text-cyan-200"
+                      >
+                        <Bell className="h-5 w-5" />
+                        {notificationsCount > 0 && (
+                          <span className="absolute -top-1 -right-1 flex h-4 min-w-[18px] items-center justify-center rounded-full bg-red-500 text-[11px] font-semibold text-white">
+                            {notificationsCount > 9 ? '9+' : notificationsCount}
+                          </span>
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-80 border border-slate-700/60 bg-slate-900/95 text-white shadow-xl backdrop-blur"
+                    >
+                      <DropdownMenuLabel className="text-xs uppercase tracking-wide text-slate-400">
+                        Recent Community Posts
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator className="bg-slate-800/80" />
+                      <div className="max-h-72 overflow-y-auto">
+                        {notificationsLoading ? (
+                          <div className="flex items-center justify-center py-6 text-slate-400">
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin text-cyan-300" />
+                            Loading posts...
+                          </div>
+                        ) : notificationsError ? (
+                          <div className="px-3 py-4 text-sm text-red-300">
+                            Unable to load community updates right now.
+                          </div>
+                        ) : notificationsCount === 0 ? (
+                          <div className="px-3 py-4 text-sm text-slate-400">
+                            No recent member posts yet.
+                          </div>
+                        ) : (
+                          recentPosts.map((post, index) => {
+                            const createdAt = post.created_at || post.createdAt;
+                            const timestamp = createdAt ? formatDistanceToNow(new Date(createdAt), { addSuffix: true }) : 'Just now';
+                            const title = post.title || 'Untitled discussion';
+                            const author = post.author_name || 'Community Member';
+                            const key = post._id || post.id || `post-${index}`;
+
+                            return (
+                              <DropdownMenuItem
+                                key={key}
+                                className="flex flex-col items-start gap-1 rounded-md bg-transparent px-3 py-2 text-left text-sm hover:bg-slate-800/80 focus:bg-slate-800/80"
+                                onSelect={() => {
+                                  const statePayload = {
+                                    highlightDiscussionId: key,
+                                    highlightToken: Date.now(),
+                                  };
+
+                                  if (location.pathname === '/community') {
+                                    window.dispatchEvent(
+                                      new CustomEvent('rentalizer-highlight-discussion', {
+                                        detail: statePayload,
+                                      })
+                                    );
+                                  } else {
+                                    navigate('/community', {
+                                      state: statePayload,
+                                    });
+                                  }
+                                }}
+                              >
+                                <span className="w-full truncate font-medium text-white">{title}</span>
+                                <span className="w-full truncate text-xs text-slate-400">
+                                  {author} • {timestamp}
+                                </span>
+                              </DropdownMenuItem>
+                            );
+                          })
+                        )}
+                      </div>
+                      <DropdownMenuSeparator className="bg-slate-800/80" />
+                      <DropdownMenuItem
+                        className="cursor-pointer text-sm text-cyan-300 hover:text-cyan-200 focus:text-cyan-200"
+                        onSelect={() => navigate('/community#discussions')}
+                      >
+                        View all discussions
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
                 <div className="flex items-center gap-2 text-sm">
                   <User className="h-4 w-4 text-cyan-400" />
                   <div className="relative z-50">
