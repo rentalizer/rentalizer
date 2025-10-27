@@ -157,7 +157,15 @@ const Community = React.memo(() => {
         id: navigationState.highlightDiscussionId,
         token: navigationState.highlightToken ?? Date.now(),
       });
+
+      const timeoutId = window.setTimeout(() => {
+        setPendingHighlight(null);
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
     }
+
+    return undefined;
   }, [navigationState.highlightDiscussionId, navigationState.highlightToken]);
 
   const handleHighlightEvent = useCallback(

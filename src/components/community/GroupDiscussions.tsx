@@ -176,6 +176,9 @@ export const GroupDiscussions = ({
             'ring-offset-slate-900'
           );
         }, 2500);
+        setTimeout(() => {
+          highlightAppliedRef.current = null;
+        }, 2600);
       }
     });
   }, [highlightDiscussionId, highlightToken, discussionsList]);

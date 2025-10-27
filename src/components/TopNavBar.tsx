@@ -152,10 +152,10 @@ export const TopNavBar = () => {
                         )}
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="w-80 border border-slate-700/60 bg-slate-900/95 text-white shadow-xl backdrop-blur"
-                    >
+                      <DropdownMenuContent
+                        align="end"
+                        className="w-80 border border-slate-700/60 bg-slate-900/95 text-white shadow-xl backdrop-blur"
+                      >
                       <DropdownMenuLabel className="text-xs uppercase tracking-wide text-slate-400">
                         Recent Community Posts
                       </DropdownMenuLabel>
@@ -183,33 +183,15 @@ export const TopNavBar = () => {
                             const key = post._id || post.id || `post-${index}`;
 
                             return (
-                              <DropdownMenuItem
+                              <div
                                 key={key}
-                                className="flex flex-col items-start gap-1 rounded-md bg-transparent px-3 py-2 text-left text-sm hover:bg-slate-800/80 focus:bg-slate-800/80"
-                                onSelect={() => {
-                                  const statePayload = {
-                                    highlightDiscussionId: key,
-                                    highlightToken: Date.now(),
-                                  };
-
-                                  if (location.pathname === '/community') {
-                                    window.dispatchEvent(
-                                      new CustomEvent('rentalizer-highlight-discussion', {
-                                        detail: statePayload,
-                                      })
-                                    );
-                                  } else {
-                                    navigate('/community', {
-                                      state: statePayload,
-                                    });
-                                  }
-                                }}
+                                className="flex flex-col items-start gap-1 rounded-md bg-transparent px-3 py-2 text-left text-sm"
                               >
                                 <span className="w-full truncate font-medium text-white">{title}</span>
                                 <span className="w-full truncate text-xs text-slate-400">
                                   {author} • {timestamp}
                                 </span>
-                              </DropdownMenuItem>
+                              </div>
                             );
                           })
                         )}
