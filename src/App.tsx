@@ -7,7 +7,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SmartRedirect } from "@/components/SmartRedirect";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AdminGuard } from "@/components/AdminGuard";
-import { BugReportWidget } from "@/components/BugReportWidget";
+// import { BugReportWidget } from "@/components/BugReportWidget";
 import { Toaster } from "@/components/ui/toaster";
 import React, { lazy, Suspense } from "react";
 
@@ -109,7 +109,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <AppRoutes />
-          <BugReportWidget />
+          {/* <BugReportWidget /> */}
           <Toaster />
         </AuthProvider>
       </BrowserRouter>
