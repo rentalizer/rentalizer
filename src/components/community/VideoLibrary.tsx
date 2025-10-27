@@ -54,7 +54,7 @@ const determineDocumentType = (fileName: string): 'pdf' | 'spreadsheet' | 'docum
   return 'document';
 };
 
-const getAttachmentIcon = (type: 'pdf' | 'spreadsheet' | 'document' | 'presentation' | 'text') => {
+const getAttachmentIcon = (type: 'pdf' | 'excel' | 'spreadsheet' | 'document' | 'presentation' | 'text') => {
   switch (type) {
     case 'pdf':
       return <span className="text-red-400 text-lg">📄</span>;
@@ -247,6 +247,15 @@ const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, 
     opacity: isDragging ? 0.5 : 1
   };
 
+  const attachment = video.attachment;
+  const hasAttachment = !!(
+    attachment &&
+    typeof attachment.filename === 'string' &&
+    attachment.filename.trim() !== '' &&
+    typeof attachment.url === 'string' &&
+    attachment.url.trim() !== ''
+  );
+
   return (
     <div ref={setNodeRef} style={style}>
       <Card className={`bg-slate-800/50 border-cyan-500/20 hover:border-cyan-500/40 transition-colors cursor-pointer ${video.featured ? 'ring-1 ring-cyan-400/30' : ''} relative group flex h-full flex-col`}>
@@ -366,21 +375,14 @@ const SortableVideoCard = ({ video, isAdmin, isAuthenticated, onEdit, onDelete, 
               </div>
               
               {/* Attachment info */}
-              <div className="mt-auto">
-                <div className="flex min-h-[2.5rem] items-center gap-2 rounded-md border border-slate-600/60 bg-slate-700/40 px-3 py-2 text-xs">
-                  {video.attachment ? (
-                    <>
-                      {getAttachmentIcon(video.attachment.type)}
-                      <span className="block max-w-[10rem] truncate text-cyan-300">{video.attachment.filename}</span>
-                    </>
-                  ) : (
-                    <>
-                      <FileText className="h-3 w-3 text-gray-500" />
-                      <span className="text-gray-500">No supporting document</span>
-                    </>
-                  )}
+              {hasAttachment && attachment && (
+                <div className="mt-auto">
+                  <div className="flex min-h-[2.5rem] items-center gap-2 rounded-md border border-slate-600/60 bg-slate-700/40 px-3 py-2 text-xs">
+                    {getAttachmentIcon(attachment.type ?? 'document')}
+                    <span className="block max-w-[10rem] truncate text-cyan-300">{attachment.filename}</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
             </div>
           </CardContent>
