@@ -15,6 +15,7 @@ import {
   Search,
   ShieldAlert,
   ShieldCheck,
+  Trash2,
   UserCheck,
   UserX,
   Users,
@@ -155,6 +156,8 @@ export const AdminMembersPanel: React.FC = () => {
     member: User;
     nextStatus: boolean;
   } | null>(null);
+  const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
+  const [pendingDeleteMember, setPendingDeleteMember] = useState<User | null>(null);
 
   useEffect(() => {
     return () => {
@@ -404,6 +407,66 @@ export const AdminMembersPanel: React.FC = () => {
     setPendingStatusToggle(null);
   }, []);
 
+  const requestDeleteMember = useCallback(
+    (member: User) => {
+      if (member.isActive) {
+        toast({
+          title: 'Deactivate first',
+          description: 'Please deactivate the member before deleting their account.',
+        });
+        return;
+      }
+      setPendingDeleteMember(member);
+    },
+    [toast]
+  );
+
+  const confirmDeleteMember = useCallback(async () => {
+    if (!pendingDeleteMember) return;
+
+    const memberId = resolveMemberId(pendingDeleteMember);
+    if (!memberId) {
+      toast({
+        title: 'Unable to delete member',
+        description: 'Missing member identifier.',
+        variant: 'destructive',
+      });
+      setPendingDeleteMember(null);
+      return;
+    }
+
+    const memberIdString = memberId.toString();
+    const memberName = getDisplayName(pendingDeleteMember);
+    setDeleteLoadingId(memberIdString);
+
+    try {
+      await apiService.deleteAdminMember(memberIdString);
+      toast({
+        title: 'Member deleted',
+        description: `${memberName} has been permanently removed.`,
+      });
+      setPendingDeleteMember(null);
+      await fetchMembers();
+    } catch (err) {
+      console.error('Failed to delete member', err);
+      toast({
+        title: 'Deletion failed',
+        description:
+          err instanceof Error ? err.message : 'Unable to delete the member right now.',
+        variant: 'destructive',
+      });
+    } finally {
+      setDeleteLoadingId(null);
+    }
+  }, [fetchMembers, pendingDeleteMember, toast]);
+
+  const cancelDeleteMember = useCallback(() => {
+    if (deleteLoadingId) {
+      return;
+    }
+    setPendingDeleteMember(null);
+  }, [deleteLoadingId]);
+
   const showPagination = pageStats.totalPages > 1;
 
   return (
@@ -547,6 +610,7 @@ export const AdminMembersPanel: React.FC = () => {
                     const memberId = resolveMemberId(member);
                     const memberIdString = memberId?.toString() ?? '';
                     const isUpdating = statusUpdatingId === memberIdString;
+                    const isDeleting = deleteLoadingId === memberIdString;
                     const nextStatus = !Boolean(member.isActive);
 
                     return (
@@ -593,7 +657,7 @@ export const AdminMembersPanel: React.FC = () => {
                           {formatRelative(member.lastLogin)}
                         </TableCell>
                         <TableCell className="text-center">
-                          <div className="flex justify-center">
+                          <div className="flex flex-wrap justify-center gap-2">
                             <Button
                               type="button"
                               size="sm"
@@ -619,6 +683,27 @@ export const AdminMembersPanel: React.FC = () => {
                                 ? 'Deactivate'
                                 : 'Activate'}
                             </Button>
+                            {!member.isActive && (
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="destructive"
+                                className="bg-red-600/20 text-red-100 hover:bg-red-600/40"
+                                disabled={isDeleting || isUpdating}
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  event.stopPropagation();
+                                  requestDeleteMember(member);
+                                }}
+                              >
+                                {isDeleting ? (
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                )}
+                                {isDeleting ? 'Deleting...' : 'Delete'}
+                              </Button>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
@@ -633,6 +718,7 @@ export const AdminMembersPanel: React.FC = () => {
                 const memberId = resolveMemberId(member);
                 const memberIdString = memberId?.toString() ?? '';
                 const isUpdating = statusUpdatingId === memberIdString;
+                const isDeleting = deleteLoadingId === memberIdString;
                 const nextStatus = !Boolean(member.isActive);
 
                 return (
@@ -714,6 +800,27 @@ export const AdminMembersPanel: React.FC = () => {
                           ? 'Deactivate'
                           : 'Activate'}
                       </Button>
+                      {!member.isActive && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="destructive"
+                          className="bg-red-600/20 text-red-100 hover:bg-red-600/40"
+                          disabled={isDeleting || isUpdating}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            requestDeleteMember(member);
+                          }}
+                        >
+                          {isDeleting ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="mr-2 h-4 w-4" />
+                          )}
+                          {isDeleting ? 'Deleting...' : 'Delete'}
+                        </Button>
+                      )}
                       <Button
                         type="button"
                         size="sm"
@@ -772,11 +879,11 @@ export const AdminMembersPanel: React.FC = () => {
           }
         }}
       >
-        <AlertDialogContent className="bg-slate-900 border border-red-500/30 text-white">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-red-300">Deactivate member?</AlertDialogTitle>
-            <AlertDialogDescription className="text-sm text-gray-300">
-              {pendingStatusToggle
+      <AlertDialogContent className="bg-slate-900 border border-red-500/30 text-white">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-red-300">Deactivate member?</AlertDialogTitle>
+          <AlertDialogDescription className="text-sm text-gray-300">
+            {pendingStatusToggle
                 ? `This will prevent ${getDisplayName(pendingStatusToggle.member)} from logging in. They will see an inactive account notice and must contact the admin via the bug report modal.`
                 : null}
             </AlertDialogDescription>
@@ -790,6 +897,42 @@ export const AdminMembersPanel: React.FC = () => {
               onClick={confirmStatusToggle}
             >
               Deactivate Member
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={pendingDeleteMember !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            cancelDeleteMember();
+          }
+        }}
+      >
+        <AlertDialogContent className="bg-slate-900 border border-red-600/40 text-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-300">Delete member?</AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-300">
+              {pendingDeleteMember
+                ? `Permanently remove ${getDisplayName(pendingDeleteMember)} and all associated data? This action cannot be undone.`
+                : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              className="border-slate-600 text-gray-200 hover:bg-slate-700"
+              onClick={cancelDeleteMember}
+              disabled={Boolean(deleteLoadingId)}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-700 hover:bg-red-800 text-white"
+              onClick={confirmDeleteMember}
+              disabled={Boolean(deleteLoadingId)}
+            >
+              {deleteLoadingId ? 'Deleting...' : 'Delete Permanently'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

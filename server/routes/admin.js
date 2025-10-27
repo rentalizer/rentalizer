@@ -128,6 +128,49 @@ router.patch('/users/:userId/status', async (req, res) => {
   }
 });
 
+// DELETE /api/admin/users/:userId - Permanently delete a deactivated user (admin only)
+router.delete('/users/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({
+        message: 'User ID is required',
+      });
+    }
+
+    if (req.user && req.user._id && req.user._id.toString() === userId) {
+      return res.status(400).json({
+        message: 'You cannot delete your own account.',
+      });
+    }
+
+    await userService.permanentlyDeleteUser(userId);
+
+    res.json({
+      message: 'User deleted successfully',
+    });
+  } catch (error) {
+    console.error('Delete user error:', error);
+
+    if (error.name === 'NotFoundError') {
+      return res.status(404).json({
+        message: 'User not found',
+      });
+    }
+
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        message: error.message || 'Unable to delete user',
+      });
+    }
+
+    res.status(500).json({
+      message: 'Internal server error while deleting user',
+    });
+  }
+});
+
 // GET /api/admin/stats - Get admin dashboard stats
 router.get('/stats', async (req, res) => {
   try {

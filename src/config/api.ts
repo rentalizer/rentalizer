@@ -29,6 +29,7 @@ export const API_CONFIG = {
       USERS: '/admin/users',
       STATS: '/admin/stats',
       USER_STATUS: (userId: string) => `/admin/users/${userId}/status`,
+      USER_DELETE: (userId: string) => `/admin/users/${userId}`,
     },
     USER: {
       PROFILE: '/user/profile',

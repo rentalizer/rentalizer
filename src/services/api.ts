@@ -695,6 +695,18 @@ class ApiService {
     }
   }
 
+  async deleteAdminMember(userId: string): Promise<{ message: string }> {
+    try {
+      const response = await api.delete<{ message: string }>(
+        API_CONFIG.ENDPOINTS.ADMIN.USER_DELETE(userId)
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      throw error;
+    }
+  }
+
   async login(data: LoginRequest): Promise<AuthResponse> {
     try {
       const response = await api.post<AuthResponse>('/auth/login', data);

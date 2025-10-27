@@ -102,6 +102,38 @@ class UserService {
     return true;
   }
 
+  // Permanently delete user (admin only, requires deactivation first)
+  async permanentlyDeleteUser(userId) {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      const error = new Error('User not found');
+      error.name = 'NotFoundError';
+      throw error;
+    }
+
+    if (user.isActive) {
+      const error = new Error('User must be deactivated before deletion');
+      error.name = 'ValidationError';
+      throw error;
+    }
+
+    const profilePicture = user.profilePicture;
+
+    await User.findByIdAndDelete(userId);
+
+    if (profilePicture) {
+      const key = r2StorageService.extractKeyFromUrl(profilePicture);
+      if (key) {
+        r2StorageService.deleteObject(key).catch((err) => {
+          console.warn('⚠️  Failed to remove user avatar from R2:', err.message);
+        });
+      }
+    }
+
+    return true;
+  }
+
   // Deactivate user account
   async deactivateUser(userId) {
     const user = await User.findByIdAndUpdate(
