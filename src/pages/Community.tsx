@@ -142,7 +142,8 @@ const Community = React.memo(() => {
     return !user; // Only loading if user is not loaded yet
   }, [user]);
 
-  const [highlightIntent, setHighlightIntent] = useState<{ id: string; token: number } | null>(null);
+  const [pendingHighlight, setPendingHighlight] = useState<{ id: string; token: number } | null>(null);
+  const [activeHighlight, setActiveHighlight] = useState<{ id: string; token: number } | null>(null);
 
   useEffect(() => {
     if (!userIsAdmin && (activeTab === 'promo-codes' || activeTab === 'members')) {
@@ -152,7 +153,7 @@ const Community = React.memo(() => {
 
   useEffect(() => {
     if (navigationState.highlightDiscussionId) {
-      setHighlightIntent({
+      setPendingHighlight({
         id: navigationState.highlightDiscussionId,
         token: navigationState.highlightToken ?? Date.now(),
       });
@@ -166,7 +167,7 @@ const Community = React.memo(() => {
       if (!detail || !detail.highlightDiscussionId) {
         return;
       }
-      setHighlightIntent({
+      setPendingHighlight({
         id: detail.highlightDiscussionId,
         token: detail.highlightToken ?? Date.now(),
       });
@@ -182,10 +183,17 @@ const Community = React.memo(() => {
   }, [handleHighlightEvent]);
 
   useEffect(() => {
-    if (highlightIntent?.id && activeTab !== 'discussions') {
+    if (!pendingHighlight) {
+      return;
+    }
+
+    setActiveHighlight(pendingHighlight);
+    setPendingHighlight(null);
+
+    if (activeTab !== 'discussions') {
       setActiveTab('discussions');
     }
-  }, [highlightIntent?.id, activeTab]);
+  }, [pendingHighlight, activeTab]);
   
   
   // Update URL hash when tab changes - debounced to prevent excessive updates
@@ -438,8 +446,8 @@ const Community = React.memo(() => {
           {/* Other Tabs */}
           <TabsContent value="discussions" className="mt-8">
             <GroupDiscussions
-              highlightDiscussionId={highlightIntent?.id}
-              highlightToken={highlightIntent?.token}
+              highlightDiscussionId={activeHighlight?.id}
+              highlightToken={activeHighlight?.token}
             />
           </TabsContent>
           <TabsContent value="calendar" className="mt-8">
