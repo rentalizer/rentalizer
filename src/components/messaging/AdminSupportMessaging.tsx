@@ -39,13 +39,6 @@ export default function AdminSupportMessaging({
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
   const [showMembersPanel, setShowMembersPanel] = useState(false);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.innerWidth < 640) {
-      setShowMembersPanel(true);
-    }
-  }, []);
-
-
   // Load conversations or all users (for admins)
   const loadConversations = useCallback(async () => {
     try {
@@ -429,7 +422,8 @@ export default function AdminSupportMessaging({
     // Set the selected member to the user we want to message
     setSelectedMemberId(initialMessageUserId);
     setHasUserSelectedConversation(true); // Mark as user-selected so messages are marked as read
-    
+    setShowMembersPanel(false); // Ensure chat view is visible, even on mobile
+
     // Show a toast notification
     if (initialMessageUserName) {
       toast({
