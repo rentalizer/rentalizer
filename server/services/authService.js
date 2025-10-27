@@ -235,9 +235,7 @@ class AuthService {
       .join(' ')
       .trim() || 'Kristina';
 
-    const recipientName = user.firstName?.trim() || user.lastName?.trim()
-      ? [user.firstName, user.lastName].filter(Boolean).join(' ').trim()
-      : user.email;
+    const recipientName = user.firstName?.trim() || user.email;
 
     const message = `Welcome to Rentalizer, ${recipientName}!\n\nMessage us here if you need help with anything.\n\nKristina\nClient Success`;
 

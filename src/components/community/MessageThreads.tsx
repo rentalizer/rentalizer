@@ -38,7 +38,7 @@ export const MessageThreads = () => {
           id: '1',
           sender_id: user?.id || 'current-user',
           recipient_id: 'admin-user',
-          sender_name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : user?.email?.split('@')[0] || 'You',
+          sender_name: user?.firstName?.trim() ? user.firstName.trim() : user?.email?.split('@')[0] || 'You',
           message: 'Welcome to the community! Feel free to ask any questions.',
           created_at: new Date().toISOString(),
           read_at: null
