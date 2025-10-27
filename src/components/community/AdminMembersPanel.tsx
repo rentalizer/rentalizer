@@ -910,7 +910,7 @@ export const AdminMembersPanel: React.FC = () => {
           }
         }}
       >
-        <AlertDialogContent className="bg-slate-900 border border-red-600/40 text-white">
+        <AlertDialogContent className="bg-slate-900 border border-red-600/40 text-white w-full max-w-[calc(100vw-1.5rem)] sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-red-300">Delete member?</AlertDialogTitle>
             <AlertDialogDescription className="text-sm text-gray-300">
