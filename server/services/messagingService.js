@@ -82,7 +82,7 @@ class MessagingService {
     try {
       const {
         page = 1,
-        limit = 50,
+        limit = 200,
         sortBy = 'created_at',
         sortOrder = 'desc'
       } = options;
@@ -525,7 +525,7 @@ class MessagingService {
     try {
       const {
         page = 1,
-        limit = 50,
+        limit = 200,
         search
       } = options;
 

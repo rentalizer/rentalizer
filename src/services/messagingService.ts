@@ -285,7 +285,7 @@ class MessagingService {
   /**
    * Get all users for admin messaging
    */
-  async getAllUsers(page = 1, limit = 50, search?: string): Promise<ApiResponse<Conversation[]>> {
+  async getAllUsers(page = 1, limit = 200, search?: string): Promise<ApiResponse<Conversation[]>> {
     const params: any = { page, limit };
     if (search) {
       params.search = search;

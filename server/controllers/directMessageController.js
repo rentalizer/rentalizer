@@ -491,7 +491,7 @@ class DirectMessageController {
    */
   async getAllUsers(req, res) {
     try {
-      const { page = 1, limit = 50, search } = req.query;
+      const { page = 1, limit = 200, search } = req.query;
       const currentUserId = req.user.id;
 
       const result = await messagingService.getAllUsersForMessaging(currentUserId, {
