@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { BarChart3, User, LogOut, Bell, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,7 +31,47 @@ export const TopNavBar = () => {
   });
 
   const recentPosts = recentPostsData?.data?.slice(0, 5) ?? [];
-  const notificationsCount = recentPosts.length;
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [lastReadTimestamp, setLastReadTimestamp] = useState<number>(0);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const stored = window.localStorage.getItem('rentalizerAdminDiscussionLastRead');
+    if (stored) {
+      const parsed = Number.parseInt(stored, 10);
+      if (!Number.isNaN(parsed)) {
+        setLastReadTimestamp(parsed);
+      }
+    }
+  }, []);
+
+  const unreadCount = useMemo(() => {
+    if (!recentPosts.length) return 0;
+    return recentPosts.reduce((count, post) => {
+      const createdAtRaw = post.created_at || post.createdAt;
+      const createdAt = createdAtRaw ? new Date(createdAtRaw).getTime() : 0;
+      if (!createdAt) return count;
+      return createdAt > lastReadTimestamp ? count + 1 : count;
+    }, 0);
+  }, [recentPosts, lastReadTimestamp]);
+
+  const markNotificationsRead = useCallback(() => {
+    const now = Date.now();
+    setLastReadTimestamp(now);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('rentalizerAdminDiscussionLastRead', String(now));
+    }
+  }, []);
+
+  const handleNotificationsOpenChange = useCallback(
+    (open: boolean) => {
+      setNotificationsOpen(open);
+      if (open) {
+        markNotificationsRead();
+      }
+    },
+    [markNotificationsRead]
+  );
 
   const handleSignOut = async () => {
     try {
@@ -93,21 +133,21 @@ export const TopNavBar = () => {
           )} */}
 
           {/* Right side - Menu and User */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
             {user && (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
                 {isAdmin && (
-                  <DropdownMenu>
+                  <DropdownMenu open={notificationsOpen} onOpenChange={handleNotificationsOpenChange}>
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="relative h-10 w-10 shrink-0 rounded-full border border-cyan-500/30 bg-slate-800/60 text-cyan-300 hover:bg-slate-700/70 hover:text-cyan-200"
+                        className="relative h-9 w-9 shrink-0 rounded-full border border-cyan-500/30 bg-slate-800/60 text-cyan-300 hover:bg-slate-700/70 hover:text-cyan-200"
                       >
                         <Bell className="h-5 w-5" />
-                        {notificationsCount > 0 && (
+                        {unreadCount > 0 && (
                           <span className="absolute -top-1 -right-1 flex h-4 min-w-[18px] items-center justify-center rounded-full bg-red-500 text-[11px] font-semibold text-white">
-                            {notificationsCount > 9 ? '9+' : notificationsCount}
+                            {unreadCount > 9 ? '9+' : unreadCount}
                           </span>
                         )}
                       </Button>
@@ -130,7 +170,7 @@ export const TopNavBar = () => {
                           <div className="px-3 py-4 text-sm text-red-300">
                             Unable to load community updates right now.
                           </div>
-                        ) : notificationsCount === 0 ? (
+                        ) : recentPosts.length === 0 ? (
                           <div className="px-3 py-4 text-sm text-slate-400">
                             No recent member posts yet.
                           </div>
@@ -174,13 +214,6 @@ export const TopNavBar = () => {
                           })
                         )}
                       </div>
-                      <DropdownMenuSeparator className="bg-slate-800/80" />
-                      <DropdownMenuItem
-                        className="cursor-pointer text-sm text-cyan-300 hover:text-cyan-200 focus:text-cyan-200"
-                        onSelect={() => navigate('/community#discussions')}
-                      >
-                        View all discussions
-                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}
@@ -189,14 +222,11 @@ export const TopNavBar = () => {
                   <div className="relative z-50">
                     <Link 
                       to="/profile-setup" 
-                      className="text-cyan-300 hover:text-cyan-200 transition-colors cursor-pointer underline-offset-4 hover:underline font-medium block py-1 px-1"
+                      className="text-cyan-300 hover:text-cyan-200 transition-colors cursor-pointer underline-offset-4 hover:underline font-medium"
                     >
                       {user?.email || 'Profile'}
                     </Link>
                   </div>
-                  <Badge variant="outline" className="bg-blue-900/30 border-blue-500/30 text-blue-300 text-xs px-2 py-0 ml-2">
-                    Pro
-                  </Badge>
                 </div>
                 <Button
                   onClick={handleSignOut}
