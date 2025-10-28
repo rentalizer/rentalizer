@@ -123,8 +123,17 @@ export const TopNavBar = () => {
 
   const handleNotificationClick = useCallback((post: any) => {
     markNotificationRead(post);
-    navigate('/community#discussions');
-  }, [markNotificationRead, navigate]);
+    setNotificationsOpen(false);
+
+    const discussionId = post?._id ?? post?.id ?? null;
+    const state = discussionId
+      ? { highlightDiscussionId: String(discussionId), highlightToken: Date.now() }
+      : undefined;
+
+    navigate('/community#discussions', {
+      state,
+    });
+  }, [markNotificationRead, navigate, setNotificationsOpen]);
 
   const handleSignOut = async () => {
     try {

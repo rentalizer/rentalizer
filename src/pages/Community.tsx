@@ -144,6 +144,9 @@ const Community = React.memo(() => {
 
   const [pendingHighlight, setPendingHighlight] = useState<{ id: string; token: number } | null>(null);
   const [activeHighlight, setActiveHighlight] = useState<{ id: string; token: number } | null>(null);
+  const handleHighlightConsumed = useCallback(() => {
+    setActiveHighlight(null);
+  }, []);
 
   useEffect(() => {
     if (!userIsAdmin && (activeTab === 'promo-codes' || activeTab === 'members')) {
@@ -456,6 +459,7 @@ const Community = React.memo(() => {
             <GroupDiscussions
               highlightDiscussionId={activeHighlight?.id}
               highlightToken={activeHighlight?.token}
+              onHighlightConsumed={handleHighlightConsumed}
             />
           </TabsContent>
           <TabsContent value="calendar" className="mt-8">

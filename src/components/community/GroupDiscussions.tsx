@@ -80,10 +80,12 @@ export const GroupDiscussions = ({
   isDayMode = false,
   highlightDiscussionId,
   highlightToken,
+  onHighlightConsumed,
 }: {
   isDayMode?: boolean;
   highlightDiscussionId?: string;
   highlightToken?: number;
+  onHighlightConsumed?: () => void;
 }) => {
   const { user, profile } = useAuth();
   const { profile: supabaseProfile } = useProfile();
@@ -179,9 +181,12 @@ export const GroupDiscussions = ({
         setTimeout(() => {
           highlightAppliedRef.current = null;
         }, 2600);
+        if (onHighlightConsumed) {
+          onHighlightConsumed();
+        }
       }
     });
-  }, [highlightDiscussionId, highlightToken, discussionsList]);
+  }, [highlightDiscussionId, highlightToken, discussionsList, onHighlightConsumed]);
 
   // Check if user needs to set up profile
   useEffect(() => {
