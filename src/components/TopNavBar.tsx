@@ -126,14 +126,26 @@ export const TopNavBar = () => {
     setNotificationsOpen(false);
 
     const discussionId = post?._id ?? post?.id ?? null;
-    const state = discussionId
+    const highlightState = discussionId
       ? { highlightDiscussionId: String(discussionId), highlightToken: Date.now() }
       : undefined;
 
-    navigate('/community#discussions', {
-      state,
-    });
-  }, [markNotificationRead, navigate, setNotificationsOpen]);
+    if (location.pathname === '/community') {
+      if (highlightState && typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('rentalizer-highlight-discussion', { detail: highlightState })
+        );
+      } else {
+        navigate({ pathname: '/community', hash: '#discussions' }, { replace: false });
+      }
+      return;
+    }
+
+    navigate(
+      { pathname: '/community', hash: '#discussions' },
+      { state: highlightState }
+    );
+  }, [location.pathname, markNotificationRead, navigate, setNotificationsOpen]);
 
   const handleSignOut = async () => {
     try {

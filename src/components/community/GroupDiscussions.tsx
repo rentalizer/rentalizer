@@ -1249,10 +1249,14 @@ export const GroupDiscussions = ({
         extraParams
       });
 
-      window.location.href = `/community?${params.toString()}#admin-support`;
+      navigate({
+        pathname: '/community',
+        search: `?${params.toString()}`,
+        hash: '#admin-support',
+      });
       return true;
     },
-    [isAdmin, user]
+    [isAdmin, navigate, user]
   );
 
   // Handle admin clicking on user name to message them
