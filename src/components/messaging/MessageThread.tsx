@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { User, Send, Paperclip, MoreVertical, Clock, Check, CheckCheck, MessageCircle } from 'lucide-react';
+import { User, Send, Paperclip, MoreVertical, Clock, Check, CheckCheck, MessageCircle, Bookmark, BookmarkCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -41,6 +41,11 @@ interface MessageThreadProps {
   isAdmin?: boolean;
   adminUserId?: string;
   memberAvatarUrl?: string;
+  onToggleManualUnread?: () => void;
+  isManualUnread?: boolean;
+  canToggleManualUnread?: boolean;
+  manualUnreadMessageIds?: string[];
+  onToggleManualUnreadMessage?: (messageId: string) => void;
 }
 
 export default function MessageThread({
@@ -56,7 +61,12 @@ export default function MessageThread({
   onMarkAsRead,
   isAdmin,
   adminUserId,
-  memberAvatarUrl
+  memberAvatarUrl,
+  onToggleManualUnread,
+  isManualUnread,
+  canToggleManualUnread = true,
+  manualUnreadMessageIds,
+  onToggleManualUnreadMessage
 }: MessageThreadProps) {
   const [newMessage, setNewMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -140,70 +150,92 @@ export default function MessageThread({
   return (
     <div className="flex flex-col h-full min-h-0 bg-slate-800 border border-slate-700 rounded-lg">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-slate-700">
-        <div className="relative">
-          {!isAdmin ? (
-            // Show group avatars for admins
-            <div className="relative flex items-center">
-              <div className="relative z-20">
-                <Avatar className="h-8 w-8 border-2 border-slate-800">
+      <div className="flex items-center justify-between gap-3 p-4 border-b border-slate-700">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            {!isAdmin ? (
+              // Show group avatars for admins
+              <div className="relative flex items-center">
+                <div className="relative z-20">
+                  <Avatar className="h-8 w-8 border-2 border-slate-800">
+                    <AvatarImage 
+                      src="/admin/adminRetalizer.jpg" 
+                      alt="Admin 1"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
+                    />
+                    <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold text-xs">
+                      A1
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <div className="relative -ml-3 z-10">
+                  <Avatar className="h-8 w-8 border-2 border-slate-800">
+                    <AvatarImage 
+                      src="/admin/adminRentalizer2.jpg" 
+                      alt="Admin 2"
+                      onError={(e) => {
+                        const target = e.currentTarget as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
+                    />
+                    <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-xs">
+                      A2
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+              </div>
+            ) : (
+              // Show recipient avatar for non-admins; never show the logged-in user's own profile picture here
+              <Avatar className="h-8 w-8 border-2 border-slate-800">
+                {recipientAvatar ? (
                   <AvatarImage 
-                    src="/admin/adminRetalizer.jpg" 
-                    alt="Admin 1"
+                    src={recipientAvatar}
+                    alt={recipientName}
                     onError={(e) => {
                       const target = e.currentTarget as HTMLImageElement;
                       target.style.display = 'none';
                     }}
                   />
-                  <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold text-xs">
-                    A1
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-              <div className="relative -ml-3 z-10">
-                <Avatar className="h-8 w-8 border-2 border-slate-800">
-                  <AvatarImage 
-                    src="/admin/adminRentalizer2.jpg" 
-                    alt="Admin 2"
-                    onError={(e) => {
-                      const target = e.currentTarget as HTMLImageElement;
-                      target.style.display = 'none';
-                    }}
-                  />
-                  <AvatarFallback className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold text-xs">
-                    A2
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-            </div>
-          ) : (
-            // Show recipient avatar for non-admins; never show the logged-in user's own profile picture here
-            <Avatar className="h-8 w-8 border-2 border-slate-800">
-              {recipientAvatar ? (
-                <AvatarImage 
-                  src={recipientAvatar}
-                  alt={recipientName}
-                  onError={(e) => {
-                    const target = e.currentTarget as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
-                />
-              ) : null}
-              <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold text-xs">
-                {recipientName?.[0]?.toUpperCase() || 'U'}
-              </AvatarFallback>
-            </Avatar>
-          )}
-          {isOnline && (
-            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border border-slate-800 rounded-full" />
-          )}
+                ) : null}
+                <AvatarFallback className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold text-xs">
+                  {recipientName?.[0]?.toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+            )}
+            {isOnline && (
+              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 border border-slate-800 rounded-full" />
+            )}
+          </div>
+          <div>
+            <h3 className="font-medium text-white text-sm">{recipientName}</h3>
+            <p className="text-xs text-slate-400">
+              {isOnline ? 'Online' : 'Offline'}
+            </p>
+          </div>
         </div>
-        <div>
-          <h3 className="font-medium text-white text-sm">{recipientName}</h3>
-          <p className="text-xs text-slate-400">
-            {isOnline ? 'Online' : 'Offline'}
-          </p>
-        </div>
+        {isAdmin && onToggleManualUnread && canToggleManualUnread && (
+          <div className="flex items-center gap-2">
+            {isManualUnread && (
+              <Badge variant="outline" className="border-yellow-400/40 text-yellow-300 text-[11px] uppercase tracking-wide">
+                Follow-up
+              </Badge>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className={`h-8 border-cyan-500/40 text-cyan-300 hover:bg-cyan-500/10 ${isManualUnread ? 'border-yellow-400/50 text-yellow-200 hover:text-yellow-100' : ''}`}
+              onClick={(event) => {
+                event.preventDefault();
+                onToggleManualUnread();
+              }}
+            >
+              {isManualUnread ? 'Clear Unread' : 'Mark Unread'}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Messages */}
@@ -212,6 +244,13 @@ export default function MessageThread({
           {messages.map((message) => {
             const isOwn = message.sender_id === currentUserId;
             const isRead = !!message.read_at;
+            const isManualFollowUp = manualUnreadMessageIds?.includes(message._id) ?? false;
+            const isAdminSender = !!(adminUserId && message.sender_id === adminUserId);
+            const bubbleHighlightClass = isManualFollowUp
+              ? 'bg-slate-700/80 border border-yellow-400/40 ring-1 ring-yellow-300/30'
+              : 'bg-slate-700';
+            const bubbleMarginClass = isAdminSender ? '' : 'ml-3';
+            const metadataMarginClass = isAdminSender ? '' : 'ml-3';
             
             // Debug logging
             console.log('Message alignment check:', {
@@ -284,35 +323,35 @@ export default function MessageThread({
 
                   <div className={`flex-1 max-w-full flex flex-col items-start`}>
                     <div
-                      className={`p-3 rounded-lg bg-slate-700 text-white ${
-                        adminUserId && message.sender_id === adminUserId 
-                          ? '' 
-                          : 'ml-3'
-                      }`}
+                      className={`p-3 rounded-lg text-white ${bubbleHighlightClass} ${bubbleMarginClass}`}
                     >
                       <p className="text-sm whitespace-pre-line">{message.message}</p>
+                      {isManualFollowUp && (
+                        <span className="mt-2 inline-flex items-center gap-1 text-[11px] uppercase tracking-wide text-yellow-300">
+                          <BookmarkCheck className="h-3 w-3" />
+                          Flagged for follow-up
+                        </span>
+                      )}
                     </div>
                   
                   {/* Message metadata */}
-                  <div className={`flex items-center gap-1 mt-1 text-xs text-slate-400 flex-row ${
-                    adminUserId && message.sender_id === adminUserId 
-                      ? '' 
-                      : 'ml-3'
-                  }`}>
-                    <span title={formatDateWithTimezone(message.created_at || message.createdAt || '')}>
-                      {formatLastMessageTime(message.created_at || message.createdAt || '')}
-                    </span>
+                  <div className={`flex items-center gap-2 mt-1 text-xs text-slate-400 flex-wrap ${metadataMarginClass}`}>
+                    <div className="flex items-center gap-1">
+                      <span title={formatDateWithTimezone(message.created_at || message.createdAt || '')}>
+                        {formatLastMessageTime(message.created_at || message.createdAt || '')}
+                      </span>
                     
-                    {/* Read status for own messages (kept but alignment unified) */}
-                    {isOwn && (
-                      <div className="flex items-center">
-                        {isRead ? (
-                          <CheckCheck className="h-3 w-3 text-blue-400" />
-                        ) : (
-                          <Check className="h-3 w-3 text-slate-500" />
-                        )}
-                      </div>
-                    )}
+                      {/* Read status for own messages (kept but alignment unified) */}
+                      {isOwn && (
+                        <div className="flex items-center">
+                          {isRead ? (
+                            <CheckCheck className="h-3 w-3 text-blue-400" />
+                          ) : (
+                            <Check className="h-3 w-3 text-slate-500" />
+                          )}
+                        </div>
+                      )}
+                    </div>
                     
                     {/* Support category badge for admin messages */}
                     {!isOwn && message.support_category !== 'general' && (
@@ -330,6 +369,27 @@ export default function MessageThread({
                         message.priority === 'urgent' ? 'bg-red-500' : 'bg-orange-500'
                       }`} />
                     ) : null}
+
+                    {isAdmin && onToggleManualUnreadMessage && (
+                      <div className="flex items-center gap-1 ml-auto">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={`h-7 w-7 ${isManualFollowUp ? 'text-yellow-300 hover:text-yellow-200 hover:bg-yellow-500/10' : 'text-slate-400 hover:text-cyan-200 hover:bg-cyan-500/10'}`}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            onToggleManualUnreadMessage(message._id);
+                          }}
+                          title={isManualFollowUp ? 'Clear follow-up flag' : 'Flag for follow-up'}
+                        >
+                          {isManualFollowUp ? (
+                            <BookmarkCheck className="h-4 w-4" />
+                          ) : (
+                            <Bookmark className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                   </div>
                 </div>

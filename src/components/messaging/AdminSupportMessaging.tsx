@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { useToast } from '@/hooks/use-toast';
@@ -10,6 +10,9 @@ import MessageThread, { Message } from './MessageThread';
 import MembersList from './MembersList';
 import messagingService, { Conversation, AdminUser } from '@/services/messagingService';
 import websocketService from '@/services/websocketService';
+
+const MANUAL_UNREAD_STORAGE_KEY = 'rentalizerAdminSupportManualUnread';
+const MANUAL_UNREAD_MESSAGES_STORAGE_KEY = 'rentalizerAdminSupportManualUnreadMessages';
 
 interface AdminSupportMessagingProps {
   initialMessageUserId?: string;
@@ -38,6 +41,64 @@ export default function AdminSupportMessaging({
   const [backendOffline, setBackendOffline] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
   const [showMembersPanel, setShowMembersPanel] = useState(false);
+  const [manualUnreadConversationIds, setManualUnreadConversationIds] = useState<string[]>([]);
+  const [manualUnreadMessageMap, setManualUnreadMessageMap] = useState<Record<string, string[]>>({});
+
+  const manualUnreadSet = useMemo(() => new Set(manualUnreadConversationIds), [manualUnreadConversationIds]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const stored = window.localStorage.getItem(MANUAL_UNREAD_STORAGE_KEY);
+      if (!stored) return;
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) {
+        setManualUnreadConversationIds(parsed.filter((id: unknown): id is string => typeof id === 'string'));
+      }
+    } catch (error) {
+      console.error('Failed to load manual unread conversations from storage', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const stored = window.localStorage.getItem(MANUAL_UNREAD_MESSAGES_STORAGE_KEY);
+      if (!stored) return;
+      const parsed = JSON.parse(stored);
+      if (parsed && typeof parsed === 'object') {
+        const cleaned: Record<string, string[]> = {};
+        Object.entries(parsed).forEach(([conversationId, ids]) => {
+          if (Array.isArray(ids)) {
+            const validIds = ids.filter((id): id is string => typeof id === 'string');
+            if (validIds.length > 0) {
+              cleaned[conversationId] = validIds;
+            }
+          }
+        });
+        setManualUnreadMessageMap(cleaned);
+      }
+    } catch (error) {
+      console.error('Failed to load manual unread messages from storage', error);
+    }
+  }, []);
+
+  const persistManualUnread = useCallback((ids: string[]) => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(MANUAL_UNREAD_STORAGE_KEY, JSON.stringify(ids));
+  }, []);
+
+  const persistManualUnreadMessages = useCallback((map: Record<string, string[]>) => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(MANUAL_UNREAD_MESSAGES_STORAGE_KEY, JSON.stringify(map));
+  }, []);
+
+  const notifyManualUnreadChange = useCallback((conversationId?: string) => {
+    if (typeof window === 'undefined') return;
+    window.dispatchEvent(new CustomEvent('admin-support-manual-unread-change', {
+      detail: { conversationId }
+    }));
+  }, []);
 
   // Load conversations or all users (for admins)
   const loadConversations = useCallback(async () => {
@@ -55,10 +116,6 @@ export default function AdminSupportMessaging({
       
       if (response.success) {
         setConversations(response.data);
-        
-        // Calculate total unread messages
-        const total = response.data.reduce((sum, conv) => sum + conv.unread_count, 0);
-        setTotalUnread(total);
       }
     } catch (error: unknown) {
       console.error('Error loading conversations:', error);
@@ -78,6 +135,17 @@ export default function AdminSupportMessaging({
       setLoading(false);
     }
   }, [isAdmin]);
+
+  const calculateTotalUnread = useCallback((list: Conversation[], manualSet: Set<string>, manualMap: Record<string, string[]>) => {
+    return list.reduce((sum, conv) => {
+      const actualUnread = conv.unread_count || 0;
+      const manualCount = Math.max(
+        manualSet.has(conv.participant_id) ? 1 : 0,
+        (manualMap[conv.participant_id] ?? []).length
+      );
+      return sum + Math.max(actualUnread, manualCount);
+    }, 0);
+  }, []);
 
   // Setup WebSocket event listeners
   const setupWebSocketListeners = useCallback(() => {
@@ -118,8 +186,8 @@ export default function AdminSupportMessaging({
         const senderId = newMessage.sender_id;
         const recipientId = newMessage.recipient_id;
         const otherUserId = senderId === user?.id ? recipientId : senderId;
-        
-        return prev.map(conv => {
+
+        const updated = prev.map(conv => {
           if (conv.participant_id === otherUserId) {
             return {
               ...conv,
@@ -130,13 +198,8 @@ export default function AdminSupportMessaging({
           }
           return conv;
         });
-      });
-      
-      // Recalculate total unread
-      setConversations(prev => {
-        const total = prev.reduce((sum, conv) => sum + conv.unread_count, 0);
-        setTotalUnread(total);
-        return prev;
+
+        return updated;
       });
     });
 
@@ -189,13 +252,25 @@ export default function AdminSupportMessaging({
             ? { ...conv, unread_count: 0 }
             : conv
         ));
-        
-        // Recalculate total unread
-        setConversations(prev => {
-          const total = prev.reduce((sum, conv) => sum + conv.unread_count, 0);
-          setTotalUnread(total);
-          return prev;
-        });
+        if (data.readCount > 0) {
+          setManualUnreadConversationIds(prev => {
+            if (!data.userId) return prev;
+            if (!prev.includes(data.userId)) return prev;
+            const updated = prev.filter(id => id !== data.userId);
+            persistManualUnread(updated);
+            notifyManualUnreadChange(data.userId);
+            return updated;
+          });
+          setManualUnreadMessageMap(prev => {
+            if (!data.userId) return prev;
+            if (!prev[data.userId]?.length) return prev;
+            const updated = { ...prev };
+            delete updated[data.userId];
+            persistManualUnreadMessages(updated);
+            notifyManualUnreadChange(data.userId);
+            return updated;
+          });
+        }
       }
     });
 
@@ -230,7 +305,7 @@ export default function AdminSupportMessaging({
     websocketService.onError((error) => {
       console.error('WebSocket error:', error);
     });
-  }, [user?.id, selectedMemberId, loadConversations]);
+  }, [user?.id, selectedMemberId, loadConversations, persistManualUnread, persistManualUnreadMessages]);
 
   // Initialize WebSocket connection
   useEffect(() => {
@@ -264,6 +339,61 @@ export default function AdminSupportMessaging({
     }
   }, [user, loadConversations]);
 
+  useEffect(() => {
+    setTotalUnread(calculateTotalUnread(conversations, manualUnreadSet, manualUnreadMessageMap));
+  }, [conversations, manualUnreadSet, manualUnreadMessageMap, calculateTotalUnread]);
+
+  const markConversationForFollowUp = useCallback((conversationId: string) => {
+    setManualUnreadConversationIds(prev => {
+      if (prev.includes(conversationId)) return prev;
+      const updated = [...prev, conversationId];
+      persistManualUnread(updated);
+      notifyManualUnreadChange(conversationId);
+      return updated;
+    });
+  }, [persistManualUnread, notifyManualUnreadChange]);
+
+  const clearConversationFollowUp = useCallback((conversationId: string) => {
+    setManualUnreadConversationIds(prev => {
+      if (!prev.includes(conversationId)) return prev;
+      const updated = prev.filter(id => id !== conversationId);
+      persistManualUnread(updated);
+      notifyManualUnreadChange(conversationId);
+      return updated;
+    });
+  }, [persistManualUnread, notifyManualUnreadChange]);
+
+  const clearManualUnreadMessagesForConversation = useCallback((conversationId: string) => {
+    setManualUnreadMessageMap(prev => {
+      if (!prev[conversationId]?.length) return prev;
+      const updated = { ...prev };
+      delete updated[conversationId];
+      persistManualUnreadMessages(updated);
+      notifyManualUnreadChange(conversationId);
+      return updated;
+    });
+  }, [persistManualUnreadMessages, notifyManualUnreadChange]);
+
+  const toggleManualUnreadMessage = useCallback((conversationId: string, messageId: string) => {
+    setManualUnreadMessageMap(prev => {
+      const existing = new Set(prev[conversationId] ?? []);
+      if (existing.has(messageId)) {
+        existing.delete(messageId);
+      } else {
+        existing.add(messageId);
+      }
+      const next: Record<string, string[]> = { ...prev };
+      if (existing.size > 0) {
+        next[conversationId] = Array.from(existing);
+      } else {
+        delete next[conversationId];
+      }
+      persistManualUnreadMessages(next);
+      notifyManualUnreadChange(conversationId);
+      return next;
+    });
+  }, [persistManualUnreadMessages, notifyManualUnreadChange]);
+
   // Mark conversation as read
   const handleMarkAsRead = useCallback(async () => {
     if (!selectedMemberId || !user) return;
@@ -281,19 +411,14 @@ export default function AdminSupportMessaging({
             ? { ...conv, unread_count: 0 }
             : conv
         );
-        
-        // Update total unread count based on the updated conversations
-        const total = updated.reduce((sum, conv) => sum + conv.unread_count, 0);
-        setTotalUnread(total);
-        
         return updated;
       });
-      
+
+      const unreadMessagesCount = conversations.find(c => c.participant_id === selectedMemberId)?.unread_count || 0;
+
       // Broadcast via WebSocket so other clients update
       // Include the count of messages marked as read
-      const unreadMessagesCount = conversations.find(c => c.participant_id === selectedMemberId)?.unread_count || 0;
-      
-      if (wsConnected) {
+      if (unreadMessagesCount > 0 && wsConnected) {
         websocketService.markMessagesAsRead(selectedMemberId, unreadMessagesCount);
       }
       
@@ -303,7 +428,7 @@ export default function AdminSupportMessaging({
       // On error, refresh from server
       loadConversations();
     }
-  }, [selectedMemberId, user, wsConnected, loadConversations]);
+  }, [selectedMemberId, user, wsConnected, loadConversations, conversations]);
 
   // Load messages for selected conversation
   const loadMessages = useCallback(async (memberId: string) => {
@@ -485,7 +610,77 @@ export default function AdminSupportMessaging({
     }
   }, []);
 
-  const selectedMember = conversations.find(c => c.participant_id === selectedMemberId);
+  const baseSelectedConversation = useMemo(() => {
+    if (!selectedMemberId) return undefined;
+    return conversations.find(conv => conv.participant_id === selectedMemberId);
+  }, [conversations, selectedMemberId]);
+
+  const decoratedConversations = useMemo(() => {
+    return conversations.map(conv => {
+      const manualMessages = manualUnreadMessageMap[conv.participant_id] ?? [];
+      const manualMessageCount = manualMessages.length;
+      const manualFlagCount = Math.max(
+        manualUnreadSet.has(conv.participant_id) ? 1 : 0,
+        manualMessageCount
+      );
+      const hasManualFlag = manualFlagCount > 0;
+      const adjustedUnread = conv.unread_count > 0 ? conv.unread_count : manualFlagCount;
+      return {
+        ...conv,
+        unread_count: adjustedUnread,
+        manualUnread: hasManualFlag,
+        manualUnreadCount: manualFlagCount,
+        manualUnreadMessageIds: manualMessages,
+        actualUnreadCount: conv.unread_count
+      } as Conversation & {
+        manualUnread?: boolean;
+        manualUnreadCount?: number;
+        manualUnreadMessageIds?: string[];
+        actualUnreadCount?: number;
+      };
+    });
+  }, [conversations, manualUnreadSet, manualUnreadMessageMap]);
+
+  const selectedMember = decoratedConversations.find(c => c.participant_id === selectedMemberId);
+
+  const handleToggleManualUnread = useCallback(() => {
+    if (!selectedMemberId) return;
+    const hasManualFlag = manualUnreadSet.has(selectedMemberId);
+    const hasManualMessages = (manualUnreadMessageMap[selectedMemberId] ?? []).length > 0;
+    if (hasManualFlag || hasManualMessages) {
+      clearConversationFollowUp(selectedMemberId);
+      clearManualUnreadMessagesForConversation(selectedMemberId);
+    } else {
+      markConversationForFollowUp(selectedMemberId);
+    }
+  }, [
+    selectedMemberId,
+    manualUnreadSet,
+    manualUnreadMessageMap,
+    clearConversationFollowUp,
+    clearManualUnreadMessagesForConversation,
+    markConversationForFollowUp
+  ]);
+
+  const handleToggleManualUnreadMessage = useCallback((messageId: string) => {
+    if (!selectedMemberId) return;
+    toggleManualUnreadMessage(selectedMemberId, messageId);
+  }, [selectedMemberId, toggleManualUnreadMessage]);
+
+  const selectedManualMessageIds = useMemo(() => {
+    if (!selectedMemberId) return [] as string[];
+    return manualUnreadMessageMap[selectedMemberId] ?? [];
+  }, [manualUnreadMessageMap, selectedMemberId]);
+
+  const isSelectedManualUnread = useMemo(() => {
+    if (!selectedMemberId) return false;
+    return manualUnreadSet.has(selectedMemberId) || selectedManualMessageIds.length > 0;
+  }, [manualUnreadSet, selectedManualMessageIds, selectedMemberId]);
+
+  const canToggleManualUnread = useMemo(() => {
+    if (!baseSelectedConversation) return true;
+    return (baseSelectedConversation.unread_count ?? 0) === 0;
+  }, [baseSelectedConversation]);
 
   // Early return check - before any conditional hooks
   if (!user) {
@@ -641,6 +836,11 @@ export default function AdminSupportMessaging({
             isAdmin={true}
             adminUserId={user.id}
             memberAvatarUrl={selectedMember.participant.profilePicture}
+            onToggleManualUnread={handleToggleManualUnread}
+            isManualUnread={isSelectedManualUnread}
+            canToggleManualUnread={canToggleManualUnread}
+            manualUnreadMessageIds={selectedManualMessageIds}
+            onToggleManualUnreadMessage={handleToggleManualUnreadMessage}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center bg-slate-800/90">
@@ -682,7 +882,7 @@ export default function AdminSupportMessaging({
       {/* Members List */}
       <div className={`${showMembersPanel ? 'flex' : 'hidden'} h-full min-h-0 w-full sm:flex sm:w-80 sm:min-w-[18rem] border-t border-slate-700 bg-slate-900/60 sm:border-t-0 sm:border-l`}>
         <MembersList
-          members={conversations}
+          members={decoratedConversations}
           selectedMemberId={selectedMemberId}
           onMemberSelect={handleMemberSelect}
           onlineUsers={onlineUsers}

@@ -6,8 +6,15 @@ import { formatDistanceToNow } from 'date-fns';
 import { Crown, MessageCircle, Clock, Circle } from 'lucide-react';
 import { Conversation } from '@/services/messagingService';
 
+type DecoratedConversation = Conversation & {
+  manualUnread?: boolean;
+  manualUnreadCount?: number;
+  manualUnreadMessageIds?: string[];
+  actualUnreadCount?: number;
+};
+
 interface MembersListProps {
-  members: Conversation[];
+  members: DecoratedConversation[];
   selectedMemberId?: string;
   onMemberSelect: (memberId: string) => void;
   onlineUsers?: Set<string>;
@@ -21,7 +28,7 @@ export default function MembersList({
 }: MembersListProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const getDisplayName = (member: Conversation) => {
+  const getDisplayName = (member: DecoratedConversation) => {
     const { firstName, lastName, email } = member.participant;
     if (firstName && lastName) {
       return `${firstName} ${lastName}`.trim();
@@ -67,7 +74,7 @@ export default function MembersList({
     return aName.localeCompare(bName);
   });
 
-  const getInitials = (member: Conversation) => {
+  const getInitials = (member: DecoratedConversation) => {
     const { firstName, lastName, email } = member.participant;
     if (firstName && lastName) {
       return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
@@ -120,7 +127,12 @@ export default function MembersList({
             <div className="space-y-1">
               {sortedMembers.map((member) => {
                 const isSelected = selectedMemberId === member.participant_id;
-                const hasUnread = member.unread_count > 0;
+                const actualUnreadCount = (member as DecoratedConversation).actualUnreadCount ?? member.unread_count ?? 0;
+                const manualUnreadCount = member.manualUnreadCount ?? 0;
+                const hasActualUnread = actualUnreadCount > 0;
+                const displayUnreadCount = hasActualUnread ? actualUnreadCount : manualUnreadCount;
+                const hasManualUnread = !hasActualUnread && manualUnreadCount > 0;
+                const hasUnread = displayUnreadCount > 0;
                 const isAdmin = member.participant.role === 'admin' || member.participant.role === 'superadmin';
                 
                 return (
@@ -160,7 +172,11 @@ export default function MembersList({
                         
                         {/* Unread indicator */}
                         {hasUnread && (
-                          <div className="absolute -top-1 -left-1 w-3 h-3 bg-red-500 rounded-full border-2 border-slate-800 animate-pulse"></div>
+                          <div
+                            className={`absolute -top-1 -left-1 w-3 h-3 rounded-full border-2 border-slate-800 animate-pulse ${
+                              hasManualUnread ? 'bg-yellow-400' : 'bg-red-500'
+                            }`}
+                          ></div>
                         )}
                       </div>
 
@@ -173,12 +189,21 @@ export default function MembersList({
                           
                           {/* Unread count badge */}
                           {hasUnread && (
-                            <Badge
-                              variant="destructive"
-                              className="text-xs px-2 py-0.5 h-5 min-w-5 flex items-center justify-center animate-pulse"
-                            >
-                              {member.unread_count > 99 ? '99+' : member.unread_count}
-                            </Badge>
+                            hasManualUnread ? (
+                              <Badge
+                                variant="secondary"
+                                className="text-[11px] px-2 py-0.5 h-5 flex items-center justify-center bg-yellow-500/20 text-yellow-300 border-yellow-400/40"
+                              >
+                                Follow-up{manualUnreadCount > 1 ? ` (${manualUnreadCount})` : ''}
+                              </Badge>
+                            ) : (
+                              <Badge
+                                variant="destructive"
+                                className="text-xs px-2 py-0.5 h-5 min-w-5 flex items-center justify-center animate-pulse"
+                              >
+                                {displayUnreadCount > 99 ? '99+' : displayUnreadCount}
+                              </Badge>
+                            )
                           )}
                         </div>
 

@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import messagingService from '@/services/messagingService';
+import messagingService, { Conversation } from '@/services/messagingService';
 import websocketService from '@/services/websocketService';
+
+const MANUAL_UNREAD_STORAGE_KEY = 'rentalizerAdminSupportManualUnread';
+const MANUAL_UNREAD_MESSAGES_STORAGE_KEY = 'rentalizerAdminSupportManualUnreadMessages';
+const MANUAL_EVENT_NAME = 'admin-support-manual-unread-change';
 
 export const useAdminSupportNotifications = () => {
   const [adminSupportUnreadCount, setAdminSupportUnreadCount] = useState(0);
@@ -9,21 +13,117 @@ export const useAdminSupportNotifications = () => {
   const { user } = useAuth();
   const lastFetchTimeRef = useRef(0);
   const pendingUpdateRef = useRef(false);
+  const baseUnreadRef = useRef(0);
+  const lastConversationsRef = useRef<Conversation[]>([]);
 
-  const fetchAdminSupportUnreadCount = async (force = false) => {
+  const readManualFlags = useCallback(() => {
+    if (typeof window === 'undefined') {
+      return {
+        manualConversationIds: new Set<string>(),
+        manualMessageMap: {} as Record<string, string[]>
+      };
+    }
+
+    let conversationIds: string[] = [];
+    let messageMap: Record<string, string[]> = {};
+
+    try {
+      const storedConversations = window.localStorage.getItem(MANUAL_UNREAD_STORAGE_KEY);
+      if (storedConversations) {
+        const parsed = JSON.parse(storedConversations);
+        if (Array.isArray(parsed)) {
+          conversationIds = parsed.filter((id: unknown): id is string => typeof id === 'string');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to parse manual unread conversations storage', error);
+    }
+
+    try {
+      const storedMessages = window.localStorage.getItem(MANUAL_UNREAD_MESSAGES_STORAGE_KEY);
+      if (storedMessages) {
+        const parsed = JSON.parse(storedMessages);
+        if (parsed && typeof parsed === 'object') {
+          Object.entries(parsed).forEach(([conversationId, ids]) => {
+            if (Array.isArray(ids)) {
+              const validIds = ids.filter((id): id is string => typeof id === 'string');
+              if (validIds.length > 0) {
+                messageMap[conversationId] = validIds;
+              }
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to parse manual unread messages storage', error);
+    }
+
+    return {
+      manualConversationIds: new Set(conversationIds),
+      manualMessageMap: messageMap
+    };
+  }, []);
+
+  const computeManualExtras = useCallback((conversations?: Conversation[]) => {
+    const { manualConversationIds, manualMessageMap } = readManualFlags();
+    const manualMessageMapCopy: Record<string, string[]> = { ...manualMessageMap };
+    const convs = conversations && conversations.length ? conversations : lastConversationsRef.current || [];
+
+    let manualExtra = 0;
+
+    convs.forEach(conv => {
+      const convId = conv.participant_id;
+      const actualUnread = conv.unread_count || 0;
+      const manualMessages = manualMessageMapCopy[convId] ?? [];
+      const manualMessagesCount = manualMessages.length;
+      const hasManualConversationFlag = manualConversationIds.has(convId) ? 1 : 0;
+      const manualCount = Math.max(hasManualConversationFlag, manualMessagesCount);
+
+      if (manualCount > actualUnread) {
+        manualExtra += manualCount - actualUnread;
+      }
+
+      manualConversationIds.delete(convId);
+      delete manualMessageMapCopy[convId];
+    });
+
+    // Conversations flagged manually but not present in the fetched list
+    manualConversationIds.forEach(convId => {
+      const manualMessages = manualMessageMapCopy[convId] ?? [];
+      const manualCount = Math.max(1, manualMessages.length);
+      manualExtra += manualCount;
+      delete manualMessageMapCopy[convId];
+    });
+
+    // Remaining manual message entries without a conversation flag
+    Object.values(manualMessageMapCopy).forEach(ids => {
+      manualExtra += ids.length;
+    });
+
+    return manualExtra;
+  }, [readManualFlags]);
+
+  const recomputeTotal = useCallback((baseCount: number, conversations?: Conversation[]) => {
+    const manualExtra = computeManualExtras(conversations);
+    const combined = baseCount + manualExtra;
+    setAdminSupportUnreadCount(combined);
+    setHasNotification(combined > 0);
+  }, [computeManualExtras]);
+
+  const fetchAdminSupportUnreadCount = useCallback(async (force = false) => {
     if (!user) {
+      baseUnreadRef.current = 0;
+      lastConversationsRef.current = [];
       setAdminSupportUnreadCount(0);
       setHasNotification(false);
       return;
     }
 
-    // If there's a pending local update, don't override it with server data
     if (!force && pendingUpdateRef.current) {
       console.log('⏭️ Skipping admin support fetch - pending local update');
       return;
     }
 
-    // Debounce: Don't fetch if we just updated locally within the last 10 seconds
     const now = Date.now();
     if (!force && now - lastFetchTimeRef.current < 10000) {
       console.log('⏭️ Skipping admin support fetch - too soon after local update');
@@ -31,82 +131,63 @@ export const useAdminSupportNotifications = () => {
     }
 
     try {
-      // Get conversations to find admin support unread count
       const response = await messagingService.getConversations();
       if (response.success) {
-        // Calculate total unread messages from admin conversations
-        const totalUnread = response.data.reduce((sum, conv) => sum + conv.unread_count, 0);
-        console.log('📬 Fetched admin support unread count from server:', totalUnread);
-        
-        // Only update if different to prevent unnecessary re-renders
-        setAdminSupportUnreadCount(prevCount => {
-          if (prevCount !== totalUnread) {
-            console.log(`📬 Admin support count different, updating: ${prevCount} -> ${totalUnread}`);
-            setHasNotification(totalUnread > 0);
-            return totalUnread;
-          }
-          console.log('📬 Admin support count same as local, no update needed');
-          return prevCount;
-        });
+        lastFetchTimeRef.current = now;
+        lastConversationsRef.current = response.data;
+        const serverUnread = response.data.reduce((sum, conv) => sum + (conv.unread_count || 0), 0);
+        baseUnreadRef.current = serverUnread;
+        console.log('📬 Fetched admin support unread count from server:', serverUnread);
+        recomputeTotal(serverUnread, response.data);
+        pendingUpdateRef.current = false;
       }
     } catch (error) {
       console.error('Error fetching admin support unread count:', error);
-      // Keep the existing count on error
     }
-  };
+  }, [user, recomputeTotal]);
 
   const clearNotification = useCallback(() => {
     console.log('🔔 Clearing admin support notification');
     setHasNotification(false);
-    // Don't reset the count to 0, just hide the notification
-    // The count will be updated when messages are actually marked as read
   }, []);
 
   useEffect(() => {
     if (!user) {
+      baseUnreadRef.current = 0;
+      lastConversationsRef.current = [];
       setAdminSupportUnreadCount(0);
       setHasNotification(false);
       return;
     }
 
-    // Initial fetch
+    baseUnreadRef.current = 0;
+    lastConversationsRef.current = [];
+    recomputeTotal(0);
     fetchAdminSupportUnreadCount();
 
-    // Set up WebSocket listeners for real-time updates
     const handleNewMessage = (data: any) => {
       console.log('📨 New admin support message received, updating notification');
-      // Increment unread count if the message is for the current user (from admin)
       if (data.message && data.message.recipient_id === user.id) {
-        setAdminSupportUnreadCount(prev => {
-          const newCount = prev + 1;
-          setHasNotification(true);
-          return newCount;
-        });
+        baseUnreadRef.current += 1;
+        recomputeTotal(baseUnreadRef.current);
       }
     };
 
     const handleMessagesRead = (data: any) => {
       console.log('✅ Admin support messages marked as read, data:', data);
       
-      // Mark that we have a pending local update
       pendingUpdateRef.current = true;
       lastFetchTimeRef.current = Date.now();
       
-      // Directly decrement based on count if provided
       if (data.count !== undefined && data.count > 0) {
-        setAdminSupportUnreadCount(prev => {
-          const newCount = Math.max(0, prev - data.count);
-          console.log(`📬 Decrementing admin support unread locally: ${prev} - ${data.count} = ${newCount}`);
-          setHasNotification(newCount > 0);
-          return newCount;
-        });
-        
-        // Clear pending flag after 15 seconds
+        baseUnreadRef.current = Math.max(0, baseUnreadRef.current - data.count);
+        console.log(`📬 Adjusting base unread count locally: ${baseUnreadRef.current}`);
+        recomputeTotal(baseUnreadRef.current);
+
         setTimeout(() => {
           pendingUpdateRef.current = false;
         }, 15000);
       } else {
-        // Fallback: fetch from server after ensuring backend has updated
         setTimeout(() => {
           pendingUpdateRef.current = false;
           fetchAdminSupportUnreadCount(true);
@@ -114,27 +195,33 @@ export const useAdminSupportNotifications = () => {
       }
     };
 
-    const handleMessageSent = (data: any) => {
-      // When user sends a message, it doesn't affect their unread count
+    const handleMessageSent = () => {
       console.log('📤 Admin support message sent confirmation');
     };
 
-    // Subscribe to WebSocket events
+    const handleManualChange = () => {
+      console.log('📌 Manual admin support follow-up change detected, recomputing badge count');
+      recomputeTotal(baseUnreadRef.current);
+    };
+
     websocketService.onNewMessage(handleNewMessage);
     websocketService.onMessagesRead(handleMessagesRead);
     websocketService.onMessageSent(handleMessageSent);
+    if (typeof window !== 'undefined') {
+      window.addEventListener(MANUAL_EVENT_NAME, handleManualChange);
+    }
 
-    // Refresh unread count periodically (every 60 seconds) as a fallback
     const interval = setInterval(() => {
       fetchAdminSupportUnreadCount(true);
     }, 60000);
 
     return () => {
       clearInterval(interval);
-      // Note: We don't unsubscribe from websocket events here as they might be used by other components
-      // The websocket service handles cleanup when the connection is closed
+      if (typeof window !== 'undefined') {
+        window.removeEventListener(MANUAL_EVENT_NAME, handleManualChange);
+      }
     };
-  }, [user]);
+  }, [user, fetchAdminSupportUnreadCount, recomputeTotal]);
 
   return {
     adminSupportUnreadCount,
