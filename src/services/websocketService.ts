@@ -290,6 +290,10 @@ class WebSocketService {
     this.socket?.on('message_status_updated', callback);
   }
 
+  onMessageUpdated(callback: (data: { messageId: string; message: any; updatedBy: string }) => void): void {
+    this.socket?.on('message_updated', callback);
+  }
+
   onOnlineUsersUpdate(callback: (data: { users: OnlineUser[]; count: number }) => void): void {
     if (this.socket) {
       this.socket.on('online_users_for_messaging', callback);
@@ -347,6 +351,10 @@ class WebSocketService {
 
   offMessageStatusUpdated(): void {
     this.socket?.off('message_status_updated');
+  }
+
+  offMessageUpdated(): void {
+    this.socket?.off('message_updated');
   }
 
   offOnlineUsersUpdate(): void {

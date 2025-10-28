@@ -516,6 +516,59 @@ class MessagingService {
   }
 
   /**
+   * Update message content (admin messages only)
+   * @param {string} messageId - Message ID
+   * @param {string} userId - Admin user ID performing the edit
+   * @param {string} newContent - New message content
+   * @returns {Promise<Object>} Updated message
+   */
+  async updateMessageContent(messageId, userId, newContent) {
+    try {
+      const user = await User.findById(userId);
+      if (!user || (user.role !== 'admin' && user.role !== 'superadmin')) {
+        throw new Error('Unauthorized: Admin access required');
+      }
+
+      const message = await DirectMessage.findById(messageId).populate([
+        { path: 'sender_id', select: 'firstName lastName email profilePicture role' },
+        { path: 'recipient_id', select: 'firstName lastName email profilePicture role' }
+      ]);
+
+      if (!message) {
+        throw new Error('Message not found');
+      }
+
+      if (message.is_deleted) {
+        throw new Error('Cannot edit a deleted message');
+      }
+
+      const senderRole = message.sender_id?.role;
+      if (senderRole !== 'admin' && senderRole !== 'superadmin') {
+        throw new Error('Only admin messages can be edited');
+      }
+
+      const trimmedContent = (newContent || '').trim();
+      if (!trimmedContent) {
+        throw new Error('Message content is required');
+      }
+
+      if (trimmedContent.length > 2000) {
+        throw new Error('Message cannot exceed 2000 characters');
+      }
+
+      message.message = trimmedContent;
+      message.is_edited = true;
+      message.edited_at = new Date();
+      await message.save();
+
+      return message;
+    } catch (error) {
+      console.error('Error in updateMessageContent:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Get all users for admin messaging
    * @param {string} currentUserId - Current admin user ID
    * @param {Object} options - Query options

@@ -183,6 +183,23 @@ const validateUpdateMessageStatus = [
   handleValidationErrors
 ];
 
+const validateUpdateMessageContent = [
+  param('messageId')
+    .notEmpty()
+    .withMessage('Message ID is required')
+    .isMongoId()
+    .withMessage('Invalid message ID format'),
+
+  body('message')
+    .notEmpty()
+    .withMessage('Message content is required')
+    .isLength({ min: 1, max: 2000 })
+    .withMessage('Message must be between 1 and 2000 characters')
+    .trim(),
+
+  handleValidationErrors
+];
+
 // Custom validation for message ownership
 const validateMessageOwnership = async (req, res, next) => {
   try {
@@ -302,6 +319,7 @@ module.exports = {
   validateDeleteMessage,
   validateSearchMessages,
   validateUpdateMessageStatus,
+  validateUpdateMessageContent,
   validateMessageOwnership,
   validateConversationAccess,
   messageRateLimit,

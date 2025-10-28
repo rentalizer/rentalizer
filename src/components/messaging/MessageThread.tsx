@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { User, Send, Paperclip, MoreVertical, Clock, Check, CheckCheck, MessageCircle, Bookmark, BookmarkCheck } from 'lucide-react';
+import { User, Send, Paperclip, MoreVertical, Clock, Check, CheckCheck, MessageCircle, Bookmark, BookmarkCheck, Pencil, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { formatDistanceToNow } from 'date-fns';
 import { Message as ApiMessage } from '@/services/messagingService';
 import { formatDateWithTimezone } from '@/utils/timezone';
+import { Textarea } from '@/components/ui/textarea';
 
 export interface Message {
   _id: string;
@@ -46,6 +47,8 @@ interface MessageThreadProps {
   canToggleManualUnread?: boolean;
   manualUnreadMessageIds?: string[];
   onToggleManualUnreadMessage?: (messageId: string) => void;
+  onEditMessage?: (messageId: string, newContent: string) => Promise<void> | void;
+  pendingEditMessageId?: string;
 }
 
 export default function MessageThread({
@@ -66,10 +69,15 @@ export default function MessageThread({
   isManualUnread,
   canToggleManualUnread = true,
   manualUnreadMessageIds,
-  onToggleManualUnreadMessage
+  onToggleManualUnreadMessage,
+  onEditMessage,
+  pendingEditMessageId
 }: MessageThreadProps) {
   const [newMessage, setNewMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState('');
+  const [editError, setEditError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -139,6 +147,39 @@ export default function MessageThread({
       }
     }
   };
+
+  const beginEditingMessage = (message: Message) => {
+    setEditingMessageId(message._id);
+    setEditDraft(message.message);
+    setEditError(null);
+  };
+
+  const cancelEditingMessage = () => {
+    setEditingMessageId(null);
+    setEditDraft('');
+    setEditError(null);
+  };
+
+  const handleSaveEditedMessage = async () => {
+    if (!editingMessageId || !onEditMessage) return;
+    const trimmed = editDraft.trim();
+    if (!trimmed) {
+      setEditError('Message content cannot be empty.');
+      return;
+    }
+
+    try {
+      await onEditMessage(editingMessageId, trimmed);
+      setEditingMessageId(null);
+      setEditDraft('');
+      setEditError(null);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to update message.';
+      setEditError(message);
+    }
+  };
+
+  const isSavingEdit = editingMessageId ? pendingEditMessageId === editingMessageId : false;
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -251,6 +292,9 @@ export default function MessageThread({
               : 'bg-slate-700';
             const bubbleMarginClass = isAdminSender ? '' : 'ml-3';
             const metadataMarginClass = isAdminSender ? '' : 'ml-3';
+            const isEditing = editingMessageId === message._id;
+            const hasBeenEdited = Boolean(message.is_edited || message.edited_at || (message as { editedAt?: string }).editedAt);
+            const canEditMessage = Boolean(isAdmin && onEditMessage && adminUserId && message.sender_id === adminUserId);
             
             // Debug logging
             console.log('Message alignment check:', {
@@ -325,21 +369,71 @@ export default function MessageThread({
                     <div
                       className={`p-3 rounded-lg text-white ${bubbleHighlightClass} ${bubbleMarginClass}`}
                     >
-                      <p className="text-sm whitespace-pre-line">{message.message}</p>
-                      {isManualFollowUp && (
-                        <span className="mt-2 inline-flex items-center gap-1 text-[11px] uppercase tracking-wide text-yellow-300">
-                          <BookmarkCheck className="h-3 w-3" />
-                          Flagged for follow-up
-                        </span>
+                      {isEditing ? (
+                        <>
+                          <Textarea
+                            value={editDraft}
+                            onChange={(event) => setEditDraft(event.target.value)}
+                            onKeyDown={(event) => {
+                              if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                                event.preventDefault();
+                                void handleSaveEditedMessage();
+                              }
+                            }}
+                            disabled={isSavingEdit}
+                            className="min-h-[90px] bg-slate-800 border-slate-600 text-white"
+                          />
+                          {editError && (
+                            <p className="mt-2 text-xs text-red-400">{editError}</p>
+                          )}
+                          <div className="mt-3 flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleSaveEditedMessage}
+                              disabled={isSavingEdit}
+                              className="border-cyan-500/40 text-cyan-200 hover:bg-cyan-500/10"
+                            >
+                              {isSavingEdit && (
+                                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                              )}
+                              Save
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={cancelEditingMessage}
+                              disabled={isSavingEdit}
+                              className="text-slate-300 hover:text-white"
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-sm whitespace-pre-line">{message.message}</p>
+                          {isManualFollowUp && (
+                            <span className="mt-2 inline-flex items-center gap-1 text-[11px] uppercase tracking-wide text-yellow-300">
+                              <BookmarkCheck className="h-3 w-3" />
+                              Flagged for follow-up
+                            </span>
+                          )}
+                        </>
                       )}
                     </div>
                   
                   {/* Message metadata */}
                   <div className={`flex items-center gap-2 mt-1 text-xs text-slate-400 flex-wrap ${metadataMarginClass}`}>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                       <span title={formatDateWithTimezone(message.created_at || message.createdAt || '')}>
                         {formatLastMessageTime(message.created_at || message.createdAt || '')}
                       </span>
+                      {hasBeenEdited && !isEditing && (
+                        <span className="text-[11px] uppercase tracking-wide text-slate-400">
+                          Edited
+                        </span>
+                      )}
                     
                       {/* Read status for own messages (kept but alignment unified) */}
                       {isOwn && (
@@ -370,24 +464,40 @@ export default function MessageThread({
                       }`} />
                     ) : null}
 
-                    {isAdmin && onToggleManualUnreadMessage && (
+                    {(isAdmin && (canEditMessage || onToggleManualUnreadMessage)) && (
                       <div className="flex items-center gap-1 ml-auto">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className={`h-7 w-7 ${isManualFollowUp ? 'text-yellow-300 hover:text-yellow-200 hover:bg-yellow-500/10' : 'text-slate-400 hover:text-cyan-200 hover:bg-cyan-500/10'}`}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            onToggleManualUnreadMessage(message._id);
-                          }}
-                          title={isManualFollowUp ? 'Clear follow-up flag' : 'Flag for follow-up'}
-                        >
-                          {isManualFollowUp ? (
-                            <BookmarkCheck className="h-4 w-4" />
-                          ) : (
-                            <Bookmark className="h-4 w-4" />
-                          )}
-                        </Button>
+                        {canEditMessage && !isEditing && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 text-slate-400 hover:text-cyan-200 hover:bg-cyan-500/10"
+                            onClick={(event) => {
+                              event.preventDefault();
+                              beginEditingMessage(message);
+                            }}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {onToggleManualUnreadMessage && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className={`h-7 w-7 ${isManualFollowUp ? 'text-yellow-300 hover:text-yellow-200 hover:bg-yellow-500/10' : 'text-slate-400 hover:text-cyan-200 hover:bg-cyan-500/10'}`}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              onToggleManualUnreadMessage(message._id);
+                            }}
+                            title={isManualFollowUp ? 'Clear follow-up flag' : 'Flag for follow-up'}
+                            disabled={isSavingEdit}
+                          >
+                            {isManualFollowUp ? (
+                              <BookmarkCheck className="h-4 w-4" />
+                            ) : (
+                              <Bookmark className="h-4 w-4" />
+                            )}
+                          </Button>
+                        )}
                       </div>
                     )}
                   </div>

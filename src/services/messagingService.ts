@@ -59,6 +59,9 @@ export interface Message {
   // Fallback for old field names
   createdAt?: string;
   updatedAt?: string;
+  is_edited?: boolean;
+  edited_at?: string | null;
+  editedAt?: string | null;
 }
 
 export interface Conversation {
@@ -200,6 +203,14 @@ class MessagingService {
    */
   async deleteMessage(messageId: string): Promise<ApiResponse<any>> {
     const response = await messagingAPI.delete(`/${messageId}`);
+    return response.data;
+  }
+
+  /**
+   * Update message content (admin only)
+   */
+  async updateMessageContent(messageId: string, message: string): Promise<ApiResponse<Message>> {
+    const response = await messagingAPI.put(`/${messageId}`, { message });
     return response.data;
   }
 

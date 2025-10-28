@@ -44,8 +44,46 @@ export default function AdminSupportMessaging({
   const [showMembersPanel, setShowMembersPanel] = useState(false);
   const [manualUnreadConversationIds, setManualUnreadConversationIds] = useState<string[]>([]);
   const [manualUnreadMessageMap, setManualUnreadMessageMap] = useState<Record<string, string[]>>({});
+  const [updatingMessageId, setUpdatingMessageId] = useState<string | null>(null);
 
   const manualUnreadSet = useMemo(() => new Set(manualUnreadConversationIds), [manualUnreadConversationIds]);
+
+  const normalizeDirectMessage = useCallback((raw: any): Message => {
+    if (!raw) {
+      throw new Error('Invalid message payload');
+    }
+
+    const normalizeId = (value: any): string => {
+      if (!value) return '';
+      if (typeof value === 'string') return value;
+      if (typeof value === 'object') {
+        if (typeof value._id === 'string') return value._id;
+        if (typeof value.id === 'string') return value.id;
+        if (value.toString) return value.toString();
+      }
+      return String(value);
+    };
+
+    return {
+      _id: raw._id,
+      sender_id: normalizeId(raw.sender_id),
+      recipient_id: normalizeId(raw.recipient_id),
+      message: raw.message,
+      sender_name: raw.sender_name || '',
+      message_type: raw.message_type || 'text',
+      support_category: raw.support_category || 'general',
+      priority: raw.priority || 'medium',
+      status: raw.status || 'open',
+      read_at: raw.read_at || null,
+      created_at: raw.created_at || raw.createdAt || new Date().toISOString(),
+      updated_at: raw.updated_at || raw.updatedAt || raw.created_at || raw.createdAt || new Date().toISOString(),
+      createdAt: raw.createdAt,
+      updatedAt: raw.updatedAt,
+      is_edited: raw.is_edited ?? raw.isEdited ?? false,
+      edited_at: raw.edited_at || raw.editedAt || null,
+      editedAt: raw.editedAt || raw.edited_at || null
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -146,47 +184,46 @@ export default function AdminSupportMessaging({
     // New message received
     websocketService.onNewMessage((data) => {
       const newMessage = data.message;
+      const normalizedMessage = normalizeDirectMessage(newMessage);
       
       console.log('📨 Received new message via WebSocket:', {
-        messageId: newMessage._id,
-        sender_id: newMessage.sender_id,
-        sender_idType: typeof newMessage.sender_id,
+        messageId: normalizedMessage._id,
+        sender_id: normalizedMessage.sender_id,
+        sender_idType: typeof normalizedMessage.sender_id,
         currentUserId: user?.id,
         currentUserIdType: typeof user?.id,
-        created_at: newMessage.created_at,
-        createdAt: (newMessage as { createdAt?: string }).createdAt,
-        message: newMessage.message,
+        created_at: normalizedMessage.created_at,
+        message: normalizedMessage.message,
         fullMessage: newMessage
       });
       
-      // Add to messages if it's for current conversation
       setMessages(prev => {
-        const exists = prev.some(msg => msg._id === newMessage._id);
+        const exists = prev.some(msg => msg._id === normalizedMessage._id);
         if (exists) return prev;
         
-        // Check if message is for current conversation
         const isForCurrentConversation = selectedMemberId && 
-          (newMessage.sender_id === selectedMemberId || newMessage.recipient_id === selectedMemberId);
+          (normalizedMessage.sender_id === selectedMemberId || normalizedMessage.recipient_id === selectedMemberId);
         
         if (isForCurrentConversation) {
-          return [...prev, newMessage as Message];
+          return [...prev, normalizedMessage];
         }
         
         return prev;
       });
 
-      // Update conversations list without full reload
       setConversations(prev => {
-        const senderId = newMessage.sender_id;
-        const recipientId = newMessage.recipient_id;
+        const senderId = normalizedMessage.sender_id;
+        const recipientId = normalizedMessage.recipient_id;
         const otherUserId = senderId === user?.id ? recipientId : senderId;
 
         const updated = prev.map(conv => {
           if (conv.participant_id === otherUserId) {
             return {
               ...conv,
-              last_message: newMessage,
-              // Only increment unread if we're not currently viewing this conversation
+              last_message: {
+                ...(conv.last_message || {}),
+                ...normalizedMessage
+              },
               unread_count: selectedMemberId === otherUserId ? conv.unread_count : conv.unread_count + 1
             };
           }
@@ -200,19 +237,20 @@ export default function AdminSupportMessaging({
     // Message sent confirmation
     websocketService.onMessageSent((data) => {
       if (data.message) {
+        const normalized = normalizeDirectMessage(data.message);
         console.log('✅ Message sent confirmation via WebSocket:', {
-          messageId: data.message._id,
-          sender_id: data.message.sender_id,
-          sender_idType: typeof data.message.sender_id,
+          messageId: normalized._id,
+          sender_id: normalized.sender_id,
+          sender_idType: typeof normalized.sender_id,
           currentUserId: user?.id,
           currentUserIdType: typeof user?.id,
-          created_at: data.message.created_at,
-          message: data.message.message
+          created_at: normalized.created_at,
+          message: normalized.message
         });
         
         setMessages(prev => {
-          const exists = prev.some(msg => msg._id === data.message._id);
-          return exists ? prev : [...prev, data.message as Message];
+          const exists = prev.some(msg => msg._id === normalized._id);
+          return exists ? prev : [...prev, normalized];
         });
       }
     });
@@ -268,6 +306,32 @@ export default function AdminSupportMessaging({
       }
     });
 
+    websocketService.onMessageUpdated((data) => {
+      const normalized = normalizeDirectMessage(data.message);
+      console.log('✏️ Message updated via WebSocket:', {
+        messageId: normalized._id,
+        updatedBy: data.updatedBy,
+        content: normalized.message
+      });
+
+      setMessages(prev => prev.map(msg => 
+        msg._id === normalized._id ? { ...msg, ...normalized } : msg
+      ));
+
+      setConversations(prev => prev.map(conv => {
+        if (conv.last_message && (conv.last_message._id === normalized._id || conv.last_message.id === normalized._id)) {
+          return {
+            ...conv,
+            last_message: {
+              ...conv.last_message,
+              ...normalized
+            }
+          };
+        }
+        return conv;
+      }));
+    });
+
     // Message deleted
     websocketService.onMessageDeleted((data) => {
       setMessages(prev => prev.filter(msg => msg._id !== data.messageId));
@@ -299,7 +363,7 @@ export default function AdminSupportMessaging({
     websocketService.onError((error) => {
       console.error('WebSocket error:', error);
     });
-  }, [user?.id, selectedMemberId, loadConversations, persistManualUnread, persistManualUnreadMessages]);
+  }, [user?.id, selectedMemberId, loadConversations, persistManualUnread, persistManualUnreadMessages, normalizeDirectMessage, emitManualUnreadChange]);
 
   // Initialize WebSocket connection
   useEffect(() => {
@@ -552,6 +616,51 @@ export default function AdminSupportMessaging({
       });
     }
   }, [isAdmin, initialMessageUserId, initialMessageUserName, fromDiscussion, selectedMemberId, toast]);
+
+  const handleEditMessageContent = useCallback(async (messageId: string, content: string) => {
+    const trimmed = content.trim();
+    if (!trimmed) {
+      const error = new Error('Message content cannot be empty.');
+      throw error;
+    }
+
+    try {
+      setUpdatingMessageId(messageId);
+      const response = await messagingService.updateMessageContent(messageId, trimmed);
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to update message content.');
+      }
+      const updatedMessage = normalizeDirectMessage(response.data);
+
+      setMessages(prev => prev.map(msg => 
+        msg._id === updatedMessage._id ? { ...msg, ...updatedMessage } : msg
+      ));
+
+      setConversations(prev => prev.map(conv => {
+        if (conv.last_message && (conv.last_message._id === updatedMessage._id || (conv.last_message as unknown as { id?: string }).id === updatedMessage._id)) {
+          return {
+            ...conv,
+            last_message: {
+              ...conv.last_message,
+              ...updatedMessage
+            }
+          };
+        }
+        return conv;
+      }));
+    } catch (error: unknown) {
+      console.error('Error updating message content:', error);
+      const description = error instanceof Error ? error.message : 'Unable to update the message right now.';
+      toast({
+        title: 'Edit failed',
+        description,
+        variant: 'destructive'
+      });
+      throw (error instanceof Error ? error : new Error(description));
+    } finally {
+      setUpdatingMessageId(null);
+    }
+  }, [normalizeDirectMessage, toast]);
 
   // Send message
   const handleSendMessage = useCallback(async (messageContent: string) => {
@@ -835,6 +944,8 @@ export default function AdminSupportMessaging({
             canToggleManualUnread={canToggleManualUnread}
             manualUnreadMessageIds={selectedManualMessageIds}
             onToggleManualUnreadMessage={handleToggleManualUnreadMessage}
+            onEditMessage={handleEditMessageContent}
+            pendingEditMessageId={updatingMessageId || undefined}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center bg-slate-800/90">

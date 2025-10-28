@@ -13,6 +13,7 @@ const {
   validateDeleteMessage,
   validateSearchMessages,
   validateUpdateMessageStatus,
+  validateUpdateMessageContent,
   validateMessageOwnership,
   validateConversationAccess,
   messageRateLimit
@@ -185,6 +186,19 @@ router.put(
   validateUpdateMessageStatus,
   validateMessageOwnership,
   directMessageController.updateMessageStatus
+);
+
+/**
+ * @route   PUT /api/messages/:messageId
+ * @desc    Update message content (admin messages only)
+ * @access  Private (Admin only)
+ */
+router.put(
+  '/:messageId',
+  requireAdmin,
+  validateUpdateMessageContent,
+  validateMessageOwnership,
+  directMessageController.updateMessageContent
 );
 
 module.exports = router;

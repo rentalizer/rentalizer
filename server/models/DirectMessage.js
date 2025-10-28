@@ -79,6 +79,14 @@ const directMessageSchema = new mongoose.Schema({
     type: String,
     enum: ['open', 'in_progress', 'resolved', 'closed'],
     default: 'open'
+  },
+  is_edited: {
+    type: Boolean,
+    default: false
+  },
+  edited_at: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }

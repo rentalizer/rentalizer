@@ -404,6 +404,57 @@ class DirectMessageController {
   }
 
   /**
+   * Update message content (admin only)
+   * PUT /api/messages/:messageId
+   */
+  async updateMessageContent(req, res) {
+    try {
+      const userId = req.user.id;
+      const { messageId } = req.params;
+      const { message } = req.body;
+
+      const updatedMessage = await messagingService.updateMessageContent(messageId, userId, message);
+
+      const io = req.app.get('io');
+      if (io) {
+        const normalizeId = (value) => {
+          if (!value) return null;
+          if (typeof value === 'string') return value;
+          if (value._id) return value._id.toString();
+          return value.toString();
+        };
+        const participants = [
+          normalizeId(updatedMessage.sender_id),
+          normalizeId(updatedMessage.recipient_id)
+        ].filter(Boolean);
+        participants.forEach(participantId => {
+          io.to(`user_${participantId}`).emit('message_updated', {
+            messageId,
+            message: updatedMessage,
+            updatedBy: userId
+          });
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Message updated successfully',
+        data: updatedMessage
+      });
+    } catch (error) {
+      console.error('Error updating message content:', error);
+      const statusCode = error.message.includes('not found') ? 404 :
+        error.message.includes('Unauthorized') ? 403 :
+        error.message.includes('Cannot edit') ? 400 : 400;
+
+      res.status(statusCode).json({
+        success: false,
+        message: error.message || 'Failed to update message content'
+      });
+    }
+  }
+
+  /**
    * Get support categories
    * GET /api/messages/support-categories
    */
