@@ -310,7 +310,7 @@ export default function MessageThread({
                 key={message._id}
                 className={`flex justify-start`}
               >
-                <div className="flex items-start gap-2 max-w-[85%]">
+                <div className="flex items-start gap-2 max-w-[85%] lg:max-w-[65%]">
                   {/* Per-message avatar on the left */}
                   <div className="flex-shrink-0 mt-0.5">
                     {adminUserId && message.sender_id === adminUserId ? (
@@ -367,11 +367,14 @@ export default function MessageThread({
 
                   <div className={`flex-1 max-w-full flex flex-col items-start`}>
                     <div
-                      className={`p-3 rounded-lg text-white ${bubbleHighlightClass} ${bubbleMarginClass}`}
+                      className={`p-3 rounded-lg text-white ${bubbleHighlightClass} ${bubbleMarginClass} ${
+                        isEditing ? 'w-full sm:min-w-[20rem] md:min-w-[28rem] lg:min-w-[32rem]' : ''
+                      }`}
                     >
                       {isEditing ? (
                         <>
                           <Textarea
+                            className="w-full min-h-[120px] sm:min-h-[140px] bg-slate-800 border-slate-600 text-white"
                             value={editDraft}
                             onChange={(event) => setEditDraft(event.target.value)}
                             onKeyDown={(event) => {
@@ -381,7 +384,6 @@ export default function MessageThread({
                               }
                             }}
                             disabled={isSavingEdit}
-                            className="min-h-[90px] bg-slate-800 border-slate-600 text-white"
                           />
                           {editError && (
                             <p className="mt-2 text-xs text-red-400">{editError}</p>
