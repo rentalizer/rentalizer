@@ -2,10 +2,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import messagingService, { Conversation } from '@/services/messagingService';
 import websocketService from '@/services/websocketService';
+import { subscribeManualUnread } from '@/lib/adminSupportManualUnreadBus';
 
 const MANUAL_UNREAD_STORAGE_KEY = 'rentalizerAdminSupportManualUnread';
 const MANUAL_UNREAD_MESSAGES_STORAGE_KEY = 'rentalizerAdminSupportManualUnreadMessages';
-const MANUAL_EVENT_NAME = 'admin-support-manual-unread-change';
 
 export const useAdminSupportNotifications = () => {
   const [adminSupportUnreadCount, setAdminSupportUnreadCount] = useState(0);
@@ -207,9 +207,7 @@ export const useAdminSupportNotifications = () => {
     websocketService.onNewMessage(handleNewMessage);
     websocketService.onMessagesRead(handleMessagesRead);
     websocketService.onMessageSent(handleMessageSent);
-    if (typeof window !== 'undefined') {
-      window.addEventListener(MANUAL_EVENT_NAME, handleManualChange);
-    }
+    const unsubscribeManual = subscribeManualUnread(handleManualChange);
 
     const interval = setInterval(() => {
       fetchAdminSupportUnreadCount(true);
@@ -217,9 +215,7 @@ export const useAdminSupportNotifications = () => {
 
     return () => {
       clearInterval(interval);
-      if (typeof window !== 'undefined') {
-        window.removeEventListener(MANUAL_EVENT_NAME, handleManualChange);
-      }
+      unsubscribeManual();
     };
   }, [user, fetchAdminSupportUnreadCount, recomputeTotal]);
 

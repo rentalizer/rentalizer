@@ -10,6 +10,7 @@ import MessageThread, { Message } from './MessageThread';
 import MembersList from './MembersList';
 import messagingService, { Conversation, AdminUser } from '@/services/messagingService';
 import websocketService from '@/services/websocketService';
+import { emitManualUnreadChange } from '@/lib/adminSupportManualUnreadBus';
 
 const MANUAL_UNREAD_STORAGE_KEY = 'rentalizerAdminSupportManualUnread';
 const MANUAL_UNREAD_MESSAGES_STORAGE_KEY = 'rentalizerAdminSupportManualUnreadMessages';
@@ -91,13 +92,6 @@ export default function AdminSupportMessaging({
   const persistManualUnreadMessages = useCallback((map: Record<string, string[]>) => {
     if (typeof window === 'undefined') return;
     window.localStorage.setItem(MANUAL_UNREAD_MESSAGES_STORAGE_KEY, JSON.stringify(map));
-  }, []);
-
-  const notifyManualUnreadChange = useCallback((conversationId?: string) => {
-    if (typeof window === 'undefined') return;
-    window.dispatchEvent(new CustomEvent('admin-support-manual-unread-change', {
-      detail: { conversationId }
-    }));
   }, []);
 
   // Load conversations or all users (for admins)
@@ -258,7 +252,7 @@ export default function AdminSupportMessaging({
             if (!prev.includes(data.userId)) return prev;
             const updated = prev.filter(id => id !== data.userId);
             persistManualUnread(updated);
-            notifyManualUnreadChange(data.userId);
+            emitManualUnreadChange({ conversationId: data.userId });
             return updated;
           });
           setManualUnreadMessageMap(prev => {
@@ -267,7 +261,7 @@ export default function AdminSupportMessaging({
             const updated = { ...prev };
             delete updated[data.userId];
             persistManualUnreadMessages(updated);
-            notifyManualUnreadChange(data.userId);
+            emitManualUnreadChange({ conversationId: data.userId });
             return updated;
           });
         }
@@ -348,20 +342,20 @@ export default function AdminSupportMessaging({
       if (prev.includes(conversationId)) return prev;
       const updated = [...prev, conversationId];
       persistManualUnread(updated);
-      notifyManualUnreadChange(conversationId);
+      emitManualUnreadChange({ conversationId });
       return updated;
     });
-  }, [persistManualUnread, notifyManualUnreadChange]);
+  }, [persistManualUnread]);
 
   const clearConversationFollowUp = useCallback((conversationId: string) => {
     setManualUnreadConversationIds(prev => {
       if (!prev.includes(conversationId)) return prev;
       const updated = prev.filter(id => id !== conversationId);
       persistManualUnread(updated);
-      notifyManualUnreadChange(conversationId);
+      emitManualUnreadChange({ conversationId });
       return updated;
     });
-  }, [persistManualUnread, notifyManualUnreadChange]);
+  }, [persistManualUnread]);
 
   const clearManualUnreadMessagesForConversation = useCallback((conversationId: string) => {
     setManualUnreadMessageMap(prev => {
@@ -369,10 +363,10 @@ export default function AdminSupportMessaging({
       const updated = { ...prev };
       delete updated[conversationId];
       persistManualUnreadMessages(updated);
-      notifyManualUnreadChange(conversationId);
+      emitManualUnreadChange({ conversationId });
       return updated;
     });
-  }, [persistManualUnreadMessages, notifyManualUnreadChange]);
+  }, [persistManualUnreadMessages]);
 
   const toggleManualUnreadMessage = useCallback((conversationId: string, messageId: string) => {
     setManualUnreadMessageMap(prev => {
@@ -389,10 +383,10 @@ export default function AdminSupportMessaging({
         delete next[conversationId];
       }
       persistManualUnreadMessages(next);
-      notifyManualUnreadChange(conversationId);
+      emitManualUnreadChange({ conversationId });
       return next;
     });
-  }, [persistManualUnreadMessages, notifyManualUnreadChange]);
+  }, [persistManualUnreadMessages]);
 
   // Mark conversation as read
   const handleMarkAsRead = useCallback(async () => {
