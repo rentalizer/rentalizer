@@ -11,6 +11,8 @@ import { useQuery } from '@tanstack/react-query';
 import apiService from '@/services/api';
 import { formatDistanceToNow } from 'date-fns';
 
+const READ_DISCUSSION_STORAGE_KEY = 'rentalizerAdminDiscussionReadIds';
+
 export const TopNavBar = () => {
   const { user, signOut, isLoading } = useAuth();
   const { isAdmin } = useAdminRole();
@@ -32,46 +34,97 @@ export const TopNavBar = () => {
 
   const recentPosts = recentPostsData?.data?.slice(0, 5) ?? [];
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [lastReadTimestamp, setLastReadTimestamp] = useState<number>(0);
+  const [readNotificationIds, setReadNotificationIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const stored = window.localStorage.getItem('rentalizerAdminDiscussionLastRead');
-    if (stored) {
-      const parsed = Number.parseInt(stored, 10);
-      if (!Number.isNaN(parsed)) {
-        setLastReadTimestamp(parsed);
+    const stored = window.localStorage.getItem(READ_DISCUSSION_STORAGE_KEY);
+    if (!stored) return;
+
+    try {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) {
+        setReadNotificationIds(parsed.filter((id): id is string => typeof id === 'string'));
+      }
+    } catch (error) {
+      console.error('Failed to parse stored notification ids', error);
+    }
+  }, []);
+
+  const readIdsSet = useMemo(() => new Set(readNotificationIds), [readNotificationIds]);
+
+  const getNotificationId = useCallback((post: any) => {
+    const id = post?._id || post?.id;
+    if (id) {
+      const normalizedId = typeof id === 'string' ? id : String(id);
+      if (normalizedId.trim() !== '') {
+        return normalizedId;
       }
     }
+
+    const createdAt = post?.created_at || post?.createdAt;
+    const title = post?.title;
+    if (createdAt || title) {
+      return `${createdAt ?? 'unknown'}-${title ?? 'untitled'}`;
+    }
+
+    return undefined;
   }, []);
 
   const unreadCount = useMemo(() => {
     if (!recentPosts.length) return 0;
     return recentPosts.reduce((count, post) => {
-      const createdAtRaw = post.created_at || post.createdAt;
-      const createdAt = createdAtRaw ? new Date(createdAtRaw).getTime() : 0;
-      if (!createdAt) return count;
-      return createdAt > lastReadTimestamp ? count + 1 : count;
+      const notificationId = getNotificationId(post);
+      if (!notificationId) return count;
+      return readIdsSet.has(notificationId) ? count : count + 1;
     }, 0);
-  }, [recentPosts, lastReadTimestamp]);
+  }, [recentPosts, readIdsSet, getNotificationId]);
 
-  const markNotificationsRead = useCallback(() => {
-    const now = Date.now();
-    setLastReadTimestamp(now);
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('rentalizerAdminDiscussionLastRead', String(now));
-    }
-  }, []);
+  const markNotificationRead = useCallback((post: any) => {
+    const notificationId = getNotificationId(post);
+    if (!notificationId) return;
+
+    setReadNotificationIds(prev => {
+      if (prev.includes(notificationId)) {
+        return prev;
+      }
+
+      const updated = [...prev, notificationId];
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(READ_DISCUSSION_STORAGE_KEY, JSON.stringify(updated));
+      }
+      return updated;
+    });
+  }, [getNotificationId]);
+
+  const handleClearAllNotifications = useCallback(() => {
+    setReadNotificationIds(prev => {
+      const merged = new Set(prev);
+      recentPosts.forEach(post => {
+        const id = getNotificationId(post);
+        if (id) {
+          merged.add(id);
+        }
+      });
+      const updated = Array.from(merged);
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(READ_DISCUSSION_STORAGE_KEY, JSON.stringify(updated));
+      }
+      return updated;
+    });
+  }, [getNotificationId, recentPosts]);
 
   const handleNotificationsOpenChange = useCallback(
     (open: boolean) => {
       setNotificationsOpen(open);
-      if (open) {
-        markNotificationsRead();
-      }
     },
-    [markNotificationsRead]
+    []
   );
+
+  const handleNotificationClick = useCallback((post: any) => {
+    markNotificationRead(post);
+    navigate('/community#discussions');
+  }, [markNotificationRead, navigate]);
 
   const handleSignOut = async () => {
     try {
@@ -157,7 +210,22 @@ export const TopNavBar = () => {
                         className="w-80 border border-slate-700/60 bg-slate-900/95 text-white shadow-xl backdrop-blur"
                       >
                       <DropdownMenuLabel className="text-xs uppercase tracking-wide text-slate-400">
-                        Recent Community Posts
+                        <div className="flex items-center justify-between">
+                          <span>Recent Community Posts</span>
+                          {unreadCount > 0 && (
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                handleClearAllNotifications();
+                              }}
+                              className="text-[11px] font-normal uppercase tracking-wide text-cyan-300 transition hover:text-cyan-200"
+                            >
+                              Clear All
+                            </button>
+                          )}
+                        </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator className="bg-slate-800/80" />
                       <div className="max-h-72 overflow-y-auto">
@@ -181,17 +249,32 @@ export const TopNavBar = () => {
                             const title = post.title || 'Untitled discussion';
                             const author = post.author_name || 'Community Member';
                             const key = post._id || post.id || `post-${index}`;
+                            const notificationId = getNotificationId(post);
+                            const isUnread = notificationId ? !readIdsSet.has(notificationId) : false;
 
                             return (
-                              <div
+                              <DropdownMenuItem
                                 key={key}
-                                className="flex flex-col items-start gap-1 rounded-md bg-transparent px-3 py-2 text-left text-sm"
+                                onSelect={(event) => {
+                                  event.preventDefault();
+                                  handleNotificationClick(post);
+                                }}
+                                className={`flex flex-col items-start gap-1 rounded-md px-3 py-2 text-left text-sm focus:bg-slate-800/80 ${
+                                  isUnread ? 'bg-slate-800/70 text-white' : 'bg-transparent text-slate-300'
+                                }`}
                               >
-                                <span className="w-full truncate font-medium text-white">{title}</span>
+                                <span className={`w-full truncate font-medium ${isUnread ? 'text-white' : 'text-slate-200'}`}>
+                                  {title}
+                                </span>
                                 <span className="w-full truncate text-xs text-slate-400">
                                   {author} • {timestamp}
                                 </span>
-                              </div>
+                                {isUnread && (
+                                  <span className="text-[11px] font-semibold uppercase tracking-wide text-cyan-300">
+                                    New
+                                  </span>
+                                )}
+                              </DropdownMenuItem>
                             );
                           })
                         )}
